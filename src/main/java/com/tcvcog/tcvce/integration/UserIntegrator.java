@@ -200,7 +200,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(1, usr.getUserID());
             rs = stmt.executeQuery();
             while(rs.next()){
-                ua = new UserAuthorized(usr);
+                ua = new UserAuthorized(getUser(usr.getUserID()));
                 ua = generateUserAuthorized(ua, rs);
             }
             
@@ -799,8 +799,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     public void updateUserLastUpdatedTS(int userID) throws IntegrationException{
          Connection con = getPostgresCon();
         
-         String query = "UPDATE public.login\n" +
-            "   SET lastudpatedts = now() WHERE userid = ?";
+         String query = "UPDATE public.login \n" +
+            "   SET lastupdatedts = now() WHERE userid = ?";
         
         PreparedStatement stmt = null;
         if(userID != 0){

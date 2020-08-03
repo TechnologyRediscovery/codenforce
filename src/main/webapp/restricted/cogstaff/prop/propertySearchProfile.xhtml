@@ -570,7 +570,7 @@
                                                                        actionListener="#{propertyProfileBB.onNoteInitButtonChange}"
                                                                        oncomplete="PF('propinfo-notes-dialog-var').show()"
                                                                        update="propinfo-note-create-form"/>
-
+                                                    <p:spacer height="5px" />
                                                     <div    id="propinf-ot-notes-div"
                                                             class="data_field"
                                                             style="clear:both;">
@@ -626,6 +626,21 @@
                                                 <div    id="prop-add-container-div"
                                                         class="ui-g data-container">
 
+                                                    <div    id="prop-add-muni-div"
+                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                                        <p:outputLabel  value="Municipality"
+                                                                        for="prop-add-muni-som"/>
+
+                                                        <h:selectOneMenu id="prop-add-muni-som"
+                                                                         value="#{propertyProfileBB.currentProperty.muni}" style="width:175px;height:25px">
+                                                            <f:converter converterId="muniConverter"/>
+                                                            <f:selectItems id="propinfoedit-muninamelist"
+                                                                           value="#{sessionBean.sessUser.authMuniList}"
+                                                                           var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
+
+                                                        </h:selectOneMenu>
+                                                    </div>
                                                     <div    id="prop-add-address-div"
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field">
                                                         <p:outputLabel value="Street Address"/>
@@ -648,34 +663,6 @@
 
                                                     </div>
 
-                                                    <div    id="prop-add-zip-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Zip Code"
-                                                                       for="prop-add-zip-it"
-                                                                       />
-
-                                                        <p:inputText    id="prop-add-zip-it"
-                                                                        value="#{propertyProfileBB.currentProperty.address_zip}"
-                                                                        />
-                                                    </div>
-
-                                                    <div    id="prop-add-muni-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel  value="Municipality"
-                                                                        for="prop-add-muni-som"/>
-
-                                                        <h:selectOneMenu id="prop-add-muni-som"
-                                                                         value="#{propertyProfileBB.currentProperty.muni}" style="width:175px;height:25px">
-                                                            <f:converter converterId="muniConverter"/>
-                                                            <f:selectItems id="propinfoedit-muninamelist"
-                                                                           value="#{sessionBean.sessUser.authMuniList}"
-                                                                           var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
-
-                                                        </h:selectOneMenu>
-                                                    </div>
-
                                                     <div    id="prop-add-state-div"
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
@@ -688,6 +675,19 @@
                                                                         />
 
                                                     </div>
+
+                                                    <div    id="prop-add-zip-div"
+                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                                        <p:outputLabel value="Zip Code"
+                                                                       for="prop-add-zip-it"
+                                                                       />
+
+                                                        <p:inputText    id="prop-add-zip-it"
+                                                                        value="#{propertyProfileBB.currentProperty.address_zip}"
+                                                                        />
+                                                    </div>
+
 
                                                     <div    id="prop-add-lab-div"
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field">
@@ -743,6 +743,7 @@
                                                         <h:selectOneMenu id="prop-add-condition-som"
                                                                          value="#{propertyProfileBB.currentProperty.condition}" style="width:175px;height:25px">
                                                             <f:converter converterId="intensityClassConverter"/>
+                                                            <f:selectItem itemLabel="select a muni..." noSelectionOption="true" />
                                                             <f:selectItems id="propinfoedit-condition-selitems"
                                                                            value="#{propertyProfileBB.conditionIntensityList}"
                                                                            var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
@@ -759,6 +760,7 @@
                                                         <h:selectOneMenu id="prop-add-landprospect-som"
                                                                          value="#{propertyProfileBB.currentProperty.landBankProspect}" style="width:175px;height:25px">
                                                             <f:converter converterId="intensityClassConverter"/>
+                                                            <f:selectItem itemLabel="select a muni..." noSelectionOption="true" />
                                                             <f:selectItems id="propinfoedit-landprospect-selitems"
                                                                            value="#{propertyProfileBB.landBankProspectIntensityList}"
                                                                            var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
@@ -775,6 +777,7 @@
                                                         <h:selectOneMenu id="prop-add-source-som"
                                                                          value="#{propertyProfileBB.currentProperty.bobSource}" style="width:175px;height:25px">
                                                             <f:converter converterId="bobSourceConverter"/>
+                                                            <f:selectItem itemLabel="select a muni..." noSelectionOption="true" />
                                                             <f:selectItems id="propinfoedit-sourcess-elitems"
                                                                            value="#{propertyProfileBB.sourceList}"
                                                                            var="bs" itemValue="#{bs}" itemLabel="#{bs.title}"/>

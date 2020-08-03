@@ -232,7 +232,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
      * Listener for user requests to create a note event on this property
      * @return redirection to the EventAdd page 
      */
-    public String onAddNoteButtonChange(){
+    public String onAddNoteEventButtonChange(){
         EventCoordinator ec = getEventCoordinator();
          
         try {

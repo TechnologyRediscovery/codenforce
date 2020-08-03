@@ -1668,6 +1668,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         CEActionRequestIntegrator cari = getcEActionRequestIntegrator();
 
         params.setCaseAttachment_ctl(false);
+        params.setRequestStatus_ctl(true);
         
         try {
             params.setRequestStatus_val(cari.getRequestStatus(Integer.parseInt(

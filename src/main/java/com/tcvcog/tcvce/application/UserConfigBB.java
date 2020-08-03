@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
@@ -36,10 +37,10 @@ import com.tcvcog.tcvce.entities.UserAuthorizedForConfig;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.integration.UserIntegrator;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -71,10 +72,12 @@ public class UserConfigBB extends BackingBeanUtils{
     private List<Municipality> muniCandidateList;
     
     private String formUsername;
-    private String formNotes;
+    private String formNoteText;
     private String formInvalidateRecordReason;
     
     private List<Person> userPersonList;
+    protected int personIDToLink;
+    protected boolean personLinkUseID;
     private Person selectedUserPerson;
     
       /**
@@ -111,6 +114,7 @@ public class UserConfigBB extends BackingBeanUtils{
                 userListForConfig = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
                 muniCandidateList = mc.getPermittedMunicipalityListForAdminMuniAssignment(getSessionBean().getSessUser());
                 roleTypeCandidateList = uc.auth_getPermittedRoleTypesToGrant(getSessionBean().getSessUser());
+                personLinkUseID = false;
             } else {
                 System.out.println("UserConfigBB.initBean: FATAL init error; null userconfig");
             }
@@ -182,11 +186,6 @@ public class UserConfigBB extends BackingBeanUtils{
         return PageModeEnum.LOOKUP.equals(currentMode) ;
     }
 
-    //check if current mode == Lookup
-    public boolean getActiveViewMode() {
-        // hard-wired on since there's always a property loaded
-        return true;
-    }
 
     //check if current mode == Insert
     public boolean getActiveInsertUpdateMode() {
@@ -217,6 +216,23 @@ public class UserConfigBB extends BackingBeanUtils{
             
             }
         }
+    }
+    
+    /**
+     * Functions to get a fresh copy of the user auth in config
+     */
+    private void reloadUserAuthorizedInConfig(){
+        UserCoordinator uc = getUserCoordinator();
+        try {
+            userAuthorizedInConfig = uc.user_transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser(), userAuthorizedInConfig);
+        } catch (AuthorizationException | IntegrationException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                    "FATAL: Unable to refresh current user; Apologies", ""));
+            
+        }
+        
     }
      
  
@@ -307,12 +323,14 @@ public class UserConfigBB extends BackingBeanUtils{
                 usr = uc.user_getUser(freshUserID);
                 freshUserPswd = uc.user_generateRandomPassword_SECURITYCRITICAL();
                 uc.user_updateUserPassword_SECURITYCRITICAL(usr, freshUserPswd);
+                
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Successfully added username " + usr.getUsername()
                                 + " to the system with an initial password of " + freshUserPswd, ""));
                 
             }
+            
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -351,6 +369,49 @@ public class UserConfigBB extends BackingBeanUtils{
         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Updated User", ""));
         //reminder: set muniManageSample in faces-config.xml
         //return to muniManage_sample.xhtml page
+        
+    }
+      /**
+     * Listener for commencement of note writing process
+     * @param ev 
+     */
+    public void onNoteInitButtonChange(ActionEvent ev){
+        formNoteText = new String();
+        
+    }
+    
+    
+    /**
+     * Listener for user requests to commit new note content to the current Property
+     * 
+     * @param ev 
+     */
+    public void onNoteCommitButtonChange(ActionEvent ev){
+        SystemCoordinator sc = getSystemCoordinator();
+        UserCoordinator uc = getUserCoordinator();
+        
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        mbp.setCred(getSessionBean().getSessUser().getKeyCard());
+        mbp.setExistingContent(userAuthorizedInConfig.getNotes());
+        mbp.setNewMessageContent(formNoteText);
+        mbp.setHeader("Property Note");
+        mbp.setUser(getSessionBean().getSessUser());
+        userAuthorizedInConfig.setNotes(sc.appendNoteBlock(mbp));
+        try {
+            userAuthorizedInConfig.setLastUpdatedTS(LocalDateTime.now());
+            uc.user_updateUser(userAuthorizedInConfig);
+            getFacesContext().addMessage(null, 
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                "Succesfully appended note!", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, 
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                "Fatal error appending note; apologies!", ""));
+            
+        }
+        
+        
         
     }
     
@@ -451,6 +512,10 @@ public class UserConfigBB extends BackingBeanUtils{
 
     public void onAuthPeriodNewInit(){
         UserCoordinator uc = getUserCoordinator();
+        System.out.println("UserConfigBB.onAuthPeriodNewInit facesmessage list size: " + getFacesContext().getMessageList().size());  
+          getFacesContext().getMessageList().clear();
+          
+        System.out.println("UserConfigBB.onAuthPeriodNewInit facesmessage list size: " + getFacesContext().getMessageList().size());  
         try {
             umapInConfig = uc.auth_initializeUserMuniAuthPeriod_SECURITYCRITICAL(getSessionBean().getSessUser(), 
                                                             userAuthorizedInConfig, 
@@ -481,7 +546,7 @@ public class UserConfigBB extends BackingBeanUtils{
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
+                            "Auth period add error: " + ex.getMessage(), ""));
         }
     }
     
@@ -545,12 +610,39 @@ public class UserConfigBB extends BackingBeanUtils{
      */
     public void onUserPersonLinkUpdate(){
         UserCoordinator uc = getUserCoordinator();
+        PersonCoordinator pc = getPersonCoordinator();
+        Person pers = null;
         try {
-            uc.user_updateUserPersonLink(userAuthorizedInConfig, selectedUserPerson);
-            reloadCurrentUser();
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully udpated your person link: see notes", ""));
+            if(!personLinkUseID){
+                if(selectedUserPerson != null){
+                    
+                uc.user_updateUserPersonLink(userAuthorizedInConfig, selectedUserPerson);
+                reloadCurrentUser();
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Successfully udpated user person link: see notes", ""));
+                } else {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Cannot link a User to a null Person!", ""));
+                    
+                }
+            } else {
+                pers = pc.getPerson(personIDToLink);
+                if(pers != null && pers.getPersonID() != 0){
+                    uc.user_updateUserPersonLink(userAuthorizedInConfig, pers);
+                    reloadCurrentUser();
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                    "Successfully udpated user person link: see notes", ""));
+                    
+                } else {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Could not find Person with ID" + personIDToLink, ""));
+                    
+                }
+            }
         } catch (IntegrationException | AuthorizationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -803,17 +895,17 @@ public class UserConfigBB extends BackingBeanUtils{
    
 
     /**
-     * @return the formNotes
+     * @return the formNoteText
      */
-    public String getFormNotes() {
-        return formNotes;
+    public String getFormNoteText() {
+        return formNoteText;
     }
 
     /**
-     * @param formNotes the formNotes to set
+     * @param formNoteText the formNoteText to set
      */
-    public void setFormNotes(String formNotes) {
-        this.formNotes = formNotes;
+    public void setFormNoteText(String formNoteText) {
+        this.formNoteText = formNoteText;
     }
 
     /**
@@ -842,6 +934,34 @@ public class UserConfigBB extends BackingBeanUtils{
      */
     public void setPageModes(List<PageModeEnum> pageModes) {
         this.pageModes = pageModes;
+    }
+
+    /**
+     * @return the personIDToLink
+     */
+    public int getPersonIDToLink() {
+        return personIDToLink;
+    }
+
+    /**
+     * @param personIDToLink the personIDToLink to set
+     */
+    public void setPersonIDToLink(int personIDToLink) {
+        this.personIDToLink = personIDToLink;
+    }
+
+    /**
+     * @return the personLinkUseID
+     */
+    public boolean isPersonLinkUseID() {
+        return personLinkUseID;
+    }
+
+    /**
+     * @param personLinkUseID the personLinkUseID to set
+     */
+    public void setPersonLinkUseID(boolean personLinkUseID) {
+        this.personLinkUseID = personLinkUseID;
     }
 
    

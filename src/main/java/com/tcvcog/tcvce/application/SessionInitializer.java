@@ -41,6 +41,10 @@ import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntryCatEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.search.QueryCEAR;
+import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
+import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import javax.faces.application.FacesMessage;
@@ -653,11 +657,13 @@ public  class       SessionInitializer
     private void initSubsystem_VII_CECase(UserAuthorized ua, SubSysEnum ss) throws SessionException{
         CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
-        
+        QueryCECase cseQ = sc.initQuery(QueryCECaseEnum.OPENCASES, ua.getKeyCard());
         try {
-            List<CECase> hist = cc.getCECaseHistory(ua);
+            cseQ = sc.runQuery(cseQ);
+            
+//            List<CECase> hist = cc.getCECaseHistory(ua);
             // NEXT LINE: YUCK!!!!!!!!
-            sb.setSessCECaseList(cc.assembleCECasePropertyUnitHeavyList(hist));
+            sb.setSessCECaseList(cc.assembleCECasePropertyUnitHeavyList(cseQ.getBOBResultList()));
             
             if(sb.getSessCECaseList().isEmpty()){
                 sb.setSessCECase(cc.assembleCECaseDataHeavy(cc.selectDefaultCECase(ua), ua));
@@ -667,7 +673,7 @@ public  class       SessionInitializer
             
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
-            throw new SessionException("Error assembling session CECase list from history", ex, ss, ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
+            throw new SessionException("Error assembling session CECase list", ex, ss, ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
         }
 
         sb.setQueryCECaseList(sc.buildQueryCECaseList(ua.getKeyCard()));
@@ -694,6 +700,15 @@ public  class       SessionInitializer
      */
     private void initSubsystem_VIII_CEActionRequest(Credential cred, SubSysEnum ss) throws SessionException{
         SearchCoordinator sc = getSearchCoordinator();
+        QueryCEAR cearQ = sc.initQuery(QueryCEAREnum.UNPROCESSED, cred);
+        try {
+            cearQ = sc.runQuery(cearQ);
+        } catch (SearchException ex) {
+            System.out.println(ex);
+        }
+        sb.setSessCEARList(cearQ.getBOBResultList());
+        
+        
         sb.setQueryCEARList(sc.buildQueryCEARList(cred));
         if(!sb.getQueryCEARList().isEmpty()){
             sb.setQueryCEAR(sb.getQueryCEARList().get(0));

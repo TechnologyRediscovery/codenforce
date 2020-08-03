@@ -1458,7 +1458,7 @@
         <from-view-id>*</from-view-id>  
         <navigation-case>
             <from-outcome>cEActionRequests</from-outcome>
-            <to-view-id>/restricted/cogview/cEActionRequests.xhtml</to-view-id>
+            <to-view-id>/restricted/cogstaff/ce/ceActionRequests.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>

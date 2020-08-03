@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -803,6 +804,7 @@ public class    SessionBean
 
   
 
+    
     /**
      * @param queryOccPeriod the queryOccPeriod to set
      */
@@ -1083,6 +1085,19 @@ public class    SessionBean
      */
     public void setSessOccPeriod(OccPeriodDataHeavy sessOccPeriod) {
         this.sessOccPeriod = sessOccPeriod;
+    }
+    /**
+     * @param opBase     
+     */
+    public void setSessOccPeriod(OccPeriod opBase) {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        OccPeriodDataHeavy opdh = null;
+        try {
+            opdh = oc.assembleOccPeriodDataHeavy(opBase, sessUser.getKeyCard());
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
+            System.out.println(ex);
+        }
+        this.sessOccPeriod = opdh;
     }
 
     /**
