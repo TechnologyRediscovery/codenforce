@@ -5,7 +5,7 @@ __all__ = [
     "_parse",
     "_events",
     "_fetch",
-    "_insert",
+    "_write",
     "_utils",
     "parcelupdate",
 ]

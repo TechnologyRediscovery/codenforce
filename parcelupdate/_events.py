@@ -1,6 +1,7 @@
 from collections import namedtuple
 from colorama import init
 init()
+import warnings
 from colorama import Fore, Back, Style
 from _constants import BOT_ID
 
@@ -21,8 +22,8 @@ def query_propertyexternaldata_for_changes_and_write_events(parid, prop_id, ceca
     """ Checks if parcel info is different from last time. Records Changes. """
     select_sql = """
         SELECT
-            property_propertyid, ownername, address_street, address_citystatezip,
-            livingarea, condition, taxcode
+            ownername, address_street, address_citystatezip,
+            livingarea, condition
         FROM public.propertyexternaldata
         WHERE property_propertyid = %(prop_id)s
         ORDER BY lastupdated DESC
@@ -60,9 +61,13 @@ def query_propertyexternaldata_for_changes_and_write_events(parid, prop_id, ceca
     if old[4] != new[4]:
         details.changes = Changes("condition", old[4], new[4])
         DifferentCondition(details).write_to_db()
-    if old[5] != new[5]:
-        details.changes = Changes("tax code", old[5], new[5])
-        DifferentTaxCode(details).write_to_db()
+    # # # Todo: Since taxcodes are no longer are related to property, begin deprecating
+    # if old[5] != new[5]:
+    #     # Todo: Find pythonic way to put this in front of every column
+    #     if old[5] is not None:  # The old value will likely only be None due to an API / Script change,
+    #                             # opposed to a change in the actual change in tax status.
+    #         details.changes = Changes("tax code", old[5], new[5])
+    #         DifferentTaxCode(details).write_to_db()
 
     if details.changes:
         return True
@@ -84,7 +89,7 @@ class Event:
 
         # To be filled in by subclasses
         self.category_id = None
-        self.description = None
+        self.eventdescription = None
         self.active = None
         self.notes = None
         self.occperiod = None
@@ -94,7 +99,7 @@ class Event:
         """ Writes an event to the database. """
         self._write_event_dunder_dict()
         self.event_id = self._write_event_to_db()  # uses self.ce_caseid
-        print(Fore.RED, self.description, sep="")
+        print(Fore.RED, self.eventdescription, sep="")
         print(Style.RESET_ALL, end="")
 
     def _get_cecase_id(self, db_cursor):
@@ -111,7 +116,7 @@ class Event:
 
     def _write_event_dunder_dict(self):
         assert self.category_id
-        assert self.description
+        assert self.eventdescription
         assert self.active
         assert self.notes
 
@@ -131,7 +136,7 @@ class Event:
             )
             VALUES(
                 DEFAULT, %(category_id)s, %(cecase_caseid)s, now(),
-                %(description)s, %(creator_userid)s, %(active)s, %(notes)s,
+                %(eventdescription)s, %(creator_userid)s, %(active)s, %(notes)s,
                 %(occ_period)s, now(), now(), %(lastupdatedby_userid)s,
                 now()
             )
@@ -146,7 +151,7 @@ class NewParcelid(Event):
     def __init__(self, details):
         super().__init__(details)
         self.category_id = 300
-        self.description = "Parcel {} was added.".format(self.parid)
+        self.eventdescription = "Parcel {} was added.".format(self.parid)
         self.active = True
         self.ce_notes = " "
         self.notes = " "
@@ -159,7 +164,7 @@ class ParcelChangedEvent(Event):
         self.eventdescription = f"Parcel {d.parid}'s {d.changes.name} changed from {d.changes.orig} to {d.changes.new}"
         self.active = True
         self.ce_notes = " "
-        self.event_notes = " "
+        self.notes = " "
         self.occ_period = None
 
 
@@ -203,6 +208,7 @@ class DifferentTaxCode(ParcelChangedEvent):
     def __init__(self, details):
         super().__init__(details)
         self.category_id = 307
+        warnings.warn("DifferentTaxCode may be deprecated soon, as TaxCode is no longer an attribute on the property table", DeprecationWarning)
 
 
 def main():

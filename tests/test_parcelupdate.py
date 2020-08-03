@@ -13,8 +13,9 @@ A link to database dumps can be provided to interested contributors.
 #   This is intentional:
 #       It allows for more test classes to be added under the umbrella of an outer class without refactoring
 
+# TODO: Despite having seperate cursors, it treates it all like a single transaction anyways. Make it so it works.
 # Todo: Custom Black config for 3 lines after module level classes, or just ignore file.
-# Todo: Get auto-commit working for new IDE. Have tests run automatically on commit
+# Todo: Get pre-commit working for new IDE. Have tests run automatically on commit
 
 import sys
 import pytest
@@ -23,6 +24,7 @@ import psycopg2
 from os import path
 from parcelupdate._events import *
 from parcelupdate import _parse
+from parcelupdate import _write as write
 from parcelupdate._parse import TaxStatus
 import pickle
 
@@ -48,11 +50,49 @@ details = EventDetails(None, None, None, None)
 details.changes = Changes(None, None, None)
 
 # Todo: During this setup phase, add CogLand objects into local db
+@pytest.fixture
+def taxstatus_paid():
+    return TaxStatus(year='2020', paidstatus='PAID', tax='473', penalty='000', interest='000', total='473', date_paid='6/2/2020', blank=None)
+
+@pytest.fixture
+def taxstatus_unpaid():
+    return TaxStatus(year='2020', paidstatus='UNPAID', tax='36894', penalty='1845', interest='369', total='39108', date_paid=None, blank=None)
+
+@pytest.fixture
+def taxstatus_balancedue():
+    return TaxStatus(year='2020', paidstatus='BALANCE DUE', tax='069', penalty='003', interest='001', total='073', date_paid=None, blank=None)
+
+@pytest.fixture
+def taxstatus_none():
+    return TaxStatus(year='2020', paidstatus=None, tax='000', penalty='000', interest='000', total='000', date_paid=None, blank=None)
+
+
+@pytest.fixture
+def person1_prop_imap():
+    with open(MOCKS + "person1_prop_imap.pickle", "rb") as p:
+        return pickle.load(p)
+
+@pytest.fixture
+def person1_cecase_imap():
+    with open(MOCKS + "person1_cecase_imap.pickle", "rb") as p:
+        return pickle.load(p)
+
+@pytest.fixture
+def person1_owner_imap():
+    with open(MOCKS + "person1_owner_imap.pickle", "rb") as p:
+        return pickle.load(p)
+
+@pytest.fixture
+def person1_propexternaldata_imap():
+    with open(MOCKS + "person1_propertyexternaldata.pickle", "rb") as p:
+        return pickle.load(p)
+
 
 
 class TestEventsTrigger:
     """
     """
+    # Compare against
     def test_NewParcelid_trigger(self):
         pass
 
@@ -82,26 +122,28 @@ class TestEventsTrigger:
 class TestParse:
     # Todo: pickled objects to fixtures?
     class TestParseTaxFromSoup:
-        def test_paid(self):
+        """ Assert parse_tax_from_soup returns the correct TaxStatus, given a BeautifulSoup object"""
+        # Todo: Learn if these tests break if BS4 is
+        def test_paid(self, taxstatus_paid):
             with open(MOCKS + "paid.pickle", "rb") as p:
                 soup = pickle.load(p)
-            assert _parse.parse_tax_from_soup(soup) == TaxStatus(year='2020', paidstatus='PAID', tax='473', penalty='000', interest='000', total='473', date_paid='6/2/2020', blank=None)
+            assert _parse.parse_tax_from_soup(soup) == taxstatus_paid
 
-        def test_unpaid(self):
+        def test_unpaid(self, taxstatus_unpaid):
             with open(MOCKS + "unpaid.pickle", "rb") as p:
                 soup = pickle.load(p)
-            assert _parse.parse_tax_from_soup(soup) == TaxStatus(year='2020', paidstatus='UNPAID', tax='36894', penalty='1845', interest='369', total='39108', date_paid=None, blank=None)
+            assert _parse.parse_tax_from_soup(soup) == taxstatus_unpaid
 
-        def test_balancedue(self):
+        def test_balancedue(self, taxstatus_balancedue):
             with open(MOCKS + "balancedue.pickle", "rb") as p:
                 soup = pickle.load(p)
-            assert _parse.parse_tax_from_soup(soup) == TaxStatus(year='2020', paidstatus='BALANCE DUE', tax='069', penalty='003', interest='001', total='073', date_paid=None, blank=None)
+            assert _parse.parse_tax_from_soup(soup) == taxstatus_balancedue
 
-        def test_none(self):
+        def test_none(self, taxstatus_none):
             # Todo: Does the truely represent no taxes, or is it representative of blank data?
             with open(MOCKS + "none.pickle", "rb") as p:
                 soup = pickle.load(p)
-            assert _parse.parse_tax_from_soup(soup) == TaxStatus(year='2020', paidstatus=None, tax='000', penalty='000', interest='000', total='000', date_paid=None, blank=None)
+            assert _parse.parse_tax_from_soup(soup) == taxstatus_none
 
 
     class TestParseOwnerFromSoup:
@@ -117,41 +159,36 @@ with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="lo
         They write to a local copy of the cogdb database.
         Changes to the database persist between tests, so these are not "pure" unittests.
         """
-        def test_create_property_imap(self):
-            pass
+        # Todo: Is calling a new cursor for every function correct? This way tests don't share components.
 
-        def test_write_property(self):
-            pass
+        def test_property(self, person1_prop_imap):
+            with conn.cursor() as cursor:
+                write.property(person1_prop_imap, cursor)
 
-        def test_write_unit(self):
-            pass
+        # def test_unit(self):
+        #     with conn.cursor() as cursor:
+        #         write.unit(unit_imap, cursor)
 
-        def test_create_cecase_imap(self):
-            pass
+        def test_cecase(self, person1_cecase_imap):
+            with conn.cursor() as cursor:
+                write.cecase(person1_cecase_imap, cursor)
 
-        def test_write_cecase(self):
-            pass
+        def test_person(self, person1_owner_imap):
+            with conn.cursor() as cursor:
+                write.person(person1_owner_imap, cursor)
 
-        def test_create_owner_imap(self):
-            pass
+        # def test_connect_property_to_person(self):
+        #     with conn.cursor() as cursor:
+        #         write.connect_property_to_person(prop_id, person_id, cursor)
 
-        def test_write_person(self):
-            pass
+        # def test_taxstatus(self):
+        #     with conn.cursor() as cursor:
+        #         write.taxstatus(tax_status, cursor)
 
-        def test_connect_prop_to_person(self):
-            pass
+        def test_propertyexternaldata(self, person1_propertyexternaldata_imap):
+            with conn.cursor() as cursor:
+                write.propertyexternaldata(person1_propertyexternaldata_imap, cursor)
 
-        def test_create_tax_status_imap(self):
-            pass
-
-        def test_write_tax_status(self):
-            pass
-
-        def test_create_propertyexternaldataimap(self):
-            pass
-
-        def test_write_propertyexternaldata(self):
-            pass
 
 
     class TestIntegrity():
@@ -201,13 +238,6 @@ with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="lo
                     cursor.execute(select_sql, info)
                     row = cursor.fetchone()
                     assert instance.active == row[0]
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":

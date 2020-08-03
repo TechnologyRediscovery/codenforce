@@ -8,7 +8,7 @@ import json
 import _create as create
 import _fetch as fetch
 from _fetch import valid_json
-import _insert as insert
+import _write as write
 import _scrape as scrape
 import _events
 import _parse
@@ -29,94 +29,6 @@ def parcel_not_in_db(parid, cursor):
     return False
 
 
-def write_property_to_db(imap, cursor):
-    # Todo: Write function in a way so that we can reuse the insert sql for the alter sql
-    insert_sql = """
-        INSERT INTO property(
-            propertyid, municipality_municode, parid, lotandblock,
-            address, usegroup, constructiontype, countycode,
-            notes, addr_city, addr_state, addr_zip,
-            ownercode, propclass, lastupdated, lastupdatedby,
-            locationdescription, bobsource_sourceid, creationts            
-        )
-        VALUES(
-            DEFAULT, %(municipality_municode)s, %(parid)s, %(lotandblock)s,
-            %(address)s, %(usegroup)s, %(constructiontype)s, %(countycode)s,
-            %(notes)s, %(addr_city)s, %(addr_state)s, %(addr_zip)s,
-            %(ownercode)s, %(propclass)s, now(), %(lastupdatedby)s, %(locationdescription)s,
-            %(bobsource)s, now()
-        )
-        RETURNING propertyid;
-    """
-    cursor.execute(insert_sql, imap)
-    return cursor.fetchone()[0]  # Returns the property_id
-
-
-def update_property_in_db(propid, imap, cursor):
-    # Todo: Write function in a way so that we can reuse the insert sql for the alter sql
-    imap["propertyid"] = propid
-    insert_sql = """
-        UPDATE property SET(
-            municipality_municode = %(municipality_municode)s,
-            parid = %(parid)s,
-            lotandblock = %(lotandblock)s,
-            address = %(address)s,
-            usegroup = %(usegroup)s,
-            constructiontype = %(constructiontype)s,
-            countycode = %(countycode)s,
-            notes = %(notes)s,
-            addr_city = %(addr_city)s,
-            addr_state = %(addr_state)s,
-            addr_zip = %(addr_zip)s,
-            ownercode = %(ownercode)s,
-            propclass = %(propclass)s,
-            lastupdated = now(),
-            lastupdatedby = %(lastupdatedby)s,
-            locationdescription) = %(locationdescription)s,
-            bobsource = %(bobsource)s
-        )
-        WHERE propertyid = %(propertyid)
-    """
-    cursor.execute(insert_sql, imap)
-    return cursor.fetchone()[0]  # Returns the property_id
-
-
-def write_person_to_db(record, cursor):
-    insert_sql = """
-        INSERT INTO public.person(
-            persontype, muni_municode, fname, lname, 
-            jobtitle, phonecell, phonehome, phonework, 
-            email, address_street, address_city, address_state, 
-            address_zip, notes, lastupdated, expirydate, 
-            isactive, isunder18, humanverifiedby, rawname,
-            cleanname, compositelname, multientity)
-        VALUES(
-            cast ( 'ownercntylookup' as persontype), %(muni_municode)s, %(fname)s, %(lname)s,
-            %(jobtitle)s, %(phonecell)s, %(phonehome)s, %(phonework)s,
-            %(email)s, %(address_street)s, %(address_city)s, %(address_state)s,
-            %(address_zip)s, %(notes)s, now(), %(expirydate)s,
-            %(isactive)s, %(isunder18)s, %(humanverifiedby)s, %(rawname)s,
-            %(cleanname)s, %(compositelname)s, %(multientity)s
-        )
-        RETURNING personid;
-    """
-    cursor.execute(insert_sql, record)
-    return cursor.fetchone()[0]
-
-
-def connect_property_to_person(prop_id, person_id, cursor):
-    propperson = {"prop_id": prop_id, "person_id": person_id}
-    insert_sql = """
-        INSERT INTO public.propertyperson(
-            property_propertyid, person_personid    
-        )
-        VALUES(
-            %(prop_id)s, %(person_id)s
-        );
-    """
-    cursor.execute(insert_sql, propperson)
-
-
 def compare(WPRDC_data, AlleghenyCountyData):
     if WPRDC_data != AlleghenyCountyData:
         raise ValueError(
@@ -124,50 +36,11 @@ def compare(WPRDC_data, AlleghenyCountyData):
             f"\t WPRDC's: {WPRDC_data}\tCounty's: {AlleghenyCountyData}"
         )
 
+
 # Todo: Validate more data
 def validate_data(r, tax):                  #   Example data as applicable to explain transformations
                                             #   WPRDC               Allegheny County
     compare(r["TAXYEAR"], int(tax.year))    #   2020.0              2020
-
-
-def write_propertyexternaldata(propextern_map, cursor):
-    insert_sql = """
-        INSERT INTO public.propertyexternaldata(
-            extdataid,
-            property_propertyid, ownername, address_street, address_citystatezip,
-            address_city, address_state, address_zip, saleprice,
-            saleyear, assessedlandvalue, assessedbuildingvalue, assessmentyear,
-            usecode, livingarea, condition, 
-            notes, lastupdated, taxstatus_taxstatusid
-        )
-        VALUES(
-            DEFAULT,
-            %(property_propertyid)s, %(ownername)s, %(address_street)s, %(address_citystatezip)s,
-            %(address_city)s, %(address_state)s, %(address_zip)s, %(saleprice)s,
-            %(saleyear)s, %(assessedlandvalue)s, %(assessedbuildingvalue)s, %(assessmentyear)s,
-            %(usecode)s, %(livingarea)s, %(condition)s,
-            %(notes)s, now(), %(taxstatus_taxstatusid)s
-        )
-        RETURNING property_propertyid;
-    """
-    cursor.execute(insert_sql, propextern_map)
-    return cursor.fetchone()[0]  # property_id
-
-
-def write_taxstatus(tax_status, cursor):
-    insert_sql = """
-        INSERT INTO taxstatus(
-            year, paidstatus, tax, penalty,
-            interest, total, datepaid
-        )
-        VALUES(
-            %(year)s, %(paidstatus)s, %(tax)s, %(penalty)s,
-            %(interest)s, %(total)s, %(date_paid)s
-        )
-        returning taxstatusid;
-    """
-    cursor.execute(insert_sql, tax_status._asdict())    # Todo: For fun, learn speed of tuple -> dict
-    return cursor.fetchone()[0] # taxstatus_id
 
 
 def insert_and_update_database(record, conn, cursor, commit):
@@ -182,15 +55,15 @@ def insert_and_update_database(record, conn, cursor, commit):
     if parcel_not_in_db(parid, cursor):
         new_parcel = True
         imap = create.property_insertmap(record)
-        prop_id = write_property_to_db(imap, cursor)
+        prop_id = write.property(imap, cursor)
         if record["PROPERTYUNIT"] == " ":
-            unit_id = insert.unit(
+            unit_id = write.unit(
                 {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
                 cursor,
             )
         else:
             print(record["PROPERTYUNIT"])
-            unit_id = insert.unit(
+            unit_id = write.unit(
                 {
                     "unitnumber": record["PROPERTYUNIT"],
                     "property_propertyid": prop_id,
@@ -198,19 +71,19 @@ def insert_and_update_database(record, conn, cursor, commit):
                 cursor,
             )
         cecase_map = create.cecase_imap(prop_id, unit_id)
-        cecase_id = insert.cecase(cecase_map, cursor)
+        cecase_id = write.cecase(cecase_map, cursor)
         #
         owner_map = create.owner_imap(owner_name, record)
-        person_id = write_person_to_db(owner_map, cursor)
+        person_id = write.person(owner_map, cursor)
         #
-        connect_property_to_person(prop_id, person_id, cursor)
+        write.connect_property_to_person(prop_id, person_id, cursor)
         Tally.inserted += 1
     else:   # If the parcel was already in the database
         new_parcel = False
         prop_id = fetch.prop_id(parid, cursor)
         unit_id = fetch.unit_id(prop_id, cursor)
         if not unit_id:
-            unit_id = insert.unit(
+            unit_id = write.unit(
                 {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
                 cursor,
             )
@@ -218,16 +91,16 @@ def insert_and_update_database(record, conn, cursor, commit):
         cecase_id = fetch.cecase_id(unit_id, cursor)
         if not cecase_id:
             cecase_map = create.cecase_imap(prop_id, unit_id)
-            cecase_id = insert.cecase(cecase_map, cursor)
+            cecase_id = write.cecase(cecase_map, cursor)
             # TODO: ERROR: Property exists without cecase
 
     validate_data(record, tax_status)
-    tax_status_id = write_taxstatus(tax_status, cursor)
+    tax_status_id = write.taxstatus(tax_status, cursor)
     propextern_map = create.propertyexternaldata_imap(
         prop_id, owner_name.raw, record, tax_status_id
     )
     # Property external data is a misnomer. It's just a log of the data from every time stuff
-    write_propertyexternaldata(propextern_map, cursor)
+    write.propertyexternaldata(propextern_map, cursor)
 
     if _events.query_propertyexternaldata_for_changes_and_write_events(
             parid, prop_id, cecase_id, new_parcel, cursor
@@ -239,6 +112,15 @@ def insert_and_update_database(record, conn, cursor, commit):
     else:
         # A check to make sure variables weren't forgotten to be assigned. Maybe move to testing suite?
         assert [attr is not None for attr in [parid, new_parcel, prop_id, unit_id, cecase_id]]
+
+    # from _utils import pickler
+    # pickler(html, "html", incr=False)
+    # pickler(owner_name, "own", incr=False)
+    # pickler(soup, "soup", incr=False)
+    # pickler(imap, "prop_imap", incr=False)
+    # pickler(cecase_map, "cecase_imap", incr=False)
+    # pickler(owner_map, "owner_imap", incr=False)
+    # pickler(propextern_map, "propext_imap", incr=True)
 
     Tally.total += 1
     print("Record count:", Tally.total, sep="\t")
@@ -265,6 +147,7 @@ def update_muni(muni, db_conn, commit=True):
 
     with db_conn.cursor() as cursor:
         for record in records:
+
             insert_and_update_database(
                 record, db_conn, cursor, commit
             )

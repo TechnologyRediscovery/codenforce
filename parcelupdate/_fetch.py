@@ -12,9 +12,6 @@ from _constants import PARCEL_ID_LISTS
 Municipality = namedtuple("Municipalicty", ["municode", "name"])
 
 
-
-
-
 def munis(cursor):
     select_sql = "SELECT municode FROM municipality;"
     cursor.execute(select_sql)
@@ -95,9 +92,7 @@ def valid_json(file_name):
         if not (f["success"] and len(f["result"]["records"]) > 0):
             # Check and see if it's a test municipality
             if file.name.startswith(os.path.join(PARCEL_ID_LISTS, "COG Land")):
-                return True
-            # Todo: log_error
+                return False
             os.rename(file_name, file_name + "_corrupt")
             raise ValueError("{} not valid".format(file.name))
         return True
-    print(file_name, "could not be validated. Skipping.")
