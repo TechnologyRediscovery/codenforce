@@ -177,15 +177,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </p:dataTable>
 
                                     <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <p:commandButton value="Add a unit" 
-                                                         actionListener="#{occPermitApplicationManageBB.addNewUnit}"
+                                        <p:commandButton value="Add a unit" ajax="true"
+                                                         actionListener="#{occPermitApplicationManageBB.addNewUnit()}"
                                                          update="manage-units-info-form"/> 
                                     </div>
 
                                 </div>
 
                                 <p:commandButton action="#{occPermitApplicationManageBB.acceptUnitListChanges()}"
-                                                 value="Accept changes to Unit List" icon="fa fa-check"/>
+                                                 value="Accept changes to Unit List" icon="fa fa-check"
+                                                 update="period-creation-messages-form"/>
                                 <p:commandButton value="Cancel" icon="fa fa-stop" 
                                                  action="#{occPermitApplicationManageBB.cancelAttachment()}"/>
 

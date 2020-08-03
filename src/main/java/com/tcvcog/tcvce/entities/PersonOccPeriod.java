@@ -20,7 +20,9 @@ public class        PersonOccPeriod
     private boolean applicant;
     private boolean preferredContact;
     private PersonType applicationPersonTppe;
-    
+
+    public PersonOccPeriod() {
+    }
     
     public PersonOccPeriod(Person p){
         this.personID = p.personID;

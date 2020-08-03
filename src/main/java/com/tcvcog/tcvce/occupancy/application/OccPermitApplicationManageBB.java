@@ -19,7 +19,9 @@ package com.tcvcog.tcvce.occupancy.application;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -27,11 +29,16 @@ import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
+import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.occupancy.OccApplicationStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
+import com.tcvcog.tcvce.entities.search.QueryPerson;
+import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
+import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -70,6 +77,13 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     private boolean connectedOccPeriod_ctl;
     private boolean connectedOccPeriod_val;
 
+    private Person searchPerson;
+    private List<Person> personSearchResults;
+    private Person applicant;
+    private Person contactPerson;
+    private List<PersonType> requiredPersons;
+    private List<PersonType> optAndReqPersons;
+
     private String rejectedApplicationMessage;
     private String invalidApplicationMessage;
     private String acceptApplicationMessage;
@@ -101,6 +115,8 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         unitAlreadyDetermined = getSessionBean().isUnitDetermined();
 
+        searchPerson = new Person();
+
         try {
             PropertyCoordinator pc = getPropertyCoordinator();
             propertyForApplication = pc.getPropertyByPropUnitID(selectedApplication.getApplicationPropertyUnit().getUnitID());
@@ -118,6 +134,23 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         }
 
+        if (selectedApplication != null) {
+            attachedPersons = selectedApplication.getAttachedPersons();
+
+            try {
+                requiredPersons = selectedApplication.getReason().getPersonsRequirement().getRequiredPersonTypes();
+
+                optAndReqPersons = new ArrayList<>();
+
+                optAndReqPersons.addAll(requiredPersons);
+
+                optAndReqPersons.addAll(selectedApplication.getReason().getPersonsRequirement().getOptionalPersonTypes());
+            } catch (NullPointerException ex) {
+                //Do nothing. The try block simply acts as an optimized null pointer check.
+                //requiredPersonTypes is so deep that otherwise there would have to be three if statements
+                //to make this code safe
+            }
+        }
         //initialize default setting         
         defaultSetting();
     }
@@ -311,6 +344,172 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
     }
 
+    public void searchForPersons() {
+        UserCoordinator uc = getUserCoordinator();
+        SearchCoordinator sc = getSearchCoordinator();
+
+        QueryPerson qp = null;
+
+        try {
+
+            qp = sc.initQuery(QueryPersonEnum.PERSON_NAME, uc.getPublicUserAuthorized().getMyCredential());
+
+            if (qp != null && !qp.getParamsList().isEmpty()) {
+                SearchParamsPerson spp = qp.getPrimaryParams();
+                spp.setName_last_ctl(true);
+                spp.setName_last_val(searchPerson.getLastName());
+                spp.setName_first_ctl(true);
+                spp.setName_first_val(searchPerson.getFirstName());
+                spp.setEmail_ctl(true);
+                spp.setEmail_val(searchPerson.getEmail());
+                spp.setPhoneNumber_ctl(true);
+                spp.setPhoneNumber_val(searchPerson.getPhoneCell());
+                spp.setAddress_streetNum_ctl(true);
+                spp.setAddress_streetNum_val(searchPerson.getAddressStreet());
+                sc.runQuery(qp);
+            } else {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Something when wrong with the person search! Sorry!", ""));
+            }
+
+        } catch (IntegrationException | SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Something when wrong with the person search! Sorry!", ""));
+        }
+
+        if (qp != null && !qp.getBOBResultList().isEmpty()) {
+
+            List<Person> skeletonHorde = qp.getBOBResultList();
+            personSearchResults = new ArrayList<>();
+
+            for (Person skeleton : skeletonHorde) {
+                personSearchResults.add(skeleton);
+            }
+
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Your search completed with " + personSearchResults.size() + " results", ""));
+
+        }
+
+    }
+
+    public void addPersonToApplication(Person person) {
+
+        boolean duplicateFlag = false;
+
+        person.setPersonType(PersonType.Other);
+
+        for (Person test : attachedPersons) {
+
+            if (test.getPersonID() == person.getPersonID()) {
+
+                duplicateFlag = true;
+
+                break;
+
+            }
+
+        }
+
+        if (duplicateFlag) {
+
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "You already attached that person to the application.", ""));
+
+        } else {
+
+            attachedPersons.add(new PersonOccPeriod(person));
+
+        }
+    }
+
+    public void removePersonFromApplication(PersonOccPeriod person) {
+        attachedPersons.remove(person);
+    }
+
+    public String addANewPerson() {
+
+        PersonOccPeriod skeleton = new PersonOccPeriod();
+
+        attachedPersons.add(skeleton);
+
+        return "";
+    }
+
+    public String getApplicantName() {
+
+        if (applicant != null) {
+            return applicant.getFirstName() + " " + applicant.getLastName();
+        } else {
+            return "UNSELECTED";
+        }
+
+    }
+
+    public String getContactName() {
+
+        //The contact defaults to the Applicant if the applicant doesn't choose one.
+        //So supply the applicant's name first.
+        if (contactPerson == null && applicant != null) {
+            return applicant.getFirstName() + " " + applicant.getLastName();
+        } else if (contactPerson != null) {
+            return contactPerson.getFirstName() + " " + contactPerson.getLastName();
+        } else {
+            return "UNSELECTED";
+        }
+
+    }
+
+    public List<String> getPersonRequirementDescription() {
+
+        List<PersonType> required = requiredPersons;
+
+        List<PersonType> optional = getSessionBean().getSessOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes();
+
+        StringBuilder description = new StringBuilder("It is required that you have these types of people: ");
+
+        List<String> descList = new ArrayList<>();
+
+        for (PersonType type : required) {
+
+            description.append(type.getLabel()).append(", ");
+
+        }
+
+        description.deleteCharAt(description.lastIndexOf(","));
+
+        descList.add(description.toString());
+
+        description = new StringBuilder();
+
+        description.append("You may also add these types of people: ");
+
+        for (PersonType type : optional) {
+
+            description.append(type.getLabel()).append(", ");
+
+        }
+
+        if (optional.size() > 0) {
+            description.deleteCharAt(description.lastIndexOf(","));
+        }
+
+        descList.add(description.toString());
+
+        description = new StringBuilder();
+
+        description.append("Also, please identify yourself by clicking the \"Set As Applicant\" button in the row with your name.");
+
+        descList.add(description.toString());
+
+        return descList;
+
+    }
+
     /**
      * A method that changes only the selectedApplication's status.
      *
@@ -335,8 +534,9 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     }
 
     public void removeSelectedUnit(PropertyUnit unit) {
-        if(unit.getUnitID() == 0) {
-        propertyForApplication.getUnitList().remove(unit);
+        if (unit.getUnitID() == 0) {
+            propertyForApplication.getUnitList().remove(unit);
+            setCurrentViewOption(currentViewOption);
         }
     }
 
@@ -345,11 +545,19 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
         newUnit.setPropertyID(propertyForApplication.getPropertyID());
         newUnit.setActive(true);
         propertyForApplication.getUnitList().add(newUnit);
+        setCurrentViewOption(currentViewOption);
     }
 
     public String attachToOccPeriod() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
+
+        if (acceptApplicationMessage == null || acceptApplicationMessage.contentEquals("")) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please fill out an acceptance message before attaching this permit to an Occ Period.", ""));
+            return "";
+        }
 
         try {
 
@@ -496,6 +704,15 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
         getSessionBean().getNavStack().pushCurrentPage();
 
         return "applicationUnitList";
+    }
+
+    public String editAttachedPersons() {
+
+        getSessionBean().setSessOccPermitApplication(selectedApplication);
+
+        getSessionBean().getNavStack().pushCurrentPage();
+
+        return "applicationChangePeople";
     }
 
     public String acceptUnitListChanges() {
@@ -790,6 +1007,54 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
     public void setUnitList(List<PropertyUnit> unitList) {
         this.unitList = unitList;
+    }
+
+    public Person getSearchPerson() {
+        return searchPerson;
+    }
+
+    public void setSearchPerson(Person searchPerson) {
+        this.searchPerson = searchPerson;
+    }
+
+    public List<Person> getPersonSearchResults() {
+        return personSearchResults;
+    }
+
+    public void setPersonSearchResults(List<Person> personSearchResults) {
+        this.personSearchResults = personSearchResults;
+    }
+
+    public Person getApplicant() {
+        return applicant;
+    }
+
+    public void setApplicant(Person applicant) {
+        this.applicant = applicant;
+    }
+
+    public Person getContactPerson() {
+        return contactPerson;
+    }
+
+    public void setContactPerson(Person contactPerson) {
+        this.contactPerson = contactPerson;
+    }
+
+    public List<PersonType> getRequiredPersons() {
+        return requiredPersons;
+    }
+
+    public void setRequiredPersons(List<PersonType> requiredPersons) {
+        this.requiredPersons = requiredPersons;
+    }
+
+    public List<PersonType> getOptAndReqPersons() {
+        return optAndReqPersons;
+    }
+
+    public void setOptAndReqPersons(List<PersonType> optAndReqPersons) {
+        this.optAndReqPersons = optAndReqPersons;
     }
 
 }

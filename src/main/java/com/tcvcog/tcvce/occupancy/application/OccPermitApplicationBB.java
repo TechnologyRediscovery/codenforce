@@ -738,7 +738,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
                 exportedPerson = pic.export(attachedPerson);
 
-                currentApplication.getAttachedPersons().add((PersonOccPeriod) exportedPerson);
+                currentApplication.getAttachedPersons().add( new PersonOccPeriod(exportedPerson));
 
             }
 
