@@ -97,6 +97,7 @@
                                                          id="sessioninit-umaplist-button-credentialize" 
                                                          value="load session" 
                                                          icon="fa fa-credit-card"
+                                                         disabled="#{!(empty period.recorddeactivatedTS)}"
                                                          styleClass="multiButtonLineButton" 
                                                          action="#{sessionInitializer.sessionInit_credentializeUserMuniAuthPeriod(period)}"
                                                          update="init-session-messages-form"/>

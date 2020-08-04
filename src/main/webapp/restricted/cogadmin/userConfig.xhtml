@@ -190,7 +190,7 @@
                                                 </p>
                                                 <div class="ui-g data-container">
 
-                                                    <div    id='usercfg-ot-addr-div'
+                                                    <div    id='usercfg-ot-username-div'
                                                             class="ui-g-12 ui-md-6 ui-lg-3">
                                                         <h:outputLabel  value="Username"
                                                                         styleClass="data_field_label"
@@ -203,7 +203,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div    id='userinfo--div'
+                                                    <div    id='userinfo-pswdlastupdated-div'
                                                             class="ui-g-12 ui-md-6 ui-lg-3 data_field">
                                                         <h:outputLabel  value="Password Last Updated"
                                                                         styleClass="data_field_label"
@@ -216,7 +216,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div    id='userinfo--div'
+                                                    <div    id='userinfo-perslink-div'
                                                             class="ui-g-12 ui-md-6 ui-lg-3 data_field">
                                                         <h:outputLabel  value="Person Link"
                                                                         styleClass="data_field_label"
@@ -235,7 +235,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div    id='userinfo--div'
+                                                    <div    id='userinfo-active-div'
                                                             class="ui-g-12 ui-md-6 ui-lg-3 data_field">
                                                         <h:outputLabel  value="Active"
                                                                         styleClass="data_field_label"
@@ -253,7 +253,7 @@
 
 
 
-                                                    <div    id='userinfo--div'
+                                                    <div    id='userinfo-virtual-div'
                                                             class="ui-g-12 ui-md-6 ui-lg-3 data_field">
                                                         <h:outputLabel  value="Virtual User"
                                                                         styleClass="data_field_label"
@@ -263,6 +263,20 @@
                                                             <h:outputText id="userinfo-virtual"
                                                                           styleClass="data_field_value" 
                                                                           value="#{userConfigBB.userAuthorizedInConfig.noLoginVirtualUser ? 'Virtual only; no login' : 'Regular user'}" />
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div    id='userinfo-homemuni-div'
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  value="Home Municipality"
+                                                                        styleClass="data_field_label"
+                                                                        for="userinfo-homemuni"
+                                                                        />
+                                                        <div class="data_field_value" >
+                                                            <h:outputText id="userinfo-homemuni"
+                                                                          styleClass="data_field_value" 
+                                                                          value="#{userConfigBB.userAuthorizedInConfig.homeMuniID}" />
                                                         </div>
                                                     </div>
 
@@ -316,6 +330,15 @@
                                                         <h:message for="userconfig-useraddupdate-username-it" showDetail="false" showSummary="true" 
                                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
+                                                        <p:spacer height="5px" />
+                                                        <p:commandButton    id="usercfg-checkusername-button"
+                                                                            icon="fa fa-search"
+                                                                            ajax="true"
+                                                                            actionListener="#{userConfigBB.onUsernameCheckButtonChange}"
+                                                                            value="Check for Username Availability"
+                                                                            update="messages-addupdate-form"
+                                                                            process="userconfig-useraddupdate-username-it"
+                                                                            />
                                                     </div>
 
 
@@ -336,16 +359,49 @@
 
 
                                                     </div>
-                                                    
-                                                    <p>User-Person Mapping</p>
-                                                    
-                                                    <h:outputText   rendered="#{!(empty userConfigBB.userAuthorizedInConfig.person)}"
-                                                                    value="This user is currently mapped to: #{userConfigBB.userAuthorizedInConfig.person.firstName} #{userConfigBB.userAuthorizedInConfig.person.lastName} (ID: #{userConfigBB.userAuthorizedInConfig.person.personID})" />
-                                                    
-                                                    <h:outputText   rendered="#{empty userConfigBB.userAuthorizedInConfig.person}"
-                                                                    value="Map the User to a Person:" />
 
-                                                    
+                                                    <div    id="usercfg-add-muni-div"
+                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field"
+                                                            style="clear:both;">
+
+                                                        <p:outputLabel  for="usercfg-add-muni-som" 
+                                                                        value="Home (Default) Municipality"
+                                                                        styleClass="data_field_label"/>
+
+
+                                                        <p:selectOneMenu id="usercfg-add-muni-som" 
+                                                                         required="true" 
+                                                                         value="#{userConfigBB.userAuthorizedInConfig.homeMuniID}">
+                                                            
+                                                            <f:selectItem itemLabel="select a muni..." noSelectionOption="true" />
+                                                            <f:selectItems value="#{userConfigBB.muniCandidateList}"  var="mu" itemValue="#{mu.muniCode}" 
+                                                                           itemLabel="#{mu.muniName}"/>
+                                                        </p:selectOneMenu>
+
+                                                        <h:message for="usercfg-add-muni-som" showDetail="false" showSummary="true" 
+                                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                    </div>
+
+                                                    <div    id="usercfg-person-header-div"
+                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field"
+                                                            style="clear:both;">
+
+                                                        <h:outputText   value="User-Person Linkage" />
+
+                                                    </div>
+
+                                                    <div    id="usercfg-person-info-div"
+                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field"
+                                                            style="clear:both;">
+
+                                                        <h:outputText   rendered="#{!(empty userConfigBB.userAuthorizedInConfig.person)}"
+                                                                        value="This user is currently mapped to: #{userConfigBB.userAuthorizedInConfig.person.firstName} #{userConfigBB.userAuthorizedInConfig.person.lastName} (ID: #{userConfigBB.userAuthorizedInConfig.person.personID})" />
+
+                                                        <h:outputText   rendered="#{empty userConfigBB.userAuthorizedInConfig.person}"
+                                                                        value="Map the User to a Person:" />
+                                                    </div>
+
 
                                                     <div    id="usercfg-personlink-chooselinkmethod-div"
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field">
@@ -355,8 +411,8 @@
                                                             <h:outputText value="Select a user-person selection method:"/>
                                                         </p:outputLabel>
                                                         <p:selectBooleanButton id="usercfg-personlink-chooselinkmethod-sbb"
-                                                                               onLabel="Link by UserID" 
-                                                                               offLabel="Link from Person List"
+                                                                               onLabel="Link from Person List" 
+                                                                               offLabel="Link by Manual Person ID Entry"
                                                                                styleClass="selectButton" 
                                                                                value="#{userConfigBB.personLinkUseID}"
                                                                                >
@@ -376,7 +432,7 @@
                                                                         styleClass="data_field_label"/>
 
                                                         <p:selectOneMenu id="userconfig-som-userpersons" 
-                                                                         required="true" 
+                                                                         required="false" 
                                                                          disabled="#{userConfigBB.personLinkUseID}"
                                                                          value="#{userConfigBB.userAuthorizedInConfig.person}"
                                                                          styleClass="data_field_value">
@@ -400,7 +456,7 @@
                                                                         styleClass="data_field_label"/>
 
                                                         <p:inputText id="userconfig-addpersonbyid-it" 
-                                                                    disabled="#{!userConfigBB.personLinkUseID}"
+                                                                     disabled="#{!userConfigBB.personLinkUseID}"
                                                                      value="#{userConfigBB.personIDToLink}" 
                                                                      style="width: 50px;" 
                                                                      tabindex="3" 
@@ -412,32 +468,26 @@
                                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                     </div>
 
+
                                                 </div>
-
-
 
 
 
 
                                                 <p:commandButton    id="usercfg-add-addnew-commit-button-1"
                                                                     icon="fa fa-thmubs-o-up"
-                                                                    ajax="true"
-                                                                    actionListener="#{userConfigBB.onUserInsertCommitButtonChange}"
+                                                                    ajax="false"
+                                                                    action="#{userConfigBB.onUserInsertCommitButtonChange()}"
                                                                     value="Create User"
-                                                                    oncomplete="PF('usercfg-newpassword-dialog-var').show()"
                                                                     rendered="#{userConfigBB.userAuthorizedInConfig.userID == 0}"
-                                                                    update="    messages-addupdate-form
-                                                                                userconfig-messages-form-updatepassword
-                                                                                userconfig-form-updatepassword"
                                                                     />
 
                                                 <p:commandButton    id="usercfg-add-update-commit-button-1"
                                                                     icon="fa fa-edit"
-                                                                    ajax="true"
-                                                                    actionListener="#{userConfigBB.onUserUpdateCommitButtonChange}"
+                                                                    ajax="false"
+                                                                    action="#{userConfigBB.onUserUpdateCommitButtonChange()}"
                                                                     value="Commit Updates"
                                                                     rendered="#{userConfigBB.userAuthorizedInConfig.userID != 0}"
-                                                                    update="messages-addupdate-form"
                                                                     />
 
                                                 <p:commandButton    id="usercfg-add-discard-button-1"
@@ -469,7 +519,7 @@
                                                 <p:commandButton icon="fa fa-trash-o"
                                                                  ajax="true"
                                                                  actionListener="#{userConfigBB.onUserDeactivateInitButtonChange}"
-                                                                 
+
                                                                  oncomplete="PF('usercfg-userdeactivate-confirm-dialog-var').show()"
                                                                  value="Permanently deactivate user: #{userConfigBB.userAuthorizedInConfig.username} (ID: #{userConfigBB.userAuthorizedInConfig.userID})"
                                                                  />
@@ -594,7 +644,8 @@
                                                                          id="users-authrecordtable-button-initializenewsession" 
                                                                          value="Init new Session" 
                                                                          icon="fa fa-user-circle-o"
-                                                                         rendered="#{muPeriod.valid and systemServicesBB.bbSessionUser.keyCard.hasDeveloperPermissions}"
+                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasDeveloperPermissions}"
+                                                                         disabled="true"
                                                                          styleClass="multiButtonLineButton" 
                                                                          action="#{userConfigBB.onSessionReinitWithNewUMAP(muPeriod, systemServicesBB.bbSessionUser)}"
                                                                          />
@@ -605,9 +656,8 @@
                                                                          id="users-authrecordtable-button-invalidate" 
                                                                          value="Invalidate" 
                                                                          icon="fa fa-close"
-                                                                         rendered="#{muPeriod.valid}"
                                                                          styleClass="multiButtonLineButton" 
-                                                                         actionListener="#{userConfigBB.onInvalidateUserAuthPeriodInit(user, muPeriod)}"
+                                                                         actionListener="#{userConfigBB.onInvalidateUserAuthPeriodInit(muPeriod)}"
                                                                          oncomplete="PF('userconfig-dialog-invalidateperiod-var').show()"
                                                                          update="userconfig-dialog-invalidateperiodform" />
                                                     </p:column>
@@ -805,10 +855,10 @@
 
                                 <p:spacer height="5px" />
                             </f:subview>
-                             <f:subview  id="usercfg-newpassword-subview-nopass"
-                                         rendered="#{(empty userConfigBB.freshPasswordCleartext)}" >
-                                 <p>There was an error in the user creation process that must be addressed by a coder, sorry!</p>
-                             </f:subview>
+                            <f:subview  id="usercfg-newpassword-subview-nopass"
+                                        rendered="#{(empty userConfigBB.freshPasswordCleartext)}" >
+                                <p>There was an error in the user creation process that must be addressed by a coder, sorry!</p>
+                            </f:subview>
                             <p:commandButton ajax="true" 
                                              value="Close" 
                                              icon="fa thumbs-up" 
@@ -1037,16 +1087,12 @@
                             <p:spacer height="15px"/>
 
                             <p:commandButton    id="userconfig-button-commituap"
-                                                ajax="true" 
+                                                ajax="false" 
                                                 value="Commit new authorization period" 
                                                 icon="fa fa-plus" 
                                                 tabindex="3" 
-                                                oncomplete="PF('userconfig-umap-add-dialog-var').hide()"
-                                                actionListener="#{userConfigBB.onAuthPeriodNewCommit}"
-                                                update="userconfig-addauthperiod-messages-form
-                                                usercfg-umap-panel-messages-form
-                                                usercfg-umap-panel
-                                                usercfg-panel-notes"
+                                                update="@all"
+                                                action="#{userConfigBB.onAuthPeriodNewCommit}"
                                                 />
 
                             <p:commandButton    ajax="true" 
@@ -1080,8 +1126,8 @@
 
                         <h:form id="userconfig-dialog-invalidateperiodform">
                             <h2> 
-                                <h:outputText value="Invalidate authorization period for " />
-                                <h:outputText value="#{userConfigBB.userAuthorizedInConfig.username}" />
+                                <h:outputText value="Invalidate authorization period ID " />
+                                <h:outputText value="#{userConfigBB.umapInConfig.userMuniAuthPeriodID}" />
                                 <h:outputText value=" in " />
                                 <h:outputText value="#{userConfigBB.umapInConfig.muni.muniName}" />
                             </h2>
@@ -1104,12 +1150,12 @@
                                              tabindex="4"/> 
 
                             <p:commandButton    id="userconfig-invalidateauthper-button-commitinvalidate"
-                                                ajax="true" 
+                                                ajax="false" 
                                                 value="Invalidate period (undoable!)" 
                                                 icon="fa fa-fire" 
                                                 tabindex="11" 
-                                                actionListener="#{userConfigBB.onInvalidateUserMuniAuthPeriodCommit}"
-                                                update="userconfig-dialog-invalidateperiod" />
+                                                action="#{userConfigBB.onInvalidateUserMuniAuthPeriodCommit}"
+                                                />
 
 
                             <p:spacer height="5px" />

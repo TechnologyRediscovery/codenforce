@@ -66,6 +66,10 @@ public class UserMuniAuthPeriod  implements Serializable, Comparable<UserMuniAut
 
     private int assignmentRelativeOrder;
     
+    /**
+     * Half-baked attempt at some security on BOBs
+     * @return 
+     */
     public boolean isValid(){
         boolean v = false;
         if(validityEvaluatedTS != null 

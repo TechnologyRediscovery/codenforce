@@ -42,6 +42,7 @@ public class UserAuthorized extends User{
     
     protected LocalDateTime pswdLastUpdated;
     protected LocalDateTime forcePasswordResetTS;
+    
 
     
     /**
@@ -192,17 +193,19 @@ public class UserAuthorized extends User{
     public Credential getMyCredential() {
         return myCredential;
     }
-
-   
-
-   
-
+    /**
+     * @return the homeMuni
+     */
+    /**
+     * @param homeMuni the homeMuni to set
+     */
     /**
      * @return the accessRecord
      */
     /**
      * @param accessRecord the accessRecord to set
      */
+
 
     
 }

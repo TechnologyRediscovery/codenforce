@@ -46,6 +46,7 @@ public class User implements Serializable{
     
     protected LocalDateTime deactivatedTS;
     protected int deactivatedByUserID;
+    protected int homeMuniID;
     
     
     
@@ -326,6 +327,26 @@ public class User implements Serializable{
     public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
         this.lastUpdatedTS = lastUpdatedTS;
     }
+
+    /**
+     * @return the homeMuniID
+     */
+    public int getHomeMuniID() {
+        return homeMuniID;
+    }
+
+    /**
+     * @param homeMuniID the homeMuniID to set
+     */
+    public void setHomeMuniID(int homeMuniID) {
+        this.homeMuniID = homeMuniID;
+    }
+    /**
+     * @return the accessRecord
+     */
+    /**
+     * @param accessRecord the accessRecord to set
+     */
   
 
 }

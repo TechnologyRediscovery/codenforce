@@ -133,6 +133,10 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         
         if(ua != null && umapReq != null){
             
+            if(umapReq.getRecorddeactivatedTS() != null){
+                throw new AuthorizationException("Cannot credentialize a deactivated authorization period!");
+            }
+            
             // ************************************************************
             // ******* GENERATE AND INJECT CREDENTIAL FOR CHOSEN MUNI *****
             // ************************************************************
@@ -221,21 +225,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         
     }
     
-    /**
-     * Factory method for UserAuthorizedForConfig objects which contain
-     * a list of raw UMAPs for configuration
-     * @param ua
-     * @return
-     * @throws IntegrationException 
-     */
-    public UserAuthorizedForConfig user_assembleUserAuthorizedForConfig(UserAuthorized ua) throws IntegrationException{
-        UserAuthorizedForConfig uafg = null;
-        if(ua != null){
-             uafg = new UserAuthorizedForConfig(ua);
-             uafg.setUmapList(user_auth_getUMAPListRaw(ua));
-        }
-        return uafg;
-    }
+  
     
     /**
      * Extracts all UMAP objects from the DB, valid or not
@@ -627,7 +617,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @return true if the username is unique and user insert can proceed; false 
      * if name is not unique--abort insert
      */
-    private boolean user_checkUsernameAllowedForInsert(String uname){
+    public boolean user_checkUsernameAllowedForInsert(String uname){
         UserIntegrator ui = getUserIntegrator();
         boolean allowed = false;
         try {
@@ -802,11 +792,17 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @param u
      * @throws IntegrationException 
      */
-    public void user_updateUser(User u) throws IntegrationException{
+    public void user_updateUser(User u) throws IntegrationException, AuthorizationException{
         UserIntegrator ui = getUserIntegrator();
         StringBuilder sb = new StringBuilder();
-        ui.updateUser(u);
-        
+        if(u != null && u.getUsername() != null && !u.getUsername().equals(" ")){
+            if(user_checkUsernameAllowedForInsert(u.getUsername())){
+                ui.updateUser(u);
+            }
+            else {
+                throw new AuthorizationException("Username chose is already in use or null");
+            }
+        }
     }
     
     /**
@@ -852,7 +848,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     public void user_updateUserPassword_SECURITYCRITICAL(User u, String pw) throws IntegrationException, AuthorizationException{
         UserIntegrator ui = getUserIntegrator();
         if(pw.length() >= MIN_PSSWD_LENGTH){
-            ui.setUserPassword(u, pw);
+            ui.setUserPassword_SECURITYCRITICAL(u, pw);
         } else {
             throw new AuthorizationException("Password must be at least " + MIN_PSSWD_LENGTH + " characters");
         }
@@ -866,7 +862,10 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      */
     public User user_getUserSkeleton(User u){
         User skel = new User();
-        skel.setCreatedByUserId(u.getUserID());
+        if(u != null){
+            skel.setHomeMuniID(u.getHomeMuniID());
+            skel.setCreatedByUserId(u.getUserID());
+        }
         return skel;
     }
    
@@ -877,18 +876,18 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
       * Adds a timestamp to the period's invalidation. Normally, a period is not
       * directly invalidated but rather expires and is updated with a new one
       * @param aup
-      * @param u
+      * @param requestingUser
       * @param note
       * @throws IntegrationException
       * @throws AuthorizationException 
       */
-    public void auth_invalidateUserAuthPeriod(UserMuniAuthPeriod aup, UserAuthorized u, String note) throws IntegrationException, AuthorizationException{
+    public void auth_invalidateUserAuthPeriod(UserMuniAuthPeriod aup, UserAuthorized requestingUser, String note) throws IntegrationException, AuthorizationException{
         SystemCoordinator sc = getSystemCoordinator();
         UserIntegrator ui = getUserIntegrator();
-        if(aup.getUserMuniAuthPeriodID() == u.getMyCredential().getGoverningAuthPeriod().getUserMuniAuthPeriodID()){
+        if(aup.getUserMuniAuthPeriodID() == requestingUser.getMyCredential().getGoverningAuthPeriod().getUserMuniAuthPeriodID()){
             throw new AuthorizationException("You are unauthorized to invalidate your current authorization period");
         }
-        aup.setNotes(sc.appendNoteBlock(new MessageBuilderParams(aup.getNotes(), "INVALIDATION OF AUTH PERIOD", "", note, u, u.getMyCredential())));
+        aup.setNotes(sc.appendNoteBlock(new MessageBuilderParams(aup.getNotes(), "INVALIDATION OF AUTH PERIOD", "", note, requestingUser, requestingUser.getMyCredential())));
         ui.invalidateUserAuthRecord(aup);
         
         // We should be logging this action
@@ -921,6 +920,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      */
     public List<User> user_auth_assembleUserListForConfig(UserAuthorized userRequestor) throws IntegrationException, AuthorizationException{
         
+        UserIntegrator ui = getUserIntegrator();
         List<User> usersForConfig = null;
         
         if(userRequestor != null){
@@ -939,6 +939,19 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                     usersForConfig = user_auth_assembleUserListForConfig(mu,userRequestor);
                 } 
             } //close loop over authmunis 
+            
+            // add any users who don't have any auth periods in that muni but whose home muni is the user's auth muni
+            List<User> usersInHomeMuni = ui.getUsersByHomeMuni(userRequestor.getKeyCard().getGoverningAuthPeriod().getMuni());
+            List<User> usersToAdd = new ArrayList<>();
+            for(User usr: usersInHomeMuni){
+                if(!usersForConfig.contains(usr)){
+                    usersToAdd.add(usr);
+                }
+            }
+            if(!usersToAdd.isEmpty()){
+                usersForConfig.addAll(usersToAdd);
+            }
+            
         } // close param not null check
         return usersForConfig;
     }
@@ -1021,17 +1034,17 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * Logic bundle for building a UserAuthorized without a credential for
      * configuration purposes; Credential objects are only inserted 
      * when that UserAuthorized is backing a system session
-     * @param userRequestor
      * @param userToConfigure
      * @return
      * @throws AuthorizationException
      * @throws IntegrationException 
      */
-    public UserAuthorizedForConfig user_transformUserToUserAuthorizedForConfig(UserAuthorized userRequestor, User userToConfigure) throws AuthorizationException, IntegrationException{
+    public UserAuthorizedForConfig user_transformUserToUserAuthorizedForConfig(User userToConfigure) throws AuthorizationException, IntegrationException{
         UserAuthorizedForConfig uafc = null;
         UserIntegrator ui = getUserIntegrator();
-        if(userRequestor != null && userToConfigure != null){
-            uafc = new UserAuthorizedForConfig(ui.getUserAuthorizedNoAuthPeriods(userToConfigure));
+        if(userToConfigure != null){
+            User utemp = user_getUser(userToConfigure.getUserID());
+            uafc = new UserAuthorizedForConfig(ui.getUserAuthorizedNoAuthPeriods(utemp));
             uafc.setMuniAuthPeriodsMap(auth_assembleMuniUMAPMapRaw(userToConfigure));
             uafc.setUmapList(ui.getUserMuniAuthPeriodsRaw(userToConfigure.getUserID()));
             System.out.println("UserCoordinator.user_transformUserToUserAuthorizedForConfig: Transformed username " + userToConfigure.getUsername());

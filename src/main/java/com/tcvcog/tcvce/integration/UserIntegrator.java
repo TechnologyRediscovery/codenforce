@@ -18,6 +18,9 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -67,7 +70,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         // broken query
         String query =  "   SELECT userid, username, notes, personlink, \n" +
                         "       createdby, createdts, nologinvirtualonly, \n" +
-                        "       deactivatedts, deactivated_userid, lastupdatedts\n" +
+                        "       deactivatedts, deactivated_userid, lastupdatedts, homemuni \n" +
                         "  FROM public.login WHERE userid = ?;";
         
         PreparedStatement stmt = null;
@@ -142,6 +145,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     private User generateUser(ResultSet rs) throws IntegrationException, SQLException{
         User user = new User();
         PersonIntegrator pi = getPersonIntegrator();
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        
+        
             // line 1 of SELECT
             user.setUserID(rs.getInt("userid"));
             user.setUsername(rs.getString("username"));
@@ -164,6 +170,10 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             user.setDeactivatedBy(rs.getInt("deactivated_userid"));
             if(rs.getTimestamp("lastupdatedts") != null){
                 user.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+            }
+            
+            if(rs.getInt("homemuni") != 0){
+                user.setHomeMuniID(rs.getInt("homemuni"));
             }
             
             
@@ -235,6 +245,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             if(rs.getTimestamp("createdts") != null){
                 ua.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
             }
+            
+            
         
         return ua;
         
@@ -614,7 +626,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                         "            accessgranteddatestop, recorddeactivatedts, authorizedrole, createdts, \n" +
                         "            createdby_userid, notes, supportassignedby, assignmentrank)\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, \n" +
-                        "            ?, ?, CAST (? AS role), now(), \n" +
+                        "            ?, NULL, CAST (? AS role), now(), \n" +
                         "            ?, ?, ?, ?);";
         
         PreparedStatement stmt = null;
@@ -626,19 +638,15 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setTimestamp(3, java.sql.Timestamp.valueOf(uap.getStartDate()));
             
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(uap.getStopDate()));
-            if(uap.getRecorddeactivatedTS() != null){
-                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(uap.getRecorddeactivatedTS())); 
-            } else {
-                stmt.setNull(5, java.sql.Types.NULL);
-            }
-            stmt.setString(6, uap.getRole().toString());
+            
+            stmt.setString(5, uap.getRole().toString());
             // created TS by postgres now()
             
-            stmt.setInt(7, uap.getCreatedByUserID());
-            stmt.setString(8, uap.getNotes());
+            stmt.setInt(6, uap.getCreatedByUserID());
+            stmt.setString(7, uap.getNotes());
             // set support assigned to null until functionality implemented
-            stmt.setNull(9, java.sql.Types.NULL);
-            stmt.setInt(10, uap.getAssignmentRelativeOrder());
+            stmt.setNull(8, java.sql.Types.NULL);
+            stmt.setInt(9, uap.getAssignmentRelativeOrder());
             
             stmt.execute();
             
@@ -669,10 +677,10 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         String query =  "INSERT INTO public.login(\n" +
                         "            userid, username, password, notes, personlink, pswdlastupdated, \n" +
                         "            forcepasswordreset, createdby, createdts, nologinvirtualonly, \n" +
-                        "            deactivatedts, deactivated_userid, lastupdatedts, userrole)\n" +
+                        "            deactivatedts, deactivated_userid, lastupdatedts, userrole, homemuni)\n" +
                         "    VALUES (DEFAULT, ?, NULL, ?, ?, NULL, \n" +
                         "            NULL, ?, now(), ?, \n" +
-                        "            NULL, NULL, now(), 'User'::role);";
+                        "            NULL, NULL, now(), 'User'::role, ?);";
         
         PreparedStatement stmt = null;
         
@@ -696,6 +704,13 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             // created ts from db's now()
             stmt.setBoolean(5, userToInsert.isNoLoginVirtualUser());
             
+            if(userToInsert.getHomeMuniID() != 0){
+                stmt.setInt(6, userToInsert.getHomeMuniID());
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+            
+            
             stmt.execute();
             
             String idNumQuery = "SELECT currval('login_userid_seq');";
@@ -716,6 +731,49 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
+    
+    /**
+     * Insertion point for records in the login table; NOTE that this is a rather 
+     * sparse isnert since several login fields like password, etc., are managed 
+     * by separate methods in this class and the UserCoordinator
+     * @param muni
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<User> getUsersByHomeMuni(Municipality muni) throws IntegrationException{
+        UserCoordinator uc = getUserCoordinator();
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query =  "SELECT userid FROM public.login WHERE homemuni = ?;";
+        List<User> usrList = new ArrayList<>();
+        if(muni == null){
+            return usrList;
+        }
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, muni.getMuniCode());
+            stmt.execute();
+            
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                usrList.add(uc.user_getUser(rs.getInt("userid")));
+            }
+            
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error inserting new user", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return usrList;
+    }
+    
     /**
      * Invalidating an Authorization period is effectively deleting that record. This action
      * cannot be undone, not even by developers.
@@ -727,14 +785,14 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
          Connection con = getPostgresCon();
         
          String query =     "UPDATE loginmuniauthperiod SET recorddeactivatedts = now(), notes=? "
-                        +   "WHERE muniauthperiodid=?";
+                        +   "WHERE muniauthperiodid=?;";
         
         PreparedStatement stmt = null;
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, uap.getUserMuniAuthPeriodID());
-            stmt.setString(2, uap.getNotes());
+            stmt.setString(1, uap.getNotes());
+            stmt.setInt(2, uap.getUserMuniAuthPeriodID());
             
             stmt.executeUpdate();
             
@@ -761,7 +819,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @param psswd
      * @throws IntegrationException 
      */
-    public void setUserPassword(User user, String psswd) throws IntegrationException{
+    public void setUserPassword_SECURITYCRITICAL(User user, String psswd) throws IntegrationException{
          Connection con = getPostgresCon();
         
          String query = "UPDATE public.login\n" +
@@ -828,6 +886,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
+    
     /**
      * Updates fields on login table record; most login fields are managed by independent
      * methods for security thoroughness
@@ -839,7 +898,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         
         String query =  "UPDATE public.login\n" +
                         "   SET username=?, notes=?, personlink=?, \n" +
-                        "    nologinvirtualonly=?, deactivatedts=?, deactivated_userid=?, lastupdatedts=now() \n" +
+                        "    nologinvirtualonly=?, deactivatedts=?, deactivated_userid=?, lastupdatedts=now(), homemuni=? \n" +
                         " WHERE userid=?;";
         
         PreparedStatement stmt = null;
@@ -880,7 +939,13 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
             
-            stmt.setInt(7, usr.getUserID());
+            if(usr.getHomeMuniID() != 0){
+                stmt.setInt(7, usr.getHomeMuniID());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(8, usr.getUserID());
             
             stmt.executeUpdate();
             

@@ -243,9 +243,9 @@ public  class       SessionInitializer
             return "";
         } catch (AuthorizationException ex) {
             System.out.println("SessionInitializer.intitiateInternalSession | Auth exception");
+            System.out.println(ex);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     ex.getMessage(), ""));
-            System.out.println(ex);
             return "";
         } catch (SessionException ex) {
             System.out.println("SessionInitializer.intitiateInternalSession | Session exception");

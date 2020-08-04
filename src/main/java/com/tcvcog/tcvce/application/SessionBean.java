@@ -58,6 +58,7 @@ public class    SessionBean
     private UserAuthorized sessUser;
     private User sessUserQueued;
     private User userForReInit;
+    private UserAuthorizedForConfig userForConfig;
     
     private UserMuniAuthPeriod umapRequestedForReInit;
     private List<UserMuniAuthPeriod> sessUMAPListValidOnly;
@@ -1416,6 +1417,20 @@ public class    SessionBean
 
     public void setOccPermitPreferredContact(PublicInfoBundlePerson occPermitPreferredContact) {
         this.occPermitPreferredContact = occPermitPreferredContact;
+    }
+
+    /**
+     * @return the userForConfig
+     */
+    public UserAuthorizedForConfig getUserForConfig() {
+        return userForConfig;
+    }
+
+    /**
+     * @param userForConfig the userForConfig to set
+     */
+    public void setUserForConfig(UserAuthorizedForConfig userForConfig) {
+        this.userForConfig = userForConfig;
     }
     
 }
