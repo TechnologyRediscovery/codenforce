@@ -22,6 +22,7 @@ import pytest
 from copy import copy
 import psycopg2
 from os import path
+import functools
 from parcelupdate._events import *
 from parcelupdate import _parse
 from parcelupdate import _write as write
@@ -45,6 +46,9 @@ for k in d:
             continue
     except TypeError:
         continue
+
+
+
 
 details = EventDetails(None, None, None, None)
 details.changes = Changes(None, None, None)
@@ -83,8 +87,8 @@ def person1_owner_imap():
         return pickle.load(p)
 
 @pytest.fixture
-def person1_propexternaldata_imap():
-    with open(MOCKS + "person1_propertyexternaldata.pickle", "rb") as p:
+def person1_propertyexternaldata_imap():
+    with open(MOCKS + "person1_propertyexternaldata_imap.pickle", "rb") as p:
         return pickle.load(p)
 
 
@@ -150,7 +154,28 @@ class TestParse:
         pass
 
 
+
+
+
+
+
 with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="localhost", port="5432") as conn:
+
+
+    def transaction(func):
+        """ Decorator that allows each unittest to be run in its own transaction
+        """
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            cursor = conn.cursor()
+            try:
+                cursor.execute("BEGIN;")
+                func(*args, **kwargs)
+            finally:
+                cursor.execute("ROLLBACK;")
+                cursor.close()
+        return wrapper
+
 
     class TestWrites():
         """
@@ -160,34 +185,46 @@ with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="lo
         Changes to the database persist between tests, so these are not "pure" unittests.
         """
         # Todo: Is calling a new cursor for every function correct? This way tests don't share components.
-
+        @transaction
         def test_property(self, person1_prop_imap):
             with conn.cursor() as cursor:
                 write.property(person1_prop_imap, cursor)
 
-        # def test_unit(self):
-        #     with conn.cursor() as cursor:
-        #         write.unit(unit_imap, cursor)
+        # # def test_unit(self):
+        # #     with conn.cursor() as cursor:
+        # #         write.unit(unit_imap, cursor)
+        #
 
+        @transaction
         def test_cecase(self, person1_cecase_imap):
             with conn.cursor() as cursor:
                 write.cecase(person1_cecase_imap, cursor)
 
-        def test_person(self, person1_owner_imap):
-            with conn.cursor() as cursor:
-                write.person(person1_owner_imap, cursor)
 
-        # def test_connect_property_to_person(self):
+
+
+
+
+
+
+
+        # @transaction
+        # def test_person(self, person1_owner_imap):
         #     with conn.cursor() as cursor:
-        #         write.connect_property_to_person(prop_id, person_id, cursor)
-
-        # def test_taxstatus(self):
+        #         write.person(person1_owner_imap, cursor)
+        #
+        # # def test_connect_property_to_person(self):
+        # #     with conn.cursor() as cursor:
+        # #         write.connect_property_to_person(prop_id, person_id, cursor)
+        #
+        # # def test_taxstatus(self):
+        # #     with conn.cursor() as cursor:
+        # #         write.taxstatus(tax_status, cursor)
+        #
+        # @transaction
+        # def test_propertyexternaldata(self, person1_propertyexternaldata_imap):
         #     with conn.cursor() as cursor:
-        #         write.taxstatus(tax_status, cursor)
-
-        def test_propertyexternaldata(self, person1_propertyexternaldata_imap):
-            with conn.cursor() as cursor:
-                write.propertyexternaldata(person1_propertyexternaldata_imap, cursor)
+        #         write.propertyexternaldata(person1_propertyexternaldata_imap, cursor)
 
 
 
