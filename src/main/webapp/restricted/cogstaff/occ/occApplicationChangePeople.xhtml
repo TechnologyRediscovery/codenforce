@@ -52,7 +52,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                        value="Edit the people attached to the application, then specify the applicant and preferred contact." />
                                     </div>
 
-                                    <p:outputLabel value="#{occPermitApplicationManageBB.selectedApplication.reason.humanFriendlyDescription}"/>
+                                    <div class="ui-g-12 ui-md-9 ui-lg-9 data_field">
+                                        <p:outputLabel value="#{occPermitApplicationManageBB.selectedApplication.reason.humanFriendlyDescription}"/>
+                                        <p:outputLabel><br/> Changes to persons and newly created persons will be saved in the database upon acceptance.</p:outputLabel>
+                                    </div>
 
                                     <h:panelGrid id="menu" columns="1" cellpadding="10" columnClasses="gridTd-solid-back" style="width:100%">
                                         <h:panelGroup >
@@ -93,8 +96,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </h:panelGroup>
 
                                             </h:panelGrid>
+
+                                            <p:spacer height="10px"/>
+
                                             <p:commandButton value= "Search" action="#{occPermitApplicationManageBB.searchForPersons()}" 
                                                              update="results-dt" ajax="true"/>
+
+                                            <p:spacer height="10px"/>
 
 
                                             <p:dataTable id="results-dt" 
@@ -141,208 +149,221 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </h:panelGroup>
                                     </h:panelGrid>
 
-                                    <p:outputLabel> Can't find the person you are looking for? Add a person to the table below and press the pencil to enter their information.
-                                        Click the arrow button below the pencil to fill in more of their contact information.
-                                    </p:outputLabel> 
+                                    <div class="ui-g-12 ui-md-9 ui-lg-9 data_field">
+                                        <p:outputLabel> Can't find the person you are looking for? <br/> Add a person to the table below and press the pencil to enter their information. <br/>
+                                            Click the arrow button below the pencil to fill in more of their contact information.
+                                        </p:outputLabel> 
+                                    </div>
 
-                                    <h:panelGrid columns="1" cellpadding="10">
+                                    <p:spacer height="10px"/>
 
-                                        <h:panelGroup>
-                                            <p:outputLabel value="#{occPermitApplicationManageBB.personRequirementDescription.get(0)}"/>
-                                        </h:panelGroup>
+                                    <div class="ui-g-12 ui-md-9 ui-lg-9 data_field">
 
-                                        <h:panelGroup>
-                                            <p:outputLabel value="#{occPermitApplicationManageBB.personRequirementDescription.get(1)}"/>
-                                        </h:panelGroup>
+                                        <h:panelGrid columns="1" cellpadding="10">
 
-                                        <h:panelGroup>
-                                            <p:outputLabel value="#{occPermitApplicationManageBB.personRequirementDescription.get(2)}"/>
-                                        </h:panelGroup>
-                                    </h:panelGrid>
+                                            <h:panelGroup>
+                                                <p:outputLabel value="#{occPermitApplicationManageBB.personRequirementDescription.get(0)}"/>
+                                            </h:panelGroup>
 
-                                    <p:dataTable id="applicationPersonTable"
-                                                 widgetVar="datatable"
-                                                 rowIndexVar="rowIndex"
-                                                 var="applicationPerson" value="#{occPermitApplicationManageBB.attachedPersons}" 
-                                                 rowKey="#{applicationPerson.personID}"
-                                                 editable="true">                                
-                                        <p:column headerText="Last Name">
-                                            <p:cellEditor>
-                                                <f:facet name="output"><h:outputText value="#{applicationPerson.lastName}"/></f:facet>
-                                                <f:facet name="input">
-                                                    <p:inputText value="#{applicationPerson.lastName}"
-                                                                 onkeydown="PF('datatable').onKeyDown(event)"
-                                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
-                                                </f:facet>
-                                            </p:cellEditor>
-                                        </p:column>
+                                            <h:panelGroup>
+                                                <p:outputLabel value="#{occPermitApplicationManageBB.personRequirementDescription.get(1)}"/>
+                                            </h:panelGroup>
 
-                                        <p:column headerText="First Name">
-                                            <p:cellEditor>
-                                                <f:facet name="output"><h:outputText value="#{applicationPerson.firstName}"/></f:facet>
-                                                <f:facet name="input">
-                                                    <p:inputText value="#{applicationPerson.firstName}"
-                                                                 onkeydown="PF('datatable').onKeyDown(event)"
-                                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
-                                                </f:facet>
-                                            </p:cellEditor>
-                                        </p:column>
+                                            <h:panelGroup>
+                                                <p:outputLabel value="#{occPermitApplicationManageBB.personRequirementDescription.get(2)}"/>
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+                                    </div>
 
-                                        <p:column headerText="Person Type">
-                                            <p:selectOneMenu value="#{applicationPerson.personType}">
-                                                <f:selectItems value="#{occPermitApplicationManageBB.optAndReqPersons}" var="type" itemLabel="#{type.label}" itemValue="#{type}"/>
-                                            </p:selectOneMenu> 
-                                        </p:column>  
+                                    <div class="ui-g-12 ui-md-9 ui-lg-9 data_field">
 
-                                        <p:column headerText="Edit?">
-                                            <p:rowEditor/>
-                                            <p:rowToggler/>
-                                        </p:column>
+                                        <p:commandButton update="applicationPersonTable" value="Add a new person" action="#{occPermitApplicationManageBB.addANewPerson}" />
 
-                                        <p:column headerText="">
-                                            <p:commandButton ajax="true" value="Set as applicant" 
-                                                             action="#{occPermitApplicationManageBB.setApplicant(applicationPerson)}"
-                                                             update="#{p:component('currentApplicantLabel')} #{p:component('currentContactLabel')}"
-                                                             /> 
-                                        </p:column>
+                                        <p:dataTable id="applicationPersonTable"
+                                                     widgetVar="datatable"
+                                                     rowIndexVar="rowIndex"
+                                                     var="applicationPerson" value="#{occPermitApplicationManageBB.attachedPersons}" 
+                                                     rowKey="#{applicationPerson.personID}"
+                                                     editable="true">                                
+                                            <p:column headerText="Last Name">
+                                                <p:cellEditor>
+                                                    <f:facet name="output"><h:outputText value="#{applicationPerson.lastName}"/></f:facet>
+                                                    <f:facet name="input">
+                                                        <p:inputText value="#{applicationPerson.lastName}"
+                                                                     onkeydown="PF('datatable').onKeyDown(event)"
+                                                                     onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                    </f:facet>
+                                                </p:cellEditor>
+                                            </p:column>
 
-                                        <p:column headerText="">
-                                            <p:commandButton ajax="true" value="Set as preferred contact" 
-                                                             action="#{occPermitApplicationManageBB.setContactPerson(applicationPerson)}"
-                                                             update="#{p:component('currentContactLabel')}"
-                                                             /> 
-                                        </p:column>
+                                            <p:column headerText="First Name">
+                                                <p:cellEditor>
+                                                    <f:facet name="output"><h:outputText value="#{applicationPerson.firstName}"/></f:facet>
+                                                    <f:facet name="input">
+                                                        <p:inputText value="#{applicationPerson.firstName}"
+                                                                     onkeydown="PF('datatable').onKeyDown(event)"
+                                                                     onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                    </f:facet>
+                                                </p:cellEditor>
+                                            </p:column>
 
+                                            <p:column headerText="Person Type">
+                                                <p:selectOneMenu value="#{applicationPerson.applicationPersonType}">
+                                                    <f:selectItems value="#{occPermitApplicationManageBB.optAndReqPersons}" var="type" itemLabel="#{type.label}" itemValue="#{type}"/>
+                                                </p:selectOneMenu> 
+                                            </p:column>  
 
-                                        <p:column>
-                                            <p:commandButton ajax="true" value="Remove" 
-                                                             action="#{occPermitApplicationManageBB.removePersonFromApplication(applicationPerson)}"
-                                                             update="#{p:component('applicationPersonTable')}"
-                                                             /> 
-                                        </p:column>
+                                            <p:column headerText="Edit?">
+                                                <p:rowEditor/>
+                                                <p:rowToggler/>
+                                            </p:column>
 
-                                        <p:rowExpansion>
+                                            <p:column headerText="">
+                                                <p:commandButton ajax="true" value="Set as applicant" 
+                                                                 action="#{occPermitApplicationManageBB.setApplicant(applicationPerson)}"
+                                                                 update="#{p:component('currentApplicantLabel')} #{p:component('currentContactLabel')}"
+                                                                 /> 
+                                            </p:column>
 
-                                            <div class="outlinedBox">
-
-                                                <p:outputLabel><b>Remember to hit the enter key when you finish filling out a box!</b></p:outputLabel>
-
-                                                <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
-                                                             columnClasses="gridTd, gridTd, gridTd, gridTd">
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Phone (cell)" />
-                                                        <div class="rowExpansion">
-                                                            <p:inputText value="#{applicationPerson.phoneCell}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Phone (home)" />
-                                                        <div class="rowExpansion">
-                                                            <p:inputText value="#{applicationPerson.phoneHome}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Phone (work)" />
-                                                        <div class="rowExpansion">
-                                                            <p:inputText value="#{applicationPerson.phoneWork}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Email" />
-                                                        <div class="rowExpansion">
-                                                            <p:inputText value="#{applicationPerson.email}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <p:spacer height="5px"/>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Street" />
-                                                        <div class="rowExpansion">
-                                                            <p:inputText value="#{applicationPerson.addressStreet}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="City" />
-                                                        <div class="rowExpansion">
-                                                            <p:inputText value="#{applicationPerson.addressCity}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="State" />
-                                                        <div class="rowExpansion">
-                                                            <p:inputText value="#{applicationPerson.addressState}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Zip Code" />
-                                                        <div class="rowExpansion">
-                                                            <p:inputText value="#{applicationPerson.addressZip}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <p:spacer height="5px"/>
-
-                                                    <h:outputText styleClass="bold" value="If you have a separate mailing address, fill out the section below:"/>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Would you like to use a separate mailing address?" />
-                                                        <div class="rowExpansion">
-                                                            <p:inputSwitch value="#{applicationPerson.useSeparateMailingAddress}" onLabel="Yes" offLabel="No"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Street" />
-                                                        <div class="rowExpansion">
-                                                            <p:inputText value="#{applicationPerson.mailingAddressStreet}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Address third line:" />
-                                                        <div class="rowExpansion">
-                                                            <p:inputText value="#{applicationPerson.mailingAddressThirdLine}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="City" />
-                                                        <div class="rowExpansion">
-                                                            <p:inputText value="#{applicationPerson.mailingAddressCity}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="State" />
-                                                        <div class="rowExpansion">
-                                                            <p:inputText value="#{applicationPerson.mailingAddressState}"/>
-                                                        </div>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <h:outputText styleClass="bold" value="Zip Code" />
-                                                        <div class="rowExpansion">
-                                                            <p:inputText value="#{applicationPerson.mailingAddressZip}"/>
-                                                        </div>
-                                                    </h:panelGroup>
+                                            <p:column headerText="">
+                                                <p:commandButton ajax="true" value="Set as preferred contact" 
+                                                                 action="#{occPermitApplicationManageBB.setContactPerson(applicationPerson)}"
+                                                                 update="#{p:component('currentContactLabel')}"
+                                                                 /> 
+                                            </p:column>
 
 
-                                                </h:panelGrid>
+                                            <p:column>
+                                                <p:commandButton ajax="true" value="Remove" 
+                                                                 action="#{occPermitApplicationManageBB.removePersonFromApplication(applicationPerson)}"
+                                                                 update="#{p:component('applicationPersonTable')}"
+                                                                 /> 
+                                            </p:column>
+
+                                            <p:rowExpansion>
+
+                                                <div class="outlinedBox">
+
+                                                    <p:outputLabel><b>Remember to hit the enter key when you finish filling out a box!</b></p:outputLabel>
+
+                                                    <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                                 columnClasses="gridTd, gridTd, gridTd, gridTd">
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Phone (cell)" />
+                                                            <div class="rowExpansion">
+                                                                <p:inputText value="#{applicationPerson.phoneCell}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Phone (home)" />
+                                                            <div class="rowExpansion">
+                                                                <p:inputText value="#{applicationPerson.phoneHome}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Phone (work)" />
+                                                            <div class="rowExpansion">
+                                                                <p:inputText value="#{applicationPerson.phoneWork}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Email" />
+                                                            <div class="rowExpansion">
+                                                                <p:inputText value="#{applicationPerson.email}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Street" />
+                                                            <div class="rowExpansion">
+                                                                <p:inputText value="#{applicationPerson.addressStreet}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="City" />
+                                                            <div class="rowExpansion">
+                                                                <p:inputText value="#{applicationPerson.addressCity}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="State" />
+                                                            <div class="rowExpansion">
+                                                                <p:inputText value="#{applicationPerson.addressState}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Zip Code" />
+                                                            <div class="rowExpansion">
+                                                                <p:inputText value="#{applicationPerson.addressZip}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:outputText styleClass="bold" value="If they have a separate mailing address, fill out the section below:"/>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Would you like to use a separate mailing address?" />
+                                                            <div class="rowExpansion">
+                                                                <p:inputSwitch value="#{applicationPerson.useSeparateMailingAddress}" onLabel="Yes" offLabel="No"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Street" />
+                                                            <div class="rowExpansion">
+                                                                <p:inputText value="#{applicationPerson.mailingAddressStreet}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Address third line:" />
+                                                            <div class="rowExpansion">
+                                                                <p:inputText value="#{applicationPerson.mailingAddressThirdLine}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="City" />
+                                                            <div class="rowExpansion">
+                                                                <p:inputText value="#{applicationPerson.mailingAddressCity}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="State" />
+                                                            <div class="rowExpansion">
+                                                                <p:inputText value="#{applicationPerson.mailingAddressState}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputText styleClass="bold" value="Zip Code" />
+                                                            <div class="rowExpansion">
+                                                                <p:inputText value="#{applicationPerson.mailingAddressZip}"/>
+                                                            </div>
+                                                        </h:panelGroup>
+
+
+                                                    </h:panelGrid>
 
 
 
-                                            </div>
+                                                </div>
 
-                                        </p:rowExpansion>
+                                            </p:rowExpansion>
 
-                                    </p:dataTable>
+                                        </p:dataTable>
+
+                                    </div>
 
                                     <script type="text/javascript">
 
@@ -380,21 +401,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                     </script>
                                     <p:spacer height="10px"/>
+                                    <div class="ui-g-12 ui-md-9 ui-lg-9 data_field">
+                                        <h:outputText id ="currentApplicantLabel" value="Current Applicant: #{occPermitApplicationManageBB.applicantName}"/>
 
-                                    <h:outputText id ="currentApplicantLabel" value="Current Applicant: #{occPermitApplicationManageBB.applicantName}"/>
+                                        <p:spacer height="5px"/>
 
-                                    <p:spacer height="10px"/>
+                                        <h:outputText id ="currentContactLabel" value="Preferred Contact: #{occPermitApplicationManageBB.contactName}"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-9 ui-lg-9 data_field">
 
-                                    <h:outputText id ="currentContactLabel" value="Preferred Contact: #{occPermitApplicationManageBB.contactName}"/>
-
-                                    <p:spacer height="10px"/>
-                                    <p:commandButton update="applicationPersonTable" value="Add a new person" action="#{occPermitApplicationManageBB.addANewPerson}" />
-
-                                    <p:spacer height="10px"/>
-
-
-                                    <p:commandButton value="Cancel" icon="fa fa-stop" 
-                                                     action="#{occPermitApplicationManageBB.cancelAttachment()}"/>
+                                        <p:commandButton action="#{occPermitApplicationManageBB.acceptAttachedPersonChanges()}"
+                                                         value="Accept changes to attached persons" icon="fa fa-check"
+                                                         update="period-creation-messages-form"/>
+                                        <p:commandButton value="Cancel" icon="fa fa-stop" 
+                                                         action="#{occPermitApplicationManageBB.cancelAttachment()}"/>
+                                    </div>
 
                                 </div>
                             </h:form>

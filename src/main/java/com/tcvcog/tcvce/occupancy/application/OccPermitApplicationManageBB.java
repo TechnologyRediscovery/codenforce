@@ -345,14 +345,13 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     }
 
     public void searchForPersons() {
-        UserCoordinator uc = getUserCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
 
         QueryPerson qp = null;
 
         try {
 
-            qp = sc.initQuery(QueryPersonEnum.PERSON_NAME, uc.getPublicUserAuthorized().getMyCredential());
+            qp = sc.initQuery(QueryPersonEnum.PERSON_NAME, getSessionBean().getSessUser().getMyCredential());
 
             if (qp != null && !qp.getParamsList().isEmpty()) {
                 SearchParamsPerson spp = qp.getPrimaryParams();
@@ -373,7 +372,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
                                 "Something when wrong with the person search! Sorry!", ""));
             }
 
-        } catch (IntegrationException | SearchException ex) {
+        } catch (SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -433,9 +432,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
     public String addANewPerson() {
 
-        PersonOccPeriod skeleton = new PersonOccPeriod();
-
-        attachedPersons.add(skeleton);
+        attachedPersons.add(new PersonOccPeriod());
 
         return "";
     }
@@ -502,7 +499,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         description = new StringBuilder();
 
-        description.append("Also, please identify yourself by clicking the \"Set As Applicant\" button in the row with your name.");
+        description.append("Also, please identify the applicant by clicking the \"Set As Applicant\" button in the row with their name.");
 
         descList.add(description.toString());
 
@@ -520,6 +517,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         try {
             OccPermitApplication app = oi.getOccPermitApplication(selectedApplication.getId());
+            app.setStatus(statusToSet);
             oi.updateOccPermitApplication(app);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Status changed on application ID " + selectedApplication.getId(), ""));
@@ -766,6 +764,28 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
     }
 
+    public String acceptAttachedPersonChanges(){
+        
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        
+        selectedApplication.setApplicantPerson(applicant);
+
+        selectedApplication.setPreferredContact(contactPerson);
+        
+        selectedApplication.setAttachedPersons(attachedPersons);
+        try{
+        selectedApplication = oc.verifyOccPermitPersonsRequirement(selectedApplication);
+        } catch (BObStatusException ex){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.toString(), ""));
+        }
+        
+        
+        
+        return "";
+    }
+    
     public boolean isPathsDisabled() {
 
         if (selectedApplication == null) {

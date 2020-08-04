@@ -1500,14 +1500,14 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     public void insertOccApplicationPersons(OccPermitApplication application) throws IntegrationException {
 
         String query = "INSERT INTO public.occpermitapplicationperson(occpermitapplication_applicationid, "
-                + "person_personid, applicant, preferredcontact, applicationpersontype)\n"
-                + "VALUES (?, ?, ?, ?, CAST (? AS persontype));";
+                + "person_personid, applicant, preferredcontact, active, applicationpersontype)\n"
+                + "VALUES (?, ?, ?, ?, true, CAST (? AS persontype));";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
         List<PersonOccPeriod> applicationPersons = application.getAttachedPersons();
-        for (Person person : applicationPersons) {
+        for (PersonOccPeriod person : applicationPersons) {
             try {
                 stmt = con.prepareStatement(query);
                 stmt.setInt(1, application.getId());
@@ -1528,12 +1528,15 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 } else {
                     stmt.setBoolean(4, false);
                 }
-                stmt.setString(5, person.getPersonType().name());
+                stmt.setString(5, person.getApplicationPersonType().name());
                 stmt.execute();
             } catch (SQLException ex) {
                 System.out.println("OccupancyIntegrator.insertOccApplicationPersons() | ERROR: "+ ex);
                 throw new IntegrationException("OccupancyIntegrator.insertOccApplicationPersons"
                         + " | IntegrationException: Unable to insert occupancy permit application ", ex);
+            } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { } }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { } }
             }
         }
     }

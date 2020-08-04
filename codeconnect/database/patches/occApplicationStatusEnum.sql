@@ -23,6 +23,7 @@ CREATE TABLE public.occpermitapplicationperson
   applicant boolean,
   preferredcontact boolean,
   applicationpersontype persontype NOT NULL DEFAULT 'Other'::persontype,
+  active boolean,
   CONSTRAINT occpermitapplicationperson_comp_pk PRIMARY KEY (occpermitapplication_applicationid, person_personid),
   CONSTRAINT occpermitapplicationperson_applicationid_fk FOREIGN KEY (occpermitapplication_applicationid)
       REFERENCES public.occpermitapplication (applicationid) MATCH SIMPLE

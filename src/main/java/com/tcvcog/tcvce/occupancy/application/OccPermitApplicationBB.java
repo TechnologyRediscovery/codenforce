@@ -632,62 +632,28 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     public String reviewApplication() {
 
-        List<Integer> countTypes = new ArrayList();
-
-        //Create an ArrayList that will stores how many of each type
-        for (int index = 0; index < 17; index++) {
-
-            countTypes.add(0);
-
-        }
-        //count each type
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        List<PersonOccPeriod> unbundledPersons = new ArrayList<>();
+        
+        //An application we'll use to test if the person requirements have been met.
+        OccPermitApplication temp = new OccPermitApplication();
+        
         for (PublicInfoBundlePerson p : attachedPersons) {
-
-            Person bundle = p.getBundledPerson();
-            
-            int index = bundle.getPersonType().ordinal();
-
-            int temp = countTypes.get(index) + 1;
-
-            if(bundle.getFirstName() == null || bundle.getFirstName().contentEquals("")
-               || bundle.getLastName() == null || bundle.getFirstName().contentEquals("")){
-                
-                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Please enter the first and last name of every person in the list.", ""));
-                return "";
-                
-            }
-            
-            countTypes.set(index, temp);
-
+            unbundledPersons.add(new PersonOccPeriod(p.getBundledPerson()));
         }
-        //compare the counts of each person type with the list of requirements. 
-        //If any required types have less than 1 person, then tell the user they
-        //are missing some types.
-        for (PersonType type : requiredPersons) {
+        
+        temp.setAttachedPersons(unbundledPersons);
+        temp.setApplicantPerson(applicant.getBundledPerson());
+        temp.setPreferredContact(contactPerson.getBundledPerson());
 
-            int index = type.ordinal();
-
-            if (countTypes.get(index) < 1) {
-
-                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "You are missing a " + type.getLabel(), ""));
-                return "";
-
-            }
-
+        try{
+        oc.verifyOccPermitPersonsRequirement(temp);
+        } catch(BObStatusException ex){
+            //The user has made an error, let's tell them about it.
+              getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        ex.toString(), ""));
+              return "";
         }
-
-        if (applicant == null) {
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Please identify yourself by setting yourself as the applicant in the list below.", ""));
-            return "";
-        }
-
-        if (contactPerson == null) {
-            contactPerson = applicant;
-        }
-
         getSessionBean().setOccPermitApplicant(applicant);
 
         getSessionBean().setOccPermitPreferredContact(contactPerson);
@@ -719,13 +685,17 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             currentApplication.setApplicationPropertyUnit(exportedUnit);
 
-            Person exportedPerson = pic.export(applicant);
+            PersonOccPeriod exportedPerson = new PersonOccPeriod(pic.export(applicant));
+
+            exportedPerson.setApplicationPersonType(applicant.getBundledPerson().getPersonType());
 
             currentApplication.setApplicantPerson(exportedPerson);
 
             if (contactPerson != null) {
 
-                exportedPerson = pic.export(contactPerson);
+                exportedPerson = new PersonOccPeriod(pic.export(contactPerson));
+                
+                exportedPerson.setApplicationPersonType(contactPerson.getBundledPerson().getPersonType());
 
             }
 
@@ -736,10 +706,11 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             
             for (PublicInfoBundlePerson attachedPerson : attachedPersons) {
 
-                exportedPerson = pic.export(attachedPerson);
-
-                currentApplication.getAttachedPersons().add( new PersonOccPeriod(exportedPerson));
-
+                exportedPerson = new PersonOccPeriod(pic.export(attachedPerson));
+                
+                exportedPerson.setPersonType(attachedPerson.getBundledPerson().getPersonType());
+                
+                currentApplication.getAttachedPersons().add(exportedPerson);
             }
 
             oc.insertOccPermitApplication(currentApplication);
@@ -892,20 +863,20 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         List<PersonChangeOrder> changeList = new ArrayList<>();
 
-        List<Person> currentPersonList = new ArrayList<>();
+        List<PersonOccPeriod> currentPersonList = new ArrayList<>();
 
         List<Person> existingPersonList = new ArrayList<>();
 
-        //Export the workingPropUnits list from PublicInfoBundles to units. This should preserve changes made by the user.
+        //Export the workingPropUnits list from PublicInfoBundles to PersonOccPeriods. This should preserve changes made by the user.
         for (PublicInfoBundlePerson bundle : attachedPersons) {
             try {
-                currentPersonList.add(pic.export(bundle));
+                currentPersonList.add(new PersonOccPeriod(pic.export(bundle))); //This must be a PersonOccPeriod in order to store the person type data in the correct field.
             } catch (IntegrationException ex) {
                 System.out.println("OccPermitApplicationBB.submitPersonChangeList() | ERROR: " + ex);
             }
 
         }
-
+        
         //Grab the persons that are currently in the database
         for(Person p : currentPersonList){
             try {
@@ -916,7 +887,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             System.out.println("OccPermitApplicationBB.submitUnitChangeList() | ERROR: " + ex);
             }
         }
-        for (Person workingPerson : currentPersonList) {
+        for (PersonOccPeriod workingPerson : currentPersonList) {
 
             //Intialize change order so it's ready to receive edits.
             PersonChangeOrder skeleton = new PersonChangeOrder();
@@ -929,6 +900,10 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
                     //this block fires if the unit ID already exists in our database. The unit is an existing one that may have been changed
                     added = false;
+                    
+                    //We don't want to change the overall person type. 
+                    //The type the user assigned should only be stored in the applicationPersonType. The PersonOccPeriod() constructor above has done that.
+                    workingPerson.setPersonType(existingPerson.getPersonType());  
                     
                     skeleton = new PersonChangeOrder(existingPerson, workingPerson); //This constructor will compare the two.
                     
@@ -953,36 +928,6 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         }
 
-        //We checked for changes and added units. We will now check for removed units
-        for (Person activePerson : existingPersonList) {
-
-            PersonChangeOrder skeleton = new PersonChangeOrder();
-
-            boolean removed = true;
-
-            for (Person workingPerson : currentPersonList) {
-
-                if (activePerson == null || workingPerson.getPersonID() == activePerson.getPersonID()) {
-
-                    removed = false;
-
-                }
-
-            }
-
-            if (removed == true) {
-
-                //Only the personID and removed flag are needed to deactivate a person from the database
-                skeleton.setPersonID(activePerson.getPersonID());
-
-                skeleton.setRemoved(removed);
-
-                changeList.add(skeleton);
-
-            }
-
-        }
-
         //We are done getting change orders. It's time to get them ready for the database and insert them.
         
         //There's a bit of a dependency caveat: we need to set who changed these people
@@ -999,7 +944,6 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         
         try {
            changedby = pi.getPerson(currentApplicant.getPersonID());
-           
         } catch(IntegrationException ex){
             System.out.println(ex);            
         }

@@ -17,7 +17,6 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
@@ -32,7 +31,6 @@ import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
@@ -209,6 +207,44 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         List<PersonOccPeriod> personList = new ArrayList<>();
         String selectQuery =  "SELECT person_personid, applicant, preferredcontact, \n" +
                                 "   applicationpersontype\n" +
+                                "   FROM public.occpermitapplicationperson WHERE occpermitapplication_applicationid=? AND active=true;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = con.prepareStatement(selectQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            stmt.setInt(1, application.getId());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                personList.add(generatePersonOccPeriod(rs));
+                
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to get persons connected to OccPermitApplication", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return personList;
+    }
+    
+    /**
+     * Gets a list that includes inactive links
+     * 
+     * @param application
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<PersonOccPeriod> getPersonOccApplicationListWithInactive(OccPermitApplication application) throws IntegrationException{
+        List<PersonOccPeriod> personList = new ArrayList<>();
+        String selectQuery =  "SELECT person_personid, applicant, preferredcontact, \n" +
+                                "   applicationpersontype\n" +
                                 "   FROM public.occpermitapplicationperson WHERE occpermitapplication_applicationid=?;";
 
         Connection con = getPostgresCon();
@@ -236,11 +272,38 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         return personList;
     }
     
+    public void updatePersonOccPeriod(PersonOccPeriod input, OccPermitApplication app) throws IntegrationException{
+        Connection con = getPostgresCon();
+        String query = "UPDATE occpermitapplicationperson "
+                + "SET applicant = ?, preferredcontact = ?, applicationpersontype = ?::persontype, active = ? "
+                + "WHERE person_personid = ? AND occpermitapplication_applicationid = ?;";
+
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setBoolean(1, input.isApplicant());
+            stmt.setBoolean(2, input.isPreferredContact());
+            stmt.setString(3, input.getApplicationPersonType().name());
+            stmt.setInt(4, input.getPersonID());
+            stmt.setInt(5, app.getId());
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update person-occperiod link");
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
     private PersonOccPeriod generatePersonOccPeriod(ResultSet rs) throws SQLException, IntegrationException{
         PersonOccPeriod pop = new PersonOccPeriod(getPerson(rs.getInt("person_personid")));
-        pop.setApplicant(rs.getBoolean("applicant"));;
+        pop.setApplicant(rs.getBoolean("applicant"));
         pop.setPreferredContact(rs.getBoolean("preferredcontact"));
-        pop.setApplicationPersonTppe(PersonType.valueOf(rs.getString("applicationpersontype")));
+        pop.setApplicationPersonType(PersonType.valueOf(rs.getString("applicationpersontype")));
+        pop.setLinkActive(rs.getBoolean("active"));
         return pop;        
     }
     

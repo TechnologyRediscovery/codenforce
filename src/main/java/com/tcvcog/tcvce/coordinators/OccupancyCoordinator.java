@@ -79,8 +79,10 @@ import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
+import java.util.Iterator;
 
 /**
  * King of all business logic implementation for the entire Occupancy object
@@ -852,27 +854,42 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * Sets boolean requirementSatisfied on an OccPermitApplication based on the
      * application reason, the person requirement for that reason, and the
      * PersonTypes of the Persons attached to the application.
+     * Also checks for Applicant. 
+     * If Preferred Contact is null, then it sets the Preferred Contact equal to the applicant
      *
      * @param opa
+     * @return the sanitize OccPermitApplication
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public void verifyOccPermitPersonsRequirement(OccPermitApplication opa) {
-        boolean isRequirementSatisfied = true;
+    public OccPermitApplication verifyOccPermitPersonsRequirement(OccPermitApplication opa) throws BObStatusException {
         OccAppPersonRequirement pr = opa.getReason().getPersonsRequirement();
-        List<PersonType> requiredPersonTypes = pr.getRequiredPersonTypes();
-        List<Person> applicationPersons = new ArrayList<>();
-        for (PersonOccPeriod skeleton : opa.getAttachedPersons()) {
-            applicationPersons.add(skeleton);
+        pr.setRequirementSatisfied(false); // If we meet the requirement, we will reach the end and set this to true.
+        
+        if(opa.getApplicantPerson() == null){
+            throw new BObStatusException("Please specify an applicant.");
         }
+        
+        if(opa.getPreferredContact() == null){
+            opa.setPreferredContact(opa.getApplicantPerson());
+        }
+        
         List<PersonType> applicationPersonTypes = new ArrayList<>();
-        for (Person applicationPerson : applicationPersons) {
-            applicationPersonTypes.add(applicationPerson.getPersonType());
+        for (PersonOccPeriod applicationPerson : opa.getAttachedPersons()) {
+            if (applicationPerson.getFirstName() == null || applicationPerson.getFirstName().contentEquals("")){
+                throw new BObStatusException("The first name field is not optional. "
+                        + "If you are filling in the name of a business, "
+                        + "please put your business\' full name in the first name field.");
+            }
+            applicationPersonTypes.add(applicationPerson.getApplicationPersonType());
         }
-        for (PersonType personType : requiredPersonTypes) {
+        
+        for (PersonType personType : pr.getRequiredPersonTypes()) {
             if (!applicationPersonTypes.contains(personType)) {
-                isRequirementSatisfied = false;
+                throw new BObStatusException("Please specify a(n) " + personType.getLabel());
             }
         }
-        pr.setRequirementSatisfied(isRequirementSatisfied);
+        pr.setRequirementSatisfied(true);//we've reached the end, the requirement was satisfied.
+        return opa;
     }
 
     /**
@@ -985,6 +1002,49 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         oi.updateOccPermitApplication(application);
         
         return newPeriodID;
+        
+    }
+    
+    public void updateOccPermitApplicationPersons(OccPermitApplication opa) throws IntegrationException{
+        
+        PersonIntegrator pi = getPersonIntegrator();
+        
+        List<PersonOccPeriod> existingList = pi.getPersonOccApplicationListWithInactive(opa);
+        
+        PersonOccPeriod applicationPerson = new PersonOccPeriod();
+        
+        for (PersonOccPeriod existingPerson : existingList){
+            
+           boolean removed = true;
+            
+            Iterator itr = opa.getAttachedPersons().iterator();
+            
+            while(itr.hasNext()){
+                
+                applicationPerson = (PersonOccPeriod) itr.next();
+                
+                if(applicationPerson.getPersonID() == 0){
+                    //insert
+                    break;
+                }
+                
+                if(applicationPerson.getPersonID() == existingPerson.getPersonID()){
+                    removed = false;
+                    //update
+                    break;
+                }
+                
+            }
+            
+            if (removed == true){
+                
+                //we never found it in the while loop above, it's been removed
+                existingPerson.setActive(false);
+                pi.updatePersonOccPeriod(existingPerson, opa);
+                
+            }
+            
+        }
         
     }
     
