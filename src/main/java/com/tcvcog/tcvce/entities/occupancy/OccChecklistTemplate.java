@@ -32,7 +32,7 @@ import java.util.Objects;
  */
 public class OccChecklistTemplate  {
     
-    // note we have a lexicon switch HERE: in the DB, this object is
+    // note we have a lexicon switch here: in the DB, this object is
     // derived from an inspectionchecklist row. In Javaland, we make
     // a ChecklistTemplate object that contains data from sevearl tables
     private int inspectionChecklistID;

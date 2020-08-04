@@ -453,7 +453,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
             pr.setActivatesOn(LocalDateTime.now());
             pr.setHidden(false);
             pr.setProposalRejected(false);
-            // TODO: implement some logic HERE for order assignment
+            // TODO: implement some logic here for order assignment
             pr.setOrder(0);
         } else {
             return;

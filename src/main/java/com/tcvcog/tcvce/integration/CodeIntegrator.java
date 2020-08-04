@@ -128,7 +128,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             "sourceid, name, year, description, isactive, url, notes)\n" +
             "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?);";
 
-        // create sql statement up HERE
+        // create sql statement up here
         Connection con = null;
         PreparedStatement stmt = null;
 
@@ -166,7 +166,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
                 "       notes=?\n" +
                 " WHERE sourceid=?;";
 
-        // create sql statement up HERE
+        // create sql statement up here
         Connection con = null;
         PreparedStatement stmt = null;
 
@@ -471,7 +471,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to delete enforcable code element: "
-                    + "it is probably used somewhere in the system and is HERE to stay!", ex);
+                    + "it is probably used somewhere in the system and is here to stay!", ex);
         } finally{
            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -859,7 +859,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         } catch (SQLException ex) { 
              System.out.println(ex.toString());
              throw new IntegrationException("Unable to delete code element--"
-                     + "probably because it has been used somewhere in the system. It's HERE to stay.", ex);
+                     + "probably because it has been used somewhere in the system. It's here to stay.", ex);
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }

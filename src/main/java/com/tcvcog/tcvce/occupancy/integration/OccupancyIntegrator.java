@@ -55,7 +55,7 @@ import java.util.List;
  * Integration methods that return populated business objects with all their
  * composite elements all nicely situated on shelves and in Lists
  *
- * High-level object families produced HERE include: OccPeriod OccPeriodType
+ * High-level object families produced here include: OccPeriod OccPeriodType
  * OccPermit OccPermitApplication
  *
  * @author ellen bascomb of apt 31y

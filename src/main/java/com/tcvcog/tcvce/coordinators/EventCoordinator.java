@@ -939,7 +939,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
         event.setCeCaseID(currentCase.getCaseID());
 //        event.set(LocalDateTime.now());
-        // not sure if I can access the session level info for the specific user HERE in the
+        // not sure if I can access the session level info for the specific user here in the
         // coordinator bean
         event.setUserCreator(getSessionBean().getSessUser());
         event.setActive(true);

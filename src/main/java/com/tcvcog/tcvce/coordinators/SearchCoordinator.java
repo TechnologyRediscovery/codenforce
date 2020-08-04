@@ -287,7 +287,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             for(Integer i: ci.searchForCECases(params)){
                 CECase cse = cc.getCECase(i);
                 // Case Phases only exist in JavaJavaLand, so we'll evaluate the
-                // search params HERE before adding the new objects to the
+                // search params here before adding the new objects to the
                 // final query result list
                 if(params.isCaseStage_ctl() && params.getCaseStage_val() != null){
                     if(cse.getCasePhase().getCaseStage() == params.getCaseStage_val()){
@@ -535,7 +535,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         for (Iterator it = q.getParamsList().iterator(); it.hasNext();) {
             SearchParams sp = (SearchParams) it.next();
-            // logic could be run HERE on SPs before adding them to the list to run
+            // logic could be run here on SPs before adding them to the list to run
             splst.add(sp);
         }
         

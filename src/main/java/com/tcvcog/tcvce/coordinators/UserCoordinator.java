@@ -95,7 +95,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     
     
      /**
-     * Primary user retrieval method: Note that there aren't as many checks HERE
+     * Primary user retrieval method: Note that there aren't as many checks here
      * since the jboss container is managing the lookup of authenticated users. 
      * We are pulling the login name from the already authenticated jboss session user 
      * and grabbing their list of authorized periods
@@ -296,7 +296,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         
         UserMuniAuthPeriodLogEntry skel = new UserMuniAuthPeriodLogEntry();
         skel.setCategory(cat.toString());
-        // this is being set HERE in the skeleton factory and should stay HERE
+        // this is being set here in the skeleton factory and should stay here
         // the redundant injection in the coordinator should be a check instead
         skel.setUserMuniAuthPeriodID(ua.getMyCredential().getGoverningAuthPeriod().getUserMuniAuthPeriodID());
         
@@ -625,7 +625,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     
     
     /**
-     * This is NOT a UserAuthorized so we're just passing out objects HERE
+     * This is NOT a UserAuthorized so we're just passing out objects here
      * @param userID
      * @return
      * @throws IntegrationException 
@@ -700,7 +700,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             if(umapList != null && !umapList.isEmpty()){
                 userIDList = new ArrayList<>();
                
-                // Consider adding a step HERE to remove invalid periods,
+                // Consider adding a step here to remove invalid periods,
                 // meaning we can restrict to only seeing "active users"
                 // in your municipality to say those Users ranked Dev or better
 //                if(uq.getRole().getRank() == RoleType.SysAdmin.getRank()){

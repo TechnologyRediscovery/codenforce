@@ -197,7 +197,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setPaccStatusMessage("This control code is associated with a "
                     + "code enforcement case but the case manager has not permitted "
                     + "pulic release of this information. Please contact your "
-                    + "municipal staff at the contact info displayed HERE. ");
+                    + "municipal staff at the contact info displayed here. ");
         }
 
         return pib;
@@ -621,7 +621,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             return exportable;
         } catch (IntegrationException ex) {
             System.out.println("Exporting payment failed. Assuming exported payment is new, and could not be found in DB.");
-            System.out.println("But HERE's the error message, just in case: " + ex.toString());
+            System.out.println("But here's the error message, just in case: " + ex.toString());
             return unbundled;
         }
     }
@@ -691,7 +691,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         } catch (IntegrationException ex) {
             System.out.println("Exporting payment failed. Assuming exported property unit is new, and could not be found in DB.");
-            System.out.println("But HERE's the error message, just in case: " + ex.toString());
+            System.out.println("But here's the error message, just in case: " + ex.toString());
             exportable = unbundled;
 
         }
@@ -749,7 +749,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         } catch (IntegrationException ex) {
             System.out.println("Exporting event failed. Assuming exported event is new, and could not be found in DB.");
-            System.out.println("But HERE's the error message, just in case: " + ex.toString());
+            System.out.println("But here's the error message, just in case: " + ex.toString());
             exportable = new EventCnFPropUnitCasePeriodHeavy(unbundled);
         }
 

@@ -777,7 +777,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     
     
     /**
-     * List produced HERE ultimately used for actively picking event categories by the user
+     * List produced here ultimately used for actively picking event categories by the user
      * @param et
      * @return
      * @throws IntegrationException
