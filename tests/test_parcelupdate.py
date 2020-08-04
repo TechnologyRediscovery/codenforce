@@ -13,7 +13,6 @@ A link to database dumps can be provided to interested contributors.
 #   This is intentional:
 #       It allows for more test classes to be added under the umbrella of an outer class without refactoring
 
-# TODO: Despite having seperate cursors, it treates it all like a single transaction anyways. Make it so it works.
 # Todo: Custom Black config for 3 lines after module level classes, or just ignore file.
 # Todo: Get pre-commit working for new IDE. Have tests run automatically on commit
 
@@ -155,10 +154,6 @@ class TestParse:
 
 
 
-
-
-
-
 with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="localhost", port="5432") as conn:
 
 
@@ -190,24 +185,12 @@ with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="lo
             with conn.cursor() as cursor:
                 write.property(person1_prop_imap, cursor)
 
-        # # def test_unit(self):
-        # #     with conn.cursor() as cursor:
-        # #         write.unit(unit_imap, cursor)
+        # # Requires a property id
+        # @transaction
+        # def test_unit(self):
+        #     with conn.cursor() as cursor:
+        #         write.unit(unit_imap, cursor)
         #
-
-        @transaction
-        def test_cecase(self, person1_cecase_imap):
-            with conn.cursor() as cursor:
-                write.cecase(person1_cecase_imap, cursor)
-
-
-
-
-
-
-
-
-
         # @transaction
         # def test_person(self, person1_owner_imap):
         #     with conn.cursor() as cursor:
@@ -217,9 +200,9 @@ with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="lo
         # #     with conn.cursor() as cursor:
         # #         write.connect_property_to_person(prop_id, person_id, cursor)
         #
-        # # def test_taxstatus(self):
-        # #     with conn.cursor() as cursor:
-        # #         write.taxstatus(tax_status, cursor)
+        # def test_taxstatus(self):
+        #     with conn.cursor() as cursor:
+        #         write.taxstatus(tax_status, cursor)
         #
         # @transaction
         # def test_propertyexternaldata(self, person1_propertyexternaldata_imap):
