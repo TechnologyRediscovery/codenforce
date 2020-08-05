@@ -486,7 +486,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 stmt.setTimestamp(14, java.sql.Timestamp.valueOf(LocalDateTime.now()));
             }
             
-            stmt.setInt(15, prop.getLastUpdatedBy().getUserID());
              if(prop.getLastUpdatedBy() != null){
                 stmt.setInt(15, prop.getLastUpdatedBy().getUserID());
             } else {
@@ -610,6 +609,40 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return "propertyProfile";
     }
     
+    
+     /**
+     * Returns a full table dump of PropertyUseType entries
+     * @param p the property containing the new note value. Client must append note properly
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void updatePropertyNoteFieldOnly(Property p) throws IntegrationException{
+        String query = "UPDATE public.property SET notes=? WHERE propertyid=?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, p.getNotes());
+            stmt.setInt(2, p.getPropertyID());
+            
+            stmt.executeUpdate();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Error searching for properties", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    /**
+     * Delete equivalent: marks active to false on property with given ID
+     * @param propID
+     * @throws IntegrationException 
+     */
     public void inactivateProperty(int propID) throws IntegrationException{
       String query =  "UPDATE public.property\n" +
                         "   SET active=? WHERE propertyid=?;";

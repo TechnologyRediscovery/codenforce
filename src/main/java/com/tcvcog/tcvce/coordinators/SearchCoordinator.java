@@ -583,6 +583,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             sp.setMuni_rtMin(RoleType.Developer);
             sp.setMuni_ctl(true);
             sp.setMuni_val(q.getCredential().getGoverningAuthPeriod().getMuni());
+            // hack to get person queries to work without muni restriction
+            if(q instanceof QueryPerson){
+                sp.setMuni_ctl(false);
+            }
             
             sp.setLimitResultCount_rtMin(RoleType.EnforcementOfficial);
             sp.setLimitResultCount_ctl(true);
@@ -670,7 +674,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          
          
          query = new QueryPerson(qName, paramsList, cred);
-         return (QueryPerson) initQueryFinalizeInit(query);
+         query = (QueryPerson) initQueryFinalizeInit(query);
+         
+         return query;
      }
      
     
@@ -1275,6 +1281,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     private SearchParamsPerson generateParams_person_prop(SearchParamsPerson params, Credential cred){
+        // turn off muni ctl to try to get query working
+        params.setMuni_ctl(false);
         params.setFilterName("Persons at property X");
         params.setFilterDescription("Across all units");
         

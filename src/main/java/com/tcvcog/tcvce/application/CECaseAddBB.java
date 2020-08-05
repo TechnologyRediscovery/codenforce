@@ -55,6 +55,10 @@ public class CECaseAddBB extends BackingBeanUtils implements Serializable{
         
     }
     
+    /**
+     * Listener method for creation of a new case
+     * @return routing string: case profile
+     */
     public String addNewCase(){
         // note that in this case, the case coordinator not this 
         // backing bean will interact with the caseintegrator
@@ -101,8 +105,13 @@ public class CECaseAddBB extends BackingBeanUtils implements Serializable{
         return "";
     }
 
+    /**
+     * Listener for user desires to abort new case add process
+     * @return 
+     */
     public String cancelAdd(){
-        return getSessionBean().getNavStack().popLastPage();
+        return "missionControl";
+        
     }
     
     /**

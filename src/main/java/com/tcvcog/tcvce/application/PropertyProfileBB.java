@@ -91,7 +91,9 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
 
     @PostConstruct
     public void initBean() {
+        
         PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         SystemCoordinator sc = getSystemCoordinator();
         pageModes = new ArrayList<>();
         pageModes.add(PageModeEnum.LOOKUP);
@@ -110,11 +112,15 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
         // use same pathway as clicking the button
         setCurrentMode(currentMode);
 
-        currentProperty = getSessionBean().getSessProperty();
-        currentPropertySelected = true;
-        muniSelected = getSessionBean().getSessMuni();
-
         try {
+            currentProperty = getSessionBean().getSessProperty();
+            if(currentProperty != null){
+                currentProperty = pc.assemblePropertyDataHeavy(currentProperty, getSessionBean().getSessUser());
+                System.out.println("PropertyProfileBB.initBean(): reassembled pdh");
+            }
+            currentPropertySelected = true;
+            muniSelected = getSessionBean().getSessMuni();
+
             putList = pi.getPropertyUseTypeList();
             sourceList = sc.getBobSourceListComplete();
             conditionIntensityList = sc.getIntensitySchemaWithClasses(
@@ -123,7 +129,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
             landBankProspectIntensityList = sc.getIntensitySchemaWithClasses(
                     getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("intensityschema_landbankprospect"))
                     .getClassList();
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
         }
     }
@@ -174,9 +180,9 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
         }
         if (currentMode != null) {
             //show the current mode in p:messages box
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            this.currentMode.getTitle() + " Mode Selected", ""));
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+//                            this.currentMode.getTitle() + " Mode Selected", ""));
         }
 
         if (currentProperty != null) {
@@ -215,6 +221,26 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
 
         currentPropertySelected = true;
         //initialize default current basic muni list
+    }
+    
+    /**
+     * Utilty method for refreshing property
+     */
+    public void reloadCurrentPropertyDataHeavy(){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            currentProperty = pc.assemblePropertyDataHeavy(currentProperty, getSessionBean().getSessUser());
+             getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Reloaded property at " + currentProperty.getAddress(), ""));
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Fatal error reloading property; apologies!", ""));
+            
+        }
+        
     }
 
     /**
@@ -262,6 +288,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Loaded property record for " + prop.getAddress(), ""));
+                getSessionBean().setSessProperty(currentProperty);
             } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
@@ -311,7 +338,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
 
         }
 
-        onExplorePropertyButtonChange(currentProperty);
+        reloadCurrentPropertyDataHeavy();
 
     }
 
@@ -364,16 +391,30 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
         PropertyCoordinator pc = getPropertyCoordinator();
         PersonCoordinator persc = getPersonCoordinator();
         try {
+            // based on the user's boolean button choice, either 
+            // look up a person by ID or use the object
             if (personLinkUseID && personIDToLink != 0) {
                 Person checkPer = null;
                 checkPer = persc.getPerson(personIDToLink);
                 if (checkPer != null && checkPer.getPersonID() != 0) {
                     pc.connectPersonToProperty(currentProperty, checkPer);
+                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                            "Connected " + checkPer.getLastName() + " to property ID " + currentProperty.getPropertyID(), ""));
+                } else {
+                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "Could not find a Person with ID " + personIDToLink, ""));
+                    
                 }
 
             } else {
                 if (personSelected != null) {
                     pc.connectPersonToProperty(currentProperty, personSelected);
+                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                            "Connected " + personSelected.getLastName() + " to property ID " + currentProperty.getPropertyID(), ""));
+                } else {
+                    
+                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "Could not complete link to person, sorry!", ""));
                 }
             }
         } catch (IntegrationException | BObStatusException ex) {
@@ -382,7 +423,28 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
             
         }
 
-        return "";
+        return "propertyInfo";
+    }
+    
+    /**
+     * Listener for user requests to remove a link between property and person
+     * @param p
+     * @return 
+     */
+    public String onPersonConnectRemoveButtonChange(Person p){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            pc.connectRemovePersonToProperty(currentProperty, p, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                            "Removed property-person link and created documentation note.", ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "Could not remove link from property to person, sorry!", ""));
+        }
+        
+        
+        return "propertyInfo";
     }
 
     /**
@@ -517,6 +579,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
 
     public String onCreateNewCaseButtonChange() {
         getSessionBean().setSessProperty(currentProperty);
+        getSessionBean().getNavStack().pushPage("ceCaseWorkflow");
         return "addNewCase";
 
     }

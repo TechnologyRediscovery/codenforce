@@ -41,6 +41,15 @@ public class NavigationStack {
         
     }
     
+    /**
+     * Pushes an arbitrary string onto stack
+     * Client must test for ViewID correctness
+     * @param viewID 
+     */
+    public void pushPage(String viewID){
+        viewIDStack.push(viewID);
+    }
+    
     public String popLastPage(){
         
         return viewIDStack.pop();

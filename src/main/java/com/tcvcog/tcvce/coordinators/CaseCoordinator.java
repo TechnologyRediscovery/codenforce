@@ -241,16 +241,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * Builds a property and propertyUnit heavy subclass of our CECase object
      *
      * @param cse
-     * @param ua
      * @return the data-rich subclass with Property and possible PropertyUnit
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
     public CECasePropertyUnitHeavy assembleCECasePropertyUnitHeavy(CECase cse) throws IntegrationException, SearchException {
         PropertyCoordinator pc = getPropertyCoordinator();
-        SearchCoordinator sc = getSearchCoordinator();
-        EventCoordinator ec = getEventCoordinator();
+
         CECasePropertyUnitHeavy csepuh = null;
+
         if (cse != null) {
             csepuh = new CECasePropertyUnitHeavy(cse);
             csepuh.setProperty(pc.getProperty(cse.getPropertyID()));
@@ -268,7 +267,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * Units
      *
      * @param cseList
-     * @param ua
      * @return
      */
     public List<CECasePropertyUnitHeavy> assembleCECasePropertyUnitHeavyList(List<CECase> cseList) {

@@ -16,12 +16,11 @@
                     <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                     </h:messages>
-                            
-                    <h1>Create New Code Enforcement Case</h1>
-                    <h2>For your current property: <h:outputText value="#{ceCaseAddBB.caseProperty.address}"/> 
-                        in <h:outputText value="#{ceCaseAddBB.caseProperty.muni.muniName}"/></h2>
                     <f:view>
+                            
                         <h:form id="caseAddForm">
+                            <h1>Create New Code Enforcement Case at <h:outputText value="#{ceCaseAddBB.caseProperty.address} (#{ceCaseAddBB.caseProperty.muni.muniName})"/> 
+
                             
                               <h:panelGrid columns="4" border="0" 
                                          cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
@@ -72,9 +71,17 @@
                             
                             <p:spacer height="10px"/>
                             
-                            <p:commandButton ajax="false" tabindex="5" value="Create New Case" action="#{ceCaseAddBB.addNewCase}" />
+                            <p:commandButton ajax="false" 
+                                             tabindex="5" 
+                                             icon="fa fa-trash"
+                                             value="Abort Case Add Operation" 
+                                             action="#{ceCaseAddBB.cancelAdd}" />
                             
-                            <p:commandButton ajax="false" tabindex="5" value="Cancel and return to previous page" action="#{ceCaseAddBB.cancelAdd}" />
+                            <p:commandButton ajax="false" 
+                                             tabindex="5" 
+                                             icon="fa fa-archive"
+                                             value="Create New Code Enforcement Case" 
+                                             action="#{ceCaseAddBB.addNewCase}" />
                             
                         </h:form>
                     </f:view>
