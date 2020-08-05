@@ -28,9 +28,3 @@ alter table propertyexternaldata
    drop column taxsubcode,
    drop column taxstatus,
    drop column taxstatusyear;
-
-CREATE SEQUENCE taxstatus_taxstatusid_seq
-    INCREMENT 1
-    START 1000
-    MINVALUE 1000;
-

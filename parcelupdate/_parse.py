@@ -33,7 +33,7 @@ def _extract_elementlist_from_soup(soup, element_id, element=SPAN, remove_tags=T
         cleaned_content.append(tag)
 
     if len(cleaned_content) != 0:
-        # Todo: Log error here
+        # Todo: Log error HERE
         return cleaned_content
     return cleaned_content
 
@@ -89,10 +89,17 @@ class OwnerName:
 
     def __init__(self, parid=None):
         self.multientity = None
+    def __str__(self):
+        return self.clean
+    def __repr__(self):
+        return f"{self.__class__.__name__}<{self.clean}>"
+
+
 
     @classmethod
     def get_Owner_from_soup(cls, soup: str):
-        """ Factory method for creating OwnerNames from parcel ids. """
+        """ Factory method for creating OwnerNames from parcel ids.
+        """
         o = OwnerName()
         o.raw = o._parse_owners_from_soup(soup)
         o.clean = (

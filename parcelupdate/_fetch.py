@@ -12,15 +12,12 @@ from _constants import PARCEL_ID_LISTS
 Municipality = namedtuple("Municipalicty", ["municode", "name"])
 
 
-
-
-
 def munis(cursor):
-    select_sql = "SELECT municode, muniname FROM municipality;"
+    select_sql = "SELECT municode FROM municipality;"
     cursor.execute(select_sql)
     munis = cursor.fetchall()
     for row in munis:
-        yield Municipality(*row)
+        yield row[0]
 
 
 def muniname_from_municode(municode, cursor):
@@ -89,15 +86,13 @@ def cecase_id(prop_id, cursor):
         return None
 
 
-def validate_muni_json(file_name):
+def valid_json(file_name):
     with open(file_name, "r") as file:
         f = json.load(file)
         if not (f["success"] and len(f["result"]["records"]) > 0):
             # Check and see if it's a test municipality
             if file.name.startswith(os.path.join(PARCEL_ID_LISTS, "COG Land")):
-                return True
-            # Todo: log_error
+                return False
             os.rename(file_name, file_name + "_corrupt")
             raise ValueError("{} not valid".format(file.name))
         return True
-    print(file_name, "could not be validated. Skipping.")
