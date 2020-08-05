@@ -1294,7 +1294,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.attachPublicMessage}"
                                              value="Submit" icon="fa fa-link" oncomplete="PF('public-message-dialog').hide()"
                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                             update="cearManage-panel-notes"/>
+                                             update="cearManage-panel-notes
+                                             form-messages-global"/>
                             <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" 
                                              onclick="PF('public-message-dialog').hide()"/>

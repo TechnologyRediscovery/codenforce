@@ -349,8 +349,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:spacer height="5px"/>
                                                         <div class="cearActionsTableOutputLabel">
                                                             <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.connectedPeriod.periodID == 0 ? 'Not connected' :  occPermitApplicationManageBB.selectedApplication.connectedPeriod.periodID}"/>
-                                                            <p:commandButton value="Go to OccPeriod" icon="fa fa-folder" action="#{occPermitApplicationManageBB.goToOccPeriod()}"/>
                                                         </div>
+                                                        <p:spacer height="5px"/>
+                                                        <p:commandButton value="Go to OccPeriod" icon="fa fa-folder" action="#{occPermitApplicationManageBB.goToOccPeriod()}"/>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
@@ -579,7 +580,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <p:column headerText="Preferred contact?:">
                                                         <h:outputText value="#{person.preferredContact ? 'Yes' : 'No'}" />
                                                     </p:column>
-                                                    
+
                                                     <p:column headerText="Under 18?:">
                                                         <h:outputText value="#{person.under18 ? 'Yes' : 'No'}" />
                                                     </p:column>
@@ -670,7 +671,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                         <h:outputText value="#{person.mailingAddressThirdLine}"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup>
                                                                     <h:outputText styleClass="bold" value="City" />
                                                                     <div class="rowExpansion">
@@ -710,7 +711,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                     icon="fa fa-gears"/>
 
                                                 <p:spacer height="5px" />
-                                                
+
                                             </h:form>
                                         </p:panel>
 
@@ -732,8 +733,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
-                                                    <!--TODO: add note editing buttons and dialogues-->
-
                                                     <h:panelGroup>
                                                         <p:outputLabel value="Submission Notes:"/>
                                                         <p:spacer height="5px"/>
@@ -750,6 +749,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             <p:outputLabel escape="false" value="&#160;#{occPermitApplicationManageBB.selectedApplication.internalNotes}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
+                                                        <p:commandButton onclick="PF('internal-message-dialog').show()" 
+                                                                         icon="fa fa-pencil-square-o"
+                                                                         value="new note" 
+                                                                         styleClass="noFill button-size-small" 
+                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}" />
+                                                        <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
@@ -758,6 +763,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <div class="cearActionsTableOutputLabel">
                                                             <p:outputLabel escape="false" value="&#160;#{occPermitApplicationManageBB.selectedApplication.externalPublicNotes}"/>
                                                         </div>
+                                                        <p:spacer height="10px"/>
+                                                        <p:commandButton onclick="PF('public-message-dialog').show()" 
+                                                                         value="new note" 
+                                                                         icon="fa fa-pencil-square-o"
+                                                                         styleClass="noFill button-size-small" 
+                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}" />
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
@@ -854,6 +865,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" 
                                              onclick="PF('override-application-status-dialog').hide()"/>
+                        </h:form>
+                    </p:confirmDialog>
+                    
+                    <p:confirmDialog message="Attach internal message" 
+                                     severity="alert" widgetVar="internal-message-dialog"
+                                     closable="true" responsive="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}">
+
+                        <h:form id="internal-message-form">
+                            <h:outputLabel for="internal-message-ita" value="Message text"/>
+                            <p:spacer height="15px"/>
+                            <p:inputTextarea id="internal-message-ita" style="width: 300px; height: 200px;" value="#{occPermitApplicationManageBB.internalNoteText}"/>
+                            <p:spacer height="15px"/>
+                            <h:outputText escape="false" value="Your name and a timestamp will be bundled with this message 
+                                          and attached to Application ID# #{occPermitApplicationManageBB.selectedApplication.id}"/>
+
+                            <p:spacer height="15px"/>
+                            <p:commandButton ajax="true" actionListener="#{occPermitApplicationManageBB.attachInternalMessage}"
+                                             value="Submit" icon="fa fa-link" oncomplete="PF('internal-message-dialog').hide()"
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
+                                             update="occPermitManage-panel-notes
+                                             form-messages-global"/>
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('internal-message-dialog').hide()"/>
+                        </h:form>
+                    </p:confirmDialog>
+
+
+                    <p:confirmDialog message="Attach public message" 
+                                     severity="alert" widgetVar="public-message-dialog"
+                                     closable="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
+
+                        <h:form id="public-message-form">
+                            <h:outputLabel for="public-message-ita" value="Message text"/>
+                            <p:spacer height="15px"/>
+                            <p:inputTextarea id="public-message-ita" style="width: 300px; height: 200px;" value="#{occPermitApplicationManageBB.externalNoteText}"/>
+                            <p:spacer height="15px"/>
+                            <h:outputText escape="false" value="Your name and a timestamp will be bundled with this message 
+                                          and attached to Application ID# #{occPermitApplicationManageBB.selectedApplication.id}"/> 
+
+                            <p:spacer height="15px"/>
+                            <p:commandButton ajax="true" actionListener="#{occPermitApplicationManageBB.attachPublicMessage}"
+                                             value="Submit" icon="fa fa-link" oncomplete="PF('public-message-dialog').hide()"
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                             update="occPermitManage-panel-notes
+                                             form-messages-global"/>
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('public-message-dialog').hide()"/>
                         </h:form>
                     </p:confirmDialog>
                 </f:view>

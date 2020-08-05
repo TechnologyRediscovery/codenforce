@@ -70,6 +70,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccApplicationStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
@@ -79,6 +80,7 @@ import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -929,7 +931,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         application.setId(applicationId);
         
-        opi.insertOccApplicationPersons(application);
+        insertOccApplicationPersonLinks(application);
         
         return applicationId;
         
@@ -1005,47 +1007,113 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
     }
     
-    public void updateOccPermitApplicationPersons(OccPermitApplication opa) throws IntegrationException{
+    /**
+     * Inserts all the persons attached to an OccPermitApplication 
+     * into the occpermitapplicationperson table. 
+     * The default value for the applicant column is false, and that
+     * column will be set to true when the applicant person is the same as a
+     * person within the OccPermitApplication's attachedPersons variable. The
+     * boolean for the preferred contact is set similarly.
+     * WARNING: Assumes all person objects are already in the database.
+     * If any personID == 0, you're going to get an integration Exception.
+     *
+     * @param application
+     * @throws IntegrationException
+     */
+    public void insertOccApplicationPersonLinks(OccPermitApplication application) throws IntegrationException {
+
+        OccupancyIntegrator oi = getOccupancyIntegrator();
         
-        PersonIntegrator pi = getPersonIntegrator();
-        
-        List<PersonOccPeriod> existingList = pi.getPersonOccApplicationListWithInactive(opa);
-        
-        PersonOccPeriod applicationPerson = new PersonOccPeriod();
-        
-        for (PersonOccPeriod existingPerson : existingList){
-            
-           boolean removed = true;
-            
-            Iterator itr = opa.getAttachedPersons().iterator();
-            
-            while(itr.hasNext()){
-                
-                applicationPerson = (PersonOccPeriod) itr.next();
-                
-                if(applicationPerson.getPersonID() == 0){
-                    //insert
-                    break;
-                }
-                
-                if(applicationPerson.getPersonID() == existingPerson.getPersonID()){
-                    removed = false;
-                    //update
-                    break;
-                }
-                
+        List<PersonOccPeriod> applicationPersons = application.getAttachedPersons();
+        for (PersonOccPeriod person : applicationPersons) {
+
+            //see javadoc
+            if (person.getPersonID() == 0){
+                throw new IntegrationException("OccupancyCoordinator.insertOccApplicationPersonLinks() detected a person not yet in the database."
+                                                + " Please insert persons into the database before running this method!");
             }
             
-            if (removed == true){
-                
-                //we never found it in the while loop above, it's been removed
-                existingPerson.setActive(false);
-                pi.updatePersonOccPeriod(existingPerson, opa);
-                
-            }
+            /* If the person  is the applicantPerson on the 
+            OccPermitApplication, set applicant to true*/
+            person.setApplicant(application.getApplicantPerson() != null && application.getApplicantPerson().equals(person));
+
+            /* If the person is the preferredContact on the 
+            OccPermitApplication, set preferredcontact to true */
+            person.setPreferredContact(application.getPreferredContact() != null && application.getPreferredContact().equals(person));
+            
+            oi.insertOccApplicationPerson(person, application.getId());
             
         }
-        
+    }
+    
+    public void updateOccPermitApplicationPersons(OccPermitApplication opa) throws IntegrationException {
+
+        PersonIntegrator pi = getPersonIntegrator();
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        PropertyIntegrator pri = getPropertyIntegrator();
+
+        List<PersonOccPeriod> existingList = pi.getPersonOccApplicationListWithInactive(opa);
+
+        PersonOccPeriod applicationPerson = new PersonOccPeriod();
+
+        for (PersonOccPeriod existingPerson : existingList) {
+
+            boolean removed = true;
+
+            Iterator itr = opa.getAttachedPersons().iterator();
+
+            while (itr.hasNext()) {
+
+                applicationPerson = (PersonOccPeriod) itr.next();
+
+                /* If the person  is the applicantPerson on the 
+                    OccPermitApplication, set applicant to true*/
+                applicationPerson.setApplicant(opa.getApplicantPerson() != null && opa.getApplicantPerson().equals(applicationPerson));
+
+                /* If the person is the preferredContact on the 
+                    OccPermitApplication, set preferredcontact to true */
+                applicationPerson.setPreferredContact(opa.getPreferredContact() != null && opa.getPreferredContact().equals(applicationPerson));
+
+                if (applicationPerson.getPersonID() == 0) {
+
+                    applicationPerson.setPersonType(applicationPerson.getApplicationPersonType());
+                    
+                    Property prop = pri.getProperty(opa.getApplicationPropertyUnit().getPropertyID());
+                    
+                    applicationPerson.setMuniCode(prop.getMuni().getMuniCode());
+                    
+                    applicationPerson.setPersonID(pi.insertPerson(applicationPerson));
+                    
+                    oi.insertOccApplicationPerson(applicationPerson, opa.getId());
+
+                    //We've inserted this new person to the database already. 
+                    //Let's remove them so we don't insert them every time the for loop fires
+                    itr.remove();
+                    break;
+                } else if (applicationPerson.getPersonID() == existingPerson.getPersonID()) {
+                    removed = false;
+                    
+                    applicationPerson.setLinkActive(true);
+                    
+                    pi.updatePerson(applicationPerson);
+                    
+                    oi.updatePersonOccPeriod(applicationPerson, opa);
+                    
+                    break;
+                }
+
+            }
+
+            if (removed == true) {
+
+                //we never found it in the while loop above, it's been removed
+                existingPerson.setLinkActive(false);
+                oi.updatePersonOccPeriod(existingPerson, opa);
+
+            }
+
+        }
+
     }
     
     public void inspectionAction_removeSpaceFromChecklist(OccInspectedSpace spc, User u, OccInspection oi) throws IntegrationException {

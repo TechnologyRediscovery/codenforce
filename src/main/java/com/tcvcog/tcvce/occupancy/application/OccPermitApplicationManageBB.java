@@ -95,6 +95,9 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
     private List<PropertyUnit> unitList;
     private List<PersonOccPeriod> attachedPersons;
+    
+    private String internalNoteText;
+    private String externalNoteText;
 
     public OccPermitApplicationManageBB() {
     }
@@ -275,6 +278,10 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
             applicationList = results;
 
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Your search completed with "+ results.size() + " results!", ""));
+            
         } catch (BObStatusException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -779,11 +786,72 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.toString(), ""));
+            return "";
+        }
+
+        try{
+        oc.updateOccPermitApplicationPersons(selectedApplication);
+        } catch(IntegrationException ex){
+            System.out.println("OccPermitApplicationManageBB.acceptAttachedPersonChanges() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to store your changes to the person", ""));
+            return "";
         }
         
+        return getSessionBean().getNavStack().popLastPage();
         
+    }
+    
+    public void attachInternalMessage(ActionEvent ev) {
+        SystemCoordinator sc = getSystemCoordinator();
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        mbp.setUser(getSessionBean().getSessUser());
+        mbp.setExistingContent(selectedApplication.getInternalNotes());
+        mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("internalNote"));
+        mbp.setExplanation("");
+        mbp.setNewMessageContent(internalNoteText);
+        String newNotes = sc.appendNoteBlock(mbp);
+        System.out.println("CEActionRequestsBB.attachInternalMessage | msg before adding to request: " + newNotes);
         
-        return "";
+        selectedApplication.setInternalNotes(newNotes);
+        try {
+            oi.updateOccPermitApplication(selectedApplication);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Done: added internal note to application ID " + selectedApplication.getId(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Unable to update notes, sorry!",
+                    getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+        }
+
+    }
+
+    public void attachPublicMessage(ActionEvent ev) {
+
+        SystemCoordinator sc = getSystemCoordinator();
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        mbp.setUser(getSessionBean().getSessUser());
+        mbp.setExistingContent(selectedApplication.getExternalPublicNotes());
+        mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("externalNote"));
+        mbp.setExplanation("");
+        mbp.setNewMessageContent(externalNoteText);
+
+        selectedApplication.setExternalPublicNotes(sc.appendNoteBlock(mbp));
+        try {
+            oi.updateOccPermitApplication(selectedApplication);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Done: Added a public note to application ID " + selectedApplication.getId(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Unable to update notes, sorry!",
+                    getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+        }
+
     }
     
     public boolean isPathsDisabled() {
@@ -1075,6 +1143,22 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
     public void setOptAndReqPersons(List<PersonType> optAndReqPersons) {
         this.optAndReqPersons = optAndReqPersons;
+    }
+
+    public String getInternalNoteText() {
+        return internalNoteText;
+    }
+
+    public void setInternalNoteText(String internalNoteText) {
+        this.internalNoteText = internalNoteText;
+    }
+
+    public String getExternalNoteText() {
+        return externalNoteText;
+    }
+
+    public void setExternalNoteText(String externalNoteText) {
+        this.externalNoteText = externalNoteText;
     }
 
 }

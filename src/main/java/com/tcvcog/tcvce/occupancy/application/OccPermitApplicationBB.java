@@ -645,6 +645,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         temp.setAttachedPersons(unbundledPersons);
         temp.setApplicantPerson(applicant.getBundledPerson());
         temp.setPreferredContact(contactPerson.getBundledPerson());
+        temp.setReason(getSessionBean().getSessOccPermitApplication().getReason());
 
         try{
         oc.verifyOccPermitPersonsRequirement(temp);

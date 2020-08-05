@@ -206,7 +206,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     public List<PersonOccPeriod> getPersonOccApplicationList(OccPermitApplication application) throws IntegrationException{
         List<PersonOccPeriod> personList = new ArrayList<>();
         String selectQuery =  "SELECT person_personid, applicant, preferredcontact, \n" +
-                                "   applicationpersontype\n" +
+                                "   applicationpersontype, active\n" +
                                 "   FROM public.occpermitapplicationperson WHERE occpermitapplication_applicationid=? AND active=true;";
 
         Connection con = getPostgresCon();
@@ -244,7 +244,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     public List<PersonOccPeriod> getPersonOccApplicationListWithInactive(OccPermitApplication application) throws IntegrationException{
         List<PersonOccPeriod> personList = new ArrayList<>();
         String selectQuery =  "SELECT person_personid, applicant, preferredcontact, \n" +
-                                "   applicationpersontype\n" +
+                                "   applicationpersontype, active\n" +
                                 "   FROM public.occpermitapplicationperson WHERE occpermitapplication_applicationid=?;";
 
         Connection con = getPostgresCon();
@@ -272,32 +272,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         return personList;
     }
     
-    public void updatePersonOccPeriod(PersonOccPeriod input, OccPermitApplication app) throws IntegrationException{
-        Connection con = getPostgresCon();
-        String query = "UPDATE occpermitapplicationperson "
-                + "SET applicant = ?, preferredcontact = ?, applicationpersontype = ?::persontype, active = ? "
-                + "WHERE person_personid = ? AND occpermitapplication_applicationid = ?;";
-
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setBoolean(1, input.isApplicant());
-            stmt.setBoolean(2, input.isPreferredContact());
-            stmt.setString(3, input.getApplicationPersonType().name());
-            stmt.setInt(4, input.getPersonID());
-            stmt.setInt(5, app.getId());
-            stmt.execute();
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to update person-occperiod link");
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-    }
-    
     private PersonOccPeriod generatePersonOccPeriod(ResultSet rs) throws SQLException, IntegrationException{
         PersonOccPeriod pop = new PersonOccPeriod(getPerson(rs.getInt("person_personid")));
         pop.setApplicant(rs.getBoolean("applicant"));
@@ -305,11 +279,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         pop.setApplicationPersonType(PersonType.valueOf(rs.getString("applicationpersontype")));
         pop.setLinkActive(rs.getBoolean("active"));
         return pop;        
-    }
-    
-
-   
-
+    }   
     
     /**
      * Creates a record in the person-property linking table, after checking that it does not exist
