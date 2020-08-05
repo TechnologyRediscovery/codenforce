@@ -619,6 +619,9 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      */
     public boolean user_checkUsernameAllowedForInsert(String uname){
         UserIntegrator ui = getUserIntegrator();
+        if(uname == null){
+            return false;
+        }
         boolean allowed = false;
         try {
             int checkID = ui.getUserID(uname);
@@ -747,20 +750,26 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     /**
      * Logic container for checking permissibility of User record deactivation.
      * Key role is to prohibit any UI-based deactivation of developer users :)
-     * @param ua
+     * @param ua requesting user
      * @param ufcToDeac 
      * @throws com.tcvcog.tcvce.domain.AuthorizationException 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
     public void user_deactivateUser(UserAuthorized ua, UserAuthorizedForConfig ufcToDeac) throws AuthorizationException, IntegrationException{
+        System.out.println("UserCoordinator.user_deactivateUser");
         UserIntegrator ui = getUserIntegrator();
         if(ufcToDeac != null && ua != null){
-            if(auditUMAPList_allowDeactivation_freeOfDevCreds(ufcToDeac.getUmapList())){
+            if(ua.getUserID() == ufcToDeac.getUserID()){
+                throw new AuthorizationException("Users cannot deactivate themselves!");
+            }
+            // users can only deactivate users whose highest UMAP rank is less than theirs, or have dev rank
+            if(auditUMAPList_determineHighestRank(ufcToDeac.getUmapList()).getRank() < ua.getKeyCard().getGoverningAuthPeriod().getRole().getRank()
+                    || ua.getKeyCard().getGoverningAuthPeriod().getRole().getRank() == RoleType.Developer.getRank()){
                 ufcToDeac.setDeactivatedBy(ua.getUserID());
-                ui.updateUser(ua);
+                ufcToDeac.setDeactivatedTS(LocalDateTime.now());
+                ui.updateUser(ufcToDeac);
             } else {
                 throw new AuthorizationException("Users with a UMAP of rank: developer cannot be deactivated from the UI");
-
             }
         } else {
             throw new AuthorizationException("Cannot deactivate a null user!");
@@ -772,15 +781,36 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @param umapList
      * @return true if no dev ranked UMAPs were found
      */
+    private RoleType auditUMAPList_determineHighestRank(List<UserMuniAuthPeriod> umapList){
+         
+        RoleType highestRole = RoleType.Public;
+        if(umapList != null && !umapList.isEmpty()){
+            
+            for(UserMuniAuthPeriod umap: umapList){
+                        if(umap.getRole().getRank() > highestRole.getRank()){
+                            highestRole = umap.getRole();
+                        }
+                    }
+        }
+        
+        return highestRole;
+    }
+    /**
+     * Mini logic container to check a list of UMAPs for dev credentials
+     * @param umapList
+     * @return true if no dev ranked UMAPs were found
+     */
     private boolean auditUMAPList_allowDeactivation_freeOfDevCreds(List<UserMuniAuthPeriod> umapList){
          
         boolean allowDeactivation = true;
-        
-        for(UserMuniAuthPeriod umap: umapList){
-                    if(umap.getRole() == RoleType.Developer){
-                        allowDeactivation = false;
+        if(umapList != null && !umapList.isEmpty()){
+            
+            for(UserMuniAuthPeriod umap: umapList){
+                        if(umap.getRole() == RoleType.Developer){
+                            allowDeactivation = false;
+                        }
                     }
-                }
+        }
         
         return allowDeactivation;
     }
@@ -791,17 +821,13 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * Note -- does not update the password which is updated separately
      * @param u
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException 
      */
     public void user_updateUser(User u) throws IntegrationException, AuthorizationException{
         UserIntegrator ui = getUserIntegrator();
         StringBuilder sb = new StringBuilder();
-        if(u != null && u.getUsername() != null && !u.getUsername().equals(" ")){
-            if(user_checkUsernameAllowedForInsert(u.getUsername())){
+        if(u != null && (u.getPerson() != null || u.getPersonID() != 0)){
                 ui.updateUser(u);
-            }
-            else {
-                throw new AuthorizationException("Username chose is already in use or null");
-            }
         }
     }
     
@@ -857,7 +883,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     /**
      * Factory method for User objects
      * 
-     * @param u
+     * @param u the requesting user
      * @return 
      */
     public User user_getUserSkeleton(User u){
@@ -1083,7 +1109,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public List<Municipality> auth_getUnauthorizedMunis(User u) throws IntegrationException {
-        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         
         UserIntegrator ui = getUserIntegrator();
         List<Municipality> authMunis = mi.getUserAuthMunis(u.getUserID());        

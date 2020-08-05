@@ -129,7 +129,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         Person newPerson = new Person();
         SystemCoordinator ssc = getSystemCoordinator();
         SystemIntegrator si = getSystemIntegrator();
-        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         
         
         try {

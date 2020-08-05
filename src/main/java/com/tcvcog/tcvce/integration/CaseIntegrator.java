@@ -1681,7 +1681,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     
     private TextBlock generateTextBlock(ResultSet rs) throws SQLException, IntegrationException{
         TextBlock tb = new TextBlock();
-        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         
         tb.setBlockID(rs.getInt("blockid"));
         tb.setTextBlockCategoryID(rs.getInt("categoryid"));

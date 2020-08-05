@@ -190,11 +190,14 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * Creates sekeletonized UserAuthorized
      * 
      * @param usr
-     * @return
+     * @return null returned with null input
      * @throws IntegrationException 
      */
     public UserAuthorized getUserAuthorizedNoAuthPeriods(User usr) throws IntegrationException{
-        
+        if(usr == null){
+            System.out.println("UserIntegrator.getUANoUMAPs: null User passed in");
+            return null;
+        }
         
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -369,7 +372,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     
     
     private UserMuniAuthPeriod generateUserMuniAuthPeriod(ResultSet rs) throws SQLException, IntegrationException{
-        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         UserMuniAuthPeriod per = new UserMuniAuthPeriod(mi.getMuni(rs.getInt("muni_municode")));
         
         per.setUserMuniAuthPeriodID(rs.getInt("muniauthperiodid"));
@@ -895,9 +898,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      */
     public void updateUser(User usr) throws IntegrationException{
         Connection con = getPostgresCon();
-        
+        System.out.println("UserIntegrator.updateUser");
         String query =  "UPDATE public.login\n" +
-                        "   SET username=?, notes=?, personlink=?, \n" +
+                        "   SET notes=?, personlink=?, \n" +
                         "    nologinvirtualonly=?, deactivatedts=?, deactivated_userid=?, lastupdatedts=now(), homemuni=? \n" +
                         " WHERE userid=?;";
         
@@ -906,46 +909,45 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         try {
             
             stmt = con.prepareStatement(query);
-            stmt.setString(1, usr.getUsername());
-            stmt.setString(2, usr.getNotes());
+            stmt.setString(1, usr.getNotes());
     
             // check both the object and ID person link fields
             // without a Person object, use the raw ID
             if(usr.getPerson() == null){
                 if(usr.getPersonID() != 0){
-                    stmt.setInt(3, usr.getPersonID());
+                    stmt.setInt(2, usr.getPersonID());
                 } else {
-                    stmt.setNull(3, java.sql.Types.NULL);
+                    stmt.setNull(2, java.sql.Types.NULL);
                 }
             } else { // we've got a person object
                 if(usr.getPerson().getPersonID() != 0){ // make sure it's not a new Person
-                    stmt.setInt(3, usr.getPerson().getPersonID());
+                    stmt.setInt(2, usr.getPerson().getPersonID());
                 } else {
-                    stmt.setNull(3, java.sql.Types.NULL);
+                    stmt.setNull(2, java.sql.Types.NULL);
                 }
             }
             
-            stmt.setBoolean(4, usr.isNoLoginVirtualUser());
+            stmt.setBoolean(3, usr.isNoLoginVirtualUser());
             
             if(usr.getDeactivatedTS() != null){
-                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(usr.getDeactivatedTS()));
+                stmt.setTimestamp(4, java.sql.Timestamp.valueOf(usr.getDeactivatedTS()));
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            if(usr.getDeactivatedBy() != 0){
+                stmt.setInt(5, usr.getDeactivatedBy());
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
             
-            if(usr.getDeactivatedBy() != 0){
-                stmt.setInt(6, usr.getDeactivatedBy());
+            if(usr.getHomeMuniID() != 0){
+                stmt.setInt(6, usr.getHomeMuniID());
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
             
-            if(usr.getHomeMuniID() != 0){
-                stmt.setInt(7, usr.getHomeMuniID());
-            } else {
-                stmt.setNull(7, java.sql.Types.NULL);
-            }
-            
-            stmt.setInt(8, usr.getUserID());
+            stmt.setInt(7, usr.getUserID());
             
             stmt.executeUpdate();
             

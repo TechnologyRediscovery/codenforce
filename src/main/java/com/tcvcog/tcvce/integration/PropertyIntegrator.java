@@ -114,7 +114,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      */
     private Property generateProperty(ResultSet rs) throws IntegrationException {
 
-        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         OccInspectionIntegrator ci = getOccInspectionIntegrator();
         SystemIntegrator si = getSystemIntegrator();
         UserIntegrator ui = getUserIntegrator();

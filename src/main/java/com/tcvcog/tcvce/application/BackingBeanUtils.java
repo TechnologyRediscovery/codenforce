@@ -284,7 +284,7 @@ public class        BackingBeanUtils
     
      
     
-    public MunicipalityIntegrator auth_getMunicipalityIntegrator(){
+    public MunicipalityIntegrator getMunicipalityIntegrator(){
         FacesContext context = getFacesContext();
         municipalityIntegrator = context. getApplication()
                 .evaluateExpressionGet(

@@ -986,7 +986,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
  
     private OccPeriodType generateOccPeriodType(ResultSet rs) throws IntegrationException {
         OccPeriodType opt = new OccPeriodType();
-        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         PaymentIntegrator pi = getPaymentIntegrator();
         
         try {

@@ -65,6 +65,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     private MunicipalityDataHeavy bbSessionMuni;
     private PropertyDataHeavy bbSessionProperty;
     private Person bbSessionPerson;
+    private List<Person> bbSessionPersonList;
     
     private List<PageModeEnum> pageModeOptions;
     
@@ -110,6 +111,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
         bbSessionMuni = getSessionBean().getSessMuni();
         bbSessionProperty = getSessionBean().getSessProperty();
         bbSessionPerson = getSessionBean().getSessPerson();
+        bbSessionPersonList = getSessionBean().getSessPersonList();
         
         userListForSearch = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
         propertyListForSearch = getSessionBean().getSessPropertyList();
@@ -479,6 +481,20 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
      */
     public void setPageModeOptions(List<PageModeEnum> pageModeOptions) {
         this.pageModeOptions = pageModeOptions;
+    }
+
+    /**
+     * @return the bbSessionPersonList
+     */
+    public List<Person> getBbSessionPersonList() {
+        return bbSessionPersonList;
+    }
+
+    /**
+     * @param bbSessionPersonList the bbSessionPersonList to set
+     */
+    public void setBbSessionPersonList(List<Person> bbSessionPersonList) {
+        this.bbSessionPersonList = bbSessionPersonList;
     }
 
     

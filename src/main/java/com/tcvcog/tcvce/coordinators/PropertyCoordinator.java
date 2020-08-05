@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
@@ -286,6 +287,35 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         }
 
         return p;
+    }
+    
+    /**
+     * Logic container for checking requests to connect a person to a property 
+     * using a linkage table. The actual DB interaction is delegated to the 
+     * PersonCoordinator who may check their own stuff
+     * 
+     * @param pdh
+     * @param pers
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public void connectPersonToProperty(PropertyDataHeavy pdh, Person pers) throws IntegrationException, BObStatusException{
+        boolean proceedWithConnect = true;
+        PersonCoordinator pc = getPersonCoordinator();
+        if(pdh != null && pers != null){
+            for(Person p: pdh.getPersonList()){
+                if(p.getPersonID() == pers.getPersonID()){
+                    proceedWithConnect = false;
+                }
+            }
+        }
+        if(proceedWithConnect){
+            pc.connectPersonToProperty(pers, pdh);
+        } else {
+            throw new BObStatusException("Person Link Already Exists");
+        }
+        
+        
     }
 
     public LocalDateTime configureDateTime(Date date) {

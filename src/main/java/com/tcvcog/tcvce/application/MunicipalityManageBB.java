@@ -48,7 +48,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
     }
 
     public String updateMuni() {
-        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
 //        try {
 //            mi.updateMuniComplete(currentMuni);
         getFacesContext().addMessage(null,

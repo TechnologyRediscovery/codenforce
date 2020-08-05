@@ -144,6 +144,7 @@
                                                         <p:commandButton ajax="true"
                                                                          id="usercfg-viewuser"
                                                                          value="#{user.userID == userConfigBB.userAuthorizedInConfig.userID ? 'Selected':'View'}"
+                                                                         style="#{user.userID == userConfigBB.userAuthorizedInConfig.userID ? 'background-color: #dee461; color:black;':''}"
                                                                          icon="fa fa-user-o"
                                                                          styleClass="multiButtonLineButton"
                                                                          actionListener="#{userConfigBB.onObjetViewButtonChange(user)}"
@@ -244,10 +245,10 @@
                                                         <div class="data_field_value" >
                                                             <h:outputText id="userinfo-active"
                                                                           styleClass="data_field_value" 
-                                                                          value="#{empty userConfigBB.userAuthorizedInConfig.deactivatedTS ? 'Active user': userConfigBB.getPrettyDate(userConfigBB.userAuthorizedInConfig.deactivatedTS)}" />
-                                                            <h:outputText id="userinfo-active2"
-                                                                          styleClass="data_field_value" 
-                                                                          value="#{userConfigBB.userAuthorizedInConfig.deactivatedBy == 0 ? userConfigBB.userAuthorizedInConfig.deactivatedBy : ''}" />
+                                                                          value="#{empty userConfigBB.userAuthorizedInConfig.deactivatedTS ? 'Active user': 'Deactivated'}" />
+                                                            <h:outputText id="userinfo-alreadydeleted-ot"
+                                                              value="This user is deactivated as of #{userConfigBB.getPrettyDate(userConfigBB.userAuthorizedInConfig.deactivatedTS)}"
+                                                              rendered="#{!(empty userConfigBB.userAuthorizedInConfig.deactivatedTS)}" />
                                                         </div>
                                                     </div>
 
@@ -318,7 +319,9 @@
                                                                        styleClass="data_field_label">
                                                             <h:outputText value="Username"/>
                                                         </p:outputLabel>
-                                                        <p:inputText id="userconfig-useraddupdate-username-it" value="#{userConfigBB.userAuthorizedInConfig.username}" 
+                                                        <p:inputText id="userconfig-useraddupdate-username-it" 
+                                                                     value="#{userConfigBB.userAuthorizedInConfig.username}" 
+                                                                     disabled="#{userConfigBB.userAuthorizedInConfig.userID != 0}"
                                                                      size="12"
                                                                      maxlength="20"
                                                                      tabindex="3" 
@@ -334,6 +337,8 @@
                                                         <p:commandButton    id="usercfg-checkusername-button"
                                                                             icon="fa fa-search"
                                                                             ajax="true"
+                                                                            immediate="true"
+                                                                            disabled="#{userConfigBB.userAuthorizedInConfig.userID != 0}"
                                                                             actionListener="#{userConfigBB.onUsernameCheckButtonChange}"
                                                                             value="Check for Username Availability"
                                                                             update="messages-addupdate-form"
@@ -514,12 +519,19 @@
 
                                             <h:form id="usercfg-remove-form">
 
-                                                <p>Caution: This action is a one-way street: no "recycle bin" in codeNforce</p>
+                                                
+                                                <h:outputText id="usercfg-oneway-ot"
+                                                              value="Caution: User deactivation is a one-way street!"
+                                                              rendered="#{(empty userConfigBB.userAuthorizedInConfig.deactivatedTS)}" />
+                                                
+                                                <h:outputText id="usercfg-alreadydeleted-ot"
+                                                              value="This user is deactivated as of #{userConfigBB.getPrettyDate(userConfigBB.userAuthorizedInConfig.deactivatedTS)}"
+                                                              rendered="#{!(empty userConfigBB.userAuthorizedInConfig.deactivatedTS)}" />
 
                                                 <p:commandButton icon="fa fa-trash-o"
                                                                  ajax="true"
+                                                                 rendered="#{empty userConfigBB.userAuthorizedInConfig.deactivatedTS}"
                                                                  actionListener="#{userConfigBB.onUserDeactivateInitButtonChange}"
-
                                                                  oncomplete="PF('usercfg-userdeactivate-confirm-dialog-var').show()"
                                                                  value="Permanently deactivate user: #{userConfigBB.userAuthorizedInConfig.username} (ID: #{userConfigBB.userAuthorizedInConfig.userID})"
                                                                  />
@@ -533,6 +545,7 @@
                                                     toggleable="true"
                                                     widgetVar="usercfg-umap-panel-var"
                                                     collapsed="false"
+                                                    rendered="#{userConfigBB.activeLookupMode or userConfigBB.activeUpdateMode}"
                                                     header="Municipality Authorization Periods (UMAPs)">
 
                                             <h:form id="usercfg-umap-panel-messages-form">
@@ -741,6 +754,7 @@
                                                     toggleable="true"
                                                     widgetVar="usercfg-pswd-panel-var"
                                                     collapsed="false"
+                                                    rendered="#{userConfigBB.activeUpdateMode}"
                                                     header="Password Manager">
 
                                             <div class="newpasswd-cont">
@@ -873,28 +887,32 @@
 
 
                     <p:confirmDialog    id="usercfg-userdeactivate-confirm-dialog"
-                                        height="400" width="600"
+                                        height="200" width="300"
                                         widgetVar="usercfg-userdeactivate-confirm-dialog-var"
                                         closable="true"
                                         header="Confirm: Remove User #{userConfigBB.userAuthorizedInConfig.username}">
 
                         <h:form id="usercfg-userdeactivate-form">
-                            <h:outputText value="Are you sure you want to permanently deactivate User #{userConfigBB.userAuthorizedInConfig.username}? This is an irreversible action and as close to delete as codeNforce gets." />
+                            <h:outputText value="Are you sure you want to permanently deactivate User #{userConfigBB.userAuthorizedInConfig.username}? " />
+                            
+                            <p:spacer height="5px" />
+                            
+                            <h:outputText value="This action cannot be undone without DB admin help." />
 
+                            <p:spacer height="5px" />
+                            
                             <p:commandButton    ajax="true"
-                                                value="Abort deactivate" icon="fa fa-stop"
+                                                value="Abort Operation" icon="fa fa-stop"
                                                 onclick="PF('usercfg-userdeactivate-confirm-dialog-var').hide()"
                                                 tabindex="4"/>
 
                             <p:commandButton    id="usercfg-userdeactivate-confirm-button"
-                                                ajax="true"
-                                                actionListener="#{userConfigBB.onUserRemoveCommitButtonChange}"
+                                                ajax="false"
+                                                action="#{userConfigBB.onUserRemoveCommitButtonChange}"
                                                 icon="fa fa-warning"
                                                 styleClass="button"
                                                 style="background-color: darkred; color:whitesmoke"
-                                                value="Permanently deactivate user"
-                                                oncomplete="PF('usercfg-userdeactivate-confirm-dialog-var').hide()"
-                                                update="@all"/>
+                                                value="Permanently Deactivate User"/>
 
 
                         </h:form>

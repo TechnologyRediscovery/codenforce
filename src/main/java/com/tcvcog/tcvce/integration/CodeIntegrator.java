@@ -328,7 +328,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
     
     private CodeSet populateCodeSetFromRS(ResultSet rs) throws SQLException, IntegrationException{
         CodeSet set = new CodeSet();
-        MunicipalityIntegrator muniInt = auth_getMunicipalityIntegrator();
+        MunicipalityIntegrator muniInt = getMunicipalityIntegrator();
         
         set.setCodeSetID(rs.getInt("codesetid"));
         set.setCodeSetName(rs.getString("name"));

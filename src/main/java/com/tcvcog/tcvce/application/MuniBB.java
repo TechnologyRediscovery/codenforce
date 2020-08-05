@@ -42,7 +42,7 @@ public class MuniBB extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public List<Municipality> getMuniList() throws IntegrationException {
-        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         muniList = mi.getMuniList();
         return muniList;
     }

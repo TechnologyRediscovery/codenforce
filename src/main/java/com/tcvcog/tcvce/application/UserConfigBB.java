@@ -105,7 +105,7 @@ public class UserConfigBB extends BackingBeanUtils{
         getPageModes().add(PageModeEnum.UPDATE);
         getPageModes().add(PageModeEnum.REMOVE);
          // use same pathway as clicking the button
-         currentMode = PageModeEnum.LOOKUP;
+        currentMode = PageModeEnum.LOOKUP;
         setCurrentMode(currentMode);
         
         try {
@@ -122,6 +122,8 @@ public class UserConfigBB extends BackingBeanUtils{
                 userSelected = true;
                 if(userAuthorizedInConfig.getUmapList() != null && !userAuthorizedInConfig.getUmapList().isEmpty()){
                     umapInConfig = userAuthorizedInConfig.getUmapList().get(0);
+                } else {
+                    onAuthPeriodNewInit();
                 }
                 onObjetViewButtonChange(userAuthorizedInConfig);
                 userListForConfig = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
@@ -194,6 +196,14 @@ public class UserConfigBB extends BackingBeanUtils{
     public boolean getActiveLookupMode() {
         // hard-wired on since there's always a property loaded
         return PageModeEnum.LOOKUP.equals(currentMode) ;
+    }
+
+    /**
+     * Provide UI elements a boolean true if the mode is UPDATE
+     * @return 
+     */
+    public boolean getActiveUpdateMode(){
+        return PageModeEnum.UPDATE.equals(currentMode);
     }
 
 
@@ -300,6 +310,7 @@ public class UserConfigBB extends BackingBeanUtils{
       * @param ev 
       */
      public void onUsernameCheckButtonChange(ActionEvent ev){
+         System.out.println("UserConfigBB.onUsernameCheckButtonChange: username: " + userAuthorizedInConfig.getUsername());
          UserCoordinator uc = getUserCoordinator();
          if(userAuthorizedInConfig != null 
                  && userAuthorizedInConfig.getUsername() != null &&
@@ -315,7 +326,11 @@ public class UserConfigBB extends BackingBeanUtils{
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Halt! " + userAuthorizedInConfig.getUsername() + " is already in use.", ""));
              }
+                 
          }
+                getFacesContext().addMessage(null, 
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Invalid username: too short, non-existant, or an empty string.", ""));
          
          
      }
@@ -373,7 +388,7 @@ public class UserConfigBB extends BackingBeanUtils{
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 ex.getMessage(),
-                                "This is an authroization be corrected by an administrator"));
+                                ""));
             }
         } else {
             getFacesContext().addMessage(null,
@@ -441,12 +456,12 @@ public class UserConfigBB extends BackingBeanUtils{
         mbp.setCred(getSessionBean().getSessUser().getKeyCard());
         mbp.setExistingContent(userAuthorizedInConfig.getNotes());
         mbp.setNewMessageContent(formNoteText);
-        mbp.setHeader("Property Note");
         mbp.setUser(getSessionBean().getSessUser());
+        mbp.setIncludeCredentialSig(false);
         userAuthorizedInConfig.setNotes(sc.appendNoteBlock(mbp));
         try {
             userAuthorizedInConfig.setLastUpdatedTS(LocalDateTime.now());
-            uc.user_updateUser(userAuthorizedInConfig);
+            uc.user_appendNoteToUser(userAuthorizedInConfig, mbp);
             getFacesContext().addMessage(null, 
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "Succesfully appended note!", ""));
@@ -457,14 +472,7 @@ public class UserConfigBB extends BackingBeanUtils{
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                 "Fatal error updating user in DB; apologies!", ""));
             
-        } catch (AuthorizationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, 
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                ex.getMessage(), ""));
-            
-        }
-        
+        }        
         
         
     }
@@ -481,9 +489,9 @@ public class UserConfigBB extends BackingBeanUtils{
     /**
      * Listener for user requests to remove the currently selected ERA;
      * Delegates all work to internal, non-listener method.
-     * @param ev
+     * @return 
      */
-    public void onUserRemoveCommitButtonChange(ActionEvent ev) {
+    public String onUserRemoveCommitButtonChange() {
         UserCoordinator uc = getUserCoordinator();
         
         try{
@@ -496,6 +504,8 @@ public class UserConfigBB extends BackingBeanUtils{
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to deactivate due to Auth or DB error!", ""));
             
         }
+        
+        return "";
     }
     
     /**
@@ -611,10 +621,6 @@ public class UserConfigBB extends BackingBeanUtils{
      */
     public void onAuthPeriodNewInit(){
         UserCoordinator uc = getUserCoordinator();
-        System.out.println("UserConfigBB.onAuthPeriodNewInit facesmessage list size: " + getFacesContext().getMessageList().size());  
-          getFacesContext().getMessageList().clear();
-          
-        System.out.println("UserConfigBB.onAuthPeriodNewInit facesmessage list size: " + getFacesContext().getMessageList().size());  
         try {
             umapInConfig = uc.auth_initializeUserMuniAuthPeriod_SECURITYCRITICAL(getSessionBean().getSessUser(), 
                                                             userAuthorizedInConfig, 
@@ -644,7 +650,8 @@ public class UserConfigBB extends BackingBeanUtils{
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully added new auth period!", ""));
-            reloadCurrentUMAP();
+            // wipe our previously inserted UMAP with a fresh one
+            onAuthPeriodNewInit();
         } catch (AuthorizationException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,

@@ -688,7 +688,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     private OccChecklistTemplate generateChecklistTemplate(ResultSet rs) throws SQLException, IntegrationException {
         OccChecklistTemplate chkList = new OccChecklistTemplate();
 
-        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
 
         chkList.setInspectionChecklistID(rs.getInt("checklistid"));

@@ -248,7 +248,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         // create the action request object
         CEActionRequest actionRequest = new CEActionRequest();
-        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
         PropertyIntegrator propI = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();

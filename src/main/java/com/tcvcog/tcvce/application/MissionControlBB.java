@@ -112,7 +112,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      */
     public String switchMuni() throws IntegrationException, SQLException{
         CodeIntegrator ci = getCodeIntegrator();
-        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         MunicipalityDataHeavy muniComp;
         try {
             muniComp = mi.getMunDataHeavy(selectedMuni.getMuniCode());

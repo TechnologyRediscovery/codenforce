@@ -127,7 +127,7 @@ public class DashboardDataBB extends BackingBeanUtils implements Serializable{
      */
     private Map<String, Integer> getCaseCountMap(){
         Map<String, Integer> caseCountMap = null;
-        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         SystemCoordinator ssc = getSystemCoordinator();
         SystemIntegrator si = getSystemIntegrator();
 //        try {

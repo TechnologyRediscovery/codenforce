@@ -241,6 +241,7 @@
                                                     <p:commandButton    id="prop-search-loadprop-button"
                                                                         icon="fa fa-folder-open-o"
                                                                         value="Load Property"
+                                                                        style="#{prop.parID == propertyProfileBB.currentProperty.propertyID ? 'background-color: #dee461; color:black;':''}""
                                                                         action="#{propertyProfileBB.onExplorePropertyButtonChange(prop)}"
                                                                         ajax="true"
                                                                         update="
@@ -425,7 +426,7 @@
                                                     </div>
 
 
-                                                   
+
 
                                                     <div    id="propinfo-ot-source-div"
                                                             class="ui-g-12 ui-md-6 ui-lg-3 data_field">
@@ -543,7 +544,7 @@
                                                     </div>
 
 
-                                                 
+
                                                 </div>
 
                                             </h:form>
@@ -710,7 +711,7 @@
                                                         <p:inputText    id="prop-add-parid-it"
                                                                         value="#{propertyProfileBB.currentProperty.parID}"/>
                                                     </div>
-                                                    
+
                                                     <div    id="prop-add-usegroup-div"
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
@@ -720,8 +721,8 @@
                                                         <p:inputText    id="prop-add-usegroup-it"
                                                                         value="#{propertyProfileBB.currentProperty.useGroup}"/>
                                                     </div>
-                                                    
-                                                    
+
+
                                                     <div    id="prop-add-const-div"
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
@@ -731,9 +732,9 @@
                                                         <p:inputText    id="prop-add-const-it"
                                                                         value="#{propertyProfileBB.currentProperty.constructionType}"/>
                                                     </div>
-                                                    
-                                                  
-                                                    
+
+
+
                                                     <div    id="prop-add-cond-div"
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
@@ -750,7 +751,7 @@
 
                                                         </h:selectOneMenu>
                                                     </div>
-                                                    
+
                                                     <div    id="prop-add-landprospect-div"
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
@@ -767,7 +768,7 @@
 
                                                         </h:selectOneMenu>
                                                     </div>
-                                                    
+
                                                     <div    id="prop-add-source-div"
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
@@ -784,7 +785,7 @@
 
                                                         </h:selectOneMenu>
                                                     </div>
-                                                    
+
 
                                                     <div    id="prop-add-unfit-div"
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field">
@@ -1218,8 +1219,8 @@
                                                                    action="#{propertyProfileBB.onCreateNewCaseButtonChange}"
                                                                    oncomplete="PF('prop-persons-manage-var').show()"
                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                                   value="Manage Persons"
-                                                                   icon="fa fa-user-plus"
+                                                                   value="Create New Code Enforcement Case"
+                                                                   icon="fa fa-user-archive"
                                                                    />
 
                                                 <p:spacer height="5px" />
@@ -1231,6 +1232,14 @@
                                                              rowKey="#{cse.caseID}"
                                                              >
 
+
+                                                    <p:column headerText="Date Opened"
+                                                              styleClass="centeredColumnContent"
+                                                              sortBy="#{cse.originationDate}">
+
+                                                        <h:outputText value="#{!(empty cse.originationDate) ? propertyProfileBB.getPrettyDate(cse.originationDate) : ''}"/>
+
+                                                    </p:column>
 
                                                     <p:column headerText="Status"
                                                               styleClass="centeredColumnContent">
@@ -1246,10 +1255,10 @@
 
                                                     </p:column>
 
-                                                    <p:column headerText="Phase"
+                                                    <p:column headerText="Manager"
                                                               styleClass="centeredColumnContent">
 
-                                                        <h:outputText value="#{cse.casePhase.label}"/>
+                                                        <h:outputText value="#{!(empty cse.caseManager) ? cse.caseManager.person.lastName:'No manager '}"/>
 
                                                     </p:column>
                                                     <p:column headerText="ID"
@@ -1267,7 +1276,7 @@
                                                                             styleClass="noFill button-size-small"
                                                                             action="#{propertyProfileBB.onViewCaseButtonChange(cse)}"
                                                                             icon="fa fa-folder-open-o"
-                                                                            value="View CE Case"
+                                                                            value="View"
                                                                             />
 
                                                     </p:column>
@@ -1294,6 +1303,7 @@
                                                                     icon="fa fa-hotel"
                                                                     />
 
+                                                <p:spacer height="5px" />
 
                                                 <p:dataTable id="prop-units-table"
                                                              var="unit"
@@ -1425,42 +1435,110 @@
                                 height="300" width="550"
                                 widgetVar="prop-persons-manage-var"
                                 closable="true"
-                                header="Manage Person Connections"
+                                header="Connect New Person"
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                 >
 
                         <h:form id="prop-persons-manage-form">
-
                             <h:messages id="prop-persons-manage-form-messages"
                                         globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
+                        </h:form>
 
-                            <p:outputLabel id="person-list-menu-ol" for="person-list-menu" value="Current person list:"/>
-                            <p:selectOneMenu id="person-list-menu" required="false" value="#{propertyProfileBB.personSelected}">
-                                <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
-                                <f:selectItems value="#{sessionBean.sessPersonList}"  var="p" itemValue="#{p}"
-                                               itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
-                                <f:converter converterId="personConverter"/>
-                            </p:selectOneMenu>
-                            <h:message for="person-list-menu" showDetail="false" showSummary="true"
-                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                        <h:form id="prop-persons-manage-form">
 
-                            <p:commandButton    ajax="true" actionListener="#{propertyProfileBB.queueSelectedPerson}"
-                                                value="Add selected person to event" disabled="true"
-                                                update="persons-to-add-ds"/>
-                            <p:spacer height="5px"/>
+                            <div    id="usercfg-add-container-div"
+                                    class="ui-g data-container">
 
-                            <p:dataScroller     id="persons-to-add-ds"
-                                                value="#{propertyProfileBB.personToAddList}"
-                                                var="pers">
-                                <h:outputText value="#{pers.firstName} #{pers.lastName} (id:#{pers.personID})"/>
-                                <p:commandButton    ajax="true" icon="fa fa-stop"
-                                                    process="persons-to-add-ds" immediate="true"
-                                                    actionListener="#{eventsBB.deQueuePersonFromEvent(pers)}"
-                                                    update="persons-to-add-ds"/>
-                            </p:dataScroller>
+                                <div    id="prop-pers-personlink-chooselinkmethod-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
+                                    <p:outputLabel for="prop-pers-personlink-chooselinkmethod-sbb"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Select a user-person selection method:"/>
+                                    </p:outputLabel>
+                                    <p:selectBooleanButton id="prop-pers-personlink-chooselinkmethod-sbb"
+                                                           onLabel="Link from Person List" 
+                                                           offLabel="Link by Manual Person ID Entry"
+                                                           styleClass="selectButton" 
+                                                           value="#{propertyProfileBB.personLinkUseID}"
+                                                           >
+                                        <p:ajax update="prop-person-som-userpersons
+                                                prop-person-addpersonbyid-it" />
+                                    </p:selectBooleanButton>
+
+
+                                </div>
+
+                                <div    id="prop-pers-personlink-som-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+
+                                    <p:outputLabel  for="prop-person-som-userpersons" 
+                                                    value="Available User-type persons:"
+                                                    styleClass="data_field_label"/>
+
+                                    <p:selectOneMenu id="prop-person-som-userpersons" 
+                                                     required="false" 
+                                                     disabled="#{propertyProfileBB.personLinkUseID}"
+                                                     value="#{propertyProfileBB.userAuthorizedInConfig.person}"
+                                                     styleClass="data_field_value">
+
+                                        <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+
+                                        <f:selectItems value="#{systemServicesBB.bbSessionPersonList}"  var="p" itemValue="#{p}" 
+                                                       itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+
+                                        <f:converter converterId="personConverter"/>
+                                    </p:selectOneMenu>
+
+                                    <h:message for="prop-person-som-userpersons" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </div>
+
+
+                                <div    id="prop-pers-personlink-byid-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+
+
+                                    <p:outputLabel  for="prop-person-addpersonbyid-it" 
+                                                    value="Add user by ID"
+                                                    styleClass="data_field_label"/>
+
+                                    <p:inputText id="prop-person-addpersonbyid-it" 
+                                                 disabled="#{!propertyProfileBB.personLinkUseID}"
+                                                 value="#{propertyProfileBB.personIDToLink}" 
+                                                 style="width: 50px;" 
+                                                 tabindex="3" 
+                                                 type="number"
+                                                 required="false" 
+                                                 styleClass="inputText"/>
+
+                                    <h:message for="prop-person-addpersonbyid-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                </div>
+                            </div>
+
+                            <p:spacer height="5px" />
+                            
+                                <p:commandButton    ajax="true" 
+                                                tabindex="2"
+                                                oncomplete="PF('prop-persons-manage-var').hide()"
+                                                value="Cancel" 
+                                                icon="fa fa-stop" 
+                                                />
+                                
+                            <p:commandButton ajax="false"
+                                             id="prop-person-commitconnect" 
+                                             value="Connect" 
+                                             icon="fa fa-user-circle-o"
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasDeveloperPermissions}"
+                                             disabled="false"
+                                             action="#{propertyProfileBB.onPersonConnectCommitButtonChange}"
+                                             />
 
 
 

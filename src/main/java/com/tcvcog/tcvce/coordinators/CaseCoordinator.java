@@ -908,7 +908,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         NoticeOfViolation nov = new NoticeOfViolation();
         nov.setViolationList(new ArrayList<CodeViolationDisplayable>());
         nov.setDateOfRecord(LocalDateTime.now());
-        MunicipalityIntegrator mi = auth_getMunicipalityIntegrator();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
 
         try {
             nov.setStyle(si.getPrintStyle(mdh.getDefaultNOVStyleID()));
