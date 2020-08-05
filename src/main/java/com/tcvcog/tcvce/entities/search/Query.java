@@ -82,7 +82,7 @@ public abstract class   Query<E extends BOb>
     
     /**
      * Implementing classes must allow a BOb list to be set
-     * TODO: Fix inheritance snafoo here! 
+     * TODO: Fix inheritance snafoo here!
      * 
      * @param l 
      */

@@ -1,4 +1,5 @@
-
+-- An addendum to dbpatch_beta2.
+-- U+2795 was chosen as a suffix over U+002B to be alphabetically sorted after dbpatch_beta2.
 ALTER TABLE PERSON DROP COLUMN IF EXISTS bobsource_sourceid;
 
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
