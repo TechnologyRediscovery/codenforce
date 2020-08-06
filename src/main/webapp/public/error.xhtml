@@ -14,36 +14,84 @@
             <ui:define name="content">
                 <div class="mainContainer">
                     <f:view id="erroPageView">
-                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
-
-                        <h1>Oops, we've got an error!</h1>
                         <h:form id="errorPageForm">
-                            <h:outputText value="#{request.contextPath}"/>
-                            <p>No fear, the Back button is...up there! Please click Back (or alt + left arrow) and try another pathway.</p>
 
-                            <h2>Reporting errors</h2>
-                            <p>You are encouraged to log all errors you find troublesome through our trusty error reporting form:</p>
+                            <!-- VALIDATION MESSAGE -->
+                            <p:growl id="growl" showDetail="false"/>
 
-                            <p:commandLink ajax="false" value="Bug reporting form" action="improvementSuggestion"
-                                           styleClass="sblink" style="font-weight:bold"/>
+                            <!-- MAIN CONTAINER -->
+                            <div class="mainContainer">
 
-                            <h2>Troubleshooting</h2>
+                                <!-- TITLE COMPONENT -->
+                                <div class="public-title">
+                                    <div class="public-title-main">
+                                        Oops, We've Got an Error!
+                                    </div>
+                                    <div class="public-title-sub">
+                                        <h:outputText value="#{request.contextPath}"/>
+                                    </div>
+                                </div>
 
-                            <p>A common source of page load errors may be not having an appropriate business object activated 
-                                when trying to view its details (i.e. trying to view a Property's profile 
-                                without having searched for and selected an active property.</p>
+                                <!-- CONTENTS CONTAINER -->
+                                <div class="public-main-contents-containner">
 
-                            <p>Check the entries in your system status bar above for details on which Property, Case, Municipality, etc., are active 
-                                during your session.</p>
-                            <h2>Talk to a human!</h2>
-                            <p>In the event the error you are receiving is debilitating to your work, 
-                                please call system administrator Eric Darsow at 412.923.9907 (c).</p>
-                            <p>Messages are checked periodically throughout a workday.</p>
-                            <p>Email is not a reliable way to work through errors: please use our reporting form or the telephone.</p>
+                                    <!--CONTENT MAIN COMPONENT -->
+                                    <div class="public-main-contents">
+
+                                        <!-- GUIDANCE COMPONENT -->
+                                        <div class="public-guide">
+                                            <p>No fear, the Back button is...up there! Please click Back (or alt + left arrow) and try another pathway.</p>
+                                        </div>
 
 
+                                        <div class="ui-g data-container">
+                                            <div class="ui-g-12 ui-md-6 ui-lg-4">
+                                                <div class=" data_field_card">
+                                                    <div class="data_field_card_title">
+                                                        Reporting errors
+                                                    </div>
+
+                                                    <p>You are encouraged to log all errors you find troublesome through our trusty error reporting form:</p>
+
+                                                    <div style="text-align: center; padding-top: 20%">
+                                                        <p:commandButton ajax="false" 
+                                                                         value="Bug reporting form" 
+                                                                         action="improvementSuggestion"
+                                                                         />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-4 ">
+                                                <div class="data_field_card">
+                                                    <div class="data_field_card_title">
+                                                        Troubleshooting
+                                                    </div>
+
+                                                    <p>A common source of page load errors may be not having an appropriate business object activated 
+                                                        when trying to view its details (i.e. trying to view a Property's profile 
+                                                        without having searched for and selected an active property.</p>
+
+                                                    <p>Check the entries in your system status bar above for details on which Property, Case, Municipality, etc., are active 
+                                                        during your session.</p>
+                                                </div>
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-4">
+                                                <div class="data_field_card">
+                                                    <div class="data_field_card_title">
+                                                        Talk to a human!
+                                                    </div>
+                                                    <p>In the event the error you are receiving is debilitating to your work, 
+                                                        please call system administrator Eric Darsow at 412.923.9907 (c).</p>
+                                                    <p>Messages are checked periodically throughout a workday.</p>
+                                                    <p>Email is not a reliable way to work through errors: please use our reporting form or the telephone.</p>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </h:form>
                     </f:view>
                 </div>

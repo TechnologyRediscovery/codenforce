@@ -7,80 +7,134 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <h:outputStylesheet name="css/style.css"/>
-        <title>TCVCOG Code Enforcement Home</title>
+        <title>Review And Submit</title>
     </h:head>
     <h:body>
         <ui:composition template="./../../navContainer_public.xhtml">
-
             <ui:define name="content">
                 <f:view id="sysHomeView">
+                    <h:form id="reviewAndSubmitForm">
 
-                    <div class="mainContainer">
+                        <!-- VALIDATION MESSAGE -->
+                        <p:growl id="growl" showDetail="false"/>
 
-                        <h:messages id="personSearchPublicMessages" globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
+                        <!-- MAIN CONTAINER -->
+                        <div class="mainContainer">
 
+                            <!-- TITLE COMPONENT -->
+                            <div class="public-title">
+                                <div class="public-title-main">
+                                    Apply For An Occupancy Permit
+                                </div>
+                                <div class="public-title-sub">
+                                    Step 7: Review And Submit
+                                </div>
+                            </div>
 
-                        <h1>Review Application</h1>
+                            <!-- CONTENTS CONTAINER -->
+                            <div class="public-main-contents-containner">
 
-                        <h:form id="reviewAndSubmitForm">
-                            <h:panelGroup>
-                                <h:panelGrid columns="1" cellpadding="10" footerClass="gridFooter" style="width: 500px" styleClass="ui-panelgrid-blank">
-                                    <p:column>
-                                        <p:outputLabel value="Reason for application: #{occPermitApplicationBB.currentApplication.reason.title}" />
-                                    </p:column>
-                                    
-                                    <p:column>
-                                        <p:outputLabel value="Property Address: #{occPermitApplicationBB.prop.bundledProperty.address}" />
-                                    </p:column>
-                                    
-                                    <p:column>
-                                        <p:outputLabel value="Property Unit: #{occPermitApplicationBB.selectedUnit.bundledUnit.unitNumber} (#{occPermitApplicationBB.selectedUnit.bundledUnit.notes})" />
-                                    </p:column>
-                                    
-                                    <p:column>
-                                        <p:outputLabel value="Applicant: #{occPermitApplicationBB.applicant.bundledPerson.firstName} #{occPermitApplicationBB.applicant.bundledPerson.lastName}" />
-                                    </p:column>
-                                    
-                                    <p:column>                                        
-                                        <p:outputLabel value="Application Persons:" />
-                                        <p:dataTable var="applicationPerson" value="#{occPermitApplicationBB.attachedPersons}"
-                                                     rowKey="#{applicationPerson.bundledPerson.personID}">
-                                             
-                                            <p:column headerText="Name">
-                                                <h:outputText value="#{applicationPerson.bundledPerson.firstName} #{applicationPerson.bundledPerson.lastName}"/>
-                                            </p:column>
-                                             
-                                            <p:column headerText="Person Type">
-                                                <h:outputText value="#{applicationPerson.bundledPerson.personType}"/>
-                                            </p:column>
-                                        </p:dataTable>
-                                    </p:column>
+                                <!--CONTENT MAIN COMPONENT -->
+                                <div class="public-main-contents">
 
-                                    <p:column>
-                                        <p:outputLabel value="Notes: #{occPermitApplicationBB.currentApplication.submissionNotes}" />
-                                    </p:column>                                    
-                                </h:panelGrid>
-                            </h:panelGroup>
+                                    <!-- GUIDANCE COMPONENT -->
+                                    <div class="public-guide occpermit">
+                                        <p:steps activeIndex="6" styleClass="custom" >
+                                            <p:menuitem value="Step 1: Choose Municipality" containerStyleClass="complete"/>
+                                            <p:menuitem value="Step 2: Choose Property" containerStyleClass="complete"/>
+                                            <p:menuitem value="Step 3: Configure Unit List" containerStyleClass="complete"/>
+                                            <p:menuitem value="Step 4: Select Units" containerStyleClass="complete"/>
+                                            <p:menuitem value="Step 5: Choose Reason" containerStyleClass="complete"/>
+                                            <p:menuitem value="Step 6: Add People" containerStyleClass="complete"/>
+                                            <p:menuitem value="Step 7: Review And Submit" />
+                                        </p:steps>
+                                    </div>
 
-                            <p:spacer height="10px"/>
-                            
-                            <p:outputLabel>Would you like to apply for more units?</p:outputLabel>
-                            
-                            <p:spacer height="10px"/>
-                            
-                            <p:commandButton ajax="false" value="Submit Application and Return to Unit List" action="#{occPermitApplicationBB.submitApplication('selectForApply')}"/>
-                            
-                            <p:commandButton ajax="false" value="Submit Application and Exit" action="#{occPermitApplicationBB.submitApplication('systemHome')}"/>
-                            
-                        </h:form>
+                                    <!-- CONTENT IO COMPONENT -->
+                                    <div class="public-main-contents-io">
+                                        <!--Grid CSS From Primefaces-->
+                                        <div class="ui-g data-container">
 
-                        
-                        
-                    </div>
+                                            <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                <h:outputLabel styleClass="data_field_label" 
+                                                               value="Reason for application:"
+                                                               />
+                                                <p:outputLabel styleClass="data_field_value"
+                                                               value="#{occPermitApplicationBB.currentApplication.reason.title}" 
+                                                               />
+                                            </div>
+
+                                            <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                <h:outputLabel styleClass="data_field_label" 
+                                                               value="Property Address:"
+                                                               />
+                                                <p:outputLabel styleClass="data_field_value"
+                                                               value="#{occPermitApplicationBB.prop.bundledProperty.address}" 
+                                                               />
+                                            </div>
+
+                                            <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                <h:outputLabel styleClass="data_field_label" 
+                                                               value="Property Unit:"
+                                                               />
+                                                <p:outputLabel styleClass="data_field_value"
+                                                               value="#{occPermitApplicationBB.selectedUnit.bundledUnit.unitNumber} (#{occPermitApplicationBB.selectedUnit.bundledUnit.notes})" 
+                                                               />
+                                            </div>
+
+                                            <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                <h:outputLabel styleClass="data_field_label" 
+                                                               value="Applicant:"
+                                                               />
+                                                <p:outputLabel styleClass="data_field_value"
+                                                               value="#{occPermitApplicationBB.applicant.bundledPerson.firstName} #{occPermitApplicationBB.applicant.bundledPerson.lastName}" 
+                                                               />
+                                            </div>
+
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+                                                <h:outputLabel styleClass="data_field_label"
+                                                               value="Application Persons:" 
+                                                               />
+                                                <p:dataTable var="applicationPerson" value="#{occPermitApplicationBB.attachedPersons}"
+                                                             rowKey="#{applicationPerson.bundledPerson.personID}">
+
+                                                    <p:column headerText="Name">
+                                                        <h:outputText value="#{applicationPerson.bundledPerson.firstName} #{applicationPerson.bundledPerson.lastName}"/>
+                                                    </p:column>
+
+                                                    <p:column headerText="Person Type">
+                                                        <h:outputText value="#{applicationPerson.bundledPerson.personType}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+                                                <h:outputLabel styleClass="data_field_label"
+                                                               value="Note:" 
+                                                               />
+                                                <p:outputLabel styleClass="data_field_value"
+                                                               value="#{occPermitApplicationBB.currentApplication.submissionNotes}"
+                                                               />
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <!-- CONTENT BUTTON -->
+                                    <div class="public-main-contents-button" style="flex">
+                                        <p:commandButton ajax="false" 
+                                                         value="Submit Application and Return to Unit List" 
+                                                         action="#{occPermitApplicationBB.submitApplication('selectForApply')}"/>
+
+                                        <p:commandButton ajax="false"
+                                                         value="Submit Application and Exit" 
+                                                         action="#{occPermitApplicationBB.submitApplication('systemHome')}"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </h:form>
                 </f:view>
-
             </ui:define>
         </ui:composition>
     </h:body>
