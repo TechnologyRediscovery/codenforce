@@ -650,4 +650,49 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return propUnit;
     }
 
+    /**
+     * A method that takes a unit list and compares it to the database and
+     * applies any changes (deactivations and insertions too) BUT BYPASSES THE
+     * UNITCHANGEORDER WORKFLOW, so it should only be used internally.
+     *
+     * @param unitList the edited unit list we would like to compare with the DB's list
+     * @param prop the property we would like to compare it with. Does not use the built in list, but fetches it from the DB
+     * @return the new list grabbed from the Database!
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public List<PropertyUnit> applyUnitList(List<PropertyUnit> unitList, Property prop) 
+            throws BObStatusException, IntegrationException {
+
+        PropertyIntegrator pi = getPropertyIntegrator();
+
+        sanitizePropertyUnitList(unitList);
+        
+        for(PropertyUnit unit : unitList) {
+
+            // decide if we're updating a unit or inserting it based on initial value
+            // newly created units don't have an ID, just a default unit number
+            unit.setPropertyID(prop.getPropertyID());
+
+            if (unit.getUnitID() == 0) {
+                pi.insertPropertyUnit(unit);
+
+            } else {
+
+                pi.updatePropertyUnit(unit);
+
+            }
+        }
+        
+        
+        List<PropertyUnit> listTwo = pi.getPropertyUnitList(prop);
+        
+        prop.setUnitList(listTwo);
+        
+        // mark parent property as updated now
+        editProperty(prop, getSessionBean().getSessUser());
+        
+        return listTwo;
+        
+    }
 }

@@ -40,6 +40,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplicationReason;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
+import com.tcvcog.tcvce.entities.occupancy.OccApplicationStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
 import java.io.Serializable;
@@ -754,7 +755,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 + "            ?, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
-                + "            ?, ?, ?);   ";
+                + "            ?, ?, ?);";
         ResultSet rs = null;
         Connection con = null;
         PreparedStatement stmt = null;
@@ -1035,8 +1036,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         String query = "INSERT INTO public.occpermitapplication(applicationid,  "
                 + "reason_reasonid, submissiontimestamp, "
                 + "submitternotes, internalnotes, propertyunitid, "
-                + "declaredtotaladults, declaredtotalyouth, rentalintent, occperiod_periodid) "
-                + "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+                + "declaredtotaladults, declaredtotalyouth, rentalintent, occperiod_periodid, externalnotes, status) "
+                + "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::occapplicationstatus) "
                 + "RETURNING applicationid;";
 
         Connection con = null;
@@ -1068,6 +1069,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setInt(7, youth);
             stmt.setBoolean(8, false);
             stmt.setInt(9, application.getConnectedPeriod().getPeriodID());
+            stmt.setString(10, application.getExternalPublicNotes());
+            stmt.setString(11, OccApplicationStatusEnum.Waiting.name());
                     
             stmt.execute();
             ResultSet inserted_application = stmt.getResultSet();
@@ -1124,7 +1127,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         OccPermitApplication occpermitapp = null;
         String query = "   SELECT applicationid, reason_reasonid, submissiontimestamp, \n"
                 + "       submitternotes, internalnotes, propertyunitid, declaredtotaladults, \n"
-                + "       declaredtotalyouth, occperiod_periodid, rentalintent\n"
+                + "       declaredtotalyouth, occperiod_periodid, rentalintent, status, externalnotes\n"
                 + "  FROM public.occpermitapplication WHERE applicationid=?;";
 
         Connection con = null;
@@ -1160,34 +1163,74 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             occpermitapp.setSubmissionDate(rs.getTimestamp("submissiontimestamp").toLocalDateTime());
             occpermitapp.setSubmissionNotes(rs.getString("submitternotes"));
             occpermitapp.setInternalNotes(rs.getString("internalNotes"));
-            occpermitapp.setApplicationPropertyUnit(propint.getPropertyUnit(rs.getInt("propertyunitid")));
+            occpermitapp.setApplicationPropertyUnit(propint.getPropertyUnit(Integer.parseInt(rs.getString("propertyunitid"))));
             occpermitapp.setConnectedPeriod(getOccPeriod(rs.getInt("occperiod_periodid")));
+            occpermitapp.setStatus(OccApplicationStatusEnum.valueOf(rs.getString("status")));
+            occpermitapp.setExternalPublicNotes(rs.getString("externalnotes"));
             
-            List<Person> personList = new ArrayList<>();
+            if(occpermitapp.getConnectedPeriod() != null)
+            {
             
-            for (PersonOccPeriod skeleton : pi.getPersonOccPeriodList(occpermitapp.getConnectedPeriod())) {
+                occpermitapp.setAttachedPersons(new ArrayList<PersonOccPeriod>());
                 
-                if (skeleton.isApplicant()){
-                    occpermitapp.setApplicantPerson(skeleton);
+                for (PersonOccPeriod skeleton : pi.getPersonOccApplicationList(occpermitapp)) {
+
+                    if (skeleton.isApplicant()){
+                        occpermitapp.setApplicantPerson(skeleton);
+                    }
+
+                    if(skeleton.isPreferredContact()){
+                        occpermitapp.setPreferredContact(skeleton);
+                    }
+
+                    occpermitapp.getAttachedPersons().add(skeleton);
+
                 }
-                
-                if(skeleton.isPreferredContact()){
-                    occpermitapp.setPreferredContact(skeleton);
-                }
-                
-                personList.add(skeleton);
-                
             }
             
-            occpermitapp.setAttachedPersons(personList);
-            
         } catch (SQLException ex) {
+            System.out.println("OccupancyIntegrator.generateOccPermitApplication() | ERROR: " + ex);
             throw new IntegrationException("OccupancyInspectionIntegrator.generateOccPermitApplication | "
                     + "IntegrationException: Unable to generate occupancy permit application ", ex);
         }
         return occpermitapp;
     }
 
+    /**
+     * Gets all OccPermitApplications. Use with care.
+     * @return
+     * @throws IntegrationException
+     * @throws EventException
+     * @throws AuthorizationException
+     * @throws BObStatusException
+     * @throws ViolationException 
+     */
+    public List<OccPermitApplication> getOccPermitApplicationList() throws IntegrationException, EventException, AuthorizationException, BObStatusException, ViolationException {
+        List<OccPermitApplication> occpermitappList = new ArrayList<>();
+        String query = "SELECT applicationid \n"
+                + "  FROM public.occpermitapplication;";
+
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                occpermitappList.add(getOccPermitApplication(rs.getInt("applicationid")));
+            }
+        } catch (SQLException ex) {
+            throw new IntegrationException("OccupancyIntegrator.getOccPermitApplicationList", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        }
+        return occpermitappList;
+    }
+    
     public List<OccPermitApplication> getOccPermitApplicationList(OccPeriod op) throws IntegrationException, EventException, AuthorizationException, BObStatusException, ViolationException {
         List<OccPermitApplication> occpermitappList = new ArrayList<>();
         String query = "SELECT occpermitapp_applicationid\n"
@@ -1216,25 +1259,28 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
 
     public void updateOccPermitApplication(OccPermitApplication application) throws IntegrationException {
-        String query = "UPDATE public.occupancypermitapplication"
-                + "SET multiunit=?, reason_reasonid=?, submissiontimestamp=?, "
-                + "submitternotes=?, internalnotes=?, propertyunitid=?"
-                + "WHERE occupancypermitapplication.applicationid = ?;";
+        String query = "UPDATE public.occpermitapplication "
+                + "SET reason_reasonid=?, submissiontimestamp=?, "
+                + "submitternotes=?, internalnotes=?, propertyunitid=?, externalnotes=?, status=?::occapplicationstatus "
+                + "WHERE occpermitapplication.applicationid = ?;";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(2, application.getReason().getId());
-            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(application.getSubmissionDate()));
-            stmt.setString(4, application.getSubmissionNotes());
-            stmt.setString(5, application.getInternalNotes());
-            stmt.setString(6, String.valueOf(application.getApplicationPropertyUnit().getUnitID()));
-            stmt.setInt(7, application.getId());
+            stmt.setInt(1, application.getReason().getId());
+            stmt.setTimestamp(2, java.sql.Timestamp.valueOf(application.getSubmissionDate()));
+            stmt.setString(3, application.getSubmissionNotes());
+            stmt.setString(4, application.getInternalNotes());
+            stmt.setString(5, String.valueOf(application.getApplicationPropertyUnit().getUnitID()));
+            stmt.setString(6, application.getExternalPublicNotes());
+            stmt.setString(7, application.getStatus().name());
+            stmt.setInt(8, application.getId());
             stmt.executeUpdate();
 
         } catch (SQLException ex) {
+            System.out.println("OccupancyIntegrator.updateOccPermitApplication() | ERROR: " + ex);
             throw new IntegrationException("OccupancyInspectionIntegrator.updateOccPermitApplication"
                     + " | IntegrationException: Unable to update occupancy permit application ", ex);
         } finally {
@@ -1440,58 +1486,70 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         }
         return optionalPersonTypes;
     }
-
+    
     /**
      * Inserts a person into the occpermitapplicationperson table in the
-     * database. The default value for the applicant column is false, and that
-     * column will be set to true when the applicant person is the same as a
-     * person within the OccPermitApplication's attachedPersons variable. The
-     * boolean for the preferred contact is set similarly.
+     * database.
      *
-     * @param application
+     * @param person
+     * @param applicationID
      * @throws IntegrationException
      */
-    public void insertOccPeriodPersons(OccPermitApplication application) throws IntegrationException {
+    public void insertOccApplicationPerson(PersonOccPeriod person, int applicationID) throws IntegrationException {
 
-        String query = "INSERT INTO public.occperiodperson(period_periodid, "
-                + "person_personid, applicant, preferredcontact, applicationpersontype)\n"
-                + "VALUES (?, ?, ?, ?, CAST (? AS persontype));";
+        String query = "INSERT INTO public.occpermitapplicationperson(occpermitapplication_applicationid, "
+                + "person_personid, applicant, preferredcontact, active, applicationpersontype)\n"
+                + "VALUES (?, ?, ?, ?, true, CAST (? AS persontype));";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, applicationID);
+            stmt.setInt(2, person.getPersonID());
 
-        List<Person> applicationPersons = application.getAttachedPersons();
-        for (Person person : applicationPersons) {
-            try {
-                stmt = con.prepareStatement(query);
-                stmt.setInt(1, application.getConnectedPeriod().getPeriodID());
-                stmt.setInt(2, person.getPersonID());
-
-                /* If the person at this step of the for-loop is the applicantPerson on the 
-                OccPermitApplication, set applicant column to true*/
-                if (application.getApplicantPerson() != null && application.getApplicantPerson().equals(person)) {
-                    stmt.setBoolean(3, true);
-                } else {
-                    stmt.setBoolean(3, false);
-                }
-
-                /* If the person at this step of the for-loop is the preferredContact on the 
-                OccPermitApplication, set preferredcontact column to true */
-                if (application.getPreferredContact() != null && application.getPreferredContact().equals(person)) {
-                    stmt.setBoolean(4, true);
-                } else {
-                    stmt.setBoolean(4, false);
-                }
-                stmt.setString(5, person.getPersonType().getLabel());
-                stmt.execute();
+            stmt.setBoolean(3, person.isApplicant());
+            stmt.setBoolean(4, person.isPreferredContact());
+            stmt.setString(5, person.getApplicationPersonType().name());
+            
+            stmt.execute();
             } catch (SQLException ex) {
-                System.out.println("OccupancyIntegrator.insertOccPeriodPersons() | ERROR: "+ ex);
-                throw new IntegrationException("OccupancyIntegrator.insertOccPermitPersons"
+                System.out.println("OccupancyIntegrator.insertOccApplicationPerson() | ERROR: "+ ex);
+                throw new IntegrationException("OccupancyIntegrator.insertOccApplicationPerson"
                         + " | IntegrationException: Unable to insert occupancy permit application ", ex);
+            } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { } }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { } }
             }
-        }
     }
+    
+    public void updatePersonOccPeriod(PersonOccPeriod input, OccPermitApplication app) throws IntegrationException{
+        Connection con = getPostgresCon();
+        String query = "UPDATE occpermitapplicationperson "
+                + "SET applicant = ?, preferredcontact = ?, applicationpersontype = ?::persontype, active = ? "
+                + "WHERE person_personid = ? AND occpermitapplication_applicationid = ?;";
 
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setBoolean(1, input.isApplicant());
+            stmt.setBoolean(2, input.isPreferredContact());
+            stmt.setString(3, input.getApplicationPersonType().name());
+            stmt.setBoolean(4, input.isLinkActive());
+            stmt.setInt(5, input.getPersonID());
+            stmt.setInt(6, app.getId());
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update person-occperiod link");
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
     /*
     
      OccPeriodType tpe = null;

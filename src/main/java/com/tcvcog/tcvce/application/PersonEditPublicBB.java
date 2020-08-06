@@ -21,13 +21,13 @@ import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 
 /**
  *
@@ -78,9 +78,15 @@ public class PersonEditPublicBB extends BackingBeanUtils implements Serializable
     public String addCloneToApplicantPersons(Person clone) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         pi.updatePerson(clone);
-        getSessionBean().getSessOccPermitApplication().getAttachedPersons().add(clone);
+        getSessionBean().getSessOccPermitApplication().getAttachedPersons().add((PersonOccPeriod) clone);
         OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
         oc.verifyOccPermitPersonsRequirement(getSessionBean().getSessOccPermitApplication());
+        } catch(BObStatusException ex){
+            System.out.println("PersonEditPublicBB.addCloneToApplicantPersons() | ERROR: " + ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        ex.toString(), ""));
+        }
         return "managePeople";
     }
     
@@ -93,7 +99,7 @@ public class PersonEditPublicBB extends BackingBeanUtils implements Serializable
     }
 
     /**
-     * @param person the person to set
+     * @param clonePerson the person to set
      */
     public void setClonePerson(Person clonePerson) {
         this.clonePerson = clonePerson;

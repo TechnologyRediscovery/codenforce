@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -31,10 +32,12 @@ import java.util.List;
 public class OccPermitApplication {
     private int id;
     private OccPermitApplicationReason reason;
+    private OccApplicationStatusEnum status;
     private LocalDateTime submissionDate;
-    private Date submissionDateUtilDate;;
+    private Date submissionDateUtilDate;
     private String submissionNotes;
     private String internalNotes;
+    private String externalPublicNotes;
     private PropertyUnit applicationPropertyUnit;
     private Person applicantPerson;
     private Person preferredContact;
@@ -46,7 +49,7 @@ public class OccPermitApplication {
  application. The occupancy coordinator will digest this list to determine if the requirements 
     * have been satisfied.
     */
-    private List<Person> attachedPersons;
+    private List<PersonOccPeriod> attachedPersons;
 
     /**
      * @return the id
@@ -155,14 +158,14 @@ public class OccPermitApplication {
     /**
      * @return the attachedPersons
      */
-    public List<Person> getAttachedPersons() {
+    public List<PersonOccPeriod> getAttachedPersons() {
         return attachedPersons;
     }
 
     /**
      * @param attachedPersons the attachedPersons to set
      */
-    public void setAttachedPersons(List<Person> attachedPersons) {
+    public void setAttachedPersons(List<PersonOccPeriod> attachedPersons) {
         this.attachedPersons = attachedPersons;
     }
 
@@ -188,4 +191,20 @@ public class OccPermitApplication {
         this.connectedPeriod = connectedPeriod;
     }
 
+    public OccApplicationStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(OccApplicationStatusEnum status) {
+        this.status = status;
+    }
+
+    public String getExternalPublicNotes() {
+        return externalPublicNotes;
+    }
+
+    public void setExternalPublicNotes(String externalPublicNotes) {
+        this.externalPublicNotes = externalPublicNotes;
+    }
+    
 }

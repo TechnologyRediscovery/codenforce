@@ -10,7 +10,6 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
-import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -294,11 +293,9 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
     /**
      *
-     * @param currentMode Lookup, Insert, Update, Remove
-     * @throws IntegrationException
-     * @throws AuthorizationException
+     * @param currentMode Search, Actions, Object, Notes
      */
-    public void setCurrentMode(String currentMode) throws IntegrationException, AuthorizationException {
+    public void setCurrentMode(String currentMode) {
 
         //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
         String tempCurMode = this.currentMode;
@@ -325,6 +322,24 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     
     public void defaultSetting(){
         currentCEARSelected = false;
+    }
+    
+    public String goToCase(){
+        
+        CaseCoordinator cc = getCaseCoordinator();
+        try{
+        CECase cse = cc.getCECase(selectedRequest.getCaseID());
+        
+        getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(cse, getSessionBean().getSessUser().getMyCredential()));
+        
+        return "ceCaseWorkflow";
+        } catch (BObStatusException | IntegrationException | SearchException ex){
+            System.out.println("CEActionRequestsBB.goToCase() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to redirect you to the CE Case Workflow.", ""));
+            return "";
+        }
     }
     
     public void prepareReportMultiCEAR(ActionEvent ev) {

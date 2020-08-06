@@ -135,73 +135,19 @@ public class PropertyUnitsBB
      *
      */
     public void finalizeUnitList() {
-        PropertyIntegrator pi = getPropertyIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
 
-        boolean badUnit = false;
-        
         try {
-            pc.sanitizePropertyUnitList(unitDisplayList);
-        } catch (BObStatusException ex){
+            pc.applyUnitList(unitDisplayList, currProp);
+        } catch(IntegrationException ex) {
+            System.out.println("PropertyUnitsBB.finalizeUnitList() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "An error occurred while trying to save your changes to the database", "")); 
+        }catch (BObStatusException ex){
            getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                     ex.toString(), "")); 
-           badUnit = true;
-        }
-        
-         if (!badUnit) {
-
-            getCurrProp().setUnitList(unitDisplayList);
-
-            Iterator<PropertyUnit> iter = getCurrProp().getUnitList().iterator();
-
-            while (iter.hasNext()) {
-                PropertyUnit unit = iter.next();
-
-                // decide if we're updating a unit or inserting it based on initial value
-                // newly created units don't have an ID, just a default unit number
-                unit.setPropertyID(getCurrProp().getPropertyID());
-
-                if (unit.getUnitID() == 0) {
-                    try {
-                        pi.insertPropertyUnit(unit);
-
-                        getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                        "Success! Inserted property unit: " + unit.getUnitNumber(), ""));
-                    } catch (IntegrationException ex) {
-                        getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                        "Could not insert unit with number: " + unit.getUnitNumber(), ""));
-                    }
-                } else {
-                    try {
-                        pi.updatePropertyUnit(unit);
-                        getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                        "Success! Updated property unit: " + unit.getUnitNumber(), ""));
-                    } catch (IntegrationException ex) {
-                        getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                        "Could not update unit with number: " + unit.getUnitNumber(), ""));
-                    }
-                }
-            }
-        }
-
-        // mark parent property as updated now
-        try {
-            pc.editProperty(currProp, getSessionBean().getSessUser());
-            currProp = pc.assemblePropertyDataHeavy(currProp, getSessionBean().getSessUser());
-        } catch (BObStatusException | SearchException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not update associated property: ", ""));
         }
 
         refreshCurrPropWithLists();
