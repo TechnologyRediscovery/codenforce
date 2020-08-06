@@ -13,48 +13,86 @@
         <ui:composition template="./../../navContainer_public.xhtml">
             <ui:define name="content">
                 <f:view id="docHomeView">
-                    
-                    <div class="mainContainer">
+                    <h:form id="contactForm">
 
-                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
+                        <!-- MAIN CONTAINER -->
+                        <div class="mainContainer">
 
-                        <h1>Contact CodeConnect</h1>
-                        <h:form id="contactForm">
-                            
-                            <p>Contact the Turtle Creek Valley Council of Governments for
-                            non-technical inquiries related to CodeConnect. All support inquiries
-                            and technical issues can be directed to Technology Rediscovery LLC.</p>
-                        
-                           <p:panelGrid columns="2" layout="grid"
-                                      columnClasses="gridTd, gridTd">
-                               
-                               <h:panelGroup>
-                                    <p:graphicImage width="250px" value="/resources/tcvcoglogo.png"/>
-                               </h:panelGroup>  
-                               
-                               <h:panelGroup>
-                                   <h2>Turtle Creek Valley Council of Governments</h2>
-                                   <p>Phone: 412.858.5115</p>
-                                   <p>2700 Monroeville Boulevard<br />Monroeville, PA 15146 </p>
-                                   <h:outputLink value="http://tcvcog.com">TCVCOG Homepage</h:outputLink>
-                               </h:panelGroup>  
-                               
-                               <h:panelGroup>
-                                    <p:graphicImage width="250px" value="/resources/techredllclogo.png"/>
-                               </h:panelGroup>  
-                               <h:panelGroup>
-                                   <h2>Technology Rediscovery LLC</h2>
-                                   <p>Phone: 412.894.3020</p>
-                                   <p>2209 S Braddock Ave<br />Pittsburgh, PA 15218</p>
-                                   <h:outputLink value="http://technologyrediscovery.net">TechnologyRediscovery.net</h:outputLink>
-                               </h:panelGroup>  
-                               
-                               
-                           </p:panelGrid>
-                        </h:form>
-                    </div>
+                            <!-- TITLE COMPONENT -->
+                            <div class="public-title">
+                                <div class="public-title-main">
+                                    Contact
+                                </div>
+                            </div>
+
+                            <!-- CONTENTS CONTAINER -->
+                            <div class="public-main-contents-containner">
+
+                                <!--CONTENT MAIN COMPONENT -->
+                                <div class="public-main-contents">
+
+                                    <!-- GUIDANCE COMPONENT -->
+                                    <div class="public-guide" >
+                                        Contact the Turtle Creek Valley Council of Governments for
+                                        non-technical inquiries related to CODENFORCE.
+                                        <br/>
+                                        All support inquiries and technical issues can be directed to Technology Rediscovery LLC.
+                                    </div>
+
+                                    <div class="ui-g data-container" style="text-align: center">
+
+                                        <div class="ui-g-12 ui-md-1 ui-lg-1"/>
+
+                                        <div class="ui-g-12 ui-md-4 ui-lg-4">
+                                            <div class=" data_field_card">
+                                                <div class="data_field_card_title">
+                                                    Turtle Creek Valley Council of Governments
+                                                </div>
+                                                <p:graphicImage width="70%"
+                                                                value="/images/tcvcog_logo_inverted.jpg"
+                                                                />
+                                                
+                                                <p:spacer height="20px"/>
+                                                
+                                                <p>PHONE : 412.858.5115</p>
+                                                <p>ADDRESS: 2700 Monroeville Boulevard, Monroeville, PA 15146 </p>
+                                                <p:linkButton href="http://tcvcog.com" 
+                                                              value="TCVCOG Homepage"
+                                                              style="min-width: 200px"
+                                                              />
+
+                                            </div>
+                                        </div>
+
+                                        <div class="ui-g-12 ui-md-2 ui-lg-2"/>
+
+                                        <div class="ui-g-12 ui-md-4 ui-lg-4 ">
+                                            <div class="data_field_card">
+                                                <div class="data_field_card_title">
+                                                    Technology Rediscovery LLC
+                                                </div>
+
+                                                <p:graphicImage width="70%" 
+                                                                value="/resources/techredllclogo.png"
+                                                                />
+                                                
+                                                <p:spacer height="20px"/>
+
+                                                <p>PHONE : 412.894.3020</p>
+                                                <p>ADDRESS: 2209 S Braddock Ave, Pittsburgh, PA 15218</p>
+                                                <p:linkButton href="http://technologyrediscovery.net" 
+                                                              value="TechnologyRediscovery.net"
+                                                              style="min-width: 200px"
+                                                              />
+                                            </div>
+
+                                        </div>
+                                        <div class="ui-g-12 ui-md-1 ui-lg-1"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </h:form>
                 </f:view>
             </ui:define>
         </ui:composition>

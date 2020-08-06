@@ -6,8 +6,6 @@
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 /**
  *
@@ -19,13 +17,17 @@ public class        PersonOccPeriod
     
     private boolean applicant;
     private boolean preferredContact;
-    private PersonType applicationPersonTppe;
-    
+    private PersonType applicationPersonType;
+    private boolean linkActive; //stores if this link is active in the database, not the person object itself
+
+    public PersonOccPeriod() {
+    }
     
     public PersonOccPeriod(Person p){
         this.personID = p.personID;
 
         this.personType = p.personType;
+        this.applicationPersonType = p.personType;
         this.muniCode = p.muniCode;
         this. muniName = p.muniName;
 
@@ -109,12 +111,19 @@ public class        PersonOccPeriod
     }
 
     /**
-     * @return the applicationPersonTppe
+     * @return the applicationPersonType
      */
-    public PersonType getApplicationPersonTppe() {
-        return applicationPersonTppe;
+    public PersonType getApplicationPersonType() {
+        return applicationPersonType;
     }
 
+    public PersonType getPersonType() {
+        return personType;
+    }
+
+    public void setPersonType(PersonType personType) {
+        this.personType = personType;
+    }
    
     /**
      * @param preferredContact the preferredContact to set
@@ -124,10 +133,10 @@ public class        PersonOccPeriod
     }
 
     /**
-     * @param applicationPersonTppe the applicationPersonTppe to set
+     * @param applicationPersonType the applicationPersonType to set
      */
-    public void setApplicationPersonTppe(PersonType applicationPersonTppe) {
-        this.applicationPersonTppe = applicationPersonTppe;
+    public void setApplicationPersonType(PersonType applicationPersonType) {
+        this.applicationPersonType = applicationPersonType;
     }
 
     public boolean isApplicant() {
@@ -137,5 +146,13 @@ public class        PersonOccPeriod
     public void setApplicant(boolean applicant) {
         this.applicant = applicant;
     }
-    
+
+    public boolean isLinkActive() {
+        return linkActive;
+    }
+
+    public void setLinkActive(boolean linkActive) {
+        this.linkActive = linkActive;
+    }
+ 
 }

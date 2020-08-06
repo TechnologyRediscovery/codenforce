@@ -13,27 +13,57 @@
         <ui:composition template="./../../navContainer_public.xhtml">
             <ui:define name="content">
                 <f:view id="docHomeView">
-                    
+
+                    <!-- MAIN CONTAINER -->
                     <div class="mainContainer">
 
-                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
+                        <!-- TITLE COMPONENT -->
+                        <div class="public-title">
+                            <div class="public-title-main">
+                                About Us
+                            </div>
+                            <div class="public-title-sub">
+                               
+                            </div>
+                        </div>
 
-                        <h1>About CodeConnect</h1>
-                        
-                        <p>CodeNForce is a municipal code enforcement and occupancy 
-                            inspection permitting database system created by Technology Rediscovery LLC 
-                            for the Turtle Creek Valley Council of Governments and the Steel Rivers Council of Governments
-                            between Fall of 2016.</p>
-                        
-                        <p>CodeNForce grew out of CMU's Heinz College culminating Systems project 
-                            completed by students from both the Masters of Information Systems Management (MISM) 
-                            program and the Masters in Public Policy (MPP) program. 
-                            The union of the two fields created a robust project 
-                            plan which was then implemented by one member of the 
-                            project following graduation.</p>
-                    
+                        <!-- CONTENTS CONTAINER -->
+                        <div class="public-main-contents-containner">
+
+                            <!--CONTENT MAIN COMPONENT -->
+                            <div class="public-main-contents">
+
+                                <!-- GUIDANCE COMPONENT -->
+                                <div class="public-guide">
+
+                                </div>
+
+                                <!-- CONTENT IO COMPONENT -->
+                                <div class="public-main-contents-io public-main-contents-login">
+
+                                    <h:graphicImage styleClass="public-login-logo" value="/images/login-logo.png" />
+
+                                    <div class="publi-login-container">
+                                        <div class="public-login-text">
+                                            <p>
+                                                CodeNForce is a municipal code enforcement and occupancy 
+                                                inspection permitting database system created by Technology Rediscovery LLC 
+                                                for the Turtle Creek Valley Council of Governments and the Steel Rivers Council of Governments
+                                                between Fall of 2016.
+                                            </p>
+                                            <p>
+                                                CodeNForce grew out of CMU's Heinz College culminating Systems project 
+                                                completed by students from both the Masters of Information Systems Management (MISM) 
+                                                program and the Masters in Public Policy (MPP) program. 
+                                                The union of the two fields created a robust project 
+                                                plan which was then implemented by one member of the 
+                                                project following graduation.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </f:view>
             </ui:define>

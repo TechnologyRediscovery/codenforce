@@ -28,6 +28,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </h:head>
 
     <!--TODO: NOT TAB-INDEXED-->
+    <!--PLEASE READ:
+        In the panels you will see a lot of spacers without a size attribute or anything. These are to take up columns in the grid.
+        If you can come up with a better arrangement for the panels, feel free to get rid of them or rearrange them to your hearts' content.
+    -->
 
     <h:body id="cearManageBody">
 
@@ -55,7 +59,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                            >
                                             <f:selectItem itemLabel="SEARCH" itemValue="Search"  />
                                             <f:selectItem itemLabel="ACTIONS" itemValue="Actions"  />
-                                            <f:selectItem itemLabel="OBJECTS" itemValue="Objects"  />
+                                            <f:selectItem itemLabel="CONNECTIONS" itemValue="Objects"  />
                                             <f:selectItem itemLabel="NOTES" itemValue="Notes"  />
 
                                             <f:ajax render="@all"/>
@@ -398,6 +402,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <div class="cearActionsTableOutputLabel">
                                                             <h:outputText id="selr-attachedCase" 
                                                                           value="#{cEActionRequestsBB.selectedRequest.caseID == 0 ? null : cEActionRequestsBB.selectedRequest.caseID}"/>
+                                                            <p:commandButton value="Go to CECase" icon="fa fa-folder" action="#{cEActionRequestsBB.goToCase()}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
@@ -426,6 +431,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
+                                                    
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Description:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestDescription}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
                                                     <h:panelGroup>
                                                         <p:outputLabel value="Public access reference num (PACC):"/>
@@ -443,10 +457,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
-
+                                                    
+                                                    <p:spacer/>
+                                                    
                                                     <h3>Available actions:</h3>
 
                                                     <p:spacer height="5px"/>
+                                                    
+                                                    <p:spacer/>
+                                                    
+                                                    <p:spacer/>
 
                                                     <p:commandButton    id="open-new-case-cb"
                                                                         ajax="false" value="Open new code enf case at this property" 
@@ -519,11 +539,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </p:panel>
 
 
-                                        <!--Objects Table-->
+                                        <!--Connections Table-->
                                         <p:panel id="cearManage-panel-objects"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="Objects Panel"
+                                                 header="Connections Panel"
                                                  rendered="#{cEActionRequestsBB.getActiveObjectsMode()}"
                                                  >
 
@@ -633,7 +653,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:outputLabel value="Officer-only notes:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="cearNotesTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.cogInternalNotes}"/>
+                                                            <p:outputLabel escape="false" value="&#160;#{cEActionRequestsBB.selectedRequest.cogInternalNotes}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                         <p:commandButton onclick="PF('internal-message-dialog').show()" 
@@ -647,7 +667,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:outputLabel value="System internal only notes:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="cearNotesTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.muniNotes}"/>
+                                                            <p:outputLabel escape="false" value="&#160;#{cEActionRequestsBB.selectedRequest.muniNotes}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                         <p:commandButton onclick="PF('muni-message-dialog').show()" 
@@ -661,7 +681,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:outputLabel value="Public notes:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="cearNotesTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.publicExternalNotes}"/>
+                                                            <p:outputLabel escape="false" value="&#160;#{cEActionRequestsBB.selectedRequest.publicExternalNotes}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                         <p:commandButton onclick="PF('public-message-dialog').show()" 
@@ -781,7 +801,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                      severity="alert" widgetVar="override-request-status-dialog"
                                      closable="true"
                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
-
                         <h:form id="override-request-status-form">
 
                             <h:outputLabel styleClass="bold" for="ceactionrequeststatusmenu" value="Change status to:"/>
@@ -801,7 +820,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 oncomplete="PF('override-request-status-dialog').hide()"/>
                             <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" 
-                                             onclick="PF('manage-public-access-dialog').hide()"/>
+                                             onclick="PF('override-request-status-dialog').hide()"/>
                         </h:form>
                     </p:confirmDialog>
 
@@ -1275,7 +1294,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             <p:commandButton ajax="true" actionListener="#{cEActionRequestsBB.attachPublicMessage}"
                                              value="Submit" icon="fa fa-link" oncomplete="PF('public-message-dialog').hide()"
                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                             update="cearManage-panel-notes"/>
+                                             update="cearManage-panel-notes
+                                             form-messages-global"/>
                             <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" 
                                              onclick="PF('public-message-dialog').hide()"/>

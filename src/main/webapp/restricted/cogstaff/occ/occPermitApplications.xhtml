@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8' ?>
 <!--
-Copyright (C) 2020 cogconnect1
+Copyright (C) 2020 Turtle Creek Valley
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,13 +15,911 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <title>TODO supply a title</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    </head>
-    <body>
-        <div>TODO write content</div>
-    </body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Occupancy Permit Applications</title>
+    </h:head>
+
+    <!--TODO: NOT TAB-INDEXED-->
+
+    <h:body id="occPermitManageBody">
+
+        <ui:composition template="../../navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view >
+
+                    <p:outputPanel id="body-panel">
+                        <h1>Manage Occupancy Permits Applications</h1>
+
+                        <h:form id="form-messages-global">
+                            <p:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true" />
+                        </h:form>
+
+                        <div class="mainContainer">
+
+                            <div class ="two-column-page-flex-container">
+
+                                <div class="list-column" >
+
+                                    <h:form id="mode-form">
+
+                                        <p:selectOneButton style="width: 100%; margin-top: 10px ; height: 20px;"
+                                                           value="#{occPermitApplicationManageBB.currentMode}" 
+                                                           >
+                                            <f:selectItem itemLabel="SEARCH" itemValue="Search"  />
+                                            <f:selectItem itemLabel="ACTIONS" itemValue="Actions"  />
+                                            <f:selectItem itemLabel="CONNECTIONS" itemValue="Objects"  />
+                                            <f:selectItem itemLabel="NOTES" itemValue="Notes"  />
+
+                                            <f:ajax render="@all"/>
+
+                                        </p:selectOneButton> 
+
+                                    </h:form>
+
+                                    <p:spacer height="30px"/>
+
+                                    <p:scrollPanel style="height: 550px;" >
+
+                                        <h:form id="occPermitManage-form-side">
+
+                                            <p:dataTable id="occPermitTable"
+                                                         var="app"
+                                                         value="#{occPermitApplicationManageBB.applicationList}"
+                                                         tableStyleClass="primeDataTable"
+                                                         >
+
+                                                <p:column headerText="ID"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{app.id}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Name"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{app.reason.title}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Status"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{app.status.label}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Date Submitted"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{app.submissionDateUtilDate}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Option"
+                                                          styleClass="centeredColumnContent"
+                                                          style="width: 80px"
+                                                          >
+
+                                                    <p:selectBooleanButton onLabel="Deselect" 
+                                                                           offLabel="Select"
+                                                                           styleClass="selectButton" 
+                                                                           value="#{occPermitApplicationManageBB.currentApplicationSelected}"
+                                                                           disabled="#{occPermitApplicationManageBB.getSelectedButtonActive()}"
+                                                                           >
+
+                                                        <p:ajax update="
+                                                                form-messages-global
+                                                                occPermitManage-form-side
+                                                                occPermitManage-panel"
+                                                                listener="#{occPermitApplicationManageBB.onApplicationSelection(app)}"/>
+
+                                                    </p:selectBooleanButton>
+
+                                                </p:column>
+
+                                            </p:dataTable>
+
+                                            <p:spacer height="10px"/>
+
+                                        </h:form>
+
+                                    </p:scrollPanel>
+
+                                </div>
+
+
+
+                                <div class ="object-column">
+
+                                    <p:outputPanel id = "occPermitManage-panel" >
+
+                                        <!--Search Table-->
+                                        <p:panel id="occPermitManage-panel-search"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Search Panel"
+                                                 rendered="#{occPermitApplicationManageBB.getActiveSearchMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="occPermitManage-form-search">
+
+
+                                                <p:panelGrid columns="2" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd" 
+                                                             >
+
+                                                    <ui:remove>
+                                                        <h:panelGroup>
+                                                            <p:selectOneMenu id="applicationquery-som" 
+                                                                             tabindex="1" 
+                                                                             value="#{occPermitApplicationManageBB.selectedQueryOccApplication}"
+                                                                             style="margin-right: 10px;">
+                                                                <f:converter converterId="bOBQueryConverter"/>
+                                                                <f:selectItem itemLabel="select a query..." noSelectionOption="true" itemDisabled="true"/>
+                                                                <f:selectItems id="querylist-si" value="#{occPermitApplicationManageBB.queryList}" var="q" itemValue="#{q}" itemLabel="#{q.queryTitle}" />
+                                                                <p:ajax update="application-query-desc-ot"/>
+                                                            </p:selectOneMenu>
+
+                                                            <p:commandButton    id="execute-selected-query" 
+                                                                                ajax="true"
+                                                                                value="perform selected query" 
+                                                                                actionListener="#{occPermitApplicationManageBB.executeQuery}"
+                                                                                disabled="false"
+                                                                                icon="fa fa-wheelchair-alt"
+                                                                                update="
+                                                                                occPermitManage-panel-search
+                                                                                occPermitManage-form-side
+                                                                                form-messages-global"/>
+                                                            <p:spacer height="5px" />
+                                                        </h:panelGroup>
+
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="bold" value="Query description: " for="cears-query-desc-ot" />
+                                                            <p:spacer height="5px" />
+                                                            <h:outputText id="cears-query-desc-ot" value="#{occPermitApplicationManageBB.selectedQueryApplication.queryName.desc}" />
+                                                        </h:panelGroup>
+
+                                                    </ui:remove>
+
+                                                    <h3>Advanced search options</h3>
+
+                                                    <p:spacer/>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Query start date"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="occPermitSearchTermsLabel">
+                                                            <p:calendar id="eventDateCalStart" value="#{occPermitApplicationManageBB.queryBegin_Util}" 
+                                                                        mode="popup"  
+                                                                        showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                                        navigator="true" tabindex="16"
+                                                                        showButtonPanel="true" showTodayButton="true"/>
+                                                            <h:message for="eventDateCalStart" showDetail="false" showSummary="true" 
+                                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Query end date"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="occPermitTermsLabel">
+                                                            <p:calendar id="eventDateCalEnd" value="#{occPermitApplicationManageBB.queryEnd_Util}" 
+                                                                        mode="popup" 
+                                                                        showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                                        navigator="true" tabindex="16"
+                                                                        showButtonPanel="true" showTodayButton="true"/>
+                                                            <h:message for="eventDateCalEnd" showDetail="false" showSummary="true" 
+                                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Filter by OccPeriod attachment?"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="occPermitSearchTermsLabel">
+                                                            <p:selectBooleanCheckbox id="useAttachedToOccPeriod" value="#{occPermitApplicationManageBB.connectedOccPeriod_ctl}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                        <p:outputLabel value="Attached to OccPeriod"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearSearchTermsLabel">
+                                                            <p:selectBooleanButton id="attachedToCaseCB" onLabel="Yes" offLabel="No" value="#{occPermitApplicationManageBB.connectedOccPeriod_val}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Search by Application Reason?"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearSearchTermsLabel">
+                                                            <p:selectBooleanCheckbox id="useOccPermitReasonCB" value="#{occPermitApplicationManageBB.reason_ctl}" />
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                        <p:selectOneMenu id="occApplicationReasonMenuSearch" required="false" value="#{occPermitApplicationManageBB.searchParams.reason}">
+                                                            <f:converter converterId="occPermitApplicationReasonConverter"/>
+                                                            <f:selectItem itemLabel="Select a reason" itemDisabled="true"/>
+                                                            <f:selectItems id="reasonList" value="#{occPermitApplicationBB.reasonList}" var ="r" itemValue="#{r}" itemLabel="#{r.title}" />
+                                                        </p:selectOneMenu>
+                                                    </h:panelGroup>
+
+                                                    <p:spacer/>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Search by Request status?"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearSearchTermsLabel">
+                                                            <p:selectBooleanCheckbox id="useOccPermitReasonSB" value="#{occPermitApplicationManageBB.status_ctl}" />
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                        <p:selectOneMenu id="occApplicationStatusMenuSearch" required="false" value="#{occPermitApplicationManageBB.searchParams.status}">
+                                                            <f:converter converterId="occPermitApplicationStatusConverter"/>
+                                                            <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                                            <f:selectItems value="#{occPermitApplicationManageBB.statusList}"
+                                                                           var="status" itemValue="#{status}" itemLabel="#{status.label}"/>
+                                                        </p:selectOneMenu>
+                                                    </h:panelGroup>
+
+                                                    <p:spacer/>
+
+                                                    <p:commandButton id="custom-query-cb"
+                                                                     ajax="true" 
+                                                                     value="Execute custom query" 
+                                                                     actionListener="#{occPermitApplicationManageBB.executeCustomQuery}"
+                                                                     update="occPermitManage-form-side
+                                                                     occPermitManage-panel-search
+                                                                     form-messages-global"/>
+
+                                                </p:panelGrid>
+
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <!--Actions Table-->
+                                        <p:panel id="occPermitManage-panel-actions"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Actions Panel"
+                                                 rendered="#{occPermitApplicationManageBB.getActiveActionsMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="occPermitManage-form-actions">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.id}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Reason:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.reason.title} (#{occPermitApplicationManageBB.selectedApplication.reason.description})"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Status:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.status.label}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Date Submitted:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.submissionDateUtilDate.toString()}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Connected to OccPeriod?"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.connectedPeriod.periodID == 0 ? 'Not connected' :  occPermitApplicationManageBB.selectedApplication.connectedPeriod.periodID}"/>
+                                                        </div>
+                                                        <p:spacer height="5px"/>
+                                                        <p:commandButton value="Go to OccPeriod" icon="fa fa-folder" action="#{occPermitApplicationManageBB.goToOccPeriod()}"/>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <p:spacer/>
+
+                                                    <p:spacer/>
+
+                                                    <p:spacer/>
+
+                                                    <p:commandButton    id="open-new-period-cb"
+                                                                        ajax="false" value="Create a new Occupancy Period" 
+                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                        action="#{occPermitApplicationManageBB.path1SpawnNewOccPeriod()}"
+                                                                        disabled="#{occPermitApplicationManageBB.isPathsDisabled()}"
+                                                                        icon="fa fa-folder" styleClass="occpermit-actions-button"/>
+
+                                                    <p:commandButton    id="new-unit-period-cb"
+                                                                        value="Add a new unit and attach a new period to it"
+                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                        disabled="#{occPermitApplicationManageBB.isPathsDisabled()}"
+                                                                        action="#{occPermitApplicationManageBB.path2NewUnitAndPeriod()}"
+                                                                        icon="fa fa-book" />
+
+
+                                                    <p:commandButton    id="reject-application-cb"
+                                                                        value="Reject application"
+                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                        disabled="#{occPermitApplicationManageBB.isPathsDisabled()}"
+                                                                        onclick="PF('reject-application-dialog').show()"
+                                                                        icon="fa fa-circle-o"/>
+
+                                                    <p:commandButton    id="invalid-application-cb"
+                                                                        value="Invalid application"
+                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                        disabled="#{occPermitApplicationManageBB.isPathsDisabled()}"
+                                                                        onclick="PF('invalid-application-dialog').show()"
+                                                                        icon="fa fa-exclamation-circle"/>
+
+                                                    <p:commandButton    id="manually-override-status-cb"
+                                                                        value="Manually override application status"
+                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                                                        disabled="#{empty occPermitApplicationManageBB.selectedApplication}"
+                                                                        onclick="PF('override-application-status-dialog').show()"
+                                                                        icon="fa fa-gears"/>
+
+
+                                                    <!--No report generator yet!-->
+                                                    <ui:remove>
+                                                        <p:commandButton    id="prep-multi-application-cb"
+                                                                            value="Prepare application list report"
+                                                                            actionListener="#{occPermitApplicationManageBB.prepareReportMultiApplication}"
+                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                            disabled="false"
+                                                                            oncomplete="PF('application-print-dialog-var').show()"
+                                                                            icon="fa fa-print"
+                                                                            update="application-print-form"
+                                                                            />
+                                                    </ui:remove>
+                                                </p:panelGrid>
+
+                                                <p:spacer height="10px" />
+
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <!--Connections Table-->
+                                        <p:panel id="occPermitManage-panel-objects"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Connections Panel"
+                                                 rendered="#{occPermitApplicationManageBB.getActiveObjectsMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="occPermitManage-form-objects">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <h2>Property Unit:</h2>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Unit ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.unitID}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Property ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.propertyID}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Unit Number:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.unitNumber}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Other Known Address:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.otherKnownAddress}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Rental Intent Date Start:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.rentalIntentDateStart}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Rental Intent Date Stop:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.rentalIntentDateStop}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Rental Intent Last Updated By:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.rentalIntentLastUpdatedBy.person.firstName} #{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.rentalIntentLastUpdatedBy.person.lastName} ID:(#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.rentalIntentLastUpdatedBy.person.personID})"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.notes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Rental Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.rentalNotes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Active?"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.applicationPropertyUnit.active ? 'Yes' : 'No'}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Edit unit list for this property?"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:commandButton    id="edit-unit-list-cb"
+                                                                                value="Edit"
+                                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                                disabled="#{occPermitApplicationManageBB.pathsDisabled}"
+                                                                                action="#{occPermitApplicationManageBB.editAttachedUnits()}"
+                                                                                icon="fa fa-gears"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                </p:panelGrid>
+
+                                                <h2>Attached Persons:</h2>
+
+                                                <p:dataTable id="attached-persons" 
+                                                             var="person" 
+                                                             value="#{occPermitApplicationManageBB.attachedPersons}" 
+                                                             scrollable="true" scrollHeight="300"
+                                                             >
+
+                                                    <p:column headerText="Exp.">
+                                                        <p:rowToggler/>
+                                                    </p:column>
+
+                                                    <p:column headerText="ID:">
+                                                        <h:outputText value="#{person.personID}" />
+                                                    </p:column>
+
+                                                    <p:column headerText="Last Name:">
+                                                        <h:outputText value="#{person.lastName}" />
+                                                    </p:column>
+
+                                                    <p:column headerText="First Name">
+                                                        <h:outputText value="#{person.firstName}" />
+                                                    </p:column>
+
+                                                    <p:column headerText="Person type:">
+                                                        <h:outputText value="#{person.personType.label}" />
+                                                    </p:column>
+
+                                                    <p:column headerText="Applicant?:">
+                                                        <h:outputText value="#{person.applicant ? 'Yes' : 'No'}" />
+                                                    </p:column>
+
+                                                    <p:column headerText="Preferred contact?:">
+                                                        <h:outputText value="#{person.preferredContact ? 'Yes' : 'No'}" />
+                                                    </p:column>
+
+                                                    <p:column headerText="Under 18?:">
+                                                        <h:outputText value="#{person.under18 ? 'Yes' : 'No'}" />
+                                                    </p:column>
+
+                                                    <p:rowExpansion>
+
+                                                        <div class="outlinedBox">
+
+                                                            <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                                         columnClasses="gridTd, gridTd, gridTd, gridTd">
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Phone (cell)" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.phoneCell}" />
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Phone (home)" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.phoneHome}" />
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Phone (work)" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.phoneWork}" />
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Email" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.email}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Street" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.addressStreet}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="City" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.addressCity}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="State" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.addressState}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Zip Code" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.addressZip}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <p:spacer height="5px"/>
+
+                                                                <h:outputText styleClass="bold" value="Mailing address:"/>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Uses seperate mailing address?" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.useSeparateMailingAddress ? 'Yes' : 'No'}" />
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Street" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.mailingAddressStreet}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Third line" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.mailingAddressThirdLine}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="City" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.mailingAddressCity}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="State" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.mailingAddressState}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="bold" value="Zip Code" />
+                                                                    <div class="rowExpansion">
+                                                                        <h:outputText value="#{person.mailingAddressZip}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                            </h:panelGrid>
+
+                                                        </div>
+
+                                                    </p:rowExpansion>
+
+                                                </p:dataTable>
+
+                                                <p:spacer height="5px" />
+
+                                                <p:commandButton    id="edit-person-list-cb"
+                                                                    value="Edit attached persons"
+                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                    disabled="#{empty occPermitApplicationManageBB.selectedApplication}"
+                                                                    action="#{occPermitApplicationManageBB.editAttachedPersons()}"
+                                                                    icon="fa fa-gears"/>
+
+                                                <p:spacer height="5px" />
+
+                                            </h:form>
+                                        </p:panel>
+
+
+                                        <!--Notes Table-->
+                                        <p:panel id="occPermitManage-panel-notes"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Notes Panel"
+                                                 rendered="#{occPermitApplicationManageBB.getActiveNotesMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="occPermitManage-form-notes">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Submission Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel escape="false" value="&#160;#{occPermitApplicationManageBB.selectedApplication.submissionNotes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Internal Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel escape="false" value="&#160;#{occPermitApplicationManageBB.selectedApplication.internalNotes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                        <p:commandButton onclick="PF('internal-message-dialog').show()" 
+                                                                         icon="fa fa-pencil-square-o"
+                                                                         value="new note" 
+                                                                         styleClass="noFill button-size-small" 
+                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}" />
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="External (Public) Notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel escape="false" value="&#160;#{occPermitApplicationManageBB.selectedApplication.externalPublicNotes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                        <p:commandButton onclick="PF('public-message-dialog').show()" 
+                                                                         value="new note" 
+                                                                         icon="fa fa-pencil-square-o"
+                                                                         styleClass="noFill button-size-small" 
+                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}" />
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                </p:panelGrid>
+
+                                                <p:spacer height="10px" />
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                    </p:outputPanel>
+                                </div>
+                            </div>
+                        </div>
+                    </p:outputPanel>
+
+                    <p:confirmDialog message="Reject Occupancy Permit Application" 
+                                     severity="alert" widgetVar="reject-application-dialog"
+                                     closable="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
+
+                        <h:form id="reject-application-form">
+                            <h:outputLabel for="rejectionMessageITA" value="Explain why you reject this application:"/>
+                            <p:spacer height="15px"/>
+                            <p:inputTextarea id="rejectionMessageITA" style="width: 300px; height: 200px;" value="#{occPermitApplicationManageBB.rejectedApplicationMessage}"/>
+                            <p:spacer height="15px"/>
+                            <p>This message, your name, and a timestamp will be appended <br />to the public note section of application ID 
+                                <h:outputText escape="false" value="#{occPermitApplicationManageBB.selectedApplication.id}"/> </p>
+
+                            <p:spacer height="15px"/>
+                            <p:commandButton ajax="true" actionListener="#{occPermitApplicationManageBB.path3AttachRejectionMessage}"
+                                             value="Submit" icon="fa fa-link" oncomplete="PF('reject-application-dialog').hide()"
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                             update="occPermitManage-panel-actions
+                                             form-messages-global
+                                             occPermitManage-form-side"/>
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('reject-application-dialog').hide()"/>
+                        </h:form>
+                    </p:confirmDialog>
+
+                    <p:confirmDialog message="Mark request as invalid" 
+                                     severity="alert" widgetVar="invalid-application-dialog"
+                                     closable="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
+
+                        <h:form id="invalid-form">
+                            <h:outputLabel for="invalidMessageITA" value="What makes this an invalid application?"/>
+                            <p:spacer height="15px"/>
+                            <p:inputTextarea id="invalidMessageITA" style="width: 300px; height: 200px;" value="#{occPermitApplicationManageBB.invalidApplicationMessage}"/>
+                            <p:spacer height="15px"/>
+                            <p>This message, your name, and a timestamp will be appended <br />to the public note section of application ID 
+                                <h:outputText escape="false" value="#{occPermitApplicationManageBB.selectedApplication.id}"/> </p>
+
+                            <p:spacer height="15px "/>
+                            <p:commandButton ajax="true" actionListener="#{occPermitApplicationManageBB.path4AttachInvalidMessage}"
+                                             value="Submit" icon="fa fa-link" oncomplete="PF('invalid-application-dialog').hide()"
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                             update="occPermitManage-panel-actions
+                                             form-messages-global
+                                             occPermitManage-form-side"/>
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('invalid-application-dialog').hide()"/>
+                        </h:form>
+                    </p:confirmDialog>
+
+                    <p:confirmDialog message="Override application status" 
+                                     severity="alert" widgetVar="override-application-status-dialog"
+                                     closable="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
+
+                        <h:form id="override-application-status-form">
+
+                            <h:outputLabel styleClass="bold" for="applicationstatusmenu" value="Change status to:"/>
+
+                            <p:selectOneMenu id="applicationstatusmenu" required="false" value="#{occPermitApplicationManageBB.newStatus}">
+                                <f:converter converterId="occPermitApplicationStatusConverter"/>
+                                <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                <f:selectItems value="#{occPermitApplicationManageBB.statusList}"
+                                               var="status" itemValue="#{status}" itemLabel="#{status.label}"/>
+                            </p:selectOneMenu>
+
+                            <p:commandButton    id="change-application-status-cb"
+                                                ajax="true" value="Change application status" 
+                                                actionListener="#{occPermitApplicationManageBB.changeApplicationStatus}"
+                                                update="occPermitManage-panel-actions
+                                                form-messages-global
+                                                occPermitManage-form-side"
+                                                oncomplete="PF('override-application-status-dialog').hide()"/>
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('override-application-status-dialog').hide()"/>
+                        </h:form>
+                    </p:confirmDialog>
+                    
+                    <p:confirmDialog message="Attach internal message" 
+                                     severity="alert" widgetVar="internal-message-dialog"
+                                     closable="true" responsive="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}">
+
+                        <h:form id="internal-message-form">
+                            <h:outputLabel for="internal-message-ita" value="Message text"/>
+                            <p:spacer height="15px"/>
+                            <p:inputTextarea id="internal-message-ita" style="width: 300px; height: 200px;" value="#{occPermitApplicationManageBB.internalNoteText}"/>
+                            <p:spacer height="15px"/>
+                            <h:outputText escape="false" value="Your name and a timestamp will be bundled with this message 
+                                          and attached to Application ID# #{occPermitApplicationManageBB.selectedApplication.id}"/>
+
+                            <p:spacer height="15px"/>
+                            <p:commandButton ajax="true" actionListener="#{occPermitApplicationManageBB.attachInternalMessage}"
+                                             value="Submit" icon="fa fa-link" oncomplete="PF('internal-message-dialog').hide()"
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
+                                             update="occPermitManage-panel-notes
+                                             form-messages-global"/>
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('internal-message-dialog').hide()"/>
+                        </h:form>
+                    </p:confirmDialog>
+
+
+                    <p:confirmDialog message="Attach public message" 
+                                     severity="alert" widgetVar="public-message-dialog"
+                                     closable="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
+
+                        <h:form id="public-message-form">
+                            <h:outputLabel for="public-message-ita" value="Message text"/>
+                            <p:spacer height="15px"/>
+                            <p:inputTextarea id="public-message-ita" style="width: 300px; height: 200px;" value="#{occPermitApplicationManageBB.externalNoteText}"/>
+                            <p:spacer height="15px"/>
+                            <h:outputText escape="false" value="Your name and a timestamp will be bundled with this message 
+                                          and attached to Application ID# #{occPermitApplicationManageBB.selectedApplication.id}"/> 
+
+                            <p:spacer height="15px"/>
+                            <p:commandButton ajax="true" actionListener="#{occPermitApplicationManageBB.attachPublicMessage}"
+                                             value="Submit" icon="fa fa-link" oncomplete="PF('public-message-dialog').hide()"
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                             update="occPermitManage-panel-notes
+                                             form-messages-global"/>
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('public-message-dialog').hide()"/>
+                        </h:form>
+                    </p:confirmDialog>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
 </html>

@@ -7,169 +7,94 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Add reason to occupancy permit application</title>
+        <title>Choose Reason For Application</title>
     </h:head>
     <h:body>
         <ui:composition template="./../../navContainer_public.xhtml">
             <ui:define name="content">
                 <f:view id="occPermitApplicationFlowView">
+                    <h:form id="occPermitApplicationAddReasonForm">
 
-                    <div class="mainContainer">
-                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
-                        <h1>Step 4/5: Choose a reason for application</h1>                        
-                        <h:form id="occPermitApplicationAddReasonForm">
+                        <!-- VALIDATION MESSAGE -->
+                        <p:growl id="growl" showDetail="false"/>
 
-                            <p:panel>
-                                <h3>Step 1: Select Property</h3>
-                                
-                                <p:outputLabel>Chosen property:</p:outputLabel>
+                        <!-- MAIN CONTAINER -->
+                        <div class="mainContainer">
 
-                                <p:dataTable
-                                    id="chosenPropertyTable"
-                                    var="prop" 
-                                    value="#{occPermitApplicationBB.prop.bundledProperty}"
-                                    rowKey="#{prop.propertyID}">
+                            <!-- TITLE COMPONENT -->
+                            <div class="public-title">
+                                <div class="public-title-main">
+                                    Apply For An Occupancy Permit
+                                </div>
+                                <div class="public-title-sub">
+                                    Step 5: Choose Reason For Application
+                                </div>
+                            </div>
 
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Address" />
-                                        </f:facet>
-                                        <h:outputText value="#{prop.address}"/>
-                                    </p:column>
+                            <!-- CONTENTS CONTAINER -->
+                            <div class="public-main-contents-containner">
 
+                                <!--CONTENT MAIN COMPONENT -->
+                                <div class="public-main-contents">
 
-                                    <p:column>
+                                    <!-- GUIDANCE COMPONENT -->
+                                    <div class="public-guide occpermit">
+                                        <p:steps activeIndex="4" styleClass="custom" >
+                                            <p:menuitem value="Step 1: Choose Municipality" containerStyleClass="complete"/>
+                                            <p:menuitem value="Step 2: Choose Property" containerStyleClass="complete"/>
+                                            <p:menuitem value="Step 3: Configure Unit List" containerStyleClass="complete"/>
+                                            <p:menuitem value="Step 4: Select Units" containerStyleClass="complete"/>
+                                            <p:menuitem value="Step 5: Choose Reason" />
+                                            <p:menuitem value="Step 6: Add People" />
+                                            <p:menuitem value="Step 7: Review And Submit" />
+                                        </p:steps>
+                                    </div>
 
-                                        <f:facet name="header">
-                                            <h:outputText value="Type" />
-                                        </f:facet>
-                                        <h:outputText value="#{prop.useType.name}"/>
+                                    <!-- CONTENT IO COMPONENT -->
+                                    <div class="public-main-contents-io">
+                                        <p>
+                                            1. Please choose select your reason for applying for occupancy from the drop-down menu. 
+                                            Below the drop down menu, you should put any details you think are important, such as
+                                            the purpose of the unit(s) you are applying for.
+                                        </p>
 
-                                    </p:column>
+                                        <p:selectOneMenu id="reasonSM" 
+                                                         tabindex="1"
+                                                         value="#{occPermitApplicationBB.currentApplication.reason}">
+                                           
+                                            <f:converter converterId="occPermitApplicationReasonConverter"/>
+                                            <f:selectItem itemLabel="Select a reason" itemDisabled="true"/>
+                                            <f:selectItems id="reasonList" value="#{occPermitApplicationBB.reasonList}" var ="r" itemValue="#{r}" itemLabel="#{r.title}" />
 
-                                </p:dataTable>
+                                        </p:selectOneMenu>
 
-                            </p:panel>
+                                        <p>
+                                            2. Please enter any notes you have about this application below
+                                        </p>
 
-                            <p:panel>
-                                <h3>Step 2: Configure Unit List</h3>
-                                <p:outputLabel>Configured Unit List:</p:outputLabel>
-                                <p:dataTable
-                                    id="configuredUnitTable"
-                                    var="unit"
-                                    value="#{occPermitApplicationBB.workingPropUnits}"
-                                    rowKey="#{unit.bundledUnit.unitID}"
-                                    >                                         
+                                        <p:inputTextarea id='notesInputText'
+                                                         styleClass="textArea"
+                                                         rows="6"
+                                                         tabindex="2"
+                                                         required="false"
+                                                         style="width: 100%"
+                                                         value="#{occPermitApplicationBB.currentApplication.submissionNotes}" 
+                                                         />
+                                    </div>
 
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Unit Number" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.bundledUnit.unitNumber}" />
-                                    </p:column>
+                                    <!-- CONTENT BUTTON -->
+                                    <div class="public-main-contents-button">
+                                        <p:commandButton ajax="false"
+                                                         value="Add people to application"
+                                                         action="#{occPermitApplicationBB.storeReason()}"
+                                                         style="width: 100%;"
+                                                         />
+                                    </div>
 
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Rental Notes" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.bundledUnit.rentalNotes}" />
-                                    </p:column>
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Unit Description" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.bundledUnit.notes}" />
-                                    </p:column>
-
-                                </p:dataTable>
-                            </p:panel>
-
-                            <p:panel>
-                                <h3>Step 3: Select Units For Application</h3>
-                                
-                                <p:outputLabel>Chosen Unit:</p:outputLabel>
-
-                                <p:dataTable
-                                    id="chosenUnitTable"
-                                    var="unit"
-                                    value="#{occPermitApplicationBB.selectedUnit.bundledUnit}"
-                                    rowKey="#{unit.unitID}"
-                                    >                                         
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Unit Number" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.unitNumber}" />
-                                    </p:column>
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Rental Notes" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.rentalNotes}" />
-                                    </p:column>
-
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Unit Description" />
-                                        </f:facet>
-                                        <h:outputText value="#{unit.notes}" />
-                                    </p:column>
-
-                                </p:dataTable>
-                            </p:panel>
-
-                            <p:spacer height="5px" />
-
-                            <h2 id="currentStep">Step 4: Choose Reason For Application</h2>
-
-                            <p:outputLabel> Please choose select your reason for applying for occupancy from the drop-down menu. 
-                                Below the drop down menu, you should put any details you think are important, such as
-                                the purpose of the unit(s) you are applying for.
-                            </p:outputLabel>
-
-                            <p:spacer height="5px" />
-
-                            <p:selectOneMenu
-                                id="reasonSM" tabindex="1"
-                                value="#{occPermitApplicationBB.currentApplication.reason}">
-                                <f:converter converterId="occPermitApplicationReasonConverter"/>
-                                <f:selectItem itemLabel="Select a reason" itemDisabled="true"/>
-                                <f:selectItems id="reasonList" value="#{occPermitApplicationBB.reasonList}" var ="r" itemValue="#{r}" itemLabel="#{r.title}" />
-
-                            </p:selectOneMenu>
-
-                            <p:spacer height="10px" />
-
-                            <p:outputLabel for="notesInputText" value="Please enter any notes you have about this application below:"/>
-
-                            <p:inputTextarea
-                                id='notesInputText'
-                                styleClass="textArea"
-                                rows="6"
-                                tabindex="2"
-                                required="false"
-                                style="width: 100%"
-                                value="#{occPermitApplicationBB.currentApplication.submissionNotes}" />
-
-                            <p:spacer height="10px" />
-
-                            <h3>Step 5: Add People To Application</h3>
-
-                            <p:outputLabel>...</p:outputLabel>
-
-                            <p:spacer height="10px"/>
-
-                            <p:commandButton ajax="false"
-                                             value="Add people to application"
-                                             action="#{occPermitApplicationBB.storeReason()}"/>
-
-                        </h:form>
-                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </h:form>
                 </f:view>
             </ui:define>
         </ui:composition>

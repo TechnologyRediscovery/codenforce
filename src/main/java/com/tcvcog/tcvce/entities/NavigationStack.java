@@ -17,6 +17,8 @@
 package com.tcvcog.tcvce.entities;
 
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
 /**
@@ -43,8 +45,16 @@ public class NavigationStack {
     
     public String popLastPage(){
         
+        try {
+        
         return viewIDStack.pop();
         
+        } catch(NoSuchElementException ex){
+            //We ran out of pages! (This should not happen)
+            //To keep the user from getting stuck, let's send them to an error page
+            //The error page should tell them to manually go backwards
+            return null;
+        }
     }
     
     public String peekLastPage(){

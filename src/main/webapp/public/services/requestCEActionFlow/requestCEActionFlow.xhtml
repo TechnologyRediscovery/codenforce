@@ -14,63 +14,68 @@
             <ui:define name="content">
                 <f:view id="requestCEActionFlow1View">
                     <h:form id="requestCEActionFlowFormChooseMuni">
-                        
+
                         <!-- VALIDATION MESSAGE -->
                         <p:growl id="growl" showDetail="false"/>
-                        
+
                         <!-- MAIN CONTAINER -->
                         <div class="mainContainer">
-                            
+
                             <!-- TITLE COMPONENT -->
                             <div class="public-title">
                                 <div class="public-title-main">
                                     Request Code Enforcement Action
                                 </div>
                                 <div class="public-title-sub">
-                                    Choose Municipality
+                                    Step 1: Choose Municipality
                                 </div>
-                            </div>
-                            
-                            <!-- GUIDANCE COMPONENT -->
-                            <div class="public-steps-guide">
-                                <p:steps activeIndex="0" styleClass="custom" >
-                                    <p:menuitem value="Step 1: Choose Municipality" />
-                                    <p:menuitem value="Step 2: Choose Property" />
-                                    <p:menuitem value="Step 3: Describe Concern" />
-                                    <p:menuitem value="Step 4: Upload Phote" />
-                                    <p:menuitem value="Step 5: Request Details" />
-                                    <p:menuitem value="Step 6: Review and Submit" />
-                                </p:steps>
                             </div>
 
-                            <!-- STEPS CONTENT COMPONENT -->
-                            <div class="public-steps-contents">
-                                
-                                <!-- STEPS CONTENT SELECTION COMPONENT -->
-                                <div class="public-steps-contents-select">
-                                    <p:selectOneMenu id="muniSelectMenu" 
-                                                     tabindex="1" 
-                                                     required="true"
-                                                     value="#{cEActionRequestSubmitBB.selectedMuni}"
-                                                     label=" Select a municipality ">
-                                        <f:converter converterId="muniConverter"/>
-                                        <f:selectItem itemLabel="Select a municipality..." 
-                                                      noSelectionOption="true" 
-                                                      itemDisabled="true"/>
-                                        <f:selectItems id="muniNameList" 
-                                                       value="#{muniBB.muniList}" 
-                                                       var="m" itemValue="#{m}" 
-                                                       itemLabel="#{m.muniName}"/>
-                                    </p:selectOneMenu>
-                                </div>
-                                
-                                <!-- STEPS CONTENT NEXT BUTTON COMPONENT -->
-                                <div class="public-steps-contents-next">
-                                    <p:commandButton ajax="false" 
-                                                     value="Next Step: Choose property" 
-                                                     action="#{cEActionRequestSubmitBB.storeSelectedMuni}"
-                                                     style="width: 100%;"
-                                                     update="growl"/>
+                            <!-- CONTENTS CONTAINER -->
+                            <div class="public-main-contents-containner">
+
+                                <!--CONTENT MAIN COMPONENT -->
+                                <div class="public-main-contents">
+                                    
+                                    <!-- GUIDANCE COMPONENT -->
+                                    <div class="public-guide">
+                                        <p:steps activeIndex="0" styleClass="custom" >
+                                            <p:menuitem value="Step 1: Choose Municipality" />
+                                            <p:menuitem value="Step 2: Choose Property" />
+                                            <p:menuitem value="Step 3: Describe Concern" />
+                                            <p:menuitem value="Step 4: Upload Phote" />
+                                            <p:menuitem value="Step 5: Request Details" />
+                                            <p:menuitem value="Step 6: Review and Submit" />
+                                        </p:steps>
+                                    </div>
+
+                                    <!-- CONTENT IO COMPONENT -->
+                                    <div class="public-main-contents-io">
+                                        <p:selectOneMenu id="muniSelectMenu" 
+                                                         tabindex="1" 
+                                                         required="true"
+                                                         value="#{cEActionRequestSubmitBB.selectedMuni}"
+                                                         label=" Select a municipality ">
+                                            <f:converter converterId="muniConverter"/>
+                                            <f:selectItem itemLabel="Select a municipality..." 
+                                                          noSelectionOption="true" 
+                                                          itemDisabled="true"/>
+                                            <f:selectItems id="muniNameList" 
+                                                           value="#{muniBB.muniList}" 
+                                                           var="m" itemValue="#{m}" 
+                                                           itemLabel="#{m.muniName}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <!-- CONTENT BUTTON -->
+                                    <div class="public-main-contents-button">
+                                        <p:commandButton ajax="false" 
+                                                         value="Next Step: Choose property" 
+                                                         action="#{cEActionRequestSubmitBB.storeSelectedMuni}"
+                                                         style="width: 100%;"
+                                                         update="growl"/>
+                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>

@@ -7,37 +7,60 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>codeNforce home</title>
+        <title>CodeNforce Home</title>
     </h:head>
     <h:body>
         <ui:composition template="./navContainer_public.xhtml">
-           
             <ui:define name="content">
                 <f:view id="sysHomeView">
-                    
-                    <div class="mainContainer">
-                        <h1>CODENFORCE System Access Portal</h1>
-                        
-                        <h:form id="sysHomeForm">
-                            <h2>Staff access</h2>
-                            <p>TCVCOG staff, code enforcement officials, and other authorized users access tools
-                                via mission control</p>
-                                <p:commandButton ajax="false" value="Log in to mission control" 
-                                                 action="#{loginBB.loginToMissionControl}"/>
-                                            
-                                <p:spacer height="10px" />
-                               
-                                <h:outputText value="Public user ID: #{loginBB.publicUA.userID}" style="color:lightgray" />
-                                
-                                <p:spacer height="10px" />
-                                
-                                <h:outputText value="Signature: #{loginBB.publicUA.keyCard.signature}" style="color:lightgray" />
-                                
-                        </h:form>
-                        
-                    </div>
+                    <h:form id="sysHomeForm">
+
+                        <!-- MAIN CONTAINER -->
+                        <div class="mainContainer">
+
+                            <!-- CONTENTS CONTAINER -->
+                            <div class="public-main-contents-containner">
+
+                                <!--CONTENT MAIN COMPONENT -->
+                                <div class="public-main-contents">
+
+                                    <!-- CONTENT IO COMPONENT -->
+                                    <div class="public-main-contents-io public-main-contents-login">
+
+                                        <h:graphicImage styleClass="public-login-logo" value="/images/login-logo.png" />
+                                        
+                                        <div class="publi-login-container">
+
+                                            <div class="publi-login-title">
+                                                HI, WELCOME TO <span style="float:right"><span style="color: #DEE461">CODE</span><span style="color:#00B4ED">NFORCE</span> ! </span> 
+                                            </div>
+
+                                            <div class="public-login-button">
+                                                <p:commandButton ajax="false" 
+                                                                 value="Login To Mission Control" 
+                                                                 action="#{loginBB.loginToMissionControl}"
+                                                                 style="width: 100%"/>
+                                            </div>
+                                            <div class="public-login-text">
+                                                <p>
+                                                    TCVCOG staff, code enforcement officials, and other authorized users access tools
+                                                    via mission control
+                                                </p>
+                                            </div>
+                                            <div class="public-login-text" style="color: lightgray">
+                                                <p:outputLabel value="Public user ID: #{loginBB.publicUA.userID}"/>
+                                            </div>
+                                            <div class="public-login-text" style="color: lightgray">
+                                                <p:outputLabel value="Signature: #{loginBB.publicUA.keyCard.signature}"/>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </h:form>
                 </f:view>
-                
             </ui:define>
         </ui:composition>
     </h:body>

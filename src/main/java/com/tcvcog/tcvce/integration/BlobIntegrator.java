@@ -183,6 +183,41 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * Since many values in the Blob sphere shouldn't be changed after uploaded,
+     * this method only updates the filename and description values.
+     * @param blob the blob to be updated
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void updateBlobDescriptors(Blob blob) throws  IntegrationException{
+        
+        Connection con = getPostgresCon();
+        String query =  " UPDATE public.photodoc\n" +
+                        " SET photodocdescription=?, photodocfilename=?\n" +
+                        " WHERE photodocid=?;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, blob.getDescription());
+            stmt.setString(2, blob.getFilename());
+            
+            stmt.setInt(3, blob.getBlobID());
+            
+            System.out.println("BlobIntegrator.storeBlob | Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error updating blob. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
      * removes this blob from the db, as well as any rows associated with this blob in linker tables.
      * @param blobID the blobID of the blob to be removed
      * @throws IntegrationException thrown instead of a SQLException

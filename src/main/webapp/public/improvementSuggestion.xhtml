@@ -12,58 +12,78 @@
     <h:body>
         <ui:composition template="./navContainer_public.xhtml">
             <ui:define name="content">
-                <div class="mainContainer">
-                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                    </h:messages>
-                            
-                    <h1>Report a bug or make a suggestion</h1>
-                    
-                        <p>Our system is like a "living document." We make it better based on your feedback.</p>
-               
-                    
-                    <f:view>
-                        <h:form id="caseAddForm">
-                            <h2>Submission form</h2>
-                            
-                            <h:outputLabel value="Select a ticket type:" for="listItemChangeEditor"/>
-                            <p:spacer height="15px"/>
-                            <p:selectOneMenu value="#{systemServicesBB.selectedImprovementType}"
-                                        id="improvementType" 
-                                        tabindex="1">
-                                <f:selectItems value="#{systemServicesBB.improvementTypeMap}"/>
-                            </p:selectOneMenu>
-                            
-                            <p:spacer height="5px"/>
-                            
-                            <p>In the editor below, please describe the nature of the bug or details of your suggestion.
-                                If you are reporting a bug, please make note of the exact page heading in your write-up below.
-                                (For technical reasons, the name of the file in your browser location bar (something.xhtml) may not
-                                correspond to the actual name of the page about which you are reporting.)</p>
-                            
-                            <p:editor  id="listItemChangeEditor"  value="#{systemServicesBB.systemImprovementTicketRText}" 
-                                    controls="bold italic underline strikethrough font size style color 
-                                    bullets numbering center undo redo rule link removeformat outdent 
-                                    indent link unlink copy cut paste rule alignleft center alignright"
-                                    width="1000" 
-                                    height="200"/>
-                            
-                            <h:message for="listItemChangeEditor" showDetail="false" showSummary="true" 
-                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                            
-                            <p:spacer height="5px"/>
-                            
-                            <p>Note: Your user ID and the current time are automatically attached to your submission</p>
-                            
-                            <p:commandButton ajax="false" action="#{systemServicesBB.submitImprovementSuggestion}"
-                                             value="Submit suggestion" icon="fa fa-paper-plane" tabindex="2"/>
-                            
-                            
-                            
-                            
-                        </h:form>
-                    </f:view>
-                </div>
+                <f:view>
+                    <h:form id="caseAddForm">
+
+                        <!-- VALIDATION MESSAGE -->
+                        <p:growl id="growl" showDetail="false"/>
+
+                        <!-- MAIN CONTAINER -->
+                        <div class="mainContainer">
+
+                            <!-- TITLE COMPONENT -->
+                            <div class="public-title">
+                                <div class="public-title-main">
+                                    Report A Bug Or Make A Suggestion
+                                </div>
+                                <div class="public-title-sub">
+                                    Our system is like a "living document." We make it better based on your feedback.
+                                </div>
+                            </div>
+
+                            <!-- CONTENTS CONTAINER -->
+                            <div class="public-main-contents-containner">
+
+                                <!--CONTENT MAIN COMPONENT -->
+                                <div class="public-main-contents">
+
+                                    <!-- GUIDANCE COMPONENT -->
+                                    <div class="public-guide">
+                                    </div>
+
+                                    <!-- CONTENT IO COMPONENT -->
+                                    <div class="public-main-contents-io">
+                                        <p>
+                                            1. Select a ticket type...
+                                        </p>
+                                        <p:selectOneMenu value="#{systemServicesBB.selectedImprovementType}"
+                                                         id="improvementType" 
+                                                         tabindex="1">
+                                            <f:selectItems value="#{systemServicesBB.improvementTypeMap}"/>
+                                        </p:selectOneMenu>
+                                        <p>
+                                            2. In the editor below, please describe the nature of the bug or details of your suggestion.
+                                            If you are reporting a bug, please make note of the exact page heading in your write-up below.
+                                            (For technical reasons, the name of the file in your browser location bar (something.xhtml) may not
+                                            correspond to the actual name of the page about which you are reporting.)
+                                        </p>
+
+                                        <p:editor  id="listItemChangeEditor" 
+                                                   value="#{systemServicesBB.systemImprovementTicketRText}" 
+                                                   controls="bold italic underline strikethrough font size style color 
+                                                   bullets numbering center undo redo rule link removeformat outdent 
+                                                   indent link unlink copy cut paste rule alignleft center alignright"
+                                                   style="width: 100%; height: 300px;"/>
+
+                                        <p:message for="listItemChangeEditor" showDetail="false" showSummary="true" />
+
+                                        <p>Note: Your user ID and the current time are automatically attached to your submission</p>
+                                    </div>
+                                    <!-- CONTENT BUTTON -->
+                                    <div class="public-main-contents-button">
+                                        <p:commandButton ajax="false"
+                                                         action="#{systemServicesBB.submitImprovementSuggestion}"
+                                                         value="Submit suggestion" 
+                                                         icon="fa fa-paper-plane" 
+                                                         tabindex="2"
+                                                         style="width: 100%"/>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </h:form>
+                </f:view>
             </ui:define>
         </ui:composition>
     </h:body>

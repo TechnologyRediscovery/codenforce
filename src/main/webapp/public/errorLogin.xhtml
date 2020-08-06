@@ -12,22 +12,48 @@
     <h:body>
         <ui:composition template="navContainer_public.xhtml">
             <ui:define name="content">
-                <div class="mainContainer">
-                    <f:view id="erroPageView">
-                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
+                <f:view id="erroPageView">
+                    <h:form>
+                        <!-- MAIN CONTAINER -->
+                        <div class="mainContainer">
 
-                        <h1>Incorrect username and/or password</h1>
-                        <h2>Please click your browser's BACK button and try again.</h2>
-                        <p><span class="bold">Remember:</span> Both usernames and passswords ARE cAse SenSiTIve.</p>
-                        <p>If you have tried a bunch of times and checked your records, etc., and believe 
-                                this is non-user, system error please contact system administrator Eric Darsow at 412.923.9907 (c).</p>
-                        <p>Automated password reset services are not yet setup for this system.</p>
+                            <!-- CONTENTS CONTAINER -->
+                            <div class="public-main-contents-containner">
+
+                                <!--CONTENT MAIN COMPONENT -->
+                                <div class="public-main-contents">
+
+                                    <!-- CONTENT IO COMPONENT -->
+                                    <div class="public-main-contents-io public-main-contents-login">
+                                        
+                                        <h:graphicImage styleClass="public-login-logo" value="/images/login-logo.png" />
+
+                                        <div class="publi-login-container">
+                                            <div class="publi-login-title" style="text-align: center; font-size: 3em" >
+                                                Incorrect Username Or Password
+                                            </div>
+                                            <div class="public-login-text">
+                                                <p><span class="bold">Remember:</span> Both usernames and passswords ARE cAse SenSiTIve.</p>
+                                                <p>If you have tried a bunch of times and checked your records, etc., and believe 
+                                                    this is non-user, system error please contact system administrator Eric Darsow at 412.923.9907 (c).</p>
+                                                <p>Automated password reset services are not yet setup for this system.</p>
+                                            </div>
+
+                                            <div class="public-login-button">
+                                                <p:commandButton ajax="false" 
+                                                                 value="Try Again" 
+                                                                 action="systemHome"
+                                                                 style="width: 100%"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </h:form>
 
 
-                    </f:view>
-                </div>
+                </f:view>
             </ui:define>
         </ui:composition>
     </h:body>
