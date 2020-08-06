@@ -7,8 +7,8 @@ __all__ = [
     "_fetch",
     "_write",
     "_utils",
-    "parcelupdate",
+    "pyparcel",
 ]
 
-#   parcelupdate uses semantic versioning (https://semver.org/)
+#   pyparcel uses semantic versioning (https://semver.org/)
 #   Please note that the versioning will not be kept up to date until version 1.0.0

@@ -6,7 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/codeconnect/scripts/parcelupdate" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/codeconnect/scripts" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/parcelupdate" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/pyparcel" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="Pipenv (codenforce)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -23,10 +23,10 @@ import psycopg2
 from os import path
 from contextlib import contextmanager
 import functools
-from parcelupdate._events import *
-from parcelupdate import _parse
-from parcelupdate import _write as write
-from parcelupdate._parse import TaxStatus
+from pyparcel._events import *
+from pyparcel import _parse
+from pyparcel import _write as write
+from pyparcel._parse import TaxStatus
 import pickle
 
 

@@ -4,7 +4,6 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-# black can cause issues because it is a pre-release. If it doesn't work properly, try pipenv install black --pre --dev
 black = "*"
 pre-commit = "*"
 pytest = "*"
@@ -15,7 +14,7 @@ psycopg2 = "*"
 bs4 = "*"
 click = "*"
 colorama = "*"
-parcelupdate  = {path = ".", editable = true}
+pyparcel  = {path = ".", editable = true}
 
 [requires]
 python_version = "3.8"
