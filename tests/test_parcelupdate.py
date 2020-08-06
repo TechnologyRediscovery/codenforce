@@ -21,6 +21,7 @@ import pytest
 from copy import copy
 import psycopg2
 from os import path
+from contextlib import contextmanager
 import functools
 from parcelupdate._events import *
 from parcelupdate import _parse
@@ -153,12 +154,19 @@ class TestParse:
         pass
 
 
+try:
+    conn = psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="localhost", port="5432")
+except psycopg2.OperationalError:
+    @contextmanager
+    def mocked_conn():
+        try: yield None
+        finally: pass
+    conn = mocked_conn()
 
-with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="localhost", port="5432") as conn:
 
-
+with conn:
     def transaction(func):
-        """ Decorator that allows each unittest to be run in its own transaction
+        """ transaction is a decorator that allows each unittest to be run in its own transaction
         """
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -172,55 +180,55 @@ with psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="lo
         return wrapper
 
 
-    class TestWrites():
+    def db_connection_established():
+        """ db_connection_established is a flag representing if a database connection could be made.
         """
-        These tests ensure that the code write to the database properly.
-
-        They write to a local copy of the cogdb database.
-        Changes to the database persist between tests, so these are not "pure" unittests.
-        """
-        # Todo: Is calling a new cursor for every function correct? This way tests don't share components.
-        @transaction
-        def test_property(self, person1_prop_imap):
-            with conn.cursor() as cursor:
-                write.property(person1_prop_imap, cursor)
-
-        # # Requires a property id
-        # @transaction
-        # def test_unit(self):
-        #     with conn.cursor() as cursor:
-        #         write.unit(unit_imap, cursor)
-        #
-        # @transaction
-        # def test_person(self, person1_owner_imap):
-        #     with conn.cursor() as cursor:
-        #         write.person(person1_owner_imap, cursor)
-        #
-        # # def test_connect_property_to_person(self):
-        # #     with conn.cursor() as cursor:
-        # #         write.connect_property_to_person(prop_id, person_id, cursor)
-        #
-        # def test_taxstatus(self):
-        #     with conn.cursor() as cursor:
-        #         write.taxstatus(tax_status, cursor)
-        #
-        # @transaction
-        # def test_propertyexternaldata(self, person1_propertyexternaldata_imap):
-        #     with conn.cursor() as cursor:
-        #         write.propertyexternaldata(person1_propertyexternaldata_imap, cursor)
+        if isinstance(conn, psycopg2.extensions.connection):
+            return True
 
 
+    def test_database_connection():
+        assert db_connection_established()
 
-    class TestIntegrity():
-        """
-        These tests ensure the versions of objects created in the scripts match the version in the database.
 
-        They read from a local copy of the cogdb database.
-        """
+    @pytest.mark.skipif(not db_connection_established(), reason="Requires a database connection")
+    class TestsRequiringADatabaseConnection:
+        class TestWrites():
+            """ TestWrites tests check that the code write to the database properly.
+            """
+            @transaction
+            def test_property(self, person1_prop_imap):
+                with conn.cursor() as cursor:
+                    write.property(person1_prop_imap, cursor)
+
+            # # Requires a property id
+            # @transaction
+            # def test_unit(self):
+            #     with conn.cursor() as cursor:
+            #         write.unit(unit_imap, cursor)
+            #
+            # @transaction
+            # def test_person(self, person1_owner_imap):
+            #     with conn.cursor() as cursor:
+            #         write.person(person1_owner_imap, cursor)
+            #
+            # # def test_connect_property_to_person(self):
+            # #     with conn.cursor() as cursor:
+            # #         write.connect_property_to_person(prop_id, person_id, cursor)
+            #
+            # def test_taxstatus(self):
+            #     with conn.cursor() as cursor:
+            #         write.taxstatus(tax_status, cursor)
+            #
+            # @transaction
+            # def test_propertyexternaldata(self, person1_propertyexternaldata_imap):
+            #     with conn.cursor() as cursor:
+            #         write.propertyexternaldata(person1_propertyexternaldata_imap, cursor)
+
+
         class TestEventCategories:
             """ Ensures events in _events.py share the same attributes of their counterpart in the database.
             """
-
             @pytest.mark.parametrize("event", event_categories)
             def test_name_integrity(self, event):
                 """ Compares the class's name to the database's event category's title.
