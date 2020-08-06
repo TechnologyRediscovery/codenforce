@@ -726,6 +726,45 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         return typeList;
     }
     
+    /**
+     * Generates a list of CEActionRequestIssueType objects
+     * @param muni restrict results to given muni; when null, all issue types are returned
+     * @return the list of sub-BObs
+     * @throws IntegrationException 
+     */
+    public List<CEActionRequestIssueType> getRequestIssueTypeList() throws IntegrationException {
+
+        List<CEActionRequestIssueType> typeList = new ArrayList();
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append( "SELECT issuetypeid, typename, typedescription, muni_municode, notes, intensity_classid, active \n");
+        sb.append(" FROM public.ceactionrequestissuetype; ");
+        
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(sb.toString());
+
+            rs = stmt.executeQuery();
+
+            // loop through the result set and reat an action request from each
+            while (rs.next()) {
+                typeList.add(generateCEActionRequestIssueType(rs));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequestByControlCode | Integration Error: Unable to retrieve action request", ex);
+        } finally {
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return typeList;
+    }
+    
     
     
     

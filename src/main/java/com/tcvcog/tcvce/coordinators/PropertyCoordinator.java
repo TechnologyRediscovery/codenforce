@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
@@ -287,6 +288,35 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
         return p;
     }
+    
+    /**
+     * Logic container for checking requests to connect a person to a property 
+     * using a linkage table. The actual DB interaction is delegated to the 
+     * PersonCoordinator who may check their own stuff
+     * 
+     * @param pdh
+     * @param pers
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public void connectPersonToProperty(PropertyDataHeavy pdh, Person pers) throws IntegrationException, BObStatusException{
+        boolean proceedWithConnect = true;
+        PersonCoordinator pc = getPersonCoordinator();
+        if(pdh != null && pers != null){
+            for(Person p: pdh.getPersonList()){
+                if(p.getPersonID() == pers.getPersonID()){
+                    proceedWithConnect = false;
+                }
+            }
+        }
+        if(proceedWithConnect){
+            pc.connectPersonToProperty(pers, pdh);
+        } else {
+            throw new BObStatusException("Person Link Already Exists");
+        }
+        
+        
+    }
 
     public LocalDateTime configureDateTime(Date date) {
         return new java.sql.Timestamp(date.getTime()).toLocalDateTime();
@@ -338,12 +368,13 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         CECase cse = cc.initCECase(p, ua);
         //review all case mems and set app ones for info case
         
-        try {
-            cse.setCaseManager(uc.getUser(ua.getMyCredential().getGoverningAuthPeriod().getUserID()));
-            cc.insertNewCECase(cse, ua, null);
-        } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
-            System.out.println(ex);
-        }
+//        try {
+//            cse.setCaseManager(uc.getUser(ua.getMyCredential().getGoverningAuthPeriod().getUserID()));
+// TODO: Debug later
+//            cc.insertNewCECase(cse, ua, null);
+//        } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
+//            System.out.println(ex);
+//        }
         if(p.getPropInfoCaseList() == null){
             p.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
         }
@@ -385,19 +416,15 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param prop
      * @param ua
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public void editProperty(Property prop, UserAuthorized ua) throws IntegrationException {
+    public void editProperty(Property prop, UserAuthorized ua) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         prop.setLastUpdatedBy(ua);
         prop.setLastUpdatedTS(LocalDateTime.now());
-//        prop.setAbandonedDateStart(LocalDateTime.parse(prop.getAbandonedDateStart().toString()));
-//        prop.setAbandonedDateStop(LocalDateTime.parse(prop.getAbandonedDateStop().toString()));
-//        prop.setVacantDateStart(LocalDateTime.parse(prop.getVacantDateStart().toString()));
-//        prop.setVacantDateStop(LocalDateTime.parse(prop.getVacantDateStop().toString()));
-//        prop.setUnfitDateStart(LocalDateTime.parse(prop.getUnfitDateStart().toString()));
-//        prop.setUnfitDateStop(LocalDateTime.parse(prop.getUnfitDateStop().toString()));
         if (checkAllDates(prop) == false) {
-
+            throw new BObStatusException("Date error in committing property updates; Ensure no end date is before a start date");
+            
         }
         pi.updateProperty(prop);
 

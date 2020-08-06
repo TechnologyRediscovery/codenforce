@@ -1275,7 +1275,17 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     stmt.setString(++paramCounter, str.toString());
                 }
                 
-                // filters PERS-9 and PERS-10 take zero arguments
+                // filter PERS-9
+                if(params.isPersonType_ctl()){
+                    if(params.getPersonType_val() != null){
+                        stmt.setString(++paramCounter, params.getPersonType_val().name());
+                    } else {
+                        // choose arbitrarily
+                        stmt.setString(++paramCounter, PersonType.User.name());
+                    }
+                }
+                
+                // PERS-10 take zero arguments
                 
                 // filter PERS-11
                 if (params.isSource_ctl()) {
@@ -1374,7 +1384,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         skeleton.setAdded(rs.getBoolean("added"));
         skeleton.setChangedOn(rs.getTimestamp("entryts"));
         skeleton.setApprovedOn(rs.getTimestamp("approvedondate"));
-        skeleton.setApprovedBy(uc.getUser(rs.getInt("approvedby")));
+        skeleton.setApprovedBy(uc.user_getUser(rs.getInt("approvedby")));
         skeleton.setChangedBy(rs.getInt("changedby_personid"));
         skeleton.setActive(rs.getBoolean("active"));
         

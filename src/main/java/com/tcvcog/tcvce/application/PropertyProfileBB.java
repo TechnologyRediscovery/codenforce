@@ -1,10 +1,10 @@
 package com.tcvcog.tcvce.application;
 
-
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
-import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -13,20 +13,20 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventRuleAbstract;
 import com.tcvcog.tcvce.entities.IntensityClass;
-import com.tcvcog.tcvce.entities.IntensitySchema;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyExtData;
-import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -48,97 +48,100 @@ import javax.faces.event.ActionEvent;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.address}" />
-                                    <h:outputText value=" | " />
-                                    <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}" />
-                                    <h:outputText value=" | " />
-                                    <h:outputText id="header-lob-ot" value="Lot-block: #{propertyProfileBB.currentProperty.parID}"/>  
-                                    <h:outputText value=" | " />
-                                    <h:outputText id="header-propid-ot" value="ID: #{propertyProfileBB.currentProperty.propertyID}"/>  
+ * You should have received a copy of the GNU General Public License 
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 /**
  *
  * @author ellen bascomb of apt 31y
  */
-public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
-    
-     
+public class PropertyProfileBB extends BackingBeanUtils implements Serializable {
+
     private PageModeEnum currentMode;
     private List<PageModeEnum> pageModes;
-    
+
     private PropertyDataHeavy currentProperty;
     private boolean currentPropertySelected;
-    
+
     private Municipality muniSelected;
-    
+
     private List<PropertyUseType> putList;
     private PropertyUseType selectedPropertyUseType;
-    
+
     private List<IntensityClass> conditionIntensityList;
-    private IntensityClass conditionIntensitySelected;
-    
+    protected List<IntensityClass> landBankProspectIntensityList;
     private List<BOBSource> sourceList;
-    private BOBSource sourceSelected;
-    
+
     private List<PropertyExtData> propExtDataListFiltered;
-    
+
     private String formNoteText;
-    
+
     private Person personSelected;
     private List<Person> personToAddList;
-    
-    private  ViewOptionsProposalsEnum selectedPropViewOption;
-    
+    private boolean personLinkUseID;
+    private int personIDToLink;
+
+    private ViewOptionsProposalsEnum selectedPropViewOption;
+
     /**
      * Creates a new instance of PropertyProfileBB
      */
     public PropertyProfileBB() {
     }
-    
+
     @PostConstruct
-    public void initBean(){
+    public void initBean() {
         PropertyIntegrator pi = getPropertyIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
         pageModes = new ArrayList<>();
-        pageModes.add(PageModeEnum.VIEW);
+        pageModes.add(PageModeEnum.LOOKUP);
         pageModes.add(PageModeEnum.INSERT);
         pageModes.add(PageModeEnum.UPDATE);
         pageModes.add(PageModeEnum.REMOVE);
 
-        if(getSessionBean().isStartPropInfoPageWithAdd()){
+        if (getSessionBean().isStartPropInfoPageWithAdd()) {
             currentMode = PageModeEnum.INSERT;
         } else {
-            currentMode = PageModeEnum.VIEW;
+            currentMode = PageModeEnum.LOOKUP;
         }
-        
+
         personToAddList = new ArrayList<>();
-        
+
         // use same pathway as clicking the button
         setCurrentMode(currentMode);
-        
+
         currentProperty = getSessionBean().getSessProperty();
         currentPropertySelected = true;
         muniSelected = getSessionBean().getSessMuni();
 
         try {
             putList = pi.getPropertyUseTypeList();
+            sourceList = sc.getBobSourceListComplete();
+            conditionIntensityList = sc.getIntensitySchemaWithClasses(
+                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("intensityschema_propertycondition"))
+                    .getClassList();
+            landBankProspectIntensityList = sc.getIntensitySchemaWithClasses(
+                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("intensityschema_landbankprospect"))
+                    .getClassList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
     }
-    
-     /**
+
+    /**
      * Getter for currentMode
-     * @return 
+     *
+     * @return
      */
     public PageModeEnum getCurrentMode() {
         return currentMode;
     }
 
     /**
-     * Responds to the user clicking one of the page modes: LOOKUP, ADD, UPDATE, REMOVE
-     * @param mode     
+     * Responds to the user clicking one of the page modes: LOOKUP, ADD, UPDATE,
+     * REMOVE
+     *
+     * @param mode
      */
     public void setCurrentMode(PageModeEnum mode) {
 
@@ -151,9 +154,9 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
             this.currentMode = tempCurMode;
         } else {
             this.currentMode = mode;
-            switch(currentMode){
-                case VIEW:
-                    initiatePropertyView();
+            switch (currentMode) {
+                case LOOKUP:
+                    initPropertyLookup();
                     break;
                 case INSERT:
                     initiatePropertyAdd();
@@ -166,25 +169,32 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
                     break;
                 default:
                     break;
-                    
+
             }
         }
-        if(currentMode != null){
+        if (currentMode != null) {
             //show the current mode in p:messages box
-            getFacesContext().addMessage(null, 
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                this.currentMode.getTitle() + " Mode Selected", ""));
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            this.currentMode.getTitle() + " Mode Selected", ""));
         }
-        
-        if(currentProperty != null){
+
+        if (currentProperty != null) {
             currentPropertySelected = true;
         }
 
     }
 
     //check if current mode == Lookup
+    public boolean getActiveLookupMode() {
+        // hard-wired on since there's always a property loaded
+        return PageModeEnum.LOOKUP.equals(currentMode);
+    }
+
+    //check if current mode == Lookup
     public boolean getActiveViewMode() {
-        return PageModeEnum.VIEW.equals(currentMode);
+        return PageModeEnum.VIEW.equals(currentMode) || PageModeEnum.LOOKUP.equals(currentMode);
+
     }
 
     //check if current mode == Insert
@@ -197,34 +207,33 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         return PageModeEnum.REMOVE.equals(currentMode);
     }
 
-
     /**
      * Initialize the whole page into default setting
      */
     public void loadDefaultPageConfig() {
         System.out.println("EventRuleConfigBB.loadDefaultPageConfig()");
-        
+
         currentPropertySelected = true;
         //initialize default current basic muni list
     }
-    
-    
+
     /**
      * Listener for when the user aborts a property add operation;
-     * 
-     * @param ev 
+     *
+     * @param ev
      */
-    public void onDiscardNewPropertyDataButtonChange(ActionEvent ev){
-        
+    public void onDiscardNewPropertyDataButtonChange(ActionEvent ev) {
+
     }
-    
+
     /**
      * Listener for user requests to create a note event on this property
-     * @return redirection to the EventAdd page 
+     *
+     * @return redirection to the EventAdd page
      */
-    public String onAddNoteButtonChange(){
+    public String onAddNoteEventButtonChange() {
         EventCoordinator ec = getEventCoordinator();
-         
+
         try {
             EventCnF ev = ec.initEvent(currentProperty.getPropInfoCaseList().get(0),
                     ec.getEventCategory(Integer.parseInt(
@@ -234,33 +243,98 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         } catch (IntegrationException | BObStatusException | EventException ex) {
             System.out.println(ex);
         }
-        
+
         return "eventAdd";
-        
+
     }
-    
-    public void onCommitNoteButtonChange(ActionEvent ev){
-        
-        
-    }
-    
+
     /**
-     * Listener for user requests to explore the property info cases on this property
-     * @return 
+     * Action listener for user request to view a full property record from Also
+     * acts as a property reload tool the list
+     *
+     * @param prop
      */
-    public String onInfoCaseListButtonChange(){
+    public void onExplorePropertyButtonChange(Property prop) {
+        PropertyCoordinator pc = getPropertyCoordinator();
+        if (prop != null) {
+            try {
+                currentProperty = pc.getPropertyDataHeavy(prop.getPropertyID(), getSessionBean().getSessUser());
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Loaded property record for " + prop.getAddress(), ""));
+            } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Fatal error loading property; apologies!", ""));
+            }
+        }
+    }
+
+    /**
+     * Listener for commencement of note writing process
+     *
+     * @param ev
+     */
+    public void onNoteInitButtonChange(ActionEvent ev) {
+        formNoteText = new String();
+
+    }
+
+    /**
+     * Listener for user requests to commit new note content to the current
+     * Property
+     *
+     * @param ev
+     */
+    public void onNoteCommitButtonChange(ActionEvent ev) {
+        SystemCoordinator sc = getSystemCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        mbp.setCred(getSessionBean().getSessUser().getKeyCard());
+        mbp.setExistingContent(currentProperty.getNotes());
+        mbp.setNewMessageContent(formNoteText);
+        mbp.setHeader("Property Note");
+        mbp.setUser(getSessionBean().getSessUser());
+        currentProperty.setNotes(sc.appendNoteBlock(mbp));
+        try {
+            currentProperty.setLastUpdatedTS(LocalDateTime.now());
+            pc.editProperty(currentProperty, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Succesfully appended note!", ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Fatal error appending note; apologies!", ""));
+
+        }
+
+        onExplorePropertyButtonChange(currentProperty);
+
+    }
+
+    /**
+     * Listener for user requests to explore the property info cases on this
+     * property
+     *
+     * @return
+     */
+    public String onInfoCaseListButtonChange() {
         CaseCoordinator cc = getCaseCoordinator();
-        
-        if(currentProperty != null && currentProperty.getPropInfoCaseList() != null){
+
+        if (currentProperty != null && currentProperty.getPropInfoCaseList() != null) {
             getSessionBean().setSessCECaseListWithDowncastAndLookup(currentProperty.getPropInfoCaseList());
         }
-        
+
         return "ceCaseSearch";
     }
 
     /**
      * Listener for button clicks when user is ready to insert a new EventRule.
      * Delegates all work to internal method
+     *
      * @return Empty string which prompts page reload without wiping bean memory
      */
     public String onInsertButtonChange() {
@@ -273,8 +347,48 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * Listener for user requests to submit object updates;
-     * Delegates all work to internal method
+     * Listener for the user's commencement of the person link process
+     *
+     * @param ev
+     */
+    public void onPersonConnectInitButtonChange(ActionEvent ev) {
+
+    }
+
+    /**
+     * Listener for the user signaling their desire to connect a person
+     *
+     * @return
+     */
+    public String onPersonConnectCommitButtonChange() {
+        PropertyCoordinator pc = getPropertyCoordinator();
+        PersonCoordinator persc = getPersonCoordinator();
+        try {
+            if (personLinkUseID && personIDToLink != 0) {
+                Person checkPer = null;
+                checkPer = persc.getPerson(personIDToLink);
+                if (checkPer != null && checkPer.getPersonID() != 0) {
+                    pc.connectPersonToProperty(currentProperty, checkPer);
+                }
+
+            } else {
+                if (personSelected != null) {
+                    pc.connectPersonToProperty(currentProperty, personSelected);
+                }
+            }
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+            
+        }
+
+        return "";
+    }
+
+    /**
+     * Listener for user requests to submit object updates; Delegates all work
+     * to internal method
+     *
      * @return Empty string which prompts page reload without wiping bean memory
      */
     public String onUpdateButtonChange() {
@@ -283,214 +397,190 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         //reminder: set muniManageSample in faces-config.xml
         //return to muniManage_sample.xhtml page
         commitPropertyUpdates();
-        
+
         return "";
     }
-    
-    
 
     /**
      * Listener for user requests to remove the currently selected ERA;
      * Delegates all work to internal, non-listener method.
+     *
      * @return Empty string which prompts page reload without wiping bean memory
      */
     public String onRemoveButtonChange() {
         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Remove Municipality", ""));
         return "";
     }
-    
-    public String onPropUnitExploreButtonChange(){
-        
+
+    public String onPropUnitExploreButtonChange() {
+
         getSessionBean().setSessProperty(currentProperty);
         return "propertyUnits";
     }
-    
 
-    
     /**
-     * Listener for clicks to manage person connections
-     * @param ev 
+     * Listener for user requests to view advanced search dialog
+     *
+     * @param ev
      */
-    public void onPersonManageButtonChange(ActionEvent ev){
-        
-        
+    public void onAdvancedSearchButtonChange(ActionEvent ev) {
+
     }
- 
-    private void initiatePropertyView(){
-        
+
+    private void initPropertyLookup() {
+
     }
-    
+
+    private void initiatePropertyView() {
+
+    }
+
     /**
      * Internal logic container at commencement of property update operation
      */
-    private void initiatePropertyUpdate(){
-        
+    private void initiatePropertyUpdate() {
+
         // do nothing
     }
-    
-    
+
     /**
      * Internal logic container for property remove operations
      */
-    private void initiatePropertyRemove(){
-        
+    private void initiatePropertyRemove() {
+
     }
-    
+
     /**
      * Loads a skeleton property into which we inject values from the form
      */
-    public void initiatePropertyAdd(){
-       PropertyCoordinator pc = getPropertyCoordinator();
-       currentProperty = pc.initPropertyDataHeavy(getSessionBean().getSessMuni());
+    public void initiatePropertyAdd() {
+        PropertyCoordinator pc = getPropertyCoordinator();
+        currentProperty = pc.initPropertyDataHeavy(getSessionBean().getSessMuni());
     }
 
     /**
      * Liases with coordinator to insert a new property object
      */
-    private void commitPropertyAdd(){
+    private void commitPropertyAdd() {
         PropertyCoordinator pc = getPropertyCoordinator();
         int newID = 0;
         try {
             newID = pc.addProperty(currentProperty, getSessionBean().getSessUser());
             getSessionBean().setSessProperty(pc.getPropertyDataHeavy(newID, getSessionBean().getSessUser()));
             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Successfully added property with ID: " + currentProperty.getPropertyID()
-                                + ", which is now your 'active property'", ""));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully added property with ID: " + currentProperty.getPropertyID()
+                            + ", which is now your 'active property'", ""));
         } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Could not update property, sorries!" + ex.getClass().toString(), ""));
-        } 
-        
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not update property, sorries!" + ex.getClass().toString(), ""));
+        }
+
     }
-    
-     private void commitPropertyUpdates(){
+
+    private void commitPropertyUpdates() {
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
 //            currentProperty.setAbandonedDateStart(pc.configureDateTime(currentProperty.getAbandonedDateStart().to));
             pc.editProperty(currentProperty, getSessionBean().getSessUser());
             currentProperty = pc.getPropertyDataHeavy(currentProperty.getPropertyID(), getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Successfully updated property with ID " + getCurrentProperty().getPropertyID() 
-                                + ", which is now your 'active property'", ""));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully updated property with ID " + getCurrentProperty().getPropertyID()
+                            + ", which is now your 'active property'", ""));
         } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Could not update property, sorries! " + ex.toString(), ""));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not update property, sorries! " + ex.toString(), ""));
         }
-     
+
     }
-    
-  
-    
+
     /**
-     * Listener for requests from the user to view a Person's
-     * profile
+     * Listener for requests from the user to view a Person's profile
+     *
      * @param p
-     * @return 
+     * @return
      */
-    public String onViewPersonProfileButtonChange(Person p){
-        if(p != null){
-            getSessionBean().getSessPersonList().add(0,p);
+    public String onViewPersonProfileButtonChange(Person p) {
+        if (p != null) {
+            getSessionBean().getSessPersonList().add(0, p);
             return "personInfo";
-            
+
         }
         return "";
-        
+
     }
-    
-    public String onCreateNewCaseButtonChange(){
+
+    public String onCreateNewCaseButtonChange() {
         getSessionBean().setSessProperty(currentProperty);
         return "addNewCase";
-        
+
     }
-    
+
     /**
      * Listener for requests to view an event
+     *
      * @param ev
-     * @return 
+     * @return
      */
-    public String onViewEventButtonChange(EventCnF ev){
-        if(ev != null){
+    public String onViewEventButtonChange(EventCnF ev) {
+        if (ev != null) {
             getSessionBean().setSessEventQueued(ev);
             return "eventAddEdit";
         }
         return "";
-        
+
     }
-    
+
     /**
      * Listener for requests to view a CECase
+     *
      * @param cse
-     * @return 
+     * @return
      */
-    public String onViewCaseButtonChange(CECase cse){
+    public String onViewCaseButtonChange(CECase cse) {
         CaseCoordinator cc = getCaseCoordinator();
-        if(cse != null){
-            
+        if (cse != null) {
+
             try {
                 getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(cse, getSessionBean().getSessUser()));
             } catch (BObStatusException | IntegrationException | SearchException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not load CE Case for viewing, sorry! " + ex.toString(), ""));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Could not load CE Case for viewing, sorry! " + ex.toString(), ""));
             }
         }
         return "ceCaseProfile";
     }
-    
-    
-    
-    /**
-     * Listener method for adding the selected person to a queue
-     * @param ev 
-     */
-    public void queueSelectedPerson(ActionEvent ev) {
-        if (getPersonSelected() != null) {
-            currentProperty.getPersonList().add(getPersonSelected());
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Please select one or more people to attach to this event",
-                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
-        }
-    }
 
     /**
-     * Listener for requests to remove a potential new person link
-     * to the current Property
-     * @param p 
+     * Listener for requests to remove a potential new person link to the
+     * current Property
+     *
+     * @param p
      */
     public void deQueuePersonFromEvent(Person p) {
-       // TODO Finish my guts
+        // TODO Finish my guts
     }
-    
-    
+
     /**
      * @return the currentProperty
      */
     public PropertyDataHeavy getCurrentProperty() {
         return currentProperty;
     }
-    
-    
-    
+
     /**
      * @param currentProperty the currentProperty to set
      */
     public void setCurrentProperty(PropertyDataHeavy currentProperty) {
         this.currentProperty = currentProperty;
     }
-    
- 
-    
-   
-   
 
     /**
      * @return the muniSelected
@@ -506,9 +596,6 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         this.muniSelected = muniSelected;
     }
 
- 
-
-    
     /**
      * @return the putList
      */
@@ -552,24 +639,10 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @return the conditionIntensitySelected
-     */
-    public IntensityClass getConditionIntensitySelected() {
-        return conditionIntensitySelected;
-    }
-
-    /**
      * @return the sourceList
      */
     public List<BOBSource> getSourceList() {
         return sourceList;
-    }
-
-    /**
-     * @return the sourceSelected
-     */
-    public BOBSource getSourceSelected() {
-        return sourceSelected;
     }
 
     /**
@@ -601,24 +674,10 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param conditionIntensitySelected the conditionIntensitySelected to set
-     */
-    public void setConditionIntensitySelected(IntensityClass conditionIntensitySelected) {
-        this.conditionIntensitySelected = conditionIntensitySelected;
-    }
-
-    /**
      * @param sourceList the sourceList to set
      */
     public void setSourceList(List<BOBSource> sourceList) {
         this.sourceList = sourceList;
-    }
-
-    /**
-     * @param sourceSelected the sourceSelected to set
-     */
-    public void setSourceSelected(BOBSource sourceSelected) {
-        this.sourceSelected = sourceSelected;
     }
 
     /**
@@ -691,8 +750,47 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable{
         this.selectedPropViewOption = selectedPropViewOption;
     }
 
-   
- 
-   
- 
+    /**
+     * @return the landBankProspectIntensityList
+     */
+    public List<IntensityClass> getLandBankProspectIntensityList() {
+        return landBankProspectIntensityList;
+    }
+
+    /**
+     * @param landBankProspectIntensityList the landBankProspectIntensityList to
+     * set
+     */
+    public void setLandBankProspectIntensityList(List<IntensityClass> landBankProspectIntensityList) {
+        this.landBankProspectIntensityList = landBankProspectIntensityList;
+    }
+
+    /**
+     * @return the personLinkUseID
+     */
+    public boolean isPersonLinkUseID() {
+        return personLinkUseID;
+    }
+
+    /**
+     * @param personLinkUseID the personLinkUseID to set
+     */
+    public void setPersonLinkUseID(boolean personLinkUseID) {
+        this.personLinkUseID = personLinkUseID;
+    }
+
+    /**
+     * @return the personIDToLink
+     */
+    public int getPersonIDToLink() {
+        return personIDToLink;
+    }
+
+    /**
+     * @param personIDToLink the personIDToLink to set
+     */
+    public void setPersonIDToLink(int personIDToLink) {
+        this.personIDToLink = personIDToLink;
+    }
+
 }

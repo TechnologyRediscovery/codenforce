@@ -332,9 +332,9 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
             prop.setEvaluationEvent(ec.getEvent(rs.getInt("responseevent_eventid")));
         }
                
-        prop.setInitiator(uc.getUser(rs.getInt("initiator_userid")));
+        prop.setInitiator(uc.user_getUser(rs.getInt("initiator_userid")));
         
-        prop.setResponderIntended(uc.getUser(rs.getInt("responderintended_userid")));
+        prop.setResponderIntended(uc.user_getUser(rs.getInt("responderintended_userid")));
         if(rs.getTimestamp("activateson") != null){
             prop.setActivatesOn(rs.getTimestamp("activateson").toLocalDateTime());
         }
@@ -342,7 +342,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
             prop.setExpiresOn(rs.getTimestamp("expireson").toLocalDateTime());
         }
         
-        prop.setResponderActual(uc.getUser(rs.getInt("responderactual_userid")));
+        prop.setResponderActual(uc.user_getUser(rs.getInt("responderactual_userid")));
         prop.setProposalRejected(rs.getBoolean("rejectproposal"));
         if(rs.getTimestamp("responsetimestamp") != null){
             prop.setResponseTS(rs.getTimestamp("responsetimestamp").toLocalDateTime());
@@ -1191,7 +1191,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
         impl.setOccPeriodID(rs.getInt("occperiod_periodid"));
         
         impl.setImplementationTS(rs.getTimestamp("attachedts").toLocalDateTime());
-        impl.setImplementedBy(uc.getUser(rs.getInt("implby_userid")));
+        impl.setImplementedBy(uc.user_getUser(rs.getInt("implby_userid")));
         
         if(rs.getTimestamp("lastevaluatedts") != null){
             impl.setLastEvaluatedTS(rs.getTimestamp("lastevaluatedts").toLocalDateTime());
@@ -1212,17 +1212,17 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
         if(rs.getTimestamp("waivedts") != null){
             impl.setWaivedTS(rs.getTimestamp("waivedts").toLocalDateTime());
         }
-        impl.setWaivedBy(uc.getUser(rs.getInt("waivedby_userid")));
+        impl.setWaivedBy(uc.user_getUser(rs.getInt("waivedby_userid")));
         
         if(rs.getTimestamp("passoverridets") != null){
             impl.setPassOverrideTS(rs.getTimestamp("passoverridets").toLocalDateTime());
         }
-        impl.setPassOverrideBy(uc.getUser(rs.getInt("passoverrideby_userid")));
+        impl.setPassOverrideBy(uc.user_getUser(rs.getInt("passoverrideby_userid")));
         
         if(rs.getTimestamp("deacts") != null){
             impl.setDeactivatedTS(rs.getTimestamp("deacts").toLocalDateTime());
         }
-        impl.setDeactivatedBy(uc.getUser(rs.getInt("deacby_userid")));
+        impl.setDeactivatedBy(uc.user_getUser(rs.getInt("deacby_userid")));
         
         impl.setNotes(rs.getString("notes"));
        

@@ -308,7 +308,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      */
     public Person selectDefaultPerson(Credential cred) throws IntegrationException{
         UserCoordinator uc = getUserCoordinator();
-        return uc.getUser(cred.getGoverningAuthPeriod().getUserID()).getPerson();
+        return uc.user_getUser(cred.getGoverningAuthPeriod().getUserID()).getPerson();
         
     }
 

@@ -107,6 +107,9 @@ public  class       PropertyDataHeavy
         this.active = prop.isActive();
         this.nonAddressable = prop.isNonAddressable();
         
+        this.creationTS = prop.getCreationTS();
+        
+        
     }
     
 
@@ -155,6 +158,7 @@ public  class       PropertyDataHeavy
         this.nonAddressable = prop.isNonAddressable();
         
         this.unitList = prop.getUnitList();
+        this.creationTS = prop.getCreationTS();
         
         
     }

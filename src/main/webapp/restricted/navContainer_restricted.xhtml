@@ -12,6 +12,7 @@
         <h:outputStylesheet name="css/style.css"/>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
         <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"/>
+        <link href='https://fonts.googleapis.com/css?family=Heebo' rel='stylesheet'/>
         <title>codeNforce</title>
     </h:head>
     <h:body>
@@ -172,19 +173,17 @@
                                 <h2>
                                     <h:outputText value="User settings:" />
 
+                                    <h:outputText value="#{userBB.currentUser.username}" />
+                                    <h:outputText value="(ID: "/>
+                                    <h:outputText value="#{userBB.currentUser.userID}" />
+                                    <h:outputText value=")" />
                                     <h:outputText value=" " />
                                     <h:outputText value="#{userBB.currentUser.person.firstName}" />
                                     <h:outputText value=" " />
                                     <h:outputText value="#{userBB.currentUser.person.lastName}" />
                                     <h:outputText value=" " />
-                                    <h:outputText value="("/>
+                                    <h:outputText value="(ID: "/>
                                     <h:outputText value="#{userBB.currentUser.person.personID}" />
-                                    <h:outputText value=")" />
-                                    <h:outputText value=" " />
-                                    <h:outputText value="+" />
-                                    <h:outputText value="#{userBB.currentUser.username}" />
-                                    <h:outputText value="("/>
-                                    <h:outputText value="#{userBB.currentUser.userID}" />
                                     <h:outputText value=")" />
                                 </h2>
 
@@ -230,7 +229,9 @@
                                                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                                         </h:messages>
                                                     </h:form>
-                                                    <h:form id="usersettings-form">
+                                                    
+                                                    <h:form id="usersettings-form"
+                                                            rendered="false">
 
                                                         <p:outputLabel for="usersettings-it-username">
                                                             <h:outputText value="User name"/>
@@ -240,6 +241,7 @@
                                                                      maxlength="20"
                                                                      tabindex="3" 
                                                                      required="true" 
+                                                                     disabled="true"
                                                                      validatorMessage="Length must be between 5 and 20 characters"
                                                                      styleClass="inputText">
                                                             <f:validateLength minimum="4" maximum="50" />
@@ -255,6 +257,7 @@
                                                                             usersettings-messages-form-username
                                                                             usersettings-notes-form"
                                                                             value="Update username" 
+                                                                            rendered="false"
                                                                             tabindex="3"/>
                                                     </h:form>
                                                 </p:column>
@@ -330,15 +333,34 @@
                                                         <p:outputLabel for="usersettings-it-password">
                                                             <h:outputText value="New password (use letters and numbers; at least 8 chars please! "/>
                                                         </p:outputLabel>
-                                                        <p:inputText id="usersettings-it-password" value="#{userBB.formPassword}" 
-                                                                     size="15"
+                                                        <p:password id="usersettings-it-password" value="#{userBB.formPassword}" 
+                                                                     style="width: 150px;"
                                                                      maxlength="80"
                                                                      tabindex="3" 
                                                                      required="true" 
                                                                      validatorMessage="Length must be between 8 and 50 characters"
+                                                                     feedback="true"
                                                                      styleClass="inputText">
                                                             <f:validateLength minimum="8" maximum="50" />
-                                                        </p:inputText>
+                                                        </p:password>
+                                                        
+                                                        <p:spacer height="5px" />
+                                                        
+                                                        <p:outputLabel for="usersettings-it-password">
+                                                            <h:outputText value="Re-enter password"/>
+                                                        </p:outputLabel>
+                                                        
+                                                        <p:password id="usersettings-it-password-reentry" value="#{userBB.formPasswordReentry}" 
+                                                                     style="width: 150px;"
+                                                                     maxlength="80"
+                                                                     tabindex="3" 
+                                                                     required="true" 
+                                                                     validatorMessage="Length must be between 8 and 50 characters"
+                                                                     feedback="true"
+                                                                     styleClass="inputText">
+                                                            <f:validateLength minimum="8" maximum="50" />
+                                                        </p:password>
+                                                        
                                                         <h:message for="usersettings-it-password" showDetail="false" showSummary="true" 
                                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                         <p:commandButton    id="usersettings-button-updatepassword"
@@ -347,7 +369,7 @@
                                                                             update="usersettings-messages-form-updatepassword
                                                                             usersettings-form-updatepassword
                                                                             usersettings-notes-form"
-                                                                            icon="fa fa-thumbs-0-up"
+                                                                            icon="fa fa-lock"
                                                                             value="Update password" 
                                                                             tabindex="3"/>
                                                     </h:form>

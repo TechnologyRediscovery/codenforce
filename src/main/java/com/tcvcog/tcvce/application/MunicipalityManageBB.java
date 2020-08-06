@@ -160,7 +160,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
             //initialize default current muni profile list
             currentMuniProfileList = mc.getMuniProfilesList();
             //initialize default current user list
-            currentUserList = uc.assembleUserListForSearch(getSessionBean().getSessUser());
+            currentUserList = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
             //initialize default current print style list
             currentStyleList = sc.getPrintStyleList();
 

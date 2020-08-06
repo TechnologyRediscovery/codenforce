@@ -65,7 +65,7 @@ public class PersonSearchPublicBB extends BackingBeanUtils implements Serializab
 
         try {
 
-            qp = sc.initQuery(QueryPersonEnum.PERSON_NAME, uc.getPublicUserAuthorized().getMyCredential());
+            qp = sc.initQuery(QueryPersonEnum.PERSON_NAME, uc.auth_getPublicUserAuthorized().getMyCredential());
 
             if (qp != null && !qp.getParamsList().isEmpty()) {
                 qp.addParams(params);

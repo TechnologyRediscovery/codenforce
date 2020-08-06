@@ -28,10 +28,13 @@ import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.ProposalCECase;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.sql.SQLException;
 import javax.annotation.PostConstruct;
@@ -71,7 +74,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     public void initBean() {
         UserCoordinator uc = getUserCoordinator();
         currentUser = getSessionBean().getSessUser();
-        userList = uc.assembleUserListForSearch(getSessionBean().getSessUser());
+        userList = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
         
         generateMainDash();
     }
@@ -82,15 +85,15 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         DashboardColumn column2 = new DefaultDashboardColumn();
         DashboardColumn column3 = new DefaultDashboardColumn();
         column1.addWidget("dashpanel-ce-cears");
-        column1.addWidget("dashpanel-ce-cecases");
-        column1.addWidget("dashpanel-ce-todo");
+//        column1.addWidget("dashpanel-ce-todo");
         
-        column2.addWidget("dashpanel-occ-periods");
-        column2.addWidget("dashpanel-occ-inspections");
-        column2.addWidget("dashpanel-persons");
-        column2.addWidget("dashpanel-properties");
+        column2.addWidget("dashpanel-ce-cecases");
+//        column2.addWidget("dashpanel-occ-periods");
+//        column2.addWidget("dashpanel-occ-inspections");
+//        column2.addWidget("dashpanel-persons");
+//        column2.addWidget("dashpanel-properties");
         
-        column3.addWidget("dashpanel-sys-events");
+//        column3.addWidget("dashpanel-sys-events");
         column3.addWidget("dashpanel-sys-switchmuni");
         column3.addWidget("dashpanel-sys-switchuser");
         
@@ -134,6 +137,39 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         return "publicPortal";
     }
     
+    /**
+     * Listener for user requests to view at CEAR
+     * @param req
+     * @return 
+     */
+    public String onViewCEARButtonChange(CEActionRequest req){
+        if(req != null){
+            getSessionBean().setSessCEAR(req);
+        }
+        return "cEActionRequests";
+    }
+    
+    /**
+     * Listener for user requests to view a CECase
+     * @param cse
+     * @return 
+     */
+    public String onViewCECaseButtonChange(CECaseDataHeavy cse){
+        if(cse != null){
+            getSessionBean().setSessCECase(cse);
+        }
+        return "ceCaseWorkflow";
+    }
+    
+    public String onViewOccPeriodButtonChange(OccPeriod per){
+        if(per != null){
+            getSessionBean().setSessOccPeriod(per);
+        }
+        
+        return "occPeriodWorkflow";
+    }
+    
+    
     public String switchToUser(){
         System.out.println("MissionControlBB.switchToUser");
         if(selectedUser != null){
@@ -150,6 +186,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     }
     
    
+    
     /**
      * @return the user
      */

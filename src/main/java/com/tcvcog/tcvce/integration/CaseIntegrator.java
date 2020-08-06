@@ -318,9 +318,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      */
     public List<CECase> getCECasesByProp(int propID) throws IntegrationException, BObStatusException{
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
-            "            login_userid, casename, casephase, originationdate, closingdate, \n" +
-            "            creationtimestamp, notes, paccenabled, allowuplinkaccess, active \n" +
-            "  FROM public.cecase WHERE property_propertyid = ?;";
+                        "       login_userid, casename, originationdate, closingdate, creationtimestamp, \n" +
+                        "       notes, paccenabled, allowuplinkaccess, propertyinfocase, personinfocase_personid, \n" +
+                        "       bobsource_sourceid, active, lastupdatedby_userid, lastupdatedts \n" +
+                        "  FROM public.cecase WHERE property_propertyid = ?;";
         ResultSet rs = null;
         CaseCoordinator cc = getCaseCoordinator();
         PreparedStatement stmt = null;
@@ -371,7 +372,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         cse.setPropertyID(rs.getInt("property_propertyid"));
         cse.setPropertyUnitID(rs.getInt("propertyunit_unitid"));
         
-        cse.setCaseManager(uc.getUser(rs.getInt("login_userid")));
+        cse.setCaseManager(uc.user_getUser(rs.getInt("login_userid")));
 
         cse.setCaseName(rs.getString("casename"));
         
@@ -401,7 +402,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         cse.setActive(rs.getBoolean("active"));
         
         if(rs.getInt("lastupdatedby_userid") != 0){
-            cse.setLastUpdatedBy(uc.getUser(rs.getInt("lastupdatedby_userid")));
+            cse.setLastUpdatedBy(uc.user_getUser(rs.getInt("lastupdatedby_userid")));
         }
         
         if(rs.getTimestamp("lastupdatedts") != null){
@@ -511,7 +512,12 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setBoolean(9, ceCase.isPaccEnabled());
             stmt.setBoolean(10, ceCase.isAllowForwardLinkedPublicAccess());
             stmt.setBoolean(11, ceCase.isPropertyInfoCase());
-            stmt.setInt(12, ceCase.getPersonInfoPersonID());
+            if(ceCase.getPersonInfoPersonID() != 0){
+                stmt.setInt(12, ceCase.getPersonInfoPersonID());
+            } else {
+                stmt.setNull(12, java.sql.Types.NULL); 
+                
+            }
             
             if(ceCase.getSource() != null){
                 stmt.setInt(13, ceCase.getSource().getSourceid());

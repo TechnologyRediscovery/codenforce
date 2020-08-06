@@ -891,11 +891,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         MunicipalityCoordinator mc = getMuniCoordinator();
         SystemIntegrator si = getSystemIntegrator();
         
-        UserAuthorized user = uc.getPublicUserAuthorized();
+        UserAuthorized user = uc.auth_getPublicUserAuthorized();
         
         Property prop = pri.getPropertyUnitWithProp(application.getApplicationPropertyUnit().getUnitID()).getProperty();
         
-        MunicipalityDataHeavy muni = mc.assembleMuniDataHeavy(prop.getMuni(), user.getMyCredential());
+        MunicipalityDataHeavy muni = mc.assembleMuniDataHeavy(prop.getMuni(), user);
         
         OccPeriod connectedPeriod = initOccPeriod(
                 prop, 

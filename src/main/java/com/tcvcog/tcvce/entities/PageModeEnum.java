@@ -25,22 +25,24 @@ package com.tcvcog.tcvce.entities;
  */
 public enum PageModeEnum {
     
-    LOOKUP        (   "LOOKUP", true, 3, false      ),
-    INSERT        (   "INSERT", false, 4, false     ),
-    UPDATE        (   "UPDATE", false, 4, true      ),
-    REMOVE        (   "REMOVE", false, 5, true      ),
-    VIEW          (   "VIEW",   true, 3, true       );
+    LOOKUP        (   "LOOKUP AND VIEW", true, 3, false, true ),
+    INSERT        (   "INSERT", false, 4, false, true     ),
+    UPDATE        (   "UPDATE", false, 4, true, false      ),
+    REMOVE        (   "REMOVE", false, 5, true, false      ),
+    VIEW          (   "VIEW",   true, 3, true, false       );
                                                                 
     private final String title;                                 
     private final boolean defaultMode;
     private final int minUserRankToEnable;
     private final boolean objectSelectRequiredToEnable;
+    private final boolean allowedDuringInsert;
                                                                 
-    private PageModeEnum(String t, boolean def, int rnk, boolean obreq){
+    private PageModeEnum(String t, boolean def, int rnk, boolean obreq, boolean adi){
         title = t;
         defaultMode = def;
         minUserRankToEnable = rnk;
         objectSelectRequiredToEnable = obreq;
+        allowedDuringInsert = adi;
     }
 
     /**
@@ -66,6 +68,13 @@ public enum PageModeEnum {
      */
     public boolean isObjectSelectRequiredToEnable() {
         return objectSelectRequiredToEnable;
+    }
+
+    /**
+     * @return the allowedDuringInsert
+     */
+    public boolean isAllowedDuringInsert() {
+        return allowedDuringInsert;
     }
 
 

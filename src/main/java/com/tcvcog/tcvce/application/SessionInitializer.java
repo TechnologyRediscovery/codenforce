@@ -41,6 +41,11 @@ import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntryCatEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.search.QueryCEAR;
+import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
+import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
+import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
@@ -49,27 +54,47 @@ import javax.servlet.http.HttpServletRequest;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.SubSysEnum;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- *
+ * *******************************
+ * ***    SECURITY CRITICAL    ***
+ * *******************************
+ * 
+ * Central backing bean and psuedo-coordinator at the Session level
+ * that processes the requested UserMuniAuthPeriod and builds an entire
+ * session full of business objects once security checks are passed
+ * 
+ * As expected, this class works in tandem with the UserCoordinator
+ * to manage the UserMuniAuthorizationPeriod list, one of which is chosen
+ * and becomes and television program!
+ * 
+ * Contents in brief:
+ * <ul>
+ * <li>User-centric login and session initialization methods</li>
+ * <li>Subsystem initialization controller</li>
+ * <li>A heap of subsystem-specific initialization methods</li>
+ * </ul>
  * @author ellen bascomb of apt 31y
  */
 public  class       SessionInitializer 
         extends     BackingBeanUtils 
         implements  Serializable {
 
-    private String userQueuedForSession;
+    private String usernameQueuedForSession;
     private UserAuthorized userAuthorizedQueuedForSession;
+    private List<UserMuniAuthPeriod> umapCandidateList;
     private UserMuniAuthPeriod umapQueuedForSession;
     private Municipality muniQueuedForSession;
     private SessionBean sb;
-    
-    private List<UserMuniAuthPeriod> umapListValidForUserSelect;
     
     /**
      * Creates a new instance of SessionInitializer
@@ -82,34 +107,58 @@ public  class       SessionInitializer
         sb = getSessionBean();
         System.out.println("SessionInitializer.initBean");
         userAuthorizedQueuedForSession = null;
+        User tmpUser = null;
         UserCoordinator uc = getUserCoordinator();
+        UserIntegrator ui = getUserIntegrator();
         // check to see if we have an internal session created already
         // to determine which user we authenticate with
         
         if(sb.getUserForReInit() != null){
-            userQueuedForSession = sb.getUserForReInit().getUsername();
-        } else if(userQueuedForSession == null){
+            usernameQueuedForSession = sb.getUserForReInit().getUsername();
+        } else if(usernameQueuedForSession == null){
             try {
                 // we have a first init! Ask the container for its user
-                userQueuedForSession = getContainerAuthenticatedUser();
+                usernameQueuedForSession = sessionInit_getContainerAuthenticatedUser();
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
         } 
+        try {
+            tmpUser = ui.getUser(ui.getUserID(usernameQueuedForSession));
+            userAuthorizedQueuedForSession = uc.auth_prepareUserForSessionChoice(tmpUser);
+            sb.setSessUser(userAuthorizedQueuedForSession);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+        umapCandidateList = new ArrayList<>();
+        
+        List<Municipality> tempMuniList;
+        if(userAuthorizedQueuedForSession != null && userAuthorizedQueuedForSession.getMuniAuthPeriodsMap() != null){
             
-            
-            umapListValidForUserSelect = uc.assembleValidAuthPeriods(userQueuedForSession);
-            getSessionBean().setSessUMAPListValidOnly(umapListValidForUserSelect);
-//            userAuthorizedQueuedForSession = uc.authorizeUser(userQueuedForSession, muniQueuedForSession, umapQueuedForSession);
+            Set<Municipality> muniSet = userAuthorizedQueuedForSession.getMuniAuthPeriodsMap().keySet();
+            if(!muniSet.isEmpty()){
+                tempMuniList = new ArrayList(muniSet);
+                for(Municipality muni: tempMuniList){
+                    umapCandidateList.addAll(userAuthorizedQueuedForSession.getMuniAuthPeriodsMap().get(muni));
+                }
+
+            }
+        }
+        
     }
     
     
     /**
+    * *******************************
+    * ***    SECURITY CRITICAL    ***
+    * *******************************
+    * 
      * JBoss is responsible for the first query against the DB. If a username/pass
      * matches the query, this method will extract the username from any old request
      * @return the username string of an authenticated user from the container
      */
-    private String getContainerAuthenticatedUser() throws IntegrationException {
+    private String sessionInit_getContainerAuthenticatedUser() throws IntegrationException {
         System.out.println("SessionInitializer.getContainerAuthenticatedUser");
         FacesContext fc = getFacesContext();
         ExternalContext ec = fc.getExternalContext();
@@ -125,35 +174,45 @@ public  class       SessionInitializer
      * 
      * @param u 
      */
-    public void loadAuthPeriodsForAlternateUser(User u){
+    public void sessionInit_loadAuthPeriodsForAlternateUser(User u){
         
         
         
     }
     
     /**
+    * *******************************
+    * ***    SECURITY CRITICAL    ***
+    * *******************************
+    * 
      * Processes the user's choice of their authorization period
      * and initiates the entire auth process to create a fully populted session
      * @param umap the chosen UMAP, which should be valid
      * @return 
      */
-    public String credentializeUserMuniAuthPeriod(UserMuniAuthPeriod umap){
-           return configureSession(umap);
+    public String sessionInit_credentializeUserMuniAuthPeriod(UserMuniAuthPeriod umap){
+        String page = sessionInit_configureSession(getSessionBean().getSessUser(), umap);
+        
+        return page;
         
     }
     
     
     /**
+    * *******************************
+    * ***    SECURITY CRITICAL    ***
+    * *******************************
+    * 
      * Core configuration method for sessions that takes in a chosen UMAP from
      * a pre-assembled list of valid UMAPs
      * 
      * The logic work is passed up to the UserCoordinator
      * 
+     * @param ua
      * @param umap
      * @return nav string
-     * @throws IntegrationException 
      */
-    public String configureSession(UserMuniAuthPeriod umap) {
+    public String sessionInit_configureSession(UserAuthorized ua, UserMuniAuthPeriod umap) {
         FacesContext facesContext = getFacesContext();
         UserCoordinator uc = getUserCoordinator();
         System.out.println("SessionInitializer.configureSession()");
@@ -161,7 +220,7 @@ public  class       SessionInitializer
         try {
             // The central call which initiates the User's session for a particular municipality
             // Muni will be null when called from initiateInternalSession
-            UserAuthorized authUser = uc.authorizeUser(umap, getSessionBean().getSessUMAPListValidOnly());
+            UserAuthorized authUser = uc.auth_authorizeUser_SECURITYCRITICAL(ua, umap);
             
             // as long as we have an actual user, proceed with session config
             if(authUser != null){
@@ -184,9 +243,9 @@ public  class       SessionInitializer
             return "";
         } catch (AuthorizationException ex) {
             System.out.println("SessionInitializer.intitiateInternalSession | Auth exception");
+            System.out.println(ex);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     ex.getMessage(), ""));
-            System.out.println(ex);
             return "";
         } catch (SessionException ex) {
             System.out.println("SessionInitializer.intitiateInternalSession | Session exception");
@@ -197,6 +256,10 @@ public  class       SessionInitializer
     
     
     /**
+    * *******************************
+    * ***    SECURITY CRITICAL    ***
+    * *******************************
+    * 
      * Distributor method for all subsystem initialization routines.
      * Individual subsystems are initialized in an order which allows 
      * each to use objects generated during its predecessors sequences, such as
@@ -276,6 +339,10 @@ public  class       SessionInitializer
     }
     
     /**
+    * *******************************
+    * ***    SECURITY CRITICAL    ***
+    * *******************************
+    * 
      * Designed for recording data about the human user's computer connected to our surver.
      * TODO: during early design tests, this method wasn't getting the UserAgent from the HTTP
      * headers like we wanted to
@@ -347,6 +414,10 @@ public  class       SessionInitializer
     }
 
     /**
+    * *******************************
+    * ***    SECURITY CRITICAL    ***
+    * *******************************
+    * 
      * Subsystem initialization controller
      *
      * >>> -------------------------------------------------------------- <<<
@@ -586,11 +657,13 @@ public  class       SessionInitializer
     private void initSubsystem_VII_CECase(UserAuthorized ua, SubSysEnum ss) throws SessionException{
         CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
-        
+        QueryCECase cseQ = sc.initQuery(QueryCECaseEnum.OPENCASES, ua.getKeyCard());
         try {
-            List<CECase> hist = cc.getCECaseHistory(ua);
+            cseQ = sc.runQuery(cseQ);
+            
+//            List<CECase> hist = cc.getCECaseHistory(ua);
             // NEXT LINE: YUCK!!!!!!!!
-            sb.setSessCECaseList(cc.assembleCECasePropertyUnitHeavyList(hist));
+            sb.setSessCECaseList(cc.assembleCECasePropertyUnitHeavyList(cseQ.getBOBResultList()));
             
             if(sb.getSessCECaseList().isEmpty()){
                 sb.setSessCECase(cc.assembleCECaseDataHeavy(cc.selectDefaultCECase(ua), ua));
@@ -600,7 +673,7 @@ public  class       SessionInitializer
             
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
-            throw new SessionException("Error assembling session CECase list from history", ex, ss, ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
+            throw new SessionException("Error assembling session CECase list", ex, ss, ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
         }
 
         sb.setQueryCECaseList(sc.buildQueryCECaseList(ua.getKeyCard()));
@@ -627,6 +700,15 @@ public  class       SessionInitializer
      */
     private void initSubsystem_VIII_CEActionRequest(Credential cred, SubSysEnum ss) throws SessionException{
         SearchCoordinator sc = getSearchCoordinator();
+        QueryCEAR cearQ = sc.initQuery(QueryCEAREnum.UNPROCESSED, cred);
+        try {
+            cearQ = sc.runQuery(cearQ);
+        } catch (SearchException ex) {
+            System.out.println(ex);
+        }
+        sb.setSessCEARList(cearQ.getBOBResultList());
+        
+        
         sb.setQueryCEARList(sc.buildQueryCEARList(cred));
         if(!sb.getQueryCEARList().isEmpty()){
             sb.setQueryCEAR(sb.getQueryCEARList().get(0));
@@ -756,7 +838,7 @@ public  class       SessionInitializer
          UserMuniAuthPeriodLogEntry umaple;
          UserCoordinator uc = getUserCoordinator();
          
-        umaple = uc.assembleUserMuniAuthPeriodLogEntrySkeleton(
+        umaple = uc.auth_assembleUserMuniAuthPeriodLogEntrySkeleton(
                               authUser, 
                               UserMuniAuthPeriodLogEntryCatEnum.SESSION_INIT);
 
@@ -767,7 +849,7 @@ public  class       SessionInitializer
             umaple.setAudit_muni_municode(sb.getSessMuni().getMuniCode());
             umaple.setAudit_usercredential_userid(authUser.getMyCredential().getGoverningAuthPeriod().getUserID());
             try {
-                uc.logCredentialInvocation(umaple, authUser.getMyCredential().getGoverningAuthPeriod());
+                uc.auth_logCredentialInvocation(umaple, authUser.getMyCredential().getGoverningAuthPeriod());
             } catch (IntegrationException | AuthorizationException ex) {
                 System.out.println(ex);
                 throw new SessionException( "Failure creating user muni auth period log entry", 
@@ -817,17 +899,17 @@ public  class       SessionInitializer
 
     /**
 
-     * @return the userQueuedForSession
+     * @return the usernameQueuedForSession
      */
-    public String getUserQueuedForSession() {
-        return userQueuedForSession;
+    public String getUsernameQueuedForSession() {
+        return usernameQueuedForSession;
     }
 
     /**
-     * @param userQueuedForSession the userQueuedForSession to set
+     * @param usernameQueuedForSession the usernameQueuedForSession to set
      */
-    public void setUserQueuedForSession(String userQueuedForSession) {
-        this.userQueuedForSession = userQueuedForSession;
+    public void setUsernameQueuedForSession(String usernameQueuedForSession) {
+        this.usernameQueuedForSession = usernameQueuedForSession;
     }
 
     /**
@@ -845,16 +927,18 @@ public  class       SessionInitializer
     }
 
     /**
-     * @return the umapListValidForUserSelect
+     * @return the umapCandidateList
      */
-    public List<UserMuniAuthPeriod> getUmapListValidForUserSelect() {
-        return umapListValidForUserSelect;
+    public List<UserMuniAuthPeriod> getUmapCandidateList() {
+        return umapCandidateList;
     }
 
     /**
-     * @param umapListValidForUserSelect the umapListValidForUserSelect to set
+     * @param umapCandidateList the umapCandidateList to set
      */
-    public void setUmapListValidForUserSelect(List<UserMuniAuthPeriod> umapListValidForUserSelect) {
-        this.umapListValidForUserSelect = umapListValidForUserSelect;
+    public void setUmapCandidateList(List<UserMuniAuthPeriod> umapCandidateList) {
+        this.umapCandidateList = umapCandidateList;
     }
+
+   
 }

@@ -423,8 +423,40 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         return hm;
     }
 
-   
-     
+    /**
+     * Returns all Source IDs in the bobsource table
+     * @return
+     * @throws IntegrationException 
+     */
+     public List<Integer> getBobSourceListComplete() throws IntegrationException{
+          List<Integer> sidl = new ArrayList<>();
+          BOBSource bs = null;
+          
+          String query =    "   SELECT sourceid FROM public.bobsource;";
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            stmt = con.prepareStatement(query);
+            
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                sidl.add(rs.getInt("sourceid"));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return sidl;
+     }
       
       public BOBSource getBOBSource(int sourceID) throws IntegrationException{
           if(sourceID == 0){
@@ -528,12 +560,32 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         return in;
     }
     
-
+ 
+    /**
+     * Utility adaptor method for legacy compatability
+     * @param cat
+     * @return
+     * @throws IntegrationException 
+     */
     public List<IntensityClass> getIntensityClassList(IntensitySchema cat) throws IntegrationException {
+        
+        return getIntensityClassList(cat.getLabel());
+        
+    }
+    
+    
+    /**
+     * A search-like method for intensity classes with any schema name like X
+     * @param schemaLabel
+     * @param cat
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<IntensityClass> getIntensityClassList(String schemaLabel) throws IntegrationException {
 
         List<IntensityClass> inList = new ArrayList<>();
 
-        String query = "SELECT classid, title, muni_municode, numericrating, schemaname, active, icon_iconid FROM intensityclass WHERE schemaname LIKE ?;";
+        String query = "SELECT classid, title, muni_municode, numericrating, schemaname, active, icon_iconid FROM intensityclass WHERE schemaname ILIKE ?;";
 
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -541,7 +593,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setString(1, cat.getLabel());
+            stmt.setString(1, schemaLabel);
             rs = stmt.executeQuery();
             while (rs.next()) {
                 inList.add(generateIntensityClass(rs));

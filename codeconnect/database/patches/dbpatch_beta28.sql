@@ -3,7 +3,16 @@
 -- "Mid-july" launch changes
 -- Person revisions: adding type of link to propertyperson
 -- 
--- 
+-- EXTRA RUN ON SERVER
+-- ALTER TABLE public.codeviolation ADD COLUMN lastupdatedts timestamp with time zone;
+-- ALTER TABLE public.codeviolation ADD COLUMN lastupdated_userid integer;
+-- ALTER TABLE public.codeviolation ADD COLUMN active boolean;
+-- ALTER TABLE public.codeviolation ALTER COLUMN active SET DEFAULT true;
+-- ALTER TABLE public.codeviolation
+--   ADD CONSTRAINT codeviolation_lastupdatedby_fk FOREIGN KEY (lastupdated_userid)
+--       REFERENCES public.login (userid) MATCH SIMPLE
+--       ON UPDATE NO ACTION ON DELETE NO ACTION;
+
 -- ****************************************************************************
 
 INSERT INTO public.icon(
@@ -29,16 +38,63 @@ ALTER TABLE public.cecase ADD COLUMN lastupdatedts TIMESTAMP WITH TIME ZONE;
 
 
 
+ALTER TABLE public.login ADD COLUMN lastupdatedts TIMESTAMP WITH TIME ZONE DEFAULT now();
+ALTER TABLE public.login DROP COLUMN pswdcleartext;
+ALTER TABLE public.login DROP COLUMN active;
 
---IF datepublished IS NULL the patch is still open and receiving changes
-INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (28, 'database/patches/dbpatch_beta28.sql', NULL, 'ecd', 'mid-july-launch');
---  LAUNCH DAY PATCH! (07/15/2020)
---      Added miscellaneous columns.
---      Added event category's.
---      Added function resetsequences to dynamically avoid id collisions.
---  AUTHOR: SNAPPER VIBES
--- ****************************************************************************
+
+INSERT INTO public.intensityclass(
+            classid, title, muni_municode, numericrating, schemaname, active, 
+            icon_iconid)
+    VALUES (DEFAULT, 'Well-Kept', 999, 1, 'propcondition', TRUE, 
+            10);
+
+
+INSERT INTO public.intensityclass(
+            classid, title, muni_municode, numericrating, schemaname, active, 
+            icon_iconid)
+    VALUES (DEFAULT, 'Weathered', 999, 2, 'propcondition', TRUE, 
+            10);
+
+
+INSERT INTO public.intensityclass(
+            classid, title, muni_municode, numericrating, schemaname, active, 
+            icon_iconid)
+    VALUES (DEFAULT, 'Deterioriated', 999, 3, 'propcondition', TRUE, 
+            10);
+
+INSERT INTO public.intensityclass(
+            classid, title, muni_municode, numericrating, schemaname, active, 
+            icon_iconid)
+    VALUES (DEFAULT, 'Structurally unsound', 999, 5, 'propcondition', TRUE, 
+            10);
+
+INSERT INTO public.intensityclass(
+            classid, title, muni_municode, numericrating, schemaname, active, 
+            icon_iconid)
+    VALUES (DEFAULT, 'Optimal location', 999, 1, 'landbankprospect', TRUE, 
+            10);
+
+INSERT INTO public.intensityclass(
+            classid, title, muni_municode, numericrating, schemaname, active, 
+            icon_iconid)
+    VALUES (DEFAULT, 'Poor location', 999, 2, 'landbankprospect', TRUE, 
+            10);
+
+INSERT INTO public.intensityclass(
+            classid, title, muni_municode, numericrating, schemaname, active, 
+            icon_iconid)
+    VALUES (DEFAULT, 'Solid location, severe damage', 999, 3, 'landbankprospect', TRUE, 
+            10);
+
+INSERT INTO public.intensityclass(
+            classid, title, muni_municode, numericrating, schemaname, active, 
+            icon_iconid)
+    VALUES (DEFAULT, 'Poor location, Desirable condition', 999, 4, 'landbankprospect', TRUE, 
+            10);
+
+
+
 
 
 ALTER TABLE person
@@ -166,3 +222,13 @@ $$ LANGUAGE plpgsql;
 --ALTER SEQUENCE person_personidseq
 --    START WITH 120000
 --    RESTART;
+
+--IF datepublished IS NULL the patch is still open and receiving changes
+INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
+    VALUES (28, 'database/patches/dbpatch_beta28.sql', '08-03-2020', 'ecd', 'mid-july-launch');
+--  LAUNCH DAY PATCH! (07/15/2020)
+--      Added miscellaneous columns.
+--      Added event category's.
+--      Added function resetsequences to dynamically avoid id collisions.
+--  AUTHOR: SNAPPER VIBES
+-- ****************************************************************************
