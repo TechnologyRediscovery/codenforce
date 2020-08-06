@@ -13,24 +13,52 @@
         <ui:composition template="./../../../navContainer_public.xhtml">
             <ui:define name="content">
                 <f:view id="docHomeView">
-                    
+
+                    <!-- MAIN CONTAINER -->
                     <div class="mainContainer">
 
-                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
+                        <!-- TITLE COMPONENT -->
+                        <div class="public-title">
+                            <div class="public-title-main">
+                                Technical Reference
+                            </div>
+                        </div>
 
-                        <h1>Technical reference</h1>
-                        
-                        <h2>Github pages documentation</h2>
-                        
-                        <p>The most current system documentation is evolving and <span class="bold"><a href="https://technologyrediscovery.github.io/codenforce/" style="color:darkblue;">rooted at master/docs</a></span> 
-                            in our project's <span class="bold"><a href="https://github.com/TechnologyRediscovery/codenforce" style="color:darkblue;">official GitHub repository</a></span></p>
-                            
-                            <h2>Issue tracking</h2>
-                        
-                            <p>Current work underway is tracked through our <a href="https://github.com/TechnologyRediscovery/codenforce/issues" style="color:darkblue;"> GitHub issues page</a></p>
-                 
+                        <!-- CONTENTS CONTAINER -->
+                        <div class="public-main-contents-containner">
+
+                            <!--CONTENT MAIN COMPONENT -->
+                            <div class="public-main-contents">
+
+                                <!-- GUIDANCE COMPONENT -->
+                                <div class="public-guide">
+
+                                </div>
+
+                                <!-- CONTENT IO COMPONENT -->
+                                <div class="public-main-contents-io public-main-contents-login">
+
+                                    <h:graphicImage styleClass="public-login-logo" value="/images/login-logo.png" />
+
+                                    <div class="publi-login-container">
+                                        <div class="public-login-text">
+                                            <div class="public-main-contents-title">
+                                                Github Pages Documentation:
+                                            </div>
+
+                                            <p>The most current system documentation is evolving and <span class="bold"><a href="https://technologyrediscovery.github.io/codenforce/" style="color:darkblue;">rooted at master/docs</a></span> 
+                                                in our project's <span class="bold"><a href="https://github.com/TechnologyRediscovery/codenforce" style="color:darkblue;">official GitHub repository</a></span>
+                                            </p>
+
+                                            <div class="public-main-contents-title">
+                                                Issue Tracking: 
+                                            </div>
+                                            <p>Current work underway is tracked through our <a href="https://github.com/TechnologyRediscovery/codenforce/issues" style="color:darkblue;"> GitHub issues page</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </f:view>
             </ui:define>

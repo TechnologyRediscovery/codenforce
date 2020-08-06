@@ -7,41 +7,81 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Occupancy Permit Application</title>
     </h:head>
     <h:body>
         <ui:composition template="./../../navContainer_public.xhtml">
             <ui:define name="content">
                 <f:view id="occPermitApplicationFlowView">
+                    <h:form id="occPermitApplicationChooseMuniForm">
 
-                    <div class="mainContainer">
-                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
-                        <h1>Submit Occupancy Permit Application</h1>
+                        <!-- VALIDATION MESSAGE -->
+                        <p:growl id="growl" showDetail="false"/>
 
-                        <h:form id="occPermitApplicationChooseMuniForm">
+                        <!-- MAIN CONTAINER -->
+                        <div class="mainContainer">
 
-                            <p:outputLabel for="muniSM" value="Choose your municipality:"/>
+                            <!-- TITLE COMPONENT -->
+                            <div class="public-title">
+                                <div class="public-title-main">
+                                    Apply For An Occupancy Permit
+                                </div>
+                                <div class="public-title-sub">
+                                    Step 1: Choose Municipality
+                                </div>
+                            </div>
 
-                            <p:spacer height="5px"/>
+                            <!-- CONTENTS CONTAINER -->
+                            <div class="public-main-contents-containner">
 
-                            <p:selectOneMenu
-                                id="muniSM" tabindex="1"
-                                value="#{occPermitApplicationBB.selectedMuni}">
-                                
-                                <f:selectItem itemLabel="select a municipality..." itemDisabled="true"/>
-                                
-                                <f:converter converterId="muniConverter"/>
-                                <f:selectItems id="muniNameList" value="#{muniBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
-                                
-                            </p:selectOneMenu>
+                                <!--CONTENT MAIN COMPONENT -->
+                                <div class="public-main-contents">
 
-                            <p:spacer height="10px"/>
+                                    <!-- GUIDANCE COMPONENT -->
+                                    <div class="public-guide occpermit">
+                                        <p:steps activeIndex="0" styleClass="custom" >
+                                            <p:menuitem value="Step 1: Choose Municipality" />
+                                            <p:menuitem value="Step 2: Choose Property" />
+                                            <p:menuitem value="Step 3: Configure Unit List" />
+                                            <p:menuitem value="Step 4: Select Units" />
+                                            <p:menuitem value="Step 5: Choose Reason" />
+                                            <p:menuitem value="Step 6: Add People" />
+                                            <p:menuitem value="Step 7: Review And Submit" />
+                                        </p:steps>
+                                    </div>
 
-                            <p:commandButton ajax="false" value="Next step: Choose a property" 
-                                             action="#{occPermitApplicationBB.recordSelectedMuni()}"/>                            
-                        </h:form>
-                    </div>
+                                    <!-- CONTENT IO COMPONENT -->
+                                    <div class="public-main-contents-io">
+                                        <p:selectOneMenu id="muniSM" 
+                                                         tabindex="1"
+                                                         value="#{occPermitApplicationBB.selectedMuni}">
+
+                                            <f:selectItem itemLabel="Select your municipality..." 
+                                                          itemDisabled="true"/>
+
+                                            <f:converter converterId="muniConverter"/>
+
+                                            <f:selectItems id="muniNameList" 
+                                                           value="#{muniBB.muniList}" 
+                                                           var="m" itemValue="#{m}" 
+                                                           itemLabel="#{m.muniName}" 
+                                                           />
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <!-- CONTENT BUTTON -->
+                                    <div class="public-main-contents-button">
+                                        <p:commandButton ajax="false" 
+                                                         value="Next step: Choose property" 
+                                                         action="#{occPermitApplicationBB.recordSelectedMuni()}"
+                                                         style="width: 100%;"
+                                                         />
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </h:form>
                 </f:view>
             </ui:define>
         </ui:composition>

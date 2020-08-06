@@ -13,19 +13,57 @@
         <ui:composition template="./navContainer_public.xhtml">
             <ui:define name="content">
                 <f:view id="initiateSessionView">
+
+                    <!-- MAIN CONTAINER -->
                     <div class="mainContainer">
-                        <form method="POST" action="j_security_check">
-                            <h1>Enter your login credentials:</h1>
-                            
-                            <p>Username:</p>
-                            <input type="text" name="j_username"/>
-                            
-                             <p>Password:</p>
-                            <input type="password" name="j_password"/>
-                            <button type="submit" name="Login" title="Submit" value="submit">Submit</button>
-                            <p style="font-style: italic">For any login issues or to request access, please 
-                                call our system administrator <br />Eric Darsow at 412.923.9907(m) or 412.894.3020(w)</p>
-                        </form>
+                        <!-- CONTENTS CONTAINER -->
+                        <div class="public-main-contents-containner">
+
+                            <!--CONTENT MAIN COMPONENT -->
+                            <div class="public-main-contents">
+
+                                <!-- CONTENT IO COMPONENT -->
+                                <div class="public-main-contents-io public-main-contents-login">
+
+                                    <h:graphicImage styleClass="public-login-logo" value="/images/login-logo.png" />
+
+                                    <div class="publi-login-container">
+
+                                        <!--
+                                        <div class="publi-login-title">
+                                            Enter Your Login Credentials
+                                        </div>
+                                        -->
+
+                                        <form method="POST" action="j_security_check">
+
+                                            <input type="text" name="j_username" placeholder="User Name"/>
+
+                                            <input type="password" name="j_password" placeholder="Password"/>
+
+                                            <div class="public-login-button">
+                                                <button type="submit" name="Login" title="Submit" value="submit" class="login-button">
+                                                    <span>
+                                                        Submit
+                                                    </span>
+                                                </button>
+                                            </div>
+
+                                            <div class="public-login-text">
+
+                                                <p> For any login issues or to request access, please 
+                                                    call our system administrator.
+                                                    Eric Darsow at 412.923.9907(m) or 412.894.3020(w)
+                                                </p>
+                                            </div>
+
+                                        </form>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </f:view>
             </ui:define>

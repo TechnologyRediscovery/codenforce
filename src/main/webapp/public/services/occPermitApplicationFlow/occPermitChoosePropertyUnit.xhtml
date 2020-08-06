@@ -13,114 +13,130 @@
         <ui:composition template="./../../navContainer_public.xhtml">
             <ui:define name="content">
                 <f:view id="occPermitApplicationFlowView">
-                    
-                    <div class="mainContainer">
-                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
-                        <h1>Step 1/5: Select a property in <h:outputText value="#{occPermitApplicationBB.selectedMuni.muniName}"/></h1>
-                        
-                        <h:form id="occPermitApplicationChoosePropertyForm">                          
-                            <p:panel>
-                            
-                                <h2 id="currentStep">Step 1: Select Property</h2>
+                    <h:form id="occPermitApplicationChoosePropertyForm">                          
 
-                             <p>Please search for and select the property of concern using this search tool.</p>
+                        <!-- VALIDATION MESSAGE -->
+                        <p:growl id="growl" showDetail="false"/>
 
-                            <p:spacer height="10px"/>
+                        <!-- MAIN CONTAINER -->
+                        <div class="mainContainer">
 
-                            <p:panelGrid columns="3" layout="grid">
+                            <!-- TITLE COMPONENT -->
+                            <div class="public-title">
+                                <div class="public-title-main">
+                                    Apply For An Occupancy Permit
+                                </div>
+                                <div class="public-title-sub">
+                                    Step 2: Select A Property In <h:outputText value="#{occPermitApplicationBB.selectedMuni.muniName}"/>
+                                </div>
+                            </div>
 
-                                <h:panelGroup>
-                                    <p:outputLabel for="propSearchHouseNumIT">
-                                        <h:outputText value="House number:"/>
-                                    </p:outputLabel>
-                                    <p:inputText id="propSearchHouseNumIT" value="#{occPermitApplicationBB.houseNum}" 
-                                                  tabindex="2" required="false" styleClass="inputText">
-                                    </p:inputText>
-                                    <h:message for="propSearchHouseNumIT" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
+                            <!-- CONTENTS CONTAINER -->
+                            <div class="public-main-contents-containner">
 
-                                <h:panelGroup>
-                                    <p:outputLabel for="propSearchStreetIT">
-                                        <h:outputText value="Street name:"/>
-                                    </p:outputLabel>
-                                    <p:inputText id="propSearchStreetIT" value="#{occPermitApplicationBB.streetName}" 
-                                                  tabindex="3" required="false" styleClass="inputText">
-                                    </p:inputText>
-                                    <h:message for="propSearchStreetIT" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
+                                <!--CONTENT MAIN COMPONENT -->
+                                <div class="public-main-contents">
 
-                                <h:panelGroup>
-                                    <p:commandButton
-                                        value="Search in Selected Municipality" tabindex="4" ajax="false" icon="fa fa-search"
-                                        action="#{occPermitApplicationBB.searchForPropertiesSingleMuni}" 
-                                        update=    "propSearchHouseNumIT
-                                                    propSearchStreetIT
-                                                    propertyResultTable"/>
-                                </h:panelGroup>
-                            </p:panelGrid> 
+                                    <!-- GUIDANCE COMPONENT -->
+                                    <div class="public-guide occpermit">
+                                        <p:steps activeIndex="1" styleClass="custom" >
+                                            <p:menuitem value="Step 1: Choose Municipality" containerStyleClass="complete"/>
+                                            <p:menuitem value="Step 2: Choose Property" />
+                                            <p:menuitem value="Step 3: Configure Unit List" />
+                                            <p:menuitem value="Step 4: Select Units" />
+                                            <p:menuitem value="Step 5: Choose Reason" />
+                                            <p:menuitem value="Step 6: Add People" />
+                                            <p:menuitem value="Step 7: Review And Submit" />
+                                        </p:steps>
+                                    </div>
 
-                            <h3>Search Results:</h3>
-                            <p>If the property you are looking for is not below, try searching again.
-                               If it is, please select it and click the button labeled 
-                               "Confirm and Continue" at the bottom of the page.</p>
+                                    <!-- CONTENT IO COMPONENT -->
+                                    <div class="public-main-contents-io">
+                                        <p>
+                                            1. Please search for and select the property of concern using this search tool.
+                                        </p>
 
-                            <p:dataTable
-                                id="propertyResultTable"
-                                var="prop" 
-                                value="#{occPermitApplicationBB.propList}"
-                                selectionMode="single" tabindex="5"
-                                scrollable="true" scrollHeight="200" 
-                                selection="#{occPermitApplicationBB.selectedProperty}"
-                                rowKey="#{prop.bundledProperty.propertyID}">
+                                        <div class="ui-g data-container">
+                                            <div class="ui-g-12 ui-md-12 ui-lg-5 data_field">
+                                                <p:inputText id="propSearchHouseNumIT" 
+                                                             value="#{occPermitApplicationBB.houseNum}" 
+                                                             tabindex="1" 
+                                                             required="false"
+                                                             styleClass="data_field_value"
+                                                             placeholder="House Number"
+                                                             />
+                                            </div>
+                                            <div class="ui-g-12 ui-md-12 ui-lg-5 data_field">
+                                                <p:inputText id="propSearchStreetIT" 
+                                                             value="#{occPermitApplicationBB.streetName}" 
+                                                             tabindex="2" 
+                                                             required="false" 
+                                                             styleClass="data_field_value"
+                                                             placeholder="Street Name"
+                                                             />
+                                            </div>
+                                            <div class="ui-g-12 ui-md-12 ui-lg-2 data_field">
+                                                <p:commandButton value="Search" 
+                                                                 tabindex="3" ajax="false" 
+                                                                 icon="fa fa-search"
+                                                                 action="#{occPermitApplicationBB.searchForPropertiesSingleMuni}" 
+                                                                 update="propSearchHouseNumIT
+                                                                 propSearchStreetIT
+                                                                 propertyResultTable"
+                                                                 style="float: right"
+                                                                 />
+                                            </div>
+                                        </div>
 
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Address" />
-                                    </f:facet>
-                                    <h:outputText value="#{prop.bundledProperty.address}"/>
-                                </p:column>
-                                
+                                        <p>2. If the property you are looking for is not below, try searching again.
+                                            If it is, please select it and click the button labeled 
+                                            "Confirm and Continue" at the bottom of the page.
+                                        </p>
 
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Type" />
-                                    </f:facet>
-                                    <h:outputText value="#{prop.bundledProperty.useType.name}"/>
-                                </p:column>
+                                        <p>Search Results:</p>
+                                        
+                                        <p:dataTable id="propertyResultTable"
+                                                     var="prop" 
+                                                     value="#{occPermitApplicationBB.propList}"
+                                                     selectionMode="single" 
+                                                     tabindex="4"
+                                                     scrollable="true" 
+                                                     scrollHeight="120" 
+                                                     selection="#{occPermitApplicationBB.selectedProperty}"
+                                                     rowKey="#{prop.bundledProperty.propertyID}">
 
-                            </p:dataTable>
-                            
-                            </p:panel>
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="Address" />
+                                                </f:facet>
+                                                <h:outputText value="#{prop.bundledProperty.address}"/>
+                                            </p:column>
 
 
-                           <h3>Step 2: Configure Unit List</h3>
-                           
-                           <p:outputLabel>...</p:outputLabel>
-                           
-                           <h3>Step 3: Select Units For Application</h3>
-                           
-                           <p:outputLabel>...</p:outputLabel>
-                           
-                           <h3>Step 4: Choose Reason For Application</h3>
-                           
-                           <p:outputLabel>...</p:outputLabel>
-                           
-                           <h3>Step 5: Add People To Application</h3>
-                           
-                           <p:outputLabel>...</p:outputLabel>
-                                      
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="Type" />
+                                                </f:facet>
+                                                <h:outputText value="#{prop.bundledProperty.useType.name}"/>
+                                            </p:column>
 
-                            <p:spacer height="10px"/>
-                                <p:commandButton ajax="false" value="Confirm and continue" action="#{occPermitApplicationBB.selectProperty}" />
-                                
-                        </h:form>
-                        
-                        
-                    </div>
+                                        </p:dataTable>
+
+
+                                    </div>
+
+                                    <!-- CONTENT BUTTON -->
+                                    <div class="public-main-contents-button">
+                                        <p:commandButton ajax="false"
+                                                         value="Next step: Configure Unit List" 
+                                                         action="#{occPermitApplicationBB.selectProperty}" 
+                                                         style="width: 100%"/>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </h:form>
                 </f:view>
             </ui:define>
         </ui:composition>

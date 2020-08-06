@@ -12,20 +12,46 @@
     <h:body>
         <ui:composition template="./navContainer_public.xhtml">
             <ui:define name="content">
-                <div class="mainContainer">
-                    <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                    </h:messages>
-                            
-                      <h1>Logout: Successful</h1>
-                       <p>You have been thanked in advance for using The Code Enforcement Database: Turtle Creek Valley's premier code enforcement data management system,.</p>
-            
-                       <f:view id="exitLandingView">
-                        <h:form id="exitLandingForm">
-                            <p:commandLink ajax="false" action="systemHome" value="&larr; Return to login page and start over" />
-                        </h:form>
-                    </f:view>
-                </div>
+                <f:view id="exitLandingView">
+                    <h:form id="exitLandingForm">
+
+                        <!-- MAIN CONTAINER -->
+                        <div class="mainContainer">
+
+                            <!-- CONTENTS CONTAINER -->
+                            <div class="public-main-contents-containner">
+
+                                <!--CONTENT MAIN COMPONENT -->
+                                <div class="public-main-contents">
+
+                                    <!-- CONTENT IO COMPONENT -->
+                                    <div class="public-main-contents-io public-main-contents-login">
+
+                                        <h:graphicImage styleClass="public-login-logo" value="/images/login-logo.png" />
+
+                                        <div class="publi-login-container">
+                                            <div class="publi-login-title" style="text-align: center; font-size: 3em">
+                                                LOGOUT SUCCESSFUL! 
+                                            </div>
+                                            <div class="public-login-text">
+                                                <p>
+                                                    You have been thanked in advance for using The Code Enforcement Database: Turtle Creek Valley's premier code enforcement data management system.
+                                                </p>
+                                            </div>
+
+                                            <div class="public-login-button">
+                                                <p:commandButton ajax="false" 
+                                                                 value="Return To Login Page" 
+                                                                 action="systemHome"
+                                                                 style="width: 100%"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </h:form>
+                </f:view>
             </ui:define>
         </ui:composition>
     </h:body>

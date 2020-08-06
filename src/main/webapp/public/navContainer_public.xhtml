@@ -19,65 +19,83 @@
     <h:body>
 
         <div class="public-container">
+            
+            <div class="public-menu-toggler-button" id="public-menu-toggler-button-id" >
+                <i class="fa fa-list" onclick="onClickMenuTogglerButton()"/>
+            </div>
 
-            <div class="ui-g">
+            <div class="public-menu-container" id="public-menu-container-id">
 
-                <div class="ui-g-12 ui-md-12 ui-lg-3 public-menu-container">
+                <div class="public-menu-content">
 
-                    <div class="public-menu-content">
+                    <f:view id="sideBarView">
 
-                        <f:view id="sideBarView">
+                        <h:graphicImage styleClass="public-menu-logo" value="/images/Logo-N_Font.png" />
 
-                            <h:graphicImage styleClass="public-menu-logo" value="/images/Logo-N_public.png" />
-
-                            <h:form id="panelMenu">
-                                <div class="public-menu-button"> 
-                                    <p:commandButton value="Login" action="systemHome" ajax="false" icon="fa fa-sign-in" />
-                                </div>
-                                <div class="public-menu-button">
-                                    <p:commandButton value="Request Code Enforcement" action="requestCEActionFlow" ajax="false" icon="fa fa-clipboard" escape="false"/>
-                                </div>
-                                <div class="public-menu-button">
-                                    <p:commandButton value="Check On Your Case" action="paccSearch" ajax="false" icon="fa fa-tachometer" />
-                                </div>
-                                <div class="public-menu-button">
-                                    <p:commandButton value="Apply For An Occupancy Permit" action="occPermitApplicationFlow" ajax="false" icon="fa fa-building" escape="false"/>
-                                </div>
-                                <div class="public-menu-button">
-                                    <p:commandButton value="About" action="about" ajax="false" icon="fa fa-info" />
-                                </div>
-                                <div class="public-menu-button">
-                                    <p:commandButton value="Contact" action="contact" ajax="false" icon="fa fa-phone" />
-                                </div>
-                                <div class="public-menu-button">
-                                    <p:commandButton value="How-To Guides" action="howtos" ajax="false" icon="fa fa-question-circle" />
-                                </div>
-                                <div class="public-menu-button">
-                                    <p:commandButton value="For Developers" action="technical"  ajax="false" icon="fa fa-database" />
-                                </div>
-                            </h:form>
-
-                            <div class="public-menu-text">
-                                <p>This database application is maintained and updated by the Turtle Creek Valley Council of Governments.</p>
+                        <h:form id="panelMenu">
+                            <div class="public-menu-button"> 
+                                <p:commandButton value="Login" action="systemHome" ajax="false" icon="fa fa-sign-in" />
                             </div>
+                            <div class="public-menu-button">
+                                <p:commandButton value="Request Code Enforcement" action="requestCEActionFlow" ajax="false" icon="fa fa-clipboard" escape="false"/>
+                            </div>
+                            <div class="public-menu-button">
+                                <p:commandButton value="Check On Your Case" action="paccSearch" ajax="false" icon="fa fa-tachometer" />
+                            </div>
+                            <div class="public-menu-button">
+                                <p:commandButton value="Apply For An Occupancy Permit" action="occPermitApplicationFlow" ajax="false" icon="fa fa-building" escape="false"/>
+                            </div>
+                            <div class="public-menu-button">
+                                <p:commandButton value="About" action="about" ajax="false" icon="fa fa-info" />
+                            </div>
+                            <div class="public-menu-button">
+                                <p:commandButton value="Contact" action="contact" ajax="false" icon="fa fa-phone" />
+                            </div>
+                            <div class="public-menu-button">
+                                <p:commandButton value="How-To Guides" action="howtos" ajax="false" icon="fa fa-question-circle" />
+                            </div>
+                            <div class="public-menu-button">
+                                <p:commandButton value="For Developers" action="technical"  ajax="false" icon="fa fa-database" />
+                            </div>
+                        </h:form>
 
-                        </f:view>
-                    </div>
+                        <div class="public-menu-text">
+                            <p>This database application is maintained and updated by the Turtle Creek Valley Council of Governments.</p>
+                        </div>
 
-                </div>
-
-                <div class=" ui-g-12 ui-md-12 ui-lg-9 public-content-container">
-                    <div class="public-content">
-                        <f:view id="sessionInfoView">
-                            <ui:insert name="content">
-                                <p>I am content in the template content</p>
-                            </ui:insert>
-                        </f:view>
-                    </div>
+                    </f:view>
                 </div>
 
             </div>
+
+            <div class="public-content-container">
+                <div class="public-content">
+                    <f:view id="sessionInfoView">
+                        <ui:insert name="content">
+                            <p>I am content in the template content</p>
+                        </ui:insert>
+                    </f:view>
+                </div>
+            </div>
+
         </div>
+
+        <script>
+            function onClickMenuTogglerButton() {
+                var x = document.getElementById("public-menu-container-id");
+                if (x.className === "public-menu-container") {
+                    x.className += " public-menu-toggler-responsive";
+                } else {
+                    x.className = "public-menu-container";
+                }
+                var x = document.getElementById("public-menu-toggler-button-id");
+                if (x.className === "public-menu-toggler-button") {
+                    x.className += " public-menu-toggler-button-white";
+                } else {
+                    x.className = "public-menu-toggler-button";
+                }
+            }
+        </script>
 
     </h:body>
 
