@@ -57,7 +57,7 @@ public class DataCoordinator extends BackingBeanUtils implements Serializable{
             //CasePhase[] phaseValuesArray = CasePhaseEnum.values();
             Iterator<CECaseDataHeavy> caseIter = caseList.iterator();
             while (caseIter.hasNext()) {
-                CasePhaseEnum p = caseIter.next().getCasePhase();
+                CasePhaseEnum p = caseIter.next().getStatusBundle().getPhase();
                 phaseCountMap.put(p, phaseCountMap.get(p) + 1);
             }
         }
@@ -76,7 +76,7 @@ public class DataCoordinator extends BackingBeanUtils implements Serializable{
                 stageCountMap.put(cs, 0);
             }
             for (CECaseDataHeavy c : caseList) {
-                CaseStageEnum stg = c.getCasePhase().getCaseStage();
+                CaseStageEnum stg = c.getStatusBundle().getPhase().getCaseStage();
                 stageCountMap.put(stg, stageCountMap.get(stg) + 1);
             }
         }

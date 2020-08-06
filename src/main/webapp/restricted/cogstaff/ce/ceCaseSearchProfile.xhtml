@@ -1,0 +1,1247 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!--
+Copyright (C) 2020 Turtle Creek Valley
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>CE Case Lookup and Profile</title>
+    </h:head>
+
+    <h:body id="cecase-lookup-profile-body">
+
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="cecase-lookup-profile-view">
+
+                    <p:outputPanel id="body-panel">
+                        <h1>CECase Lookup and Profile</h1>
+
+                        <h:form id="form-messages-global">
+                            <p:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true" />
+                        </h:form>
+
+                        <div class="mainContainer">
+
+                            <div class ="two-column-page-flex-container">
+
+                                <div class="list-column" >
+
+
+                                    <h:form id="mode-form">
+                                        <p:selectOneButton style="  width: 100%;
+                                                           margin-top: 10px ;
+                                                           height: 20px;"
+                                                           value="#{ceCaseSearchProfileBB.currentMode}"
+                                                           unselectable="false"
+                                                           >
+                                            <f:selectItems value="#{ceCaseSearchProfileBB.pageModes}"
+                                                           var="pmo"
+                                                           itemLabel="#{pmo.title}"
+                                                           itemDisabled="#{empty userConfigBB.userSelected  and pmo.objectSelectRequiredToEnable}"/>
+                                            <f:ajax render="@all"/>
+                                        </p:selectOneButton>
+                                    </h:form>
+
+                                    <p:spacer height="10px"/>
+
+
+                                    <p:panel    id="usercfg-pswd-panel"
+                                                toggleable="true"
+                                                widgetVar="usercfg-pswd-panel-var"
+                                                collapsed="false"
+                                                rendered="#{userConfigBB.activeUpdateMode}"
+                                                header="Password Manager">
+
+
+                                        <h:outputLabel styleClass="bold" 
+                                                       value="Select a query:" 
+                                                       for="cecase-query-desc-ot" />
+
+                                        <p:selectOneMenu id="cecase-query-som" 
+                                                         tabindex="1" 
+                                                         value="#{ceCaseSearchBB.querySelected}"
+                                                         disabled="#{ceCaseSearchBB.querySelected.queryExecuted}">
+                                            <f:converter converterId="bOBQueryConverter"/>
+                                            <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                            <f:selectItems id="querylist-si" value="#{ceCaseSearchBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
+                                            <p:ajax listener="#{ceCaseSearchBB.changeQuerySelected}"
+                                                    update="cecase-search-form
+                                                    cecase-search-messages-form" />
+                                        </p:selectOneMenu>
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputLabel styleClass="bold" 
+                                                       value="Description: " 
+                                                       for="cecase-query-desc-ot" />
+                                        <h:outputText id="cecase-query-desc-ot" 
+                                                      value="#{ceCaseSearchBB.querySelected.queryName.desc}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <p:commandButton   id="cecase-executequery-cb" 
+                                                           ajax="true" 
+                                                           actionListener="#{ceCaseSearchBB.executeQuery}"
+                                                           disabled="#{ceCaseSearchBB.querySelected.queryExecuted}"
+                                                           icon="fa fa-flash" 
+                                                           styleClass="button"
+                                                           value="run query" 
+                                                           update="cecase-search-form
+                                                           cecase-search-results-form
+                                                           cecase-search-messages-form
+                                                           cecase-search-form
+                                                           cecase-search-log-form"/>
+
+                                        <p:commandButton   id="cecase-search-clear-cb" 
+                                                           ajax="true" 
+                                                           actionListener="#{ceCaseSearchBB.resetQuery}"
+                                                           icon="fa fa-eraser" 
+                                                           styleClass="button inline-button"
+                                                           value="clear query" 
+                                                           disabled="#{!ceCaseSearchBB.querySelected.queryExecuted}"
+                                                           update=" cecase-search-messages-form
+                                                           cecase-search-log-form
+                                                           cecase-search-form
+                                                           cecase-search-log-form"/>
+
+                                        <p:spacer height="5px" />
+
+                                        <p:outputLabel for="cecase-search-appendresults-chkbox">
+                                            <h:outputText value="Append results to list? "
+                                                          styleClass="bold"/>
+                                        </p:outputLabel>
+
+                                        <p:selectBooleanCheckbox   id="cecase-search-appendresults-chkbox" 
+                                                                   value="#{ceCaseSearchBB.appendResultsToList}" 
+                                                                   disabled="false" />
+
+
+                                    </p:panel>
+
+                                    <p:panel        id="cecase-caselist-panel"
+                                                    toggleable="true"
+                                                    widgetVar="cecase-caselist-panel-var"
+                                                    collapsed="false"
+                                                    rendered="#{userConfigBB.activeLookupMode}"
+                                                    header="Code Enforcement Case List">
+                                        <h:form id="cecase-search-results-form" >
+
+                                            <p:commandButton   id="cecase-search-results-clear-button" 
+                                                               ajax="true" 
+                                                               actionListener="#{ceCaseSearchBB.clearCECaseList}"
+                                                               icon="fa fa-eraser" 
+                                                               styleClass="button"
+                                                               value="clear results list" 
+                                                               update="cecase-search-messages-form
+                                                               cecase-search-results-form"/>
+
+                                            <p:commandButton   id="cecase-search-loadhistory-button" 
+                                                               ajax="true" 
+                                                               actionListener="#{ceCaseSearchBB.loadCECaseHistory}"
+                                                               icon="fa fa-clock-o" 
+                                                               styleClass="button"
+                                                               value="load case history" 
+                                                               update="cecase-search-messages-form 
+                                                               cecase-search-results-form"/>
+
+                                            <p:spacer height="5px" />
+
+                                            <h:outputText value="list contains #{ceCaseSearchBB.caseListSize} code enforcement cases" 
+                                                          styleClass="italic"/>
+                                            <p:spacer height="5px" />
+
+                                            <p:dataTable
+                                                id="cecase-search-results-table"
+                                                var="c"
+                                                filteredValue="#{ceCaseSearchBB.filteredCaseList}"
+                                                rowKey="#{c.caseID}"
+                                                rowExpandMode="multiple"
+                                                widgetVar="ceViewTable"
+                                                value="#{ceCaseSearchBB.caseList}"
+                                                tableStyleClass="primeDataTable">
+
+                                                <p:column width="5%" sortBy="#{c.originationDate}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Opened" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{ceCaseSearchBB.getPrettyDateNoTime(c.originationDate)}"/>
+                                                </p:column>
+                                                <p:column width="15%" sortBy="#{c.property.address}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Property" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{c.property.address} (#{c.property.muni.muniName})"/>
+                                                </p:column>
+                                                <p:column width="15%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Name" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{c.caseName}"/>
+                                                </p:column>
+                                                <p:column width="8%" sortBy="#{c.casePhase.caseStage.label}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Stage" />
+                                                    </f:facet>
+                                                    <div class="#{c.statusBundle.phaseIcon.styleClass}">
+                                                        <i class="material-icons status-display-icon-i"><h:outputText value="#{c.casePhaseIcon.materialIcon}"/></i>
+                                                    </div>
+                                                </p:column>
+                                                <p:column width="8%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="ID" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{c.caseID}"/>
+                                                </p:column>
+                                                <p:column width="5%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="view" />
+                                                    </f:facet>
+                                                    <p:commandButton    id="cecases-viewcase-cb"
+                                                                        icon="fa fa-hand-o-right" 
+                                                                        action="#{ceCaseSearchBB.manageCECase(c)}"
+                                                                        ajax="false"
+                                                                        />
+                                                </p:column>
+                                            </p:dataTable>
+
+
+                                            <p:spacer height="10px"/>
+
+                                            <p:commandButton   id="print-case-list-cb" 
+                                                               ajax="true" actionListener="#{ceCaseSearchBB.prepareReportCECaseList}"
+                                                               icon="fa fa-print" styleClass="button"
+                                                               oncomplete="PF('report-caselist-profile-diaglog-var').show()"
+                                                               value="generate case list report" 
+                                                               update="report-caselist-profile-form"/>
+
+                                        </h:form>
+
+                                    </p:panel>
+
+                                    <p:panel  id="cecase-search-log-panel"
+                                              toggleable="true"
+                                              widgetVar="cecase-search-log-panel-var"
+                                              collapsed="true"
+                                              style="width:100%;"
+                                              header="Query log">
+
+                                        <h:form id="cecase-search-log-form">
+                                            <div class='search-query-desc'>
+                                                <h:outputText id="cecase-search-log-ot" 
+                                                              value="#{ceCaseSearchBB.querySelected.queryLog}"
+                                                              escape="false"/>
+                                            </div>
+                                        </h:form>
+                                    </p:panel>
+                                </div>
+
+                                <div class ="object-column">
+
+                                    <h:form id="cecaselists-launcher">
+                                        <h1>
+                                            <h:outputText id="header-type-ot" value="#{ceCaseWorkflowBB.currentCase.caseName} | "/> 
+                                            <h:outputText id="header-id-ot" value="Case ID: #{ceCaseWorkflowBB.currentCase.caseID}"/><br />
+                                        </h1>
+                                        <h2>
+                                            <h:outputText id="header-addr-ot" value="#{ceCaseWorkflowBB.currentCase.property.address} "/>  
+                                            <h:outputText id="header-muni-ot" value="(#{ceCaseWorkflowBB.currentCase.property.muni.muniName})"/>  
+                                            <h:outputText id="header-propid-ot" value=" Prop ID: #{ceCaseWorkflowBB.currentCase.property.propertyID}"/>  
+                                            <h:outputText id="header-lob-ot" value=" | Lot-block: #{ceCaseWorkflowBB.currentCase.property.lotAndBlock}"/>  
+                                        </h2>
+                                        <p>
+                                            <a href="#todos">proposals <h:outputText value=" (#{ceCaseWorkflowBB.currentCase.proposalList.size()})" /> </a> | 
+                                            <a href="#cears">enforcement requests <h:outputText value=" (#{ceCaseWorkflowBB.currentCase.ceActionRequestList.size()})" /></a>  
+                                            <a href="#events">event history <h:outputText value=" (#{ceCaseWorkflowBB.currentCase.eventListMaster.size()})" /></a> | 
+                                            <a href="#violations">violations <h:outputText value=" (#{ceCaseWorkflowBB.currentCase.violationList.size()})" /></a> | 
+                                            <a href="#notices">notices <h:outputText value=" (#{ceCaseWorkflowBB.currentCase.noticeList.size()})" /></a> | 
+                                            <a href="#citations">citations <h:outputText value=" (#{ceCaseWorkflowBB.currentCase.citationList.size()})" /></a> | 
+                                        </p>
+
+                                    </h:form>
+
+                                    <p:outputPanel id = "cecase-profile-panel" >
+
+                                        <p:panel    id="cecase-profile-panel"
+                                                    toggleable="true"
+                                                    widgetVar="cecase-profile-panel-var"
+                                                    collapsed="false"
+                                                    header="TODO Items">
+
+                                            <h:form id="cecase-profile-form">
+
+
+                                                <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                                             columnClasses="gridTd, gridTd">
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Case Status: #{ceCaseWorkflowBB.currentCase.statusBundle.phase.caseOpen ? 'Open' : 'Closed'}" />
+                                                    </h:panelGroup>      
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Opening Date: "/>
+                                                        <h:outputText id="selcase-odate-it" value="#{ceCaseWorkflowBB.currentCase.originiationDatePretty}"/>
+                                                        <h:outputText id="selcase-age-it" 
+                                                                      value=" (#{ceCaseWorkflowBB.currentCase.caseAge} days ago)" 
+                                                                      rendered="#{empty ceCaseWorkflowBB.currentCase.closingDate}"/>
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputLabel styleClass="bold" value="Closing Date: "/>
+                                                        <h:outputText id="selcase-cdate-it" value="#{ceCaseWorkflowBB.currentCase.closingDatePretty}"/>
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputLabel styleClass="bold" value="Case Manager: "/>
+                                                        <h:outputText id="selcase-manager-it" 
+                                                                      value="#{ceCaseWorkflowBB.currentCase.caseManager.person.firstName} 
+                                                                      #{ceCaseWorkflowBB.currentCase.caseManager.person.lastName} 
+                                                                      (#{ceCaseWorkflowBB.currentCase.caseManager.username})"/>  
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputLabel styleClass="bold" value="Case Phase: "/>
+                                                        <h:outputText id="casephase-ot" value="#{ceCaseWorkflowBB.currentCase.statusBundle.phase.label}"/>
+                                                    </h:panelGroup>      
+
+                                                    <f:facet name="footer" class="leftalign">
+                                                        <h:outputLabel styleClass="bold" value="Case notes: "/>
+                                                        <div class="rowExpansion">
+
+                                                            <h:outputText id="selcase-notes-ot" value="#{ceCaseWorkflowBB.currentCase.notes}"/>
+                                                        </div>
+
+                                                        <p:spacer height="5px"/>
+
+                                                    </f:facet>
+                                                </h:panelGrid>
+
+                                                <p:commandButton    id="view-property-cb" 
+                                                                    ajax="false" 
+                                                                    action="#{cECaseWorkflowBB.exploreProperty}"
+                                                                    icon="fa fa-home" 
+                                                                    styleClass="noFill button-size-small"
+                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                    value="view property profile" />
+
+                                                <p:commandButton    id="refresh-case-cb" 
+                                                                    ajax="true" actionListener="#{ceCaseWorkflowBB.refreshCurrentCase}"
+                                                                    icon="fa fa-refresh" styleClass="noFill"
+                                                                    value="reload current case data" 
+                                                                    update="
+                                                                    case-details-form
+
+                                                                    "
+                                                                    />
+
+                                                <p:commandButton    id="case-settings-cb" 
+                                                                    ajax="true" disabled="true"
+                                                                    icon="fa fa-gears" styleClass="noFill"
+                                                                    value="case settings" />
+
+                                                <p:commandButton    id="overridephase-cb" 
+                                                                    ajax="true"
+                                                                    immediate="true"
+                                                                    value="change stage"
+                                                                    onclick="PF('phase-override').show()"
+                                                                    icon="fa fa-tachometer" styleClass="noFill"
+                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                    update="casePhaseChangeForm"
+                                                                    />
+                                                <p:commandButton   id="print-case-cb" 
+                                                                   ajax="true" actionListener="#{ceCaseWorkflowBB.prepareReportCECase}"
+                                                                   icon="fa fa-print" styleClass="noFill"
+                                                                   oncomplete="PF('report-case-profile-diaglog-var').show()"
+                                                                   value="print case profile" 
+                                                                   update="report-case-profile-form"/>
+
+
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <p:panel id="caseprofile-todos-panel"
+                                                 toggleable="true"
+                                                 widgetVar="caseprofile-panel-todos-var"
+                                                 collapsed="false"
+                                                 header="TODOs (#{ceCaseWorkflowBB.currentCase.proposalList.size()})">
+
+                                            <h:form id="caseprofile-todos-messages-form">
+                                                <h:messages id="caseprofile-todos-messages" globalOnly="true" showDetail="true" showSummary="true"
+                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                                </h:messages>
+                                            </h:form>
+
+                                            <h:form id="caseprofile-todos-form">
+
+
+                                                <h:outputLabel styleClass="ui-label" for="cecase-viewoptionsproposals-solb">
+                                                    <h:outputText value="proposal list view options: "/>
+                                                </h:outputLabel>
+
+                                                <p:selectOneMenu style="width: 300px;" 
+                                                                 id="cecase-viewoptionsproposals-solb" 
+                                                                 value="#{workflowBB.selectedProposalsViewOption}" 
+                                                                 tabindex="10">
+
+                                                    <p:ajax update="proposals-proposalscroller"                                                           
+                                                            immediate="true"/>
+                                                    <f:selectItems  id="cecase-viewoptionsproposals-selitems" 
+                                                                    value="#{workflowBB.proposalsViewOptions}" 
+                                                                    var="pvo" 
+                                                                    itemValue="#{pvo}" 
+                                                                    itemLabel="#{pvo.label}"/>
+                                                </p:selectOneMenu>
+
+                                                <h:message for="cecase-viewoptionsproposals-solb" showDetail="false" showSummary="true"  
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+
+                                                <p:dataScroller id="proposals-proposalscroller"
+                                                                var="proposal"
+                                                                widgetVar="proposals-proposalscroller-var"
+                                                                value="#{ceCaseWorkflowBB.currentCase.assembleProposalList(workflowBB.selectedProposalsViewOption)}"
+                                                                rowIndexVar="#{proposal.proposalID}">
+                                                    <div class="outlinedBox">
+                                                        <div class="proposal-metadata-container">
+                                                            <div class="proposal-propbuttoncontainer">
+                                                                <p:commandButton    id="proposal-button-showdescription"
+                                                                                    styleClass="noFill button-size-small button-moreinfo"
+                                                                                    icon="fa fa-info"/>
+
+                                                                <p:overlayPanel id="proposal-overlaypanel-proposaldescription"
+                                                                                for="proposal-button-showdescription"
+                                                                                hideEffect="fade" 
+                                                                                dynamic="true" 
+                                                                                showCloseIcon="true"
+                                                                                style="width:300px" 
+                                                                                modal="false">
+
+                                                                    <h:outputText       styleClass="proposal-description"
+                                                                                        value="#{proposal.directive.description}" />
+                                                                </p:overlayPanel>
+
+
+                                                                <p:commandButton    id="proposal-button-rejectionreason"
+                                                                                    styleClass="noFill button-size-small"
+                                                                                    oncomplete="PF('cecase-rejectproposal-dialog-var').show()"
+                                                                                    rendered="#{!proposal.directive.requiredEvaluationForBOBClose 
+                                                                                                or systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions }"
+                                                                                    icon="fa fa-trash"/>
+                                                            </div>
+                                                            <div class="proposal-prophead">
+                                                                <h:outputText value="#{proposal.directive.title}" />
+                                                            </div>
+                                                            <p:spacer height="5px" />
+                                                            <h:panelGrid   id="cecase-proposals-panelgrid-propinfo" 
+                                                                           columns="1" 
+                                                                           style="clear:both;"
+                                                                           columnClasses="gridTd" 
+                                                                           rendered="true">
+                                                                <h:panelGroup>
+                                                                    <h:outputText styleClass="ui-label-inline" 
+                                                                                  value="Intended for: "  />
+                                                                    <h:outputText styleClass="data-text" 
+                                                                                  value="#{workflowBB.currentProposal.responderIntended.person.firstName}" />
+                                                                    <h:outputText styleClass="data-text" 
+                                                                                  value=" " />
+                                                                    <h:outputText styleClass="data-text" 
+                                                                                  value="#{workflowBB.currentProposal.responderIntended.person.lastName}" />
+                                                                </h:panelGroup>
+                                                            </h:panelGrid>
+                                                        </div>
+
+                                                        <p:dataScroller id="proposals-choicescroller"
+                                                                        var="choice"
+                                                                        widgetVar="proposals-choicescroller-var"
+                                                                        value="#{proposal.directive.choiceListVisible}"
+                                                                        rowIndexVar="#{choice.chosenChoice.choiceID}">
+
+                                                            <p:commandButton    id="proposal-choice-button-choose"
+                                                                                ajax="true" 
+                                                                                styleClass="proposal-choice-button"
+                                                                                actionListener="#{workflowBB.proposals_makeChoice(choice, proposal)}"
+                                                                                disabled="#{!choice.chosenChoice.canChoose or !(empty proposal.responseTS)}"
+                                                                                value="#{choice.chosenChoice.title}"
+                                                                                icon="#{choice.chosenChoice.icon.fontAwesome}"
+                                                                                title="#{choice.chosenChoice.description}"
+                                                                                update="cecase-form-proposals
+                                                                                cecase-panel-proposals-messages-form"/>
+                                                            <p:spacer height="5px" />
+                                                        </p:dataScroller>
+                                                    </div>
+                                                </p:dataScroller>
+
+                                                <p:commandButton    id="caseprofile-todos-settings-button"
+                                                                    ajax="true"
+                                                                    value="proposals settings"
+                                                                    styleClass="noFill button-size-small"
+                                                                    actionListener="#{workflowBB.proposals_initiateViewPropMetadata(proposal)}"
+                                                                    oncomplete="PF('cecase-dialog-proposalmetadata-var').show()"
+                                                                    icon="fa fa-gears"
+                                                                    update="cecase-panel-proposals-messages-form
+                                                                    edit-case-metadata-dialog
+
+                                                                    "/>
+                                            </h:form>
+                                        </p:panel>
+
+
+                                        <!--Insert Table-->
+                                        <p:panel id="cecase-open-panel"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Open New Case"
+                                                 rendered="#{ceCaseSearchProfileBB.activeInsertUpdateMode}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="cecase-open-form">
+                                                <p:commandButton    id="cecase-open-button" 
+                                                                    ajax="false" 
+                                                                    action="#{ceCaseSearchProfileBB.onCaseOpenButtonChange}"                                                               icon="fa fa-home" 
+                                                                    styleClass="noFill button-size-small"
+                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                    value="Open a New Code Enforcement Case at #{ceCaseSearchProfileBB.currentCase.property.address}" />
+
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <!--Update Table-->
+                                        <p:panel id="cecase-update-panel"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Update Case Details"
+                                                 rendered="#{municipalityManageSampleBB.getActiveUpdateMode()}"
+                                                 >
+                                            <h:form id="updateCaseForm">
+
+                                                <h:panelGrid columns="2" border="0" 
+                                                             cellpadding="2" columnClasses="gridTd, gridTd"
+                                                             footerClass="gridFooter">
+                                                    <h:panelGroup>
+                                                        <h:outputText value="Public access control code"/>
+                                                    </h:panelGroup> 
+                                                    <h:panelGroup>
+                                                        <h:inputText value="#{ceCaseWorkflowBB.currentCase.publicControlCode}"/>
+                                                    </h:panelGroup> 
+                                                    <h:panelGroup>
+                                                        <h:outputText value="Case name"/>
+                                                    </h:panelGroup> 
+                                                    <h:panelGroup>
+                                                        <h:inputText value="#{ceCaseWorkflowBB.currentCase.caseName}"/>
+                                                    </h:panelGroup> 
+                                                    <h:panelGroup>
+                                                        <h:outputText value="Opening date"/>
+                                                    </h:panelGroup> 
+                                                    <h:panelGroup>
+                                                        <p:calendar value="#{ceCaseWorkflowBB.currentCase.originationDateUtilDate}" 
+                                                                    mode="popup" tabindex="3"
+                                                                    id="formCaseOriginationDateCal"
+                                                                    showOn="button"
+                                                                    pattern="EEE, dd MMM, yyyy"
+                                                                    navigator="true"
+                                                                    showButtonPanel="true"
+                                                                    showTodayButton="true"
+                                                                    required="true"/>
+
+                                                        <h:message for="formCaseOriginationDateCal" showDetail="false" showSummary="true" 
+                                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                    </h:panelGroup>
+                                                    <h:panelGroup>
+                                                        <h:outputText value="Notes:"/>
+                                                    </h:panelGroup> 
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel class="bold" value="Public access reference num: " for="selcase-pacc" />
+                                                        <h:outputText id="selcase-pacc" value="#{ceCaseWorkflowBB.currentCase.publicControlCode}"/>
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputLabel class="bold" value="Allow access using ref num?" for="selcase-access-sbcb" />
+                                                        <p:selectBooleanCheckbox id="selcase-access-sbcb" value="#{ceCaseWorkflowBB.currentCase.paccEnabled}"
+                                                                                 disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
+                                                        </p:selectBooleanCheckbox>
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputLabel class="bold" value="Allow action request linking?" for="selcase-forwardlinking-sbcb" />
+                                                        <h:outputText value=" "/>
+                                                        <p:selectBooleanCheckbox id="selcase-forwardlinking-sbcb" value="#{ceCaseWorkflowBB.currentCase.paccEnabled}"
+                                                                                 disabled="#{!sessionBeasessionUserer.keyCard.hasMuniStaffPermissions}">
+                                                        </p:selectBooleanCheckbox>
+
+                                                        <p:spacer height="5px"/>
+                                                    </h:panelGroup>
+                                                </h:panelGrid>
+                                                <p:spacer height="10px"/>
+                                                <p:commandButton ajax="true" value="Update Case" action="#{ceCaseSearchProfileBB.on}"  icon="fa fa-edit"/>
+                                            </h:form>
+
+
+                                        </p:panel>
+
+
+                                        <!--Remove Table-->
+                                        <p:panel id="muniManage-panel-remove"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="LoopUp Panel"
+                                                 rendered="#{municipalityManageSampleBB.getActiveRemoveMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="muniManage-form-remove">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <!--Remove Table Content-->
+
+                                                </p:panelGrid>
+
+                                                <p:spacer height="10px" />
+
+                                                <!--Remove Button-->
+                                                <p:commandButton icon="fa fa-edit"
+                                                                 ajax="false"
+                                                                 action="#{municipalityManageSampleBB.onRemoveButtonChange()}"
+                                                                 value="Remove"
+                                                                 />
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                    </p:outputPanel>
+                                </div>
+                            </div>
+                        </div>
+                    </p:outputPanel>
+
+                    <p:dialog     id="cecase-search-advanced-dialog"
+                                  header="Code Enforcement Case: Advanced Search" 
+                                  widgetVar="cecase-search-advanced-dialog-var" 
+                                  responsive="true" 
+                                  width="800"
+                                  modal="true"
+                                  height="700">
+
+
+                        <h:form id="cecase-search-messages-form">
+                            <h:messages id="cecase-search-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+
+
+                        <h:form id="cecase-search-advanced-form">
+
+                            <p:spacer height="5px" />
+                            <h:panelGrid columns="1" cellpadding="10" columnClasses="gridTd"
+                                         footerClass="gridFooter">
+                                <h:panelGroup>
+
+                                    <ui:remove>
+
+
+                                        <h:outputLabel styleClass="bold" 
+                                                       value="Search parameter bundles" 
+                                                       for="cecase-search-params-som" />
+                                        <p:spacer height="5px" />
+
+
+                                        <p:selectOneMenu id="cecase-search-params-som" 
+                                                         tabindex="1" 
+                                                         value="#{ceCaseSearchBB.searchParamsSelected}"
+                                                         disabled="#{ceCaseSearchBB.querySelected.queryExecuted}">
+                                            <f:converter converterId="searchParamsConverter"/>
+                                            <f:selectItem itemLabel="select a parameter bundle..." 
+                                                          noSelectionOption="true" 
+                                                          itemDisabled="true"/>
+                                            <f:selectItems id="cecase-search-params-si" 
+                                                           value="#{ceCaseSearchBB.querySelected.paramsList}" 
+                                                           var="sp" itemValue="#{sp}" 
+                                                           itemLabel="#{sp.filterName}" />
+                                            <p:ajax update="cecase-search-form" />
+                                        </p:selectOneMenu>
+
+                                    </ui:remove>
+
+                                    <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                 columnClasses="gridTd gridTd">
+
+                                        <h:panelGroup>
+                                            <p:outputLabel id="cecase-filter-muni-ol" 
+                                                           for="seev-filter-muni-chkbx" 
+                                                           value="filter by municipality "/>
+                                            <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" value="#{ceCaseSearchBB.searchParamsSelected.muni_ctl}" >
+                                                <p:ajax update="cecase-search-muni-som"/>
+                                            </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:selectOneMenu id="cecase-search-muni-som" tabindex="1" value="#{ceCaseSearchBB.searchParamsSelected.muni_val}"
+                                                             disabled="#{!ceCaseSearchBB.searchParamsSelected.muni_ctl}">
+                                                <f:converter converterId="muniConverter"/>
+                                                <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
+                                                <f:selectItems id="muniNameList" value="#{systemServicesBB.municipalityListForSearch}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                            </p:selectOneMenu>
+                                            <h:message for="cecase-search-muni-som" showDetail="true" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:outputLabel id="cecase-search-startend-chkbx-ol" 
+                                                           for="cecase-search-startend-chkbx" 
+                                                           value="filter by date range "/>
+                                            <p:selectBooleanCheckbox id="cecase-search-startend-chkbx" 
+                                                                     value="#{ceCaseSearchBB.searchParamsSelected.date_startEnd_ctl}" >
+                                                <p:ajax update="cecase-search-date-field-val
+                                                        cecase-search-date-start-val
+                                                        cecase-search-date-end-val
+                                                        cecase-search-date-relative-ctl" />
+                                            </p:selectBooleanCheckbox>
+
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+
+                                            <p:selectOneMenu  id="cecase-search-date-field-val" 
+                                                              tabindex="1" 
+                                                              value="#{ceCaseSearchBB.searchParamsSelected.date_field}"
+                                                              disabled="#{!ceCaseSearchBB.searchParamsSelected.date_startEnd_ctl}">
+                                                <f:selectItem itemLabel="select a date field..." 
+                                                              noSelectionOption="true" 
+                                                              itemDisabled="true"/>
+                                                <f:selectItems id="cecase-search-date-field-val-items" 
+                                                               value="#{ceCaseSearchBB.searchParamsSelected.dateFieldList}" 
+                                                               var="f" itemValue="#{f}" itemLabel="#{f.title}" />
+                                                <f:converter converterId="dateFieldConverter" />
+                                            </p:selectOneMenu>
+
+                                        </h:panelGroup>
+
+                                        <h:panelGroup styleClass="pgspacer">
+                                            <h:outputText value=" " />
+                                        </h:panelGroup>
+
+
+
+                                        <h:panelGroup id="datepickers-pg">
+                                            <h:panelGrid    columns="1" 
+                                                            cellpadding="10" 
+                                                            columnClasses="gridTd">
+                                                <h:panelGroup>
+
+                                                    <p:outputLabel for="cecase-search-date-start-val" 
+                                                                   value="start date"/>
+
+                                                    <p:spacer height="1px" />
+
+                                                    <p:calendar id="cecase-search-date-start-val" 
+                                                                value="#{ceCaseSearchBB.searchParamsSelected.startDate_val_utilDate}" 
+                                                                disabled="#{(!ceCaseSearchBB.searchParamsSelected.date_startEnd_ctl) or ceCaseSearchBB.searchParamsSelected.date_relativeDates_ctl}"
+                                                                mode="popup" 
+                                                                showOn="button" 
+                                                                pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                                navigator="true" 
+                                                                tabindex="16" 
+                                                                timeInput="true" 
+                                                                showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                                showButtonPanel="true" 
+                                                                showTodayButton="true"
+                                                                required="false"/>
+                                                    <h:message for="cecase-search-date-start-val" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+
+                                                    <p:outputLabel for="cecase-search-date-end-val" 
+                                                                   value="end date"/>
+
+                                                    <p:spacer height="1px" />
+
+                                                    <p:calendar id="cecase-search-date-end-val" 
+                                                                value="#{ceCaseSearchBB.searchParamsSelected.endDate_val_utilDate}" 
+                                                                disabled="#{(!ceCaseSearchBB.searchParamsSelected.date_startEnd_ctl) or ceCaseSearchBB.searchParamsSelected.date_relativeDates_ctl}"
+                                                                mode="popup" 
+                                                                showOn="button" 
+                                                                pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                                navigator="true" 
+                                                                tabindex="16" 
+                                                                timeInput="true" 
+                                                                showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                                showButtonPanel="true" 
+                                                                showTodayButton="true"
+                                                                required="false"/>
+                                                    <h:message for="cecase-search-date-end-val" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                </h:panelGroup>
+                                            </h:panelGrid>
+                                        </h:panelGroup>
+
+
+                                        <h:panelGroup styleClass="pgspacer">
+                                            <h:outputText value=" " />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <h:panelGrid    columns="1" 
+                                                            columnClasses="gridTd">
+                                                <h:panelGroup>
+                                                    <p:outputLabel for="cecase-search-date-relative-ctl" 
+                                                                   value="Relative dates"/>
+                                                    <p:selectBooleanCheckbox id="cecase-search-date-relative-ctl" 
+                                                                             value="#{ceCaseSearchBB.searchParamsSelected.date_relativeDates_ctl}" 
+                                                                             disabled="#{!ceCaseSearchBB.searchParamsSelected.date_startEnd_ctl}">
+                                                        <p:ajax update="cecase-search-date-end-val
+                                                                cecase-search-date-start-val
+                                                                cecase-search-date-end-val
+                                                                cecase-search-date-relative-start-val
+                                                                cecase-search-date-relative-end-val" />
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <p:outputLabel for="cecase-search-date-relative-start-val" 
+                                                                   value="start x days from today"/>
+                                                    <p:spacer height="1px"/>
+                                                    <p:inputText id="cecase-search-date-relative-start-val" 
+                                                                 value="#{ceCaseSearchBB.searchParamsSelected.date_relativeDates_start_val}" 
+                                                                 disabled="#{!(ceCaseSearchBB.searchParamsSelected.date_startEnd_ctl and ceCaseSearchBB.searchParamsSelected.date_relativeDates_ctl)}" />
+                                                    <h:message for="cecase-search-date-relative-start-val" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                </h:panelGroup>
+                                                <h:panelGroup>
+                                                    <p:outputLabel for="cecase-search-date-relative-end-val" 
+                                                                   value="end x days from today"/>
+                                                    <p:spacer height="1px"/>
+                                                    <p:inputText id="cecase-search-date-relative-end-val" 
+                                                                 value="#{ceCaseSearchBB.searchParamsSelected.date_realtiveDates_end_val}" 
+                                                                 disabled="#{!(ceCaseSearchBB.searchParamsSelected.date_startEnd_ctl and ceCaseSearchBB.searchParamsSelected.date_relativeDates_ctl)}" />
+                                                    <h:message for="cecase-search-date-relative-end-val" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </h:panelGroup>
+                                            </h:panelGrid>
+                                        </h:panelGroup>
+
+
+                                        <h:panelGroup>
+                                            <p:outputLabel for="cecase-search-filter-id-ctl" 
+                                                           value="filter by occ case id"/>
+
+                                            <p:selectBooleanCheckbox id="cecase-search-filter-id-ctl" 
+                                                                     value="#{ceCaseSearchBB.searchParamsSelected.bobID_ctl}"
+                                                                     disabled="false">
+                                                <p:ajax update="cecase-search-filter-id-val" />
+                                            </p:selectBooleanCheckbox>
+
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <p:outputLabel for="cecase-search-filter-id-val" 
+                                                           value="id:" />
+
+                                            <p:spacer height="5px"/>
+
+                                            <p:inputText id="cecase-search-filter-id-val"
+                                                         type="number"
+                                                         value="#{ceCaseSearchBB.searchParamsSelected.bobID_val}"
+                                                         disabled="#{!ceCaseSearchBB.searchParamsSelected.bobID_ctl}"/>
+                                            <h:message for="cecase-search-filter-id-val" showDetail="false" showSummary="true"
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+
+                                        <h:panelGroup>
+                                            <p:outputLabel for="cecase-search-filter-user-ctl" 
+                                                           value="User filter"/>
+
+                                            <p:selectBooleanCheckbox id="cecase-search-filter-user-ctl" 
+                                                                     value="#{ceCaseSearchBB.searchParamsSelected.user_ctl}"
+                                                                     disabled="#{!(ceCaseSearchBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
+                                                <p:ajax update="cecase-search-filter-user-som
+                                                        cecase-search-user-field-val" />
+                                            </p:selectBooleanCheckbox>
+
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:selectOneMenu  id="cecase-search-user-field-val" 
+                                                              tabindex="1" 
+                                                              value="#{ceCaseSearchBB.searchParamsSelected.user_field}"
+                                                              disabled="#{!ceCaseSearchBB.searchParamsSelected.user_ctl}">
+                                                <f:selectItem itemLabel="select a user field..." 
+                                                              noSelectionOption="true" 
+                                                              itemDisabled="true"/>
+                                                <f:selectItems id="cecase-search-user-field-val-items" 
+                                                               value="#{ceCaseSearchBB.searchParamsSelected.userFieldList}" 
+                                                               var="uf" itemValue="#{uf}" itemLabel="#{uf.title}" />
+                                                <f:converter converterId="userFieldConverter" />
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup styleClass="pgspacer">
+                                            <h:outputText value=" " />
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <p:selectOneMenu id="cecase-search-filter-user-som" required="false" 
+                                                             value="#{ceCaseSearchBB.searchParamsSelected.user_val}"
+                                                             disabled="#{!ceCaseSearchBB.searchParamsSelected.user_ctl}">
+                                                <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
+                                                <f:selectItems value="#{systemServicesBB.userListForSearch}"  var="u" itemValue="#{u}" 
+                                                               itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
+                                                <f:converter converterId="userConverter"/>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+
+                                        <ui:remove>
+
+
+                                            <h:panelGroup>
+                                                <p:outputLabel id="cecases-filter-stage-ol" 
+                                                               for="cecases-filter-stage" 
+                                                               value="filter by case stage "/>
+                                                <p:selectBooleanCheckbox id="cecases-filter-stage" 
+                                                                         value="#{ceCaseSearchBB.searchParamsSelected.caseStage_ctl}" >
+                                                    <p:ajax update="cecases-filter-stage-val" />
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <p:selectOneMenu value="#{ceCaseSearchBB.searchParamsSelected.caseStage_val}"
+                                                                 id="cecases-filter-stage-val"
+                                                                 disabled="#{!ceCaseSearchBB.searchParamsSelected.caseStage_ctl}">
+                                                    <f:selectItem itemLabel="select a case stage..." noSelectionOption="true" />
+                                                    <f:selectItems value="#{ceCaseSearchBB.caseStageList}"
+                                                                   var="stg"
+                                                                   itemValue="#{stg}"
+                                                                   itemLabel="#{stg.label}"/>
+                                                </p:selectOneMenu>
+
+                                            </h:panelGroup>
+
+                                        </ui:remove>
+
+
+                                        <h:panelGroup>
+                                            <p:outputLabel id="cecase-filter-property-ol" 
+                                                           for="cecase-filter-property" 
+                                                           value="filter by property "/>
+
+                                            <p:selectBooleanCheckbox id="cecase-filter-property" 
+                                                                     value="#{ceCaseSearchBB.searchParamsSelected.property_ctl}" >
+                                                <p:ajax update="cecase-criteria-property-som" />
+                                            </p:selectBooleanCheckbox>
+
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:selectOneMenu id="cecase-criteria-property-som" required="false" 
+                                                             value="#{ceCaseSearchBB.searchParamsSelected.property_val}"
+                                                             disabled="#{!ceCaseSearchBB.searchParamsSelected.property_ctl}">
+
+                                                <f:selectItem itemLabel="select a propery..." noSelectionOption="true" />
+                                                <f:selectItems value="#{ceCaseSearchBB.propListForSearch}"  var="p" itemValue="#{p}" 
+                                                               itemLabel="#{p.address} (#{p.muni.muniName})"/>
+                                                <f:converter converterId="propertyConverter"/>
+
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+
+
+                                        <h:panelGroup>
+                                            <p:outputLabel for="cecase-search-filter-propinfocase-ctl" 
+                                                           value="filter by property info case"/>
+                                            <p:selectBooleanCheckbox id="cecase-search-filter-propinfocase-ctl" 
+                                                                     value="#{ceCaseSearchBB.searchParamsSelected.propInfoCase_ctl}"
+                                                                     disabled="false">
+                                                <p:ajax update="cecase-search-filter-propinfocase-val" />
+                                            </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:outputLabel for="cecase-search-filter-propinfocase-val" 
+                                                           value="is info container"/>
+                                            <p:selectBooleanCheckbox id="cecase-search-filter-propinfocase-val" 
+                                                                     value="#{ceCaseSearchBB.searchParamsSelected.propInfoCase_val}"
+                                                                     disabled="#{!ceCaseSearchBB.searchParamsSelected.propInfoCase_ctl}">
+                                            </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
+
+
+                                        <h:panelGroup>
+                                            <p:outputLabel for="cecase-search-filter-open-ctl" 
+                                                           value="filter by open"/>
+                                            <p:selectBooleanCheckbox id="cecase-search-filter-open-ctl" 
+                                                                     value="#{ceCaseSearchBB.searchParamsSelected.caseOpen_ctl}"
+                                                                     disabled="false">
+                                                <p:ajax update="cecase-search-filter-open-val" />
+                                            </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:outputLabel for="cecase-search-filter-open-val" 
+                                                           value="is open"/>
+                                            <p:selectBooleanCheckbox id="cecase-search-filter-open-val" 
+                                                                     value="#{ceCaseSearchBB.searchParamsSelected.caseOpen_val}"
+                                                                     disabled="#{!ceCaseSearchBB.searchParamsSelected.caseOpen_ctl}">
+                                            </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:outputLabel for="cecase-search-filter-active-ctl" 
+                                                           value="filter by active"/>
+                                            <p:selectBooleanCheckbox id="cecase-search-filter-active-ctl" 
+                                                                     value="#{ceCaseSearchBB.searchParamsSelected.active_ctl}"
+                                                                     disabled="false">
+                                                <p:ajax update="cecase-search-filter-active-val" />
+                                            </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:outputLabel for="cecase-search-filter-active-val" 
+                                                           value="is active"/>
+                                            <p:selectBooleanCheckbox id="cecase-search-filter-active-val" 
+                                                                     value="#{ceCaseSearchBB.searchParamsSelected.active_val}"
+                                                                     disabled="#{!ceCaseSearchBB.searchParamsSelected.active_ctl}">
+                                            </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:outputLabel id="cecase-query-limit-ol" 
+                                                           for="cecase-query-limit" 
+                                                           value="limit results"/>
+                                            <p:selectBooleanCheckbox id="cecase-query-limit" 
+                                                                     value="#{ceCaseSearchBB.searchParamsSelected.limitResultCount_ctl}" />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:inputText id="cecase-filter-limit-it"
+                                                         type="number"
+                                                         value="#{ceCaseSearchBB.searchParamsSelected.limitResultCount_val}"
+                                                         disabled="#{!ceCaseSearchBB.searchParamsSelected.limitResultCount_ctl}"/>
+                                            <h:message for="cecase-filter-limit-it" showDetail="false" showSummary="true"
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+
+                                    </h:panelGrid> 
+                                </h:panelGroup>
+                            </h:panelGrid>
+
+                        </h:form>
+                    </p:dialog>
+
+
+
+
+
+                    <p:dialog   id="cecase-report-dialog"
+                                widgetVar="cecase-report-dialog-var"
+                                closable="true" 
+                                responsive="true"
+                                >
+
+                        <h:form id="report-case-profile-form">
+
+                            <h:panelGrid columns="2" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd"
+                                         footerClass="gridFooter">
+
+                                <f:facet name="header">
+
+
+                                    <h:outputLabel for="report-case-profile-title-it" value="Report title"/>
+
+                                    <p:spacer height="5px"/>
+
+                                    <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{ceCaseWorkflowBB.reportCECase.title}"/>
+                                    <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include case name" for="report-case-profile-casename-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-casename-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeCaseName}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
+                                    <p:spacer height="5px"/>
+                                    <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{ceCaseWorkflowBB.reportCECase.notes}"/>
+                                    <p:spacer height="5px"/>
+                                </f:facet>
+
+                                <h:panelGroup>
+                                    <h3>Case event history report options</h3>
+
+                                    <h:outputLabel class="bold" value="Include hidden events: " for="report-case-profile-hidden-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-hidden-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeHiddenEvents}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include inactive events: " for="report-case-profile-inactive-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-inactive-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeInactiveEvents}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include event notes: " for="report-case-profile-eventnotes-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-eventnotes-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeEventNotes}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include requested action fields: " for="report-case-profile-eventrequests-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-eventrequests-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeRequestedActionFields}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include non-public, muni-only events " for="report-case-profile-events-muni-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-events-muni-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeMunicipalityDiclosedEvents}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include code officer only events " for="report-case-profile-events-ceo-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-events-ceo-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeOfficerOnlyEvents}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include event access and metadata" for="report-case-profile-events-meta-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-events-meta-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeEventMetadata}" />
+
+                                </h:panelGroup>
+                                <h:panelGroup>
+
+                                    <h3>Other options</h3>
+
+                                    <h:outputLabel class="bold" value="Include full letter text of notices of violation: " for="report-case-profile-noticetext-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-noticetext-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeNoticeFullText}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include returned notices of violation: " for="report-case-profile-allnotices-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-allnotices-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeAllNotices}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include full text of violated ordinances: " for="report-case-profile-ordtext-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-ordtext-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeFullOrdinanceText}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include photos of violations" for="report-case-profile-photo-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-photo-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeViolationPhotos}" />
+
+                                </h:panelGroup>
+                            </h:panelGrid>
+
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('report-case-profile-diaglog-var').hide()"/>
+
+                            <p:commandButton ajax="true" action="#{ceCaseWorkflowBB.generateReportCECase}"
+                                             value="Generate" icon="fa fa-print" 
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                             />
+
+                        </h:form>
+                    </p:dialog>
+
+                    <p:dialog   id="cecase-list-report-dialog"
+                                widgetVar="cecase-list-report-dialog-var"
+                                closable="true" 
+                                responsive="true"
+                                >
+
+                        <h:form id="report-caselist-profile-form">
+
+                            <h:panelGrid columns="2" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd"
+                                         footerClass="gridFooter">
+
+                                <f:facet name="header">
+
+
+                                    <h:outputLabel for="report-caselist-profile-title-it" value="Report title"/>
+
+                                    <p:spacer height="5px"/>
+
+                                    <p:inputText id="report-caselist-title-it" style="width: 300px;" value="#{ceCaseSearchBB.reportCECaseList.title}"/>
+                                    <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include case names" for="report-caselist-casename-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchBB.reportCECaseList.includeCaseNames}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel for="report-caselist-notes-ita" value="Notes"/>
+                                    <p:spacer height="5px"/>
+                                    <p:inputText id="report-caselist-notes-ita" style="width: 300px; height: 100px;" value="#{ceCaseSearchBB.reportCECaseList.notes}"/>
+                                    <p:spacer height="5px"/>
+                                </f:facet>
+
+                                <h:panelGroup>
+                                    <h3>Additional case list report options</h3>
+
+                                    <h:outputLabel class="bold" value="Include full owner contact info: " for="report-caselist-ownercontact-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-caselist-ownercontact-chkbox" value="#{ceCaseSearchBB.reportCECaseList.includeListSummaryFigures}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include violation list for each case: " for="report-caselist-viols-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-caselist-viols-chkbox" value="#{ceCaseSearchBB.reportCECaseList.includeViolationList}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include summary of each case's event history: " for="report-caselist-eventhist-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-caselist-eventhist-chkbox" value="#{ceCaseSearchBB.reportCECaseList.includeEventSummaryByCase}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" value="Include extended property info for each listing: " for="report-caselist-propertyinfo" />
+                                    <p:selectBooleanCheckbox id="report-caselist-propertyinfo" value="#{ceCaseSearchBB.reportCECaseList.includeExtendedPropertyDetails}" />
+
+
+                                </h:panelGroup>
+
+                            </h:panelGrid>
+
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" immediate="true"
+                                             onclick="PF('report-caselist-profile-diaglog-var').hide()"/>
+
+                            <p:commandButton ajax="true" action="#{ceCaseSearchBB.generateReportCECaseList}"
+                                             value="Generate" icon="fa fa-print" 
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                             />
+
+                        </h:form>
+                    </p:dialog>
+
+
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

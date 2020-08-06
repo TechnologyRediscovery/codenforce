@@ -17,7 +17,6 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -26,18 +25,16 @@ import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.CaseStageEnum;
-import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
-import com.tcvcog.tcvce.integration.SystemIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -46,16 +43,21 @@ import javax.faces.event.ActionEvent;
  *
  * @author sylvia
  */
-public class CECaseSearchBB
+public class CECaseSearchProfileBB
         extends BackingBeanUtils
         implements Serializable {
 
-    private CECasePropertyUnitHeavy currentCase;
+    
+    private PageModeEnum currentMode;
+    private List<PageModeEnum> pageModes;
+
+    private CECaseDataHeavy currentCase;
+    private boolean currentCaseSelected;
 
     private List<CECasePropertyUnitHeavy> caseList;
     private List<CECasePropertyUnitHeavy> filteredCaseList;
+    
     private SearchParamsCECase searchParamsSelected;
-
     private List<QueryCECase> queryList;
     private QueryCECase querySelected;
     private boolean appendResultsToList;
@@ -63,14 +65,20 @@ public class CECaseSearchBB
     private List<Property> propListForSearch;
     private CaseStageEnum[] caseStageList;
 
+    private ReportConfigCECase reportCECase;
     private ReportConfigCECaseList reportCECaseList;
 
     /**
      * Creates a new instance of CECaseSearchBB
      */
-    public CECaseSearchBB() {
+    public CECaseSearchProfileBB() {
     }
 
+    /**
+     * Sets up primary case list and aux lists for editing, and searching
+     * This is a hybrid bean that coordinates both CECase search and 
+     * list viewing functions
+     */
     @PostConstruct
     public void initBean() {
         CaseCoordinator cc = getCaseCoordinator();
@@ -78,8 +86,9 @@ public class CECaseSearchBB
 
         SessionBean sb = getSessionBean();
         try {
-            currentCase = (cc.assembleCECasePropertyUnitHeavy((CECase) sb.getSessCECase()));
-        } catch (IntegrationException | SearchException ex) {
+            currentCase = cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
+            
+        } catch (IntegrationException | SearchException | BObStatusException ex) {
             System.out.println(ex);
         }
 
@@ -95,10 +104,18 @@ public class CECaseSearchBB
         caseStageList = CaseStageEnum.values();
 
         ReportConfigCECaseList listRpt = getSessionBean().getReportConfigCECaseList();
+        
         if (listRpt != null) {
             reportCECaseList = listRpt;
         } else {
             reportCECaseList = cc.getDefaultReportConfigCECaseList();
+        }
+        
+        ReportConfigCECase rpt = getSessionBean().getReportConfigCECase();
+        
+        if (rpt != null) {
+            rpt.setTitle("Code Enforcement Case Summary");
+            reportCECase = rpt;
         }
     }
 
@@ -116,44 +133,238 @@ public class CECaseSearchBB
             searchParamsSelected = null;
         }
     }
+    
+    /**
+     * Listener for requests to reload the current CECaseDataHeavy
+     * @param ev 
+     */
+    public void refreshCurrentCase(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            currentCase = cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
+        } catch (BObStatusException  | IntegrationException | SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                "Could not refresh current case", ""));
+        }
+        
+    }
+    
+     /**
+     * Responds to the user clicking one of the page modes: LOOKUP, ADD, UPDATE, REMOVE
+     * @param mode     
+     */
+    public void setCurrentMode(PageModeEnum mode) {
+
+        //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
+        PageModeEnum tempCurMode = this.currentMode;
+        //reset default setting every time the Mode has been selected 
+//        loadDefaultPageConfig();
+        //check the currentMode == null or not
+        if (currentMode == null) {
+            this.currentMode = tempCurMode;
+        } else {
+            this.currentMode = mode;
+            switch(currentMode){
+                case LOOKUP:
+                    onModeLookupInit();
+                    break;
+                case INSERT:
+                    onModeInsertInit();
+                    break;
+                case UPDATE:
+                    onModeUpdateInit();
+                    break;
+                case REMOVE:
+                    onModeRemoveInit();
+                    break;
+                default:
+                    break;
+                    
+            }
+        }
+    }
+    
+    /**
+     * Primary listener method which copies a reference to the selected 
+     * user from the list and sets it on the selected user perch
+     * @param cse
+     */
+    public void onObjetViewButtonChange(CECase cse){
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        if(cse != null){
+            try {
+                currentCase = cc.assembleCECaseDataHeavy(cse, getSessionBean().getSessUser());
+                getSessionBean().setSessCECase(currentCase);
+                getSessionBean().setSessProperty(currentCase.getPropertyID());
+            } catch (IntegrationException | BObStatusException | SearchException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null, 
+                      new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                      "Unable to assemble case data heavy " + ex.getMessage(), ""));
+            }
+        }
+    }
+     
+ 
+    /**
+     * Internal logic container for changes to page mode: Lookup
+     */
+    private void onModeLookupInit(){
+    }
+    
+   
+    
+    /**
+     * Internal logic container for beginning the user creation change process
+     * Delegated from the mode button router
+     */
+    public void onModeInsertInit(){
+    }
+    
+    /**
+     * Listener for user requests to open new case at current property
+     * @return 
+     */
+    public String onCaseOpenButtonChange(){
+        getSessionBean().getNavStack().pushPage("ceCaseSearchProfile");
+        return "caseAdd";
+        
+    }
+    
+    /**
+     * Listener for beginning of update process
+     */
+     public void onModeUpdateInit(){
+         // nothign to do here yet since the user is selected
+     }
+     
+     /**
+      * Listener for user requests to commit updates
+      * @return 
+      */
+     public String onCaseUpdateButtonChange(){
+         CaseCoordinator cc = getCaseCoordinator();
+        
+        try {
+            cc.updateCECaseMetadata(currentCase);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                "Case metadata updated", ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                "Could not update case metadata, sorry! This error must be corrected by an administrator", ""));
+            
+        }
+         
+         return "ceCaseSearchProfile";
+    }
+     
+    
+     public void onModeRemoveInit(){
+       // nothing to do here yet but let panels reset themselves
+    }
+     
+    
+
+    //check if current mode == Lookup
+    public boolean getActiveLookupMode() {
+        // hard-wired on since there's always a property loaded
+        return PageModeEnum.LOOKUP.equals(currentMode) ;
+    }
 
     /**
-     * Primary injection point for setting the case which will be displayed in
-     * the right column (the manage object column) on cECases.xhtml
-     *
-     * @param c the case to be managed--comes from the data table row button
-     * @return
+     * Provide UI elements a boolean true if the mode is UPDATE
+     * @return 
      */
-    public String manageCECase(CECase c) {
-        SystemIntegrator si = getSystemIntegrator();
-        CaseCoordinator cc = getCaseCoordinator();
-        PropertyCoordinator pc = getPropertyCoordinator();
+    public boolean getActiveUpdateMode(){
+        return PageModeEnum.UPDATE.equals(currentMode);
+    }
 
-        System.out.println("CaseProfileBB.manageCECase | caseid: " + c.getCaseID());
+
+    //check if current mode == Insert
+    public boolean getActiveInsertUpdateMode() {
+        return PageModeEnum.INSERT.equals(currentMode) || PageModeEnum.UPDATE.equals(currentMode);
+    }
+
+    //check if current mode == Insert
+    public boolean getActiveInsertMode() {
+        return PageModeEnum.INSERT.equals(currentMode);
+    }
+
+    //check if current mode == Remove
+    public boolean getActiveRemoveMode() {
+        return PageModeEnum.REMOVE.equals(currentMode);
+    }
+
+
+    /**
+     * Listener for requests to go view the property profile of a property associated
+     * with the given case
+     * @return 
+     */
+    public String exploreProperty(){
         try {
-            si.logObjectView(getSessionBean().getSessUser(), c);
-
-            getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(
-                    currentCase,
-                    getSessionBean().getSessUser()));
-
-            getSessionBean().setSessionProperty(currentCase.getProperty());
-
-        } catch (BObStatusException | SearchException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-        } catch (IntegrationException ex) {
-
+            getSessionBean().setSessProperty(currentCase.getPropertyID());
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Cannot load full case with data.", ""));
+                    "Could not load property data heavy; reloaded page", ""));
+            return "";
         }
-        return "ceCaseWorkflow";
+        return "propertyInfo";
+        
+    }
+    
+   
+    
+    /**
+     * Listener for user requests to build a code enforcement case
+     * 
+     * @return 
+     */
+    public String generateReportCECase() {
+        CaseCoordinator cc = getCaseCoordinator();
 
+        getReportCECase().setCse(currentCase);
+
+        getReportCECase().setCreator(getSessionBean().getSessUser());
+        getReportCECase().setMuni(getSessionBean().getSessMuni());
+        getReportCECase().setGenerationTimestamp(LocalDateTime.now());
+
+        try {
+            setReportCECase(cc.transformCECaseForReport(getReportCECase()));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Could not generate report, sorry!", ""));
+        }
+
+        getSessionBean().setReportConfigCECase(getReportCECase());
+        // this is for use by the report header to have a super class with only
+        // the basic info. reportingBB exposes it to the faces page
+        getSessionBean().setSessReport(getReportCECase());
+        // force our reportingBB to choose the right bundle
+        getSessionBean().setReportConfigCECaseList(null);
+
+        return "reportCECase";
     }
 
+    /**
+     * Listener for the report initiation process
+     * @param ev 
+     */
+    public void prepareReportCECase(ActionEvent ev) {
+        CaseCoordinator cc = getCaseCoordinator();
+        setReportCECase(cc.getDefaultReportConfigCECase(currentCase));
+        System.out.println("CaseProfileBB.prepareReportCECase | reportConfigOb: " + getReportCECase());
+
+    }
+    
+    
     /**
      * Responder to the query button on the UI
      *
@@ -293,7 +504,7 @@ public class CECaseSearchBB
     /**
      * @return the currentCase
      */
-    public CECase getCurrentCase() {
+    public CECaseDataHeavy getCurrentCase() {
         return currentCase;
     }
 
@@ -342,7 +553,7 @@ public class CECaseSearchBB
     /**
      * @param currentCase the currentCase to set
      */
-    public void setCurrentCase(CECasePropertyUnitHeavy currentCase) {
+    public void setCurrentCase(CECaseDataHeavy currentCase) {
         this.currentCase = currentCase;
     }
 
@@ -428,6 +639,57 @@ public class CECaseSearchBB
      */
     public void setCaseStageList(CaseStageEnum[] caseStageList) {
         this.caseStageList = caseStageList;
+    }
+
+    /**
+     * @return the currentMode
+     */
+    public PageModeEnum getCurrentMode() {
+        return currentMode;
+    }
+
+    /**
+     * @return the pageModes
+     */
+    public List<PageModeEnum> getPageModes() {
+        return pageModes;
+    }
+
+    /**
+     * @return the currentCaseSelected
+     */
+    public boolean isCurrentCaseSelected() {
+        return currentCaseSelected;
+    }
+
+  
+
+    /**
+     * @param pageModes the pageModes to set
+     */
+    public void setPageModes(List<PageModeEnum> pageModes) {
+        this.pageModes = pageModes;
+    }
+
+    /**
+     * @param currentCaseSelected the currentCaseSelected to set
+     */
+    public void setCurrentCaseSelected(boolean currentCaseSelected) {
+        this.currentCaseSelected = currentCaseSelected;
+    }
+
+    /**
+     * @return the reportCECase
+     */
+    public ReportConfigCECase getReportCECase() {
+        return reportCECase;
+    }
+
+    /**
+     * @param reportCECase the reportCECase to set
+     */
+    public void setReportCECase(ReportConfigCECase reportCECase) {
+        this.reportCECase = reportCECase;
     }
 
 }

@@ -98,7 +98,13 @@ public class    SessionBean
     private QueryProperty queryProperty;
     private List<QueryProperty> queryPropertyList;
     
-    public void setSessionProperty(int propID) throws BObStatusException, IntegrationException{
+    /**
+     * Convenience method for setting the session property with only an ID
+     * @param propID
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public void setSessProperty(int propID) throws BObStatusException, IntegrationException{
         PropertyCoordinator pc = getPropertyCoordinator();
         if(propID == 0){
             throw new BObStatusException("Prop ID cannot be 0");
@@ -106,7 +112,13 @@ public class    SessionBean
         pc.getProperty(propID);
     }
     
-    public void setSessionProperty(Property prop){
+    /**
+     * Convenience method for setting the session property DH with only a base
+     * class instance
+     * 
+     * @param prop 
+     */
+    public void setSessProperty(Property prop){
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
             sessProperty = pc.assemblePropertyDataHeavy(prop, sessUser);

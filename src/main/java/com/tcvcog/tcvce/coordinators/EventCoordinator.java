@@ -426,7 +426,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         if(erg != null){
             if(erg instanceof CECaseDataHeavy){
                 cse = (CECaseDataHeavy) erg;
-                 if(cse.getCasePhase() == CasePhaseEnum.Closed && 
+                 if(cse.getStatusBundle().getPhase() == CasePhaseEnum.Closed && 
                     (
                         ec.getEventType() == EventType.Action
                         || 
@@ -933,7 +933,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         sb.append("Manual case phase change from  \'");
         sb.append(pastPhase.toString());
         sb.append("\' to \'");
-        sb.append(currentCase.getCasePhase().toString());
+        sb.append(currentCase.getStatusBundle().getPhase().toString());
         sb.append("\' by a a case officer.");
         event.setDescription(sb.toString());
         
