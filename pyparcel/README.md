@@ -1,4 +1,4 @@
-# Parcel Update
+# PyParcel
 ###### A command line interface for keeping Turtle Creek COG's CodeNForce's data up to date.
 ## Using the code
 ### Quickstart
@@ -6,10 +6,10 @@ Assuming you are at the root of the CodeNForce folder structure:
 ~~~
 $ pipenv install
 $ pipenv shell
-$ cd codeconnect\scripts\parcelupdate
-$ python parcelupdate.py
+$ cd codeconnect\scripts\pyparcel
+$ python pyparcel.py
 ~~~
-This updates all parcels using the latest data from the WPRDC. For more options, run `python parcelupdate.py -h`.
+This updates all parcels using the latest data from the WPRDC. For more options, run `python pyparcel.py -h`.
 
 *"[Pipenv](https://pipenv.pypa.io/en/latest/) automatically creates and manages a virtualenv for your projects, as well as adds/removes packages from your Pipfile as you install/uninstall packages. It also generates the ever-important Pipfile.lock, which is used to produce deterministic builds."*
 
@@ -41,6 +41,3 @@ INSERT INTO public.eventcategory(
 <h4 id=parcel-change>What constitutes a Parcel Change?</h4>
 A regular, month to month change.
 Examples include DifferentTaxStatus and DifferentOwner, but do not include events such as NewParcelid and ParcelNotInCountyData.
-
-## Unimport maintainer todo
-* Change application name to pyparcel (stylized PyParcel)
