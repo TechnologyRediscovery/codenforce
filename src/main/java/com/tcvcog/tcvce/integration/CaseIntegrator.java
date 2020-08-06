@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECase;
@@ -42,6 +43,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -272,9 +274,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      */
     public CECase getCECase(int ceCaseID) throws IntegrationException, BObStatusException{
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
-            "            login_userid, casename, casephase, originationdate, closingdate, \n" +
-            "            creationtimestamp, notes, paccenabled, allowuplinkaccess, active \n" +
-            "  FROM public.cecase WHERE caseid = ?;";
+                        "       login_userid, casename, originationdate, closingdate, creationtimestamp, \n" +
+                        "       notes, paccenabled, allowuplinkaccess, propertyinfocase, personinfocase_personid, \n" +
+                        "       bobsource_sourceid, active, lastupdatedby_userid, lastupdatedts \n" +
+                        "  FROM public.cecase WHERE caseid = ?;";
         ResultSet rs = null;
         CaseCoordinator cc = getCaseCoordinator();
         PreparedStatement stmt = null;
@@ -315,9 +318,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      */
     public List<CECase> getCECasesByProp(int propID) throws IntegrationException, BObStatusException{
         String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
-            "            login_userid, casename, casephase, originationdate, closingdate, \n" +
-            "            creationtimestamp, notes, paccenabled, allowuplinkaccess, active \n" +
-            "  FROM public.cecase WHERE property_propertyid = ?;";
+                        "       login_userid, casename, originationdate, closingdate, creationtimestamp, \n" +
+                        "       notes, paccenabled, allowuplinkaccess, propertyinfocase, personinfocase_personid, \n" +
+                        "       bobsource_sourceid, active, lastupdatedby_userid, lastupdatedts \n" +
+                        "  FROM public.cecase WHERE property_propertyid = ?;";
         ResultSet rs = null;
         CaseCoordinator cc = getCaseCoordinator();
         PreparedStatement stmt = null;
@@ -357,7 +361,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      */
      private CECase generateCECase(ResultSet rs) throws SQLException, IntegrationException{
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
+        SystemIntegrator si = getSystemIntegrator();
         
         CECase cse = new CECase();
 
@@ -367,28 +372,42 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         cse.setPropertyID(rs.getInt("property_propertyid"));
         cse.setPropertyUnitID(rs.getInt("propertyunit_unitid"));
         
-        cse.setCaseManager(ui.getUser(rs.getInt("login_userid")));
+        cse.setCaseManager(uc.user_getUser(rs.getInt("login_userid")));
 
         cse.setCaseName(rs.getString("casename"));
         
-        cse.setOriginationDate(rs.getTimestamp("originationdate")
-                .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        if(rs.getTimestamp("originationdate") != null){
+            cse.setOriginationDate(rs.getTimestamp("originationdate")
+                    .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        }
 
         if(rs.getTimestamp("closingdate") != null){
             cse.setClosingDate(rs.getTimestamp("closingdate")
                     .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
         }
-        
-        cse.setNotes(rs.getString("notes"));
-        
         if(rs.getTimestamp("creationtimestamp") != null){
             cse.setCreationTimestamp(rs.getTimestamp("creationtimestamp")
                     .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
         }
-
+        
+        cse.setNotes(rs.getString("notes"));
         cse.setPaccEnabled(rs.getBoolean("paccenabled"));
         cse.setAllowForwardLinkedPublicAccess(rs.getBoolean("allowuplinkaccess"));
+        cse.setPropertyInfoCase(rs.getBoolean("propertyinfocase"));
+        cse.setPersonInfoPersonID(rs.getInt("personinfocase_personid"));
+        
+        if(rs.getInt("bobsource_sourceid") != 0){
+            cse.setSource(si.getBOBSource(rs.getInt("bobsource_sourceid")));
+        }
         cse.setActive(rs.getBoolean("active"));
+        
+        if(rs.getInt("lastupdatedby_userid") != 0){
+            cse.setLastUpdatedBy(uc.user_getUser(rs.getInt("lastupdatedby_userid")));
+        }
+        
+        if(rs.getTimestamp("lastupdatedts") != null){
+            cse.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+        }
         
 
         return cse;
@@ -448,16 +467,17 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     public int insertNewCECase(CECase ceCase) throws IntegrationException, BObStatusException{
         String query = "INSERT INTO public.cecase(\n" +
                         "            caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
-                        "            login_userid, casename, originationdate, closingdate, \n" +
-                        "            notes, creationTimestamp, active, casephase) \n" +
+                        "            login_userid, casename, originationdate, closingdate, creationtimestamp, \n" +
+                        "            notes, paccenabled, allowuplinkaccess, propertyinfocase, personinfocase_personid, \n" +
+                        "            bobsource_sourceid, active, lastupdatedby_userid, lastupdatedts)\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, \n" +
-                        "            ?, now(), ?, ?::casephase);";
+                        "            ?, ?, ?, ?, now(), \n" +
+                        "            ?, ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, now());";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         int insertedCaseID = 0;
         Connection con = null;
-        PaymentCoordinator pc = getPaymentCoordinator();
         
         try {
             
@@ -467,20 +487,51 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setInt(2, ceCase.getPropertyID());
             if(ceCase.getPropertyUnitID() != 0) {
                 stmt.setInt(3, ceCase.getPropertyUnitID());
-            } else { stmt.setNull(3, java.sql.Types.NULL); }
+            } else { 
+                stmt.setNull(3, java.sql.Types.NULL); 
+            }
             
-            stmt.setInt(4, ceCase.getCaseManager().getUserID());
+            if(ceCase.getCaseManager() != null){
+                stmt.setInt(4, ceCase.getCaseManager().getUserID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
             stmt.setString(5, ceCase.getCaseName());
-            stmt.setTimestamp(6, java.sql.Timestamp
-                    .valueOf(ceCase.getOriginationDate()));
+            
+            if(ceCase.getOriginationDate() != null){
+                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(ceCase.getOriginationDate()));
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);                
+            }
             // closing date
             stmt.setNull(7, java.sql.Types.NULL); 
             
-            stmt.setString(8, ceCase.getNotes());
-            stmt.setBoolean(9, ceCase.isActive());
+            // creation TS set by database with now()
             
-            stmt.setString(10, ceCase.getCasePhase().toString());
-            System.out.println("CaseIntegrator.insertNewCase| sql: " + stmt.toString());
+            stmt.setString(8, ceCase.getNotes());
+            stmt.setBoolean(9, ceCase.isPaccEnabled());
+            stmt.setBoolean(10, ceCase.isAllowForwardLinkedPublicAccess());
+            stmt.setBoolean(11, ceCase.isPropertyInfoCase());
+            if(ceCase.getPersonInfoPersonID() != 0){
+                stmt.setInt(12, ceCase.getPersonInfoPersonID());
+            } else {
+                stmt.setNull(12, java.sql.Types.NULL); 
+                
+            }
+            
+            if(ceCase.getSource() != null){
+                stmt.setInt(13, ceCase.getSource().getSourceid());
+            } else {
+                stmt.setNull(13, java.sql.Types.NULL); 
+            }
+            
+            stmt.setBoolean(14, ceCase.isActive());
+            
+            if(ceCase.getLastUpdatedBy() != null){
+                stmt.setInt(15, ceCase.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(15, java.sql.Types.NULL); 
+            }
             
             stmt.execute();
             
@@ -494,7 +545,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Case Integrator: cannot insert new case, sorry", ex);
+            throw new IntegrationException("Case Integrator: FATAL INSERT error; apologies.", ex);
             
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -517,10 +568,12 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      */
     public void updateCECaseMetadata(CECaseDataHeavy ceCase) throws IntegrationException{
         String query =  "UPDATE public.cecase\n" +
-                        "   SET cecasepubliccc=?, \n" +
-                        "       casename=?, originationdate=?, closingdate=?, notes=?, \n" +
-                        " paccenabled=?, allowuplinkaccess=?, active=? " +
-                        " WHERE caseid=?;";
+                        "   SET cecasepubliccc=?, property_propertyid=?, propertyunit_unitid=?, \n" + // 1-3
+                        "       login_userid=?, casename=?, originationdate=?, closingdate=?, \n" + // 4-7
+                        "       notes=?, paccenabled=?, allowuplinkaccess=?, \n" + // 5-7
+                        "       propertyinfocase=?, personinfocase_personid=?, bobsource_sourceid=?, \n" + // 8-10
+                        "       active=?, lastupdatedby_userid=?, lastupdatedts=now() \n" + // 11-12
+                        "  WHERE caseid=?;";
         PreparedStatement stmt = null;
         Connection con = null;
         
@@ -529,23 +582,47 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ceCase.getPublicControlCode());
-            stmt.setString(2, ceCase.getCaseName());
-            stmt.setTimestamp(3, java.sql.Timestamp
-                    .valueOf(ceCase.getOriginationDate()));
-            if(ceCase.getClosingDate() != null){
-                stmt.setTimestamp(4, java.sql.Timestamp
-                        .valueOf(ceCase.getClosingDate()));
-                
+            stmt.setInt(2, ceCase.getPropertyID());
+            if(ceCase.getPropertyUnitID() != 0){
+                stmt.setInt(3, ceCase.getPropertyUnitID());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            
+            if(ceCase.getCaseManager() != null){
+                stmt.setInt(4, ceCase.getCaseManager().getUserID());
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
-            stmt.setString(5, ceCase.getNotes());
-            stmt.setBoolean(6, ceCase.isPaccEnabled());
-            stmt.setBoolean(7, ceCase.isAllowForwardLinkedPublicAccess());
-            stmt.setBoolean(8, ceCase.isActive());
+            if(ceCase.getCaseName() != null){
+                stmt.setString(5, ceCase.getCaseName());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            if(ceCase.getOriginationDate() != null){
+                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(ceCase.getOriginationDate()));
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+            if(ceCase.getClosingDate() != null){
+                stmt.setTimestamp(7, java.sql.Timestamp.valueOf(ceCase.getClosingDate()));
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
             
-            stmt.setInt(9, ceCase.getCaseID());
-            stmt.execute();
+            stmt.setString(8, ceCase.getNotes());
+            stmt.setBoolean(9, ceCase.isPaccEnabled());
+            if(ceCase.getSource() != null){
+                stmt.setInt(10, ceCase.getSource().getSourceid());
+            } else {
+                stmt.setNull(10, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(11, ceCase.isAllowForwardLinkedPublicAccess());
+            stmt.setBoolean(12, ceCase.isActive());
+            
+            stmt.setInt(13, ceCase.getCaseID());
+            
+            stmt.executeUpdate();
             
             
         } catch (SQLException ex) {

@@ -158,7 +158,7 @@ public class PropertyUnitsBB
     private void refreshCurrPropWithLists() {
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            currProp = pc.getPropertyDataHeavy(currProp.getPropertyID(), getSessionBean().getSessUser().getMyCredential());
+            currProp = pc.getPropertyDataHeavy(currProp.getPropertyID(), getSessionBean().getSessUser());
             getSessionBean().setSessProperty(currProp);
         } catch (IntegrationException | BObStatusException | SearchException | AuthorizationException | EventException ex) {
             System.out.println(ex);

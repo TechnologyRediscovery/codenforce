@@ -18,9 +18,6 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -41,11 +38,16 @@ public class User implements Serializable{
     protected String badgeNumber;
     protected String oriNumber;
     
-    protected boolean active;
     protected boolean noLoginVirtualUser;
     
     protected int createdByUserId;
     protected LocalDateTime createdTS;
+    protected LocalDateTime lastUpdatedTS;
+    
+    protected LocalDateTime deactivatedTS;
+    protected int deactivatedByUserID;
+    protected int homeMuniID;
+    
     
     
     /**
@@ -231,6 +233,10 @@ public class User implements Serializable{
      * @return the active
      */
     public boolean isActive() {
+        boolean active = true;
+        if(deactivatedTS != null){
+            active = false;
+        }
         return active;
     }
 
@@ -239,13 +245,6 @@ public class User implements Serializable{
      */
     public boolean isNoLoginVirtualUser() {
         return noLoginVirtualUser;
-    }
-
-    /**
-     * @param active the active to set
-     */
-    public void setActive(boolean active) {
-        this.active = active;
     }
 
 
@@ -286,6 +285,68 @@ public class User implements Serializable{
     public void setCreatedTS(LocalDateTime createdTS) {
         this.createdTS = createdTS;
     }
+
+    /**
+     * @return the deactivatedTS
+     */
+    public LocalDateTime getDeactivatedTS() {
+        return deactivatedTS;
+    }
+
+    /**
+     * @return the deactivatedByUserID
+     */
+    public int getDeactivatedBy() {
+        return deactivatedByUserID;
+    }
+
+    /**
+     * @param deactivatedTS the deactivatedTS to set
+     */
+    public void setDeactivatedTS(LocalDateTime deactivatedTS) {
+        this.deactivatedTS = deactivatedTS;
+    }
+
+    /**
+     * @param userid
+     */
+    public void setDeactivatedBy(int userid) {
+        this.deactivatedByUserID =userid;
+    }
+
+    /**
+     * @return the lastUpdatedTS
+     */
+    public LocalDateTime getLastUpdatedTS() {
+        return lastUpdatedTS;
+    }
+
+    /**
+     * @param lastUpdatedTS the lastUpdatedTS to set
+     */
+    public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
+        this.lastUpdatedTS = lastUpdatedTS;
+    }
+
+    /**
+     * @return the homeMuniID
+     */
+    public int getHomeMuniID() {
+        return homeMuniID;
+    }
+
+    /**
+     * @param homeMuniID the homeMuniID to set
+     */
+    public void setHomeMuniID(int homeMuniID) {
+        this.homeMuniID = homeMuniID;
+    }
+    /**
+     * @return the accessRecord
+     */
+    /**
+     * @param accessRecord the accessRecord to set
+     */
   
 
 }

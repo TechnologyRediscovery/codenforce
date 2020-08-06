@@ -29,7 +29,7 @@
                                     toggleable="true"
                                     widgetVar="prop-pers-list-panel-var"
                                     collapsed="false"
-                                    header="Persons connected to #{propertyPersonsBB.currProp.address} (#{propertyProfileBB.currProp.muni.muniName})">
+                                    header="Persons connected to #{propertyPersonsBB.currProp.address} (#{propertyProfileBB.currentProperty.muni.muniName})">
                                
                             <h:form id="prop-pers-list-form">
                                 
@@ -97,7 +97,7 @@
                                             <h:outputText value="Edit" />
                                         </f:facet>
                                         <p:commandButton icon="fa fa-clipboard"
-                                                         action="#{propertyProfileBB.viewPersonProfile(p)}" 
+                                                         action="#{propertyProfileBB.onViewPersonProfileButtonChange(p)}" 
                                                          ajax="false" disabled="false"/>
                                     </p:column>
                                     <p:rowExpansion>

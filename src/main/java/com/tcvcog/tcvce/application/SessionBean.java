@@ -17,6 +17,12 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.reports.*;
 import com.tcvcog.tcvce.entities.search.*;
@@ -24,6 +30,8 @@ import com.tcvcog.tcvce.entities.occupancy.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**
@@ -50,6 +58,7 @@ public class    SessionBean
     private UserAuthorized sessUser;
     private User sessUserQueued;
     private User userForReInit;
+    private UserAuthorizedForConfig userForConfig;
     
     private UserMuniAuthPeriod umapRequestedForReInit;
     private List<UserMuniAuthPeriod> sessUMAPListValidOnly;
@@ -83,9 +92,29 @@ public class    SessionBean
     
     private PropertyUnit sessPropertyUnit;
     
+    private boolean startPropInfoPageWithAdd;
+    
     /* >>> QUERY PROPERTY <<< */
     private QueryProperty queryProperty;
     private List<QueryProperty> queryPropertyList;
+    
+    public void setSessionProperty(int propID) throws BObStatusException, IntegrationException{
+        PropertyCoordinator pc = getPropertyCoordinator();
+        if(propID == 0){
+            throw new BObStatusException("Prop ID cannot be 0");
+        }
+        pc.getProperty(propID);
+    }
+    
+    public void setSessionProperty(Property prop){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            sessProperty = pc.assemblePropertyDataHeavy(prop, sessUser);
+        } catch (BObStatusException | IntegrationException | SearchException ex) {
+            System.out.println("SessionBean.setSessionProperty: error setting session prop");
+            System.out.println(ex);
+        }
+    }
     
     
     /* >>> -------------------------------------------------------------- <<< */
@@ -530,7 +559,22 @@ public class    SessionBean
         }
     }
     
-
+    public void setSessCECaseListWithDowncastAndLookup(List<CECaseDataHeavy> cseldh){
+        CaseCoordinator cc = getCaseCoordinator();
+        List<CECasePropertyUnitHeavy> cseListPDH = new ArrayList<>();
+        if(cseldh != null && !cseldh.isEmpty()){
+            for(CECaseDataHeavy csedh: cseldh){
+                try {
+                    cseListPDH.add(cc.assembleCECasePropertyUnitHeavy(csedh));
+                } catch (IntegrationException | SearchException ex) {
+                    System.out.println(ex);
+                }
+            }
+            sessCECaseList = cseListPDH;
+        }
+        
+    }
+    
     /**
      * @param sessCECaseList the sessCECaseList to set
      */
@@ -764,6 +808,7 @@ public class    SessionBean
 
   
 
+    
     /**
      * @param queryOccPeriod the queryOccPeriod to set
      */
@@ -1044,6 +1089,19 @@ public class    SessionBean
      */
     public void setSessOccPeriod(OccPeriodDataHeavy sessOccPeriod) {
         this.sessOccPeriod = sessOccPeriod;
+    }
+    /**
+     * @param opBase     
+     */
+    public void setSessOccPeriod(OccPeriod opBase) {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        OccPeriodDataHeavy opdh = null;
+        try {
+            opdh = oc.assembleOccPeriodDataHeavy(opBase, sessUser.getKeyCard());
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
+            System.out.println(ex);
+        }
+        this.sessOccPeriod = opdh;
     }
 
     /**
@@ -1326,6 +1384,20 @@ public class    SessionBean
         this.sessEventDomain = sessEventDomain;
     }
 
+    /**
+     * @return the startPropInfoPageWithAdd
+     */
+    public boolean isStartPropInfoPageWithAdd() {
+        return startPropInfoPageWithAdd;
+    }
+
+    /**
+     * @param startPropInfoPageWithAdd the startPropInfoPageWithAdd to set
+     */
+    public void setStartPropInfoPageWithAdd(boolean startPropInfoPageWithAdd) {
+        this.startPropInfoPageWithAdd = startPropInfoPageWithAdd;
+    }
+    
     public List<PublicInfoBundlePerson> getOccPermitAttachedPersons() {
         return occPermitAttachedPersons;
     }
@@ -1356,6 +1428,18 @@ public class    SessionBean
 
     public void setUnitDetermined(boolean unitDetermined) {
         this.unitDetermined = unitDetermined;
+    /**
+     * @return the userForConfig
+     */
+    public UserAuthorizedForConfig getUserForConfig() {
+        return userForConfig;
+    }
+
+    /**
+     * @param userForConfig the userForConfig to set
+     */
+    public void setUserForConfig(UserAuthorizedForConfig userForConfig) {
+        this.userForConfig = userForConfig;
     }
     
 }

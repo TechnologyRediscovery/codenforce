@@ -38,10 +38,11 @@ public class UserAuthorized extends User{
     /**
      * Only contains valid auth periods
      */
-    private Map<Municipality, List<UserMuniAuthPeriod>> muniAuthPeriodsMap;
+    protected Map<Municipality, List<UserMuniAuthPeriod>> muniAuthPeriodsMap;
     
     protected LocalDateTime pswdLastUpdated;
     protected LocalDateTime forcePasswordResetTS;
+    
 
     
     /**
@@ -53,16 +54,27 @@ public class UserAuthorized extends User{
      * @param akc 
      */
     public UserAuthorized(User u ){
-        this.userID = u.getUserID();
-        this.username = u.getUsername();
-        this.person = u.getPerson();
-        this.personID = u.getPersonID();
-        this.notes = u.getNotes();
-        this.badgeNumber = u.getBadgeNumber();
-        this.oriNumber = u.getOriNumber();
-        
-        this.active = u.isActive();
-        this.noLoginVirtualUser = u.isNoLoginVirtualUser();
+        if(u != null){
+            
+            this.userID = u.getUserID();
+            this.username = u.getUsername();
+            this.person = u.getPerson();
+            this.personID = u.getPersonID();
+            this.notes = u.getNotes();
+            this.badgeNumber = u.getBadgeNumber();
+            this.oriNumber = u.getOriNumber();
+
+            this.noLoginVirtualUser = u.isNoLoginVirtualUser();
+
+
+            this.createdByUserId = u.getCreatedByUserId();
+            this.createdTS = u.getCreatedTS();
+
+            this.lastUpdatedTS = u.lastUpdatedTS;
+            this.deactivatedByUserID = u.deactivatedByUserID;
+            this.deactivatedTS = u.deactivatedTS;
+
+        }
     }
     
     
@@ -181,17 +193,19 @@ public class UserAuthorized extends User{
     public Credential getMyCredential() {
         return myCredential;
     }
-
-   
-
-   
-
+    /**
+     * @return the homeMuni
+     */
+    /**
+     * @param homeMuni the homeMuni to set
+     */
     /**
      * @return the accessRecord
      */
     /**
      * @param accessRecord the accessRecord to set
      */
+
 
     
 }

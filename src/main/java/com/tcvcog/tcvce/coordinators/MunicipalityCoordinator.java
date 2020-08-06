@@ -35,6 +35,7 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -57,17 +58,21 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
     public MunicipalityCoordinator() {
     }
 
-    public MunicipalityDataHeavy assembleMuniDataHeavy(Municipality muni, Credential cred) throws IntegrationException, AuthorizationException, BObStatusException, EventException {
+    public MunicipalityDataHeavy assembleMuniDataHeavy(Municipality muni, UserAuthorized ua) throws IntegrationException, AuthorizationException, BObStatusException, EventException {
         MunicipalityDataHeavy mdh = null;
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         mdh = mi.getMunDataHeavy(muni.getMuniCode());
-        return configureMuniDataHeavy(mdh, cred);
+        return configureMuniDataHeavy(mdh, ua);
     }
 
-    private MunicipalityDataHeavy configureMuniDataHeavy(MunicipalityDataHeavy mdh, Credential cred) throws IntegrationException, BObStatusException, AuthorizationException, EventException {
+    private MunicipalityDataHeavy configureMuniDataHeavy(MunicipalityDataHeavy mdh, UserAuthorized ua) throws IntegrationException, BObStatusException, AuthorizationException, EventException {
         PropertyCoordinator pc = getPropertyCoordinator();
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        // FIX THIS WHEN WE HAVE STABLE AUTHORIZATION PROCEDURES
+//        muni.setUserList(uc.extractUsersFromUserAuthorized(uc.getUserAuthorizedListForConfig(muni)));
         try {
-            pc.getPropertyDataHeavy(mdh.getMuniOfficePropertyId(), cred);
+            mdh.setMuniPropertyDH(pc.assemblePropertyDataHeavy(pc.getProperty(mdh.getMuniOfficePropertyId()), ua));
+            mdh.setCourtEntities(cei.getCourtEntityList(mdh.getMuniCode()));
         } catch (SearchException ex) {
             System.out.println(ex);
         }
@@ -88,12 +93,12 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
 
     }
 
-    public OccPeriod selectDefaultMuniOccPeriod(Credential cred) throws IntegrationException, AuthorizationException {
+    public OccPeriod selectDefaultMuniOccPeriod(UserAuthorized ua) throws IntegrationException, AuthorizationException {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         MunicipalityDataHeavy mdh = null;
-        if (cred != null) {
+        if (ua != null) {
             try {
-                mdh = assembleMuniDataHeavy(cred.getGoverningAuthPeriod().getMuni(), cred);
+                mdh = assembleMuniDataHeavy(ua.getMyCredential().getGoverningAuthPeriod().getMuni(), ua);
             } catch (BObStatusException | EventException ex) {
                 System.out.println(ex);
             }

@@ -86,7 +86,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     private void setPublicUser() throws IntegrationException {
         if (publicUser == null) {
             UserCoordinator uc = getUserCoordinator();
-            publicUser = uc.getPublicUserAuthorized();
+            publicUser = uc.auth_getPublicUserAuthorized();
         }
     }
 
@@ -162,7 +162,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     private PublicInfoBundleCECase extractPublicInfo(CECase cse) throws IntegrationException, SearchException, EventException, AuthorizationException, BObStatusException {
         CaseCoordinator cc = getCaseCoordinator();
         setPublicUser();
-        CECasePropertyUnitHeavy c = cc.assembleCECasePropertyUnitHeavy(cse, publicUser.getMyCredential());
+        CECasePropertyUnitHeavy c = cc.assembleCECasePropertyUnitHeavy(cse);
 
         PublicInfoBundleCECase pib = new PublicInfoBundleCECase();
 
@@ -171,16 +171,21 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         if (c.isPaccEnabled()) {
             pib.setBundledCase(cse);
-            pib.setAddress(c.getProperty());
-            pib.setPublicEventList(new ArrayList<PublicInfoBundleEventCnF>());
-            if (c.getVisibleEventList() != null) {
-                for (EventCnF ev : c.getVisibleEventList()) {
-                    if (ev.getCategory().getUserRankMinimumToView() >= PUBLIC_VIEW_USER_RANK) {
-                        pib.getPublicEventList().add(extractPublicInfo(ev));
-                    }
-                }
+            if (c.getProperty() == null || c.getProperty().isNonAddressable()) {
+                pib.setAddressAssociated(false);
+            } else {
+                pib.setAddressAssociated(true);
+                pib.setPropertyAddress(c.getProperty().getAddress());
             }
-
+            
+            // TODO: Deal with these implications
+//            pib.setPublicEventList(new ArrayList<EventCnF>());
+//            for (EventCnF ev : c.getVisibleEventList()) {
+//                if (ev.getCategory().getUserRankMinimumToView() >= PUBLIC_VIEW_USER_RANK) {
+//                    pib.getPublicEventList().add(ev);
+//                }
+//            }
+            pib.setAddress(c.getProperty());
             pib.setShowAddMessageButton(false);
             pib.setPaccStatusMessage("Public access enabled");
 
@@ -737,6 +742,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         EventCoordinator ec = getEventCoordinator();
         EventCnF unbundled = input.getBundledEvent();
         EventCnFPropUnitCasePeriodHeavy exportable;
+        CaseCoordinator cc = getCaseCoordinator();
 
         try {
 
@@ -750,7 +756,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         if (unbundled.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
 
-            exportable.setCecase(export(input.getCecase()));
+            exportable.setCecase(cc.assembleCECasePropertyUnitHeavy(export(input.getCecase())));
 
         } else if (unbundled.getDomain() == EventDomainEnum.OCCUPANCY) {
 
@@ -791,7 +797,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         CaseCoordinator cc = getCaseCoordinator();
         setPublicUser();
-        CECaseDataHeavy exportable = cc.assembleCECaseDataHeavy(cc.getCECase(input.getBundledCase().getCaseID()), publicUser.getMyCredential());
+        CECaseDataHeavy exportable = cc.assembleCECaseDataHeavy(cc.getCECase(input.getBundledCase().getCaseID()), publicUser);
 
         return exportable;
 

@@ -65,6 +65,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     private MunicipalityDataHeavy bbSessionMuni;
     private PropertyDataHeavy bbSessionProperty;
     private Person bbSessionPerson;
+    private List<Person> bbSessionPersonList;
     
     private List<PageModeEnum> pageModeOptions;
     
@@ -110,8 +111,9 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
         bbSessionMuni = getSessionBean().getSessMuni();
         bbSessionProperty = getSessionBean().getSessProperty();
         bbSessionPerson = getSessionBean().getSessPerson();
+        bbSessionPersonList = getSessionBean().getSessPersonList();
         
-        userListForSearch = uc.assembleUserListForSearch(getSessionBean().getSessUser());
+        userListForSearch = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
         propertyListForSearch = getSessionBean().getSessPropertyList();
         personListForSearch = getSessionBean().getSessPersonList();
         
@@ -170,7 +172,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     
     public void logErrorPageLoad(){
 //        try {
-//            getLogIntegrator().makeLogEntry(getSessionBean().getSessionUser().getUserID(),
+//            getLogIntegrator().makeLogEntry(getSessionBean().getSessionUser().auth_getUserID(),
 //                    getSessionID(), 2, "error page hit", true, false);
 //        } catch (IntegrationException ex) {
 //            getFacesContext().addMessage(null,
@@ -479,6 +481,20 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
      */
     public void setPageModeOptions(List<PageModeEnum> pageModeOptions) {
         this.pageModeOptions = pageModeOptions;
+    }
+
+    /**
+     * @return the bbSessionPersonList
+     */
+    public List<Person> getBbSessionPersonList() {
+        return bbSessionPersonList;
+    }
+
+    /**
+     * @param bbSessionPersonList the bbSessionPersonList to set
+     */
+    public void setBbSessionPersonList(List<Person> bbSessionPersonList) {
+        this.bbSessionPersonList = bbSessionPersonList;
     }
 
     

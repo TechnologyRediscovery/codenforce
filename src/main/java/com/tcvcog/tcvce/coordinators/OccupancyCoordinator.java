@@ -34,7 +34,6 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectableStatus;
@@ -964,7 +963,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         Property prop = pri.getPropertyUnitWithProp(application.getApplicationPropertyUnit().getUnitID()).getProperty();
         
-        MunicipalityDataHeavy muni = mc.assembleMuniDataHeavy(prop.getMuni(), user.getMyCredential());
+        MunicipalityDataHeavy muni = mc.assembleMuniDataHeavy(prop.getMuni(), user);
         
         OccPeriod connectedPeriod = initOccPeriod(
                 prop,

@@ -7,10 +7,10 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
-        
+
         <h:outputStylesheet name="css/dashboards.css"/>
-        
-    <title>CodeNForce Dashboard</title>
+
+        <title>CodeNForce Dashboard</title>
     </h:head>
     <h:body>
         <ui:composition template="navContainer_restricted.xhtml">
@@ -20,15 +20,160 @@
                         <h:messages id="missionControlMessages" globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                        
+
                         <h:form id="missionControlForm">
                             <h1><h:outputText value="codeNforce Dashboard: #{systemServicesBB.bbSessionMuni.muniName}"/> </h1>
-                        
+
                             <p:dashboard model="#{missionControlBB.mainDash}">
-                            
-                              
-                       
-                                
+
+
+
+
+                                <p:panel id="dashpanel-ce-cears"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="#{sessionBean.sessCEARList.size()} CE Action Requests Awaitng Review"
+                                         rendered="true"
+                                         footer=""
+                                         toggleableHeader="true"
+                                         menuTitle="">
+                                    <p:scrollPanel style="height: 550px;"
+                                                   >
+
+                                        <h:form id="dash-cears-form">
+
+                                            <p:dataTable id="requestTable"
+                                                         var="r"
+                                                         rowKey="#{r.requestID}"
+                                                         value="#{sessionBean.sessCEARList}"
+                                                         tableStyleClass="primeDataTable"
+                                                         >
+
+                                                <p:column headerText="Date Submitted000"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{missionControlBB.getPrettyDateNoTime(r.submittedTimeStamp)}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Address"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{r.requestProperty.address}"/>
+
+                                                </p:column>
+
+
+                                                <p:column headerText="Issue Type"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{r.issue.name}"/>
+
+                                                </p:column>
+
+
+
+                                                <p:column headerText="View"
+                                                          styleClass="centeredColumnContent"
+                                                          >
+
+                                                    <p:commandButton    
+                                                        id="dash-switchuser-button-switch"
+                                                        value="View"
+                                                        styleClass="button" 
+                                                        ajax="false"
+                                                        action="#{missionControlBB.onViewCEARButtonChange(r)}" 
+                                                        icon="fa fa-cogs" />
+
+
+                                                </p:column>
+
+                                            </p:dataTable>
+
+                                            <p:spacer height="15px"/>
+
+                                            <p:chart type="donut" 
+                                                     model="#{cEActionRequestsBB.requestReasonDonut}" 
+                                                     style="width:600px; height: 600px;"/>
+
+                                            <p:spacer height="10px"/>
+
+                                        </h:form>
+
+                                    </p:scrollPanel>
+                                </p:panel>
+
+                                <p:panel id="dashpanel-ce-cecases"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="#{sessionBean.sessCECaseList.size()} Open Code Enforcement Cases"
+                                         rendered="true"
+                                         footer=""
+                                         toggleableHeader="true"
+                                         menuTitle="">
+                                    <p:scrollPanel style="height: 550px;"
+                                                   >
+
+                                        <h:form id="dash-cecases-form">
+                                            <p:dataTable
+                                                id="cecase-table"
+                                                var="c"
+                                                rowKey="#{c.caseID}"
+                                                widgetVar="cecase-table-var"
+                                                value="#{sessionBean.sessCECaseList}"
+                                                tableStyleClass="primeDataTable">
+
+                                                <p:column width="5%" sortBy="#{c.originationDate}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Date Opened" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{missionControlBB.getPrettyDateNoTime(c.originationDate)}"/>
+                                                </p:column>
+                                              
+                                                <p:column width="15%" sortBy="#{c.property.address}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Property" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{c.property.address} (#{c.property.muni.muniName})"/>
+                                                </p:column>
+                                                
+                                                <p:column width="15%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Name" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{c.caseName}"/>
+                                                </p:column>
+                                               
+                                                <p:column width="5%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="view" />
+                                                    </f:facet>
+                                                    <p:commandButton    id="cecases-viewcase-cb"
+                                                                        icon="fa fa-archive" 
+                                                                        action="#{missionControlBB.onViewCECaseButtonChange(c)}"
+                                                                        ajax="false"
+                                                                        />
+                                                </p:column>
+                                            </p:dataTable>
+
+
+                                            <p:spacer height="15px"/>
+
+                                            <p:chart type="donut" 
+                                                     model="#{cEActionRequestsBB.requestReasonDonut}" 
+                                                     style="width:600px; height: 600px;"/>
+
+                                            <p:spacer height="10px"/>
+
+                                        </h:form>
+
+                                    </p:scrollPanel>
+                                </p:panel>
+
+
+
                                 <p:panel id="dashpanel-sys-switchmuni"
                                          collapsed="false"
                                          closable="true"
@@ -45,8 +190,7 @@
                                                         action="#{missionControlBB.reauthenticate}" 
                                                         icon="fa fa-exchange" />
                                 </p:panel>
-                                
-                                  
+
                                 <p:panel id="dashpanel-sys-switchuser"
                                          collapsed="false"
                                          closable="true"
@@ -74,12 +218,12 @@
                                                         action="#{missionControlBB.switchToUser}" 
                                                         icon="fa fa-universal-access" />
                                 </p:panel>
-                                
+
                             </p:dashboard>
 
 
                         </h:form>
-                        
+
                         <h:form id="dashboardHelpLinksForm">
 
                             <p:spacer height="15px"/>
@@ -127,7 +271,7 @@
 
 
                             </p:dialog>
-                           
+
                             <p:spacer height="10px"/>
 
 

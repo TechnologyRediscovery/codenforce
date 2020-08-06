@@ -10,6 +10,7 @@ import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
 import com.tcvcog.tcvce.entities.RoleType;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -40,6 +41,7 @@ public abstract class   Query<E extends BOb>
      */
     private RoleType userRankAccessMinimum;
     private Credential credential;
+    protected UserAuthorized requestingUser;
     
     private StringBuilder resultsMessage;
     private LocalDateTime executionTimestamp;
@@ -80,7 +82,7 @@ public abstract class   Query<E extends BOb>
     
     /**
      * Implementing classes must allow a BOb list to be set
-     * TODO: Fix inheritance snafoo here! 
+     * TODO: Fix inheritance snafoo here!
      * 
      * @param l 
      */
@@ -233,6 +235,20 @@ public abstract class   Query<E extends BOb>
             return EntityUtils.getPrettyDate(executionTimestamp);
         }
         return null;
+    }
+
+    /**
+     * @return the requestingUser
+     */
+    public UserAuthorized getRequestingUser() {
+        return requestingUser;
+    }
+
+    /**
+     * @param requestingUser the requestingUser to set
+     */
+    public void setRequestingUser(UserAuthorized requestingUser) {
+        this.requestingUser = requestingUser;
     }
 
     

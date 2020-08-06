@@ -20,6 +20,7 @@ public class MessageBuilderParams {
     private String newMessageContent;
     private User user;
     private Credential cred;
+    private boolean includeCredentialSig;
 
     public MessageBuilderParams(String existingContent, 
                                 String header, 
@@ -121,6 +122,20 @@ public class MessageBuilderParams {
      */
     public void setCred(Credential cred) {
         this.cred = cred;
+    }
+
+    /**
+     * @return the includeCredentialSig
+     */
+    public boolean isIncludeCredentialSig() {
+        return includeCredentialSig;
+    }
+
+    /**
+     * @param includeCredentialSig the includeCredentialSig to set
+     */
+    public void setIncludeCredentialSig(boolean includeCredentialSig) {
+        this.includeCredentialSig = includeCredentialSig;
     }
     
 }

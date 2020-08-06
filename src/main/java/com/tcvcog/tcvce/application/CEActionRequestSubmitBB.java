@@ -139,7 +139,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
                 personCandidateList = getSessionBean().getSessPersonList();
 
-                if (currentRequest.getRequestProperty() != null) {
+//                if (currentRequest.getRequestProperty() != null) {
 //            TODO: occbeta
 
 //            try {
@@ -147,7 +147,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 //            } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
 //                System.out.println(ex);
 //            }
-                }
+//                }
             }
 
         }
@@ -161,7 +161,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
         if (currentRequest.getMuni() != null) {
             try {
-                issueTypeList = cc.getIssueTypes(currentRequest.getMuni());
+//                issueTypeList = cc.getIssueTypes(currentRequest.getMuni());
+                issueTypeList = cc.getIssueTypes();
             } catch (IntegrationException ex) {
                 System.out.println("Error occured while fetching issue typelist: " + ex);
             }
@@ -335,7 +336,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         Municipality m = currentRequest.getMuni();
         Person skel = pc.personCreateMakeSkeleton(m);
         try {
-            skel.setCreatorUserID(uc.getUserRobot().getUserID());
+            skel.setCreatorUserID(uc.user_getUserRobot().getUserID());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -506,7 +507,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         QueryProperty qp = null;
 
         try {
-            qp = sc.initQuery(QueryPropertyEnum.HOUSESTREETNUM, uc.getPublicUserAuthorized().getMyCredential());
+            qp = sc.initQuery(QueryPropertyEnum.HOUSESTREETNUM, uc.auth_getPublicUserAuthorized().getMyCredential());
 
             if (qp != null && !qp.getParamsList().isEmpty()) {
                 SearchParamsProperty spp = qp.getPrimaryParams();

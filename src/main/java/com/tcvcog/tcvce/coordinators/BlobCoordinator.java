@@ -38,7 +38,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             blob.setUploadPersonID(getSessionBean().getSessUser().getPersonID());
         } else {
             UserCoordinator uc = getUserCoordinator();
-            blob.setUploadPersonID(uc.getPublicUserAuthorized().getUserID());
+            blob.setUploadPersonID(uc.auth_getPublicUserAuthorized().getUserID());
         }
         return blob;
     }

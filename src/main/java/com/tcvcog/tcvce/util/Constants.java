@@ -65,12 +65,18 @@ public class Constants implements Serializable {
      
     public final static String FMT_SEARCH_HEAD_QUERYOG =       "----------- QUERY LOG -------------";
     public final static String FMT_SEARCH_HEAD_FILTERLOG =       "----------- filter log -------------";
-    public final static String FMT_NOTE_START =       "----------- note start -------------";
-    public final static String FMT_NOTE_END =    "----------- note end   -------------";
-    public final static String FMT_NOTE_SEP_INTERNAL =       "....................................";
+    public final static String FMT_NOTE_START =             "----------NOTE-----------";
+    public final static String FMT_NOTE_END =               "-------------------------";
+    public final static String FMT_NOTE_SEP_INTERNAL =      "-------------------------";
     public final static String FMT_HTML_BREAK = "<br>";
     public final static String FMT_SPACE_LITERAL = " ";
     public final static String FMT_SPLAT = "*";
+    
+    public final static String FMT_NOTEBYLINE = "Created by: ";
+    public final static String FMT_USER = "Username: ";
+    public final static String FMT_ID = "ID:";
+    public final static String FMT_AT = " at ";
+    public final static String FMT_CONTENT = "Content: ";
     
     public final static String FMT_DTYPE_SYMB_USERNAME = "+";
     

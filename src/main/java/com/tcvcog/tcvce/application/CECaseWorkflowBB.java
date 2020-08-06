@@ -95,7 +95,7 @@ public  class CECaseWorkflowBB
     public void refreshCurrentCase(ActionEvent ev){
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            currentCase = cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser().getMyCredential());
+            currentCase = cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
         } catch (BObStatusException  | IntegrationException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -136,8 +136,8 @@ public  class CECaseWorkflowBB
     public String exploreProperty(ActionEvent ev){
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(currentCase.getProperty(), getSessionBean().getSessUser().getMyCredential()));
-        } catch (IntegrationException |BObStatusException | SearchException ex) {
+            getSessionBean().setSessionProperty(currentCase.getPropertyID());
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

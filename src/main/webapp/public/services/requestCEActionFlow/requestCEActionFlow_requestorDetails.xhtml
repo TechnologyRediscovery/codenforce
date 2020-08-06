@@ -14,250 +14,332 @@
             <ui:define name="content">
                 <f:view id="pers-info-view">
 
+                    <!-- VALIDATION MESSAGE -->
+                    <p:growl id="growl" showDetail="false"/>
+
+                    <!-- MAIN CONTAINER -->
                     <div class="mainContainer">
 
-                        <!--Global Messages-->
-                        <h:form id="pers-info-messages-form">
-                            <p:messages id="pers-info-messages" globalOnly="true" showDetail="true" showSummary="true" />
+                        <!-- TITLE COMPONENT -->
+                        <div class="public-title">
+                            <div class="public-title-main">
+                                Request Code Enforcement Action
+                            </div>
+                            <div class="public-title-sub">
+                                Request Details
+                            </div>
+                        </div>
+
+                        <h:form>
+                            <!-- GUIDANCE COMPONENT -->
+                            <div class="public-steps-guide">
+                                <p:steps activeIndex="4" styleClass="custom">
+                                    <p:menuitem value="Step 1: Choose Municipality" containerStyleClass="complete" />
+                                    <p:menuitem value="Step 2: Choose Property" containerStyleClass="complete" />
+                                    <p:menuitem value="Step 3: Describe Concern" containerStyleClass="complete"/>
+                                    <p:menuitem value="Step 4: Upload Phote" containerStyleClass="complete"/>
+                                    <p:menuitem value="Step 5: Request Details" />
+                                    <p:menuitem value="Step 6: Review and Submit" />
+                                </p:steps>
+                            </div>
                         </h:form>
 
-                        <p:panel id="self-info-panel"
-                                 toggleable="true"
-                                 widgetVar="self-info-panel-var"
-                                 collapsed="false"
-                                 header="Option 1: Request action as yourself"
-                                 rendered="#{!(empty sessionBean.sessUser)}">
+                        <!-- STEPS CONTENT COMPONENT -->
+                        <div class="public-steps-contents">
 
-                            <h:form id="self-info-form">
+                            <!-- STEPS CONTENT SELECTION COMPONENT -->
+                            <div class="public-steps-contents-select">
 
-                                <!--Grid CSS From Primefaces-->
-                                <div class="ui-g data-container">
+                                <p:panel id="self-info-panel"
+                                         toggleable="true"
+                                         widgetVar="self-info-panel-var"
+                                         collapsed="false"
+                                         header="Option 1: Request action as yourself"
+                                         rendered="#{!(empty sessionBean.sessUser)}">
 
-                                    <div class="ui-g-12 ui-md-9 ui-lg-9 data_field">
-                                        <h:outputLabel styleClass="data_table_header" 
-                                                       value="Use this option when you identified the code enforcement concern yourself." />
-                                    </div>
+                                    <h:form id="self-info-form">
 
-                                    <div class="ui-g-12 ui-md-3 ui-lg-3 data_field">
-                                        <p:commandButton ajax="false" tabindex="1"
-                                                         id="ceactionrequest-requestasyourself-cb"
-                                                         value="Request as yourself: #{sessionBean.sessUser.person.firstName} #{sessionBean.sessUser.person.lastName} (user ID #{sessionBean.sessUser.userID})" 
-                                                         action="#{cEActionRequestSubmitBB.requestActionAsFacesUser}"
-                                                         />   
-                                    </div>
-                                </div>
+                                        <!--Grid CSS From Primefaces-->
+                                        <div class="ui-g data-container">
 
-                            </h:form>
+                                            <div class="ui-g-12 ui-md-12 ui-lg-10 data_field">
+                                                <h:outputLabel styleClass="data_field_label"
+                                                               value="Use this option when you identified the code enforcement concern yourself." 
+                                                               />
+                                            </div>
 
-                        </p:panel>
+                                            <div class="ui-g-12 ui-md-12 ui-lg-2 data_field">
+                                                <p:commandButton ajax="false" 
+                                                                 tabindex="1"
+                                                                 id="ceactionrequest-requestasyourself-cb"
+                                                                 value="Request as yourself: #{sessionBean.sessUser.person.firstName} #{sessionBean.sessUser.person.lastName} (user ID #{sessionBean.sessUser.userID})" 
+                                                                 action="#{cEActionRequestSubmitBB.requestActionAsFacesUser}"
+                                                                 style="width: 100%"
+                                                                 />   
+                                            </div>
+                                        </div>
 
-                        <p:panel id="behalf-info-panel"
-                                 toggleable="true"
-                                 widgetVar="behalf-info-panel-var"
-                                 collapsed="false"
-                                 header="Option 2: Request action on behalf of existing person"
-                                 rendered="#{!(empty sessionBean.sessUser)}">
+                                    </h:form>
 
-                            <h:form id="behalf-info-form">
+                                </p:panel>
 
-                                <!--Grid CSS From Primefaces-->
-                                <div class="ui-g data-container">
+                                <p:panel id="behalf-info-panel"
+                                         toggleable="true"
+                                         widgetVar="behalf-info-panel-var"
+                                         collapsed="false"
+                                         header="Option 2: Request action on behalf of existing person"
+                                         rendered="#{!(empty sessionBean.sessUser)}">
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Persons connected to #{cEActionRequestSubmitBB.currentRequest.requestProperty.address}:"/>
-                                        <p:selectOneMenu id="person-list-menu" 
-                                                         required="false" tabindex="2" styleClass="data_field_value"
-                                                         value="#{cEActionRequestSubmitBB.currentPerson}"
-                                                         disabled="#{cEActionRequestSubmitBB.personCandidateList.size() == 0}">
-                                            <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
-                                            <f:selectItems value="#{cEActionRequestSubmitBB.personCandidateList}"  var="p" itemValue="#{p}" 
-                                                           itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
-                                            <f:converter converterId="personConverter"/>
+                                    <h:form id="behalf-info-form">
 
-                                            <p:ajax     listener="#{cEActionRequestSubmitBB.changePropertyPersonsDropDown}"
-                                                        update="ceactionrequestflow-requestasprpertyperson-cb" />
-                                        </p:selectOneMenu>
-                                        <h:message for="person-list-menu" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </div>
+                                        <!--Grid CSS From Primefaces-->
+                                        <div class="ui-g data-container">
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Recently viewed Persons:"/>
-                                        <p:selectOneMenu id="recent-person-list-menu" 
-                                                         required="false" tabindex="2"
-                                                         value="#{cEActionRequestSubmitBB.currentPerson}"
-                                                         disabled="#{sessionBean.sessPropertyList.size() == 0}"
-                                                         styleClass="data_field_value">
-                                            <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
-                                            <f:selectItems value="#{sessionBean.sessPersonList}"  var="p" itemValue="#{p}" 
-                                                           itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
-                                            <f:converter converterId="personConverter"/>
+                                            <div class="ui-g-12 ui-md-12 ui-lg-5 data_field">
+                                                <h:outputLabel styleClass="data_field_label" value="Persons connected to #{cEActionRequestSubmitBB.currentRequest.requestProperty.address}:"/>
+                                                <p:selectOneMenu id="person-list-menu" 
+                                                                 required="false" tabindex="2" styleClass="data_field_value"
+                                                                 value="#{cEActionRequestSubmitBB.currentPerson}"
+                                                                 disabled="#{cEActionRequestSubmitBB.personCandidateList.size() == 0}">
+                                                    <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                                    <f:selectItems value="#{cEActionRequestSubmitBB.personCandidateList}"  var="p" itemValue="#{p}" 
+                                                                   itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                                                    <f:converter converterId="personConverter"/>
 
-                                            <p:ajax     listener="#{cEActionRequestSubmitBB.changePropertyPersonsDropDown}"
-                                                        update="ceactionrequestflow-requestasprpertyperson-cb" />
-                                            <h:message for="recent-person-list-menu" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                        </p:selectOneMenu>
-                                    </div>
+                                                    <p:ajax     listener="#{cEActionRequestSubmitBB.changePropertyPersonsDropDown}"
+                                                                update="ceactionrequestflow-requestasprpertyperson-cb" />
+                                                </p:selectOneMenu>
+                                                <h:message for="person-list-menu" showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            </div>
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <p:commandButton ajax="false"  tabindex="3"
-                                                         id="ceactionrequestflow-requestasprpertyperson-cb"
-                                                         value="Request on behalf of: #{cEActionRequestSubmitBB.currentPerson.firstName} #{cEActionRequestSubmitBB.currentPerson.lastName}" 
-                                                         action="#{cEActionRequestSubmitBB.assignSelectedRequestorPersonAndContinue}"
-                                                         disabled="#{empty cEActionRequestSubmitBB.currentPerson}"
-                                                         styleClass="data_edit_button"/>
-                                    </div>
+                                            <div class="ui-g-12 ui-md-12 ui-lg-5 data_field">
+                                                <h:outputLabel styleClass="data_field_label" value="Recently viewed Persons:"/>
+                                                <p:selectOneMenu id="recent-person-list-menu" 
+                                                                 required="false" tabindex="2"
+                                                                 value="#{cEActionRequestSubmitBB.currentPerson}"
+                                                                 disabled="#{sessionBean.sessPropertyList.size() == 0}"
+                                                                 styleClass="data_field_value">
+                                                    <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                                    <f:selectItems value="#{sessionBean.sessPersonList}"  var="p" itemValue="#{p}" 
+                                                                   itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                                                    <f:converter converterId="personConverter"/>
 
-                                </div>
+                                                    <p:ajax     listener="#{cEActionRequestSubmitBB.changePropertyPersonsDropDown}"
+                                                                update="ceactionrequestflow-requestasprpertyperson-cb" />
+                                                    <h:message for="recent-person-list-menu" showDetail="false" showSummary="true" 
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </p:selectOneMenu>
+                                            </div>
 
-                            </h:form>
+                                            <div class="ui-g-12 ui-md-12 ui-lg-2 data_field">
+                                                <p:commandButton ajax="false"  
+                                                                 tabindex="3"
+                                                                 id="ceactionrequestflow-requestasprpertyperson-cb"
+                                                                 value="Request on behalf of: #{cEActionRequestSubmitBB.currentPerson.firstName} #{cEActionRequestSubmitBB.currentPerson.lastName}" 
+                                                                 action="#{cEActionRequestSubmitBB.assignSelectedRequestorPersonAndContinue}"
+                                                                 disabled="#{empty cEActionRequestSubmitBB.currentPerson}"
+                                                                 style="width: 100%"
+                                                                 />
+                                            </div>
 
-                        </p:panel>
+                                        </div>
 
-                        <p:panel id="pers-info-panel"
-                                 toggleable="true"
-                                 widgetVar="pers-info-panel-var"
-                                 collapsed="false"
-                                 header="#{(empty sessionBsessionUserUser)? 'Enter your contact details' : 'Option 3: Input a new person'}">
+                                    </h:form>
 
-                            <h:form id="pers-info-form">
+                                </p:panel>
 
-                                <!--Grid CSS From Primefaces-->
-                                <div class="ui-g data-container">
+                                <p:panel id="pers-info-panel"
+                                         toggleable="true"
+                                         widgetVar="pers-info-panel-var"
+                                         collapsed="false"
+                                         header="#{(empty sessionBsessionUserUser)? 'Enter your contact details' : 'Option 3: Input a new person'}">
 
+                                    <h:form id="pers-info-form">
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Please choose the most appropriate role from the list"/>
-                                        <p:selectOneMenu 
-                                            id="requestorType" 
-                                            required="true" tabindex="4"
-                                            value="#{cEActionRequestSubmitBB.currentRequest.requestor.personType}"
-                                            disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
-                                            styleClass="data_field_value">
+                                        <!--Grid CSS From Primefaces-->
+                                        <div class="ui-g data-container">
 
-                                            <f:selectItems 
-                                                value="#{cEActionRequestSubmitBB.submittingPersonTypes}"
-                                                var="p" 
-                                                itemValue="#{p}"
-                                                itemLabel="#{p.label}"/>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                <h:outputLabel styleClass="data_field_label" 
+                                                               value="Please choose the most appropriate role from the list"
+                                                               />
+                                                <p:selectOneMenu id="requestorType" 
+                                                                 required="true" 
+                                                                 tabindex="4"
+                                                                 value="#{cEActionRequestSubmitBB.currentRequest.requestor.personType}"
+                                                                 disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
+                                                                 styleClass="data_field_value"
+                                                                 label="Role">
 
-                                        </p:selectOneMenu>
-                                    </div>
+                                                    <f:selectItems 
+                                                        value="#{cEActionRequestSubmitBB.submittingPersonTypes}"
+                                                        var="p" 
+                                                        itemValue="#{p}"
+                                                        itemLabel="#{p.label}"
+                                                        />
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="First Name*"/>
-                                        <h:inputText 
-                                            id="requestorFirstName" size="30"  tabindex="5"
-                                            value="#{cEActionRequestSubmitBB.currentRequest.requestor.firstName}" styleClass="data_field_value" 
-                                            required="true"
-                                            disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
-                                            />
-                                        <h:message for="requestorFirstName" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </div>
+                                                </p:selectOneMenu>
+                                            </div>
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Last Name*"/>
-                                        <h:inputText id="requestorLastName" size="30" value="#{cEActionRequestSubmitBB.currentRequest.requestor.lastName}" 
-                                                     styleClass="inputText" required="false" tabindex="6"
-                                                     disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
-                                        <h:message for="requestorLastName" showDetail="true" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                <h:outputLabel styleClass="data_field_label" 
+                                                               value="First Name"
+                                                               />
+                                                <p:inputText id="requestorFirstName" 
+                                                             size="30"  
+                                                             tabindex="5"
+                                                             value="#{cEActionRequestSubmitBB.currentRequest.requestor.firstName}" 
+                                                             styleClass="data_field_value" 
+                                                             required="true"
+                                                             disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
+                                                             label="First Name"
+                                                             />
+                                            </div>
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Job Title (if applicable)"/>
-                                        <h:inputText id="requestorJobTitle" size="30" value="#{cEActionRequestSubmitBB.currentRequest.requestor.jobTitle}" 
-                                                     disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
-                                                     styleClass="data_field_value" required="false" tabindex="7"/>
-                                        <h:message for="requestorJobTitle" showDetail="true" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                <h:outputLabel styleClass="data_field_label" 
+                                                               value="Last Name"/>
+                                                <p:inputText id="requestorLastName" 
+                                                             size="30" 
+                                                             value="#{cEActionRequestSubmitBB.currentRequest.requestor.lastName}" 
+                                                             styleClass="data_field_value" 
+                                                             required="true" 
+                                                             tabindex="6"
+                                                             disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
+                                                             label="Last Name"
+                                                             />
+                                            </div>
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Phone (cell)"/>
-                                        <h:inputText id="requestorPhoneCell" size="15" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneCell}" 
-                                                     styleClass="data_field_value" required="false" tabindex="8"
-                                                     disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
-                                        <h:message for="requestorPhoneCell" showDetail="true" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                <h:outputLabel styleClass="data_field_label" 
+                                                               value="Job Title (if applicable)"/>
+                                                <p:inputText id="requestorJobTitle" 
+                                                             size="30" 
+                                                             value="#{cEActionRequestSubmitBB.currentRequest.requestor.jobTitle}" 
+                                                             disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
+                                                             styleClass="data_field_value" 
+                                                             required="false" 
+                                                             tabindex="7"
+                                                             label="Job Title"
+                                                             />
+                                            </div>
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Phone (home)"/>
-                                        <h:inputText id="requestorPhoneHome" size="15" value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneHome}" 
-                                                     styleClass="data_field_value" required="false" tabindex="9"
-                                                     disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
-                                        <h:message for="requestorPhoneHome" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                <h:outputLabel styleClass="data_field_label" value="Phone (cell)"/>
+                                                <p:inputText id="requestorPhoneCell" 
+                                                             size="15" 
+                                                             value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneCell}" 
+                                                             styleClass="data_field_value"
+                                                             required="false" 
+                                                             tabindex="8"
+                                                             disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
+                                                             label="Phone(cell)"
+                                                             />
+                                            </div>
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Email"/>
-                                        <h:inputText id="requestorEmail" size="30" value="#{cEActionRequestSubmitBB.currentRequest.requestor.email}" 
-                                                     styleClass="data_field_value" required="false" tabindex="11"
-                                                     disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
-                                        <h:message for="requestorEmail" showDetail="true" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                <h:outputLabel styleClass="data_field_label" value="Phone (home)"/>
+                                                <p:inputText id="requestorPhoneHome" 
+                                                             size="15"
+                                                             value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneHome}" 
+                                                             styleClass="data_field_value" 
+                                                             required="false" 
+                                                             tabindex="9"
+                                                             disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
+                                                             label="Phone(home)"
+                                                             />
+                                            </div>
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Street Address*"/>
-                                        <h:inputText id="requestorAddressStreet" size="30" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressStreet}" 
-                                                     styleClass="data_field_value" required="false" tabindex="12"
-                                                     disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
-                                        <h:message for="requestorAddressStreet" showDetail="true" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                <h:outputLabel styleClass="data_field_label" 
+                                                               value="Email"/>
+                                                <p:inputText id="requestorEmail" 
+                                                             size="30" 
+                                                             value="#{cEActionRequestSubmitBB.currentRequest.requestor.email}" 
+                                                             styleClass="data_field_value" 
+                                                             required="false"
+                                                             tabindex="10"
+                                                             disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
+                                                             label="Email"
+                                                             />
+                                            </div>
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="City*"/>
-                                        <h:inputText id="requestorAddressCity" size="30" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressCity}" 
-                                                     styleClass="data_field_value" required="false" tabindex="13"
-                                                     disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
-                                        <h:message for="requestorAddressCity" showDetail="true" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                <h:outputLabel styleClass="data_field_label" 
+                                                               value="Street Address*"/>
+                                                <p:inputText id="requestorAddressStreet" 
+                                                             size="30" 
+                                                             value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressStreet}" 
+                                                             styleClass="data_field_value" 
+                                                             required="false" 
+                                                             tabindex="11"
+                                                             disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
+                                                             label="Street Adress"
+                                                             />
+                                            </div>
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="ZIP Code*"/>
-                                        <h:inputText id="requestorAddressZip" size="10" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressZip}" 
-                                                 styleClass="data_field_value" required="false" tabindex="14"
-                                                 disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
-                                    <h:message for="requestorAddressZip" showDetail="true" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                <h:outputLabel styleClass="data_field_label"
+                                                               value="City"/>
+                                                <p:inputText id="requestorAddressCity" 
+                                                             size="30" 
+                                                             value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressCity}" 
+                                                             styleClass="data_field_value" 
+                                                             required="false" 
+                                                             tabindex="12"
+                                                             disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
+                                                             label="City"
+                                                             />
+                                            </div>
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="State Abbreviation*"/>
-                                        <h:inputText id="requestorAddressState" size="2" value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressState}" 
-                                                 styleClass="data_field_value" required="true" tabindex="15"
-                                                 disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"/>
-                                    <h:message for="requestorAddressState" showDetail="true" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                <h:outputLabel styleClass="data_field_label" 
+                                                               value="ZIP Code*"/>
+                                                <p:inputText id="requestorAddressZip"
+                                                             size="10" 
+                                                             value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressZip}" 
+                                                             styleClass="data_field_value" 
+                                                             required="false" 
+                                                             tabindex="13"
+                                                             disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
+                                                             label="ZIP Code"
+                                                             />
+                                            </div>
 
-                                </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                <h:outputLabel styleClass="data_field_label" 
+                                                               value="State Abbreviation"/>
+                                                <p:inputText id="requestorAddressState" 
+                                                             size="2" 
+                                                             value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressState}" 
+                                                             styleClass="data_field_value" 
+                                                             required="true" 
+                                                             tabindex="14"
+                                                             disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
+                                                             label="State Abbreviation"
+                                                             />
+                                            </div>
 
-                                <p:commandButton ajax="false" value="Store new person and continue" 
-                                             id="ceactionrequestflow-storenewperson-cb" tabindex="16"
-                                             action="#{cEActionRequestSubmitBB.validateActionRequestorNewPersonAndContinue}"/>
-                                
-                            </h:form>
-
-                        </p:panel>
-
+                                        </div>
+                                        
+                                        <!-- STEPS CONTENT NEXT BUTTON COMPONENT -->
+                                        <div class="public-steps-contents-next">
+                                            <p:commandButton ajax="false" value="Store new person and continue" 
+                                                             id="ceactionrequestflow-storenewperson-cb" tabindex="16"
+                                                             action="#{cEActionRequestSubmitBB.validateActionRequestorNewPersonAndContinue}"
+                                                             style="width: 100%"/>
+                                        </div>
+                                        
+                                    </h:form>
+                                </p:panel>
+                            </div>
+                        </div>
                     </div>
-
                 </f:view>
-
             </ui:define>
-
         </ui:composition>
-
     </h:body>
-
 </html>
 
 

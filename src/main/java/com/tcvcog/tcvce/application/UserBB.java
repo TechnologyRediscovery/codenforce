@@ -58,6 +58,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     
     private String formUsername;
     private String formPassword;
+    private String formPasswordReentry;
     
     private String formNotes;
     
@@ -118,31 +119,12 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     
     
     
-    /**
-     * We must do a full re-init of the session!
-     * @deprecated  
-     */
-    public void refreshCurrentUser(){
-        System.out.println("UserBB.refreshCurrentUser");
-        UserCoordinator uc = getUserCoordinator();
-//        try {
-//            currentUser = uc.authorizeUser(currentUser, getSessionBean().getSessionMuni(), null);
-//            
-//        } catch (IntegrationException ex) {
-//            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (AuthorizationException ex) {
-//            Logger.getLogger(UserBB.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-        
-        
-    }
-    
+  
     
     public void commitUsernameUpdates(ActionEvent ev){
         UserCoordinator uc = getUserCoordinator();
         try {
-            uc.updateUser(currentUser, null, formUsername);
-            refreshCurrentUser();
+            uc.user_updateUser(currentUser);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated user", ""));
@@ -152,6 +134,11 @@ public class UserBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not update user", ""));
             
+        } catch (AuthorizationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
         }
     }
     
@@ -160,8 +147,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         UserCoordinator uc = getUserCoordinator();
         try {
             
-            uc.updateUser(currentUser, formSelectedUserPerson, null);
-            refreshCurrentUser();
+            uc.user_updateUser(currentUser);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully udpated your person link", ""));
@@ -171,6 +157,11 @@ public class UserBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not update person link, sorry!", ""));
             
+        }  catch (AuthorizationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
         }
         
     }
@@ -179,14 +170,21 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         
         UserCoordinator uc = getUserCoordinator();
         try { 
-            uc.updateUserPassword(currentUser, formPassword);
-            refreshCurrentUser();
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully udpated your password to --> " + formPassword 
-                                    + " <-- Please write this down in a safe place; "
-                                    + "If you lose it, you'll have to make a new one.", ""));
+            if(formPassword.equals(formPasswordReentry)){
+                uc.user_updateUserPassword_SECURITYCRITICAL(currentUser, formPassword);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Successfully udpated your password to --> " + formPassword 
+                                        + " <-- Please write this down in a safe place; "
+                                        + "If you lose it, you'll have to make a new one.", ""));
+            } else {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Passwords do not match!", ""));
+                
+            }
             formPassword = "";
+            formPasswordReentry = "";
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -323,6 +321,20 @@ public class UserBB extends BackingBeanUtils implements Serializable {
      */
     public void setUserPersonList(List<Person> userPersonList) {
         this.userPersonList = userPersonList;
+    }
+
+    /**
+     * @return the formPasswordReentry
+     */
+    public String getFormPasswordReentry() {
+        return formPasswordReentry;
+    }
+
+    /**
+     * @param formPasswordReentry the formPasswordReentry to set
+     */
+    public void setFormPasswordReentry(String formPasswordReentry) {
+        this.formPasswordReentry = formPasswordReentry;
     }
 
   

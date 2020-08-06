@@ -26,7 +26,7 @@ public class    Property
     
     protected String notes;
   
-    private LocalDateTime creationTS;
+    protected LocalDateTime creationTS;
     protected LocalDateTime lastUpdatedTS;
     protected User lastUpdatedBy;
     protected OccLocationDescriptor  locationDescriptor;

@@ -60,14 +60,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         Municipality muni = null;
         Connection con = null;
         // note that muniCode is not returned in this query since it is specified in the WHERE
-        String query =  "    SELECT municode, muniname, address_street, address_city, address_state, \n" +
-                        "       address_zip, phone, fax, email, population, activeinprogram, \n" +
-                        "       defaultcodeset, occpermitissuingsource_sourceid, novprintstyle_styleid, \n" +
-                        "       profile_profileid, enablecodeenforcement, enableoccupancy, enablepublicceactionreqsub, \n" +
-                        "       enablepublicceactionreqinfo, enablepublicoccpermitapp, enablepublicoccinspectodo, \n" +
-                        "       munimanager_userid, office_propertyid, notes, lastupdatedts, \n" +
-                        "       lastupdated_userid, primarystaffcontact_userid\n" +
-                        "  FROM public.municipality WHERE municode=? AND activeinprogram = true;";
+        String query =  " SELECT municode, muniname FROM public.municipality WHERE municode=?;";
         ResultSet rs = null;
  
         try {
@@ -185,9 +178,6 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         mdh.setLastUpdatedBy(ui.getUser(rs.getInt("lastupdated_userid")));
         mdh.setPrimaryStaffContact(ui.getUser(rs.getInt("primarystaffcontact_userid")));
         
-        // FIX THIS WHEN WE HAVE STABLE AUTHORIZATION PROCEDURES
-//        muni.setUserList(uc.extractUsersFromUserAuthorized(uc.getUserAuthorizedListForConfig(muni)));
-        mdh.setCourtEntities(cei.getCourtEntityList(mdh.getMuniCode()));
         
         return mdh;
     }

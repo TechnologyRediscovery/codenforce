@@ -115,7 +115,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         if(ev.getDomain() == EventDomainEnum.OCCUPANCY && ev.getOccPeriodID() != 0){
             edh.setPeriod(oc.getOccPeriodPropertyUnitHeavy(edh.getOccPeriodID()));
         } else if(ev.getDomain() == EventDomainEnum.CODE_ENFORCEMENT && ev.getCeCaseID() != 0){
-            edh.setCecase(cc.assembleCECasePropertyUnitHeavy(cc.getCECase(edh.getCeCaseID()), getSessionBean().getSessUser().getMyCredential()));
+            edh.setCecase(cc.assembleCECasePropertyUnitHeavy(cc.getCECase(edh.getCeCaseID())));
             // note that a Property object is already inside our CECase base class
         } else {
             throw new EventException("Cannot build data heavy event");
@@ -723,6 +723,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return ec;
     }
   
+    
+    /**
+     * Extracts a complete list of event categories
+     * @return 
+     */
     public List<EventCategory> getEventCategoryList(){
         EventIntegrator ei = getEventIntegrator();
         try {
@@ -851,7 +856,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setCategory(ec);
 //        event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(message);
-        event.setUserCreator(uc.getUserRobot());
+        event.setUserCreator(uc.user_getUserRobot());
         event.setActive(true);
         event.setHidden(false);
         event.setNotes("Event created by a public user");

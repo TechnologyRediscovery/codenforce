@@ -16,11 +16,13 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.util.Objects;
+
 /**
  *
  * @author Nathan Dietz
  */
-public class IntensityClass {
+public class IntensityClass implements Comparable<IntensityClass> {
     
     private int classID;
     private String title;
@@ -90,5 +92,69 @@ public class IntensityClass {
     public void setIcon(Icon icon) {
         this.icon = icon;
     }
+
+    @Override
+    public int compareTo(IntensityClass o) {
+        int order = 0;
+        if(o != null){
+            if(this.numericRating < o.numericRating){
+                order = 1;
+            } else {
+                order = -1;
+            }
+        }
+        return order;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 41 * hash + this.classID;
+        hash = 41 * hash + Objects.hashCode(this.title);
+        hash = 41 * hash + Objects.hashCode(this.muni);
+        hash = 41 * hash + this.numericRating;
+        hash = 41 * hash + Objects.hashCode(this.schema);
+        hash = 41 * hash + (this.active ? 1 : 0);
+        hash = 41 * hash + Objects.hashCode(this.icon);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final IntensityClass other = (IntensityClass) obj;
+        if (this.classID != other.classID) {
+            return false;
+        }
+        if (this.numericRating != other.numericRating) {
+            return false;
+        }
+        if (this.active != other.active) {
+            return false;
+        }
+        if (!Objects.equals(this.title, other.title)) {
+            return false;
+        }
+        if (!Objects.equals(this.muni, other.muni)) {
+            return false;
+        }
+        if (!Objects.equals(this.schema, other.schema)) {
+            return false;
+        }
+        if (!Objects.equals(this.icon, other.icon)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
     
 }

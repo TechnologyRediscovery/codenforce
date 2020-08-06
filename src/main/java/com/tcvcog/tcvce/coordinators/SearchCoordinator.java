@@ -45,7 +45,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     private static final int RESULT_COUNT_LIMIT_DEFAULT = 100;
     private static final int FILTER_OFF_DEFVALUE_INT = 0;
     
-    
     private static final int PASTPERIOD_RECENT = 30;
     private static final int PASTPERIOD_WEEK = 7;
     private static final int PASTPERIOD_MONTH = 30;
@@ -1656,7 +1655,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setFilterName("Action requests you've made");
          
         params.setUser_ctl(true);
-        params.setUser_val(uc.getUser(cred.getGoverningAuthPeriod().getUserID()));
+        params.setUser_val(uc.user_getUser(cred.getGoverningAuthPeriod().getUserID()));
             
         return params;
 
@@ -1669,6 +1668,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         CEActionRequestIntegrator cari = getcEActionRequestIntegrator();
 
         params.setCaseAttachment_ctl(false);
+        params.setRequestStatus_ctl(true);
         
         try {
             params.setRequestStatus_val(cari.getRequestStatus(Integer.parseInt(

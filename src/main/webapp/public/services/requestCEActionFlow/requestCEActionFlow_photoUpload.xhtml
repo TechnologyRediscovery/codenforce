@@ -13,54 +13,81 @@
         <ui:composition template="./../../navContainer_public.xhtml">
             <ui:define name="content">
                 <f:view id="requestCEActionFlow1View">
-                    
+
+                    <!-- VALIDATION MESSAGE -->
+                    <p:growl id="growl" showDetail="false"/>
+
+                    <!-- MAIN CONTAINER -->
                     <div class="mainContainer">
-                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
-                        
-                        <h1>Upload photos of your concern at <h:outputText value="#{cEActionRequestSubmitBB.currentRequest.requestProperty.address}"/> in <h:outputText value="#{cEActionRequestSubmitBB.currentRequest.muni.muniName}"/></h1>
-                        
-                        <h:form id="requestCEActionFlowFormUploadPhoto" enctype="multipart/form-data">
+
+                        <!-- TITLE COMPONENT -->
+                        <div class="public-title">
+                            <div class="public-title-main">
+                                Request Code Enforcement Action
+                            </div>
+                            <div class="public-title-sub">
+                                Upload Photos Of Your Concern At <h:outputText value="#{cEActionRequestSubmitBB.currentRequest.requestProperty.address}"/> In <h:outputText value="#{cEActionRequestSubmitBB.currentRequest.muni.muniName}"/>
+                            </div>
+                        </div>
+
+                        <h:form>
                             
-                         <p:commandButton  ajax="false" tabindex="1"
-                                              value="Skip photo upload and continue to contact info" 
-                                              id="ceactionrequestflow-nophotos-cb"
-                                              action="#{cEActionRequestSubmitBB.skipPhotoUpload}"/>
-                        
-                        <p:spacer height="5px"/>
-                        <hr />
-                        <p:spacer height="5px"/>
-                        
-                        <h2>Choose a file and upload</h2>
-                        
-                            <p:fileUpload fileUploadListener="#{cEActionRequestSubmitBB.handlePhotoUpload}"
-                            mode="advanced" 
-                            update="requestCEActionFlowFormDescribePhoto:photoTable"
-                            multiple="true"
-                            fileLimit="3" 
-                            sizeLimit="900000000" 
-                            allowTypes="/(\.|\/)(jpe?g|png)$/"/>    
+                            <!-- GUIDANCE COMPONENT -->
+                            <div class="public-steps-guide">
+                                <p:steps activeIndex="3" styleClass="custom">
+                                    <p:menuitem value="Step 1: Choose Municipality" containerStyleClass="complete" />
+                                    <p:menuitem value="Step 2: Choose Property" containerStyleClass="complete" />
+                                    <p:menuitem value="Step 3: Describe Concern" containerStyleClass="complete"/>
+                                    <p:menuitem value="Step 4: Upload Phote" />
+                                    <p:menuitem value="Step 5: Request Details" />
+                                    <p:menuitem value="Step 6: Review and Submit" />
+                                </p:steps>
+                            </div>
+
                         </h:form>
-                        
-                        <p:spacer height="5px"/>
-                                  
-                        
-                        <h:form id="requestCEActionFlowFormDescribePhoto">
-                            <h2>Review and describe uploaded photos</h2>
-                                    <p:dataTable
-                                        id="photoTable"
-                                        var="blob"
-                                        value="#{cEActionRequestSubmitBB.blobList}"
-                                        rowKey="#{blob.blobID}"
-                                        tableStyleClass="primeDataTable"
-                                        draggableRows="false" tabindex="6">
+
+                        <!-- STEPS CONTENT COMPONENT -->
+                        <div class="public-steps-contents">
+
+                            <!-- STEPS CONTENT SELECTION COMPONENT -->
+                            <div class="public-steps-contents-select">
+
+                                <h:form id="requestCEActionFlowFormUploadPhoto" 
+                                        enctype="multipart/form-data">
+                                    <p>
+                                        1. Choose a file and upload
+                                    </p>
+
+                                    <p:fileUpload fileUploadListener="#{cEActionRequestSubmitBB.handlePhotoUpload}"
+                                                  mode="advanced" 
+                                                  update="requestCEActionFlowFormDescribePhoto:photoTable"
+                                                  multiple="true"
+                                                  fileLimit="3" 
+                                                  sizeLimit="900000000" 
+                                                  allowTypes="/(\.|\/)(jpe?g|png)$/"
+                                                  />    
+                                </h:form>
+
+                                <h:form id="requestCEActionFlowFormDescribePhoto">
+                                    <p>
+                                        2. Review and describe uploaded photos
+                                    </p>
+
+                                    <p:dataTable id="photoTable"
+                                                 var="blob"
+                                                 value="#{cEActionRequestSubmitBB.blobList}"
+                                                 rowKey="#{blob.blobID}"
+                                                 tableStyleClass="primeDataTable"
+                                                 draggableRows="false" 
+                                                 tabindex="1">
+
                                         <p:column>
                                             <f:facet name="header">
                                                 <h:outputText value="blobID"/>
                                             </f:facet>
                                             <h:outputText value="#{blob.blobID}"/>
                                         </p:column>
+
                                         <p:column width="70%">
                                             <f:facet name="header">
                                                 <h:outputText value="Photo"/>
@@ -69,23 +96,41 @@
                                                 <f:param name="blobID" value="#{blob.blobID}"/>
                                             </p:graphicImage>
                                         </p:column>
+
                                         <p:column>
                                             <f:facet name="header">
                                                 <h:outputText value="Description"/>
                                             </f:facet>
-                                            <p:inputTextarea id="desc" value="#{blob.description}"
-                                                     style="width: 100%;" tabindex="5" required="true" styleClass="inputText"/>
+                                            <p:inputTextarea id="desc" 
+                                                             value="#{blob.description}"
+                                                             style="width: 100%;" 
+                                                             tabindex="2" 
+                                                             required="true" 
+                                                             styleClass="inputText"/>
                                         </p:column>
-                                        
+
                                     </p:dataTable>
-                            
-                            <p:spacer height="5px"/>
-                            
-                            <p:commandButton  ajax="false" tabindex="12"
-                                              value="Save photos and proceed to contact details" id="continueToContactInfoButton"
-                                              action="#{cEActionRequestSubmitBB.savePhotosAndContinue}"/>
-                        </h:form>
-                        
+                                </h:form>
+                            </div>
+
+                            <h:form>
+                                <!-- STEPS CONTENT NEXT BUTTON COMPONENT -->
+                                <div class="public-steps-contents-next" style="display: flex">
+                                    <p:commandButton  ajax="false" 
+                                                      tabindex="12"
+                                                      value="Save photos and proceed to contact details" 
+                                                      id="continueToContactInfoButton"
+                                                      action="#{cEActionRequestSubmitBB.savePhotosAndContinue}"
+                                                      />
+                                    <p:commandButton  ajax="false" 
+                                                      tabindex="13"
+                                                      value="Skip photo upload and continue to contact info" 
+                                                      id="ceactionrequestflow-nophotos-cb"
+                                                      action="#{cEActionRequestSubmitBB.skipPhotoUpload}"
+                                                      />
+                                </div>
+                            </h:form>
+                        </div>
                     </div>
                 </f:view>
             </ui:define>

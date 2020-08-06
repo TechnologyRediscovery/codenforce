@@ -25,10 +25,13 @@
                                 <p:commandButton ajax="false" value="Log in to mission control" 
                                                  action="#{loginBB.loginToMissionControl}"/>
                                             
+                                <p:spacer height="10px" />
                                
-                                <h:outputText value="Public user ID: #{loginBB.publicUA.userID}" />
+                                <h:outputText value="Public user ID: #{loginBB.publicUA.userID}" style="color:lightgray" />
                                 
-                                <h:outputText value="Public user ID: #{loginBB.publicUA.keyCard.signature}" />
+                                <p:spacer height="10px" />
+                                
+                                <h:outputText value="Signature: #{loginBB.publicUA.keyCard.signature}" style="color:lightgray" />
                                 
                         </h:form>
                         

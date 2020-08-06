@@ -12,19 +12,24 @@ import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
+import java.util.Iterator;
 
 /**
- *
- * @author Ellen Bascomb
+ *  Listified CECase object 
+ * 
+ * @author Ellen Bascomb (Apartment 31Y)
  */
 public class CECaseDataHeavy
-        extends CECasePropertyUnitHeavy
+        extends CECase
         implements Cloneable,
         IFace_EventRuleGoverned,
         IFace_CredentialSigned,
         IFace_Loggable {
 
     // accessed through methods specified in the interfaces
+    private List<EventCnF> eventList;
+    private List<EventCnF> eventListMaster;
+    
     private List<Proposal> proposalList;
     private List<EventRuleImplementation> eventRuleList;
 
@@ -32,58 +37,17 @@ public class CECaseDataHeavy
 
     private List<MoneyCECaseFeeAssigned> feeList;
     private List<MoneyCECaseFeePayment> paymentList;
+    
+    protected boolean showHiddenEvents;
+    protected boolean showInactiveEvents;
 
-    private String credentialSignature;
-
-    /**
-     * Constructor used to create an instance of this object with a CECase
-     * without any lists. Transfers the member variables from the incoming
-     * object to this sublcass
-     *
-     * ** CONSTRUCTORS ARE NOT INHERITED! ** but member variables and methods
-     * sure are!
-     *
-     * @param cse
-     */
-    public CECaseDataHeavy(CECasePropertyUnitHeavy cse) {
-        super(cse);
-        this.property = cse.property;
-        this.propUnit = cse.propUnit;
-        this.showHiddenEvents = cse.isShowHiddenEvents();
-        this.showInactiveEvents = cse.isShowInactiveEvents();
-        this.eventList = cse.getEventList();
-        this.completeEventList = cse.getCompleteEventList();
-    }
-
-    @Override
-    public String getCredentialSignature() {
-        return credentialSignature;
+   
+    public CECaseDataHeavy(CECase cse){
+        eventListMaster = new ArrayList<>();
+        
     }
     
     
-    @Override
-    public EventDomainEnum discloseEventDomain() {
-        return EventDomainEnum.CODE_ENFORCEMENT;
-    }
-    
-    
-    @Override
-    public int getBObID() {
-        return caseID;
-    }
-
-
-
-    /**
-     *
-     * @return @throws CloneNotSupportedException
-     */
-    @Override
-    public CECaseDataHeavy clone() throws CloneNotSupportedException {
-        super.clone();
-        return null;
-    }
-
     @Override
     public List<EventCnF> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle) {
         List<EventCnF> visEventList = new ArrayList<>();
@@ -118,6 +82,69 @@ public class CECaseDataHeavy
         return visEventList;
     }
 
+    public boolean isShowHiddenEvents() {
+        return showHiddenEvents;
+    }
+
+    public void setShowHiddenEvents(boolean showHiddenEvents) {
+        this.showHiddenEvents = showHiddenEvents;
+    }
+
+    public boolean isShowInactiveEvents() {
+        return showInactiveEvents;
+    }
+
+    public void setShowInactiveEvents(boolean showInactiveEvents) {
+        this.showInactiveEvents = showInactiveEvents;
+    }
+
+    public List<EventCnF> getEventListMaster() {
+        return eventListMaster;
+    }
+
+    public void setEventListMaster(List<EventCnF> eventListMaster) {
+        if(eventListMaster != null){
+            this.eventListMaster = eventListMaster;
+        }
+    }
+
+    public List<EventCnF> getEventList() {
+        return eventList;
+    }
+
+    @Override
+    public void setEventList(List<EventCnF> eventList) {
+        this.eventList = eventList;
+    }
+
+    
+
+   
+    
+    @Override
+    public EventDomainEnum discloseEventDomain() {
+        return EventDomainEnum.CODE_ENFORCEMENT;
+    }
+    
+    
+    @Override
+    public int getBObID() {
+        return caseID;
+    }
+
+
+
+    /**
+     *
+     * @return @throws CloneNotSupportedException
+     */
+    @Override
+    public CECaseDataHeavy clone() throws CloneNotSupportedException {
+        super.clone();
+        return null;
+    }
+
+   
     @Override
     public List<EventRuleImplementation> assembleEventRuleList(ViewOptionsEventRulesEnum voere) {
         List<EventRuleImplementation> evRuleList = new ArrayList<>();
@@ -322,6 +349,11 @@ public class CECaseDataHeavy
         }
 
         this.paymentList = skeletonHorde;
+    }
+
+    @Override
+    public String getCredentialSignature() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

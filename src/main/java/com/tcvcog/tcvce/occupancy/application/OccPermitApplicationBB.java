@@ -233,7 +233,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         QueryProperty qp = null;
 
         try {
-            qp = sc.initQuery(QueryPropertyEnum.HOUSESTREETNUM, uc.getPublicUserAuthorized().getMyCredential());
+            qp = sc.initQuery(QueryPropertyEnum.HOUSESTREETNUM, uc.auth_getPublicUserAuthorized().getMyCredential());
 
             if (qp != null && !qp.getParamsList().isEmpty()) {
                 SearchParamsProperty spp = qp.getPrimaryParams();
@@ -465,7 +465,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         try {
 
-            qp = sc.initQuery(QueryPersonEnum.PERSON_NAME, uc.getPublicUserAuthorized().getMyCredential());
+            qp = sc.initQuery(QueryPersonEnum.PERSON_NAME, uc.auth_getPublicUserAuthorized().getMyCredential());
 
             if (qp != null && !qp.getParamsList().isEmpty()) {
                 SearchParamsPerson spp = qp.getPrimaryParams();
@@ -741,7 +741,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         //Grab the unit list that is currently attached to the property in the database
         try {
-            existingProp = pc.assemblePropertyDataHeavy(prop.getBundledProperty(), uc.getPublicUserAuthorized().getMyCredential());
+            existingProp = pc.assemblePropertyDataHeavy(prop.getBundledProperty(), uc.auth_getPublicUserAuthorized());
 
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println("OccPermitApplicationBB.submitUnitChangeList() | ERROR: " + ex);

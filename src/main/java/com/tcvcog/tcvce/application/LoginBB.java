@@ -44,7 +44,7 @@ public class LoginBB extends BackingBeanUtils {
     public void initBean(){
         UserCoordinator uc = getUserCoordinator();
         try {
-            publicUA = uc.getPublicUserAuthorized();
+            publicUA = uc.auth_getPublicUserAuthorized();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
