@@ -17,7 +17,7 @@ about = {}
 # This is the code that SHOULD have allowed for a more proper setup:
 #       from codecs import open # Honestly, I am not sure if this is necessary.
 #       HERE = os.path.abspath(os.path.dirname(__file__))
-#       with open(os.path.join(HERE, "parcelupdate", '__version__.py'), 'r', 'utf-8') as f:
+#       with open(os.path.join(HERE, "pyparcel", '__version__.py'), 'r', 'utf-8') as f:
 #           exec(f.read(), about)
 
 description = "A command line interface for keeping Turtle Creek COG's CodeNForce's data up to date."
@@ -35,6 +35,7 @@ setup(
     # If your package is a single module, use this instead of 'packages':
     py_modules=['parcelupdate',],
     install_requires=requires,
+    extras_require={"dev":"pytest"},
     include_package_data=True,
     license='GNU GENERAL PUBLIC LICENSE',
 )

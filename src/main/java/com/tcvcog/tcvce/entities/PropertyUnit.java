@@ -168,7 +168,7 @@ public class    PropertyUnit
      */
     public Date getRentalIntentDateStopUtil() {
         Date rentalIntentDateStopUtil = null;
-        if(rentalIntentDateStart != null){
+        if(rentalIntentDateStop != null){
             rentalIntentDateStopUtil = Date.from(rentalIntentDateStop.atZone(ZoneId.systemDefault()).toInstant());
         }
         
