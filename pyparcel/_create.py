@@ -1,4 +1,3 @@
-# Todo: Move functions from parcelupdate into create
 from _constants import BOT_ID
 from _constants import SPACE
 
