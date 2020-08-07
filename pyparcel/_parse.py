@@ -1,8 +1,8 @@
 import re
 from collections import namedtuple
 import bs4
-from _constants import OWNER, TAXINFO
-from _constants import SPAN
+from ._constants import OWNER, TAXINFO
+from ._constants import SPAN
 
 def soupify_html(raw_html):
     return bs4.BeautifulSoup(raw_html, "html.parser")

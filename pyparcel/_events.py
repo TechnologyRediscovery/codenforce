@@ -3,7 +3,7 @@ from colorama import init
 init()
 import warnings
 from colorama import Fore, Back, Style
-from _constants import BOT_ID
+from ._constants import BOT_ID
 
 
 # These structures help organize the creation of events. See query_propertyexternaldata_for_changes_and_write_events
