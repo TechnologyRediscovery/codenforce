@@ -15,6 +15,7 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
@@ -181,6 +182,18 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     } // end postConstruct
 
+    public String goBack() {
+        try {
+            return getSessionBean().getNavStack().popLastPage();
+        } catch (NavigationException ex) {
+            System.out.println("OccPermitApplication.goBack() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Something went wrong when we tried to direct you back a page!", ""));
+            return "occPermitApplicationFlow";
+        }
+    }
+    
     /* TODO: Move to internal Occ App BB
     public String beginInternalOccApp(PublicInfoBundlePropertyUnit pu) throws IntegrationException, BObStatusException {
         OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -218,6 +231,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         OccupancyCoordinator oc = getOccupancyCoordinator();
         OccPermitApplication occpermitapp = oc.getNewOccPermitApplication();
         getSessionBean().setSessOccPermitApplication(occpermitapp);
+        getSessionBean().getNavStack().pushCurrentPage();
         return "chooseProperty";
     }
 
@@ -339,6 +353,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         }
 
+        getSessionBean().getNavStack().pushCurrentPage();
+        
         try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
             ec.redirect("/tcvce/public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml#currentStep");
@@ -359,6 +375,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         unit.getBundledUnit().setPropertyID(getSessionBean().getOccPermitAppActiveProp().getBundledProperty().getPropertyID());
         getSessionBean().setOccPermitAppActivePropUnit(unit);
+        getSessionBean().getNavStack().pushCurrentPage();
 
         try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
@@ -390,7 +407,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         }
         getSessionBean().getOccPermitAppWorkingProp().setUnitList(workingPropUnits);
         getSessionBean().getOccPermitAppActiveProp().setUnitList(workingPropUnits);
-
+        getSessionBean().getNavStack().pushCurrentPage();
+        
         try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
 
@@ -445,7 +463,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         }
         
         getSessionBean().setSessOccPermitApplication(currentApplication);
-
+        getSessionBean().getNavStack().pushCurrentPage();
+        
         try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
 
@@ -644,7 +663,12 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         
         temp.setAttachedPersons(unbundledPersons);
         temp.setApplicantPerson(applicant.getBundledPerson());
+        
+        if(contactPerson != null){
         temp.setPreferredContact(contactPerson.getBundledPerson());
+        } else{
+            temp.setPreferredContact(applicant.getBundledPerson());
+        }
         temp.setReason(getSessionBean().getSessOccPermitApplication().getReason());
 
         try{
@@ -660,7 +684,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         getSessionBean().setOccPermitPreferredContact(contactPerson);
         
         getSessionBean().setOccPermitAttachedPersons(attachedPersons);
-
+        getSessionBean().getNavStack().pushCurrentPage();
+        
         try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
 
@@ -724,6 +749,14 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                             "Something when wrong while submitting your application: " + ex, ""));
         }
 
+        while (!getSessionBean().getNavStack().peekLastPage().contains("occPermitAddPropertyUnit.xhtml")) { //Clear the navstack until we reach occPermitAddPropertyUnit.xhtml
+            try {
+                getSessionBean().getNavStack().popLastPage();
+            } catch (NavigationException ex) {
+                //nothing, we just want to clear the stack anyway.
+            }
+        }
+        
         return redir;
     }
 

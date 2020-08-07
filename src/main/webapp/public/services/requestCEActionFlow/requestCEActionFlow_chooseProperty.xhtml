@@ -84,7 +84,8 @@
                                                                  actionListener="#{cEActionRequestSubmitBB.searchForPropertiesSingleMuni}" 
                                                                  update="propSearchHouseNumIT 
                                                                  propSearchStreetIT
-                                                                 propertyResultTable"
+                                                                 propertyResultTable
+                                                                 growl"
                                                                  style="float: right"
                                                                  />
                                             </div>
@@ -131,8 +132,14 @@
                                     </div>
 
                                     <!-- CONTENT BUTTON -->
+                                    
+                                    
                                     <div class="public-main-contents-button">
-                                        <p:commandButton ajax="false" 
+                                        
+                                        <p:commandButton ajax="false" styleClass="buttonOwnLine"
+                                                         id="goBack" value="Go Back"
+                                                         action="#{cEActionRequestSubmitBB.goBack()}"/>
+                                        <p:commandButton ajax="false" styleClass="buttonOwnLine"
                                                          value="Next step: Describe your concern" 
                                                          action="#{cEActionRequestSubmitBB.storePropertyInfo}"
                                                          style="width: 100%;"/>

@@ -1428,6 +1428,8 @@ public class    SessionBean
 
     public void setUnitDetermined(boolean unitDetermined) {
         this.unitDetermined = unitDetermined;
+    }
+    
     /**
      * @return the userForConfig
      */

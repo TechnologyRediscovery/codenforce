@@ -84,10 +84,13 @@
 
                                     <!-- CONTENT BUTTON -->
                                     <div class="public-main-contents-button">
+                                        <p:commandButton id="goBack" ajax="false"
+                                                         value="Go Back" styleClass="buttonOwnLine"
+                                                         action="#{occPermitApplicationBB.goBack()}"/>
                                         <p:commandButton ajax="false"
                                                          value="Add people to application"
                                                          action="#{occPermitApplicationBB.storeReason()}"
-                                                         style="width: 100%;"
+                                                         style="width: 100%;" styleClass="buttonOwnLine"
                                                          />
                                     </div>
 

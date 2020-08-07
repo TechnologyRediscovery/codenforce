@@ -43,7 +43,7 @@
                                             <p:menuitem value="Step 1: Choose Municipality" containerStyleClass="complete" />
                                             <p:menuitem value="Step 2: Choose Property" containerStyleClass="complete" />
                                             <p:menuitem value="Step 3: Describe Concern" containerStyleClass="complete"/>
-                                            <p:menuitem value="Step 4: Upload Phote" containerStyleClass="complete"/>
+                                            <p:menuitem value="Step 4: Upload Photo" containerStyleClass="complete"/>
                                             <p:menuitem value="Step 5: Request Details" />
                                             <p:menuitem value="Step 6: Review and Submit" />
                                         </p:steps>
@@ -329,10 +329,13 @@
                                             </div>
                                             <!-- CONTENT BUTTON -->
                                             <div class="public-main-contents-button">
+                                                <p:commandButton ajax="false" styleClass="buttonOwnLine"
+                                                                 id="goBack" value="Go Back" tabindex="16"
+                                                         action="#{cEActionRequestSubmitBB.goBack()}"/>
                                                 <p:commandButton ajax="false" value="Store new person and continue" 
-                                                                 id="ceactionrequestflow-storenewperson-cb" tabindex="16"
+                                                                 id="ceactionrequestflow-storenewperson-cb" tabindex="17"
                                                                  action="#{cEActionRequestSubmitBB.validateActionRequestorNewPersonAndContinue}"
-                                                                 style="width: 100%"/>
+                                                                 style="width: 100%" styleClass="buttonOwnLine"/>
                                             </div>
                                         </h:form>
                                     </p:panel>

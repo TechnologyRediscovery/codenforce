@@ -127,10 +127,13 @@
 
                                     <!-- CONTENT BUTTON -->
                                     <div class="public-main-contents-button">
+                                        <p:commandButton id="goBack" ajax="false"
+                                                         value="Go Back" styleClass="buttonOwnLine"
+                                                         action="#{occPermitApplicationBB.goBack()}"/>
                                         <p:commandButton ajax="false"
                                                          value="Next step: Configure Unit List" 
                                                          action="#{occPermitApplicationBB.selectProperty}" 
-                                                         style="width: 100%"/>
+                                                         style="width: 100%" styleClass="buttonOwnLine"/>
 
                                     </div>
                                 </div>

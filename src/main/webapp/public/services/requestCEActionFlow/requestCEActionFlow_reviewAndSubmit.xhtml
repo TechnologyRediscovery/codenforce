@@ -43,7 +43,7 @@
                                             <p:menuitem value="Step 1: Choose Municipality" containerStyleClass="complete" />
                                             <p:menuitem value="Step 2: Choose Property" containerStyleClass="complete" />
                                             <p:menuitem value="Step 3: Describe Concern" containerStyleClass="complete"/>
-                                            <p:menuitem value="Step 4: Upload Phote" containerStyleClass="complete"/>
+                                            <p:menuitem value="Step 4: Upload Photo" containerStyleClass="complete"/>
                                             <p:menuitem value="Step 5: Request Details" containerStyleClass="complete"/>
                                             <p:menuitem value="Step 6: Review and Submit" />
                                         </p:steps>
@@ -176,17 +176,19 @@
                                     </div>
 
                                     <!-- CONTENT BUTTON -->
-                                    <div class="public-main-contents-button" style="display: flex">
-
+                                    <div class="public-main-contents-button">
+                                        <p:commandButton id="goBack" ajax="false"
+                                                         value="Go Back" styleClass="buttonOwnLine" tabindex="1"
+                                                         action="#{cEActionRequestSubmitBB.goBack()}"/>
                                         <p:commandButton 
                                             id="restartRequest" ajax="false"
                                             value="Restart Code Enforcement Request" 
-                                            styleClass="buttonOwnLine" tabindex="1"
+                                            styleClass="buttonOwnLine" tabindex="2"
                                             action="#{cEActionRequestSubmitBB.restartRequest()}"/>
                                         <p:commandButton 
                                             id="submitRequest" ajax="false"
                                             value="Submit Code Enforcement Request" 
-                                            styleClass="buttonOwnLine" tabindex="2"
+                                            styleClass="buttonOwnLine" tabindex="3"
                                             action="#{cEActionRequestSubmitBB.submitActionRequest}"/>
 
                                     </div>

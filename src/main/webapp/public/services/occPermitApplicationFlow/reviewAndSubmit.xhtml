@@ -120,12 +120,15 @@
                                         </div>
                                     </div>
                                     <!-- CONTENT BUTTON -->
-                                    <div class="public-main-contents-button" style="flex">
-                                        <p:commandButton ajax="false" 
+                                    <div class="public-main-contents-button">
+                                        
+                                        <p:commandButton id="goBack" ajax="false"
+                                                         value="Go Back" styleClass="buttonOwnLine"
+                                                         action="#{occPermitApplicationBB.goBack()}"/>
+                                        <p:commandButton ajax="false" styleClass="buttonOwnLine"
                                                          value="Submit Application and Return to Unit List" 
                                                          action="#{occPermitApplicationBB.submitApplication('selectForApply')}"/>
-
-                                        <p:commandButton ajax="false"
+                                        <p:commandButton ajax="false" styleClass="buttonOwnLine"
                                                          value="Submit Application and Exit" 
                                                          action="#{occPermitApplicationBB.submitApplication('systemHome')}"/>
                                     </div>

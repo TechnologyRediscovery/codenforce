@@ -16,9 +16,9 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.domain.NavigationException;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
-import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
 /**
@@ -28,39 +28,55 @@ import javax.faces.context.FacesContext;
 public class NavigationStack {
 
     private LinkedList<String> viewIDStack;
-    
+
     public NavigationStack() {
-        
+
         viewIDStack = new LinkedList<>();
 
     }
-    
-    public void pushCurrentPage(){
-        
+
+    /**
+     * Pushes the page the user is currently on to the stack. Use before
+     * redirecting to another page to save the current page so the user can
+     * return to the saved page.
+     */
+    public void pushCurrentPage() {
+
         FacesContext context = FacesContext.getCurrentInstance();
-        
+
         viewIDStack.push(context.getViewRoot().getViewId());
-        
+
     }
-    
-    public String popLastPage(){
-        
+
+    /**
+     * Returns the last page to be pushed on the stack.
+     * Put this in the return line of a BB method that redirects the user.
+     * @return the url or ID of the last page.
+     * @throws com.tcvcog.tcvce.domain.NavigationException @throws NoSuchElementException
+     */
+    public String popLastPage() throws NavigationException{
+
         try {
-        
-        return viewIDStack.pop();
-        
-        } catch(NoSuchElementException ex){
-            //We ran out of pages! (This should not happen)
-            //To keep the user from getting stuck, let's send them to an error page
-            //The error page should tell them to manually go backwards
-            return null;
+
+            return viewIDStack.pop();
+
+        } catch (NoSuchElementException ex) {
+            //We ran out of pages! This should not happen,
+            //but sometimes does if you hit refresh at a bad time.
+            throw new NavigationException("NavigationStack ran out of pages while popping.");
         }
     }
-    
-    public String peekLastPage(){
-        
+
+    /**
+     * Takes a look at the last page without removing it from the stack
+     *
+     * @return the url or ID of the last page. Returns null if there are no more
+     * pages
+     */
+    public String peekLastPage() {
+
         return viewIDStack.peek();
-        
+
     }
-    
+
 }

@@ -21,9 +21,9 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
-import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
@@ -39,8 +39,6 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import java.io.Serializable;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
@@ -509,8 +507,17 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     public String finishAndRedir() {
-
-        return getSessionBean().getNavStack().popLastPage();
+        try {
+            return getSessionBean().getNavStack().popLastPage();
+        } catch (NavigationException ex) {
+            System.out.println("FeeManagementBB.finishAndRedir | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to direct you back to the page you were last on."
+                            + " Your changes to the database were saved. Please return to the page manually.",
+                            "Do not hit the return button again but note the error."));
+            return "";
+        }
     }
 
     public String goToFeePermissions() {

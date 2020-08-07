@@ -195,11 +195,13 @@
 
                                     <!-- CONTENT BUTTON -->
                                     <div class="public-main-contents-button">
-
+                                        <p:commandButton id="goBack" ajax="false"
+                                                         value="Go Back" styleClass="buttonOwnLine"
+                                                         action="#{occPermitApplicationBB.goBack()}"/>
                                         <p:commandButton ajax="false"                                                   
                                                          action="#{occPermitApplicationBB.finalizeUnitList()}" 
                                                          value="Confirm and Continue"
-                                                         style="width: 100%"/>
+                                                         style="width: 100%" styleClass="buttonOwnLine"/>
 
                                     </div>
 

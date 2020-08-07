@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
@@ -78,7 +79,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     private Municipality selectedMuni;
 
     private Property selectedProperty; //TODO: Turn into PublicInfoBundle!
-    
+
     private List<CEActionRequestIssueType> issueTypeList;
 
     private boolean form_atSpecificAddress;
@@ -141,7 +142,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
 //                if (currentRequest.getRequestProperty() != null) {
 //            TODO: occbeta
-
 //            try {
 //                personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getPropertyID()).getPersonOccApplicationList();
 //            } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
@@ -181,6 +181,18 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
     }
 
+    public String goBack() {
+        try {
+            return getSessionBean().getNavStack().popLastPage();
+        } catch (NavigationException ex) {
+            System.out.println("CEActionRequestSubmitBB.goBack() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Something went wrong when we tried to direct you back a page!", ""));
+            return "requestCEActionFlow";
+        }
+    }
+
     public String requestActionAsFacesUser() {
         currentRequest.setRequestor(getSessionBean().getSessUser().getPerson());
         getSessionBean().setSessCEAR(currentRequest);
@@ -205,6 +217,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
     public String validateActionRequestorNewPersonAndContinue() {
         getSessionBean().setSessCEAR(currentRequest);
+        getSessionBean().getNavStack().pushCurrentPage();
         return "reviewAndSubmit";
     }
 
@@ -251,6 +264,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         cear.setBlobIDList(new ArrayList<Integer>());
         cear.setRequestProperty(new Property());
         getSessionBean().setSessCEAR(cear);
+        getSessionBean().getNavStack().pushCurrentPage();
         return "chooseProperty";
     }
 
@@ -262,6 +276,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             return "";
         }
         getSessionBean().setSessCEAR(currentRequest);
+        getSessionBean().getNavStack().pushCurrentPage();
         return "describeConcern";
     }
 
@@ -274,6 +289,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         }
         getSessionBean().setSessCEAR(currentRequest);
         getSessionBean().setBlobList(new ArrayList<Blob>());
+        getSessionBean().getNavStack().pushCurrentPage();
         return "photoUpload";
 //            
 //        } else {
@@ -307,6 +323,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         // before moving onto the person page, get a person's skeleton from the coordinator, put it
         // in the session for use on the next page
         setupPersonEntry();
+        getSessionBean().getNavStack().pushCurrentPage();
         return "requestorDetails";
     }
 
@@ -315,11 +332,11 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         BlobIntegrator bi = getBlobIntegrator();
         for (Blob b : blobList) {
             currentRequest.getBlobIDList().add(b.getBlobID());
-            
+
             //Also, save the description to the database.
-            try{
-            bi.updateBlobDescriptors(b);
-            } catch(IntegrationException ex){
+            try {
+                bi.updateBlobDescriptors(b);
+            } catch (IntegrationException ex) {
                 System.out.println("CEActionRequestSubmitBB.savePhotosAndContinue() | ERROR: " + ex);
             }
         }
@@ -327,6 +344,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         // before moving onto the person page, get a person's skeleton from the coordinator, put it
         // in the session for use on the next page
         setupPersonEntry();
+        getSessionBean().getNavStack().pushCurrentPage();
         return "requestorDetails";
     }
 
@@ -440,6 +458,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         try {
             // send the request into the DB
             submittedActionRequestID = ceari.submitCEActionRequest(currentRequest);
+            // Now go right back to the DB and get the request we just submitted to verify before displaying the PACC
             sb.setSessCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
 
             for (Integer blobID : currentRequest.getBlobIDList()) {
@@ -450,7 +469,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                 }
             }
 
-            // Now go right back to the DB and get the request we just submitted to verify before displaying the PACC
+            clearNavStack();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Success! Your request has been submitted and passed to our code enforcement team.", ""));
@@ -483,7 +502,18 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             }
         }
 
+        clearNavStack();
         return "requestCEActionFlow";
+    }
+
+    private void clearNavStack() {
+        while (getSessionBean().getNavStack().peekLastPage() != null) {
+            try {
+                getSessionBean().getNavStack().popLastPage();
+            } catch (NavigationException ex) {
+                //nothing, we just want to clear the stack anyway.
+            }
+        }
     }
 
     public void storePropertyLocationInfo(ActionEvent event) {
@@ -519,25 +549,25 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                 spp.setLimitResultCount_val(20);
 
                 sc.runQuery(qp);
-                
+
             } else {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Something when wrong with the property search! Sorry!", ""));
+                                "Something went wrong with the property search! Sorry!", ""));
             }
 
         } catch (IntegrationException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Something when wrong with the property search! Sorry!", ""));
+                            "Something went wrong with the property search! Sorry!", ""));
         }
 
         if (qp != null && !qp.getBOBResultList().isEmpty()) {
             propList = qp.getBOBResultList();
             getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Your search completed with " + getPropList().size() + " results", ""));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Your search completed with " + getPropList().size() + " results", ""));
         }
 
     }
