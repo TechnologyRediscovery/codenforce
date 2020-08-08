@@ -56,7 +56,7 @@ public class ViolationSelectElementBB extends BackingBeanUtils implements Serial
 
     public String useSelectedElement(EnforcableCodeElement ece) {
         CaseCoordinator cc = getCaseCoordinator();
-        CodeViolation cv = cc.generateNewCodeViolation(getSessionBean().getSessCECase(), ece);
+        CodeViolation cv = cc.violation_generateNewCodeViolation(getSessionBean().getSessCECase(), ece);
         getSessionBean().setSessCodeViolation(cv);
         return "violationAdd";
 

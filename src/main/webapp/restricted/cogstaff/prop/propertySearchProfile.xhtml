@@ -740,7 +740,7 @@
                                                         <h:selectOneMenu id="prop-add-source-som"
                                                                          value="#{propertyProfileBB.currentProperty.bobSource}" style="width:175px;height:25px">
                                                             <f:converter converterId="bobSourceConverter"/>
-                                                            <f:selectItem itemLabel="select a muni..." noSelectionOption="true" />
+                                                            <f:selectItem itemLabel="select a source..." noSelectionOption="true" />
                                                             <f:selectItems id="propinfoedit-sourcess-elitems"
                                                                            value="#{propertyProfileBB.sourceList}"
                                                                            var="bs" itemValue="#{bs}" itemLabel="#{bs.title}"/>
@@ -1035,19 +1035,24 @@
                                             <h:form id="prop-events-panel-form">
 
 
+                                                <p:selectOneMenu style="width: 300px;" 
+                                                                 id="prop-viewoptionsevents-solb" 
+                                                                 value="#{propertyProfileBB.eventViewOptionSelected}" 
+                                                                 tabindex="10">
 
+                                                    <p:ajax update="prop-events-datatable"                                                           
+                                                            immediate="true"/>
 
-                                                <p:commandButton    id="prop-events-seeall-button"
-                                                                    ajax="false"
-                                                                    value="Info case list"
-                                                                    styleClass="noFill button-size-small"
-                                                                    action="#{propertyProfileBB.onInfoCaseListButtonChange}"
-                                                                    icon="fa fa-clipboard"
-                                                                    />
+                                                    <f:selectItems  id="prop-events-selitems" 
+                                                                    value="#{propertyProfileBB.eventViewOptions}" 
+                                                                    var="evo" 
+                                                                    itemValue="#{evo}" 
+                                                                    itemLabel="#{evo.label}"/>
+                                                </p:selectOneMenu>
 
                                                 <p:spacer height="5px" />
 
-                                                <p:dataTable id="prop-events-table"
+                                                <p:dataTable id="prop-events-datatable"
                                                              var="event"
                                                              value="#{propertyProfileBB.currentProperty.completeEventList}"
                                                              tableStyleClass="primeDataTable"
@@ -1134,7 +1139,7 @@
                                                         <h:outputText value="#{person.addressState}"/>
                                                         <h:outputText value=", "/>
                                                         <h:outputText value="#{person.addressZip}"/>
-                                                        
+
 
                                                     </p:column>
 
@@ -1404,8 +1409,8 @@
 
                                             </h:form>
                                         </p:panel>
-                                        
-                                        
+
+
                                         <p:panel id="propinfo-notes-panel"
                                                  toggleable="true"
                                                  collapsed="false"
@@ -1546,15 +1551,15 @@
                             </div>
 
                             <p:spacer height="5px" />
-                            
+
                             <p:commandButton    id="prop-person-connect-abort"
-                                                    ajax="true" 
-                                                    tabindex="2"
-                                                    oncomplete="PF('prop-persons-manage-var').hide()"
-                                                    value="Cancel" 
-                                                    icon="fa fa-stop" 
-                                                    />
-                                
+                                                ajax="true" 
+                                                tabindex="2"
+                                                oncomplete="PF('prop-persons-manage-var').hide()"
+                                                value="Cancel" 
+                                                icon="fa fa-stop" 
+                                                />
+
                             <p:commandButton ajax="false"
                                              id="prop-person-commitconnect" 
                                              value="Connect" 
@@ -2033,6 +2038,7 @@
 
                         </h:form>
                     </p:dialog>
+                    
                     <p:dialog   id="propinfo-notes-dialog"
                                 height="300" width="750"
                                 widgetVar="propinfo-notes-dialog-var"

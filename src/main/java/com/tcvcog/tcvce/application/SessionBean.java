@@ -154,6 +154,8 @@ public class    SessionBean
     private List<EventCnFPropUnitCasePeriodHeavy> sessEventList;
     private EventCnF sessEventQueued;
     
+    private PageModeEnum eventPageModeRequest;
+    
     /* >>> QUERY EVENT <<< */
     private QueryEvent queryEvent;
     private List<QueryEvent> queryEventList;
@@ -182,6 +184,11 @@ public class    SessionBean
     private CECaseDataHeavy sessCECase;
     private CECase sessCECaseQueued;
     private List<CECasePropertyUnitHeavy> sessCECaseList;
+    
+    private PageModeEnum ceCaseSearchProfilePageModeRequest;
+    private PageModeEnum ceCaseViolationsPageModeRequest; 
+    private PageModeEnum ceCaseNoticesPageModeRequest; 
+    private PageModeEnum ceCaseCitationsPageModeRequest; 
     
     private CodeViolation sessCodeViolation;
     private List<CodeViolation> sessViolationList;
@@ -260,6 +267,7 @@ public class    SessionBean
     
     private Blob sessBlob;
     private List<Blob> blobList;
+    private PageModeEnum blobPageModeRequest;
     
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                  XIII PublicInfoBundle                          <<< */
@@ -574,7 +582,7 @@ public class    SessionBean
         if(cseldh != null && !cseldh.isEmpty()){
             for(CECaseDataHeavy csedh: cseldh){
                 try {
-                    cseListPDH.add(cc.assembleCECasePropertyUnitHeavy(csedh));
+                    cseListPDH.add(cc.cecase_assembleCECasePropertyUnitHeavy(csedh));
                 } catch (IntegrationException | SearchException ex) {
                     System.out.println(ex);
                 }
@@ -1443,6 +1451,90 @@ public class    SessionBean
      */
     public void setUserForConfig(UserAuthorizedForConfig userForConfig) {
         this.userForConfig = userForConfig;
+    }
+
+    /**
+     * @return the ceCaseViolationsPageModeRequest
+     */
+    public PageModeEnum getCeCaseViolationsPageModeRequest() {
+        return ceCaseViolationsPageModeRequest;
+    }
+
+    /**
+     * @return the ceCaseNoticesPageModeRequest
+     */
+    public PageModeEnum getCeCaseNoticesPageModeRequest() {
+        return ceCaseNoticesPageModeRequest;
+    }
+
+    /**
+     * @return the ceCaseCitationsPageModeRequest
+     */
+    public PageModeEnum getCeCaseCitationsPageModeRequest() {
+        return ceCaseCitationsPageModeRequest;
+    }
+
+    /**
+     * @param ceCaseViolationsPageModeRequest the ceCaseViolationsPageModeRequest to set
+     */
+    public void setCeCaseViolationsPageModeRequest(PageModeEnum ceCaseViolationsPageModeRequest) {
+        this.ceCaseViolationsPageModeRequest = ceCaseViolationsPageModeRequest;
+    }
+
+    /**
+     * @param ceCaseNoticesPageModeRequest the ceCaseNoticesPageModeRequest to set
+     */
+    public void setCeCaseNoticesPageModeRequest(PageModeEnum ceCaseNoticesPageModeRequest) {
+        this.ceCaseNoticesPageModeRequest = ceCaseNoticesPageModeRequest;
+    }
+
+    /**
+     * @param ceCaseCitationsPageModeRequest the ceCaseCitationsPageModeRequest to set
+     */
+    public void setCeCaseCitationsPageModeRequest(PageModeEnum ceCaseCitationsPageModeRequest) {
+        this.ceCaseCitationsPageModeRequest = ceCaseCitationsPageModeRequest;
+    }
+
+    /**
+     * @return the eventPageModeRequest
+     */
+    public PageModeEnum getEventPageModeRequest() {
+        return eventPageModeRequest;
+    }
+
+    /**
+     * @param eventPageModeRequest the eventPageModeRequest to set
+     */
+    public void setEventPageModeRequest(PageModeEnum eventPageModeRequest) {
+        this.eventPageModeRequest = eventPageModeRequest;
+    }
+
+    /**
+     * @return the blobPageModeRequest
+     */
+    public PageModeEnum getBlobPageModeRequest() {
+        return blobPageModeRequest;
+    }
+
+    /**
+     * @param blobPageModeRequest the blobPageModeRequest to set
+     */
+    public void setBlobPageModeRequest(PageModeEnum blobPageModeRequest) {
+        this.blobPageModeRequest = blobPageModeRequest;
+    }
+
+    /**
+     * @return the ceCaseSearchProfilePageModeRequest
+     */
+    public PageModeEnum getCeCaseSearchProfilePageModeRequest() {
+        return ceCaseSearchProfilePageModeRequest;
+    }
+
+    /**
+     * @param ceCaseSearchProfilePageModeRequest the ceCaseSearchProfilePageModeRequest to set
+     */
+    public void setCeCaseSearchProfilePageModeRequest(PageModeEnum ceCaseSearchProfilePageModeRequest) {
+        this.ceCaseSearchProfilePageModeRequest = ceCaseSearchProfilePageModeRequest;
     }
     
 }

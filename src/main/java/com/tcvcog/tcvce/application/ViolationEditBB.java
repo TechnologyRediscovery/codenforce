@@ -89,7 +89,7 @@ public class ViolationEditBB extends BackingBeanUtils implements Serializable{
             currentViolation.setNotes(sc.appendNoteBlock(mcc));
 
             
-             cc.updateCodeViolation(currentCase, currentViolation, getSessionBean().getSessUser());
+             cc.violation_updateCodeViolation(currentCase, currentViolation, getSessionBean().getSessUser());
              
              // if update succeeds without throwing an error, then generate an
             // update violation event

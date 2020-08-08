@@ -112,7 +112,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
             //Update the selected request with the one from the database.
             if (getSessionBean().getSessCEAR() != null) {
-                selectedRequest = cc.getCEActionRequest(getSessionBean().getSessCEAR().getRequestID());
+                selectedRequest = cc.cear_getCEActionRequest(getSessionBean().getSessCEAR().getRequestID());
             }
         } catch (SearchException | IntegrationException ex) {
             System.out.println(ex);
@@ -125,7 +125,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         searchParams = new SearchParamsCEActionRequests();
         queryList = sc.buildQueryCEARList(getSessionBean().getSessUser().getMyCredential());
 
-        ReportCEARList rpt = cc.getInitializedReportConficCEARs(
+        ReportCEARList rpt = cc.report_getInitializedReportConficCEARs(
                 getSessionBean().getSessUser(), getSessionBean().getSessMuni());
 
         rpt.setPrintFullCEARQueue(false);
@@ -331,7 +331,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator searchCoord = getSearchCoordinator();
 
-        ReportCEARList rpt = cc.getInitializedReportConficCEARs(
+        ReportCEARList rpt = cc.report_getInitializedReportConficCEARs(
                 getSessionBean().getSessUser(), getSessionBean().getSessMuni());
 
         rpt.setPrintFullCEARQueue(true);
@@ -988,7 +988,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         CaseCoordinator cc = getCaseCoordinator();
 
         disabledDueToRoutingNotAllowed
-                = !(cc.determineCEActionRequestRoutingActionEnabledStatus(
+                = !(cc.cear_determineCEActionRequestRoutingActionEnabledStatus(
                         selectedRequest,
                         getSessionBean().getSessUser()));
 

@@ -161,8 +161,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
         if (currentRequest.getMuni() != null) {
             try {
-//                issueTypeList = cc.getIssueTypes(currentRequest.getMuni());
-                issueTypeList = cc.getIssueTypes();
+//                issueTypeList = cc.cear_getIssueTypes(currentRequest.getMuni());
+                issueTypeList = cc.cear_getIssueTypes();
             } catch (IntegrationException ex) {
                 System.out.println("Error occured while fetching issue typelist: " + ex);
             }
@@ -245,7 +245,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public String storeSelectedMuni() {
         CEActionRequest cear;
         CaseCoordinator cc = getCaseCoordinator();
-        cear = cc.getInititalizedCEActionRequest();
+        cear = cc.cear_getInititalizedCEActionRequest();
         cear.setDateOfRecordUtilDate(form_dateOfRecord);
         cear.setMuni(selectedMuni);
         cear.setBlobIDList(new ArrayList<Integer>());

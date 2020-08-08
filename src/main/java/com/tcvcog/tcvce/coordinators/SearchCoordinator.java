@@ -285,7 +285,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             // the integrator will only look at the single muni val, 
             // so we'll call searchForXXX once for each muni
             for(Integer i: ci.searchForCECases(params)){
-                CECase cse = cc.getCECase(i);
+                CECase cse = cc.cecase_getCECase(i);
                 // Case Phases only exist in JavaJavaLand, so we'll evaluate the
                 // search params here before adding the new objects to the
                 // final query result list
@@ -300,7 +300,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     caseListTemp.add(cse);
                 }
             }
-                q.addToResults(cc.assembleCECasePropertyUnitHeavyList(caseListTemp));
+                q.addToResults(cc.cecase_assembleCECasePropertyUnitHeavyList(caseListTemp));
             } catch (IntegrationException | BObStatusException ex) {
                 throw new SearchException("Exception during search: " + ex.toString());
             }
@@ -340,7 +340,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             ceariListTemp.clear();
                 try {
                     for(Integer i: ceari.searchForCEActionRequests(sp)){
-                            ceariListTemp.add(cc.getCEActionRequest(i));
+                            ceariListTemp.add(cc.cear_getCEActionRequest(i));
                     }
                 } catch (IntegrationException ex) {
                     System.out.println(ex);

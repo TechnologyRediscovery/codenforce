@@ -38,7 +38,7 @@ public class PIBCECaseBB extends BackingBeanUtils implements Serializable {
     public void attachMessageToCase(ActionEvent ev){
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            cc.attachPublicMessage(activePIBCECase.getBundledCase().getCaseID(), messagerName, messagerName, messagerPhone);
+            cc.public_attachPublicMessage(activePIBCECase.getBundledCase().getCaseID(), messagerName, messagerName, messagerPhone);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Successfully added message to csae. Please re-search using your access control code to see your event appear in the list", ""));

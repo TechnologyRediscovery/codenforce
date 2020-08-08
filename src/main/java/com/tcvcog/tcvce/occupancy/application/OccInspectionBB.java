@@ -151,11 +151,9 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         currentOccPeriod = getSessionBean().getSessOccPeriod();
         try {
             setupUnitMemberVariablesBasedOnCurrentOccPeriod();
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
-        } catch (SearchException ex) {
-            Logger.getLogger(OccInspectionBB.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
         
         // general setting of drop-down box lists
         if(workingLocationList == null){

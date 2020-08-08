@@ -289,7 +289,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ceCaseID);
-            //System.out.println("CaseIntegrator.getCECase| sql: " + stmt.toString());
+            //System.out.println("CaseIntegrator.cecase_getCECase| sql: " + stmt.toString());
             rs = stmt.executeQuery();
             
             while(rs.next()){
@@ -333,7 +333,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, propID);
-            //System.out.println("CaseIntegrator.getCECase| sql: " + stmt.toString());
+            //System.out.println("CaseIntegrator.cecase_getCECase| sql: " + stmt.toString());
             rs = stmt.executeQuery();
             
             while(rs.next()){
@@ -612,15 +612,27 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             
             stmt.setString(8, ceCase.getNotes());
             stmt.setBoolean(9, ceCase.isPaccEnabled());
-            if(ceCase.getSource() != null){
-                stmt.setInt(10, ceCase.getSource().getSourceid());
-            } else {
-                stmt.setNull(10, java.sql.Types.NULL);
-            }
-            stmt.setBoolean(11, ceCase.isAllowForwardLinkedPublicAccess());
-            stmt.setBoolean(12, ceCase.isActive());
+            stmt.setBoolean(10, ceCase.isAllowForwardLinkedPublicAccess());
             
-            stmt.setInt(13, ceCase.getCaseID());
+            stmt.setBoolean(11, ceCase.isPropertyInfoCase());
+            if(ceCase.getPersonInfoPersonID() != 0){
+                stmt.setInt(12, ceCase.getPersonInfoPersonID());
+            } else {
+                stmt.setNull(12, java.sql.Types.NULL);
+            }
+            if(ceCase.getSource() != null){
+                stmt.setInt(13, ceCase.getSource().getSourceid());
+            } else {
+                stmt.setNull(13, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(14, ceCase.isActive());
+            if(ceCase.getLastUpdatedBy() != null){
+                stmt.setInt(15, ceCase.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(15, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(16, ceCase.getCaseID());
             
             stmt.executeUpdate();
             
@@ -632,6 +644,42 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    
+    
+   
+    /**
+     * Updates only the notes field on cecase table
+     * @param cse with the Notes field as you want it inserted 
+     * 
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public void updateCECaseNotes(CECase cse) 
+            throws IntegrationException, BObStatusException{
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        if(cse == null){
+            throw new BObStatusException("cannot update notes on a null case");
+        }
+        
+        try {
+            String s = "UPDATE public.cecase SET notes=? WHERE caseid=?";
+            stmt = con.prepareStatement(s);
+            stmt.setString(1, cse.getNotes());
+            stmt.setInt(2, cse.getCaseID());
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to generate case history list", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
     }
@@ -676,7 +724,6 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
         return cseidl;
     }
-    
       /**
      *
      * @param casephase
@@ -904,7 +951,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         loadViolationPhotoList(v);
         
         v.setCitationIDList(getCitations(v.getViolationID()));
-        cc.configureCodeViolation(v);
+        cc.violation_configureCodeViolation(v);
         return v;
     }
 

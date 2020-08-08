@@ -41,11 +41,15 @@ public class CECaseDataHeavy
     private List<MoneyCECaseFeeAssigned> feeList;
     private List<MoneyCECaseFeePayment> paymentList;
     
+    private List<Blob> blobList;
+    
     protected boolean showHiddenEvents;
     protected boolean showInactiveEvents;
 
    
     public CECaseDataHeavy(CECase cse){
+        if(cse != null){
+            
         this.caseID = cse.caseID;
         this.publicControlCode = cse.publicControlCode;
         this.paccEnabled = cse.paccEnabled;
@@ -79,6 +83,9 @@ public class CECaseDataHeavy
         this.statusBundle = cse.getStatusBundle();
         
         eventListMaster = new ArrayList<>();
+        } else {
+            System.out.println("CECaseDataHeavy.const: null input case");
+        }
         
     }
     
@@ -417,6 +424,20 @@ public class CECaseDataHeavy
      */
     public void setProperty(Property property) {
         this.property = property;
+    }
+
+    /**
+     * @return the blobList
+     */
+    public List<Blob> getBlobList() {
+        return blobList;
+    }
+
+    /**
+     * @param blobList the blobList to set
+     */
+    public void setBlobList(List<Blob> blobList) {
+        this.blobList = blobList;
     }
 
 }

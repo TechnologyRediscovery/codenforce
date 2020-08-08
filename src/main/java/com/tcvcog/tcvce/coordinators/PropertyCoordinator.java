@@ -91,7 +91,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             // Property info cases
             qcse = sc.initQuery(QueryCECaseEnum.PROPINFOCASES, ua.getKeyCard());
             qcse.getPrimaryParams().setProperty_val(prop);
-            pdh.setPropInfoCaseList(cc.assembleCECaseDataHeavyList(sc.runQuery(qcse).getBOBResultList(), ua));
+            pdh.setPropInfoCaseList(cc.cecase_assembleCECaseDataHeavyList(sc.runQuery(qcse).getBOBResultList(), ua));
             
             // check list and see if it's emtpy; 
             if(pdh.getPropInfoCaseList() == null){
@@ -412,13 +412,13 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     public PropertyDataHeavy createPropertyInfoCase(PropertyDataHeavy p, UserAuthorized ua) throws SearchException{
         CaseCoordinator cc = getCaseCoordinator();
         UserCoordinator uc = getUserCoordinator();
-        CECase cse = cc.initCECase(p, ua);
+        CECase cse = cc.cecase_initCECase(p, ua);
         //review all case mems and set app ones for info case
         
 //        try {
 //            cse.setCaseManager(uc.getUser(ua.getMyCredential().getGoverningAuthPeriod().getUserID()));
 // TODO: Debug later
-//            cc.insertNewCECase(cse, ua, null);
+//            cc.cecase_insertNewCECase(cse, ua, null);
 //        } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
 //            System.out.println(ex);
 //        }

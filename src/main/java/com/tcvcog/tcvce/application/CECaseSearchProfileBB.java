@@ -17,24 +17,41 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.BOBSource;
+import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.CaseStageEnum;
+import com.tcvcog.tcvce.entities.Citation;
+import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.Proposal;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -61,7 +78,15 @@ public class CECaseSearchProfileBB
     private List<QueryCECase> queryList;
     private QueryCECase querySelected;
     private boolean appendResultsToList;
-
+    
+    private ViewOptionsActiveHiddenListsEnum eventViewOptionSelected;
+    private List<ViewOptionsActiveHiddenListsEnum> eventViewOptions;
+    
+    private List<User> userManagerOptionList;
+    private List<BOBSource> bobSourceOptionList;
+    
+    private String formNoteText;
+    
     private List<Property> propListForSearch;
     private CaseStageEnum[] caseStageList;
 
@@ -83,15 +108,11 @@ public class CECaseSearchProfileBB
     public void initBean() {
         CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
+        UserCoordinator uc = getUserCoordinator();
+        SystemCoordinator sysCor = getSystemCoordinator();
+        
 
         SessionBean sb = getSessionBean();
-        try {
-            currentCase = cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
-            
-        } catch (IntegrationException | SearchException | BObStatusException ex) {
-            System.out.println(ex);
-        }
-
         queryList = sc.buildQueryCECaseList(getSessionBean().getSessUser().getMyCredential());
         querySelected = getSessionBean().getQueryCECase();
 
@@ -99,16 +120,37 @@ public class CECaseSearchProfileBB
 
         caseList = new ArrayList<>();
         caseList.addAll(sb.getSessCECaseList());
+        CECase cseTemp = getSessionBean().getSessCECase();
+        try {
+            if(cseTemp == null && !caseList.isEmpty()){
+                cseTemp = caseList.get(0);
+            } else {
+                cseTemp = cc.cecase_selectDefaultCECase(sb.getSessUser());
+            }
+            
+            currentCase = cc.cecase_assembleCECaseDataHeavy(cseTemp, getSessionBean().getSessUser());
+            System.out.println("CECaseSearchProfile.initBean(): current case ID: " + currentCase.getCaseID());
+            
+        } catch (IntegrationException | SearchException | BObStatusException ex) {
+            System.out.println(ex);
+        }
+
 
         propListForSearch = sb.getSessPropertyList();
         caseStageList = CaseStageEnum.values();
+        
+        eventViewOptions = Arrays.asList(ViewOptionsActiveHiddenListsEnum.values());
+        setEventViewOptionSelected(ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN);
+
+        userManagerOptionList = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
+        bobSourceOptionList = sysCor.getBobSourceListComplete();
 
         ReportConfigCECaseList listRpt = getSessionBean().getReportConfigCECaseList();
         
         if (listRpt != null) {
             reportCECaseList = listRpt;
         } else {
-            reportCECaseList = cc.getDefaultReportConfigCECaseList();
+            reportCECaseList = cc.report_getDefaultReportConfigCECaseList();
         }
         
         ReportConfigCECase rpt = getSessionBean().getReportConfigCECase();
@@ -117,6 +159,17 @@ public class CECaseSearchProfileBB
             rpt.setTitle("Code Enforcement Case Summary");
             reportCECase = rpt;
         }
+        
+        pageModes = new ArrayList<>();
+        pageModes.add(PageModeEnum.LOOKUP);
+        pageModes.add(PageModeEnum.INSERT);
+        pageModes.add(PageModeEnum.UPDATE);
+        pageModes.add(PageModeEnum.REMOVE);
+        if(getSessionBean().getCeCaseSearchProfilePageModeRequest() != null){
+            setCurrentMode(getSessionBean().getCeCaseSearchProfilePageModeRequest());
+        } 
+        setCurrentMode(pageModes.get(0));
+        
     }
 
     /**
@@ -141,7 +194,7 @@ public class CECaseSearchProfileBB
     public void refreshCurrentCase(ActionEvent ev){
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            currentCase = cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
+            currentCase = cc.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
         } catch (BObStatusException  | IntegrationException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -161,10 +214,11 @@ public class CECaseSearchProfileBB
         //reset default setting every time the Mode has been selected 
 //        loadDefaultPageConfig();
         //check the currentMode == null or not
-        if (currentMode == null) {
+        if (mode == null) {
             this.currentMode = tempCurMode;
         } else {
             this.currentMode = mode;
+            System.out.println("CECaseSearchProfileBB.setCurrentMode: " + currentMode.getTitle());
             switch(currentMode){
                 case LOOKUP:
                     onModeLookupInit();
@@ -185,17 +239,51 @@ public class CECaseSearchProfileBB
         }
     }
     
+    
+    //check if current mode == Lookup
+    public boolean getActiveLookupMode() {
+        // hard-wired on since there's always a property loaded
+        return PageModeEnum.LOOKUP.equals(currentMode) ;
+    }
+
+    /**
+     * Provide UI elements a boolean true if the mode is UPDATE
+     * @return 
+     */
+    public boolean getActiveUpdateMode(){
+        return PageModeEnum.UPDATE.equals(currentMode);
+    }
+
+
+    //check if current mode == Insert
+    public boolean getActiveInsertUpdateMode() {
+        return PageModeEnum.INSERT.equals(currentMode) || PageModeEnum.UPDATE.equals(currentMode);
+    }
+
+    //check if current mode == Insert
+    public boolean getActiveInsertMode() {
+        return PageModeEnum.INSERT.equals(currentMode);
+    }
+
+    //check if current mode == Remove
+    public boolean getActiveRemoveMode() {
+        return PageModeEnum.REMOVE.equals(currentMode);
+    }
+
+
+    
     /**
      * Primary listener method which copies a reference to the selected 
      * user from the list and sets it on the selected user perch
      * @param cse
+     * @return 
      */
-    public void onObjetViewButtonChange(CECase cse){
+    public String onObjetViewButtonChange(CECase cse){
         CaseCoordinator cc = getCaseCoordinator();
         
         if(cse != null){
             try {
-                currentCase = cc.assembleCECaseDataHeavy(cse, getSessionBean().getSessUser());
+                currentCase = cc.cecase_assembleCECaseDataHeavy(cse, getSessionBean().getSessUser());
                 getSessionBean().setSessCECase(currentCase);
                 getSessionBean().setSessProperty(currentCase.getPropertyID());
             } catch (IntegrationException | BObStatusException | SearchException ex) {
@@ -205,6 +293,8 @@ public class CECaseSearchProfileBB
                       "Unable to assemble case data heavy " + ex.getMessage(), ""));
             }
         }
+        System.out.println("CECaseSearchProfileBB.currentCase: " + currentCase.getCaseID());
+        return "";
     }
      
  
@@ -248,7 +338,7 @@ public class CECaseSearchProfileBB
          CaseCoordinator cc = getCaseCoordinator();
         
         try {
-            cc.updateCECaseMetadata(currentCase);
+            cc.cecase_updateCECaseMetadata(currentCase);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "Case metadata updated", ""));
         } catch (BObStatusException | IntegrationException ex) {
@@ -262,42 +352,156 @@ public class CECaseSearchProfileBB
     }
      
     
+     /**
+      * Listener for the start of the case remove process
+      */
      public void onModeRemoveInit(){
-       // nothing to do here yet but let panels reset themselves
+       
     }
      
+    /**
+     * Listener for user requests to deactivate a cecase
+     * @return 
+     */
+    public String onCaseRemoveCommitButtonChange(){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            cc.cecase_deactivateCase(currentCase);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                "Case marked as inactive.", ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                ex.getMessage(), ""));
+            
+        }
+        return "ceCaseSearchProfile";
+        
+    }
     
+      /**
+     * Listener for commencement of note writing process
+     *
+     * @param ev
+     */
+    public void onNoteInitButtonChange(ActionEvent ev) {
+        formNoteText = new String();
 
-    //check if current mode == Lookup
-    public boolean getActiveLookupMode() {
-        // hard-wired on since there's always a property loaded
-        return PageModeEnum.LOOKUP.equals(currentMode) ;
     }
 
     /**
-     * Provide UI elements a boolean true if the mode is UPDATE
+     * Listener for user requests to commit new note content to the current
+     * Property
+     *
+     * @param ev
      * @return 
      */
-    public boolean getActiveUpdateMode(){
-        return PageModeEnum.UPDATE.equals(currentMode);
+    public String onNoteCommitButtonChange(ActionEvent ev) {
+        CaseCoordinator cc = getCaseCoordinator();
+        
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        mbp.setCred(getSessionBean().getSessUser().getKeyCard());
+        mbp.setExistingContent(currentCase.getNotes());
+        mbp.setNewMessageContent(formNoteText);
+        mbp.setHeader("Case Note");
+        mbp.setUser(getSessionBean().getSessUser());
+       
+        try {
+            
+            cc.cecase_updateCECaseNotes(mbp, currentCase);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Succesfully appended note!", ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Fatal error appending note; apologies!", ""));
+
+        }
+
+        return "ceCaseSearchProfile";
+
     }
-
-
-    //check if current mode == Insert
-    public boolean getActiveInsertUpdateMode() {
-        return PageModeEnum.INSERT.equals(currentMode) || PageModeEnum.UPDATE.equals(currentMode);
+    
+    public String onProposalViewButtonChange(Proposal prop){
+        
+        return "workflow";
+        
     }
-
-    //check if current mode == Insert
-    public boolean getActiveInsertMode() {
-        return PageModeEnum.INSERT.equals(currentMode);
+    
+    public String onProposalsListButtonChange(){
+        return "workflow";
+        
     }
-
-    //check if current mode == Remove
-    public boolean getActiveRemoveMode() {
-        return PageModeEnum.REMOVE.equals(currentMode);
+    
+    public String onEventViewButtonChange(EventCnF ev){
+        return "events";
+        
     }
-
+    
+    public String onEventAddButtonChange(){
+        return "events";
+        
+        
+    }
+    
+    public String onCEARViewButtonChange(CEActionRequest cear){
+        
+        return "cEActionRequests";
+        
+    }
+    
+    
+    
+    public String onViolationViewButtonChange(CodeViolation cv){
+        return "ceCaseViolations";
+        
+    }
+    
+    public String onViolationAddButtonChange(){
+        
+        return "ceCaseViolations";
+        
+        
+    }
+    
+    public String onNOVViewButtonChange(NoticeOfViolation nov){
+        return "ceCaseNotices";
+        
+    }
+    
+    public String onNOVAddButtonChange(){
+        
+        return "ceCaseNotices";
+        
+    }
+    
+    public String onCitationViewButtonChange(Citation cit){
+        return "ceCaseCitations";
+        
+        
+    }
+    
+    public String onCitationAddButtonChange(){
+        
+        return "ceCaseCitations";
+    }
+    
+    public String onBlobViewButtonChange(Blob blob){
+        return "blobs";
+        
+    }
+    
+    public String onBlobAddButtonChange(){
+        
+        return "blobs";
+    }
+    
+    
+    
+    
+    
 
     /**
      * Listener for requests to go view the property profile of a property associated
@@ -335,7 +539,7 @@ public class CECaseSearchProfileBB
         getReportCECase().setGenerationTimestamp(LocalDateTime.now());
 
         try {
-            setReportCECase(cc.transformCECaseForReport(getReportCECase()));
+            setReportCECase(cc.report_transformCECaseForReport(getReportCECase()));
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
                 getFacesContext().addMessage(null,
@@ -359,7 +563,7 @@ public class CECaseSearchProfileBB
      */
     public void prepareReportCECase(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
-        setReportCECase(cc.getDefaultReportConfigCECase(currentCase));
+        setReportCECase(cc.report_getDefaultReportConfigCECase(currentCase));
         System.out.println("CaseProfileBB.prepareReportCECase | reportConfigOb: " + getReportCECase());
 
     }
@@ -426,7 +630,7 @@ public class CECaseSearchProfileBB
     public void loadCECaseHistory(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            caseList.addAll(cc.assembleCECasePropertyUnitHeavyList(cc.getCECaseHistory(getSessionBean().getSessUser())));
+            caseList.addAll(cc.cecase_assembleCECasePropertyUnitHeavyList(cc.cecase_getCECaseHistory(getSessionBean().getSessUser())));
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Case history loaded", ""));
@@ -482,7 +686,7 @@ public class CECaseSearchProfileBB
         CaseCoordinator cc = getCaseCoordinator();
 
         if (getReportCECaseList() == null) {
-            setReportCECaseList(cc.getDefaultReportConfigCECaseList());
+            setReportCECaseList(cc.report_getDefaultReportConfigCECaseList());
         }
         System.out.println("CaseProfileBB.prepareCaseListReport");
 
@@ -690,6 +894,76 @@ public class CECaseSearchProfileBB
      */
     public void setReportCECase(ReportConfigCECase reportCECase) {
         this.reportCECase = reportCECase;
+    }
+
+    /**
+     * @return the eventViewOptions
+     */
+    public List<ViewOptionsActiveHiddenListsEnum> getEventViewOptions() {
+        return eventViewOptions;
+    }
+
+    /**
+     * @param eventViewOptions the eventViewOptions to set
+     */
+    public void setEventViewOptions(List<ViewOptionsActiveHiddenListsEnum> eventViewOptions) {
+        this.eventViewOptions = eventViewOptions;
+    }
+
+    /**
+     * @return the eventViewOptionSelected
+     */
+    public ViewOptionsActiveHiddenListsEnum getEventViewOptionSelected() {
+        return eventViewOptionSelected;
+    }
+
+    /**
+     * @param eventViewOptionSelected the eventViewOptionSelected to set
+     */
+    public void setEventViewOptionSelected(ViewOptionsActiveHiddenListsEnum eventViewOptionSelected) {
+        this.eventViewOptionSelected = eventViewOptionSelected;
+    }
+
+    /**
+     * @return the userManagerOptionList
+     */
+    public List<User> getUserManagerOptionList() {
+        return userManagerOptionList;
+    }
+
+    /**
+     * @param userManagerOptionList the userManagerOptionList to set
+     */
+    public void setUserManagerOptionList(List<User> userManagerOptionList) {
+        this.userManagerOptionList = userManagerOptionList;
+    }
+
+    /**
+     * @return the bobSourceOptionList
+     */
+    public List<BOBSource> getBobSourceOptionList() {
+        return bobSourceOptionList;
+    }
+
+    /**
+     * @param bobSourceOptionList the bobSourceOptionList to set
+     */
+    public void setBobSourceOptionList(List<BOBSource> bobSourceOptionList) {
+        this.bobSourceOptionList = bobSourceOptionList;
+    }
+
+    /**
+     * @return the formNoteText
+     */
+    public String getFormNoteText() {
+        return formNoteText;
+    }
+
+    /**
+     * @param formNoteText the formNoteText to set
+     */
+    public void setFormNoteText(String formNoteText) {
+        this.formNoteText = formNoteText;
     }
 
 }

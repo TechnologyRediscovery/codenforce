@@ -661,14 +661,14 @@ public  class       SessionInitializer
         try {
             cseQ = sc.runQuery(cseQ);
             
-//            List<CECase> hist = cc.getCECaseHistory(ua);
+//            List<CECase> hist = cc.cecase_getCECaseHistory(ua);
             // NEXT LINE: YUCK!!!!!!!!
-            sb.setSessCECaseList(cc.assembleCECasePropertyUnitHeavyList(cseQ.getBOBResultList()));
+            sb.setSessCECaseList(cc.cecase_assembleCECasePropertyUnitHeavyList(cseQ.getBOBResultList()));
             
             if(sb.getSessCECaseList().isEmpty()){
-                sb.setSessCECase(cc.assembleCECaseDataHeavy(cc.selectDefaultCECase(ua), ua));
+                sb.setSessCECase(cc.cecase_assembleCECaseDataHeavy(cc.cecase_selectDefaultCECase(ua), ua));
             } else {
-                sb.setSessCECase(cc.assembleCECaseDataHeavy(sb.getSessCECaseList().get(0), ua));
+                sb.setSessCECase(cc.cecase_assembleCECaseDataHeavy(sb.getSessCECaseList().get(0), ua));
             }
             
         } catch (IntegrationException | BObStatusException | SearchException ex) {

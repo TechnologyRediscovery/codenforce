@@ -119,7 +119,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         
         
         try {
-            cc.updateCitation(currentCitation);
+            cc.citation_updateCitation(currentCitation);
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -136,7 +136,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable{
         Citation c = currentCitation;
         c.setUserOwner(getSessionBean().getSessUser());
         try {
-            cc.issueCitation(c);
+            cc.citation_issueCitation(c);
               
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_INFO, 

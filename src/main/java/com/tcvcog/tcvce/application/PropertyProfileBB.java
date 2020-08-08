@@ -21,13 +21,16 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyExtData;
 import com.tcvcog.tcvce.entities.PropertyUseType;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,6 +67,9 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
     private boolean currentPropertySelected;
 
     private Municipality muniSelected;
+    
+    private ViewOptionsActiveHiddenListsEnum eventViewOptionSelected;
+    private List<ViewOptionsActiveHiddenListsEnum> eventViewOptions;
 
     private List<PropertyUseType> putList;
     private PropertyUseType selectedPropertyUseType;
@@ -108,6 +114,8 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
         }
 
         personToAddList = new ArrayList<>();
+        eventViewOptions = Arrays.asList(ViewOptionsActiveHiddenListsEnum.values());
+        eventViewOptionSelected = ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN;
 
         // use same pathway as clicking the button
         setCurrentMode(currentMode);
@@ -610,7 +618,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
         if (cse != null) {
 
             try {
-                getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(cse, getSessionBean().getSessUser()));
+                getSessionBean().setSessCECase(cc.cecase_assembleCECaseDataHeavy(cse, getSessionBean().getSessUser()));
             } catch (BObStatusException | IntegrationException | SearchException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
@@ -855,5 +863,34 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
     public void setPersonIDToLink(int personIDToLink) {
         this.personIDToLink = personIDToLink;
     }
+
+    /**
+     * @return the eventViewOptions
+     */
+    public List<ViewOptionsActiveHiddenListsEnum> getEventViewOptions() {
+        return eventViewOptions;
+    }
+
+    /**
+     * @param eventViewOptions the eventViewOptions to set
+     */
+    public void setEventViewOptions(List<ViewOptionsActiveHiddenListsEnum> eventViewOptions) {
+        this.eventViewOptions = eventViewOptions;
+    }
+
+    /**
+     * @return the eventViewOptionSelected
+     */
+    public ViewOptionsActiveHiddenListsEnum getEventViewOptionSelected() {
+        return eventViewOptionSelected;
+    }
+
+    /**
+     * @param eventViewOptionSelected the eventViewOptionSelected to set
+     */
+    public void setEventViewOptionSelected(ViewOptionsActiveHiddenListsEnum eventViewOptionSelected) {
+        this.eventViewOptionSelected = eventViewOptionSelected;
+    }
+
 
 }
