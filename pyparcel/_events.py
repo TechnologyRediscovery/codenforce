@@ -1,5 +1,6 @@
 from collections import namedtuple
 from colorama import init
+
 init()
 import warnings
 from colorama import Fore, Back, Style
@@ -8,8 +9,11 @@ from ._constants import BOT_ID
 
 # These structures help organize the creation of events. See query_propertyexternaldata_for_changes_and_write_events
 Changes = namedtuple("flag", ["name", "orig", "new"])
+
+
 class EventDetails:
     __slots__ = ["parid", "prop_id", "cecase_id", "changes", "db_cursor"]
+
     def __init__(self, parid, prop_id, cecase_id, db_cursor):
         self.parid = parid
         self.prop_id = prop_id
@@ -18,7 +22,9 @@ class EventDetails:
         self.changes = None
 
 
-def query_propertyexternaldata_for_changes_and_write_events(parid, prop_id, cecase_id, new_parcel, db_cursor):
+def query_propertyexternaldata_for_changes_and_write_events(
+    parid, prop_id, cecase_id, new_parcel, db_cursor
+):
     """ Checks if parcel info is different from last time. Records Changes. """
     select_sql = """
         SELECT
@@ -36,7 +42,11 @@ def query_propertyexternaldata_for_changes_and_write_events(parid, prop_id, ceca
     try:
         new = selection[1]
     except IndexError:  # If this is the first time the property_propertyid occurs in propertyexternaldata
-        print(Fore.YELLOW, "First time parcel has appeared in propertyexternaldata", sep="")
+        print(
+            Fore.YELLOW,
+            "First time parcel has appeared in propertyexternaldata",
+            sep="",
+        )
         print(Style.RESET_ALL, end="")
         if not new_parcel:
             # TODO: Add flag
@@ -94,7 +104,6 @@ class Event:
         self.notes = None
         self.occperiod = None
 
-
     def write_to_db(self):
         """ Writes an event to the database. """
         self._write_event_dunder_dict()
@@ -113,7 +122,6 @@ class Event:
         except TypeError:  # 'NoneType' object is not subscriptable:
             return None
 
-
     def _write_event_dunder_dict(self):
         assert self.category_id
         assert self.eventdescription
@@ -124,7 +132,6 @@ class Event:
         self.creator_userid = BOT_ID
         self.lastupdatedby_userid = BOT_ID
         self.occperiod_periodid = None
-
 
     def _write_event_to_db(self):
         insert_sql = """
@@ -159,7 +166,7 @@ class NewParcelid(Event):
 
 
 class ParcelChangedEvent(Event):
-    def __init__(self, d):  # details
+    def __init__(self, d: EventDetails):
         super().__init__(d)
         self.eventdescription = f"Parcel {d.parid}'s {d.changes.name} changed from {d.changes.orig} to {d.changes.new}"
         self.active = True
@@ -208,7 +215,16 @@ class DifferentTaxCode(ParcelChangedEvent):
     def __init__(self, details):
         super().__init__(details)
         self.category_id = 307
-        warnings.warn("DifferentTaxCode may be deprecated soon, as TaxCode is no longer an attribute on the property table", DeprecationWarning)
+        warnings.warn(
+            "DifferentTaxCode may be deprecated soon, as TaxCode is no longer an attribute on the property table",
+            DeprecationWarning,
+        )
+
+
+class ParcelNotInRecentRecords(Event):
+    def __init__(self):
+        super().__init__()
+        raise NotImplementedError
 
 
 def main():

@@ -3,7 +3,7 @@
 #
 #   Otherwise, treat the name as the module name.
 #   Example: _parse.strip_whitespace strips whitespace, _parse.OwnerName is a class
-
+import copy
 import json
 import _create as create
 import _fetch as fetch
@@ -15,6 +15,8 @@ import _parse
 from _constants import Tally
 from _constants import DEFAULT_PROP_UNIT
 from _constants import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
+
+from _events import ParcelNotInRecentRecords
 
 
 def parcel_not_in_db(parid, cursor):
@@ -38,9 +40,9 @@ def compare(WPRDC_data, AlleghenyCountyData):
 
 
 # Todo: Validate more data
-def validate_data(r, tax):                  #   Example data as applicable to explain transformations
-                                            #   WPRDC               Allegheny County
-    compare(r["TAXYEAR"], int(tax.year))    #   2020.0              2020
+def validate_data(r, tax):  #   Example data as applicable to explain transformations
+    #   WPRDC               Allegheny County
+    compare(r["TAXYEAR"], int(tax.year))  #   2020.0              2020
 
 
 def insert_and_update_database(record, conn, cursor, commit):
@@ -64,10 +66,7 @@ def insert_and_update_database(record, conn, cursor, commit):
         else:
             print(record["PROPERTYUNIT"])
             unit_id = write.unit(
-                {
-                    "unitnumber": record["PROPERTYUNIT"],
-                    "property_propertyid": prop_id,
-                },
+                {"unitnumber": record["PROPERTYUNIT"], "property_propertyid": prop_id,},
                 cursor,
             )
         cecase_map = create.cecase_imap(prop_id, unit_id)
@@ -78,7 +77,7 @@ def insert_and_update_database(record, conn, cursor, commit):
         #
         write.connect_property_to_person(prop_id, person_id, cursor)
         Tally.inserted += 1
-    else:   # If the parcel was already in the database
+    else:  # If the parcel was already in the database
         new_parcel = False
         prop_id = fetch.prop_id(parid, cursor)
         unit_id = fetch.unit_id(prop_id, cursor)
@@ -103,15 +102,18 @@ def insert_and_update_database(record, conn, cursor, commit):
     write.propertyexternaldata(propextern_map, cursor)
 
     if _events.query_propertyexternaldata_for_changes_and_write_events(
-            parid, prop_id, cecase_id, new_parcel, cursor
+        parid, prop_id, cecase_id, new_parcel, cursor
     ):
-        Tally.updated +=1
+        Tally.updated += 1
 
     if commit:
         conn.commit()
     else:
         # A check to make sure variables weren't forgotten to be assigned. Maybe move to testing suite?
-        assert [attr is not None for attr in [parid, new_parcel, prop_id, unit_id, cecase_id]]
+        assert [
+            attr is not None
+            for attr in [parid, new_parcel, prop_id, unit_id, cecase_id]
+        ]
 
     # from _utils import pickler
     # pickler(html, "html", incr=False)
@@ -127,6 +129,22 @@ def insert_and_update_database(record, conn, cursor, commit):
     print("Inserted count:", Tally.inserted, sep="\t")
     print("Updated count:", Tally.updated, sep="\t")
     print(SHORT_DASHES)
+
+
+def create_events_for_parcels_which_did_not_appear_in_records(
+    record, municdode, db_conn, cursor, commit
+):
+    all_parcels = fetch.all_parcels_in_muni(municdode, cursor)
+    remaining_parcels = copy.copy(all_parcels)
+    for i, parcel in enumerate(all_parcels):
+        for r in record:
+            if parcel == r["PARID"]:
+                remaining_parcels.pop(i)
+                continue
+    # At this point, `parcels` contains a list of muni's parcels that appeared in the database but not in the most recent record from the WPRDC.
+    for parcel_id in remaining_parcels:
+        ParcelNotInRecentRecords(parcel_id).write_to_db()
+        details = EventDetails(parid, prop_id, cecase_id, db_cursor)
 
 
 def update_muni(muni, db_conn, commit=True):
@@ -148,7 +166,10 @@ def update_muni(muni, db_conn, commit=True):
     with db_conn.cursor() as cursor:
         for record in records:
 
-            insert_and_update_database(
-                record, db_conn, cursor, commit
-            )
+            insert_and_update_database(record, db_conn, cursor, commit)
+        print(DASHES)
+
+        create_events_for_parcels_which_did_not_appear_in_records(
+            record, muni.municode, db_conn, cursor, commit
+        )
         print(DASHES)

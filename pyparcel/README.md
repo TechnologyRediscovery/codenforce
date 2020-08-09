@@ -40,4 +40,4 @@ INSERT INTO public.eventcategory(
 
 <h4 id=parcel-change>What constitutes a Parcel Change?</h4>
 A regular, month to month change.
-Examples include DifferentTaxStatus and DifferentOwner, but do not include events such as NewParcelid and ParcelNotInCountyData.
+Examples include DifferentTaxStatus and DifferentOwner, but do not include events such as NewParcelid and ParcelNotInRecentRecords.

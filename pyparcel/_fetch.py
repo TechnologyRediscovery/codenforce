@@ -5,7 +5,8 @@ import os
 
 from collections import namedtuple
 
-
+import _create
+import _write
 from _constants import PARCEL_ID_LISTS
 
 
@@ -74,6 +75,7 @@ def unit_id(prop_id, cursor):
     except TypeError:
         return None
 
+
 def cecase_id(prop_id, cursor):
     select_sql = """
         SELECT caseid FROM cecase
@@ -83,6 +85,7 @@ def cecase_id(prop_id, cursor):
     try:
         return cursor.fetchone()[0]  # Case ID
     except TypeError:  # 'NoneType' object is not subscriptable:
+        # TODO: ERROR: Property exists without cecase
         return None
 
 
