@@ -80,18 +80,9 @@ def insert_and_update_database(record, conn, cursor, commit):
     else:  # If the parcel was already in the database
         new_parcel = False
         prop_id = fetch.prop_id(parid, cursor)
+        # If a property doesn't have an associated unit and cecase, one is created.
         unit_id = fetch.unit_id(prop_id, cursor)
-        if not unit_id:
-            unit_id = write.unit(
-                {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
-                cursor,
-            )
-        # TODO: ERROR: Property exists without property unit
         cecase_id = fetch.cecase_id(unit_id, cursor)
-        if not cecase_id:
-            cecase_map = create.cecase_imap(prop_id, unit_id)
-            cecase_id = write.cecase(cecase_map, cursor)
-            # TODO: ERROR: Property exists without cecase
 
     validate_data(record, tax_status)
     tax_status_id = write.taxstatus(tax_status, cursor)
@@ -134,7 +125,11 @@ def insert_and_update_database(record, conn, cursor, commit):
 def create_events_for_parcels_which_did_not_appear_in_records(
     record, municdode, db_conn, cursor, commit
 ):
-    all_parcels = fetch.all_parcels_in_muni(municdode, cursor)
+    """
+    Writes an event to the database for every parcel in a municipality that appears in the database but was not in the WPRDC's data.
+    If a property doesn't have an associated unit and cecase, one is created.
+    """
+    all_parcels = fetch.all_parids_in_muni(municdode, cursor)
     remaining_parcels = copy.copy(all_parcels)
     for i, parcel in enumerate(all_parcels):
         for r in record:
@@ -143,15 +138,19 @@ def create_events_for_parcels_which_did_not_appear_in_records(
                 continue
     # At this point, `parcels` contains a list of muni's parcels that appeared in the database but not in the most recent record from the WPRDC.
     for parcel_id in remaining_parcels:
-        ParcelNotInRecentRecords(parcel_id).write_to_db()
-        details = EventDetails(parid, prop_id, cecase_id, db_cursor)
+        prop_id = fetch.prop_id(parcel_id, cursor)
+        cecase_id = fetch.cecase_id(prop_id, cursor)
+        details = _events.EventDetails(parcel_id, prop_id, cecase_id, cursor)
+
+        ParcelNotInRecentRecords(details).write_to_db()
+    if commit:
+        db_conn.execute()
 
 
 def update_muni(muni, db_conn, commit=True):
     """
     The core functionality of the script.
     """
-
     print("Updating {} ({})".format(muni.name, muni.municode))
     print(MEDIUM_DASHES)
     filename = fetch.muni_data_and_write_to_file(muni)
@@ -165,11 +164,10 @@ def update_muni(muni, db_conn, commit=True):
 
     with db_conn.cursor() as cursor:
         for record in records:
-
             insert_and_update_database(record, db_conn, cursor, commit)
         print(DASHES)
 
         create_events_for_parcels_which_did_not_appear_in_records(
-            record, muni.municode, db_conn, cursor, commit
+            records, muni.municode, db_conn, cursor, commit
         )
         print(DASHES)

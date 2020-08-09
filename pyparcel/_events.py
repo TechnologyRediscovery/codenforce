@@ -4,7 +4,7 @@ from colorama import init
 init()
 import warnings
 from colorama import Fore, Back, Style
-from ._constants import BOT_ID
+from _constants import BOT_ID
 
 
 # These structures help organize the creation of events. See query_propertyexternaldata_for_changes_and_write_events
@@ -222,9 +222,11 @@ class DifferentTaxCode(ParcelChangedEvent):
 
 
 class ParcelNotInRecentRecords(Event):
-    def __init__(self):
-        super().__init__()
-        raise NotImplementedError
+    def __init__(self, details):
+        super().__init__(details)
+        raise NotImplementedError(
+            "The Event Category has not been added to the database."
+        )
 
 
 def main():
