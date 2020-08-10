@@ -292,14 +292,13 @@
 
                                     <p:outputPanel id = "prop-lists-outpanel" >
                                         <h:form id="prop-info-header-form">
-
-                                            <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.address}" />
-                                            <h:outputText value=" | " />
-                                            <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}" />
-                                            <h:outputText value=" | " />
-                                            <h:outputText id="header-lob-ot" value="Lot-block: #{propertyProfileBB.currentProperty.parID}"/>
-                                            <h:outputText value=" | " />
-                                            <h:outputText id="header-propid-ot" value="ID: #{propertyProfileBB.currentProperty.propertyID}"/>
+                                            <h2>
+                                                
+                                                <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.address}" />
+                                                <h:outputText value=" (" />
+                                                <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}" />
+                                                <h:outputText value=") " />
+                                            </h2>
 
                                         </h:form>
 

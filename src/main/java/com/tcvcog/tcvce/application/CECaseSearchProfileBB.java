@@ -389,6 +389,8 @@ public class CECaseSearchProfileBB
 
     }
 
+    
+    
     /**
      * Listener for user requests to commit new note content to the current
      * Property
@@ -575,7 +577,7 @@ public class CECaseSearchProfileBB
      * @param ev
      */
     public void executeQuery(ActionEvent ev) {
-        System.out.println("CaseProfileBB.executeQuery");
+        System.out.println("CaseProfileBB.executeQuery: Listener");
         executeQuery();
     }
 

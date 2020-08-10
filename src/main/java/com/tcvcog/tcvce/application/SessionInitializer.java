@@ -671,6 +671,8 @@ public  class       SessionInitializer
                 sb.setSessCECase(cc.cecase_assembleCECaseDataHeavy(sb.getSessCECaseList().get(0), ua));
             }
             
+            
+            
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             throw new SessionException("Error assembling session CECase list", ex, ss, ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);

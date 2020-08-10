@@ -109,7 +109,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         PropertyCoordinator pc = getPropertyCoordinator();
 
         // Wrap our base class in the subclass wrapper--an odd design structure, indeed
-        CECaseDataHeavy cse = new CECaseDataHeavy(c);
+        CECaseDataHeavy cse = new CECaseDataHeavy(cecase_getCECase(c.getCaseID()));
 
         try {
             
@@ -605,6 +605,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
         ci.updateCECaseMetadata(c);
     }
+    
     /**
      * Updates only the notes field on CECase
      *
@@ -1103,10 +1104,87 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             }
         }
     }
+    
+      /**
+     * Updates only the notes field on Notice of Violation
+     *
+     * @param mbp     
+     * @param nov     
+     * @throws BObStatusException
+     * @throws IntegrationException
+     */
+    public void nov_updateNotes(MessageBuilderParams mbp, NoticeOfViolation nov) throws BObStatusException, IntegrationException {
+        CaseIntegrator ci = getCaseIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+        if(nov == null || mbp == null){
+            throw new BObStatusException("Cannot append if notes, case, or user are null");
+        }
+        
+        nov.setNotes(sc.appendNoteBlock(mbp));
+        
+        ci.novUpdateNotes(nov);
+    }
 
     // *************************************************************************
     // *                     CITATIONS                                         *
     // *************************************************************************
+    
+    /**
+     * Getter for Citation objects
+     * @param citationID
+     * @return
+     * @throws IntegrationException 
+     */
+    public Citation citation_getCitation(int citationID) throws IntegrationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        Citation cit = ci.getCitation(citationID);
+        
+        return cit;
+        
+    }
+    
+    private CitationStatus citation_getStartingCitationStatus() throws IntegrationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        CitationStatus cs = ci.getCitationStatus(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("citationInitialStatusID")));
+        return cs;
+    }
+    
+    /**
+     * Initializes a Citation object with a default start status
+     * @param ua
+     * @param cse
+     * @return
+     * @throws BObStatusException 
+     */
+    public Citation citation_getCitationSkeleton(UserAuthorized ua, CECase cse) throws BObStatusException, IntegrationException{
+        if(!ua.getKeyCard().isHasEnfOfficialPermissions()){
+            throw new BObStatusException("Users must have enforcement office permissions to create a citation");
+        }
+        Citation cit = new Citation();
+        cit.setCeCaseNoLists(cse);
+        cit.setDateOfRecord(LocalDateTime.now());
+        cit.setUserOwner(getSessionBean().getSessUser());
+        cit.setIsActive(true);
+        cit.setStatus(citation_getStartingCitationStatus());
+        cit.setOrigin_courtentity(getSessionBean().getSessMuni().getCourtEntities().get(0));
+        List<CodeViolation> l = new ArrayList<>();
+        if(cse.getViolationList() != null && !cse.getViolationList().isEmpty()){
+            
+            for (CodeViolation v : cse.getViolationList()) {
+                if (v.getActualComplianceDate() == null) {
+                    l.add(v);
+                }
+            }
+        }
+        cit.setViolationList(l);
+        
+        return cit;
+        
+        
+    }
+    
+    
     /**
      * Called to create a new citation for a given List of CodeViolation objects
      *
@@ -1172,10 +1250,63 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param c
      * @throws IntegrationException
      */
-    public void citation_updateCitation(Citation c) throws IntegrationException {
+    public void citation_updateCitation(Citation c) throws IntegrationException, BObStatusException {
+        CaseIntegrator ci = getCaseIntegrator();
+        if(c.getStatus() != null && !c.getStatus().isNonStatusEditsForbidden()){
+            ci.updateCitation(c);
+        }
+        else throw new BObStatusException("Cannot update this citation at its current status");
+        
+
+    }
+    
+    /**
+     * Logic intermediary for updating fields on Citations in the DB
+     *
+     * @param c
+     * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public void citation_removeCitation(Citation c) throws IntegrationException, BObStatusException {
+        CaseIntegrator ci = getCaseIntegrator();
+        if(c.getStatus() != null && !c.getStatus().isNonStatusEditsForbidden()){
+            c.setIsActive(false);
+            ci.updateCitation(c);
+        }
+        else throw new BObStatusException("Cannot remove this citation at its current status");
+        
+
+    }
+    
+    /**
+     * Logic intermediary for updating citation status only
+     * @param c
+     * @throws IntegrationException 
+     */
+    public void citation_updateCitationStatus(Citation c) throws IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
         ci.updateCitation(c);
 
+    }
+    
+       /**
+     * Updates only the notes field on Citation
+     *
+     * @param mbp     
+     * @param cit     
+     * @throws BObStatusException
+     * @throws IntegrationException
+     */
+    public void citation_updateNotes(MessageBuilderParams mbp, Citation cit) throws BObStatusException, IntegrationException {
+        CaseIntegrator ci = getCaseIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+        if(cit == null || mbp == null){
+            throw new BObStatusException("Cannot append if notes, case, or user are null");
+        }
+        
+        cit.setNotes(sc.appendNoteBlock(mbp));
+        
+        ci.updateCitationNotes(cit);
     }
 
 //    --------------------------------------------------------------------------
@@ -1504,6 +1635,27 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
     } // close method
 
+    
+       
+       /**
+     * Updates only the notes field on Citation
+     *
+     * @param mbp     
+     * @param viol     
+     * @throws BObStatusException
+     * @throws IntegrationException
+     */
+    public void violation_updateNotes(MessageBuilderParams mbp, CodeViolation viol) throws BObStatusException, IntegrationException {
+        CaseIntegrator ci = getCaseIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+        if(viol == null || mbp == null){
+            throw new BObStatusException("Cannot append if notes, case, or user are null");
+        }
+        
+        viol.setNotes(sc.appendNoteBlock(mbp));
+        
+        ci.updateCodeViolationNotes(viol);
+    }
     /**
      * Attempts to deactivate a code violation, but will thow an Exception if
      * the CodeViolation has been used in a notice or in a citation

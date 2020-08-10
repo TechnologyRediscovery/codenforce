@@ -33,11 +33,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <ui:define name="content">
                 <f:view id="cecase-lookup-profile-view">
 
-                    <p:growl id="cecase-messages-growl"
-                             redisplay="false"
-                             />
+                 
 
                     <p:outputPanel id="body-panel">
+                            
+                            <p:growl id="cecase-messages-growl"
+                             redisplay="false"
+                             />
+                        
                         <h1>CECase Lookup and Profile</h1>
 
                         <div class="mainContainer">
@@ -80,12 +83,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <p:selectOneMenu id="cecase-query-som" 
                                                              tabindex="1" 
-                                                             value="#{ceCaseSearchBB.querySelected}"
-                                                             disabled="#{ceCaseSearchBB.querySelected.queryExecuted}">
+                                                             value="#{ceCaseSearchProfileBB.querySelected}"
+                                                             disabled="#{ceCaseSearchProfileBB.querySelected.queryExecuted}">
                                                 <f:converter converterId="bOBQueryConverter"/>
                                                 <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
-                                                <f:selectItems id="querylist-si" value="#{ceCaseSearchBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
-                                                <p:ajax listener="#{ceCaseSearchBB.changeQuerySelected}"
+                                                <f:selectItems id="querylist-si" value="#{ceCaseSearchProfileBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
+                                                <p:ajax listener="#{ceCaseSearchProfileBB.changeQuerySelected}"
                                                         update="@form
                                                         cecase-messages-growl" />
                                             </p:selectOneMenu>
@@ -96,14 +99,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                            value="Description: " 
                                                            for="cecase-query-desc-ot" />
                                             <h:outputText id="cecase-query-desc-ot" 
-                                                          value="#{ceCaseSearchBB.querySelected.queryName.desc}" />
+                                                          value="#{ceCaseSearchProfileBB.querySelected.queryName.desc}" />
 
                                             <p:spacer height="5px" />
 
                                             <p:commandButton   id="cecase-executequery-cb" 
                                                                ajax="true" 
-                                                               actionListener="#{ceCaseSearchBB.executeQuery}"
-                                                               disabled="#{ceCaseSearchBB.querySelected.queryExecuted}"
+                                                               actionListener="#{ceCaseSearchProfileBB.executeQuery}"
+                                                               disabled="#{ceCaseSearchProfileBB.querySelected.queryExecuted}"
                                                                icon="fa fa-flash" 
                                                                styleClass="button"
                                                                value="run query" 
@@ -113,22 +116,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <p:commandButton   id="cecase-search-clear-cb" 
                                                                ajax="true" 
-                                                               actionListener="#{ceCaseSearchBB.resetQuery}"
+                                                               actionListener="#{ceCaseSearchProfileBB.resetQuery}"
                                                                icon="fa fa-eraser" 
                                                                styleClass="button inline-button"
                                                                value="clear query" 
-                                                               disabled="#{!ceCaseSearchBB.querySelected.queryExecuted}"
+                                                               disabled="#{!ceCaseSearchProfileBB.querySelected.queryExecuted}"
                                                                update=" cecase-search-log-form
                                                                @form"/>
 
-                                            <p:spacer height="5px" />
 
                                             <p:selectBooleanButton  id="cecase-search-appendresults-chkbox" 
                                                                     onLabel="Add Results to Existing Case List"
                                                                     onIcon="fa fa-indent"
-                                                                    offLabel="Build Fresh Case List"
+                                                                    offLabel="Build Fresh Case List On Search"
                                                                     offIcon="fa fa-eraser"
-                                                                    value="#{ceCaseSearchBB.appendResultsToList}" 
+                                                                    value="#{ceCaseSearchProfileBB.appendResultsToList}" 
                                                                     disabled="false" />
 
                                         </h:form>
@@ -145,7 +147,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <p:commandButton   id="cecase-search-results-clear-button" 
                                                                ajax="true" 
-                                                               actionListener="#{ceCaseSearchBB.clearCECaseList}"
+                                                               actionListener="#{ceCaseSearchProfileBB.clearCECaseList}"
                                                                icon="fa fa-eraser" 
                                                                styleClass="button"
                                                                value="clear results list" 
@@ -154,7 +156,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <p:commandButton   id="cecase-search-loadhistory-button" 
                                                                ajax="true" 
-                                                               actionListener="#{ceCaseSearchBB.loadCECaseHistory}"
+                                                               actionListener="#{ceCaseSearchProfileBB.loadCECaseHistory}"
                                                                icon="fa fa-clock-o" 
                                                                styleClass="button"
                                                                value="load case history" 
@@ -163,7 +165,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <p:spacer height="5px" />
 
-                                            <h:outputText value="list contains #{ceCaseSearchBB.caseListSize} code enforcement cases" 
+                                            <h:outputText value="list contains #{ceCaseSearchProfileBB.caseListSize} code enforcement cases" 
                                                           styleClass="italic"/>
                                             <p:spacer height="5px" />
 
@@ -210,7 +212,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <h:outputText value="view" />
                                                     </f:facet>
                                                     <p:commandButton    id="cecases-viewcase-cb"
-                                                                        icon="fa fa-archive" 
+                                                                        icon="#{c.caseID == ceCaseSearchProfileBB.currentCase.caseID ? 'fa fa-hand-o-right':'fa fa-archive'}"
+                                                                        style="#{c.caseID == ceCaseSearchProfileBB.currentCase.caseID ? 'background-color: #dee461; color:black; border:none;':''}"
                                                                         action="#{ceCaseSearchProfileBB.onObjetViewButtonChange(c)}"
                                                                         ajax="false"
                                                                         />
@@ -222,7 +225,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <p:commandButton   id="print-case-list-cb" 
                                                                ajax="true" 
-                                                               actionListener="#{ceCaseSearchBB.prepareReportCECaseList}"
+                                                               actionListener="#{ceCaseSearchProfileBB.prepareReportCECaseList}"
                                                                icon="fa fa-print" 
                                                                styleClass="button"
                                                                oncomplete="PF('cecase-list-report-dialog-var').show()"
@@ -243,7 +246,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:form id="cecase-search-log-form">
                                             <div class='search-query-desc'>
                                                 <h:outputText id="cecase-search-log-ot" 
-                                                              value="#{ceCaseSearchBB.querySelected.queryLog}"
+                                                              value="#{ceCaseSearchProfileBB.querySelected.queryLog}"
                                                               escape="false"/>
                                             </div>
                                         </h:form>
@@ -1623,14 +1626,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                         <p:selectOneMenu id="cecase-search-params-som" 
                                                          tabindex="1" 
-                                                         value="#{ceCaseSearchBB.searchParamsSelected}"
-                                                         disabled="#{ceCaseSearchBB.querySelected.queryExecuted}">
+                                                         value="#{ceCaseSearchProfileBB.searchParamsSelected}"
+                                                         disabled="#{ceCaseSearchProfileBB.querySelected.queryExecuted}">
                                             <f:converter converterId="searchParamsConverter"/>
                                             <f:selectItem itemLabel="select a parameter bundle..." 
                                                           noSelectionOption="true" 
                                                           itemDisabled="true"/>
                                             <f:selectItems id="cecase-search-params-si" 
-                                                           value="#{ceCaseSearchBB.querySelected.paramsList}" 
+                                                           value="#{ceCaseSearchProfileBB.querySelected.paramsList}" 
                                                            var="sp" itemValue="#{sp}" 
                                                            itemLabel="#{sp.filterName}" />
                                             <p:ajax update="cecase-search-form" />
@@ -1645,14 +1648,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <p:outputLabel id="cecase-filter-muni-ol" 
                                                            for="seev-filter-muni-chkbx" 
                                                            value="filter by municipality "/>
-                                            <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" value="#{ceCaseSearchBB.searchParamsSelected.muni_ctl}" >
+                                            <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" value="#{ceCaseSearchProfileBB.searchParamsSelected.muni_ctl}" >
                                                 <p:ajax update="cecase-search-muni-som"/>
                                             </p:selectBooleanCheckbox>
                                         </h:panelGroup>
 
                                         <h:panelGroup>
-                                            <p:selectOneMenu id="cecase-search-muni-som" tabindex="1" value="#{ceCaseSearchBB.searchParamsSelected.muni_val}"
-                                                             disabled="#{!ceCaseSearchBB.searchParamsSelected.muni_ctl}">
+                                            <p:selectOneMenu id="cecase-search-muni-som" tabindex="1" value="#{ceCaseSearchProfileBB.searchParamsSelected.muni_val}"
+                                                             disabled="#{!ceCaseSearchProfileBB.searchParamsSelected.muni_ctl}">
                                                 <f:converter converterId="muniConverter"/>
                                                 <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
                                                 <f:selectItems id="muniNameList" value="#{systemServicesBB.municipalityListForSearch}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
@@ -1666,7 +1669,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                            for="cecase-search-startend-chkbx" 
                                                            value="filter by date range "/>
                                             <p:selectBooleanCheckbox id="cecase-search-startend-chkbx" 
-                                                                     value="#{ceCaseSearchBB.searchParamsSelected.date_startEnd_ctl}" >
+                                                                     value="#{ceCaseSearchProfileBB.searchParamsSelected.date_startEnd_ctl}" >
                                                 <p:ajax update="cecase-search-date-field-val
                                                         cecase-search-date-start-val
                                                         cecase-search-date-end-val
@@ -1679,13 +1682,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <p:selectOneMenu  id="cecase-search-date-field-val" 
                                                               tabindex="1" 
-                                                              value="#{ceCaseSearchBB.searchParamsSelected.date_field}"
-                                                              disabled="#{!ceCaseSearchBB.searchParamsSelected.date_startEnd_ctl}">
+                                                              value="#{ceCaseSearchProfileBB.searchParamsSelected.date_field}"
+                                                              disabled="#{!ceCaseSearchProfileBB.searchParamsSelected.date_startEnd_ctl}">
                                                 <f:selectItem itemLabel="select a date field..." 
                                                               noSelectionOption="true" 
                                                               itemDisabled="true"/>
                                                 <f:selectItems id="cecase-search-date-field-val-items" 
-                                                               value="#{ceCaseSearchBB.searchParamsSelected.dateFieldList}" 
+                                                               value="#{ceCaseSearchProfileBB.searchParamsSelected.dateFieldList}" 
                                                                var="f" itemValue="#{f}" itemLabel="#{f.title}" />
                                                 <f:converter converterId="dateFieldConverter" />
                                             </p:selectOneMenu>
@@ -1710,8 +1713,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <p:spacer height="1px" />
 
                                                     <p:calendar id="cecase-search-date-start-val" 
-                                                                value="#{ceCaseSearchBB.searchParamsSelected.startDate_val_utilDate}" 
-                                                                disabled="#{(!ceCaseSearchBB.searchParamsSelected.date_startEnd_ctl) or ceCaseSearchBB.searchParamsSelected.date_relativeDates_ctl}"
+                                                                value="#{ceCaseSearchProfileBB.searchParamsSelected.startDate_val_utilDate}" 
+                                                                disabled="#{(!ceCaseSearchProfileBB.searchParamsSelected.date_startEnd_ctl) or ceCaseSearchProfileBB.searchParamsSelected.date_relativeDates_ctl}"
                                                                 mode="popup" 
                                                                 showOn="button" 
                                                                 pattern="EEE, dd MMM, yyyy HH:mm:ss"
@@ -1735,8 +1738,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <p:spacer height="1px" />
 
                                                     <p:calendar id="cecase-search-date-end-val" 
-                                                                value="#{ceCaseSearchBB.searchParamsSelected.endDate_val_utilDate}" 
-                                                                disabled="#{(!ceCaseSearchBB.searchParamsSelected.date_startEnd_ctl) or ceCaseSearchBB.searchParamsSelected.date_relativeDates_ctl}"
+                                                                value="#{ceCaseSearchProfileBB.searchParamsSelected.endDate_val_utilDate}" 
+                                                                disabled="#{(!ceCaseSearchProfileBB.searchParamsSelected.date_startEnd_ctl) or ceCaseSearchProfileBB.searchParamsSelected.date_relativeDates_ctl}"
                                                                 mode="popup" 
                                                                 showOn="button" 
                                                                 pattern="EEE, dd MMM, yyyy HH:mm:ss"
@@ -1766,8 +1769,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <p:outputLabel for="cecase-search-date-relative-ctl" 
                                                                    value="Relative dates"/>
                                                     <p:selectBooleanCheckbox id="cecase-search-date-relative-ctl" 
-                                                                             value="#{ceCaseSearchBB.searchParamsSelected.date_relativeDates_ctl}" 
-                                                                             disabled="#{!ceCaseSearchBB.searchParamsSelected.date_startEnd_ctl}">
+                                                                             value="#{ceCaseSearchProfileBB.searchParamsSelected.date_relativeDates_ctl}" 
+                                                                             disabled="#{!ceCaseSearchProfileBB.searchParamsSelected.date_startEnd_ctl}">
                                                         <p:ajax update="cecase-search-date-end-val
                                                                 cecase-search-date-start-val
                                                                 cecase-search-date-end-val
@@ -1780,8 +1783,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                    value="start x days from today"/>
                                                     <p:spacer height="1px"/>
                                                     <p:inputText id="cecase-search-date-relative-start-val" 
-                                                                 value="#{ceCaseSearchBB.searchParamsSelected.date_relativeDates_start_val}" 
-                                                                 disabled="#{!(ceCaseSearchBB.searchParamsSelected.date_startEnd_ctl and ceCaseSearchBB.searchParamsSelected.date_relativeDates_ctl)}" />
+                                                                 value="#{ceCaseSearchProfileBB.searchParamsSelected.date_relativeDates_start_val}" 
+                                                                 disabled="#{!(ceCaseSearchProfileBB.searchParamsSelected.date_startEnd_ctl and ceCaseSearchProfileBB.searchParamsSelected.date_relativeDates_ctl)}" />
                                                     <h:message for="cecase-search-date-relative-start-val" showDetail="false" showSummary="true" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
@@ -1791,8 +1794,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                    value="end x days from today"/>
                                                     <p:spacer height="1px"/>
                                                     <p:inputText id="cecase-search-date-relative-end-val" 
-                                                                 value="#{ceCaseSearchBB.searchParamsSelected.date_realtiveDates_end_val}" 
-                                                                 disabled="#{!(ceCaseSearchBB.searchParamsSelected.date_startEnd_ctl and ceCaseSearchBB.searchParamsSelected.date_relativeDates_ctl)}" />
+                                                                 value="#{ceCaseSearchProfileBB.searchParamsSelected.date_realtiveDates_end_val}" 
+                                                                 disabled="#{!(ceCaseSearchProfileBB.searchParamsSelected.date_startEnd_ctl and ceCaseSearchProfileBB.searchParamsSelected.date_relativeDates_ctl)}" />
                                                     <h:message for="cecase-search-date-relative-end-val" showDetail="false" showSummary="true" 
                                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                 </h:panelGroup>
@@ -1805,7 +1808,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                            value="filter by occ case id"/>
 
                                             <p:selectBooleanCheckbox id="cecase-search-filter-id-ctl" 
-                                                                     value="#{ceCaseSearchBB.searchParamsSelected.bobID_ctl}"
+                                                                     value="#{ceCaseSearchProfileBB.searchParamsSelected.bobID_ctl}"
                                                                      disabled="false">
                                                 <p:ajax update="cecase-search-filter-id-val" />
                                             </p:selectBooleanCheckbox>
@@ -1819,8 +1822,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <p:inputText id="cecase-search-filter-id-val"
                                                          type="number"
-                                                         value="#{ceCaseSearchBB.searchParamsSelected.bobID_val}"
-                                                         disabled="#{!ceCaseSearchBB.searchParamsSelected.bobID_ctl}"/>
+                                                         value="#{ceCaseSearchProfileBB.searchParamsSelected.bobID_val}"
+                                                         disabled="#{!ceCaseSearchProfileBB.searchParamsSelected.bobID_ctl}"/>
                                             <h:message for="cecase-search-filter-id-val" showDetail="false" showSummary="true"
                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                         </h:panelGroup>
@@ -1831,8 +1834,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                            value="User filter"/>
 
                                             <p:selectBooleanCheckbox id="cecase-search-filter-user-ctl" 
-                                                                     value="#{ceCaseSearchBB.searchParamsSelected.user_ctl}"
-                                                                     disabled="#{!(ceCaseSearchBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
+                                                                     value="#{ceCaseSearchProfileBB.searchParamsSelected.user_ctl}"
+                                                                     disabled="#{!(ceCaseSearchProfileBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
                                                 <p:ajax update="cecase-search-filter-user-som
                                                         cecase-search-user-field-val" />
                                             </p:selectBooleanCheckbox>
@@ -1842,13 +1845,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:panelGroup>
                                             <p:selectOneMenu  id="cecase-search-user-field-val" 
                                                               tabindex="1" 
-                                                              value="#{ceCaseSearchBB.searchParamsSelected.user_field}"
-                                                              disabled="#{!ceCaseSearchBB.searchParamsSelected.user_ctl}">
+                                                              value="#{ceCaseSearchProfileBB.searchParamsSelected.user_field}"
+                                                              disabled="#{!ceCaseSearchProfileBB.searchParamsSelected.user_ctl}">
                                                 <f:selectItem itemLabel="select a user field..." 
                                                               noSelectionOption="true" 
                                                               itemDisabled="true"/>
                                                 <f:selectItems id="cecase-search-user-field-val-items" 
-                                                               value="#{ceCaseSearchBB.searchParamsSelected.userFieldList}" 
+                                                               value="#{ceCaseSearchProfileBB.searchParamsSelected.userFieldList}" 
                                                                var="uf" itemValue="#{uf}" itemLabel="#{uf.title}" />
                                                 <f:converter converterId="userFieldConverter" />
                                             </p:selectOneMenu>
@@ -1859,8 +1862,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </h:panelGroup>
                                         <h:panelGroup>
                                             <p:selectOneMenu id="cecase-search-filter-user-som" required="false" 
-                                                             value="#{ceCaseSearchBB.searchParamsSelected.user_val}"
-                                                             disabled="#{!ceCaseSearchBB.searchParamsSelected.user_ctl}">
+                                                             value="#{ceCaseSearchProfileBB.searchParamsSelected.user_val}"
+                                                             disabled="#{!ceCaseSearchProfileBB.searchParamsSelected.user_ctl}">
                                                 <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
                                                 <f:selectItems value="#{systemServicesBB.userListForSearch}"  var="u" itemValue="#{u}" 
                                                                itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
@@ -1876,16 +1879,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                for="cecases-filter-stage" 
                                                                value="filter by case stage "/>
                                                 <p:selectBooleanCheckbox id="cecases-filter-stage" 
-                                                                         value="#{ceCaseSearchBB.searchParamsSelected.caseStage_ctl}" >
+                                                                         value="#{ceCaseSearchProfileBB.searchParamsSelected.caseStage_ctl}" >
                                                     <p:ajax update="cecases-filter-stage-val" />
                                                 </p:selectBooleanCheckbox>
                                             </h:panelGroup>
                                             <h:panelGroup>
-                                                <p:selectOneMenu value="#{ceCaseSearchBB.searchParamsSelected.caseStage_val}"
+                                                <p:selectOneMenu value="#{ceCaseSearchProfileBB.searchParamsSelected.caseStage_val}"
                                                                  id="cecases-filter-stage-val"
-                                                                 disabled="#{!ceCaseSearchBB.searchParamsSelected.caseStage_ctl}">
+                                                                 disabled="#{!ceCaseSearchProfileBB.searchParamsSelected.caseStage_ctl}">
                                                     <f:selectItem itemLabel="select a case stage..." noSelectionOption="true" />
-                                                    <f:selectItems value="#{ceCaseSearchBB.caseStageList}"
+                                                    <f:selectItems value="#{ceCaseSearchProfileBB.caseStageList}"
                                                                    var="stg"
                                                                    itemValue="#{stg}"
                                                                    itemLabel="#{stg.label}"/>
@@ -1902,7 +1905,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                            value="filter by property "/>
 
                                             <p:selectBooleanCheckbox id="cecase-filter-property" 
-                                                                     value="#{ceCaseSearchBB.searchParamsSelected.property_ctl}" >
+                                                                     value="#{ceCaseSearchProfileBB.searchParamsSelected.property_ctl}" >
                                                 <p:ajax update="cecase-criteria-property-som" />
                                             </p:selectBooleanCheckbox>
 
@@ -1910,11 +1913,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                         <h:panelGroup>
                                             <p:selectOneMenu id="cecase-criteria-property-som" required="false" 
-                                                             value="#{ceCaseSearchBB.searchParamsSelected.property_val}"
-                                                             disabled="#{!ceCaseSearchBB.searchParamsSelected.property_ctl}">
+                                                             value="#{ceCaseSearchProfileBB.searchParamsSelected.property_val}"
+                                                             disabled="#{!ceCaseSearchProfileBB.searchParamsSelected.property_ctl}">
 
                                                 <f:selectItem itemLabel="select a propery..." noSelectionOption="true" />
-                                                <f:selectItems value="#{ceCaseSearchBB.propListForSearch}"  var="p" itemValue="#{p}" 
+                                                <f:selectItems value="#{ceCaseSearchProfileBB.propListForSearch}"  var="p" itemValue="#{p}" 
                                                                itemLabel="#{p.address} (#{p.muni.muniName})"/>
                                                 <f:converter converterId="propertyConverter"/>
 
@@ -1926,7 +1929,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <p:outputLabel for="cecase-search-filter-propinfocase-ctl" 
                                                            value="filter by property info case"/>
                                             <p:selectBooleanCheckbox id="cecase-search-filter-propinfocase-ctl" 
-                                                                     value="#{ceCaseSearchBB.searchParamsSelected.propInfoCase_ctl}"
+                                                                     value="#{ceCaseSearchProfileBB.searchParamsSelected.propInfoCase_ctl}"
                                                                      disabled="false">
                                                 <p:ajax update="cecase-search-filter-propinfocase-val" />
                                             </p:selectBooleanCheckbox>
@@ -1936,8 +1939,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <p:outputLabel for="cecase-search-filter-propinfocase-val" 
                                                            value="is info container"/>
                                             <p:selectBooleanCheckbox id="cecase-search-filter-propinfocase-val" 
-                                                                     value="#{ceCaseSearchBB.searchParamsSelected.propInfoCase_val}"
-                                                                     disabled="#{!ceCaseSearchBB.searchParamsSelected.propInfoCase_ctl}">
+                                                                     value="#{ceCaseSearchProfileBB.searchParamsSelected.propInfoCase_val}"
+                                                                     disabled="#{!ceCaseSearchProfileBB.searchParamsSelected.propInfoCase_ctl}">
                                             </p:selectBooleanCheckbox>
                                         </h:panelGroup>
 
@@ -1946,7 +1949,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <p:outputLabel for="cecase-search-filter-open-ctl" 
                                                            value="filter by open"/>
                                             <p:selectBooleanCheckbox id="cecase-search-filter-open-ctl" 
-                                                                     value="#{ceCaseSearchBB.searchParamsSelected.caseOpen_ctl}"
+                                                                     value="#{ceCaseSearchProfileBB.searchParamsSelected.caseOpen_ctl}"
                                                                      disabled="false">
                                                 <p:ajax update="cecase-search-filter-open-val" />
                                             </p:selectBooleanCheckbox>
@@ -1956,8 +1959,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <p:outputLabel for="cecase-search-filter-open-val" 
                                                            value="is open"/>
                                             <p:selectBooleanCheckbox id="cecase-search-filter-open-val" 
-                                                                     value="#{ceCaseSearchBB.searchParamsSelected.caseOpen_val}"
-                                                                     disabled="#{!ceCaseSearchBB.searchParamsSelected.caseOpen_ctl}">
+                                                                     value="#{ceCaseSearchProfileBB.searchParamsSelected.caseOpen_val}"
+                                                                     disabled="#{!ceCaseSearchProfileBB.searchParamsSelected.caseOpen_ctl}">
                                             </p:selectBooleanCheckbox>
                                         </h:panelGroup>
 
@@ -1965,7 +1968,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <p:outputLabel for="cecase-search-filter-active-ctl" 
                                                            value="filter by active"/>
                                             <p:selectBooleanCheckbox id="cecase-search-filter-active-ctl" 
-                                                                     value="#{ceCaseSearchBB.searchParamsSelected.active_ctl}"
+                                                                     value="#{ceCaseSearchProfileBB.searchParamsSelected.active_ctl}"
                                                                      disabled="false">
                                                 <p:ajax update="cecase-search-filter-active-val" />
                                             </p:selectBooleanCheckbox>
@@ -1975,8 +1978,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <p:outputLabel for="cecase-search-filter-active-val" 
                                                            value="is active"/>
                                             <p:selectBooleanCheckbox id="cecase-search-filter-active-val" 
-                                                                     value="#{ceCaseSearchBB.searchParamsSelected.active_val}"
-                                                                     disabled="#{!ceCaseSearchBB.searchParamsSelected.active_ctl}">
+                                                                     value="#{ceCaseSearchProfileBB.searchParamsSelected.active_val}"
+                                                                     disabled="#{!ceCaseSearchProfileBB.searchParamsSelected.active_ctl}">
                                             </p:selectBooleanCheckbox>
                                         </h:panelGroup>
 
@@ -1985,14 +1988,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                            for="cecase-query-limit" 
                                                            value="limit results"/>
                                             <p:selectBooleanCheckbox id="cecase-query-limit" 
-                                                                     value="#{ceCaseSearchBB.searchParamsSelected.limitResultCount_ctl}" />
+                                                                     value="#{ceCaseSearchProfileBB.searchParamsSelected.limitResultCount_ctl}" />
                                         </h:panelGroup>
 
                                         <h:panelGroup>
                                             <p:inputText id="cecase-filter-limit-it"
                                                          type="number"
-                                                         value="#{ceCaseSearchBB.searchParamsSelected.limitResultCount_val}"
-                                                         disabled="#{!ceCaseSearchBB.searchParamsSelected.limitResultCount_ctl}"/>
+                                                         value="#{ceCaseSearchProfileBB.searchParamsSelected.limitResultCount_val}"
+                                                         disabled="#{!ceCaseSearchProfileBB.searchParamsSelected.limitResultCount_ctl}"/>
                                             <h:message for="cecase-filter-limit-it" showDetail="false" showSummary="true"
                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                         </h:panelGroup>
@@ -2183,19 +2186,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                     <p:spacer height="5px"/>
 
-                                    <p:inputText id="report-caselist-title-it" style="width: 300px;" value="#{ceCaseSearchBB.reportCECaseList.title}"/>
+                                    <p:inputText id="report-caselist-title-it" style="width: 300px;" value="#{ceCaseSearchProfileBB.reportCECaseList.title}"/>
                                     <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
 
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include case names" for="report-caselist-casename-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchBB.reportCECaseList.includeCaseNames}" />
+                                    <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeCaseNames}" />
 
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel for="report-caselist-notes-ita" value="Notes"/>
                                     <p:spacer height="5px"/>
-                                    <p:inputText id="report-caselist-notes-ita" style="width: 300px; height: 100px;" value="#{ceCaseSearchBB.reportCECaseList.notes}"/>
+                                    <p:inputText id="report-caselist-notes-ita" style="width: 300px; height: 100px;" value="#{ceCaseSearchProfileBB.reportCECaseList.notes}"/>
                                     <p:spacer height="5px"/>
                                 </f:facet>
 
@@ -2203,22 +2206,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <h3>Additional case list report options</h3>
 
                                     <h:outputLabel class="bold" value="Include full owner contact info: " for="report-caselist-ownercontact-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-caselist-ownercontact-chkbox" value="#{ceCaseSearchBB.reportCECaseList.includeListSummaryFigures}" />
+                                    <p:selectBooleanCheckbox id="report-caselist-ownercontact-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeListSummaryFigures}" />
 
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include violation list for each case: " for="report-caselist-viols-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-caselist-viols-chkbox" value="#{ceCaseSearchBB.reportCECaseList.includeViolationList}" />
+                                    <p:selectBooleanCheckbox id="report-caselist-viols-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeViolationList}" />
 
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include summary of each case's event history: " for="report-caselist-eventhist-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-caselist-eventhist-chkbox" value="#{ceCaseSearchBB.reportCECaseList.includeEventSummaryByCase}" />
+                                    <p:selectBooleanCheckbox id="report-caselist-eventhist-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeEventSummaryByCase}" />
 
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include extended property info for each listing: " for="report-caselist-propertyinfo" />
-                                    <p:selectBooleanCheckbox id="report-caselist-propertyinfo" value="#{ceCaseSearchBB.reportCECaseList.includeExtendedPropertyDetails}" />
+                                    <p:selectBooleanCheckbox id="report-caselist-propertyinfo" value="#{ceCaseSearchProfileBB.reportCECaseList.includeExtendedPropertyDetails}" />
 
 
                                 </h:panelGroup>
@@ -2229,7 +2232,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                              value="Cancel" icon="fa fa-stop" immediate="true"
                                              onclick="PF('report-caselist-profile-diaglog-var').hide()"/>
 
-                            <p:commandButton ajax="true" action="#{ceCaseSearchBB.generateReportCECaseList}"
+                            <p:commandButton ajax="true" action="#{ceCaseSearchProfileBB.generateReportCECaseList}"
                                              value="Generate" icon="fa fa-print" 
                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                              />

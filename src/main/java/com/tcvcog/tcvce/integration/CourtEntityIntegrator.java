@@ -80,6 +80,11 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
         
     }
     
+    /**
+     * Retrieves all court entities
+     * @return
+     * @throws IntegrationException 
+     */
     public List<CourtEntity> getCourtEntityList() throws IntegrationException {
             String query = "SELECT entityid FROM public.courtentity;";
             Connection con = getPostgresCon();
@@ -106,6 +111,12 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             return ceList;   
     }
     
+    /**
+     * Retrieves court entities by municode
+     * @param muniCode
+     * @return
+     * @throws IntegrationException 
+     */
        public List<CourtEntity> getCourtEntityList(int muniCode) throws IntegrationException {
             String query = "SELECT courtentity_entityid FROM municourtentity WHERE muni_municode=?;";
             Connection con = getPostgresCon();
@@ -129,6 +140,10 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
                 if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
                 if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
             }
+            if(ceList.isEmpty()){
+                ceList = getCourtEntityList();
+            }
+        
             return ceList;   
     }
     

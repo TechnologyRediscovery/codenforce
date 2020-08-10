@@ -197,6 +197,8 @@ public class    SessionBean
     private Citation sessCitation;
     
     
+    
+    
     /* >>> QUERY CECASE <<< */
     private QueryCECase queryCECase;
     private List<QueryCECase> queryCECaseList;

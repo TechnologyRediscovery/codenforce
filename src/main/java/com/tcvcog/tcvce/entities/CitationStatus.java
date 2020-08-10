@@ -25,22 +25,22 @@ import java.util.Objects;
  * @author ellen bascomb of apt 31y
  */
 public class CitationStatus extends Status {
-    private boolean editsAllowed;
+    private boolean nonStatusEditsForbidden;
     private EventRuleAbstract phaseChangeRule;
     
 
     /**
-     * @return the editsAllowed
+     * @return the nonStatusEditsForbidden
      */
-    public boolean isEditsAllowed() {
-        return editsAllowed;
+    public boolean isNonStatusEditsForbidden() {
+        return nonStatusEditsForbidden;
     }
 
     /**
-     * @param editsAllowed the editsAllowed to set
+     * @param nonStatusEditsForbidden the nonStatusEditsForbidden to set
      */
-    public void setEditsAllowed(boolean editsAllowed) {
-        this.editsAllowed = editsAllowed;
+    public void setNonStatusEditsForbidden(boolean nonStatusEditsForbidden) {
+        this.nonStatusEditsForbidden = nonStatusEditsForbidden;
     }
 
     /**
