@@ -750,6 +750,12 @@
         <managed-bean-class>com.tcvcog.tcvce.application.PropertyUnitsBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>    
+    
+    <managed-bean>
+        <managed-bean-name>propertyUnitChangesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyUnitChangesBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>    
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
   
     

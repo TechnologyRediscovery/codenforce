@@ -1218,6 +1218,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         OccupancyIntegrator oi = getOccupancyIntegrator();
         PropertyUnitDataHeavy puwl = new PropertyUnitDataHeavy(getPropertyUnit(unitID));
         puwl.setPeriodList(oi.getOccPeriodList(unitID));
+        puwl.setChangeOrderList(getPropertyUnitChangeListAll(puwl.getPropertyID()));
         return puwl;
     }
     
@@ -1467,7 +1468,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return ucl;
     }
 
-    public List<PropertyUnitChangeOrder> getPropertyUnitChangeListAll(Property property) throws IntegrationException {
+    public List<PropertyUnitChangeOrder> getPropertyUnitChangeListAll(int propertyID) throws IntegrationException {
         List<PropertyUnitChangeOrder> ucl = new ArrayList<>();
         String query = "SELECT \n"
                 + "	unitchangeid, propertyunit_unitid, \n"
@@ -1486,7 +1487,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, property.getPropertyID());
+            stmt.setInt(1, propertyID);
             rs = stmt.executeQuery();
             while (rs.next()) {
                 ucl.add(generatePropertyUnitChange(rs));
