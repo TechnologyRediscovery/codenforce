@@ -330,9 +330,9 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            CECase cse = cc.getCECase(selectedRequest.getCaseID());
+            CECase cse = cc.cecase_getCECase(selectedRequest.getCaseID());
 
-            getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(cse, getSessionBean().getSessUser()));
+            getSessionBean().setSessCECase(cc.cecase_assembleCECaseDataHeavy(cse, getSessionBean().getSessUser()));
 
             return "ceCaseWorkflow";
         } catch (BObStatusException | IntegrationException | SearchException ex) {
