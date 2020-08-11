@@ -6,7 +6,7 @@ __all__ = [
     "_events",
     "_fetch",
     "_write",
-    "_utils",
+    "utils",
     "pyparcel",
 ]
 

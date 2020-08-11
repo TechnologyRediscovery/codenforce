@@ -49,7 +49,7 @@ def insert_and_update_database(record, conn, cursor, commit):
     """
     """
     parid = record["PARID"]
-    html = scrape.county_property_assessments(parid)
+    html = scrape.county_property_assessment(parid)
     soup = _parse.soupify_html(html)
     owner_name = _parse.OwnerName.get_Owner_from_soup(soup)
     tax_status = _parse.parse_tax_from_soup(soup)

@@ -38,36 +38,42 @@ def _extract_elementlist_from_soup(soup, element_id, element=SPAN, remove_tags=T
     return cleaned_content
 
 
+# Todo: The replace_taxstatus really messes this up. Is there a way to use a single function?
+def replace_html_content(soup, id, new_str):
+    tag = soup.find(id=id)
+    tag.string = new_str
+    return soup
+
+
 TaxStatus = namedtuple(
     "tax_status",
-    ["year", "paidstatus", "tax", "penalty", "interest", "total", "date_paid", "blank"],
+    fields := [
+        "year",
+        "paidstatus",
+        "tax",
+        "penalty",
+        "interest",
+        "total",
+        "date_paid",
+        "blank",
+    ],
+    defaults=(None,) * len(fields),
 )
 
 
-def parse_tax_from_soup(soup):
+def parse_tax_from_soup(soup: bs4.BeautifulSoup, clean=True) -> TaxStatus:
     """
-    :param soup:
-    :return:
     """
     table = _extract_elementlist_from_soup(
         soup, element_id=TAXINFO, element=SPAN, remove_tags=False
     )
     row = table[0].contents[1]  # The most recent year's data
-    try:
-        return TaxStatus(*[clean_text(x.text) for x in row.contents])
-    except TypeError:  # When taxes are unpaid:
-        # Set date_paid and blank set to "" and eventually None. Todo: Make more pythonic?
-        rows = [
-            row.contents[0].text,
-            row.contents[1].text,
-            row.contents[2].text,
-            row.contents[3].text,
-            row.contents[4].text,
-            row.contents[5].text,
-            "",
-            "",
-        ]
-        return TaxStatus(*[clean_text(x) for x in rows])
+    data = row.contents
+
+    # Todo: Document Intellej bug claiming TaxStatus recieved an unexpected argument.
+    if clean:
+        return TaxStatus(*[clean_text(x.text) for x in data])
+    return TaxStatus(*[x.text for x in data])
 
 
 # Function currently unused

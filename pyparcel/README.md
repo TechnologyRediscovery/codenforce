@@ -6,13 +6,12 @@ Assuming you are at the root of the CodeNForce folder structure:
 ~~~
 $ pipenv install
 $ pipenv shell
-$ cd codeconnect\scripts\pyparcel
+$ cd pyparcel
 $ python pyparcel.py
 ~~~
 This updates all parcels using the latest data from the WPRDC. For more options, run `python pyparcel.py -h`.
 
 *"[Pipenv](https://pipenv.pypa.io/en/latest/) automatically creates and manages a virtualenv for your projects, as well as adds/removes packages from your Pipfile as you install/uninstall packages. It also generates the ever-important Pipfile.lock, which is used to produce deterministic builds."*
-
 
 ## Maintaining the code
 ### How to add a new Event Category

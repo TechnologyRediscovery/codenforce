@@ -33,7 +33,7 @@ import pickle
 ### Fixtures (and similar bits of setup code)
 
 HERE = path.abspath(path.dirname(__file__))
-MOCKS = path.join(HERE, "mocks", "")    # Represents the mocks folder
+MOCKS = path.join(HERE, "mocks", "")  # Represents the mocks folder
 
 # Generates a list of every eventcategory class in _events
 event_categories = []
@@ -48,27 +48,60 @@ for k in d:
         continue
 
 
-
-
 details = EventDetails(None, None, None, None)
 details.changes = Changes(None, None, None)
 
 # Todo: During this setup phase, add CogLand objects into local db
 @pytest.fixture
 def taxstatus_paid():
-    return TaxStatus(year='2020', paidstatus='PAID', tax='473', penalty='000', interest='000', total='473', date_paid='6/2/2020', blank=None)
+    return TaxStatus(
+        year="2020",
+        paidstatus="PAID",
+        tax="473",
+        penalty="000",
+        interest="000",
+        total="473",
+        date_paid="6/2/2020",
+    )
+
 
 @pytest.fixture
 def taxstatus_unpaid():
-    return TaxStatus(year='2020', paidstatus='UNPAID', tax='36894', penalty='1845', interest='369', total='39108', date_paid=None, blank=None)
+    return TaxStatus(
+        year="2020",
+        paidstatus="UNPAID",
+        tax="36894",
+        penalty="1845",
+        interest="369",
+        total="39108",
+        date_paid=None,
+    )
+
 
 @pytest.fixture
 def taxstatus_balancedue():
-    return TaxStatus(year='2020', paidstatus='BALANCE DUE', tax='069', penalty='003', interest='001', total='073', date_paid=None, blank=None)
+    return TaxStatus(
+        year="2020",
+        paidstatus="BALANCE DUE",
+        tax="069",
+        penalty="003",
+        interest="001",
+        total="073",
+        date_paid=None,
+    )
+
 
 @pytest.fixture
 def taxstatus_none():
-    return TaxStatus(year='2020', paidstatus=None, tax='000', penalty='000', interest='000', total='000', date_paid=None, blank=None)
+    return TaxStatus(
+        year="2020",
+        paidstatus=None,
+        tax="000",
+        penalty="000",
+        interest="000",
+        total="000",
+        date_paid=None,
+    )
 
 
 @pytest.fixture
@@ -76,15 +109,18 @@ def person1_prop_imap():
     with open(MOCKS + "person1_prop_imap.pickle", "rb") as p:
         return pickle.load(p)
 
+
 @pytest.fixture
 def person1_cecase_imap():
     with open(MOCKS + "person1_cecase_imap.pickle", "rb") as p:
         return pickle.load(p)
 
+
 @pytest.fixture
 def person1_owner_imap():
     with open(MOCKS + "person1_owner_imap.pickle", "rb") as p:
         return pickle.load(p)
+
 
 @pytest.fixture
 def person1_propertyexternaldata_imap():
@@ -92,10 +128,10 @@ def person1_propertyexternaldata_imap():
         return pickle.load(p)
 
 
-
 class TestEventsTrigger:
     """
     """
+
     # Compare against
     def test_NewParcelid_trigger(self):
         pass
@@ -122,11 +158,11 @@ class TestEventsTrigger:
         pass
 
 
-
 class TestParse:
     # Todo: pickled objects to fixtures?
     class TestParseTaxFromSoup:
         """ Assert parse_tax_from_soup returns the correct TaxStatus, given a BeautifulSoup object"""
+
         # Todo: Learn if these tests break if BS4 is
         def test_paid(self, taxstatus_paid):
             with open(MOCKS + "paid.pickle", "rb") as p:
@@ -149,25 +185,32 @@ class TestParse:
                 soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) == taxstatus_none
 
-
     class TestParseOwnerFromSoup:
         pass
 
 
 try:
-    conn = psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="localhost", port="5432")
+    conn = psycopg2.connect(
+        database="cogdb", user="sylvia", password="c0d3", host="localhost", port="5432"
+    )
 except psycopg2.OperationalError:
+
     @contextmanager
     def mocked_conn():
-        try: yield None
-        finally: pass
+        try:
+            yield None
+        finally:
+            pass
+
     conn = mocked_conn()
 
 
 with conn:
+
     def transaction(func):
         """ transaction is a decorator that allows each unittest to be run in its own transaction
         """
+
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             cursor = conn.cursor()
@@ -177,8 +220,8 @@ with conn:
             finally:
                 cursor.execute("ROLLBACK;")
                 cursor.close()
-        return wrapper
 
+        return wrapper
 
     def db_connection_established():
         """ db_connection_established is a flag representing if a database connection could be made.
@@ -186,16 +229,17 @@ with conn:
         if isinstance(conn, psycopg2.extensions.connection):
             return True
 
-
     def test_database_connection():
         assert db_connection_established()
 
-
-    @pytest.mark.skipif(not db_connection_established(), reason="Requires a database connection")
+    @pytest.mark.skipif(
+        not db_connection_established(), reason="Requires a database connection"
+    )
     class TestsRequiringADatabaseConnection:
-        class TestWrites():
+        class TestWrites:
             """ TestWrites tests check that the code write to the database properly.
             """
+
             @transaction
             def test_property(self, person1_prop_imap):
                 with conn.cursor() as cursor:
@@ -225,10 +269,10 @@ with conn:
             #     with conn.cursor() as cursor:
             #         write.propertyexternaldata(person1_propertyexternaldata_imap, cursor)
 
-
         class TestEventCategories:
             """ Ensures events in _events.py share the same attributes of their counterpart in the database.
             """
+
             @pytest.mark.parametrize("event", event_categories)
             def test_name_integrity(self, event):
                 """ Compares the class's name to the database's event category's title.
@@ -246,7 +290,6 @@ with conn:
                     cursor.execute(select_sql, info)
                     row = cursor.fetchone()
                     assert event.__name__ == row[0]
-
 
             # Todo: Refactor and do a little currying
             @pytest.mark.parametrize("event", event_categories)
