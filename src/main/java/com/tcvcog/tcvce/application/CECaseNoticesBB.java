@@ -63,7 +63,7 @@ public class CECaseNoticesBB
                 try {
                     getSessionBean().getSessPropertyList().add(0, pc.getProperty(currentCase.getPropertyID()));
 //                    positionCurrentCaseAtHeadOfQueue();
-                    nov = cc.novGetNewNOVSkeleton(currentCase, getSessionBean().getSessMuni());
+                    nov = cc.nov_GetNewNOVSkeleton(currentCase, getSessionBean().getSessMuni());
                     nov.setCreationBy(getSessionBean().getSessUser());
                     getSessionBean().setSessNotice(nov);
                     return "noticeOfViolationBuilder";
@@ -82,7 +82,7 @@ public class CECaseNoticesBB
     public void resetNotice(NoticeOfViolation nov) {
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            cc.novResetMailing(nov, getSessionBean().getSessUser());
+            cc.nov_ResetMailing(nov, getSessionBean().getSessUser());
 //            refreshCurrentCase();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -112,7 +112,7 @@ public class CECaseNoticesBB
         CaseCoordinator caseCoord = getCaseCoordinator();
         
         try {
-            caseCoord.novLockAndQueue(currentCase, nov, getSessionBean().getSessUser());
+            caseCoord.nov_LockAndQueue(currentCase, nov, getSessionBean().getSessUser());
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
@@ -139,8 +139,8 @@ public class CECaseNoticesBB
     public void deleteNoticeOfViolation(NoticeOfViolation nov) {
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
-            caseCoord.novDelete(nov);
-            currentCase = caseCoord.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
+            caseCoord.nov_delete(nov);
+            currentCase = caseCoord.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice no. " + nov.getNoticeID() + " has been nuked forever", ""));
@@ -160,7 +160,7 @@ public class CECaseNoticesBB
     public void markNoticeOfViolationAsSent(NoticeOfViolation nov) {
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
-            caseCoord.novMarkAsSent(currentCase, nov, getSessionBean().getSessUser());
+            caseCoord.nov_markAsSent(currentCase, nov, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Marked notice as sent and added event to case",
@@ -181,8 +181,8 @@ public class CECaseNoticesBB
     public void markNoticeOfViolationAsReturned(NoticeOfViolation nov) {
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
-            caseCoord.novMarkAsReturned(currentCase, nov, getSessionBean().getSessUser());
-            currentCase = caseCoord.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
+            caseCoord.nov_markAsReturned(currentCase, nov, getSessionBean().getSessUser());
+            currentCase = caseCoord.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice no. " + nov.getNoticeID()

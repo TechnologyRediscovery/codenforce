@@ -48,8 +48,6 @@ public class CECasePropertyUnitHeavy
         this.caseManager = cse.caseManager;
         this.caseName = cse.caseName;
 
-        this.casePhase = cse.casePhase;
-        this.casePhaseIcon = cse.casePhaseIcon;
 
         this.originationDate = cse.originationDate;
         this.closingDate = cse.closingDate;
@@ -69,6 +67,7 @@ public class CECasePropertyUnitHeavy
         
         this.lastUpdatedBy = cse.getLastUpdatedBy();
         this.lastUpdatedTS = cse.getLastUpdatedTS();
+        this.statusBundle = cse.getStatusBundle();
 
     }
 

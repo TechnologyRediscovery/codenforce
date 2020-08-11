@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
@@ -137,7 +138,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             CaseCoordinator cc = getCaseCoordinator();
 
             try {
-                currentCase = cc.assembleCECaseDataHeavy(getSessionBean().getFeeManagementCeCase(), getSessionBean().getSessUser());
+                currentCase = cc.cecase_assembleCECaseDataHeavy(getSessionBean().getFeeManagementCeCase(), getSessionBean().getSessUser());
             } catch (SearchException | BObStatusException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
@@ -363,8 +364,17 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     public String finishAndRedir() {
-
-        return getSessionBean().getNavStack().popLastPage();
+        try {
+            return getSessionBean().getNavStack().popLastPage();
+        } catch (NavigationException ex) {
+            System.out.println("PaymentBB.finishAndRedir() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to direct you back to the page you were on."
+                            + " No changes to the database were saved. Please return to the page manually.",
+                            "Do not hit the return button again but note the error."));
+            return "";
+        }
     }
 
     public String goToPaymentTypeManage() {
@@ -410,11 +420,11 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
             CaseCoordinator cc = getCaseCoordinator();
             try {
-                address = cc.assembleCECasePropertyUnitHeavy(currentCase).getProperty().getAddress();
+                address = cc.cecase_assembleCECasePropertyUnitHeavy(currentCase).getProperty().getAddress();
             } catch (IntegrationException | SearchException ex) {
                 System.out.println(ex);
             }
-        
+
         }
 
         return address;

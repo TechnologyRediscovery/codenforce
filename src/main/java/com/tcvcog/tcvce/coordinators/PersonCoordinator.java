@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Citation;
@@ -211,6 +212,22 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     public void connectPersonToProperty(Person person, Property prop) throws IntegrationException {
         PersonIntegrator pi = getPersonIntegrator();
         pi.connectPersonToProperty(person, prop);
+        
+    }
+    
+    
+    /**
+     * Logic holder for pass-through calls to object connection methods on the Integrator
+     * @param person
+     * @param prop
+     * @throws IntegrationException 
+     */
+    public void connectRemovePersonToProperty(Person person, Property prop) throws IntegrationException, BObStatusException {
+        if(person == null || prop == null){
+            throw new BObStatusException("Cannot remove person link if either Person or Property is NULL");
+        }
+        PersonIntegrator pi = getPersonIntegrator();
+        pi.connectRemovePersonToProperty(person, prop);
         
     }
     

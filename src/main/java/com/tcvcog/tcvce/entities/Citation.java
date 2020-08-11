@@ -31,7 +31,10 @@ public class Citation implements Serializable {
     private int citationID;
     private String citationNo;
     private CitationStatus status;
+    private boolean nonStausUpdatesAllowed;
     private CourtEntity origin_courtentity;
+    
+    private String officialText;
     
     private List<EventCnF> eventList;
     
@@ -320,6 +323,34 @@ public class Citation implements Serializable {
      */
     public void setEventList(List<EventCnF> eventList) {
         this.eventList = eventList;
+    }
+
+    /**
+     * @return the nonStausUpdatesAllowed
+     */
+    public boolean isNonStausUpdatesAllowed() {
+        return nonStausUpdatesAllowed;
+    }
+
+    /**
+     * @param nonStausUpdatesAllowed the nonStausUpdatesAllowed to set
+     */
+    public void setNonStausUpdatesAllowed(boolean nonStausUpdatesAllowed) {
+        this.nonStausUpdatesAllowed = nonStausUpdatesAllowed;
+    }
+
+    /**
+     * @return the officialText
+     */
+    public String getOfficialText() {
+        return officialText;
+    }
+
+    /**
+     * @param officialText the officialText to set
+     */
+    public void setOfficialText(String officialText) {
+        this.officialText = officialText;
     }
     
     

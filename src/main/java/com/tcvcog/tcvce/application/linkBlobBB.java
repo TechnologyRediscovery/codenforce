@@ -42,7 +42,7 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         CaseCoordinator cc = getCaseCoordinator();
         
         try{
-            cc.getCodeViolation(codeViolationID);
+            cc.violation_getCodeViolation(codeViolationID);
             System.out.println("linkBlobBB.linkBlobToCodeViolation | retrieved code violation");  //TESTING
         }catch(IntegrationException e){
             getFacesContext().addMessage(null,

@@ -183,7 +183,7 @@ public class UnitChangesBB extends BackingBeanUtils implements Serializable {
 
     public String goToChangeDetail() {
 
-        getSessionBean().setSessionProperty(selectedProperty);
+        getSessionBean().setSessProperty(selectedProperty);
 
         return "unitchangedetail";
 

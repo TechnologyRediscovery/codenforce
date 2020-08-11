@@ -102,7 +102,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         CaseCoordinator cc = getCaseCoordinator();
 
         currentMode = "Search";
-        
+
         //First search for CEARs using a standard query
         selectedQueryCEAR = sc.initQuery(QueryCEAREnum.UNPROCESSED, getSessionBean().getSessUser().getMyCredential());
 
@@ -111,7 +111,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
             //Update the selected request with the one from the database.
             if (getSessionBean().getSessCEAR() != null) {
-                selectedRequest = cc.getCEActionRequest(getSessionBean().getSessCEAR().getRequestID());
+                selectedRequest = cc.cear_getCEActionRequest(getSessionBean().getSessCEAR().getRequestID());
             }
         } catch (SearchException | IntegrationException ex) {
             System.out.println(ex);
@@ -124,7 +124,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         searchParams = new SearchParamsCEActionRequests();
         queryList = sc.buildQueryCEARList(getSessionBean().getSessUser().getMyCredential());
 
-        ReportCEARList rpt = cc.getInitializedReportConficCEARs(
+        ReportCEARList rpt = cc.report_getInitializedReportConficCEARs(
                 getSessionBean().getSessUser(), getSessionBean().getSessMuni());
 
         rpt.setPrintFullCEARQueue(false);
@@ -165,11 +165,11 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
     public void executeQuery(ActionEvent ev) {
         SearchCoordinator searchC = getSearchCoordinator();
-        
+
         selectedQueryCEAR = searchC.initQuery(selectedQueryCEAR.getQueryName(), getSessionBean().getSessUser().getMyCredential());
-        
+
         requestList = new ArrayList<>();
-        
+
         try {
             if (selectedQueryCEAR != null && !selectedQueryCEAR.getParamsList().isEmpty()) {
 
@@ -200,19 +200,19 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         try {
 
             requestList = new ArrayList<>();
-            
+
             selectedQueryCEAR = searchCoord.initQuery(QueryCEAREnum.CUSTOM, getSessionBean().getSessUser().getMyCredential());
 
             //We will manually grab each parameter so we don't also grab the existing SQL statements that are inside searchParams
             SearchParamsCEActionRequests queryParams = selectedQueryCEAR.getPrimaryParams();
 
-            if(searchParams.getDate_start_val() == null || searchParams.getDate_end_val() == null){
+            if (searchParams.getDate_start_val() == null || searchParams.getDate_end_val() == null) {
                 getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please specify a start and end date when using a custom query.", ""));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Please specify a start and end date when using a custom query.", ""));
                 return;
             }
-            
+
             if (selectedQueryCEAR != null && !selectedQueryCEAR.getParamsList().isEmpty()) {
 
                 queryParams.setDate_start_val(searchParams.getDate_start_val());
@@ -262,28 +262,30 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                             "Unable to query action requests, sorry", ""));
         }
     }
+
     /**
-     * Determines whether or not a user should currently be able to select a CEAR.
-     * Users should only select CEARs if they're in search mode.
-     * @return 
+     * Determines whether or not a user should currently be able to select a
+     * CEAR. Users should only select CEARs if they're in search mode.
+     *
+     * @return
      */
-    public boolean getSelectedButtonActive(){
+    public boolean getSelectedButtonActive() {
         return !"Search".equals(currentMode);
     }
-    
-    public boolean getActiveSearchMode(){
+
+    public boolean getActiveSearchMode() {
         return "Search".equals(currentMode);
     }
-    
-    public boolean getActiveActionsMode(){
+
+    public boolean getActiveActionsMode() {
         return "Actions".equals(currentMode);
     }
-    
-    public boolean getActiveObjectsMode(){
+
+    public boolean getActiveObjectsMode() {
         return "Objects".equals(currentMode);
     }
-    
-    public boolean getActiveNotesMode(){
+
+    public boolean getActiveNotesMode() {
         return "Notes".equals(currentMode);
     }
 
@@ -319,21 +321,21 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     public void setCurrentCEARSelected(boolean currentCEARSelected) {
         this.currentCEARSelected = currentCEARSelected;
     }
-    
-    public void defaultSetting(){
+
+    public void defaultSetting() {
         currentCEARSelected = false;
     }
-    
-    public String goToCase(){
-        
+
+    public String goToCase() {
+
         CaseCoordinator cc = getCaseCoordinator();
-        try{
-        CECase cse = cc.getCECase(selectedRequest.getCaseID());
-        
-        getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(cse, getSessionBean().getSessUser().getMyCredential()));
-        
-        return "ceCaseWorkflow";
-        } catch (BObStatusException | IntegrationException | SearchException ex){
+        try {
+            CECase cse = cc.cecase_getCECase(selectedRequest.getCaseID());
+
+            getSessionBean().setSessCECase(cc.cecase_assembleCECaseDataHeavy(cse, getSessionBean().getSessUser()));
+
+            return "ceCaseWorkflow";
+        } catch (BObStatusException | IntegrationException | SearchException ex) {
             System.out.println("CEActionRequestsBB.goToCase() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -341,12 +343,12 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             return "";
         }
     }
-    
+
     public void prepareReportMultiCEAR(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator searchCoord = getSearchCoordinator();
 
-        ReportCEARList rpt = cc.getInitializedReportConficCEARs(
+        ReportCEARList rpt = cc.report_getInitializedReportConficCEARs(
                 getSessionBean().getSessUser(), getSessionBean().getSessMuni());
 
         rpt.setPrintFullCEARQueue(true);
@@ -1003,7 +1005,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         CaseCoordinator cc = getCaseCoordinator();
 
         disabledDueToRoutingNotAllowed
-                = !(cc.determineCEActionRequestRoutingActionEnabledStatus(
+                = !(cc.cear_determineCEActionRequestRoutingActionEnabledStatus(
                         selectedRequest,
                         getSessionBean().getSessUser()));
 
@@ -1234,5 +1236,5 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     public void setRequestReasonDonut(DonutChartModel requestReasonDonut) {
         this.requestReasonDonut = requestReasonDonut;
     }
-    
+
 }

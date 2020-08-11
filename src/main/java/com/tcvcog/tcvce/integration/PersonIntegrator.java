@@ -323,6 +323,34 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
 
     }
+    /**
+     * Creates a record in the person-property linking table, after checking that it does not exist
+     * @param person
+     * @param prop
+     * @throws IntegrationException 
+     */
+    public void connectRemovePersonToProperty(Person person, Property prop) throws IntegrationException {
+
+        
+        String query = "DELETE from propertyperson WHERE property_propertyid=? AND person_personid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, prop.getPropertyID());
+            stmt.setInt(2, person.getPersonID());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to insert person and connect to property", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+    }
 
     /**
      * Accepts a Person object to store in the database.
@@ -1214,7 +1242,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 //            }
             
         } else {
-            params.appendSQL("AND caseid=? ");
+            params.appendSQL("AND personid=? ");
         }
         params.appendSQL(";");
         

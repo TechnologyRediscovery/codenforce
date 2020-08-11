@@ -40,8 +40,7 @@ public class        CECase
     protected User caseManager;
     protected String caseName;
     
-    protected CasePhaseEnum casePhase;
-    protected Icon casePhaseIcon;
+    protected CECaseStatus statusBundle;
     
     protected LocalDateTime originationDate;
     protected LocalDateTime closingDate;
@@ -87,13 +86,7 @@ public class        CECase
     
       @Override
     public boolean isOpen() {
-        if(this.casePhase != null){
-            return this.casePhase.isCaseOpen();
-        } else if (this.getClosingDate() != null){
-            return true;
-        } else {
-            return false;
-        }
+        return this.getClosingDate() != null;
     }
 
   
@@ -144,19 +137,7 @@ public class        CECase
         this.caseName = caseName;
     }
 
-    /**
-     * @return the casePhase
-     */
-    public CasePhaseEnum getCasePhase() {
-        return casePhase;
-    }
-
-    /**
-     * @param casePhase the casePhase to set
-     */
-    public void setCasePhase(CasePhaseEnum casePhase) {
-        this.casePhase = casePhase;
-    }
+   
 
     /**
      * @return the originationDate
@@ -279,19 +260,7 @@ public class        CECase
 
    
 
-    /**
-     * @return the casePhaseIcon
-     */
-    public Icon getCasePhaseIcon() {
-        return casePhaseIcon;
-    }
-
-    /**
-     * @param casePhaseIcon the casePhaseIcon to set
-     */
-    public void setCasePhaseIcon(Icon casePhaseIcon) {
-        this.casePhaseIcon = casePhaseIcon;
-    }
+  
     
     
     @Override
@@ -319,8 +288,6 @@ public class        CECase
         hash = 53 * hash + Objects.hashCode(this.caseName);
         hash = 53 * hash + Objects.hashCode(this.propertyID);
         hash = 53 * hash + Objects.hashCode(this.propertyUnitID);
-        hash = 53 * hash + Objects.hashCode(this.casePhase);
-        hash = 53 * hash + Objects.hashCode(this.casePhaseIcon);
         hash = 53 * hash + Objects.hashCode(this.originationDate);
         hash = 53 * hash + Objects.hashCode(this.closingDate);
         hash = 53 * hash + Objects.hashCode(this.creationTimestamp);
@@ -538,6 +505,20 @@ public class        CECase
      */
     public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
         this.lastUpdatedTS = lastUpdatedTS;
+    }
+
+    /**
+     * @return the statusBundle
+     */
+    public CECaseStatus getStatusBundle() {
+        return statusBundle;
+    }
+
+    /**
+     * @param statusBundle the statusBundle to set
+     */
+    public void setStatusBundle(CECaseStatus statusBundle) {
+        this.statusBundle = statusBundle;
     }
 
     

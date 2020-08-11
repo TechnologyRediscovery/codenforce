@@ -339,6 +339,15 @@
         </navigation-case>
     </navigation-rule>
     
+    <navigation-rule>
+        <from-view-id>*</from-view-id>
+        <navigation-case>
+              <from-outcome>intensityManage</from-outcome>
+              <to-view-id>/restricted/cogstaff/ce/intensityManage.xhtml</to-view-id>
+              <redirect />
+          </navigation-case>
+    </navigation-rule>
+    
         
         
    
@@ -1160,10 +1169,10 @@
     </managed-bean>
 
     <managed-bean>
-        <managed-bean-name>ceCaseSearchBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseSearchBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-name>ceCaseSearchProfileBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseSearchProfileBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
 
     <managed-bean>
         <managed-bean-name>caseIntegrator</managed-bean-name>
@@ -1172,10 +1181,10 @@
     </managed-bean>
 
     <managed-bean>
-        <managed-bean-name>violationAddBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ViolationAddBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-name>violationBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.ViolationBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
 
     <managed-bean>
         <managed-bean-name>violationSelectElementBB</managed-bean-name>
@@ -1214,14 +1223,6 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
-  
-
-    <managed-bean>
-        <managed-bean-name>ceCaseWorkflowBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseWorkflowBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-
     <managed-bean>
         <managed-bean-name>cECaseViolationsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECaseViolationsBB</managed-bean-class>
@@ -1249,7 +1250,7 @@
         <from-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</from-view-id>
         <navigation-case>
             <from-action>#{caseAddBB.addNewCase}</from-action>
-            <from-outcome>ceCases</from-outcome>
+            <from-outcome>caseAdd</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</to-view-id>
             <redirect />
         </navigation-case>
@@ -1277,7 +1278,7 @@
         <from-view-id>/restricted/cogstaff/ce/violationPhotos.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>ceHome</from-outcome>
-            <to-view-id>/restricted/cogview/cECases.xhtml</to-view-id>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseSearchProfile.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>
@@ -1317,8 +1318,12 @@
         <from-view-id>*</from-view-id>
 
         <navigation-case>
+            <from-outcome>ceCaseSearchProfile</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseSearchProfile.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
             <from-outcome>ceCaseWorkflow</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/ceCaseWorkflow.xhtml</to-view-id>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseSearchProfile.xhtml</to-view-id>
         </navigation-case>
         
         <navigation-case>
@@ -1406,11 +1411,7 @@
             <redirect />
         </navigation-case>
     
-        <navigation-case>
-            <from-outcome>intensityManage</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/intensityManage.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
+      
     </navigation-rule>
     
             
@@ -1580,6 +1581,32 @@
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules: occupancy application ~~~~~~~~~~~~~~~ --> 
     
     <navigation-rule>
+        <navigation-case>
+            <from-outcome>occPermitApplications</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/permitApplications.xhtml</to-view-id>
+            <redirect />       
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>occPeriodStatus</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occPeriodStatus.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>occInspectionAdd</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occInspectionAdd.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>occInspectionProfile</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/occProfile.xhtml</to-view-id>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>checklists</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/checklists.xhtml</to-view-id>
+        </navigation-case>
+        
         
         <navigation-case>
             <from-view-id>/public/services/occpermitApplicationFlow/occPermitChooseMuni.xhtml</from-view-id>

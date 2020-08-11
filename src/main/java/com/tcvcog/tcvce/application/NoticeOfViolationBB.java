@@ -181,7 +181,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             currentNotice.setNoticeTextAfterViolations(sb.toString());
 
             try {
-                newNoticeId = cc.novInsertNotice(currentNotice, currentCase, getSessionBean().getSessUser());
+                newNoticeId = cc.nov_InsertNotice(currentNotice, currentCase, getSessionBean().getSessUser());
             } catch (IntegrationException ex) {
                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
                 System.out.println(ex);
@@ -211,7 +211,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     public String saveNoticeDraft(){
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            cc.novUpdate(currentNotice);
+            cc.nov_update(currentNotice);
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));

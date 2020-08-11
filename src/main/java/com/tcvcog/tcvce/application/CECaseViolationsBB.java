@@ -79,7 +79,7 @@ public class CECaseViolationsBB
     public void removeViolation(CodeViolation cv){
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            cc.deactivateCodeViolation(cv, getSessionBean().getSessUser());
+            cc.violation_deactivateCodeViolation(cv, getSessionBean().getSessUser());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Violation id " + cv.getViolationID() + " removed from case!", ""));
             
@@ -108,11 +108,11 @@ public class CECaseViolationsBB
             EnforcableCodeElement ece = ci.getEnforcableCodeElement(newViolationCodeBookEleID);
             if (ece != null) {
                 selectedViolation.setViolatedEnfElement(ece);
-//                cc.updateCodeViolation(selectedViolation);
+//                cc.violation_updateCodeViolation(selectedViolation);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Success: Updated Violation with new CodeBook linking", ""));
-                currentCase = cc.assembleCECaseDataHeavy(cc.getCECase(currentCase.getCaseID()), getSessionBean().getSessUser());
+                currentCase = cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(currentCase.getCaseID()), getSessionBean().getSessUser());
             } else {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -139,7 +139,7 @@ public class CECaseViolationsBB
             e.setUserCreator(getSessionBean().getSessUser());
             e.setTimeStart(LocalDateTime.now());
             cv.setActualComplianceDate(LocalDateTime.now());
-            cc.recordCompliance(cv, getSessionBean().getSessUser());
+            cc.violation_recordCompliance(cv, getSessionBean().getSessUser());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }

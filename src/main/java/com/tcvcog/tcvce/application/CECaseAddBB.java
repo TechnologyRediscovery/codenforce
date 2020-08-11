@@ -17,11 +17,11 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
-
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
@@ -37,7 +37,7 @@ import javax.faces.application.FacesMessage;
  *
  * @author ellen bascomb of apt 31y
  */
-public class CECaseAddBB extends BackingBeanUtils implements Serializable{
+public class CECaseAddBB extends BackingBeanUtils implements Serializable {
 
     private Property caseProperty;
     private int formPropertyUnitID;
@@ -45,16 +45,20 @@ public class CECaseAddBB extends BackingBeanUtils implements Serializable{
     private Date formOriginationDate;
     private String formCaseNotes;
     private boolean isUnitAssociated;
-    
+
     /**
      * Creates a new instance of CaseAddBB
      */
     public CECaseAddBB() {
         formOriginationDate = java.util.Date.from(java.time.LocalDateTime.now()
                 .atZone(ZoneId.systemDefault()).toInstant());
-        
+
     }
     
+    /**
+     * Listener method for creation of a new case
+     * @return routing string: case profile
+     */
     public String addNewCase(){
         // note that in this case, the case coordinator not this 
         // backing bean will interact with the caseintegrator
@@ -64,47 +68,62 @@ public class CECaseAddBB extends BackingBeanUtils implements Serializable{
         // check to see if we have an action request that needs to be connected
         // to this new case
         CEActionRequest cear = getSessionBean().getSessCEAR();
-        newCase = cc.initCECase(caseProperty, getSessionBean().getSessUser());
+        newCase = cc.cecase_initCECase(caseProperty, getSessionBean().getSessUser());
         newCase.setCaseName(formCaseName);
         newCase.setOriginationDate(formOriginationDate.toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
         newCase.setNotes(formCaseNotes);
-        newCase.setCasePhase(CasePhaseEnum.PrelimInvestigationPending);
         try {
-            cc.insertNewCECase(newCase, getSessionBean().getSessUser(), cear);
-            getSessionBean().setSessCECase(cc.assembleCECaseDataHeavy(newCase, getSessionBean().getSessUser()));
+            cc.cecase_insertNewCECase(newCase, getSessionBean().getSessUser(), cear);
+            getSessionBean().setSessCECase(cc.cecase_assembleCECaseDataHeavy(newCase, getSessionBean().getSessUser()));
             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully added case to property! Access the case from the list below.", ""));
             //Send them back to the last page!
             return getSessionBean().getNavStack().popLastPage();
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Integration Module error: Unable to add case to current property.", 
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Integration Module error: Unable to add case to current property.",
                             "Best try again or note the error and complain to Eric."));
         } catch (BObStatusException ex) {
             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "A code enf action request was found in queue to be attached to this case. "
-                                    + "I couldn't do that, though, sorry..", 
+                            + "I couldn't do that, though, sorry..",
                             "Best try again or note the error and complain to Eric."));
             System.out.println(ex);
-        } catch (ViolationException | EventException |SearchException ex) {
+        } catch (NavigationException ex) {
+            System.out.println("CECaseAddBB.addNewCase() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to direct you back to the page you were last on, but your changes were saved."
+                            + " Please return to the page manually.",
+                            "Do not hit the return button again but note the error."));
+
+        } catch (ViolationException | EventException | SearchException ex) {
             System.out.println(ex);
         }
-        
-        // stick our new case on the session self for easy access
-        
+
         //reload page on error
         return "";
     }
 
-    public String cancelAdd(){
-        return getSessionBean().getNavStack().popLastPage();
+    public String cancelAdd() {
+        try {
+            return getSessionBean().getNavStack().popLastPage();
+        } catch (NavigationException ex) {
+            System.out.println("CECaseAddBB.cancelAdd() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to direct you back to the page you were on."
+                            + " No changes to the database were saved. Please return to the page manually.",
+                            "Do not hit the return button again but note the error."));
+            return "";
+        }
     }
-    
+
     /**
      * @return the formPropertyUnitID
      */
@@ -165,7 +184,7 @@ public class CECaseAddBB extends BackingBeanUtils implements Serializable{
      * @return the caseProperty
      */
     public Property getCaseProperty() {
-        
+
         caseProperty = getSessionBean().getSessProperty();
         return caseProperty;
     }
@@ -190,5 +209,5 @@ public class CECaseAddBB extends BackingBeanUtils implements Serializable{
     public void setIsUnitAssociated(boolean isUnitAssociated) {
         this.isUnitAssociated = isUnitAssociated;
     }
-    
+
 }

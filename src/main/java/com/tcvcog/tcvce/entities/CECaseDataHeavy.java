@@ -27,6 +27,9 @@ public class CECaseDataHeavy
         IFace_Loggable {
 
     // accessed through methods specified in the interfaces
+    private Property property;
+    private PropertyUnit propertyUnit;
+    
     private List<EventCnF> eventList;
     private List<EventCnF> eventListMaster;
     
@@ -38,12 +41,51 @@ public class CECaseDataHeavy
     private List<MoneyCECaseFeeAssigned> feeList;
     private List<MoneyCECaseFeePayment> paymentList;
     
+    private List<Blob> blobList;
+    
     protected boolean showHiddenEvents;
     protected boolean showInactiveEvents;
 
    
     public CECaseDataHeavy(CECase cse){
+        if(cse != null){
+            
+        this.caseID = cse.caseID;
+        this.publicControlCode = cse.publicControlCode;
+        this.paccEnabled = cse.paccEnabled;
+
+        this.allowForwardLinkedPublicAccess = cse.allowForwardLinkedPublicAccess;
+
+        this.propertyID = cse.propertyID;
+        this.propertyUnitID = cse.propertyUnitID;
+
+        this.caseManager = cse.caseManager;
+        this.caseName = cse.caseName;
+
+        this.originationDate = cse.originationDate;
+        this.closingDate = cse.closingDate;
+        this.creationTimestamp = cse.creationTimestamp;
+
+        this.notes = cse.notes;
+
+        this.source = cse.source;
+
+        this.citationList = cse.citationList;
+        this.noticeList = cse.noticeList;
+        this.violationList = cse.violationList;
+       
+        this.active = cse.active;
+        this.propertyInfoCase = cse.propertyInfoCase;
+        this.personInfoPersonID = cse.getPersonInfoPersonID();
+        
+        this.lastUpdatedBy = cse.getLastUpdatedBy();
+        this.lastUpdatedTS = cse.getLastUpdatedTS();
+        this.statusBundle = cse.getStatusBundle();
+        
         eventListMaster = new ArrayList<>();
+        } else {
+            System.out.println("CECaseDataHeavy.const: null input case");
+        }
         
     }
     
@@ -354,6 +396,48 @@ public class CECaseDataHeavy
     @Override
     public String getCredentialSignature() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    /**
+     * @return the propertyUnit
+     */
+    public PropertyUnit getPropertyUnit() {
+        return propertyUnit;
+    }
+
+    /**
+     * @param propertyUnit the propertyUnit to set
+     */
+    public void setPropertyUnit(PropertyUnit propertyUnit) {
+        this.propertyUnit = propertyUnit;
+    }
+
+    /**
+     * @return the property
+     */
+    public Property getProperty() {
+        return property;
+    }
+
+    /**
+     * @param property the property to set
+     */
+    public void setProperty(Property property) {
+        this.property = property;
+    }
+
+    /**
+     * @return the blobList
+     */
+    public List<Blob> getBlobList() {
+        return blobList;
+    }
+
+    /**
+     * @param blobList the blobList to set
+     */
+    public void setBlobList(List<Blob> blobList) {
+        this.blobList = blobList;
     }
 
 }

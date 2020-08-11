@@ -43,7 +43,7 @@
                                             <p:menuitem value="Step 1: Choose Municipality" containerStyleClass="complete" />
                                             <p:menuitem value="Step 2: Choose Property" containerStyleClass="complete" />
                                             <p:menuitem value="Step 3: Describe Concern" />
-                                            <p:menuitem value="Step 4: Upload Phote" />
+                                            <p:menuitem value="Step 4: Upload Photo" />
                                             <p:menuitem value="Step 5: Request Details" />
                                             <p:menuitem value="Step 6: Review and Submit" />
                                         </p:steps>
@@ -127,8 +127,12 @@
                                 
                                 <!-- CONTENT BUTTON -->
                                 <div class="public-main-contents-button">
+                                    <p:commandButton ajax="false" styleClass="buttonOwnLine"
+                                                     id="goBack" value="Go Back" tabindex="6"
+                                                     process="@none" immediate="true"
+                                                     action="#{cEActionRequestSubmitBB.goBack()}"/>
                                     <p:commandButton  ajax="false" 
-                                                      tabindex="6"
+                                                      tabindex="7" styleClass="buttonOwnLine" 
                                                       value="Next: Upload photos of your concern" 
                                                       id="continueToPhotoUploadButton"
                                                       action="#{cEActionRequestSubmitBB.saveConcernDescriptions}"

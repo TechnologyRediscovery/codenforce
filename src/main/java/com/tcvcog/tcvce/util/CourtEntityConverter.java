@@ -35,7 +35,6 @@ public class CourtEntityConverter extends EntityConverter implements Converter {
     
      @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
-        System.out.println("CourtEntityCovnerter.getAsObject | title: " + titleS);
         if(titleS.isEmpty()) {
             return null; 
         }
@@ -45,7 +44,6 @@ public class CourtEntityConverter extends EntityConverter implements Converter {
 
     @Override
     public String getAsString(FacesContext fc, UIComponent uic, Object o) {
-        System.out.println("CourtEntity.getAsString");
         
         if (o == null){
             return "";

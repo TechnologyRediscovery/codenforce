@@ -241,7 +241,7 @@
                                                     <p:commandButton    id="prop-search-loadprop-button"
                                                                         icon="fa fa-folder-open-o"
                                                                         value="Load Property"
-                                                                        style="#{prop.parID == propertyProfileBB.currentProperty.propertyID ? 'background-color: #dee461; color:black;':''}""
+                                                                        style="#{prop.parID == propertyProfileBB.currentProperty.propertyID ? 'background-color: #dee461; color:black;':''}"
                                                                         action="#{propertyProfileBB.onExplorePropertyButtonChange(prop)}"
                                                                         ajax="true"
                                                                         update="
@@ -292,14 +292,13 @@
 
                                     <p:outputPanel id = "prop-lists-outpanel" >
                                         <h:form id="prop-info-header-form">
-
-                                            <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.address}" />
-                                            <h:outputText value=" | " />
-                                            <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}" />
-                                            <h:outputText value=" | " />
-                                            <h:outputText id="header-lob-ot" value="Lot-block: #{propertyProfileBB.currentProperty.parID}"/>
-                                            <h:outputText value=" | " />
-                                            <h:outputText id="header-propid-ot" value="ID: #{propertyProfileBB.currentProperty.propertyID}"/>
+                                            <h2>
+                                                
+                                                <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.address}" />
+                                                <h:outputText value=" (" />
+                                                <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}" />
+                                                <h:outputText value=") " />
+                                            </h2>
 
                                         </h:form>
 
@@ -551,44 +550,6 @@
 
                                         </p:panel>
 
-                                        <p:panel id="propinfo-notes-panel"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="Property Notes"
-                                                 rendered="#{propertyProfileBB.activeLookupMode }"
-                                                 > 
-                                            <h:form id="propinfo-notes-form">
-                                                <h:messages id="propinfo-notes-messages"
-                                                            globalOnly="true" showDetail="true" showSummary="true"
-                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                                </h:messages>
-
-                                                <div class="ui-g data-container">
-                                                    <p:commandButton   id="propinfo-notes-add-button"
-                                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                                       value="Add new note"  
-                                                                       icon="fa fa-sticky-note-o"
-                                                                       actionListener="#{propertyProfileBB.onNoteInitButtonChange}"
-                                                                       oncomplete="PF('propinfo-notes-dialog-var').show()"
-                                                                       update="propinfo-note-create-form"/>
-                                                    <p:spacer height="5px" />
-                                                    <div    id="propinf-ot-notes-div"
-                                                            class="data_field"
-                                                            style="clear:both;">
-                                                        <h:outputLabel  styleClass="data_field_label"
-                                                                        for="propinfo-ot-notes"
-                                                                        value="Notes"/>
-
-                                                        <h:outputText   id="propinfo-ot-notes"
-                                                                        styleClass="data_field_value"
-                                                                        value="#{propertyProfileBB.currentProperty.notes}"
-                                                                        escape="false"/>
-                                                    </div>
-                                                </div>
-
-                                            </h:form>
-                                        </p:panel>
-
                                         <!--Insert Table-->
                                         <p:panel id="propinfo-panel-addupdate"
                                                  toggleable="true"
@@ -778,7 +739,7 @@
                                                         <h:selectOneMenu id="prop-add-source-som"
                                                                          value="#{propertyProfileBB.currentProperty.bobSource}" style="width:175px;height:25px">
                                                             <f:converter converterId="bobSourceConverter"/>
-                                                            <f:selectItem itemLabel="select a muni..." noSelectionOption="true" />
+                                                            <f:selectItem itemLabel="select a source..." noSelectionOption="true" />
                                                             <f:selectItems id="propinfoedit-sourcess-elitems"
                                                                            value="#{propertyProfileBB.sourceList}"
                                                                            var="bs" itemValue="#{bs}" itemLabel="#{bs.title}"/>
@@ -1073,19 +1034,24 @@
                                             <h:form id="prop-events-panel-form">
 
 
+                                                <p:selectOneMenu style="width: 300px;" 
+                                                                 id="prop-viewoptionsevents-solb" 
+                                                                 value="#{propertyProfileBB.eventViewOptionSelected}" 
+                                                                 tabindex="10">
 
+                                                    <p:ajax update="prop-events-datatable"                                                           
+                                                            immediate="true"/>
 
-                                                <p:commandButton    id="prop-events-seeall-button"
-                                                                    ajax="false"
-                                                                    value="Info case list"
-                                                                    styleClass="noFill button-size-small"
-                                                                    action="#{propertyProfileBB.onInfoCaseListButtonChange}"
-                                                                    icon="fa fa-clipboard"
-                                                                    />
+                                                    <f:selectItems  id="prop-events-selitems" 
+                                                                    value="#{propertyProfileBB.eventViewOptions}" 
+                                                                    var="evo" 
+                                                                    itemValue="#{evo}" 
+                                                                    itemLabel="#{evo.label}"/>
+                                                </p:selectOneMenu>
 
                                                 <p:spacer height="5px" />
 
-                                                <p:dataTable id="prop-events-table"
+                                                <p:dataTable id="prop-events-datatable"
                                                              var="event"
                                                              value="#{propertyProfileBB.currentProperty.completeEventList}"
                                                              tableStyleClass="primeDataTable"
@@ -1142,10 +1108,10 @@
 
                                                 <p:commandButton   id="prop-persons-manage-button"
                                                                    ajax="true"
-                                                                   actionListener="#{propertyProfileBB.onPersonManageButtonChange}"
+                                                                   actionListener="#{propertyProfileBB.onPersonConnectInitButtonChange}"
                                                                    oncomplete="PF('prop-persons-manage-var').show()"
                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                                   value="Manage Persons"
+                                                                   value="Link Person to Property"
                                                                    icon="fa fa-user-plus"
                                                                    />
 
@@ -1161,7 +1127,18 @@
                                                     <p:column headerText="Name"
                                                               styleClass="centeredColumnContent">
 
+                                                        <h:outputText value="#{person.firstName}"/>
+                                                        <h:outputText value=" "/>
                                                         <h:outputText value="#{person.lastName}"/>
+                                                        <p:spacer height="1px" />
+                                                        <h:outputText value="#{person.addressStreet}"/>
+                                                        <p:spacer height="1px" />
+                                                        <h:outputText value="#{person.addressCity}"/>
+                                                        <h:outputText value=" "/>
+                                                        <h:outputText value="#{person.addressState}"/>
+                                                        <h:outputText value=", "/>
+                                                        <h:outputText value="#{person.addressZip}"/>
+
 
                                                     </p:column>
 
@@ -1172,14 +1149,14 @@
 
                                                     </p:column>
 
-                                                    <p:column headerText="Last updated"
+                                                    <p:column headerText="Person Last updated"
                                                               styleClass="centeredColumnContent">
                                                         <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(person.lastUpdated)}" />
 
 
                                                     </p:column>
 
-                                                    <p:column headerText="Sys ID"
+                                                    <p:column headerText="ID"
                                                               styleClass="centeredColumnContent">
 
                                                         <h:outputText value="#{person.personID}"/>
@@ -1188,6 +1165,16 @@
 
                                                     <p:column headerText="Options"
                                                               styleClass="centeredColumnContent">
+
+                                                        <p:commandButton    id="prop-person-removepersonlink-button"
+                                                                            ajax="false"
+                                                                            styleClass="noFill button-size-small"
+                                                                            action="#{propertyProfileBB.onPersonConnectRemoveButtonChange(person)}"
+                                                                            icon="fa fa-trash"
+                                                                            value="Remove Link"
+                                                                            disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                            />
+                                                        <p:spacer height="3px" />
 
                                                         <p:commandButton    id="prop-person-exploreperson-button"
                                                                             ajax="false"
@@ -1220,7 +1207,7 @@
                                                                    oncomplete="PF('prop-persons-manage-var').show()"
                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                                    value="Create New Code Enforcement Case"
-                                                                   icon="fa fa-user-archive"
+                                                                   icon="fa fa-archive"
                                                                    />
 
                                                 <p:spacer height="5px" />
@@ -1421,6 +1408,46 @@
 
                                             </h:form>
                                         </p:panel>
+
+
+                                        <p:panel id="propinfo-notes-panel"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Property Notes"
+                                                 rendered="#{propertyProfileBB.activeLookupMode }"
+                                                 > 
+                                            <h:form id="propinfo-notes-form">
+                                                <h:messages id="propinfo-notes-messages"
+                                                            globalOnly="true" showDetail="true" showSummary="true"
+                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                                </h:messages>
+
+                                                <div class="ui-g data-container">
+                                                    <p:commandButton   id="propinfo-notes-add-button"
+                                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                       value="Add new note"  
+                                                                       icon="fa fa-sticky-note-o"
+                                                                       actionListener="#{propertyProfileBB.onNoteInitButtonChange}"
+                                                                       oncomplete="PF('propinfo-notes-dialog-var').show()"
+                                                                       update="propinfo-note-create-form"/>
+                                                    <p:spacer height="5px" />
+                                                    <div    id="propinf-ot-notes-div"
+                                                            class="data_field"
+                                                            style="clear:both;">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-notes"
+                                                                        value="Notes"/>
+
+                                                        <h:outputText   id="propinfo-ot-notes"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.notes}"
+                                                                        escape="false"/>
+                                                    </div>
+                                                </div>
+
+                                            </h:form>
+                                        </p:panel>
+
                                     </p:outputPanel>
 
                                 </div>
@@ -1439,7 +1466,7 @@
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                 >
 
-                        <h:form id="prop-persons-manage-form">
+                        <h:form id="prop-persons-messages-form">
                             <h:messages id="prop-persons-manage-form-messages"
                                         globalOnly="true" showDetail="true" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
@@ -1482,7 +1509,7 @@
                                     <p:selectOneMenu id="prop-person-som-userpersons" 
                                                      required="false" 
                                                      disabled="#{propertyProfileBB.personLinkUseID}"
-                                                     value="#{propertyProfileBB.userAuthorizedInConfig.person}"
+                                                     value="#{propertyProfileBB.personSelected}"
                                                      styleClass="data_field_value">
 
                                         <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
@@ -1523,14 +1550,15 @@
                             </div>
 
                             <p:spacer height="5px" />
-                            
-                                <p:commandButton    ajax="true" 
+
+                            <p:commandButton    id="prop-person-connect-abort"
+                                                ajax="true" 
                                                 tabindex="2"
                                                 oncomplete="PF('prop-persons-manage-var').hide()"
                                                 value="Cancel" 
                                                 icon="fa fa-stop" 
                                                 />
-                                
+
                             <p:commandButton ajax="false"
                                              id="prop-person-commitconnect" 
                                              value="Connect" 
@@ -2009,6 +2037,7 @@
 
                         </h:form>
                     </p:dialog>
+                    
                     <p:dialog   id="propinfo-notes-dialog"
                                 height="300" width="750"
                                 widgetVar="propinfo-notes-dialog-var"

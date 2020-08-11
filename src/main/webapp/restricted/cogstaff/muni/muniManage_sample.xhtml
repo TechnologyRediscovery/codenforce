@@ -24,42 +24,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Municipality Manager Sample</title>
+        <title>Code Enforcement Case Search and Profile</title>
     </h:head>
 
-    <h:body id="muniManageBody">
+    <h:body id="case-search-profile-body">
 
-        <ui:composition template="../../navContainer_restricted.xhtml">
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
                 <f:view >
-
                     <p:outputPanel id="body-panel">
-                        <h1>Municipality Manager Sample</h1>
+                        <h1>SAMPLE</h1>
 
                         <h:form id="form-messages-global">
                             <p:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true" />
                         </h:form>
 
                         <div class="mainContainer">
-
                             <div class ="two-column-page-flex-container">
-
                                 <div class="list-column" >
 
                                     <h:form id="mode-form">
-
-                                        <p:selectOneButton style="width: 100%; margin-top: 10px ; height: 20px;"
-                                                           value="#{municipalityManageSampleBB.currentMode}" 
+                                        <p:selectOneButton style="  width: 100%;
+                                                           margin-top: 10px ;
+                                                           height: 20px;"
+                                                           value="#{ceCaseSearchProfileBB.currentMode}"
+                                                           unselectable="false"
                                                            >
-                                            <f:selectItem itemLabel="LOOKUP" itemValue="Lookup"  />
-                                            <f:selectItem itemLabel="INSERT" itemValue="Insert"  />
-                                            <f:selectItem itemLabel="UPDATE" itemValue="Update"  />
-                                            <f:selectItem itemLabel="REMOVE" itemValue="Remove"  />
-
+                                            <f:selectItems value="#{userConfigBB.pageModes}"
+                                                           var="pmo"
+                                                           itemLabel="#{pmo.title}"
+                                                           itemDisabled="#{empty userConfigBB.userSelected  and pmo.objectSelectRequiredToEnable}"/>
                                             <f:ajax render="@all"/>
-
-                                        </p:selectOneButton> 
-
+                                        </p:selectOneButton>
                                     </h:form>
 
                                     <p:spacer height="30px"/>

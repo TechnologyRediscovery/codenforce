@@ -50,7 +50,7 @@ import javax.faces.event.ActionEvent;
 public class WorkflowBB extends BackingBeanUtils{
 
 
-     private IFace_EventRuleGoverned currentERG;
+    private IFace_EventRuleGoverned currentERG;
     
     private Proposal currentProposal;
     private int formEventRuleIDToAdd;
@@ -74,6 +74,10 @@ public class WorkflowBB extends BackingBeanUtils{
     
     @PostConstruct
     public void initBean(){
+        proposalsViewOptions = Arrays.asList(ViewOptionsProposalsEnum.values());
+        selectedProposalsViewOption = ViewOptionsProposalsEnum.VIEW_ACTIVE_NOTHIDDEN;
+        
+        
        
     }
     
