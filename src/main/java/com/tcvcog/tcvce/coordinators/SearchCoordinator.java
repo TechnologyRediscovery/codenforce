@@ -285,12 +285,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             // the integrator will only look at the single muni val, 
             // so we'll call searchForXXX once for each muni
             for(Integer i: ci.searchForCECases(params)){
-                CECase cse = cc.getCECase(i);
+                CECase cse = cc.cecase_getCECase(i);
                 // Case Phases only exist in JavaJavaLand, so we'll evaluate the
                 // search params here before adding the new objects to the
                 // final query result list
                 if(params.isCaseStage_ctl() && params.getCaseStage_val() != null){
-                    if(cse.getCasePhase().getCaseStage() == params.getCaseStage_val()){
+                    if(cse.getStatusBundle().getPhase().getCaseStage() == params.getCaseStage_val()){
                         caseListTemp.add(cse);
                     } else {
                         // skip adding
@@ -300,7 +300,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     caseListTemp.add(cse);
                 }
             }
-                q.addToResults(cc.assembleCECasePropertyUnitHeavyList(caseListTemp));
+                q.addToResults(cc.cecase_assembleCECasePropertyUnitHeavyList(caseListTemp));
             } catch (IntegrationException | BObStatusException ex) {
                 throw new SearchException("Exception during search: " + ex.toString());
             }
@@ -340,7 +340,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             ceariListTemp.clear();
                 try {
                     for(Integer i: ceari.searchForCEActionRequests(sp)){
-                            ceariListTemp.add(cc.getCEActionRequest(i));
+                            ceariListTemp.add(cc.cear_getCEActionRequest(i));
                     }
                 } catch (IntegrationException ex) {
                     System.out.println(ex);
@@ -583,6 +583,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             sp.setMuni_rtMin(RoleType.Developer);
             sp.setMuni_ctl(true);
             sp.setMuni_val(q.getCredential().getGoverningAuthPeriod().getMuni());
+            // hack to get person queries to work without muni restriction
+            if(q instanceof QueryPerson){
+                sp.setMuni_ctl(false);
+            }
             
             sp.setLimitResultCount_rtMin(RoleType.EnforcementOfficial);
             sp.setLimitResultCount_ctl(true);
@@ -670,7 +674,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          
          
          query = new QueryPerson(qName, paramsList, cred);
-         return (QueryPerson) initQueryFinalizeInit(query);
+         query = (QueryPerson) initQueryFinalizeInit(query);
+         
+         return query;
      }
      
     
@@ -1275,6 +1281,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     private SearchParamsPerson generateParams_person_prop(SearchParamsPerson params, Credential cred){
+        // turn off muni ctl to try to get query working
+        params.setMuni_ctl(false);
         params.setFilterName("Persons at property X");
         params.setFilterDescription("Across all units");
         

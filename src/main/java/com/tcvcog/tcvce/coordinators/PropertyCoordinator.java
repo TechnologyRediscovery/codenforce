@@ -45,6 +45,7 @@ import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         CaseCoordinator cc = getCaseCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
 
-        PropertyDataHeavy pdh = new PropertyDataHeavy(prop);
+        PropertyDataHeavy pdh = new PropertyDataHeavy(getProperty(prop.getPropertyID()));
 
         try {
             // CECase list
@@ -90,7 +91,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             // Property info cases
             qcse = sc.initQuery(QueryCECaseEnum.PROPINFOCASES, ua.getKeyCard());
             qcse.getPrimaryParams().setProperty_val(prop);
-            pdh.setPropInfoCaseList(cc.assembleCECaseDataHeavyList(sc.runQuery(qcse).getBOBResultList(), ua));
+            pdh.setPropInfoCaseList(cc.cecase_assembleCECaseDataHeavyList(sc.runQuery(qcse).getBOBResultList(), ua));
             
             // check list and see if it's emtpy; 
             if(pdh.getPropInfoCaseList() == null){
@@ -112,6 +113,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             QueryPerson qp = sc.initQuery(QueryPersonEnum.PROPERTY_PERSONS, ua.getKeyCard());
             qp.getPrimaryParams().setProperty_val(prop);
             pdh.setPersonList(sc.runQuery(qp).getBOBResultList());
+            System.out.println("PropertyCoordinator.assemblePropertyDH: personlist size: " + pdh.getPersonList().size());
 
             // change order list
             //delay this
@@ -317,6 +319,51 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
         
     }
+    
+    /**
+     * Logic pass through for removals of property and person connections 
+     * and I create a note documenting the removal and post to property
+     * @param p
+     * @param pers
+     * @param ua the user requesting the link removal for note 
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public void connectRemovePersonToProperty(Property p, Person pers, UserAuthorized ua) throws IntegrationException, BObStatusException{
+        PersonCoordinator pc = getPersonCoordinator();
+        PropertyIntegrator pi = getPropertyIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+        
+        pc.connectRemovePersonToProperty(pers, p);
+        
+        // build person link removal note
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        mbp.setUser(ua);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Removal of link between Property at ");
+        sb.append(p.getAddress());
+        sb.append(" in ");
+        sb.append(p.getMuni().getMuniName());
+        sb.append(" (ID:");
+        sb.append(p.getPropertyID());
+        sb.append(")");
+        sb.append(" and Person ");
+        sb.append(pers.getFirstName());
+        sb.append(" ");
+        sb.append(pers.getLastName());
+        sb.append(" (ID:");
+        sb.append(pers.getPersonID());
+        sb.append(") ");
+        mbp.setNewMessageContent(sb.toString());
+        mbp.setExistingContent(p.getNotes());
+        mbp.setIncludeCredentialSig(false);
+        p.setNotes(sc.appendNoteBlock(mbp));
+        // commit person link removal note
+        pi.updateProperty(p);
+        
+        
+    }
+    
 
     public LocalDateTime configureDateTime(Date date) {
         return new java.sql.Timestamp(date.getTime()).toLocalDateTime();
@@ -365,13 +412,13 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     public PropertyDataHeavy createPropertyInfoCase(PropertyDataHeavy p, UserAuthorized ua) throws SearchException{
         CaseCoordinator cc = getCaseCoordinator();
         UserCoordinator uc = getUserCoordinator();
-        CECase cse = cc.initCECase(p, ua);
+        CECase cse = cc.cecase_initCECase(p, ua);
         //review all case mems and set app ones for info case
         
 //        try {
 //            cse.setCaseManager(uc.getUser(ua.getMyCredential().getGoverningAuthPeriod().getUserID()));
 // TODO: Debug later
-//            cc.insertNewCECase(cse, ua, null);
+//            cc.cecase_insertNewCECase(cse, ua, null);
 //        } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
 //            System.out.println(ex);
 //        }

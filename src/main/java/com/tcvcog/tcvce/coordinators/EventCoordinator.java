@@ -115,7 +115,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         if(ev.getDomain() == EventDomainEnum.OCCUPANCY && ev.getOccPeriodID() != 0){
             edh.setPeriod(oc.getOccPeriodPropertyUnitHeavy(edh.getOccPeriodID()));
         } else if(ev.getDomain() == EventDomainEnum.CODE_ENFORCEMENT && ev.getCeCaseID() != 0){
-            edh.setCecase(cc.assembleCECasePropertyUnitHeavy(cc.getCECase(edh.getCeCaseID())));
+            edh.setCecase(cc.cecase_assembleCECasePropertyUnitHeavy(cc.cecase_getCECase(edh.getCeCaseID())));
             // note that a Property object is already inside our CECase base class
         } else {
             throw new EventException("Cannot build data heavy event");
@@ -426,7 +426,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         if(erg != null){
             if(erg instanceof CECaseDataHeavy){
                 cse = (CECaseDataHeavy) erg;
-                 if(cse.getCasePhase() == CasePhaseEnum.Closed && 
+                 if(cse.getStatusBundle().getPhase() == CasePhaseEnum.Closed && 
                     (
                         ec.getEventType() == EventType.Action
                         || 
@@ -933,7 +933,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         sb.append("Manual case phase change from  \'");
         sb.append(pastPhase.toString());
         sb.append("\' to \'");
-        sb.append(currentCase.getCasePhase().toString());
+        sb.append(currentCase.getStatusBundle().getPhase().toString());
         sb.append("\' by a a case officer.");
         event.setDescription(sb.toString());
         
@@ -944,7 +944,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setUserCreator(getSessionBean().getSessUser());
         event.setActive(true);
         
-//        cc.addEvent_processForCECaseDomain(currentCase, event, null);
+//        cc.events_addEvent_processForCECaseDomain(currentCase, event, null);
         
         getFacesContext().addMessage(null,
             new FacesMessage(FacesMessage.SEVERITY_INFO, 

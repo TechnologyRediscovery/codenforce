@@ -162,7 +162,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     private PublicInfoBundleCECase extractPublicInfo(CECase cse) throws IntegrationException, SearchException, EventException, AuthorizationException, BObStatusException {
         CaseCoordinator cc = getCaseCoordinator();
         setPublicUser();
-        CECasePropertyUnitHeavy c = cc.assembleCECasePropertyUnitHeavy(cse);
+        CECasePropertyUnitHeavy c = cc.cecase_assembleCECasePropertyUnitHeavy(cse);
 
         PublicInfoBundleCECase pib = new PublicInfoBundleCECase();
 
@@ -566,7 +566,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         if (input.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
             CaseCoordinator cc = getCaseCoordinator();
-            CECase c = cc.getCECase(input.getCeCaseID());
+            CECase c = cc.cecase_getCECase(input.getCeCaseID());
             pib.setCecase(extractPublicInfo(c));
         } else if (input.getDomain() == EventDomainEnum.OCCUPANCY) {
             OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -756,7 +756,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         if (unbundled.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
 
-            exportable.setCecase(cc.assembleCECasePropertyUnitHeavy(export(input.getCecase())));
+            exportable.setCecase(cc.cecase_assembleCECasePropertyUnitHeavy(export(input.getCecase())));
 
         } else if (unbundled.getDomain() == EventDomainEnum.OCCUPANCY) {
 
@@ -797,7 +797,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         CaseCoordinator cc = getCaseCoordinator();
         setPublicUser();
-        CECaseDataHeavy exportable = cc.assembleCECaseDataHeavy(cc.getCECase(input.getBundledCase().getCaseID()), publicUser);
+        CECaseDataHeavy exportable = cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(input.getBundledCase().getCaseID()), publicUser);
 
         return exportable;
 

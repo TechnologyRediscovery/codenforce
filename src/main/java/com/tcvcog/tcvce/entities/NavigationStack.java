@@ -66,6 +66,17 @@ public class NavigationStack {
             throw new NavigationException("NavigationStack ran out of pages while popping.");
         }
     }
+    
+    /**
+     * Pushes an arbitrary string onto stack
+     * Client must test for ViewID correctness
+     * @param viewID 
+     */
+    public void pushPage(String viewID){
+        viewIDStack.push(viewID);
+    }
+    
+   
 
     /**
      * Takes a look at the last page without removing it from the stack

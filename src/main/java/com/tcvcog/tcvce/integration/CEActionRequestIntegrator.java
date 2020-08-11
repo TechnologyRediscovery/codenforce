@@ -301,7 +301,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         
         
         try {
-            cecase = cc.getCECase(cecaseID);
+            cecase = cc.cecase_getCECase(cecaseID);
         } catch (IntegrationException ex) {
             throw new BObStatusException("Cannot find a CECase to which the action request can be connected");
         }

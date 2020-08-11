@@ -289,7 +289,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ceCaseID);
-            //System.out.println("CaseIntegrator.getCECase| sql: " + stmt.toString());
+            //System.out.println("CaseIntegrator.cecase_getCECase| sql: " + stmt.toString());
             rs = stmt.executeQuery();
             
             while(rs.next()){
@@ -333,7 +333,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, propID);
-            //System.out.println("CaseIntegrator.getCECase| sql: " + stmt.toString());
+            //System.out.println("CaseIntegrator.cecase_getCECase| sql: " + stmt.toString());
             rs = stmt.executeQuery();
             
             while(rs.next()){
@@ -612,15 +612,27 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             
             stmt.setString(8, ceCase.getNotes());
             stmt.setBoolean(9, ceCase.isPaccEnabled());
-            if(ceCase.getSource() != null){
-                stmt.setInt(10, ceCase.getSource().getSourceid());
-            } else {
-                stmt.setNull(10, java.sql.Types.NULL);
-            }
-            stmt.setBoolean(11, ceCase.isAllowForwardLinkedPublicAccess());
-            stmt.setBoolean(12, ceCase.isActive());
+            stmt.setBoolean(10, ceCase.isAllowForwardLinkedPublicAccess());
             
-            stmt.setInt(13, ceCase.getCaseID());
+            stmt.setBoolean(11, ceCase.isPropertyInfoCase());
+            if(ceCase.getPersonInfoPersonID() != 0){
+                stmt.setInt(12, ceCase.getPersonInfoPersonID());
+            } else {
+                stmt.setNull(12, java.sql.Types.NULL);
+            }
+            if(ceCase.getSource() != null){
+                stmt.setInt(13, ceCase.getSource().getSourceid());
+            } else {
+                stmt.setNull(13, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(14, ceCase.isActive());
+            if(ceCase.getLastUpdatedBy() != null){
+                stmt.setInt(15, ceCase.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(15, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(16, ceCase.getCaseID());
             
             stmt.executeUpdate();
             
@@ -632,6 +644,145 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    
+    
+   
+    /**
+     * Updates only the notes field on cecase table
+     * @param cse with the Notes field as you want it inserted 
+     * 
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public void updateCECaseNotes(CECase cse) 
+            throws IntegrationException, BObStatusException{
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        if(cse == null){
+            throw new BObStatusException("cannot update notes on a null case");
+        }
+        
+        try {
+            String s = "UPDATE public.cecase SET notes=? WHERE caseid=?";
+            stmt = con.prepareStatement(s);
+            stmt.setString(1, cse.getNotes());
+            stmt.setInt(2, cse.getCaseID());
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update notes", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+   
+    /**
+     * Updates only the notes field on citation table
+     
+     * 
+     * @param cit
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public void updateCitationNotes(Citation cit) 
+            throws IntegrationException, BObStatusException{
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        if(cit == null){
+            throw new BObStatusException("cannot update notes on a null citation");
+        }
+        
+        try {
+            String s = "UPDATE public.citation SET notes=? WHERE citationid=?";
+            stmt = con.prepareStatement(s);
+            stmt.setString(1, cit.getNotes());
+            stmt.setInt(2, cit.getCitationID());
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update notes", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+   
+    /**
+     * Updates only the notes field on noticeofviolation table
+     
+     * 
+     * @param nov
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public void novUpdateNotes(NoticeOfViolation nov) 
+            throws IntegrationException, BObStatusException{
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        if(nov == null){
+            throw new BObStatusException("cannot update notes on a null notice");
+        }
+        
+        try {
+            String s = "UPDATE public.noticeofviolation SET notes=? WHERE noticeid=?";
+            stmt = con.prepareStatement(s);
+            stmt.setString(1, nov.getNotes());
+            stmt.setInt(2, nov.getNoticeID());
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update notes", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+   
+    /**
+     * Updates only the notes field on codeviolation table
+     
+     * 
+     * @param viol
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public void updateCodeViolationNotes(CodeViolation viol) 
+            throws IntegrationException, BObStatusException{
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        if(viol == null){
+            throw new BObStatusException("cannot update notes on a null violation");
+        }
+        
+        try {
+            String s = "UPDATE public.codeviolation SET notes=? WHERE violationid=?";
+            stmt = con.prepareStatement(s);
+            stmt.setString(1, viol.getNotes());
+            stmt.setInt(2, viol.getViolationID());
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update notes", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
     }
@@ -676,7 +827,6 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
         return cseidl;
     }
-    
       /**
      *
      * @param casephase
@@ -904,7 +1054,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         loadViolationPhotoList(v);
         
         v.setCitationIDList(getCitations(v.getViolationID()));
-        cc.configureCodeViolation(v);
+        cc.violation_configureCodeViolation(v);
         return v;
     }
 
@@ -2027,7 +2177,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     public Citation getCitation(int id) throws IntegrationException{
 
         String query = "SELECT citationid, citationno, status_statusid, origin_courtentity_entityid, \n" +
-                        "login_userid, dateofrecord, transtimestamp, isactive, notes FROM public.citation WHERE citationid=?;";
+                        "login_userid, dateofrecord, transtimestamp, isactive, notes, officialtext FROM public.citation WHERE citationid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -2065,9 +2215,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         //this doesn't work anymore since citations don't know about cases, we have to go through citationViolation
         // codeviolations know about cases
         
-        String query =  "SELECT citationid, citationno, status_statusid, origin_courtentity_entityid, \n" +
-                        "login_userid, dateofrecord, transtimestamp, isactive, notes " +
-                        "FROM public.citation 	INNER JOIN public.cecase ON cecase.caseid = citation.caseid \n" +
+        String query =  "SELECT citationid FROM public.citation 	INNER JOIN public.cecase ON cecase.caseid = citation.caseid \n" +
                         "INNER JOIN public.property ON cecase.property_propertyID = property.propertyID \n" +
                         "WHERE propertyID=?; ";
         Connection con = getPostgresCon();
@@ -2081,7 +2229,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                citationList.add(generateCitationFromRS(rs));
+                citationList.add(getCitation(rs.getInt("citationid")));
             }
             
         } catch (SQLException ex) {
@@ -2197,6 +2345,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             cit.setIsActive(rs.getBoolean("isActive"));
             cit.setNotes(rs.getString("notes"));
             cit.setViolationList(getCodeViolations(cit));
+            cit.setOfficialText(rs.getString("officialtext"));
         } catch (SQLException | IntegrationException ex) {
             System.out.println(ex);
             throw new IntegrationException("Unable to build citation from RS", ex);
@@ -2213,7 +2362,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         String query =  "UPDATE public.citation\n" +
                         "   SET citationno=?, status_statusid=?, origin_courtentity_entityid=?, \n" +
                         "       login_userid=?, dateofrecord=?, transtimestamp=now(), isactive=?, \n" +
-                        "       notes=?\n" +
+                        "       officialtext=? \n" +
                         " WHERE citationid=?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -2226,7 +2375,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setInt(4, citation.getUserOwner().getUserID());
             stmt.setTimestamp(5, java.sql.Timestamp.valueOf(citation.getDateOfRecord()));
             stmt.setBoolean(6, citation.isIsActive());
-            stmt.setString(7, citation.getNotes());
+            stmt.setString(7, citation.getOfficialText());
             stmt.setInt(8, citation.getCitationID());
             
             stmt.execute();
@@ -2369,7 +2518,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             cs.setStatusTitle(rs.getString("statusname"));
             cs.setDescription(rs.getString("description"));
             cs.setIcon(si.getIcon(rs.getInt("icon_iconid")));
-            cs.setEditsAllowed(rs.getBoolean("editsforbidden"));
+            cs.setNonStatusEditsForbidden(rs.getBoolean("editsforbidden"));
             cs.setPhaseChangeRule(wi.rules_getEventRuleAbstract(rs.getInt("eventrule_ruleid")));
         } catch (SQLException ex) {
             System.out.println(ex);
@@ -2398,7 +2547,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setString(1, cs.getStatusTitle());
             stmt.setString(2, cs.getDescription());
             stmt.setInt(3, cs.getIcon().getIconid());
-            stmt.setBoolean(4, cs.isEditsAllowed());
+            stmt.setBoolean(4, cs.isNonStatusEditsForbidden());
             if(cs.getPhaseChangeRule() != null){
                 stmt.setInt(5, cs.getPhaseChangeRule().getRuleid());
                 
@@ -2468,7 +2617,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setString(1, cs.getStatusTitle());
             stmt.setString(2, cs.getDescription());
             stmt.setInt(3, cs.getIcon().getIconid());
-            stmt.setBoolean(4, cs.isEditsAllowed());
+            stmt.setBoolean(4, cs.isNonStatusEditsForbidden());
              if(cs.getPhaseChangeRule() != null){
                 stmt.setInt(5, cs.getPhaseChangeRule().getRuleid());
                 

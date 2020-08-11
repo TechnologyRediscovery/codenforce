@@ -75,7 +75,7 @@ public class PersonEventsBB extends BackingBeanUtils{
                 }
             } else if(ev.getDomain() == EventDomainEnum.CODE_ENFORCEMENT){
                 try{
-                    getSessionBean().setSessCECaseQueued(cc.getCECase(ev.getCeCaseID()));
+                    getSessionBean().setSessCECaseQueued(cc.cecase_getCECase(ev.getCeCaseID()));
                     return "ceCaseWorkflow";
                 } catch (IntegrationException ex) {
                     System.out.println(ex);

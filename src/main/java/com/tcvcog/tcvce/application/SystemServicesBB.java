@@ -66,6 +66,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     private PropertyDataHeavy bbSessionProperty;
     private Person bbSessionPerson;
     private List<Person> bbSessionPersonList;
+    private List<Property> bbSessionPropertyList;
     
     private List<PageModeEnum> pageModeOptions;
     
@@ -106,16 +107,18 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     public void initBean(){
         System.out.println("SystemServicesBB.initBean");
         UserCoordinator uc = getUserCoordinator();
+        SessionBean sb = getSessionBean();
         
-        bbSessionUser = getSessionBean().getSessUser();
-        bbSessionMuni = getSessionBean().getSessMuni();
-        bbSessionProperty = getSessionBean().getSessProperty();
-        bbSessionPerson = getSessionBean().getSessPerson();
-        bbSessionPersonList = getSessionBean().getSessPersonList();
+        bbSessionUser = sb.getSessUser();
+        bbSessionMuni = sb.getSessMuni();
+        bbSessionProperty = sb.getSessProperty();
+        bbSessionPerson = sb.getSessPerson();
+        bbSessionPersonList = sb.getSessPersonList();
+        bbSessionPropertyList = sb.getSessPropertyList();
         
-        userListForSearch = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
-        propertyListForSearch = getSessionBean().getSessPropertyList();
-        personListForSearch = getSessionBean().getSessPersonList();
+        userListForSearch = uc.user_assembleUserListForSearch(sb.getSessUser());
+        propertyListForSearch = sb.getSessPropertyList();
+        personListForSearch = sb.getSessPersonList();
         
         if(bbSessionUser != null){
             municipalityListForSearch = bbSessionUser.getAuthMuniList();
@@ -495,6 +498,20 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
      */
     public void setBbSessionPersonList(List<Person> bbSessionPersonList) {
         this.bbSessionPersonList = bbSessionPersonList;
+    }
+
+    /**
+     * @return the bbSessionPropertyList
+     */
+    public List<Property> getBbSessionPropertyList() {
+        return bbSessionPropertyList;
+    }
+
+    /**
+     * @param bbSessionPropertyList the bbSessionPropertyList to set
+     */
+    public void setBbSessionPropertyList(List<Property> bbSessionPropertyList) {
+        this.bbSessionPropertyList = bbSessionPropertyList;
     }
 
     

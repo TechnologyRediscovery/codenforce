@@ -175,6 +175,9 @@ public class PropertySearchBB extends BackingBeanUtils{
                 propListMaster.clear();
             } 
             propListMaster.addAll(pl);
+            if(!propListMaster.isEmpty()){
+                getSessionBean().setSessPropertyList(propListMaster);
+            }
             
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 

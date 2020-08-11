@@ -495,7 +495,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             //NavItem: Property
             NavigationItem propertyItem = getNavItem("/restricted/cogstaff/prop/propertySearchProfile.xhtml", "Property", "fa fa-home", getPropertyNavList());
             //NavItem: Code Enf
-            NavigationItem CEItem = getNavItem("/restricted/cogstaff/ce/ceCaseSearch.xhtml", "Code Enf", "fa fa-balance-scale", getCENavList());
+            NavigationItem CEItem = getNavItem("/restricted/cogstaff/ce/ceCaseSearchProfile.xhtml", "Code Enf", "fa fa-balance-scale", getCENavList());
             //NavItem: Occupancy
             NavigationItem occItem = getNavItem("/restricted/cogstaff/occ/occPeriodSearch.xhtml", "Occupancy", "fa fa-list-alt", getOccNavList());
             //NavItem: Persons

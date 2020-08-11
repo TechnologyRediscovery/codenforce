@@ -898,7 +898,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             CaseCoordinator cc = getCaseCoordinator();
 
             try {
-                currentCase = cc.assembleCECaseDataHeavy(getSessionBean().getFeeManagementCeCase(), getSessionBean().getSessUser());
+                currentCase = cc.cecase_assembleCECaseDataHeavy(getSessionBean().getFeeManagementCeCase(), getSessionBean().getSessUser());
             } catch (BObStatusException | SearchException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
@@ -943,7 +943,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
 
         try {
-            currentCase = cc.assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
+            currentCase = cc.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
 
         } catch (BObStatusException | SearchException ex) {
             getFacesContext().addMessage(null,
@@ -1175,7 +1175,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            return cc.assembleCECasePropertyUnitHeavy(currentCase).getProperty().getAddress();
+            return cc.cecase_assembleCECasePropertyUnitHeavy(currentCase).getProperty().getAddress();
         } catch (IntegrationException | SearchException ex) {
             System.out.println(ex);
         }
