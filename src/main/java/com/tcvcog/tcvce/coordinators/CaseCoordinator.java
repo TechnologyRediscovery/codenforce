@@ -1462,15 +1462,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param ece
      * @return
      */
-    public CodeViolation violation_generateNewCodeViolation(CECaseDataHeavy c, EnforcableCodeElement ece) {
+    public CodeViolation violation_getCodeViolationSkeleton(CECaseDataHeavy c, EnforcableCodeElement ece) {
         CodeViolation v = new CodeViolation();
 
         System.out.println("ViolationCoordinator.generateNewCodeViolation | enfCodeElID:" + ece.getCodeSetElementID());
 
-        v.setViolatedEnfElement(ece);
-        v.setStipulatedComplianceDate(LocalDateTime.now()
-                .plusDays(ece.getNormDaysToComply()));
-        v.setPenalty(ece.getNormPenalty());
+        
         v.setDateOfRecord(LocalDateTime.now());
         v.setCeCaseID(c.getCaseID());
         // control is passed back to the violationAddBB which stores this 

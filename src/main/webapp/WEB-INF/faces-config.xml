@@ -1147,10 +1147,10 @@
     </managed-bean>
 
     <managed-bean>
-        <managed-bean-name>violationAddBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ViolationAddBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-name>violationBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.ViolationBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
 
     <managed-bean>
         <managed-bean-name>violationSelectElementBB</managed-bean-name>
