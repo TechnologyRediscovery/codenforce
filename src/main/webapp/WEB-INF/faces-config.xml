@@ -683,12 +683,6 @@
         <managed-bean-name>propertyIntegrator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.integration.PropertyIntegrator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
-   
-    <managed-bean>
-        <managed-bean-name>unitChangesBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.UnitChangesBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>    
    
     <managed-bean>
@@ -816,6 +810,12 @@
         <navigation-case>
             <from-outcome>propertyUnits</from-outcome>
             <to-view-id>/restricted/cogstaff/prop/propertyUnits.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>unitsChanges</from-outcome>
+            <to-view-id>/restricted/cogstaff/prop/propertyUnitChanges.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         

@@ -86,6 +86,11 @@
                                         </h3>
 
                                         <p:spacer height="5px" />
+                                        
+                                        <h:outputText value="Rental notes: " />
+                                        <h:outputText value="#{unit.rentalNotes}" />
+                                        
+                                        <p:spacer height="5px" />
 
                                         <h:outputText value="Rental intent: " />
                                         <h:outputText value="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop? 'Yes' : 'No'}" />
@@ -102,6 +107,11 @@
 
                                         <p:spacer height="5px" />
 
+                                        <h:outputText value="Other known address: " />
+                                        <h:outputText value="#{unit.otherKnownAddress}" />
+                                        
+                                        <p:spacer height="5px" />
+                                        
                                         <h:outputText value="Active? " />
                                         <h:outputText value="#{unit.active ? 'Yes' : 'No'}" />
 

@@ -18,9 +18,12 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
+import java.util.Arrays;
 import java.util.List;
+import javax.annotation.PostConstruct;
 
 /**
  *
@@ -31,12 +34,34 @@ public class PropertyUnitChangesBB
     
     private PropertyDataHeavy currProp;
     private PropertyUnit currPropUnit;
+    private PropertyUnitChangeOrder currChangeOrder;
     
     private List<PropertyUnitDataHeavy> heavyDisplayList;
     
     private List<ViewOptionsActiveListsEnum> allViewOptions;
     private ViewOptionsActiveListsEnum currentViewOption;
 
+    public PropertyUnitChangesBB() {
+    }
+
+     @PostConstruct
+    public void initBean() {
+        currProp = getSessionBean().getSessProperty();
+
+        allViewOptions = Arrays.asList(ViewOptionsActiveListsEnum.values());
+
+        if (currentViewOption == null) {
+
+            setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ALL);
+
+        }
+
+    }
+    
+    public String goToPropertyUnits(){
+        return "propertyUnits";
+    }
+    
     public PropertyDataHeavy getCurrProp() {
         return currProp;
     }
@@ -76,8 +101,13 @@ public class PropertyUnitChangesBB
     public void setCurrentViewOption(ViewOptionsActiveListsEnum currentViewOption) {
         this.currentViewOption = currentViewOption;
     }
-    
-    
-    
+
+    public PropertyUnitChangeOrder getCurrChangeOrder() {
+        return currChangeOrder;
+    }
+
+    public void setCurrChangeOrder(PropertyUnitChangeOrder currChangeOrder) {
+        this.currChangeOrder = currChangeOrder;
+    }
     
 }

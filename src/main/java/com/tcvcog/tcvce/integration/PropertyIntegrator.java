@@ -1434,16 +1434,16 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
     public List<PropertyUnitChangeOrder> getPropertyUnitChangeList(Property property) throws IntegrationException {
         List<PropertyUnitChangeOrder> ucl = new ArrayList<>();
-        String query = "SELECT \n"
-                + "	unitchangeid, propertyunit_unitid, \n"
-                + "	propertyunitchange.unitnumber, propertyunitchange.otherknownaddress,\n"
-                + "	propertyunitchange.notes, propertyunitchange.rentalnotes,\n"
-                + "	removed, added, approvedon, changedby_personid, approvedby_userid, inactive\n"
-                + "FROM \n"
-                + "	propertyunitchange \n"
+        String query = "SELECT\n"
+                + "unitchangeid, propertyunit_unitid,\n"
+                + "propertyunitchange.unitnumber, propertyunitchange.otherknownaddress,\n"
+                + "propertyunitchange.notes, propertyunitchange.rentalnotes,\n"
+                + "removed, added, entryts, approvedondate, changedby_personid, approvedby_userid, propertyunitchange.active\n"
+                + "FROM\n"
+                + "propertyunitchange\n"
+                + "JOIN propertyunit ON propertyunitchange.propertyunit_unitid = propertyunit.unitid\n"
                 + "JOIN property ON propertyunit.property_propertyid = property.propertyid\n"
-                + "JOIN propertyunit ON propertyunit.propertyunitid = propertyunitchange.propertyunit_unitid"
-                + "WHERE property.propertyid=? AND propertyunitchange.inactive IS null AND propertyunitchange.approvedon IS null;";
+                + "WHERE property.propertyid=? AND propertyunitchange.active = true AND propertyunitchange.approvedon IS null;";
 
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -1470,15 +1470,15 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
     public List<PropertyUnitChangeOrder> getPropertyUnitChangeListAll(int propertyID) throws IntegrationException {
         List<PropertyUnitChangeOrder> ucl = new ArrayList<>();
-        String query = "SELECT \n"
-                + "	unitchangeid, propertyunit_unitid, \n"
-                + "	propertyunitchange.unitnumber, propertyunitchange.otherknownaddress,\n"
-                + "	propertyunitchange.notes, propertyunitchange.rentalnotes,\n"
-                + "	removed, added, approvedon, changedby_personid, approvedby_userid, inactive\n"
-                + "FROM \n"
-                + "	propertyunitchange \n"
+        String query = "SELECT\n"
+                + "unitchangeid, propertyunit_unitid,\n"
+                + "propertyunitchange.unitnumber, propertyunitchange.otherknownaddress,\n"
+                + "propertyunitchange.notes, propertyunitchange.rentalnotes,\n"
+                + "removed, added, entryts, approvedondate, changedby_personid, approvedby_userid, propertyunitchange.active\n"
+                + "FROM\n"
+                + "propertyunitchange\n"
+                + "JOIN propertyunit ON propertyunitchange.propertyunit_unitid = propertyunit.unitid\n"
                 + "JOIN property ON propertyunit.property_propertyid = property.propertyid\n"
-                + "JOIN propertyunit ON propertyunit.propertyunitid = propertyunitchange.propertyunit_unitid"
                 + "WHERE property.propertyid=?;";
 
         Connection con = getPostgresCon();
@@ -1494,7 +1494,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("PropertyIntegrator.getPropertyUnitChangeList | Unable to get property unit change, ", ex);
+            throw new IntegrationException("PropertyIntegrator.getPropertyUnitChangeListAll | Unable to get property unit change, ", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }

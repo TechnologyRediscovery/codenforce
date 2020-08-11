@@ -33,7 +33,7 @@
 
                             <h:form id="select-view-option-form">
 
-                                <p:outputLabel value="What changes would you like to edit?   "/>
+                                <p:outputLabel value="What changes would you like to edit?"/>
 
                                 <p:selectOneMenu style="width: 300px;" 
                                                  id="unit-changes-list-viewoptions" 
@@ -60,10 +60,8 @@
                             <h:form id="unit-changes-list-form" >
 
 
-                                
-                                <!--Change this button to redirect to the propertyUnits.xhtml page-->
                                 <p:commandButton       id="button-editunits"
-                                                       action="#{}"
+                                                       action="#{propertyUnitChangesBB.goToPropertyUnits()}"
                                                        rendered="#{sessionBean.sessUser.keyCard.hasMuniStaffPermissions}"
                                                        value="Edit unit list"  
                                                        icon="fa fa-edit"
@@ -84,7 +82,12 @@
                                             <h:outputText value="Unit Number: " />
                                             <h:outputText value="#{unit.unitNumber.equalsIgnoreCase('-1')? 'Single unit structure' : unit.unitNumber}" />
                                         </h3>
-                                        
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Rental notes: " />
+                                        <h:outputText value="#{unit.rentalNotes}" />
+
                                         <p:spacer height="5px" />
 
                                         <h:outputText value="Rental intent: " />
@@ -102,10 +105,15 @@
 
                                         <p:spacer height="5px" />
 
+                                        <h:outputText value="Other known address: " />
+                                        <h:outputText value="#{unit.otherKnownAddress}" />
+
+                                        <p:spacer height="5px" />
+
                                         <h:outputText value="Active? " />
                                         <h:outputText value="#{unit.active ? 'Yes' : 'No'}" />
 
-                                        <h4>Occupancy periods</h4>
+                                        <h4>Proposed changes</h4>
 
 
                                         <p:dataScroller
@@ -116,20 +124,39 @@
                                             value="#{unit.changeOrderList}"
                                             >                                         
 
-
                                             <div style="datum">
-
-
+                                                <h:outputText value="Change # " />
+                                                <h:outputText value="#{change.unitChangeID}" />
                                             </div>
 
                                             <div style="datum">
-                                              
+                                                <h:outputText value="Proposed unit number: " />
+                                                <h:outputText value="#{not empty change.unitNumber ? change.unitNumber : 'None'}" />
                                             </div>
+
                                             <div style="datum">
-                                                
+                                                <h:outputText value="Proposed rental notes: " />
+                                                <h:outputText value="#{not empty change.rentalNotes ? change.rentalNotes : 'None'}" />
                                             </div>
+                                            
                                             <div style="datum">
-                                                
+                                                <h:outputText value="Proposed unit description: " />
+                                                <h:outputText value="#{not empty change.notes ? change.notes : 'None'}" />
+                                            </div>
+                                            
+                                            <div style="datum">
+                                                <h:outputText value="Proposed other known address: " />
+                                                <h:outputText value="#{not empty change.otherKnownAddress ? change.otherKnownAddress : 'None'}" />
+                                            </div>
+                                            
+                                            <div style="datum">
+                                                <h:outputText value="Did the user want to add this unit? " />
+                                                <h:outputText value="#{change.added ? 'Yes' : 'No'}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText value="Did user want to remove (deactivate) this unit? " />
+                                                <h:outputText value="#{change.removed ? 'Yes' : 'No'}" />
                                             </div>
                                             <p:commandButton       id="button-compare-change-order"
                                                                    ajax="true" 
@@ -153,7 +180,7 @@
 
                     <p:dialog    id="dialog-compare-changes"
                                  height="650" width="900"
-                                 widgetVar="dialog-widvar-changeedit"
+                                 widgetVar="dialog-widvar-change-edit"
                                  closable="true" >
                         <h2>Compare and Manage a change order</h2>
 
@@ -163,16 +190,64 @@
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
 
+                            <h:outputText value="Did the user want to add this unit? " />
+                            <h:outputText value="#{propertyUnitChangesBB.currChangeOrder.added ? 'Yes' : 'No'}" />
+
+                            <p:spacer height="5px" />
+
+                            <h:outputText value="Did user want to remove (deactivate) this unit? " />
+                            <h:outputText value="#{propertyUnitChangesBB.currChangeOrder.removed ? 'Yes' : 'No'}" />
+
                             <p:panelGrid columns="2">
-                                
+
                                 <h:panelGroup>
-                                    
+
+                                    <h:outputText value="Unit Number: " />
+                                    <h:outputText value="#{propertyUnitChangesBB.currPropUnit.unitNumber}" />
+
+                                    <p:spacer height="5px" />
+
+                                    <h:outputText value="Rental notes: " />
+                                    <h:outputText value="#{propertyUnitChangesBB.currPropUnit.rentalNotes}" />
+
+                                    <p:spacer height="5px" />
+
+                                    <h:outputText value="Unit Description: " />
+                                    <h:outputText value="#{propertyUnitChangesBB.currPropUnit.notes}" />
+
+                                    <p:spacer height="5px" />
+
+                                    <h:outputText value="Other known address: " />
+                                    <h:outputText value="#{propertyUnitChangesBB.currPropUnit.otherKnownAddress}" />
+
                                 </h:panelGroup>
-                                
+
+                                <h:panelGroup>
+
+                                    <h:outputText value="Proposed unit number: " />
+                                    <h:outputText value="#{not empty propertyUnitChangesBB.currChangeOrder.unitNumber ? propertyUnitChangesBB.currChangeOrder.unitNumber : 'None'}" />
+
+                                    <p:spacer height="5px" />
+
+                                    <h:outputText value="Proposed rental notes: " />
+                                    <h:outputText value="#{not empty propertyUnitChangesBB.currChangeOrder.rentalNotes ? propertyUnitChangesBB.currChangeOrder.rentalNotes : 'None'}" />
+
+                                    <p:spacer height="5px" />
+
+                                    <h:outputText value="Proposed unit description: " />
+                                    <h:outputText value="#{not empty propertyUnitChangesBB.currChangeOrder.notes ? propertyUnitChangesBB.currChangeOrder.notes : 'None'}" />
+
+                                    <p:spacer height="5px" />
+
+                                    <h:outputText value="Proposed other known address: " />
+                                    <h:outputText value="#{not empty propertyUnitChangesBB.currChangeOrder.otherKnownAddress ? propertyUnitChangesBB.currChangeOrder.otherKnownAddress : 'None'}" />
+
+                                </h:panelGroup>
+
                             </p:panelGrid>
 
                             <p:spacer height="5px" />
-                            
+
 
                             <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" 
@@ -199,7 +274,7 @@
                         </h:form>
                     </p:dialog>
 
-                    
+
                 </f:view>
             </ui:define>
         </ui:composition>
