@@ -57,7 +57,9 @@ def query_propertyexternaldata_for_changes_and_write_events(
         return
 
     if old[0] != new[0]:
-        details.changes = Changes("owner name", old[0], new[0])
+        details.changes = Changes(
+            "owner name", old[0].clean_raw_name, new[0].clean_raw_name
+        )
         DifferentOwner(details).write_to_db()
     if old[1] != new[1]:
         details.changes = Changes("street", old[1], new[1])

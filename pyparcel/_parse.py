@@ -113,7 +113,7 @@ class OwnerName:
         o = OwnerName()
         o.raw = o._parse_owners_from_soup(soup)
         o.clean = (
-            o._clean_raw_name()
+            o.clean_raw_name()
         )  # Method side effect: May change flag o.multientity
 
         # The Java side hasn't updated their code to match the cleanname, and instead concatenates fname and lname.
@@ -129,7 +129,7 @@ class OwnerName:
             soup, element_id=OWNER, element=SPAN, remove_tags=True
         )
 
-    def _clean_raw_name(self) -> str:
+    def clean_raw_name(self) -> str:
         if len(self.raw) > 1:
             self.multientity = True
             cleaned_names = []
