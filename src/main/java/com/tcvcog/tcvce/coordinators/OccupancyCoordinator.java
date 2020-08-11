@@ -919,7 +919,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             MunicipalityCoordinator mc = getMuniCoordinator();
             UserCoordinator uc = getUserCoordinator();
             
-            MunicipalityDataHeavy temp = mc.assembleMuniDataHeavy(getSessionBean().getSessMuniQueued(), uc.getPublicUserAuthorized().getMyCredential());
+            MunicipalityDataHeavy temp = mc.assembleMuniDataHeavy(getSessionBean().getSessMuniQueued(), uc.auth_getPublicUserAuthorized());
             
             connectedPeriod = getOccPeriod(temp.getDefaultOccPeriodID());
             

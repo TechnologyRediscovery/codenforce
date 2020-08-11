@@ -21,12 +21,12 @@ import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
-import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Person;
@@ -95,7 +95,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
     private List<PropertyUnit> unitList;
     private List<PersonOccPeriod> attachedPersons;
-    
+
     private String internalNoteText;
     private String externalNoteText;
 
@@ -280,8 +280,8 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Your search completed with "+ results.size() + " results!", ""));
-            
+                            "Your search completed with " + results.size() + " results!", ""));
+
         } catch (BObStatusException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -593,14 +593,20 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occured while trying to attach the application to an Occ Period!", ""));
-            return "";
         } catch (BObStatusException ex) {
             System.out.println("OccPermitManageBB.attachToOccPeriod() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occured while trying to attach the application to an Occ Period: " + ex, ""));
-            return "";
+        } catch (NavigationException ex) {
+            System.out.println("OccPermitApplicationManageBB.attachToOccPeriod() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to direct you back to the page you were last on."
+                            + " Your changes to the database were saved. Please return to the page manually.",
+                            "Do not hit the return button again but note the error."));
         }
+        return ""; //only reached if an error was thrown.
     }
 
     public String cancelAttachment() {
@@ -609,7 +615,17 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         getSessionBean().setSessOccPermitApplication(selectedApplication);
 
-        return getSessionBean().getNavStack().popLastPage();
+        try {
+            return getSessionBean().getNavStack().popLastPage();
+        } catch (NavigationException ex) {
+            System.out.println("OccPermitApplicationManageBB.cancelAttachment() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to direct you back to the page you were last on."
+                            + " No changes to the database were saved. Please return to the page manually.",
+                            "Do not hit the return button again but note the error."));
+            return "";
+        }
     }
 
     public String path1SpawnNewOccPeriod() {
@@ -759,50 +775,59 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occured while trying to save your changes.", ""));
-            return "";
 
         } catch (BObStatusException ex) {
             System.out.println("OccPermitManageBB.acceptUnitListChanges() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occured while trying to save your changes: " + ex, ""));
-            return "";
+        } catch (NavigationException ex) {
+            System.out.println("OccPermitManageBB.acceptUnitListChanges() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to direct you back to the page you were on."
+                            + " Your changes to the database were saved. Please return to the page manually.",
+                            "Do not hit the return button again but note the error."));
         }
+        return "";
 
     }
 
-    public String acceptAttachedPersonChanges(){
-        
+    public String acceptAttachedPersonChanges() {
+
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        
+
         selectedApplication.setApplicantPerson(applicant);
 
         selectedApplication.setPreferredContact(contactPerson);
-        
-        selectedApplication.setAttachedPersons(attachedPersons);
-        try{
-        selectedApplication = oc.verifyOccPermitPersonsRequirement(selectedApplication);
-        } catch (BObStatusException ex){
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.toString(), ""));
-            return "";
-        }
 
-        try{
-        oc.updateOccPermitApplicationPersons(selectedApplication);
-        } catch(IntegrationException ex){
+        selectedApplication.setAttachedPersons(attachedPersons);
+
+        try {
+            selectedApplication = oc.verifyOccPermitPersonsRequirement(selectedApplication);
+            oc.updateOccPermitApplicationPersons(selectedApplication);
+            return getSessionBean().getNavStack().popLastPage();
+        } catch (IntegrationException ex) {
             System.out.println("OccPermitApplicationManageBB.acceptAttachedPersonChanges() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occured while trying to store your changes to the person", ""));
-            return "";
+        } catch (BObStatusException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.toString(), ""));
+        } catch(NavigationException ex){
+            System.out.println("OccPermitApplicationManageBB.acceptAttachedPersonChanges() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to direct you back to the page you were on."
+                            + " Your changes to the database were saved. Please return to the page manually.",
+                            "Do not hit the return button again but note the error."));
         }
-        
-        return getSessionBean().getNavStack().popLastPage();
-        
+
+        return "";
     }
-    
+
     public void attachInternalMessage(ActionEvent ev) {
         SystemCoordinator sc = getSystemCoordinator();
         OccupancyIntegrator oi = getOccupancyIntegrator();
@@ -814,7 +839,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
         mbp.setNewMessageContent(internalNoteText);
         String newNotes = sc.appendNoteBlock(mbp);
         System.out.println("CEActionRequestsBB.attachInternalMessage | msg before adding to request: " + newNotes);
-        
+
         selectedApplication.setInternalNotes(newNotes);
         try {
             oi.updateOccPermitApplication(selectedApplication);
@@ -853,7 +878,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
         }
 
     }
-    
+
     public boolean isPathsDisabled() {
 
         if (selectedApplication == null) {

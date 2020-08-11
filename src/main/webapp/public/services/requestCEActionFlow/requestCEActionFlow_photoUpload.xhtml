@@ -44,7 +44,7 @@
                                             <p:menuitem value="Step 1: Choose Municipality" containerStyleClass="complete" />
                                             <p:menuitem value="Step 2: Choose Property" containerStyleClass="complete" />
                                             <p:menuitem value="Step 3: Describe Concern" containerStyleClass="complete"/>
-                                            <p:menuitem value="Step 4: Upload Phote" />
+                                            <p:menuitem value="Step 4: Upload Photo" />
                                             <p:menuitem value="Step 5: Request Details" />
                                             <p:menuitem value="Step 6: Review and Submit" />
                                         </p:steps>
@@ -119,15 +119,19 @@
                                 
                                 <h:form>
                                     <!-- CONTENT BUTTON -->
-                                    <div class="public-main-contents-button" style="display: flex">
+                                    <div class="public-main-contents-button">
+                                        <p:commandButton ajax="false" styleClass="buttonOwnLine"
+                                                         id="goBack" value="Go Back" tabindex="12"
+                                                         process="@none" immediate="true"
+                                                         action="#{cEActionRequestSubmitBB.goBack()}"/>
                                         <p:commandButton  ajax="false" 
-                                                          tabindex="12"
+                                                          tabindex="13" styleClass="buttonOwnLine" 
                                                           value="Save photos and proceed to contact details" 
                                                           id="continueToContactInfoButton"
                                                           action="#{cEActionRequestSubmitBB.savePhotosAndContinue}"
                                                           />
                                         <p:commandButton  ajax="false" 
-                                                          tabindex="13"
+                                                          tabindex="14" styleClass="buttonOwnLine" 
                                                           value="Skip photo upload and continue to contact info" 
                                                           id="ceactionrequestflow-nophotos-cb"
                                                           action="#{cEActionRequestSubmitBB.skipPhotoUpload}"

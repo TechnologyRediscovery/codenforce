@@ -66,37 +66,34 @@
                                                      rowKey="#{unit.bundledUnit.unitID}"
                                                      >                                         
 
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Unit Number" />
-                                                </f:facet>
+                                            <p:column headerText="Unit Number">
                                                 <h:outputText value="#{unit.bundledUnit.unitNumber}" />
                                             </p:column>
 
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Rental Notes:" />
-                                                </f:facet>
+                                            <p:column headerText="Rental Notes">
                                                 <h:outputText value="#{unit.bundledUnit.rentalNotes}" />
                                             </p:column>
 
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Unit Description" />
-                                                </f:facet>
+                                            <p:column headerText="Unit Description">
                                                 <h:outputText value="#{unit.bundledUnit.notes}" />
                                             </p:column>
 
-                                            <p:column style="text-align: center">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Apply"/>
-                                                </f:facet>
+                                            <p:column style="text-align: center" headerText="Apply">
                                                 <p:commandButton ajax="false" 
                                                                  value="Select Unit" 
                                                                  action="#{occPermitApplicationBB.selectPropertyUnit(unit)}"/>
                                             </p:column>
 
                                         </p:dataTable>
+                                        
+                                        <!-- CONTENT BUTTON -->
+                                    <div class="public-main-contents-button">
+                                        <p:commandButton id="goBack" ajax="false"
+                                                         process="@none" immediate="true"
+                                                         value="Go Back" styleClass="buttonOwnLine"
+                                                         action="#{occPermitApplicationBB.goBack()}"/>
+                                    </div>
+                                        
                                     </div>
                                 </div>
                             </div>
