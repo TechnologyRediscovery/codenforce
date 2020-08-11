@@ -1,5 +1,6 @@
 # Learn more about setup.py: https://github.com/kennethreitz/setup.py
 import os
+from codecs import open
 from setuptools import setup, find_packages
 
 requires = [
@@ -11,16 +12,9 @@ requires = [
 ]
 extras_requires = {"dev": ["pytest", "pre-commit", "black"]}
 
-about = {}
-
-# setup values are set explicitly instead of reading from __version__ because packaging is difficult.
-# Feel free to make changes so maintaining packaging is easier, but don't fret over it.
-# This is the code that SHOULD have allowed for a more proper setup:
-from codecs import open  # Honestly, I am not sure if this is necessary.
-
 HERE = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(HERE, "pyparcel", "__version__.py"), "r", "utf-8") as f:
-    exec(f.read(), about)
+    exec(f.read(), about := {})
 
 description = "A command line interface for keeping Turtle Creek COG's CodeNForce's data up to date."
 
