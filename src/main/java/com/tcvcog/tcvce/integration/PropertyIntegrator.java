@@ -33,6 +33,7 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.PropertyExtData;
 import com.tcvcog.tcvce.entities.PropertyUseType;
+import com.tcvcog.tcvce.entities.TaxStatus;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
@@ -812,7 +813,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
            // **     12:TAX STATUS      **
            // ****************************
             if(params.isTaxStatus_ctl()){
-                params.appendSQL("AND taxstatus ILIKE ?");
+                params.appendSQL("AND taxstatus_taxstatusid=?");
             }
 
            // ****************************
@@ -919,6 +920,10 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                     str.append(params.getZip_val());
                     str.append("%");
                     stmt.setString(++paramCounter, str.toString());
+                }
+                
+                if(params.isTaxStatus_ctl()){
+                    stmt.setInt(++paramCounter, params.getTaxStatus_val());
                 }
                 if (params.isPropValue_ctl()) {
                     stmt.setInt(++paramCounter, params.getPropValue_min_val());
@@ -1728,8 +1733,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         String query = "SELECT extdataid, property_propertyid, ownername, ownerphone, address_street, \n" +
                         "       address_citystatezip, address_city, address_state, address_zip, \n" +
                         "       saleprice, saleyear, assessedlandvalue, assessedbuildingvalue, \n" +
-                        "       assessmentyear, usecode, yearbuilt, livingarea, condition, taxstatus, \n" +
-                        "       taxstatusyear, notes, lastupdated, tax, taxcode, taxsubcode\n" +
+                        "       assessmentyear, usecode, yearbuilt, livingarea, condition, notes, \n" +
+                        "       lastupdated, taxcode, taxstatus_taxstatusid \n" +
                         "  FROM public.propertyexternaldata WHERE extdataid=?;";
 
         Connection con = getPostgresCon();
@@ -1758,7 +1763,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
     }
     
-    private PropertyExtData generateExternalDataRecord(ResultSet rs) throws SQLException{
+    private PropertyExtData generateExternalDataRecord(ResultSet rs) throws SQLException, IntegrationException{
         PropertyExtData bundle = new PropertyExtData();
         
         bundle.setExtdataid(rs.getInt("extdataid"));
@@ -1782,17 +1787,71 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         bundle.setYearbuilt(rs.getInt("yearbuilt"));
         bundle.setLivingarea(rs.getInt("livingarea"));
         bundle.setCondition(rs.getString("condition"));
-        bundle.setTaxstatus(rs.getString("taxstatus"));
         
-        bundle.setTaxstatusyear(rs.getInt("taxstatusyear"));
         bundle.setNotes(rs.getString("notes"));
-        bundle.setLastupdated(rs.getTimestamp("lastupdated").toLocalDateTime());
-        bundle.setTax(rs.getString("tax"));
-        bundle.setTaxcode(rs.getString("taxcode"));
-        bundle.setTaxsubcode(rs.getString("taxsubcode"));
+        if(rs.getTimestamp("lastupdated") != null){
+            bundle.setLastUpdatedTS(rs.getTimestamp("lastupdated").toLocalDateTime());
+        }
+        bundle.setTaxStatus(getTaxStatus(rs.getInt("taxstatus_taxstatusid")));
         
         return bundle;
         
+    }
+    
+    /**
+     * Retrieves a single tax status record from the db table: taxstatus
+     * @param taxStatusID
+     * @return
+     * @throws IntegrationException 
+     */
+    public TaxStatus getTaxStatus(int taxStatusID) throws IntegrationException{
+           String query =   "SELECT taxstatusid, year, paidstatus, tax, penalty, interest, total, \n" +
+                            "       datepaid FROM public.taxstatus WHERE taxstatusid=?;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        TaxStatus ts = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, taxStatusID);
+            
+            rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                ts=generateTaxStatus(rs);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Error searching for properties", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return ts;
+    }
+    
+    /**
+     * Generator method for tax status objects
+     * @param rs
+     * @return
+     * @throws SQLException 
+     */
+    private TaxStatus generateTaxStatus(ResultSet rs) throws SQLException{
+        TaxStatus ts = new TaxStatus();
+        ts.setTaxStatusID(rs.getInt("taxstatusid"));
+        ts.setYear(rs.getInt("year"));
+        ts.setPaidStatus(rs.getString("paidstatus"));
+        ts.setTax(rs.getDouble("tax"));
+        ts.setPenalty(rs.getDouble("penalty"));
+        ts.setInterest(rs.getDouble("interest"));
+        ts.setTotal(rs.getDouble("total"));
+        if(rs.getDate("datepaid") != null){
+            ts.setDatePaid(rs.getDate("datepaid").toLocalDate().toString());
+        }
+        return ts;
     }
     
 

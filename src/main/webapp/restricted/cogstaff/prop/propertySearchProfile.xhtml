@@ -1382,7 +1382,7 @@
                                                     <p:column headerText="Date"
                                                               styleClass="centeredColumnContent">
 
-                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(record.lastupdated)}"/>
+                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(cord.lastUpdatedTS)}"/>
 
                                                     </p:column>
 
@@ -1396,7 +1396,7 @@
                                                     <p:column headerText="Tax status"
                                                               styleClass="centeredColumnContent">
 
-                                                        <h:outputText value="#{record.taxstatus}"/>
+                                                        <h:outputText value="#{!(empty record.taxStatus) ? record.taxStatus.paidStatus : ''}"/>
 
                                                     </p:column>
 
