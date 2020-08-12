@@ -104,7 +104,7 @@ def replace_name(new_name, soup) -> bs4.BeautifulSoup:
     return _parse.replace_html_content(soup, OWNER, new_name)
 
 
-def replace_taxstatus(taxes, soup, r) -> bs4.BeautifulSoup:
+def replace_taxstatus(taxes, soup) -> bs4.BeautifulSoup:
     """
     """
     # Setup: We want taxes to be a list of at least 4 TaxStatuses or Nones, but we accept any number, including a single TaxStatus instance
@@ -153,14 +153,6 @@ def replace_taxstatus(taxes, soup, r) -> bs4.BeautifulSoup:
             except TypeError as E:  # NoneType takes no arguments
                 tag.contents.append(field)
 
-    # # Replaces the data in the record dictionary
-    # # Todo: See if we actually have TAXCODE anywhere in the database
-    #                     # Exempt, Taxable, or Public Utility Realty Tax Act
-    # r["TAXCODE"]        # E, T, or P
-    # r["TAXDESC"]        # 10 - exempt, 20 - Taxable, 12 - PURTA
-    # # r["TAXSUBCODE"]     # Applies to PURTA only, null, E, or t (todo: veryify null)
-    # # r["TAXSUBCODE_DESC"]# "PURTA - Taxable", "PURTA - Exempt", null
-
     return soup
 
 
@@ -192,7 +184,7 @@ def anonymize_html_and_record(
     if new_name:
         soup = replace_name(new_name, soup)
     if new_taxstatus:
-        soup = replace_taxstatus(new_taxstatus, soup, r)
+        soup = replace_taxstatus(new_taxstatus, soup)
     mocked_html = soup.text
     return mocked_html, r
 

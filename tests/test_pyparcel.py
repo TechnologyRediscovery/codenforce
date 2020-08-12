@@ -27,6 +27,7 @@ from pyparcel._events import *
 from pyparcel import _parse
 from pyparcel import _write as write
 from pyparcel._parse import TaxStatus
+from unittest import mock
 import pickle
 
 
@@ -132,12 +133,47 @@ class TestEventsTrigger:
     """
     """
 
-    # Compare against
-    def test_NewParcelid_trigger(self):
-        pass
+    # query_propertyexternaldata_for_changes_and_write_events
+    # Mock query_propertyexternaldata_for_changes_and_write_events
 
-    def test_DifferentOwner_trigger(self):
-        pass
+    # # Functions to mock
+    # db_cursor.execute(select_sql, {"prop_id": prop_id})
+    # db_cursor.fetchall()
+    # Todo: As of August 2020, condition is a str. Should it be an int?
+    # [('{"LASTNAME FIRSTNAME M     "}', '0 N TEST AVE', 'PITTSBURGH PA 15206', 2064, None), [('{"LASTNAME FIRSTNAME M     "}', '0 N TEST AVE', 'PITTSBURGH PA 15206', 2064, None)]
+
+    # @mock.patch(
+    #     "pyparcel.dbcursor.fetchall",
+    #     return_value=[
+    #         ('{"LASTNAME FIRSTNAME M     "}', '0 N TEST AVE', 'PITTSBURGH PA 15206', 2064, None),
+    #         ('{"LASTNAME DIFFERENT M     "}', '0 N TEST AVE', 'PITTSBURGH PA 15206', 2064, None)]
+    # )
+    # def test_DifferentOwner_trigger(self, fetchall):
+    #     pass
+
+    @pytest.fixture
+    def example_class(self):
+        class ExampleClass:
+            def __init__(self):
+                pass
+
+            def set_value(self):
+                self.value = True
+
+        return ExampleClass()
+
+    # # @mock.patch("_events.example_with_classes", return_value=True)
+    # def test_example_func(self, example_class):
+    #     assert example_with_classes(example_class) == True
+
+    # @mock.patch(
+    #     "_events.psycopg2."
+    # )
+    # def test_DifferentOwner_trigger(self, mocked):
+    #     assert query_propertyexternaldata_for_changes_and_write_events(
+    #         "PARCEL_ID", 1234, 5678, False, None
+    #     ) == True
+    #
 
     def testDifferentStreet_trigger(self):
         pass
@@ -156,6 +192,32 @@ class TestEventsTrigger:
 
     def testDifferentTaxCode(self):
         pass
+
+
+@pytest.fixture()
+def test_cursor():
+    class mocked_cursor:
+        def execute(self, *args, **kwargs):
+            return None
+
+        def fetchall(self):
+            return (
+                ["Old Name", True, True, True, True],
+                ["New Name", True, True, True, True],
+            )
+
+        def fetchone(self):
+            return [
+                True,
+            ]
+
+    return mocked_cursor()
+
+
+# def test_query_propertyexternaldata_for_changes_and_write_events(test_cursor):
+#     x =  query_propertyexternaldata_for_changes_and_write_events(
+#         None, None, None, True, test_cursor
+#     )
 
 
 class TestParse:
