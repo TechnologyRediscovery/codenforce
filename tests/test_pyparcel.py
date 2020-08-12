@@ -129,32 +129,6 @@ def person1_propertyexternaldata_imap():
         return pickle.load(p)
 
 
-class TestEventsTrigger:
-    """
-    """
-
-    def test_DifferentOwner_trigger(self):
-        pass
-
-    def testDifferentStreet_trigger(self):
-        pass
-
-    def testDifferentCityStateZip(self):
-        pass
-
-    def testDifferentLivingArea(self):
-        pass
-
-    def testDifferentCondition(self):
-        pass
-
-    def testDifferentTaxStatus(self):
-        pass
-
-    def testDifferentTaxCode(self):
-        pass
-
-
 @pytest.fixture()
 def mocked_cursor(**kwargs):
     def _mocked_cursor(**kwargs):
@@ -210,17 +184,43 @@ def mocked_cursor(**kwargs):
     return _mocked_cursor
 
 
-def test_query_propertyexternaldata_for_changes_and_write_events(mocked_cursor):
-    x = query_propertyexternaldata_for_changes_and_write_events(
-        None, None, None, True, mocked_cursor(new_owner={"OWNER NEW I     "})
-    )
+class TestEventsTrigger:
+    """
+    """
 
+    def test_query_propertyexternaldata_for_changes_and_write_events(
+        self, mocked_cursor
+    ):
+        x = query_propertyexternaldata_for_changes_and_write_events(
+            None, None, None, True, mocked_cursor(new_owner={"OWNER NEW I     "})
+        )
 
-#                 self.old_owner = {"OWNER OLD I     "}
-#                 self.old_street = "0 Old St "
-#                 self.old_citystatezip = "PITTSBURGH PA 15206"
-#                 self.old_livingarea = 1000
-#                 self.old_condition = 4
+    #                 self.old_owner = {"OWNER OLD I     "}
+    #                 self.old_street = "0 Old St "
+    #                 self.old_citystatezip = "PITTSBURGH PA 15206"
+    #                 self.old_livingarea = 1000
+    #                 self.old_condition = 4
+
+    def test_DifferentOwner_trigger(self):
+        pass
+
+    def testDifferentStreet_trigger(self):
+        pass
+
+    def testDifferentCityStateZip(self):
+        pass
+
+    def testDifferentLivingArea(self):
+        pass
+
+    def testDifferentCondition(self):
+        pass
+
+    def testDifferentTaxStatus(self):
+        pass
+
+    def testDifferentTaxCode(self):
+        pass
 
 
 class TestParse:
