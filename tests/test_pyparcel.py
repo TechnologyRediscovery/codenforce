@@ -133,47 +133,8 @@ class TestEventsTrigger:
     """
     """
 
-    # query_propertyexternaldata_for_changes_and_write_events
-    # Mock query_propertyexternaldata_for_changes_and_write_events
-
-    # # Functions to mock
-    # db_cursor.execute(select_sql, {"prop_id": prop_id})
-    # db_cursor.fetchall()
-    # Todo: As of August 2020, condition is a str. Should it be an int?
-    # [('{"LASTNAME FIRSTNAME M     "}', '0 N TEST AVE', 'PITTSBURGH PA 15206', 2064, None), [('{"LASTNAME FIRSTNAME M     "}', '0 N TEST AVE', 'PITTSBURGH PA 15206', 2064, None)]
-
-    # @mock.patch(
-    #     "pyparcel.dbcursor.fetchall",
-    #     return_value=[
-    #         ('{"LASTNAME FIRSTNAME M     "}', '0 N TEST AVE', 'PITTSBURGH PA 15206', 2064, None),
-    #         ('{"LASTNAME DIFFERENT M     "}', '0 N TEST AVE', 'PITTSBURGH PA 15206', 2064, None)]
-    # )
-    # def test_DifferentOwner_trigger(self, fetchall):
-    #     pass
-
-    @pytest.fixture
-    def example_class(self):
-        class ExampleClass:
-            def __init__(self):
-                pass
-
-            def set_value(self):
-                self.value = True
-
-        return ExampleClass()
-
-    # # @mock.patch("_events.example_with_classes", return_value=True)
-    # def test_example_func(self, example_class):
-    #     assert example_with_classes(example_class) == True
-
-    # @mock.patch(
-    #     "_events.psycopg2."
-    # )
-    # def test_DifferentOwner_trigger(self, mocked):
-    #     assert query_propertyexternaldata_for_changes_and_write_events(
-    #         "PARCEL_ID", 1234, 5678, False, None
-    #     ) == True
-    #
+    def test_DifferentOwner_trigger(self):
+        pass
 
     def testDifferentStreet_trigger(self):
         pass
@@ -195,29 +156,71 @@ class TestEventsTrigger:
 
 
 @pytest.fixture()
-def test_cursor():
-    class mocked_cursor:
-        def execute(self, *args, **kwargs):
-            return None
+def mocked_cursor(**kwargs):
+    def _mocked_cursor(**kwargs):
+        class MockedCursor:
+            def __init__(
+                self,
+                new_owner=None,
+                new_street=None,
+                new_citystatezip=None,
+                new_livingarea=None,
+                new_tax=None,
+            ):
+                self.old_owner = '{"OWNER OLD I     "}'
+                self.old_street = "0 Old St "
+                self.old_citystatezip = "PITTSBURGH PA 15206"
+                self.old_livingarea = 1000
+                self.old_condition = 4
 
-        def fetchall(self):
-            return (
-                ["Old Name", True, True, True, True],
-                ["New Name", True, True, True, True],
-            )
+                self.new_owner = new_owner or self.old_owner
+                self.new_street = new_street or self.old_street
+                self.new_citystatezip = new_citystatezip or self.old_citystatezip
+                self.new_livingarea = new_livingarea or self.old_livingarea
+                self.new_condition = new_tax or self.old_condition
 
-        def fetchone(self):
-            return [
-                True,
-            ]
+            def execute(self, *args, **kwargs):
+                return None
 
-    return mocked_cursor()
+            def fetchall(self):
+                return (
+                    [
+                        self.old_owner,
+                        self.old_street,
+                        self.old_citystatezip,
+                        self.old_livingarea,
+                        self.old_condition,
+                    ],
+                    [
+                        self.new_owner,
+                        self.new_street,
+                        self.new_citystatezip,
+                        self.new_livingarea,
+                        self.new_condition,
+                    ],
+                )
+
+            def fetchone(self):
+                return [
+                    True,
+                ]
+
+        return MockedCursor(**kwargs)
+
+    return _mocked_cursor
 
 
-# def test_query_propertyexternaldata_for_changes_and_write_events(test_cursor):
-#     x =  query_propertyexternaldata_for_changes_and_write_events(
-#         None, None, None, True, test_cursor
-#     )
+def test_query_propertyexternaldata_for_changes_and_write_events(mocked_cursor):
+    x = query_propertyexternaldata_for_changes_and_write_events(
+        None, None, None, True, mocked_cursor(new_owner={"OWNER NEW I     "})
+    )
+
+
+#                 self.old_owner = {"OWNER OLD I     "}
+#                 self.old_street = "0 Old St "
+#                 self.old_citystatezip = "PITTSBURGH PA 15206"
+#                 self.old_livingarea = 1000
+#                 self.old_condition = 4
 
 
 class TestParse:
