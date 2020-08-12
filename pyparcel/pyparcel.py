@@ -5,8 +5,7 @@ import click
 import _fetch as fetch
 from _connection import connection_and_cursor
 from _update_muni import update_muni
-from _constants import Tally
-from _constants import DASHES, COG_DB
+from _constants import Tally, DASHES, COG_DB
 
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
@@ -31,7 +30,9 @@ def main(municodes, commit, u, password, port):
     click.echo(DASHES)
 
     try:
-        with connection_and_cursor(database=COG_DB, user=u, password=password, port=port) as (conn, cursor):
+        with connection_and_cursor(
+            database=COG_DB, user=u, password=password, port=port
+        ) as (conn, cursor):
             if municodes == ():
                 # Update ALL municipalities.
                 municodes = [muni for muni in fetch.munis(cursor)]

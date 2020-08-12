@@ -27,13 +27,14 @@ from pyparcel._events import *
 from pyparcel import _parse
 from pyparcel import _write as write
 from pyparcel._parse import TaxStatus
+from unittest import mock
 import pickle
 
 
 ### Fixtures (and similar bits of setup code)
 
 HERE = path.abspath(path.dirname(__file__))
-MOCKS = path.join(HERE, "mocks", "")    # Represents the mocks folder
+PICKLES = path.join(HERE, "pickles", "")  # Represents the mocks folder
 
 # Generates a list of every eventcategory class in _events
 event_categories = []
@@ -48,57 +49,160 @@ for k in d:
         continue
 
 
-
-
 details = EventDetails(None, None, None, None)
 details.changes = Changes(None, None, None)
 
 # Todo: During this setup phase, add CogLand objects into local db
 @pytest.fixture
 def taxstatus_paid():
-    return TaxStatus(year='2020', paidstatus='PAID', tax='473', penalty='000', interest='000', total='473', date_paid='6/2/2020', blank=None)
+    return TaxStatus(
+        year="2020",
+        paidstatus="PAID",
+        tax="473",
+        penalty="000",
+        interest="000",
+        total="473",
+        date_paid="6/2/2020",
+    )
+
 
 @pytest.fixture
 def taxstatus_unpaid():
-    return TaxStatus(year='2020', paidstatus='UNPAID', tax='36894', penalty='1845', interest='369', total='39108', date_paid=None, blank=None)
+    return TaxStatus(
+        year="2020",
+        paidstatus="UNPAID",
+        tax="36894",
+        penalty="1845",
+        interest="369",
+        total="39108",
+        date_paid=None,
+    )
+
 
 @pytest.fixture
 def taxstatus_balancedue():
-    return TaxStatus(year='2020', paidstatus='BALANCE DUE', tax='069', penalty='003', interest='001', total='073', date_paid=None, blank=None)
+    return TaxStatus(
+        year="2020",
+        paidstatus="BALANCE DUE",
+        tax="069",
+        penalty="003",
+        interest="001",
+        total="073",
+        date_paid=None,
+    )
+
 
 @pytest.fixture
 def taxstatus_none():
-    return TaxStatus(year='2020', paidstatus=None, tax='000', penalty='000', interest='000', total='000', date_paid=None, blank=None)
+    return TaxStatus(
+        year="2020",
+        paidstatus=None,
+        tax="000",
+        penalty="000",
+        interest="000",
+        total="000",
+        date_paid=None,
+    )
 
 
 @pytest.fixture
 def person1_prop_imap():
-    with open(MOCKS + "person1_prop_imap.pickle", "rb") as p:
+    with open(PICKLES + "person1_prop_imap.pickle", "rb") as p:
         return pickle.load(p)
+
 
 @pytest.fixture
 def person1_cecase_imap():
-    with open(MOCKS + "person1_cecase_imap.pickle", "rb") as p:
+    with open(PICKLES + "person1_cecase_imap.pickle", "rb") as p:
         return pickle.load(p)
+
 
 @pytest.fixture
 def person1_owner_imap():
-    with open(MOCKS + "person1_owner_imap.pickle", "rb") as p:
+    with open(PICKLES + "person1_owner_imap.pickle", "rb") as p:
         return pickle.load(p)
+
 
 @pytest.fixture
 def person1_propertyexternaldata_imap():
-    with open(MOCKS + "person1_propertyexternaldata_imap.pickle", "rb") as p:
+    with open(PICKLES + "person1_propertyexternaldata_imap.pickle", "rb") as p:
         return pickle.load(p)
 
+
+@pytest.fixture()
+def mocked_cursor(**kwargs):
+    def _mocked_cursor(**kwargs):
+        class MockedCursor:
+            def __init__(
+                self,
+                new_owner=None,
+                new_street=None,
+                new_citystatezip=None,
+                new_livingarea=None,
+                new_tax=None,
+            ):
+                self.old_owner = '{"OWNER OLD I     "}'
+                self.old_street = "0 Old St "
+                self.old_citystatezip = "PITTSBURGH PA 15206"
+                self.old_livingarea = 1000
+                self.old_condition = 4
+
+                self.new_owner = new_owner or self.old_owner
+                self.new_street = new_street or self.old_street
+                self.new_citystatezip = new_citystatezip or self.old_citystatezip
+                self.new_livingarea = new_livingarea or self.old_livingarea
+                self.new_condition = new_tax or self.old_condition
+
+            def execute(self, *args, **kwargs):
+                return None
+
+            def fetchall(self):
+                return (
+                    [
+                        self.old_owner,
+                        self.old_street,
+                        self.old_citystatezip,
+                        self.old_livingarea,
+                        self.old_condition,
+                    ],
+                    [
+                        self.new_owner,
+                        self.new_street,
+                        self.new_citystatezip,
+                        self.new_livingarea,
+                        self.new_condition,
+                    ],
+                )
+
+            def fetchone(self):
+                return [
+                    True,
+                ]
+
+        return MockedCursor(**kwargs)
+
+    return _mocked_cursor
 
 
 class TestEventsTrigger:
     """
     """
-    # Compare against
-    def test_NewParcelid_trigger(self):
-        pass
+
+    def test_query_propertyexternaldata_for_changes_and_write_events(
+        self, mocked_cursor
+    ):
+        assert (
+            query_propertyexternaldata_for_changes_and_write_events(
+                None, None, None, True, mocked_cursor(new_owner={"OWNER NEW I     "})
+            )
+            == True
+        )
+
+    #                 self.old_owner = {"OWNER OLD I     "}
+    #                 self.old_street = "0 Old St "
+    #                 self.old_citystatezip = "PITTSBURGH PA 15206"
+    #                 self.old_livingarea = 1000
+    #                 self.old_condition = 4
 
     def test_DifferentOwner_trigger(self):
         pass
@@ -122,52 +226,59 @@ class TestEventsTrigger:
         pass
 
 
-
 class TestParse:
     # Todo: pickled objects to fixtures?
     class TestParseTaxFromSoup:
         """ Assert parse_tax_from_soup returns the correct TaxStatus, given a BeautifulSoup object"""
+
         # Todo: Learn if these tests break if BS4 is
         def test_paid(self, taxstatus_paid):
-            with open(MOCKS + "paid.pickle", "rb") as p:
+            with open(PICKLES + "paid.pickle", "rb") as p:
                 soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) == taxstatus_paid
 
         def test_unpaid(self, taxstatus_unpaid):
-            with open(MOCKS + "unpaid.pickle", "rb") as p:
+            with open(PICKLES + "unpaid.pickle", "rb") as p:
                 soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) == taxstatus_unpaid
 
         def test_balancedue(self, taxstatus_balancedue):
-            with open(MOCKS + "balancedue.pickle", "rb") as p:
+            with open(PICKLES + "balancedue.pickle", "rb") as p:
                 soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) == taxstatus_balancedue
 
         def test_none(self, taxstatus_none):
             # Todo: Does the truely represent no taxes, or is it representative of blank data?
-            with open(MOCKS + "none.pickle", "rb") as p:
+            with open(PICKLES + "none.pickle", "rb") as p:
                 soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) == taxstatus_none
-
 
     class TestParseOwnerFromSoup:
         pass
 
 
 try:
-    conn = psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", host="localhost", port="5432")
+    conn = psycopg2.connect(
+        database="cogdb", user="sylvia", password="c0d3", host="localhost", port="5432"
+    )
 except psycopg2.OperationalError:
+
     @contextmanager
     def mocked_conn():
-        try: yield None
-        finally: pass
+        try:
+            yield None
+        finally:
+            pass
+
     conn = mocked_conn()
 
 
 with conn:
+
     def transaction(func):
         """ transaction is a decorator that allows each unittest to be run in its own transaction
         """
+
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             cursor = conn.cursor()
@@ -177,8 +288,8 @@ with conn:
             finally:
                 cursor.execute("ROLLBACK;")
                 cursor.close()
-        return wrapper
 
+        return wrapper
 
     def db_connection_established():
         """ db_connection_established is a flag representing if a database connection could be made.
@@ -186,16 +297,17 @@ with conn:
         if isinstance(conn, psycopg2.extensions.connection):
             return True
 
-
     def test_database_connection():
         assert db_connection_established()
 
-
-    @pytest.mark.skipif(not db_connection_established(), reason="Requires a database connection")
+    @pytest.mark.skipif(
+        not db_connection_established(), reason="Requires a database connection"
+    )
     class TestsRequiringADatabaseConnection:
-        class TestWrites():
+        class TestWrites:
             """ TestWrites tests check that the code write to the database properly.
             """
+
             @transaction
             def test_property(self, person1_prop_imap):
                 with conn.cursor() as cursor:
@@ -225,10 +337,10 @@ with conn:
             #     with conn.cursor() as cursor:
             #         write.propertyexternaldata(person1_propertyexternaldata_imap, cursor)
 
-
         class TestEventCategories:
             """ Ensures events in _events.py share the same attributes of their counterpart in the database.
             """
+
             @pytest.mark.parametrize("event", event_categories)
             def test_name_integrity(self, event):
                 """ Compares the class's name to the database's event category's title.
@@ -246,7 +358,6 @@ with conn:
                     cursor.execute(select_sql, info)
                     row = cursor.fetchone()
                     assert event.__name__ == row[0]
-
 
             # Todo: Refactor and do a little currying
             @pytest.mark.parametrize("event", event_categories)

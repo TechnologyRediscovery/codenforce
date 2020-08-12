@@ -3,10 +3,7 @@ import requests
 from _constants import GENERALINFO, BUILDING, TAX, SALES, IMAGES, COMPS, APPEAL, MAP
 
 
-
-
-
-def county_property_assessments(parcel_id: str):
+def county_property_assessment(parcel_id: str):
     COUNTY_REAL_ESTATE_URL = "http://www2.county.allegheny.pa.us/RealEstate/"
     URL_ENDING = ".aspx?"
     search_parameters = {
