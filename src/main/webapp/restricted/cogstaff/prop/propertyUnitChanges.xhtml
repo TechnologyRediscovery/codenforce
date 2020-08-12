@@ -38,11 +38,10 @@
                                 <p:selectOneMenu style="width: 300px;" 
                                                  id="unit-changes-list-viewoptions" 
                                                  value="#{propertyUnitChangesBB.currentViewOption}"
-                                                 onchange="window.location.replace(window.location.href)"
                                                  >
 
                                     <p:ajax update="form-unitedit
-                                            prop-units-list-form"/>
+                                            unit-changes-list-form"/>
 
                                     <f:selectItems  id="select-view-option-items"
                                                     value="#{propertyUnitChangesBB.allViewOptions}"
@@ -130,45 +129,49 @@
                                             </div>
 
                                             <div style="datum">
-                                                <h:outputText value="Proposed unit number: " />
-                                                <h:outputText value="#{not empty change.unitNumber ? change.unitNumber : 'None'}" />
+                                                <h:outputText rendered="#{not empty change.unitNumber}" 
+                                                              value="Proposed unit number: #{change.unitNumber}" />
                                             </div>
 
                                             <div style="datum">
-                                                <h:outputText value="Proposed rental notes: " />
-                                                <h:outputText value="#{not empty change.rentalNotes ? change.rentalNotes : 'None'}" />
+                                                <h:outputText rendered="#{not empty change.rentalNotes}" 
+                                                              value="Proposed rental notes: #{change.rentalNotes}" />
                                             </div>
                                             
                                             <div style="datum">
-                                                <h:outputText value="Proposed unit description: " />
-                                                <h:outputText value="#{not empty change.notes ? change.notes : 'None'}" />
+                                                <h:outputText rendered="#{not empty change.notes}" 
+                                                              value="Proposed unit description: #{change.notes}" />
                                             </div>
                                             
                                             <div style="datum">
-                                                <h:outputText value="Proposed other known address: " />
-                                                <h:outputText value="#{not empty change.otherKnownAddress ? change.otherKnownAddress : 'None'}" />
+                                                <h:outputText rendered="#{not empty change.otherKnownAddress}" 
+                                                              value="Proposed other known address: #{change.otherKnownAddress}" />
                                             </div>
                                             
                                             <div style="datum">
-                                                <h:outputText value="Did the user want to add this unit? " />
-                                                <h:outputText value="#{change.added ? 'Yes' : 'No'}" />
+                                                <h:outputText value="Did the user want to add this unit? #{change.added ? 'Yes' : 'No'}" />
                                             </div>
 
                                             <div style="datum">
-                                                <h:outputText value="Did user want to remove (deactivate) this unit? " />
-                                                <h:outputText value="#{change.removed ? 'Yes' : 'No'}" />
+                                                <h:outputText value="Did user want to remove (deactivate) this unit? #{change.removed ? 'Yes' : 'No'}" />
                                             </div>
                                             <p:commandButton       id="button-compare-change-order"
                                                                    ajax="true" 
-                                                                   update="dialog-widvar-change-edit"
-                                                                   action="#{}"
+                                                                   update="form-unitedit"
+                                                                   actionListener="#{PropertyUnitChangesBB.initializeChangeComparison()}"
+                                                                   oncomplete="PF('dialog-widvar-change-edit').show()"
                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                   disabled="#{not change.active}"
                                                                    value="Compare and manage change order"  
                                                                    icon="fa fa-edit"/>
                                         </p:dataScroller>
                                     </div>
                                 </p:dataScroller>
 
+                                <p:outputLabel 
+                                    rendered="#{propertyUnitChangesBB.heavyDisplayList.isEmpty()}"
+                                    value="The current property has no proposed changes to any of its units!"/>
+                                
                             </h:form>
 
                         </p:panel>
@@ -251,21 +254,21 @@
 
                             <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" 
-                                             onclick="PF('dialog-widvar-changeedit').hide()"
+                                             onclick="PF('dialog-widvar-change-edit').hide()"
                                              tabindex="4"/>
 
                             <p:commandButton ajax="true"
                                              actionListener="#{propertyUnitChangesBB.rejectChangeOrder()}"
-                                             oncomplete="PF('dialog-widvar-changeedit').hide()"
+                                             oncomplete="PF('dialog-widvar-change-edit').hide()"
                                              icon="fa fa-thumbs-o-up"
-                                             update="unit changes-messages-form
+                                             update="unit-changes-messages-form
                                              unit-changes-list-form"
                                              value="Reject Change Order" 
                                              tabindex="3"/>
 
                             <p:commandButton ajax="true"
                                              actionListener="#{propertyUnitChangesBB.applyChangeOrder()}"
-                                             oncomplete="PF('dialog-widvar-changeedit').hide()"
+                                             oncomplete="PF('dialog-widvar-change-edit').hide()"
                                              icon="fa fa-thumbs-o-up"
                                              update="unit-changes-messages-form
                                              unit-changes-list-form"

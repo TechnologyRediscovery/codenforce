@@ -20,31 +20,34 @@ import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 
 /**
  *
  * @author Nathan Dietz
  */
 public class PropertyUnitChangesBB
-        extends BackingBeanUtils{
-    
+        extends BackingBeanUtils {
+
     private PropertyDataHeavy currProp;
     private PropertyUnit currPropUnit;
     private PropertyUnitChangeOrder currChangeOrder;
-    
+
     private List<PropertyUnitDataHeavy> heavyDisplayList;
-    
+
     private List<ViewOptionsActiveListsEnum> allViewOptions;
     private ViewOptionsActiveListsEnum currentViewOption;
 
     public PropertyUnitChangesBB() {
     }
 
-     @PostConstruct
+    @PostConstruct
     public void initBean() {
         currProp = getSessionBean().getSessProperty();
 
@@ -57,11 +60,11 @@ public class PropertyUnitChangesBB
         }
 
     }
-    
-    public String goToPropertyUnits(){
+
+    public String goToPropertyUnits() {
         return "propertyUnits";
     }
-    
+
     public PropertyDataHeavy getCurrProp() {
         return currProp;
     }
@@ -98,8 +101,73 @@ public class PropertyUnitChangesBB
         return currentViewOption;
     }
 
-    public void setCurrentViewOption(ViewOptionsActiveListsEnum currentViewOption) {
-        this.currentViewOption = currentViewOption;
+    public void setCurrentViewOption(ViewOptionsActiveListsEnum input) {
+        currentViewOption = input;
+
+        heavyDisplayList = new ArrayList<>();
+
+        if (currentViewOption == null) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to set the current view option. Returning to default.", ""));
+            currentViewOption = ViewOptionsActiveListsEnum.VIEW_ACTIVE;
+        } else {
+
+            switch (currentViewOption) {
+                case VIEW_ALL:
+
+                    for (PropertyUnitDataHeavy unit : currProp.getUnitWithListsList()) {
+
+                        if (!unit.getChangeOrderList().isEmpty()) {
+                            heavyDisplayList.add(unit);
+                        }
+                    }
+                    
+                    break;
+
+                case VIEW_ACTIVE:
+
+                    for (PropertyUnitDataHeavy unit : currProp.getUnitWithListsList()) {
+
+                        List<PropertyUnitChangeOrder> activeChanges = new ArrayList<>();
+
+                        for (PropertyUnitChangeOrder change : unit.getChangeOrderList()) {
+                            if (change.isActive()) {
+                                activeChanges.add(change);
+                            }
+                        }
+
+                        if (!activeChanges.isEmpty()) {
+                            unit.setChangeOrderList(activeChanges);
+                            heavyDisplayList.add(unit);
+                        }
+                    }
+
+                    break;
+
+                case VIEW_INACTIVE:
+
+                    for (PropertyUnitDataHeavy unit : currProp.getUnitWithListsList()) {
+
+                        List<PropertyUnitChangeOrder> inactiveChanges = new ArrayList<>();
+
+                        for (PropertyUnitChangeOrder change : unit.getChangeOrderList()) {
+                            if (!change.isActive()) {
+                                inactiveChanges.add(change);
+                            }
+                        }
+
+                        if (!inactiveChanges.isEmpty()) {
+                            unit.setChangeOrderList(inactiveChanges);
+                            heavyDisplayList.add(unit);
+                        }
+                    }
+
+                    break;
+            }
+            
+        }
+
     }
 
     public PropertyUnitChangeOrder getCurrChangeOrder() {
@@ -109,5 +177,5 @@ public class PropertyUnitChangesBB
     public void setCurrChangeOrder(PropertyUnitChangeOrder currChangeOrder) {
         this.currChangeOrder = currChangeOrder;
     }
-    
+
 }

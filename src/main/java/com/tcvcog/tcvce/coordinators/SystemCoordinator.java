@@ -388,6 +388,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     private final NavigationSubItem propertySearch = getNavSubItem("Search", "/restricted/cogstaff/prop/propertySearchProfile.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem propertyInfo = getNavSubItem("Info", "/restricted/cogstaff/prop/propertySearchProfile.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem propertyUnits = getNavSubItem("Units", "/restricted/cogstaff/prop/propertyUnits.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem propertyUnitChanges = getNavSubItem("Unit Changes", "/restricted/cogstaff/prop/propertyUnitChanges.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Property
     public List<NavigationSubItem> getPropertyNavList() {
@@ -396,6 +397,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         navList.add(propertySearch);
         navList.add(propertyInfo);
         navList.add(propertyUnits);
+        navList.add(propertyUnitChanges);
         return navList;
     }
 
