@@ -191,8 +191,11 @@ class TestEventsTrigger:
     def test_query_propertyexternaldata_for_changes_and_write_events(
         self, mocked_cursor
     ):
-        x = query_propertyexternaldata_for_changes_and_write_events(
-            None, None, None, True, mocked_cursor(new_owner={"OWNER NEW I     "})
+        assert (
+            query_propertyexternaldata_for_changes_and_write_events(
+                None, None, None, True, mocked_cursor(new_owner={"OWNER NEW I     "})
+            )
+            == True
         )
 
     #                 self.old_owner = {"OWNER OLD I     "}
