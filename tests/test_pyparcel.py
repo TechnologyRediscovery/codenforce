@@ -34,7 +34,7 @@ import pickle
 ### Fixtures (and similar bits of setup code)
 
 HERE = path.abspath(path.dirname(__file__))
-MOCKS = path.join(HERE, "mocks", "")  # Represents the mocks folder
+PICKLES = path.join(HERE, "pickles", "")  # Represents the mocks folder
 
 # Generates a list of every eventcategory class in _events
 event_categories = []
@@ -107,25 +107,25 @@ def taxstatus_none():
 
 @pytest.fixture
 def person1_prop_imap():
-    with open(MOCKS + "person1_prop_imap.pickle", "rb") as p:
+    with open(PICKLES + "person1_prop_imap.pickle", "rb") as p:
         return pickle.load(p)
 
 
 @pytest.fixture
 def person1_cecase_imap():
-    with open(MOCKS + "person1_cecase_imap.pickle", "rb") as p:
+    with open(PICKLES + "person1_cecase_imap.pickle", "rb") as p:
         return pickle.load(p)
 
 
 @pytest.fixture
 def person1_owner_imap():
-    with open(MOCKS + "person1_owner_imap.pickle", "rb") as p:
+    with open(PICKLES + "person1_owner_imap.pickle", "rb") as p:
         return pickle.load(p)
 
 
 @pytest.fixture
 def person1_propertyexternaldata_imap():
-    with open(MOCKS + "person1_propertyexternaldata_imap.pickle", "rb") as p:
+    with open(PICKLES + "person1_propertyexternaldata_imap.pickle", "rb") as p:
         return pickle.load(p)
 
 
@@ -230,23 +230,23 @@ class TestParse:
 
         # Todo: Learn if these tests break if BS4 is
         def test_paid(self, taxstatus_paid):
-            with open(MOCKS + "paid.pickle", "rb") as p:
+            with open(PICKLES + "paid.pickle", "rb") as p:
                 soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) == taxstatus_paid
 
         def test_unpaid(self, taxstatus_unpaid):
-            with open(MOCKS + "unpaid.pickle", "rb") as p:
+            with open(PICKLES + "unpaid.pickle", "rb") as p:
                 soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) == taxstatus_unpaid
 
         def test_balancedue(self, taxstatus_balancedue):
-            with open(MOCKS + "balancedue.pickle", "rb") as p:
+            with open(PICKLES + "balancedue.pickle", "rb") as p:
                 soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) == taxstatus_balancedue
 
         def test_none(self, taxstatus_none):
             # Todo: Does the truely represent no taxes, or is it representative of blank data?
-            with open(MOCKS + "none.pickle", "rb") as p:
+            with open(PICKLES + "none.pickle", "rb") as p:
                 soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) == taxstatus_none
 
