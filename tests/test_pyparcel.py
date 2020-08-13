@@ -24,10 +24,11 @@ from os import path
 from contextlib import contextmanager
 import functools
 from pyparcel._events import *
-from pyparcel import _parse
+from pyparcel import _parse, _events
 from pyparcel import _write as write
 from pyparcel._parse import TaxStatus
 from unittest import mock
+from typing import NamedTuple
 import pickle
 
 
@@ -42,6 +43,7 @@ d = copy(sys.modules[__name__].__dict__)
 for k in d:
     try:
         if issubclass(d[k], Event):
+            # Skip over base classes
             if d[k].__name__ not in ("Event", "ParcelChangedEvent"):
                 event_categories.append(d[k])
             continue
@@ -49,8 +51,90 @@ for k in d:
         continue
 
 
-details = EventDetails(None, None, None, None)
-details.changes = Changes(None, None, None)
+class MockedCursor(mock.MagicMixin):
+    def __init__(
+            self,
+            new_owner=False,
+            new_street=False,
+            new_citystatezip=False,
+            new_livingarea=False,
+            new_condition=False,
+    ):
+        self.old_owner = '{"OWNER OLD     "}'
+        self.old_street = "0 Old St "
+        self.old_citystatezip = "PITTSBURGH PA 15206"
+        self.old_livingarea = 1000
+        self.old_condition = 4
+
+        self.new_owner = '{"OWNER NEW     "}' if new_owner else self.old_owner
+        self.new_street = "1 New St " if new_street else self.old_street
+        self.new_citystatezip = "NEWSCITY PA 15090" if new_citystatezip else self.old_citystatezip
+        self.new_livingarea = 2345 if new_livingarea else self.old_livingarea
+        self.new_condition = 1 if new_condition else self.old_condition
+
+    def execute(self, *args, **kwargs):
+        return None
+
+    def fetchall(self):
+        return (
+            [
+                self.old_owner,
+                self.old_street,
+                self.old_citystatezip,
+                self.old_livingarea,
+                self.old_condition,
+            ],
+            [
+                self.new_owner,
+                self.new_street,
+                self.new_citystatezip,
+                self.new_livingarea,
+                self.new_condition,
+            ],
+        )
+
+    def fetchone(self):
+        return [True]
+
+
+class EventAndCursor(NamedTuple):
+    event: _events.Event
+    cursor: MockedCursor
+EnC = EventAndCursor
+
+
+# Todo: There is a lot of duplicate code. Refactor:
+#   When creating a new event propertyexternaldata event, you should only have to add it once here
+#   It should accept:
+#       the event class,
+#       a string to be passed to the MockedCursor as an attribute (Example: new_yourevent)
+#       Starting data (old) of the correct type (since it will be tested by writing to a database)
+#       Changed data (new)
+#   Obviously EventAndCursor will need to be changed too.
+def _propertyexternaldata_events_and_corresponding_cursors():
+    """
+    A fixture constructor.
+
+    Contains all events
+
+    Returns: A list of EventAndCursor tuples.
+        Each tuple contains
+            An event that can be triggered by the function _events.query_propertyexternaldata_for_changes
+            A (mocked) cursor used to trigger passed to the event's EventDetails.
+    """
+    return [
+        EnC(DifferentOwner, MockedCursor(new_owner=True)),
+        EnC(DifferentStreet, MockedCursor(new_street=True)),
+        EnC(DifferentCityStateZip, MockedCursor(new_citystatezip=True)),
+        EnC(DifferentLivingArea, MockedCursor(new_livingarea=True)),
+        EnC(DifferentCondition, MockedCursor(new_condition=True))
+    ]
+
+
+@pytest.fixture
+def propertyexternaldata_events():
+    return [_EnC.event for _EnC in _propertyexternaldata_events_and_corresponding_cursors()]
+
 
 # Todo: During this setup phase, add CogLand objects into local db
 @pytest.fixture
@@ -128,110 +212,56 @@ def person1_propertyexternaldata_imap():
     with open(PICKLES + "person1_propertyexternaldata_imap.pickle", "rb") as p:
         return pickle.load(p)
 
-
-@pytest.fixture()
-def mocked_cursor(**kwargs):
-    def _mocked_cursor(**kwargs):
-        class MockedCursor:
-            def __init__(
-                self,
-                new_owner=None,
-                new_street=None,
-                new_citystatezip=None,
-                new_livingarea=None,
-                new_tax=None,
-            ):
-                self.old_owner = '{"OWNER OLD I     "}'
-                self.old_street = "0 Old St "
-                self.old_citystatezip = "PITTSBURGH PA 15206"
-                self.old_livingarea = 1000
-                self.old_condition = 4
-
-                self.new_owner = new_owner or self.old_owner
-                self.new_street = new_street or self.old_street
-                self.new_citystatezip = new_citystatezip or self.old_citystatezip
-                self.new_livingarea = new_livingarea or self.old_livingarea
-                self.new_condition = new_tax or self.old_condition
-
-            def execute(self, *args, **kwargs):
-                return None
-
-            def fetchall(self):
-                return (
-                    [
-                        self.old_owner,
-                        self.old_street,
-                        self.old_citystatezip,
-                        self.old_livingarea,
-                        self.old_condition,
-                    ],
-                    [
-                        self.new_owner,
-                        self.new_street,
-                        self.new_citystatezip,
-                        self.new_livingarea,
-                        self.new_condition,
-                    ],
-                )
-
-            def fetchone(self):
-                return [
-                    True,
-                ]
-
-        return MockedCursor(**kwargs)
-
-    return _mocked_cursor
-
-
-class TestEventsTrigger:
-    """
+class TestEventTriggers:
+    """ These tests ensure that an event calls write_to_db when it is supposed to
     """
 
-    def test_query_propertyexternaldata_for_changes_and_write_events(
-        self, mocked_cursor
-    ):
-        assert (
-            query_propertyexternaldata_for_changes_and_write_events(
-                None, None, None, True, mocked_cursor(new_owner={"OWNER NEW I     "})
-            )
-            == True
+    @pytest.mark.parametrize(
+        "event,mocked_cursor",
+        _propertyexternaldata_events_and_corresponding_cursors()
+    )
+    def test_propertyexternaldata(self, event, mocked_cursor):
+        """ Tests events resulting from function _events.query_propertyexternaldata_for_changes_and_write_events are raised correctly.
+        """
+        event.write_to_db = mock.MagicMock(spec=True)
+        query_propertyexternaldata_for_changes_and_write_events(
+            parid=None,
+            prop_id=None,
+            cecase_id=None,
+            new_parcel=None,
+            db_cursor=mocked_cursor
         )
+        event.write_to_db.assert_called_once()
+        event.write_to_db.reset_mock()
 
-    #                 self.old_owner = {"OWNER OLD I     "}
-    #                 self.old_street = "0 Old St "
-    #                 self.old_citystatezip = "PITTSBURGH PA 15206"
-    #                 self.old_livingarea = 1000
-    #                 self.old_condition = 4
 
-    def test_DifferentOwner_trigger(self):
-        pass
-
-    def testDifferentStreet_trigger(self):
-        pass
-
-    def testDifferentCityStateZip(self):
-        pass
-
-    def testDifferentLivingArea(self):
-        pass
-
-    def testDifferentCondition(self):
-        pass
-
-    def testDifferentTaxStatus(self):
-        pass
-
-    def testDifferentTaxCode(self):
-        pass
+    def test_multiple_propertyexternaldata_events(self, propertyexternaldata_events):
+        """ This test ensures that a cursor triggering multiple events actually result in writing multiple events.
+        """
+        mocked_cursor = MockedCursor(
+            new_owner=True,
+            new_street=True,
+            new_citystatezip=True,
+            new_livingarea=True,
+            new_condition=True
+        )
+        query_propertyexternaldata_for_changes_and_write_events(
+            parid=None,
+            prop_id=None,
+            cecase_id=None,
+            new_parcel=None,
+            db_cursor=mocked_cursor
+        )
+        for event in propertyexternaldata_events:
+            event.write_to_db.assert_called_once()
+            event.write_to_db.reset_mock()
 
 
 class TestParse:
-    # Todo: pickled objects to fixtures?
     class TestParseTaxFromSoup:
-        """ Assert parse_tax_from_soup returns the correct TaxStatus, given a BeautifulSoup object"""
+        """ Assert parse_tax_from_soup returns the correct TaxStatus, given a BeautifulSoup object
+        """
 
-        # Todo: Learn if these tests break if BS4 is
         def test_paid(self, taxstatus_paid):
             with open(PICKLES + "paid.pickle", "rb") as p:
                 soup = pickle.load(p)
@@ -262,15 +292,8 @@ try:
         database="cogdb", user="sylvia", password="c0d3", host="localhost", port="5432"
     )
 except psycopg2.OperationalError:
-
-    @contextmanager
-    def mocked_conn():
-        try:
-            yield None
-        finally:
-            pass
-
-    conn = mocked_conn()
+    conn = mock.MagicMock()
+    warnings.warn("A database connection could not be established. Skipping tests that require a connection...")
 
 
 with conn:
@@ -297,8 +320,6 @@ with conn:
         if isinstance(conn, psycopg2.extensions.connection):
             return True
 
-    def test_database_connection():
-        assert db_connection_established()
 
     @pytest.mark.skipif(
         not db_connection_established(), reason="Requires a database connection"
@@ -337,6 +358,7 @@ with conn:
             #     with conn.cursor() as cursor:
             #         write.propertyexternaldata(person1_propertyexternaldata_imap, cursor)
 
+
         class TestEventCategories:
             """ Ensures events in _events.py share the same attributes of their counterpart in the database.
             """
@@ -346,7 +368,7 @@ with conn:
                 """ Compares the class's name to the database's event category's title.
                 """
                 with conn.cursor() as cursor:
-                    instance = event(details)
+                    instance = event(mock.MagicMock())
                     info = {}
                     info["column"] = event.__name__
                     info["category_id"] = instance.category_id
@@ -359,13 +381,13 @@ with conn:
                     row = cursor.fetchone()
                     assert event.__name__ == row[0]
 
-            # Todo: Refactor and do a little currying
+            # Todo: Refactor
             @pytest.mark.parametrize("event", event_categories)
             def test_active_integrity(self, event):
                 """ Compares the class's default active status to the database's.
                 """
                 with conn.cursor() as cursor:
-                    instance = event(details)
+                    instance = event(mock.MagicMock())
                     info = {}
                     info["column"] = instance.active
                     info["category_id"] = instance.category_id
