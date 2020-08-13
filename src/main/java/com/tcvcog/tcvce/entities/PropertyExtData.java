@@ -45,7 +45,12 @@ public class PropertyExtData {
     private int yearbuilt;
     private int livingarea;
     private String condition;
-    private String taxstatus;
+    private String notes;
+    private LocalDateTime lastUpdatedTS;
+    private String taxCode;
+    private TaxStatus taxStatus;
+    
+    
 
     @Override
     public int hashCode() {
@@ -68,13 +73,6 @@ public class PropertyExtData {
         hash = 67 * hash + this.yearbuilt;
         hash = 67 * hash + this.livingarea;
         hash = 67 * hash + Objects.hashCode(this.condition);
-        hash = 67 * hash + Objects.hashCode(this.taxstatus);
-        hash = 67 * hash + this.taxstatusyear;
-        hash = 67 * hash + Objects.hashCode(this.notes);
-        hash = 67 * hash + Objects.hashCode(this.lastupdated);
-        hash = 67 * hash + Objects.hashCode(this.tax);
-        hash = 67 * hash + Objects.hashCode(this.taxcode);
-        hash = 67 * hash + Objects.hashCode(this.taxsubcode);
         return hash;
     }
 
@@ -117,9 +115,6 @@ public class PropertyExtData {
         if (this.livingarea != other.livingarea) {
             return false;
         }
-        if (this.taxstatusyear != other.taxstatusyear) {
-            return false;
-        }
         if (!Objects.equals(this.ownername, other.ownername)) {
             return false;
         }
@@ -147,33 +142,11 @@ public class PropertyExtData {
         if (!Objects.equals(this.condition, other.condition)) {
             return false;
         }
-        if (!Objects.equals(this.taxstatus, other.taxstatus)) {
-            return false;
-        }
         if (!Objects.equals(this.notes, other.notes)) {
-            return false;
-        }
-        if (!Objects.equals(this.tax, other.tax)) {
-            return false;
-        }
-        if (!Objects.equals(this.taxcode, other.taxcode)) {
-            return false;
-        }
-        if (!Objects.equals(this.taxsubcode, other.taxsubcode)) {
-            return false;
-        }
-        if (!Objects.equals(this.lastupdated, other.lastupdated)) {
             return false;
         }
         return true;
     }
-    private int taxstatusyear;
-    private String notes;
-    private LocalDateTime lastupdated;
-    private String tax;
-    private String taxcode;
-    private String taxsubcode;
-
     
     /**
      * @return the extdataid
@@ -301,19 +274,6 @@ public class PropertyExtData {
         return condition;
     }
 
-    /**
-     * @return the taxstatus
-     */
-    public String getTaxstatus() {
-        return taxstatus;
-    }
-
-    /**
-     * @return the taxstatusyear
-     */
-    public int getTaxstatusyear() {
-        return taxstatusyear;
-    }
 
     /**
      * @return the notes
@@ -322,33 +282,6 @@ public class PropertyExtData {
         return notes;
     }
 
-    /**
-     * @return the lastupdated
-     */
-    public LocalDateTime getLastupdated() {
-        return lastupdated;
-    }
-
-    /**
-     * @return the tax
-     */
-    public String getTax() {
-        return tax;
-    }
-
-    /**
-     * @return the taxcode
-     */
-    public String getTaxcode() {
-        return taxcode;
-    }
-
-    /**
-     * @return the taxsubcode
-     */
-    public String getTaxsubcode() {
-        return taxsubcode;
-    }
 
     /**
      * @param extdataid the extdataid to set
@@ -476,19 +409,7 @@ public class PropertyExtData {
         this.condition = condition;
     }
 
-    /**
-     * @param taxstatus the taxstatus to set
-     */
-    public void setTaxstatus(String taxstatus) {
-        this.taxstatus = taxstatus;
-    }
 
-    /**
-     * @param taxstatusyear the taxstatusyear to set
-     */
-    public void setTaxstatusyear(int taxstatusyear) {
-        this.taxstatusyear = taxstatusyear;
-    }
 
     /**
      * @param notes the notes to set
@@ -497,31 +418,46 @@ public class PropertyExtData {
         this.notes = notes;
     }
 
+
     /**
-     * @param lastupdated the lastupdated to set
+     * @return the lastUpdatedTS
      */
-    public void setLastupdated(LocalDateTime lastupdated) {
-        this.lastupdated = lastupdated;
+    public LocalDateTime getLastUpdatedTS() {
+        return lastUpdatedTS;
     }
 
     /**
-     * @param tax the tax to set
+     * @return the taxCode
      */
-    public void setTax(String tax) {
-        this.tax = tax;
+    public String getTaxCode() {
+        return taxCode;
     }
 
     /**
-     * @param taxcode the taxcode to set
+     * @return the taxStatus
      */
-    public void setTaxcode(String taxcode) {
-        this.taxcode = taxcode;
+    public TaxStatus getTaxStatus() {
+        return taxStatus;
     }
 
     /**
-     * @param taxsubcode the taxsubcode to set
+     * @param lastUpdatedTS the lastUpdatedTS to set
      */
-    public void setTaxsubcode(String taxsubcode) {
-        this.taxsubcode = taxsubcode;
+    public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
+        this.lastUpdatedTS = lastUpdatedTS;
+    }
+
+    /**
+     * @param taxCode the taxCode to set
+     */
+    public void setTaxCode(String taxCode) {
+        this.taxCode = taxCode;
+    }
+
+    /**
+     * @param taxStatus the taxStatus to set
+     */
+    public void setTaxStatus(TaxStatus taxStatus) {
+        this.taxStatus = taxStatus;
     }
 }

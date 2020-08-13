@@ -24,10 +24,10 @@
                             <!-- TITLE COMPONENT -->
                             <div class="public-title">
                                 <div class="public-title-main">
-                                    Request Code Enforcement Action
+                                    Report a Concern
                                 </div>
                                 <div class="public-title-sub">
-                                    Step 3: Describe your concern at #{cEActionRequestSubmitBB.currentRequest.requestProperty.address} in #{cEActionRequestSubmitBB.currentRequest.muni.muniName}
+                                    If you would like to report a concern with a properly in your municipality, please begin the process below to submit your claim.
                                 </div>
                             </div>
 
@@ -40,107 +40,174 @@
                                     <!-- GUIDANCE COMPONENT -->
                                     <div class="public-guide">
                                         <p:steps activeIndex="2" styleClass="custom">
-                                            <p:menuitem value="Step 1: Choose Municipality" containerStyleClass="complete" />
-                                            <p:menuitem value="Step 2: Choose Property" containerStyleClass="complete" />
-                                            <p:menuitem value="Step 3: Describe Concern" />
-                                            <p:menuitem value="Step 4: Upload Photo" />
-                                            <p:menuitem value="Step 5: Request Details" />
-                                            <p:menuitem value="Step 6: Review and Submit" />
+                                            <p:menuitem value="" containerStyleClass="complete" />
+                                            <p:menuitem value="" containerStyleClass="complete" />
+                                            <p:menuitem value="" />
+                                            <p:menuitem value="" />
+                                            <p:menuitem value="" />
+                                            <p:menuitem value="" />
                                         </p:steps>
                                     </div>
 
                                     <!-- CONTENT IO COMPONENT -->
                                     <div class="public-main-contents-io">
-                                        <div class="ui-g data-container">
-                                            <div class="ui-g-12 ui-md-6 ui-lg-4 data_field">
-                                                <h:outputLabel styleClass="data_field_label" 
-                                                               value="Choose the category of concern from the list or select 'other' and explain your concern below"
-                                                               />
-                                                <p:selectOneMenu id="violationSOLB" 
-                                                                 tabindex="1"
-                                                                 required="true"
-                                                                 styleClass="data_field_value" 
-                                                                 value="#{cEActionRequestSubmitBB.currentRequest.issue}"
-                                                                 label="Choose the category">
 
-                                                    <f:selectItems value="#{cEActionRequestSubmitBB.issueTypeList}" var="i" itemValue="#{i}" itemLabel="#{i.name}"/>
-                                                    <f:converter converterId="issueTypeConverter"/>
-                                                </p:selectOneMenu>
-                                            </div>
-                                            <div class="ui-g-12 ui-md-6 ui-lg-4 data_field">
-                                                <h:outputLabel styleClass="data_field_label" 
-                                                               value="If different from today, select the date of the incident or condition you are reporting"
-                                                               />
-                                                <p:calendar value="#{cEActionRequestSubmitBB.currentRequest.dateOfRecordUtilDate}" 
-                                                            mode="popup" 
-                                                            tabindex="2"
-                                                            id="dateOfRecord"
-                                                            showOn="button"
-                                                            pattern="EEE, dd MMM, yyyy HH:mm"
-                                                            maxdate="#{cEActionRequestSubmitBB.currentDate}"
-                                                            navigator="true"
-                                                            showButtonPanel="true"
-                                                            showTodayButton="true"
-                                                            />
-                                            </div>
-                                            <div class="ui-g-12 ui-md-6 ui-lg-4 data_field">
-                                                <h:outputLabel styleClass="data_field_label" 
-                                                               value="Does this issue involve immediate human safety hazards?"
-                                                               />
-                                                <p:inputSwitch tabindex="3" 
-                                                               id="isIUrgentSwitch" 
-                                                               styleClass="data_field_value"
-                                                               value="#{cEActionRequestSubmitBB.currentRequest.isUrgent}"
-                                                               onLabel="Yes" 
-                                                               offLabel="No" 
-                                                               />
-                                            </div>
-                                            <div class="ui-g-12 ui-md-6 ui-lg-4 data_field">
-                                                <h:outputLabel styleClass="data_field_label" 
-                                                               value="Do you wish to remain anonymous during the code enforcement investigation?"
-                                                               />
-                                                <p:inputSwitch id="remainAnonymousIS" 
-                                                               value="#{cEActionRequestSubmitBB.currentRequest.anonymitiyRequested}" 
-                                                               onLabel="Yes" 
-                                                               offLabel="No"
-                                                               tabindex="4"
-                                                               styleClass="data_field_value"
-                                                               />
-                                            </div>
-                                            <div class="ui-g-12 ui-md-6 ui-lg-4 data_field">
-                                                <h:outputLabel styleClass="data_field_label" 
-                                                               value="Please describe the specifics of the code enforcement concern selected above"
-                                                               />
-                                                <p:inputTextarea id="requestDescription" 
-                                                                 styleClass="textArea" 
-                                                                 rows="3" 
-                                                                 tabindex="5"
-                                                                 required="true"
-                                                                 value="#{cEActionRequestSubmitBB.currentRequest.requestDescription}"
-                                                                 label="Request Description"
-                                                                 />
+                                        <p:focus/>
+
+                                        <!-- CONTENT IO COMPONENT: INSTRUCTION -->
+                                        <div class="public-main-contents-io-title" >
+                                            3. Describe your concern with #{cEActionRequestSubmitBB.currentRequest.requestProperty.address} in #{cEActionRequestSubmitBB.currentRequest.muni.muniName}
+                                        </div>
+
+                                        <!-- CONTENT IO COMPONENT: CONTENT -->
+                                        <div class="public-main-contents-io-content" >
+
+                                            <!-- DATA CONTAINER -->
+                                            <div class="ui-g data-container">
+
+                                                <div class="ui-g-12 ui-md-4 ui-lg-4">
+
+                                                    <!-- NESTED DATA CONTAINER -->
+                                                    <div class="ui-g data_container_nested_public">
+
+                                                        <div class="ui-g-12">
+
+                                                            <h:outputLabel styleClass="data_field_label" 
+                                                                           value="What is the concern with this property? Select One."
+                                                                           />
+
+                                                            <p:selectOneMenu id="violationSOLB" 
+                                                                             tabindex="1"
+                                                                             required="true"
+                                                                             styleClass="data_field_value" 
+                                                                             value="#{cEActionRequestSubmitBB.currentRequest.issue}"
+                                                                             label="Choose the category"
+                                                                             >
+
+                                                                <f:selectItems value="#{cEActionRequestSubmitBB.issueTypeList}" 
+                                                                               var="i" 
+                                                                               itemValue="#{i}" 
+                                                                               itemLabel="#{i.name}"
+                                                                               />
+
+                                                                <f:converter converterId="issueTypeConverter"/>
+
+                                                            </p:selectOneMenu>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- NESTED DATA CONTAINER -->
+                                                    <div class="ui-g data_container_nested_public">
+
+                                                        <div class="ui-g-12 ">
+                                                            <h:outputLabel styleClass="data_field_label" 
+                                                                           value="Please describe the specifics of the concern."
+                                                                           />
+                                                            <p:inputTextarea id="requestDescription" 
+                                                                             styleClass="textArea" 
+                                                                             rows="3" 
+                                                                             tabindex="2"
+                                                                             required="true"
+                                                                             value="#{cEActionRequestSubmitBB.currentRequest.requestDescription}"
+                                                                             label="Request Description"
+                                                                             />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="ui-g-12 ui-md-1 ui-lg-1"></div>
+
+                                                <div class="ui-g-12 ui-md-7 ui-lg-7">
+                                                    <div class="ui-g">
+                                                        <div class="data_container_nested_public">
+                                                            <div class="ui-g-8" >
+                                                                <h:outputLabel styleClass="data_field_label" 
+                                                                               value="What date did this incident occur? Select today's date if unknown."
+                                                                               />
+                                                            </div>
+                                                            <div class="ui-g-4" >
+                                                                <p:calendar value="#{cEActionRequestSubmitBB.currentRequest.dateOfRecordUtilDate}" 
+                                                                            mode="popup" 
+                                                                            tabindex="3"
+                                                                            id="dateOfRecord"
+                                                                            showOn="button"
+                                                                            pattern="EEE, dd MMM, yyyy HH:mm"
+                                                                            maxdate="#{cEActionRequestSubmitBB.currentDate}"
+                                                                            navigator="true"
+                                                                            showButtonPanel="true"
+                                                                            showTodayButton="true"
+                                                                            />
+                                                            </div>
+                                                        </div>
+                                                        <div class="data_container_nested_public">
+                                                            <div class="ui-g-8" >
+                                                                <h:outputLabel styleClass="data_field_label" 
+                                                                               value="Does this issue involve immediate human and/or safety hazards?"
+                                                                               />
+                                                            </div>
+                                                            <div class="ui-g-4" >
+                                                                <p:inputSwitch tabindex="4" 
+                                                                               id="isIUrgentSwitch" 
+                                                                               styleClass="data_field_value"
+                                                                               value="#{cEActionRequestSubmitBB.currentRequest.isUrgent}"
+                                                                               onLabel="Yes" 
+                                                                               offLabel="No" 
+                                                                               />
+                                                            </div>
+                                                        </div>
+                                                        <div class="data_container_nested_public">
+                                                            <div class="ui-g-8" >
+                                                                <h:outputLabel styleClass="data_field_label" 
+                                                                               value="Do you wish to file this claim anonymously?"
+                                                                               />
+                                                            </div>
+                                                            <div class="ui-g-4">
+                                                                <p:inputSwitch id="remainAnonymousIS" 
+                                                                               value="#{cEActionRequestSubmitBB.currentRequest.anonymitiyRequested}" 
+                                                                               onLabel="Yes" 
+                                                                               offLabel="No"
+                                                                               tabindex="5"
+                                                                               styleClass="data_field_value"
+                                                                               />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                </div>
-                                
-                                <!-- CONTENT BUTTON -->
-                                <div class="public-main-contents-button">
-                                    <p:commandButton ajax="false" styleClass="buttonOwnLine"
-                                                     id="goBack" value="Go Back" tabindex="6"
-                                                     process="@none" immediate="true"
-                                                     action="#{cEActionRequestSubmitBB.goBack()}"/>
-                                    <p:commandButton  ajax="false" 
-                                                      tabindex="7" styleClass="buttonOwnLine" 
-                                                      value="Next: Upload photos of your concern" 
-                                                      id="continueToPhotoUploadButton"
-                                                      action="#{cEActionRequestSubmitBB.saveConcernDescriptions}"
-                                                      style="width: 100%"/>
+                                    <!-- CONTENT BUTTON -->
+                                    <div class="public-main-contents-button-left">
+                                        <div class="gray_button">
+                                            <p:commandButton ajax="false" styleClass="buttonOwnLine"
+                                                             id="goBack" value="Go Back" tabindex="7"
+                                                             process="@none" immediate="true"
+                                                             action="#{cEActionRequestSubmitBB.goBack()}"
+                                                             style="float: left"/>
+
+                                        </div>
+                                    </div>
+
+                                    <!-- CONTENT BUTTON -->
+                                    <div class="public-main-contents-button-right">
+
+                                        <p:commandButton  ajax="false" 
+                                                          value="Next: Upload photos of your concern" 
+                                                          id="continueToPhotoUploadButton"
+                                                          action="#{cEActionRequestSubmitBB.saveConcernDescriptions}"
+                                                          style="width: 100%"
+                                                          tabindex="6"/>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </h:form>
+                    <script>
+                        var y = document.getElementById('public-reportconcern-arrow-id');
+                        y.className += " public-menu-active";
+                    </script> 
                 </f:view>
             </ui:define>
         </ui:composition>

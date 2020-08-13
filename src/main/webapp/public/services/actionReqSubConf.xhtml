@@ -20,15 +20,15 @@
                     <!-- MAIN CONTAINER -->
                     <div class="mainContainer">
 
-                        <!-- TITLE COMPONENT -->
-                        <div class="public-title">
-                            <div class="public-title-main">
-                                Request Code Enforcement Action
+                         <!-- TITLE COMPONENT -->
+                            <div class="public-title">
+                                <div class="public-title-main">
+                                    Report a Concern
+                                </div>
+                                <div class="public-title-sub">
+                                    Report the concern Successfully
+                                </div>
                             </div>
-                            <div class="public-title-sub">
-                                Code Enforcement action request submission confirmation
-                            </div>
-                        </div>
 
                         <!-- CONTENTS CONTAINER -->
                         <div class="public-main-contents-containner">
@@ -78,6 +78,10 @@
                         </div>
                     </div>
                 </h:form>
+                <script>
+                    var y = document.getElementById('public-reportconcern-arrow-id');
+                    y.className += " public-menu-active";
+                </script> 
             </ui:define>
         </ui:composition>
     </h:body>

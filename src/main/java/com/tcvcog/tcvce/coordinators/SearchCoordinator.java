@@ -1118,7 +1118,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         // Param #PROP-12
         params.setTaxStatus_ctl(false);
-        params.setTaxStatus_val(null);
+        params.setTaxStatus_val(0);
         
         // Param #PROP-13
         params.setPropValue_ctl(false);

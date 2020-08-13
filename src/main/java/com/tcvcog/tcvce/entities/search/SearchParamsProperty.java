@@ -67,7 +67,7 @@ public  class       SearchParamsProperty
    
    // filter #PROP-12
    private boolean taxStatus_ctl;
-   private String taxStatus_val;
+   private int taxStatus_val;
    
    // filter #PROP-13
    private boolean propValue_ctl;
@@ -517,14 +517,14 @@ public  class       SearchParamsProperty
     /**
      * @return the taxStatus_val
      */
-    public String getTaxStatus_val() {
+    public int getTaxStatus_val() {
         return taxStatus_val;
     }
 
     /**
      * @param taxStatus_val the taxStatus_val to set
      */
-    public void setTaxStatus_val(String taxStatus_val) {
+    public void setTaxStatus_val(int taxStatus_val) {
         this.taxStatus_val = taxStatus_val;
     }
 

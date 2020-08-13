@@ -2,6 +2,7 @@ import re
 from collections import namedtuple
 import bs4
 from _constants import OWNER, TAXINFO, SPAN
+from typing import List
 
 
 def soupify_html(raw_html):
@@ -100,6 +101,16 @@ def remove_commas_from_numerics(text):
     return text
 
 
+def parse_owners_from_soup(
+    soup: bs4.BeautifulSoup,
+) -> List[
+    str,
+]:
+    return _extract_elementlist_from_soup(
+        soup, element_id=OWNER, element=SPAN, remove_tags=True
+    )
+
+
 class OwnerName:
     __slots__ = ["raw", "clean", "first", "last", "multientity", "compositelname"]
 
@@ -113,11 +124,11 @@ class OwnerName:
         return f"{self.__class__.__name__}<{self.clean}>"
 
     @classmethod
-    def get_Owner_from_soup(cls, soup: str):
+    def get_Owner_from_soup(cls, soup: bs4.BeautifulSoup):
         """ Factory method for creating OwnerNames from parcel ids.
         """
         o = OwnerName()
-        o.raw = o._parse_owners_from_soup(soup)
+        o.raw = parse_owners_from_soup(soup)
         o.clean = (
             o.clean_raw_name()
         )  # Method side effect: May change flag o.multientity
@@ -128,12 +139,6 @@ class OwnerName:
         o.last = o.clean
         o.compositelname = True
         return o
-
-    @staticmethod
-    def _parse_owners_from_soup(soup):
-        return _extract_elementlist_from_soup(
-            soup, element_id=OWNER, element=SPAN, remove_tags=True
-        )
 
     def clean_raw_name(self) -> str:
         if len(self.raw) > 1:

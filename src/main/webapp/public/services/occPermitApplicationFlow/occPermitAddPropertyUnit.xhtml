@@ -27,7 +27,7 @@
                                     Apply For An Occupancy Permit
                                 </div>
                                 <div class="public-title-sub">
-                                    Step 3: Configure Unit List
+                                    If you would like to apply for an occupancy permit in your municipality, please begin the process below to submit your claim.
                                 </div>
                             </div>
 
@@ -40,169 +40,195 @@
                                     <!-- GUIDANCE COMPONENT -->
                                     <div class="public-guide occpermit">
                                         <p:steps activeIndex="2" styleClass="custom" >
-                                            <p:menuitem value="Step 1: Choose Municipality" containerStyleClass="complete"/>
-                                            <p:menuitem value="Step 2: Choose Property" containerStyleClass="complete"/>
-                                            <p:menuitem value="Step 3: Configure Unit List" />
-                                            <p:menuitem value="Step 4: Select Units" />
-                                            <p:menuitem value="Step 5: Choose Reason" />
-                                            <p:menuitem value="Step 6: Add People" />
-                                            <p:menuitem value="Step 7: Review And Submit" />
+                                            <p:menuitem value="" containerStyleClass="complete"/>
+                                            <p:menuitem value="" containerStyleClass="complete"/>
+                                            <p:menuitem value="" />
+                                            <p:menuitem value="" />
+                                            <p:menuitem value="" />
+                                            <p:menuitem value="" />
+                                            <p:menuitem value="" />
                                         </p:steps>
                                     </div>
 
                                     <!-- CONTENT IO COMPONENT -->
                                     <div class="public-main-contents-io">
-                                        <p>
-                                            1. Before applying for occupancy, 
-                                            please create a complete list of 
-                                            all the units in the property, including 
-                                            those that you do not want to apply for.
-                                            Press "Add Unit" to add
-                                            an empty unit, and click the pencil 
-                                            in the edit column to fill out the information.
-                                            The Unit Number is required, a 
-                                            description may be left blank. 
-                                            The description should just 
-                                            describe what the room is (e.g. basement).
-                                            If you intend to rent please explain your plans under
-                                            "Rental notes".
-                                        </p>
 
-                                        <p:dataTable id="propertyUnitsToAddTable"
-                                                     widgetVar="datatable"
-                                                     rowIndexVar="rowIndex"
-                                                     var="unit"
-                                                     value="#{occPermitApplicationBB.workingPropUnits}"
-                                                     selectionMode="single" 
-                                                     tabindex="1"
-                                                     selection="#{occPermitApplicationBB.selectedUnit}"
-                                                     rowKey="#{unit.bundledUnit.unitID}"
-                                                     editable="true">                                         
+                                        <p:focus/>
 
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Unit Number" />
-                                                </f:facet>
-                                                <p:cellEditor>
-                                                    <f:facet name="output"><h:outputText value="#{unit.bundledUnit.unitNumber}" /></f:facet>
-                                                    <f:facet name="input">
-                                                        <p:inputText value="#{unit.bundledUnit.unitNumber}"
-                                                                     onkeydown="PF('datatable').onKeyDown(event)"
-                                                                     onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                        <!-- CONTENT IO COMPONENT: INSTRUCTION -->
+                                        <div class="public-main-contents-io-title" >
+                                            3. Configure unit list
+                                        </div>
+                                        
+                                        <!-- CONTENT IO COMPONENT: CONTENT -->
+                                        <div class="public-main-contents-io-content" >
+
+                                            <p>
+                                                Before applying for occupancy, 
+                                                please create a complete list of 
+                                                all the units in the property, including 
+                                                those that you do not want to apply for.
+                                                Press "Add Unit" to add
+                                                an empty unit, and click the pencil 
+                                                in the edit column to fill out the information.
+                                                The Unit Number is required, a 
+                                                description may be left blank. 
+                                                The description should just 
+                                                describe what the room is (e.g. basement).
+                                                If you intend to rent please explain your plans under
+                                                "Rental notes".
+                                            </p>
+
+                                            <p:dataTable id="propertyUnitsToAddTable"
+                                                         widgetVar="datatable"
+                                                         rowIndexVar="rowIndex"
+                                                         var="unit"
+                                                         value="#{occPermitApplicationBB.workingPropUnits}"
+                                                         selectionMode="single" 
+                                                         tabindex="1"
+                                                         selection="#{occPermitApplicationBB.selectedUnit}"
+                                                         rowKey="#{unit.bundledUnit.unitID}"
+                                                         editable="true">                                         
+
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Unit Number" />
                                                     </f:facet>
-                                                </p:cellEditor>
-                                            </p:column>
+                                                    <p:cellEditor>
+                                                        <f:facet name="output"><h:outputText value="#{unit.bundledUnit.unitNumber}" /></f:facet>
+                                                        <f:facet name="input">
+                                                            <p:inputText value="#{unit.bundledUnit.unitNumber}"
+                                                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                        </f:facet>
+                                                    </p:cellEditor>
+                                                </p:column>
 
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Rental notes" />
-                                                </f:facet>
-                                                <p:cellEditor>
-                                                    <f:facet name="output">
-                                                        <h:outputText value="#{unit.bundledUnit.rentalNotes}" />
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Rental notes" />
                                                     </f:facet>
-                                                    <f:facet name="input"> 
-                                                        <p:inputText value="#{unit.bundledUnit.rentalNotes}"
-                                                                     onkeydown="PF('datatable').onKeyDown(event)"
-                                                                     onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                    <p:cellEditor>
+                                                        <f:facet name="output">
+                                                            <h:outputText value="#{unit.bundledUnit.rentalNotes}" />
+                                                        </f:facet>
+                                                        <f:facet name="input"> 
+                                                            <p:inputText value="#{unit.bundledUnit.rentalNotes}"
+                                                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                        </f:facet>
+                                                    </p:cellEditor>
+                                                </p:column>
+
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Unit Description" />
                                                     </f:facet>
-                                                </p:cellEditor>
-                                            </p:column>
+                                                    <p:cellEditor>
+                                                        <f:facet name="output">
+                                                            <h:outputText value="#{unit.bundledUnit.notes}" />
+                                                        </f:facet>
+                                                        <f:facet name="input">
+                                                            <p:inputText value="#{unit.bundledUnit.notes}" 
+                                                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                        </f:facet>
+                                                    </p:cellEditor>
+                                                </p:column>
 
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Unit Description" />
-                                                </f:facet>
-                                                <p:cellEditor>
-                                                    <f:facet name="output">
-                                                        <h:outputText value="#{unit.bundledUnit.notes}" />
+                                                <p:column style="text-align: center">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Edit" />
                                                     </f:facet>
-                                                    <f:facet name="input">
-                                                        <p:inputText value="#{unit.bundledUnit.notes}" 
-                                                                     onkeydown="PF('datatable').onKeyDown(event)"
-                                                                     onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                    <p:rowEditor/>
+                                                </p:column>
+
+                                                <p:column style="text-align: center">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Remove" />
                                                     </f:facet>
-                                                </p:cellEditor>
-                                            </p:column>
 
-                                            <p:column style="text-align: center">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Edit" />
-                                                </f:facet>
-                                                <p:rowEditor/>
-                                            </p:column>
+                                                    <div class="gray_button"> 
+                                                        <p:commandButton ajax="true" 
+                                                                         value="Remove" 
+                                                                         action="#{occPermitApplicationBB.removeSelectedUnit(unit)}"
+                                                                         update="#{p:component('propertyUnitsToAddTable')}
+                                                                         occPermitApplicationAddPropertyUnitForm"
+                                                                         />   
+                                                    </div>
 
-                                            <p:column style="text-align: center">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Remove" />
-                                                </f:facet>
+                                                </p:column>
 
-                                                <p:commandButton ajax="true" 
-                                                                 value="Remove" 
-                                                                 action="#{occPermitApplicationBB.removeSelectedUnit(unit)}"
-                                                                 update="#{p:component('propertyUnitsToAddTable')}
-                                                                 occPermitApplicationAddPropertyUnitForm"
-                                                                 />                                      
+                                            </p:dataTable>
 
-                                            </p:column>
+                                            <script type="text/javascript">
 
-                                        </p:dataTable>
+                                                $(function () {
+                                                    $.extend(PF("datatable"), {
+                                                        onKeyDown: function (e) {
+                                                            var key = e.which,
+                                                                    keyCode = $.ui.keyCode;
 
-                                        <script type="text/javascript">
+                                                            if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                                e.preventDefault();
+                                                            }
+                                                        },
 
-                                            $(function () {
-                                                $.extend(PF("datatable"), {
-                                                    onKeyDown: function (e) {
-                                                        var key = e.which,
-                                                                keyCode = $.ui.keyCode;
+                                                        onKeyUp: function (e, rowIndex) {
+                                                            var key = e.which,
+                                                                    keyCode = $.ui.keyCode;
+                                                            //.ui-row-editor-check .ui-icon-check .ui-c
+                                                            if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                                this.tbody
+                                                                        .find('.ui-row-editor .ui-icon-check')
+                                                                        .eq(rowIndex)
+                                                                        .click();
+                                                            }
 
-                                                        if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
-                                                            e.preventDefault();
+                                                            if (key === keyCode.ESCAPE) {
+                                                                this.tbody
+                                                                        .find('.ui-row-editor .ui-icon-close')
+                                                                        .eq(rowIndex)
+                                                                        .click();
+                                                            }
                                                         }
-                                                    },
-
-                                                    onKeyUp: function (e, rowIndex) {
-                                                        var key = e.which,
-                                                                keyCode = $.ui.keyCode;
-                                                        //.ui-row-editor-check .ui-icon-check .ui-c
-                                                        if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
-                                                            this.tbody
-                                                                    .find('.ui-row-editor .ui-icon-check')
-                                                                    .eq(rowIndex)
-                                                                    .click();
-                                                        }
-
-                                                        if (key === keyCode.ESCAPE) {
-                                                            this.tbody
-                                                                    .find('.ui-row-editor .ui-icon-close')
-                                                                    .eq(rowIndex)
-                                                                    .click();
-                                                        }
-                                                    }
+                                                    });
                                                 });
-                                            });
 
-                                        </script>
+                                            </script>
 
-                                        <p:spacer height="20px"/>
+                                            <p:spacer height="20px"/>
 
-                                        <p:commandButton ajax="true"                                                   
-                                                         action="#{occPermitApplicationBB.addUnitToNewPropUnits()}" 
-                                                         update="propertyUnitsToAddTable"
-                                                         value="Add unit"/>
+                                            <div class="gray_button">
+                                                <p:commandButton ajax="true" 
+                                                                 tabindex="2"
+                                                                 action="#{occPermitApplicationBB.addUnitToNewPropUnits()}" 
+                                                                 update="propertyUnitsToAddTable"
+                                                                 value="Add unit"/>
 
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <!-- CONTENT BUTTON -->
-                                    <div class="public-main-contents-button">
-                                        <p:commandButton id="goBack" ajax="false"
-                                                         process="@none" immediate="true"
-                                                         value="Go Back" styleClass="buttonOwnLine"
-                                                         action="#{occPermitApplicationBB.goBack()}"/>
-                                        <p:commandButton ajax="false"                                                   
+                                    <div class="public-main-contents-button-left">
+                                        <div class="gray_button">
+                                            <p:commandButton id="goBack" ajax="false"
+                                                             process="@none" immediate="true" tabindex="4"
+                                                             value="Go Back" styleClass="buttonOwnLine"
+                                                             action="#{occPermitApplicationBB.goBack()}"/>
+                                        </div>
+                                    </div>
+
+
+                                    <!-- CONTENT BUTTON -->
+                                    <div class="public-main-contents-button-right">
+
+                                        <p:commandButton ajax="false"  
+                                                         tabindex="3"
                                                          action="#{occPermitApplicationBB.finalizeUnitList()}" 
-                                                         value="Confirm and Continue"
-                                                         style="width: 100%" styleClass="buttonOwnLine"/>
+                                                         value="Next Step: Select Units"
+                                                         style="width: 100%"/>
 
                                     </div>
 
@@ -210,6 +236,10 @@
                             </div>
                         </div>
                     </h:form>
+                    <script>
+                        var y = document.getElementById('public-applyoccpermit-arrow-id');
+                        y.className += " public-menu-active";
+                    </script> 
                 </f:view>
             </ui:define>
         </ui:composition>
