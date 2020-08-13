@@ -23,10 +23,10 @@
                         <!-- TITLE COMPONENT -->
                         <div class="public-title">
                             <div class="public-title-main">
-                                Request Code Enforcement Action
+                                Report a Concern
                             </div>
                             <div class="public-title-sub">
-                                Step 4: Upload Photos Of Your Concern At <h:outputText value="#{cEActionRequestSubmitBB.currentRequest.requestProperty.address}"/> In <h:outputText value="#{cEActionRequestSubmitBB.currentRequest.muni.muniName}"/>
+                                If you would like to report a concern with a properly in your municipality, please begin the process below to submit your claim.
                             </div>
                         </div>
 
@@ -41,12 +41,12 @@
                                     <!-- GUIDANCE COMPONENT -->
                                     <div class="public-guide">
                                         <p:steps activeIndex="3" styleClass="custom">
-                                            <p:menuitem value="Step 1: Choose Municipality" containerStyleClass="complete" />
-                                            <p:menuitem value="Step 2: Choose Property" containerStyleClass="complete" />
-                                            <p:menuitem value="Step 3: Describe Concern" containerStyleClass="complete"/>
-                                            <p:menuitem value="Step 4: Upload Photo" />
-                                            <p:menuitem value="Step 5: Request Details" />
-                                            <p:menuitem value="Step 6: Review and Submit" />
+                                            <p:menuitem value="" containerStyleClass="complete" />
+                                            <p:menuitem value="" containerStyleClass="complete" />
+                                            <p:menuitem value="" containerStyleClass="complete"/>
+                                            <p:menuitem value="" />
+                                            <p:menuitem value="" />
+                                            <p:menuitem value="" />
                                         </p:steps>
                                     </div>
 
@@ -55,92 +55,126 @@
                                 <!-- CONTENT IO COMPONENT -->
                                 <div class="public-main-contents-io">
 
-                                    <h:form id="requestCEActionFlowFormUploadPhoto" 
-                                            enctype="multipart/form-data">
-                                        <p>
-                                            1. Choose a file and upload
-                                        </p>
+                                    <!-- CONTENT IO COMPONENT: INSTRUCTION -->
+                                    <div class="public-main-contents-io-title" >
+                                        4. Upload photos of the issue(s) at <h:outputText value="#{cEActionRequestSubmitBB.currentRequest.requestProperty.address}"/> in <h:outputText value="#{cEActionRequestSubmitBB.currentRequest.muni.muniName}"/>
+                                    </div>
 
-                                        <p:fileUpload fileUploadListener="#{cEActionRequestSubmitBB.handlePhotoUpload}"
-                                                      mode="advanced" 
-                                                      update="requestCEActionFlowFormDescribePhoto:photoTable"
-                                                      multiple="true"
-                                                      fileLimit="3" 
-                                                      sizeLimit="900000000" 
-                                                      allowTypes="/(\.|\/)(jpe?g|png)$/"
-                                                      />    
-                                    </h:form>
+                                    <!-- CONTENT IO COMPONENT: CONTENT -->
+                                    <div class="public-main-contents-io-content" >
 
-                                    <h:form id="requestCEActionFlowFormDescribePhoto">
-                                        <p>
-                                            2. Review and describe uploaded photos
-                                        </p>
+                                        <h:form id="requestCEActionFlowFormUploadPhoto" 
+                                                enctype="multipart/form-data">
 
-                                        <p:dataTable id="photoTable"
-                                                     var="blob"
-                                                     value="#{cEActionRequestSubmitBB.blobList}"
-                                                     rowKey="#{blob.blobID}"
-                                                     tableStyleClass="primeDataTable"
-                                                     draggableRows="false" 
-                                                     tabindex="1">
+                                            <p:fileUpload fileUploadListener="#{cEActionRequestSubmitBB.handlePhotoUpload}"
+                                                          mode="advanced" 
+                                                          update="requestCEActionFlowFormDescribePhoto:photoTable"
+                                                          multiple="true"
+                                                          fileLimit="3" 
+                                                          sizeLimit="900000000" 
+                                                          allowTypes="/(\.|\/)(jpe?g|png)$/"
+                                                          />    
+                                        </h:form>
 
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="blobID"/>
-                                                </f:facet>
-                                                <h:outputText value="#{blob.blobID}"/>
-                                            </p:column>
+                                        <h:form id="requestCEActionFlowFormDescribePhoto">
+                                            <p>
+                                                Please use the box(es) below to describe the photos and concern.
+                                            </p>
 
-                                            <p:column width="70%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Photo"/>
-                                                </f:facet>
-                                                <p:graphicImage width="100%" value="#{blobCoordinator.image}">
-                                                    <f:param name="blobID" value="#{blob.blobID}"/>
-                                                </p:graphicImage>
-                                            </p:column>
+                                            <p:dataTable id="photoTable"
+                                                         var="blob"
+                                                         value="#{cEActionRequestSubmitBB.blobList}"
+                                                         rowKey="#{blob.blobID}"
+                                                         tableStyleClass="primeDataTable"
+                                                         draggableRows="false" 
+                                                         >
 
-                                            <p:column>
-                                                <f:facet name="header">
-                                                    <h:outputText value="Description"/>
-                                                </f:facet>
-                                                <p:inputTextarea id="desc" 
-                                                                 value="#{blob.description}"
-                                                                 style="width: 100%;" 
-                                                                 tabindex="2" 
-                                                                 required="true" 
-                                                                 styleClass="inputText"/>
-                                            </p:column>
+                                                <p:column width="5%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="ID"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{blob.blobID}"/>
+                                                </p:column>
 
-                                        </p:dataTable>
-                                    </h:form>
-                                    
+                                                <p:column width="15%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Uploaded Photos"/>
+                                                    </f:facet>
+                                                    <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                                        <f:param name="blobID" value="#{blob.blobID}"/>
+                                                    </p:graphicImage>
+                                                </p:column>
+
+                                                <p:column width="30%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="File Name"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{blob.filename}"/>
+                                                </p:column>
+
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Description of Phote"/>
+                                                    </f:facet>
+                                                    <p:inputTextarea id="desc" 
+                                                                     value="#{blob.description}"
+                                                                     style="width: 100%;" 
+                                                                     required="true" 
+                                                                     styleClass="inputText"/>
+                                                </p:column>
+
+                                            </p:dataTable>
+                                        </h:form>
+                                    </div>
                                 </div>
-                                
+
                                 <h:form>
+                                   
                                     <!-- CONTENT BUTTON -->
-                                    <div class="public-main-contents-button">
-                                        <p:commandButton ajax="false" styleClass="buttonOwnLine"
-                                                         id="goBack" value="Go Back" tabindex="12"
-                                                         process="@none" immediate="true"
-                                                         action="#{cEActionRequestSubmitBB.goBack()}"/>
+                                    <div class="public-main-contents-button-left">
+                                        <div class="gray_button">
+                                            <p:commandButton ajax="false" styleClass="buttonOwnLine"
+                                                             id="goBack" value="Go Back" tabindex="4"
+                                                             process="@none" immediate="true"
+                                                             action="#{cEActionRequestSubmitBB.goBack()}"
+                                                             style="float: left"/>
+                                        </div>
+                                    </div>
+
+                                    <!-- CONTENT BUTTON -->
+                                    <div class="public-main-contents-button-right" >
                                         <p:commandButton  ajax="false" 
-                                                          tabindex="13" styleClass="buttonOwnLine" 
-                                                          value="Save photos and proceed to contact details" 
+                                                          tabindex="2"
+                                                          styleClass="buttonOwnLine"
+                                                          value="Next Step: Save photos and proceed to contact details" 
                                                           id="continueToContactInfoButton"
                                                           action="#{cEActionRequestSubmitBB.savePhotosAndContinue}"
-                                                          />
-                                        <p:commandButton  ajax="false" 
-                                                          tabindex="14" styleClass="buttonOwnLine" 
-                                                          value="Skip photo upload and continue to contact info" 
-                                                          id="ceactionrequestflow-nophotos-cb"
-                                                          action="#{cEActionRequestSubmitBB.skipPhotoUpload}"
+                                                          style="width: 100%"
                                                           />
                                     </div>
+
+                                    <!-- CONTENT BUTTON -->
+                                    <div class="public-main-contents-button-right" >
+                                        <div class="gray_button">
+                                            <p:commandButton  ajax="false" 
+                                                              tabindex="3"
+                                                              styleClass="buttonOwnLine"
+                                                              value="Skip photo upload and continue to contact info" 
+                                                              id="ceactionrequestflow-nophotos-cb"
+                                                              action="#{cEActionRequestSubmitBB.skipPhotoUpload}"
+                                                              style="width: 100%"
+                                                              />
+                                        </div>
+                                    </div>
+
                                 </h:form>
                             </div>
                         </div>
                     </div>
+                    <script>
+                        var y = document.getElementById('public-reportconcern-arrow-id');
+                        y.className += " public-menu-active";
+                    </script> 
                 </f:view>
             </ui:define>
         </ui:composition>

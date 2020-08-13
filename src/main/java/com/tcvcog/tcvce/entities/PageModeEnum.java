@@ -25,7 +25,7 @@ package com.tcvcog.tcvce.entities;
  */
 public enum PageModeEnum {
     
-    LOOKUP        (   "LOOKUP AND VIEW", true, 3, false, true ),
+    LOOKUP        (   "SEARCH", true, 3, false, true ),
     INSERT        (   "INSERT", false, 4, false, true     ),
     UPDATE        (   "UPDATE", false, 4, true, false      ),
     REMOVE        (   "REMOVE", false, 5, true, false      ),

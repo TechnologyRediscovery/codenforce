@@ -19,7 +19,7 @@
     <h:body>
 
         <div class="public-container">
-            
+
             <div class="public-menu-toggler-button" id="public-menu-toggler-button-id" >
                 <i class="fa fa-list" onclick="onClickMenuTogglerButton()"/>
             </div>
@@ -33,30 +33,92 @@
                         <h:graphicImage styleClass="public-menu-logo" value="/images/Logo-N_Font.png" />
 
                         <h:form id="panelMenu">
-                            <div class="public-menu-button"> 
-                                <p:commandButton value="Login" action="systemHome" ajax="false" icon="fa fa-sign-in" />
+
+                            <div class="public-menu-nav-container">
+                                
+                                <div class="public-menu-nav-title">I would like to...</div>
+
+                                <div class="public-menu-nav">
+                                    <div class="public-arrow-container">
+                                        <div id="public-reportconcern-arrow-id" class="public-arrow">
+                                            ❯ 
+                                        </div>
+                                    </div>
+                                    <p:commandLink value="Report a Concern" action="requestCEActionFlow" ajax="false"/>
+                                </div>
+
+                                <div class="public-menu-nav">
+                                    <div class="public-arrow-container">
+                                        <div id="public-reviewcase-arrow-id" class="public-arrow">
+                                            ❯ 
+                                        </div>
+                                    </div>
+                                    <p:commandLink value="Review a Case" action="paccSearch" ajax="false"/>
+                                </div>
+
+                                <div class="public-menu-nav">
+                                    <div class="public-arrow-container">
+                                        <div id="public-applyoccpermit-arrow-id" class="public-arrow">
+                                            ❯ 
+                                        </div>
+                                    </div>
+                                    <p:commandLink value="Apply for Occupancy Permit" action="occPermitApplicationFlow" ajax="false"/>
+                                </div>
+
+                                <div class="public-menu-nav-seperateline">
+                                    <hr/>
+                                </div>
+
+                                <div class="public-menu-nav">
+                                    <div class="public-arrow-container">
+                                        <div id="public-about-arrow-id" class="public-arrow">
+                                            ❯ 
+                                        </div>
+                                    </div>
+                                    <p:commandLink value="About CodeNforce" action="about" ajax="false"/>
+                                </div>
+
+                                <div class="public-menu-nav">
+                                    <div class="public-arrow-container">
+                                        <div id="public-fordeveloper-arrow-id" class="public-arrow">
+                                            ❯ 
+                                        </div>
+                                    </div>
+                                    <p:commandLink value="For Developers" action="technical" ajax="false"/>
+                                </div>
+
+                                <div class="public-menu-nav">
+                                    <div class="public-arrow-container">
+                                        <div id="public-howto-arrow-id" class="public-arrow">
+                                            ❯ 
+                                        </div>
+                                    </div>
+                                    <p:commandLink value="How-To Guides" action="howtos" ajax="false"/>
+                                </div>
+
+                                <div class="public-menu-nav">
+                                    <div class="public-arrow-container">
+                                        <div id="public-contact-arrow-id" class="public-arrow">
+                                            ❯ 
+                                        </div>
+                                    </div>
+                                    <p:commandLink value="Contact Us" action="contact" ajax="false"/>
+                                </div>
+
+                                <div class="public-menu-nav-seperateline">
+                                    <hr/>
+                                </div>
+
+                                <div class="public-menu-nav">
+                                    <div class="public-arrow-container">
+                                        <div id="public-login-arrow-id" class="public-arrow">
+                                            ❯ 
+                                        </div>
+                                    </div>
+                                    <p:commandLink value="Login" action="systemHome" ajax="false"/>
+                                </div>
                             </div>
-                            <div class="public-menu-button">
-                                <p:commandButton value="Request Code Enforcement" action="requestCEActionFlow" ajax="false" icon="fa fa-clipboard" escape="false"/>
-                            </div>
-                            <div class="public-menu-button">
-                                <p:commandButton value="Check On Your Case" action="paccSearch" ajax="false" icon="fa fa-tachometer" />
-                            </div>
-                            <div class="public-menu-button">
-                                <p:commandButton value="Apply For An Occupancy Permit" action="occPermitApplicationFlow" ajax="false" icon="fa fa-building" escape="false"/>
-                            </div>
-                            <div class="public-menu-button">
-                                <p:commandButton value="About" action="about" ajax="false" icon="fa fa-info" />
-                            </div>
-                            <div class="public-menu-button">
-                                <p:commandButton value="Contact" action="contact" ajax="false" icon="fa fa-phone" />
-                            </div>
-                            <div class="public-menu-button">
-                                <p:commandButton value="How-To Guides" action="howtos" ajax="false" icon="fa fa-question-circle" />
-                            </div>
-                            <div class="public-menu-button">
-                                <p:commandButton value="For Developers" action="technical"  ajax="false" icon="fa fa-database" />
-                            </div>
+
                         </h:form>
 
                         <div class="public-menu-text">
@@ -95,6 +157,7 @@
                     x.className = "public-menu-toggler-button";
                 }
             }
+
         </script>
 
     </h:body>

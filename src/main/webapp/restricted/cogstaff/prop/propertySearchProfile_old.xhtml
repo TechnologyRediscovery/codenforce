@@ -13,24 +13,22 @@
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
                 <f:view id="prop-info-view">
+
                     <p:outputPanel id="body-panel">
 
-                        <!-- GLOBAL MESSAGES -->
+
+
                         <h:form id="form-messages-global">
-                            <p:growl id="messages-global" showDetail="false"/>
+                            <p:messages id="messages-global" globalOnly="true" showDetail="true" showSummary="true" />
                         </h:form>
 
                         <div class="mainContainer">
+                            <div class ="two-column-page-flex-container">
+                                <div class="list-column" >
 
-                            <!-- DATA CONTAINER -->
-                            <div class="ui-g data-container">
 
-                                <!-- LIST DATA CONTAINER --> 
-                                <div class="ui-g-12 ui-md-4 ui-lg-4 list-data-container">
-
-                                    <!-- MODE SELECTION --> 
                                     <h:form id="mode-form">
-                                        <div class="restrict-main-list-mode-button">
+                                        <div class="restrict-main-mode-button">
                                             <p:selectOneButton  value="#{propertyProfileBB.currentMode}"
                                                                 unselectable="false"
                                                                 tabindex="1"
@@ -45,272 +43,227 @@
                                         </div>
                                     </h:form>
 
-                                    <!-- PANEL CONTAINER -->
-                                    <p:panel id="prop-search-query-panel"
-                                             toggleable="true"
-                                             widgetVar="prop-search-query-panel-var"
-                                             collapsed="false"
-                                             style="width:100%;"
-                                             header="Property Search"
-                                             rendered="#{propertyProfileBB.activeLookupMode}">
+                                    <p:spacer height="8px" />
 
-                                        <!--MESSAGES -->
+                                    <p:panel    id="prop-search-query-panel"
+                                                toggleable="true"
+                                                widgetVar="prop-search-query-panel-var"
+                                                collapsed="false"
+                                                style="width:100%;"
+                                                header="Property search configuration"
+                                                rendered="#{propertyProfileBB.activeLookupMode}">
+
                                         <h:form id="prop-search-messages-form">
-                                            <p:growl id="prop-search-messages" showDetail="false"/>
+                                            <h:messages id="prop-search-messages"
+                                                        globalOnly="true" showDetail="true" showSummary="true"
+                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                            </h:messages>
                                         </h:form>
 
                                         <h:form id="prop-search-query-form">
 
-                                            <!-- NESTED DATA CONTAINER -->
-                                            <div class="ui-g data_container_nested_restrict">
+                                            <h:outputLabel styleClass="bold"
+                                                           value="Select a query"
+                                                           for="prop-search-query-som" />
 
-                                                <!--NESTED DATA FIELD GRID:12-->
-                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                            <p:spacer height="5px" />
 
-                                                    <!-- NESTED DATA TITLE -->
-                                                    <div class="restrict-main-contents-io-title">
-                                                        <h:outputLabel value="Select Tpye of Search"
-                                                                       for="prop-search-query-som" 
-                                                                       />
-                                                    </div>
-                                                    <!-- NESTED DATA CONTENT -->
-                                                    <div class="restrict-main-contents-io-content">
-                                                        <p:selectOneMenu id="prop-search-query-som"
-                                                                         tabindex="1"
-                                                                         value="#{propertySearchBB.querySelected}"
-                                                                         style="width: 100%"
-                                                                         >
-                                                            <f:converter converterId="bOBQueryConverter"/>
+                                            <p:selectOneMenu id="prop-search-query-som"
+                                                             tabindex="1"
+                                                             value="#{propertySearchBB.querySelected}">
+                                                <f:converter converterId="bOBQueryConverter"/>
+                                                <f:selectItem itemLabel="select one..."
+                                                              noSelectionOption="true"
+                                                              itemDisabled="true"/>
+                                                <f:selectItems id="prop-search-query-si"
+                                                               value="#{propertySearchBB.queryList}"
+                                                               var="ql"
+                                                               itemValue="#{ql}"
+                                                               itemLabel="#{ql.queryTitle}" />
+                                                <p:ajax update="prop-search-query-desc-ot
+                                                        @form
+                                                        prop-search-messages-form"
+                                                        listener="#{propertySearchBB.changeQuerySelected}"/>
+                                            </p:selectOneMenu>
 
-                                                            <f:selectItem itemLabel="select one..."
-                                                                          noSelectionOption="true"
-                                                                          itemDisabled="true"
-                                                                          />
-                                                            <f:selectItems id="prop-search-query-si"
-                                                                           value="#{propertySearchBB.queryList}"
-                                                                           var="ql"
-                                                                           itemValue="#{ql}"
-                                                                           itemLabel="#{ql.queryTitle}" 
-                                                                           />
-                                                            <p:ajax update="prop-search-filter-addr-val-0
-                                                                    @form
-                                                                    prop-search-messages-form"
-                                                                    listener="#{propertySearchBB.changeQuerySelected}"
-                                                                    />
-                                                        </p:selectOneMenu>
-                                                    </div>
-                                                </div>
+                                            <p:spacer height="5px" />
+
+                                            <h:outputLabel styleClass="bold"
+                                                           value="Query description "
+                                                           for="cears-query-desc-ot" />
+
+                                            <div class='search-query-desc'>
+                                                <h:outputText id="prop-search-query-desc-ot" value="#{propertySearchBB.querySelected.queryName.desc}" />
                                             </div>
 
-                                            <!-- NESTED DATA CONTAINER -->
-                                            <div class="ui-g data_container_nested_restrict">
+                                            <p:spacer height="5px" />
 
-                                                <!-- NESTED DATA FIELD GRID:12-->
-                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                            <h:panelGrid columns="2"
+                                                         cellpadding="10"
+                                                         columnClasses="topbottom-lines-left, topbottom-lines-right">
 
-                                                    <!-- NESTED DATA TITLE -->
-                                                    <div class="restrict-main-contents-io-title">
-                                                        <h:outputLabel value="Enter Search Criteria"
-                                                                       for="cears-query-desc-ot" />
-                                                        <div class="restrict-main-contents-io-link">
-                                                            <p:commandLink id="prop-search-advanced-button"
-                                                                           ajax="true"
-                                                                           actionListener="#{propertyProfileBB.onAdvancedSearchButtonChange}"
-                                                                           oncomplete="PF('prop-search-advanced-var').show()"
-                                                                           rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                                           value="Advanced search"
-                                                                           />
+                                                <h:panelGroup>
+                                                    <p:outputLabel for="prop-search-filter-addr-ctl-0">
+                                                        <h:outputText value="Filter by house number and/or street name"
+                                                                      styleClass="datum-label"/>
+                                                    </p:outputLabel>
+                                                    <p:selectBooleanCheckbox id="prop-search-filter-addr-ctl-0"
+                                                                             value="#{propertySearchBB.searchParamsSelected.address_ctl}" >
+                                                        <p:ajax update="prop-search-filter-addr-val-0"/>
+                                                    </p:selectBooleanCheckbox>
+                                                </h:panelGroup>
 
-                                                        </div>
-                                                    </div>
+                                                <h:panelGroup>
 
-                                                    <!-- NESTED DATA CONTENT -->
-                                                    <div class="restrict-main-contents-io-content">
-                                                        <p:inputText id="prop-search-filter-addr-val-0"
-                                                                     value="#{propertySearchBB.searchParamsSelected.address_val}"
-                                                                     style="width: 100%;"
-                                                                     tabindex="2"
-                                                                     disabled="#{!propertySearchBB.searchParamsSelected.address_ctl}"
-                                                                     required="false"
-                                                                     styleClass="data_field_value"
-                                                                     placeholder="#{propertySearchBB.querySelected.queryName.desc}"
-                                                                     />
+                                                    <p:inputText id="prop-search-filter-addr-val-0"
+                                                                 value="#{propertySearchBB.searchParamsSelected.address_val}"
+                                                                 style="width: 200px;"
+                                                                 tabindex="2"
+                                                                 disabled="#{!propertySearchBB.searchParamsSelected.address_ctl}"
+                                                                 required="false"
+                                                                 styleClass="inputText search-inputtext"/>
 
-                                                        <p:message for="prop-search-filter-addr-val-0" showDetail="false" showSummary="true"/>
-                                                    </div>
+                                                    <h:message for="prop-search-filter-addr-val-0" showDetail="false" showSummary="true"
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                </h:panelGroup>
+                                            </h:panelGrid>
 
-                                                    <!-- NESTED DATA FILTER -->
-                                                    <div class="restrict-main-contents-io-filter">
+                                            <p:spacer height="5px" />
 
-                                                        <p:selectBooleanCheckbox class="checkbox"
-                                                                                 id="prop-search-filter-addr-ctl-0"
-                                                                                 value="#{propertySearchBB.searchParamsSelected.address_ctl}" >
-                                                            <p:ajax update="prop-search-filter-addr-val-0"/>
-                                                        </p:selectBooleanCheckbox>
+                                            <p:outputLabel for="prop-search-appendresults-chkbox-0">
+                                                <h:outputText value="Append results to list? "
+                                                              styleClass="bold"/>
+                                            </p:outputLabel>
 
-                                                        <p:outputLabel for="prop-search-filter-addr-ctl-0" 
-                                                                       value="Filter by street/number"
-                                                                       />
-                                                    </div>
+                                            <p:selectBooleanCheckbox   id="prop-search-appendresults-chkbox-0"
+                                                                       value="#{propertySearchBB.appendResultsToList}"
+                                                                       disabled="false" />
 
-                                                    <!-- NESTED DATA FILTER -->
-                                                    <div class="restrict-main-contents-io-filter">
+                                            <p:spacer height="5px" />
 
-                                                        <p:selectBooleanCheckbox class="checkbox"
-                                                                                 id="prop-search-appendresults-chkbox-0"
-                                                                                 value="#{propertySearchBB.appendResultsToList}"
-                                                                                 disabled="false" />
+                                            <p:commandButton   id="prop-search-exec-cb-0"
+                                                               ajax="true"
+                                                               actionListener="#{propertySearchBB.executeQuery}"
+                                                               icon="fa fa-search"
+                                                               styleClass="button"
+                                                               value="Search"
+                                                               disabled="#{propertySearchBB.querySelected.queryExecuted}"
+                                                               update=" 
+                                                               @form
+                                                               prop-search-messages-form
+                                                               prop-search-log-form
+                                                               prop-search-results-panel
+                                                               prop-search-clear-cb-0"/>
 
-                                                        <p:outputLabel for="prop-search-appendresults-chkbox-0"
-                                                                       value="Add to results below"
-                                                                       />
 
-                                                    </div>
-                                                </div>
+                                            <p:commandButton   id="prop-search-clear-cb-0"
+                                                               ajax="true"
+                                                               actionListener="#{propertySearchBB.resetQuery}"
+                                                               icon="fa fa-eraser"
+                                                               styleClass="button inline-button"
+                                                               value="Clear search"
+                                                               disabled="#{!propertySearchBB.querySelected.queryExecuted}"
+                                                               update=" prop-search-messages-form
+                                                               prop-search-log-form
+                                                               prop-search-results-panel
+                                                               @form
+                                                               prop-search-query-form"/>
 
-                                            </div>
+                                            <p:commandButton   id="prop-search-advanced-button"
+                                                               ajax="true"
+                                                               actionListener="#{propertyProfileBB.onAdvancedSearchButtonChange}"
+                                                               oncomplete="PF('prop-search-advanced-var').show()"
+                                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                               value="Advanced search"
+                                                               icon="fa fa-gears"
+                                                               />
 
-                                            <!-- NESTED DATA CONTAINER -->
-                                            <div class="ui-g data_container_nested_restrict">
-
-                                                <!--NESTED DATA FIELD GRID:12-->
-                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                                                    <!-- NESTED DATA BUTTON -->
-                                                    <div class="restrict-main-contents-io-button">
-                                                        <p:commandButton id="prop-search-exec-cb-0"
-                                                                         ajax="true"
-                                                                         actionListener="#{propertySearchBB.executeQuery}"
-                                                                         icon="fa fa-search"
-                                                                         value="Search"
-                                                                         style="width: 100%"
-                                                                         disabled="#{propertySearchBB.querySelected.queryExecuted}"
-                                                                         update=" 
-                                                                         @form
-                                                                         prop-search-messages-form
-                                                                         prop-search-log-form
-                                                                         prop-search-results-panel
-                                                                         prop-search-clear-cb-0"/>
-
-                                                    </div>
-
-                                                    <!-- NESTED DATA GRAY BUTTON -->
-                                                    <div class="restrict-main-contents-io-button gray_button">
-                                                        <p:commandButton id="prop-search-clear-cb-0"
-                                                                         ajax="true"
-                                                                         actionListener="#{propertySearchBB.resetQuery}"
-                                                                         icon="fa fa-eraser"
-                                                                         value="Clear"
-                                                                         style="width: 100%"
-                                                                         disabled="#{!propertySearchBB.querySelected.queryExecuted}"
-                                                                         update=" prop-search-messages-form
-                                                                         prop-search-log-form
-                                                                         prop-search-results-panel
-                                                                         @form
-                                                                         prop-search-query-form"/>
-
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </h:form>
+
+
                                     </p:panel>
 
-                                    <!-- PANEL CONTAINER -->
-                                    <p:panel id="prop-search-results-panel"
-                                             toggleable="true"
-                                             widgetVar="prop-search-query-panel-var"
-                                             collapsed="false"
-                                             style="width:100%;"
-                                             header="Search Results"
-                                             rendered="#{propertyProfileBB.activeLookupMode}">
+                                    <p:panel    id="prop-search-results-panel"
+                                                toggleable="true"
+                                                widgetVar="prop-search-query-panel-var"
+                                                collapsed="false"
+                                                style="width:100%;"
+                                                header="Search results"
+                                                rendered="#{propertyProfileBB.activeLookupMode}">
 
 
                                         <h:form id="prop-search-results-form">
 
-                                            <!-- NESTED DATA CONTAINER -->
-                                            <div class="ui-g data_container_nested_restrict">
 
-                                                <!--NESTED DATA FIELD GRID:12-->
-                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                            <p:commandButton   id="prop-search-results-clear"
+                                                               ajax="true"
+                                                               actionListener="#{propertySearchBB.clearPropertyList}"
+                                                               icon="fa fa-eraser"
+                                                               styleClass="button"
+                                                               value="clear results list"
+                                                               update=" prop-search-messages-form
+                                                               prop-search-results-form"/>
+                                            <p:spacer height="3px" />
 
-                                                    <!-- NESTED DATA BUTTON -->
-                                                    <div class="restrict-main-contents-io-button gray_button">
-                                                        <p:commandButton id="prop-search-results-clear"
-                                                                         ajax="true"
-                                                                         actionListener="#{propertySearchBB.clearPropertyList}"
-                                                                         icon="fa fa-eraser"
-                                                                         style="width: 100%"
-                                                                         value="Clear Results "
-                                                                         update=" prop-search-messages-form
-                                                                         prop-search-results-form"/>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <p:dataTable id="prop-search-results-table"
-                                                         var="prop"
-                                                         value="#{propertySearchBB.propListMaster}"
-                                                         rowKey="#{prop.propertyID}"
-                                                         tableStyleClass="primeDataTable"
-                                                         draggableRows="false"
-                                                         draggableColumns="true"
-                                                         tabindex="6"
-                                                         >
-
-                                                <p:column width="10%;" style="text-align: center">
+                                            <p:dataTable
+                                                id="prop-search-results-table"
+                                                var="prop"
+                                                value="#{propertySearchBB.propListMaster}"
+                                                rowKey="#{prop.propertyID}"
+                                                tableStyleClass="primeDataTable"
+                                                draggableRows="false"
+                                                draggableColumns="true"
+                                                tabindex="6"
+                                                >
+                                                <p:column width="8%">
                                                     <f:facet name="header">
                                                         <h:outputText value="ID"/>
                                                     </f:facet>
                                                     <h:outputText value="#{prop.propertyID}" />
                                                 </p:column>
-
-                                                <p:column width="35%" style="text-align: center">
+                                                <p:column width="15%">
                                                     <f:facet name="header">
                                                         <h:outputText value="Address"/>
                                                     </f:facet>
                                                     <h:outputText value="#{prop.address}" />
                                                 </p:column>
 
-                                                <p:column width="35%" style="text-align: center">
+                                                <p:column width="10%">
                                                     <f:facet name="header">
-                                                        <h:outputText value="Municipality" />
+                                                        <h:outputText value="Muni" />
                                                     </f:facet>
                                                     <h:outputText value="#{prop.muni.muniName}"/>
                                                 </p:column>
 
-                                                <p:column width="20%" style="text-align: center">
+                                                <p:column width="25%">
                                                     <f:facet name="header">
-                                                        <h:outputText value="Load"/>
+                                                        <h:outputText value=""/>
                                                     </f:facet>
-                                                    <div class="gray_button">
-                                                        <p:commandButton id="prop-search-loadprop-button"
-                                                                         icon="fa fa-folder-open-o"
-                                                                         value="Load"
-                                                                         style="#{prop.parID == propertyProfileBB.currentProperty.propertyID ? 'background-color: #dee461; color:black;':''}"
-                                                                         action="#{propertyProfileBB.onExplorePropertyButtonChange(prop)}"
-                                                                         ajax="true"
-                                                                         update="
-                                                                         form-messages-global
-                                                                         propinfo-panel-info
-                                                                         propinfo-panel-addupdate
-                                                                         prop-remove-panel
-                                                                         prop-workflow-panel
-                                                                         prop-events-panel
-                                                                         prop-persons-panel
-                                                                         prop-cases-panel
-                                                                         prop-units-panel
-                                                                         prop-extinfo-panel
-                                                                         prop-info-header-form
-                                                                         "
-                                                                         />
-                                                    </div>
+                                                    <p:commandButton    id="prop-search-loadprop-button"
+                                                                        icon="fa fa-folder-open-o"
+                                                                        value="Load Property"
+                                                                        style="#{prop.parID == propertyProfileBB.currentProperty.propertyID ? 'background-color: #dee461; color:black;':''}"
+                                                                        action="#{propertyProfileBB.onExplorePropertyButtonChange(prop)}"
+                                                                        ajax="true"
+                                                                        update="
+                                                                        form-messages-global
+                                                                        propinfo-panel-info
+                                                                        propinfo-panel-addupdate
+                                                                        prop-remove-panel
+                                                                        prop-workflow-panel
+                                                                        prop-events-panel
+                                                                        prop-persons-panel
+                                                                        prop-cases-panel
+                                                                        prop-units-panel
+                                                                        prop-extinfo-panel
+                                                                        prop-info-header-form
+                                                                        "
+                                                                        />
                                                 </p:column>
                                             </p:dataTable>
                                         </h:form>
                                     </p:panel>
 
-                                    <!-- PANEL CONTAINER -->
                                     <p:panel  id="prop-search-log-panel"
                                               toggleable="true"
                                               widgetVar="prop-search-log-panel-var"
@@ -328,26 +281,28 @@
                                         </h:form>
                                     </p:panel>
 
+
+
+
                                 </div>
 
-                                <!-- OBJECT DATA CONTAINER --> 
-                                <div class="ui-g-12 ui-md-8 ui-lg-8 object-data-container">
 
-                                    <!-- OBJECT DATA TITLE --> 
-                                    <div class="restrict-main-object-title">
+                                <div class ="object-column">
 
-                                        <h:form id="prop-info-header-form">
-                                            <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.address}" />
-                                            <h:outputText value=" (" />
-                                            <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}" />
-                                            <h:outputText value=") " />
-                                        </h:form>
 
-                                    </div>
 
                                     <p:outputPanel id = "prop-lists-outpanel" >
+                                        <h:form id="prop-info-header-form">
+                                            <h2>
 
-                                        <!-- OBJECT DATA PANEL--> 
+                                                <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.address}" />
+                                                <h:outputText value=" (" />
+                                                <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}" />
+                                                <h:outputText value=") " />
+                                            </h2>
+
+                                        </h:form>
+
                                         <p:panel id="propinfo-panel-info"
                                                  toggleable="true"
                                                  collapsed="false"
@@ -359,264 +314,239 @@
 
                                             <h:form id="evruleconfig-panel-info-form">
 
-                                                <!-- NESTED DATA CONTAINER -->
-                                                <div class="ui-g data_container_nested_restrict">
 
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                <div class="ui-g data-container">
 
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Address"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
+                                                    <div    id='propinfo-ot-addr-div'
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-addr"
+                                                                        value="Address"/>
 
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.address}" />
-                                                            <br/>
+                                                        <div class="data_field_value" >
+
+                                                            <h:outputText   id="propinfo-ot-addr"
+                                                                            value="#{propertyProfileBB.currentProperty.address}" />
+                                                            <p:spacer height="0px" />
                                                             <h:outputText value="#{propertyProfileBB.currentProperty.address_city}" />
                                                             <h:outputText value=", " />
                                                             <h:outputText value="#{propertyProfileBB.currentProperty.address_state}" />
                                                             <h:outputText value=" " />
                                                             <h:outputText value="#{propertyProfileBB.currentProperty.address_zip}" />
                                                         </div>
+
                                                     </div>
 
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="County"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.countyCode}" />
+                                                    <div    id="propinfo-ot-muni-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-muni"
+                                                                        value="Municipality"/>
 
-                                                        </div>
+                                                        <h:outputText   id="propinfo-ot-"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.muni.muniName}
+                                                                        (ID:#{propertyProfileBB.currentProperty.muni.muniCode})" />
                                                     </div>
 
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="User Group"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.useGroup}" />
 
-                                                        </div>
+                                                    <div    id="propinfo-ot-parid-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-parid"
+                                                                        value="Parcel ID"/>
+
+                                                        <h:outputText   id="propinfo-ot-parid"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.parID}" />
                                                     </div>
 
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Land Bank Prospect"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{!(empty propertyProfileBB.currentProperty.landBankProspect)
-                                                                                   ? propertyProfileBB.currentProperty.landBankProspect.title : ' '}" />
 
-                                                        </div>
+                                                    <div    id="propinfo-ot-lab-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-lab"
+                                                                        value="Lot-Block"/>
+
+                                                        <h:outputText   id="propinfo-ot-lab"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.lotAndBlock}" />
                                                     </div>
 
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Municipality"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}
-                                                                          (ID:#{propertyProfileBB.currentProperty.muni.muniCode})" />
 
-                                                        </div>
+
+
+                                                    <div    id="propinfo-ot-usegroup-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-usegroup"
+                                                                        value="Use Group"/>
+
+                                                        <h:outputText   id="propinfo-ot-usegroup"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.useGroup}" />
                                                     </div>
 
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Construction Type"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.constructionType}" />
 
-                                                        </div>
+                                                    <div    id="propinfo-ot-const-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-const"
+                                                                        value="Construction type"/>
+
+                                                        <h:outputText   id="propinfo-ot-const"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.constructionType}" />
                                                     </div>
 
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Land Bank Held"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.landBankHeld}" />
 
-                                                        </div>
+                                                    <div    id="propinfo-ot-cond-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-cond"
+                                                                        value="Condition class"/>
+
+                                                        <h:outputText   id="propinfo-ot-cond"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{!(empty propertyProfileBB.currentProperty.condition)
+                                                                                 ? propertyProfileBB.currentProperty.condition.title
+                                                                                 : ''}" />
                                                     </div>
 
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Parcel ID"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.parID}" />
 
+                                                    <div    id='propinfo-ot-count-div'
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-county"
+                                                                        value="County code"/>
+
+                                                        <h:outputText   id="propinfo-ot-county"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.countyCode}" />
+                                                    </div>
+
+
+
+
+                                                    <div    id="propinfo-ot-source-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-source"
+                                                                        value="Source"/>
+
+                                                        <h:outputText   id="propinfo-ot-source"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{!(empty propertyProfileBB.currentProperty.bobSource)
+                                                                                 ? propertyProfileBB.currentProperty.bobSource.title : ''}" />
+                                                    </div>
+
+
+
+                                                    <div    id="propinfo-ot-abandonedstart-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-abandonedstart"
+                                                                        value="Abandonment"/>
+                                                        <div class="data_field_value">
+                                                            <h:outputText   id="propinfo-ot-abandonedstart-0"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.abandonedDateStart) ? 'Start Date: ' : ''}" />
+                                                            <h:outputText   id="propinfo-ot-abandonedstart-1"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.abandonedDateStart) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.abandonedDateStart) : ''}" />
+                                                            <p:spacer height="2px" />
+                                                            <h:outputText   id="propinfo-ot-abandonedstop-0"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.abandonedDateStop) ? 'Stop Date: ' : ''}" />
+                                                            <h:outputText   id="propinfo-ot-abandonedstop-1"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.abandonedDateStop) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.abandonedDateStop) : ''}" />
                                                         </div>
                                                     </div>
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Condition Class"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{!(empty propertyProfileBB.currentProperty.condition)
-                                                                                   ? propertyProfileBB.currentProperty.condition.title
-                                                                                   : ''}" />
-
-                                                        </div>
-                                                    </div>
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Nonaddressable"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.nonAddressable}" />
-
-                                                        </div>
-                                                    </div>
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Lot-Block"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.lotAndBlock}"  />
-
-                                                        </div>
-                                                    </div>
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Source"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{!(empty propertyProfileBB.currentProperty.bobSource)
-                                                                                   ? propertyProfileBB.currentProperty.bobSource.title : ''}"  />
+                                                    <div    id="propinfo-ot-vacantstart-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-vacantstart"
+                                                                        value="Vacany"/>
+                                                        <div class="data_field_value">
+                                                            <h:outputText   id="propinfo-ot-vacantstart-0"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.vacantDateStart) ? 'Start Date: ' : ''}" />
+                                                            <h:outputText   id="propinfo-ot-vacantstart-1"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.vacantDateStart) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.vacantDateStart) : ''}" />
+                                                            <p:spacer height="2px" />
+                                                            <h:outputText   id="propinfo-ot-vacantstop-0"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.vacantDateStop) ? 'Stop Date: ' : ''}" />
+                                                            <h:outputText   id="propinfo-ot-vacantstop-1"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.vacantDateStop) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.vacantDateStop) : ''}" />
 
                                                         </div>
                                                     </div>
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Active"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.active}" />
+                                                    <div    id="propinfo-ot-unfit-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-unfitstart"
+                                                                        value="Unfitness of occupancy"/>
+                                                        <div class="data_field_value">
+                                                            <h:outputText   id="propinfo-ot-unfitstart-0"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.unfitDateStart) ? 'Start Date: ' : ''}" />
+                                                            <h:outputText   id="propinfo-ot-unfitstart-1"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.unfitDateStart) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.unfitDateStart) : ''}" />
+                                                            <p:spacer height="2px" />
+                                                            <h:outputText   id="propinfo-ot-unfitstop-0"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.unfitDateStop) ? 'Stop Date: ' : ''}" />
+                                                            <h:outputText   id="propinfo-ot-unfitstop-1"
+                                                                            value="#{!(empty propertyProfileBB.currentProperty.unfitDateStop) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.unfitDateStop) : ''}" />
+
                                                         </div>
                                                     </div>
+
+
+                                                    <div    id="propinfo-ot-landbankpropspect-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-lbprospect"
+                                                                        value="Land bank prospect"/>
+
+                                                        <h:outputText   id="propinfo-ot-lbprospect"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{!(empty propertyProfileBB.currentProperty.landBankProspect)
+                                                                                 ? propertyProfileBB.currentProperty.landBankProspect.title : ' '}" />
+                                                    </div>
+
+                                                    <div    id="propinfo-ot-landbankheld-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-landbank"
+                                                                        value="Land bank held"/>
+
+                                                        <h:outputText   id="propinfo-ot-landbank"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.landBankHeld}" />
+                                                    </div>
+
+                                                    <div    id="propinfo-ot-nonaddressable-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-nonaddressable"
+                                                                        value="Nonaddressable"/>
+
+                                                        <h:outputText   id="propinfo-ot-nonaddressable"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.nonAddressable}" />
+                                                    </div>
+
+
+                                                    <div    id="propinf-ot-active-div"
+                                                            class="ui-g-12 ui-md-6 ui-lg-3 data_field">
+                                                        <h:outputLabel  styleClass="data_field_label"
+                                                                        for="propinfo-ot-active"
+                                                                        value="Active"/>
+
+                                                        <h:outputText   id="propinfo-ot-active"
+                                                                        styleClass="data_field_value"
+                                                                        value="#{propertyProfileBB.currentProperty.active}" />
+                                                    </div>
+
+
+
                                                 </div>
 
-                                                <!-- NESTED DATA CONTAINER -->
-                                                <div class="ui-g data_container_nested_restrict">
-
-                                                    <!--NESTED DATA FIELD VERTICAL-->
-                                                    <div class="ui-g-3 ui-md-3 ui-lg-3 restrict-data-field-vertical">
-                                                        <!--NESTED DATA LABEL VERTICAL -->
-                                                        <div class="restrict-data-field-label-vertical" >
-                                                            <h:outputLabel value=" "/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE VERTICAL -->
-                                                        <div class="restrict-data-field-value-vertical" style="font-weight: 700;">
-                                                            Start Date:
-                                                        </div>
-                                                        <!--NESTED DATA VALUE VERTICAL -->
-                                                        <div class="restrict-data-field-value-vertical" style="font-weight: 700;">
-                                                            End Date:
-                                                        </div>
-
-                                                    </div>
-
-                                                    <!--NESTED DATA FIELD VERTICAL-->
-                                                    <div class="ui-g-3 ui-md-3 ui-lg-3 restrict-data-field-vertical">
-                                                        <!--NESTED DATA LABEL VERTICAL -->
-                                                        <div class="restrict-data-field-label-vertical" >
-                                                            <h:outputLabel value="Unfitness of Occupancy"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE VERTICAL -->
-                                                        <div class="restrict-data-field-value-vertical" >
-                                                            <h:outputText id="propinfo-ot-unfitstart-1"
-                                                                          value="#{!(empty propertyProfileBB.currentProperty.unfitDateStart) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.unfitDateStart) : ''}" />
-                                                        </div>
-                                                        <!--NESTED DATA VALUE VERTICAL -->
-                                                        <div class="restrict-data-field-value-vertical" >
-                                                            <h:outputText id="propinfo-ot-unfitstop-1"
-                                                                          value="#{!(empty propertyProfileBB.currentProperty.unfitDateStop) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.unfitDateStop) : ''}" />
-                                                        </div>
-
-                                                    </div>
-
-                                                    <!--NESTED DATA FIELD VERTICAL-->
-                                                    <div class="ui-g-3 ui-md-3 ui-lg-3 restrict-data-field-vertical">
-                                                        <!--NESTED DATA LABEL VERTICAL -->
-                                                        <div class="restrict-data-field-label-vertical" >
-                                                            <h:outputLabel value="Vacany"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE VERTICAL -->
-                                                        <div class="restrict-data-field-value-vertical" >
-
-                                                            <h:outputText id="propinfo-ot-vacantstart-1"
-                                                                          value="#{!(empty propertyProfileBB.currentProperty.vacantDateStart) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.vacantDateStart) : ''}" />
-
-                                                        </div>
-                                                        <!--NESTED DATA VALUE VERTICAL -->
-                                                        <div class="restrict-data-field-value-vertical" >
-                                                            <h:outputText id="propinfo-ot-vacantstop-1"
-                                                                          value="#{!(empty propertyProfileBB.currentProperty.vacantDateStop) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.vacantDateStop) : ''}" />
-                                                        </div>
-
-                                                    </div>
-
-                                                    <!--NESTED DATA FIELD VERTICAL-->
-                                                    <div class="ui-g-3 ui-md-3 ui-lg-3 restrict-data-field-vertical">
-                                                        <!--NESTED DATA LABEL VERTICAL -->
-                                                        <div class="restrict-data-field-label-vertical" >
-                                                            <h:outputLabel value="Abandonment"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE VERTICAL -->
-                                                        <div class="restrict-data-field-value-vertical" >
-                                                            <h:outputText id="propinfo-ot-abandonedstart-1"
-                                                                          value="#{!(empty propertyProfileBB.currentProperty.abandonedDateStart) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.abandonedDateStart) : ''}" />
-
-                                                        </div>
-                                                        <!--NESTED DATA VALUE VERTICAL -->
-                                                        <div class="restrict-data-field-value-vertical" >
-                                                            <h:outputText id="propinfo-ot-abandonedstop-1"
-                                                                          value="#{!(empty propertyProfileBB.currentProperty.abandonedDateStop) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.abandonedDateStop) : ''}" />
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             </h:form>
 
                                         </p:panel>
@@ -994,12 +924,12 @@
                                         </p:panel>
 
 
-                                        <p:panel id="prop-workflow-panel"
-                                                 toggleable="true"
-                                                 widgetVar="prop-workflow-panel-var"
-                                                 collapsed="false"
-                                                 header="Proposals"
-                                                 rendered="#{propertyProfileBB.getActiveViewMode() }">
+                                        <p:panel    id="prop-workflow-panel"
+                                                    toggleable="true"
+                                                    widgetVar="prop-workflow-panel-var"
+                                                    collapsed="false"
+                                                    header="Proposals"
+                                                    rendered="#{propertyProfileBB.getActiveViewMode() }">
                                             <h:form id="prop-workflow-form">
 
                                                 <p:selectOneMenu id="prop-workflow-viewoptions-som"
@@ -1521,26 +1451,21 @@
 
                                     </p:outputPanel>
 
-
                                 </div>
 
                             </div>
-
-
                         </div>
 
                     </p:outputPanel>
 
 
-                    <p:dialog id="prop-persons-manage-dialog"
-                              modal="true"
-                              height="300" 
-                              width="550"
-                              widgetVar="prop-persons-manage-var"
-                              closable="true"
-                              header="Connect New Person"
-                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                              >
+                    <p:dialog   id="prop-persons-manage-dialog"
+                                height="300" width="550"
+                                widgetVar="prop-persons-manage-var"
+                                closable="true"
+                                header="Connect New Person"
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                >
 
                         <h:form id="prop-persons-messages-form">
                             <h:messages id="prop-persons-manage-form-messages"
@@ -1649,383 +1574,240 @@
                         </h:form>
                     </p:dialog>
 
-                    <p:dialog id="prop-search-advanced-dialog"
-                              height="500" 
-                              width="800"
-                              modal="true"
-                              widgetVar="prop-search-advanced-var"
-                              closable="true"
-                              header="Advanced Search Parameters">
+                    <p:dialog    id="prop-search-advanced-dialog"
+                                 height="400" width="600"
+                                 widgetVar="prop-search-advanced-var"
+                                 closable="true"
+                                 header="Advanced Search Parameters">
 
                         <h:form id="prop-search-params-form-1">
 
+                            <p:commandButton   id="prop-search-exec-cb"
+                                               ajax="true"
+                                               actionListener="#{propertySearchBB.executeQuery}"
+                                               icon="fa fa-search"
+                                               styleClass="button"
+                                               value="Search"
+                                               disabled="#{propertySearchBB.querySelected.queryExecuted}"
+                                               update=" prop-search-messages-form
+                                               prop-search-results-form
+                                               prop-search-log-form
+                                               prop-search-exec-cb
+                                               prop-search-clear-cb"/>
 
-                            <!-- NESTED DATA CONTAINER -->
-                            <div class="ui-g data_container_nested_restrict">
 
-                                <!--NESTED DATA FIELD -->
-                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                            <p:commandButton   id="prop-search-clear-cb"
+                                               ajax="true"
+                                               actionListener="#{propertySearchBB.resetQuery}"
+                                               icon="fa fa-eraser"
+                                               styleClass="button inline-button"
+                                               value="Clear search"
+                                               disabled="#{!propertySearchBB.querySelected.queryExecuted}"
+                                               update=" prop-search-messages-form
+                                               prop-search-log-form
+                                               @form
+                                               prop-search-query-form"/>
 
-                                    <!-- NESTED DATA TITLE -->
-                                    <div class="restrict-main-contents-io-title" >
+                            <p:spacer height="5px" />
 
-                                        <!-- NESTED DATA FILTER -->
-                                        <div class="restrict-main-contents-io-filter">
+                            <p:outputLabel for="prop-search-appendresults-chkbox">
+                                <h:outputText value="Append results to list? "
+                                              styleClass="bold"/>
+                            </p:outputLabel>
 
-                                            <p:selectBooleanCheckbox class="checkbox"
-                                                                     id="prop-search-filter-addr-ctl"
+                            <p:selectBooleanCheckbox   id="prop-search-appendresults-chkbox"
+                                                       value="#{propertySearchBB.appendResultsToList}"
+                                                       disabled="false" />
+
+                            <p:separator />
+
+
+                            <h:panelGrid    columns="1"
+                                            cellpadding="10"
+                                            columnClasses="gridTd-solid-back"
+                                            footerClass="gridFooter">
+
+                                <h:panelGroup id="prop-search-filter-addr">
+                                    <h:panelGrid columns="2"
+                                                 cellpadding="10"
+                                                 columnClasses="topbottom-lines-left, topbottom-lines-right">
+
+                                        <h:panelGroup>
+                                            <p:outputLabel for="prop-search-filter-addr-ctl">
+                                                <h:outputText value="House number and/or street name"
+                                                              styleClass="datum-label"/>
+                                            </p:outputLabel>
+                                            <p:selectBooleanCheckbox id="prop-search-filter-addr-ctl"
                                                                      value="#{propertySearchBB.searchParamsSelected.address_ctl}" >
                                                 <p:ajax update="prop-search-filter-addr-val"/>
                                             </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
 
-                                            <p:outputLabel for="prop-search-filter-addr-ctl" 
-                                                           value="Filter by House Number / Street Name"
-                                                           />
+                                        <h:panelGroup>
 
-                                        </div>
-                                    </div>
+                                            <p:inputText id="prop-search-filter-addr-val"
+                                                         value="#{propertySearchBB.searchParamsSelected.address_val}"
+                                                         style="width: 200px;"
+                                                         tabindex="2"
+                                                         disabled="#{!propertySearchBB.searchParamsSelected.address_ctl}"
+                                                         required="false"
+                                                         styleClass="inputText search-inputtext"/>
 
-                                    <!-- NESTED DATA CONTENT -->
-                                    <div class="restrict-main-contents-io-content" >
-
-                                        <p:inputText id="prop-search-filter-addr-val"
-                                                     value="#{propertySearchBB.searchParamsSelected.address_val}"
-                                                     style="width:100%"
-                                                     tabindex="2"
-                                                     disabled="#{!propertySearchBB.searchParamsSelected.address_ctl}"
-                                                     required="false"
-                                                     styleClass="inputText search-inputtext"
-                                                     />
-
-
-                                    </div>
+                                            <h:message for="prop-search-filter-addr-val" showDetail="false" showSummary="true"
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+                            </h:panelGrid>
 
 
-                                </div>
+                            <h:panelGrid    id="prop-search-filters-grid"
+                                            columns="1"
+                                            cellpadding="10"
+                                            columnClasses="gridTd-solid-back"
+                                            footerClass="gridFooter">
+                                <h:panelGroup id="prop-search-filter-muni">
+                                    <h:panelGrid columns="2"
+                                                 cellpadding="10"
+                                                 columnClasses="topbottom-lines-left, topbottom-lines-right">
 
-
-                                <!--NESTED DATA FIELD -->
-                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                                    <!-- NESTED DATA TITLE -->
-                                    <div class="restrict-main-contents-io-title" >
-
-                                        <!-- NESTED DATA FILTER -->
-                                        <div class="restrict-main-contents-io-filter">
-
-                                            <p:selectBooleanCheckbox class="checkbox"
-                                                                     id="prop-search-muni-ctl"
+                                        <h:panelGroup>
+                                            <p:outputLabel for="prop-search-muni-ctl"
+                                                           value="Municipality"
+                                                           styleClass="datum-label" />
+                                            <p:selectBooleanCheckbox id="prop-search-muni-ctl"
                                                                      value="#{propertySearchBB.searchParamsSelected.muni_ctl}" >
                                                 <p:ajax update="prop-search-muni-som"/>
                                             </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
 
-                                            <p:outputLabel for="prop-search-muni-ctl"
-                                                           value="Filter by Municipality"
-                                                           />
+                                        <h:panelGroup>
+                                            <p:selectOneMenu id="prop-search-muni-som"
+                                                             tabindex="1"
+                                                             value="#{propertySearchBB.searchParamsSelected.muni_val}"
+                                                             disabled="#{!propertySearchBB.searchParamsSelected.muni_ctl}">
+                                                <f:converter converterId="muniConverter"/>
+                                                <f:selectItem itemLabel="select municipality..."
+                                                              noSelectionOption="true"
+                                                              itemDisabled="true"/>
+                                                <f:selectItems id="muniNameList"
+                                                               value="#{systemServicesBB.bbSessionUser.authMuniList}"
+                                                               var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                            </p:selectOneMenu>
+                                            <h:message for="prop-search-muni-som" showDetail="true" showSummary="true"
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+                                    </h:panelGrid>
 
-                                        </div>
-                                    </div>
-
-                                    <!-- NESTED DATA CONTENT -->
-                                    <div class="restrict-main-contents-io-content" >
-
-                                        <p:selectOneMenu id="prop-search-muni-som"
-                                                         tabindex="1"
-                                                         value="#{propertySearchBB.searchParamsSelected.muni_val}"
-                                                         disabled="#{!propertySearchBB.searchParamsSelected.muni_ctl}"
-                                                         style="width: 100%"
-                                                         >
-                                            <f:converter converterId="muniConverter"/>
-
-                                            <f:selectItem itemLabel="select municipality..."
-                                                          noSelectionOption="true"
-                                                          itemDisabled="true"/>
-
-                                            <f:selectItems id="muniNameList"
-                                                           value="#{systemServicesBB.bbSessionUser.authMuniList}"
-                                                           var="m" 
-                                                           itemValue="#{m}" 
-                                                           itemLabel="#{m.muniName}" />
-
-                                        </p:selectOneMenu>
-
-                                    </div>
-
-                                </div>
+                                </h:panelGroup>
 
 
-                                <!--NESTED DATA FIELD -->
-                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                <h:panelGroup>
+                                    <h:panelGrid    columns="2"
+                                                    cellpadding="10"
+                                                    columnClasses="topbottom-lines-left, topbottom-lines-right">
 
-                                    <!-- NESTED DATA TITLE -->
-                                    <div class="restrict-main-contents-io-title" >
+                                        <h:panelGroup>
 
-                                        <!-- NESTED DATA FILTER -->
-                                        <div class="restrict-main-contents-io-filter">
-
-                                            <p:selectBooleanCheckbox class="checkbox"
-                                                                     id="prop-search-filter-id-ctl"
-                                                                     value="#{propertySearchBB.searchParamsSelected.bobID_ctl}"
-                                                                     disabled="false">
-                                                <p:ajax update="prop-search-filter-id-val" />
-                                            </p:selectBooleanCheckbox>
-                                            <p:outputLabel for="prop-search-filter-id-ctl"
-                                                           value="Filter by Property ID"/>
-
-                                        </div>
-                                    </div>
-
-                                    <!-- NESTED DATA CONTENT -->
-                                    <div class="restrict-main-contents-io-content" >
-                                        <p:inputText id="prop-search-filter-id-val"
-                                                     type="number"
-                                                     value="#{propertySearchBB.searchParamsSelected.bobID_val}"
-                                                     disabled="#{!propertySearchBB.searchParamsSelected.bobID_ctl}"
-                                                     />
-
-                                    </div>
-
-                                </div>
-
-
-                                <!--NESTED DATA FIELD -->
-                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                                    <!-- NESTED DATA TITLE -->
-                                    <div class="restrict-main-contents-io-title" >
-
-                                        <!-- NESTED DATA FILTER -->
-                                        <div class="restrict-main-contents-io-filter">
-                                            <p:selectBooleanCheckbox class="checkbox"
-                                                                     id="prop-search-filter-parcelid-ctl"
-                                                                     value="#{propertySearchBB.searchParamsSelected.parcelid_ctl}"
-                                                                     disabled="false">
-                                                <p:ajax update="prop-search-filter-parcelid-val" />
-                                            </p:selectBooleanCheckbox>
-
-                                            <p:outputLabel for="prop-search-filter-id-ctl"
-                                                           value="Filter by Parcel ID"/>
-                                        </div>
-                                    </div>
-
-                                    <!-- NESTED DATA CONTENT -->
-                                    <div class="restrict-main-contents-io-content" >
-                                        <p:inputText id="prop-search-filter-parcelid-val"
-                                                     type="number"
-                                                     value="#{propertySearchBB.searchParamsSelected.parcelid_val}"
-                                                     disabled="#{!propertySearchBB.searchParamsSelected.parcelid_ctl}"
-                                                     />
-
-                                    </div>
-
-                                </div>
-
-
-                                <!--NESTED DATA FIELD -->
-                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                                    <!-- NESTED DATA TITLE -->
-                                    <div class="restrict-main-contents-io-title" >
-
-                                        <!-- NESTED DATA FILTER -->
-                                        <div class="restrict-main-contents-io-filter">
-
-                                            <p:selectBooleanCheckbox class="checkbox"
-                                                                     id="prop-search-filter-usetype-ctl"
-                                                                     value="#{propertySearchBB.searchParamsSelected.useType_ctl}"
-                                                                     disabled="false">
-                                                <p:ajax update="prop-search-filter-usetype-val" />
-                                            </p:selectBooleanCheckbox>
-
-                                            <p:outputLabel for="prop-search-filter-usetype-ctl"
-                                                           value="Filter by Use Type"/>
-
-                                        </div>
-                                    </div>
-
-                                    <!-- NESTED DATA CONTENT -->
-                                    <div class="restrict-main-contents-io-content" >
-                                        <p:selectOneMenu    id="prop-search-filter-usetype-val"
-                                                            tabindex="1"
-                                                            style="width: 100%"
-                                                            value="#{propertySearchBB.searchParamsSelected.useType_val}"
-                                                            disabled="#{!propertySearchBB.searchParamsSelected.useType_ctl}">
-                                            <f:converter    converterId="propertyUseTypeConverter"/>
-                                            <f:selectItem   itemLabel="select a use type..." noSelectionOption="true" itemDisabled="true"/>
-                                            <f:selectItems  id="prop-search-filter-usetype-items"
-                                                            value="#{propertySearchBB.putList}"
-                                                            var="put" itemValue="#{put}" itemLabel="#{put.name}" />
-                                        </p:selectOneMenu>
-
-                                    </div>
-
-                                </div>
-
-
-                                <!--NESTED DATA FIELD -->
-                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                                    <!-- NESTED DATA TITLE -->
-                                    <div class="restrict-main-contents-io-title" >
-
-                                        <!-- NESTED DATA FILTER -->
-                                        <div class="restrict-main-contents-io-filter">
-
-                                            <p:selectBooleanCheckbox class="checkbox"
-                                                                     id="prop-search-filter-user-ctl"
-                                                                     value="#{propertySearchBB.searchParamsSelected.user_ctl}"
-                                                                     disabled="#{!(propertySearchBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
-                                                <p:ajax update="prop-search-filter-user-som" />
-                                            </p:selectBooleanCheckbox>
-
-                                            <p:outputLabel for="prop-search-filter-user-ctl"
-                                                           value="Filter by User"/>
-
-                                        </div>
-                                    </div>
-
-                                    <!-- NESTED DATA CONTENT -->
-                                    <div class="restrict-main-contents-io-content" >
-                                        <p:selectOneMenu id="prop-search-filter-user-som"
-                                                         style="width: 100%"
-                                                         required="false"
-                                                         value="#{propertySearchBB.searchParamsSelected.user_val}"
-                                                         disabled="#{!(propertySearchBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
-                                            <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
-                                            <f:selectItems value="#{systemServicesBB.userListForSearch}"  var="u" itemValue="#{u}"
-                                                           itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
-                                            <f:converter converterId="userConverter"/>
-                                        </p:selectOneMenu>
-                                    </div>
-
-                                </div>
-
-
-                                <!--NESTED DATA FIELD -->
-                                <div class="ui-g-12 ui-md-4 ui-lg-4 restrict-data-field">
-
-                                    <!-- NESTED DATA TITLE -->
-                                    <div class="restrict-main-contents-io-title" >
-
-                                        <!-- NESTED DATA FILTER -->
-                                        <div class="restrict-main-contents-io-filter">
-
-                                            <p:selectBooleanCheckbox class="checkbox"
-                                                                     id="prop-search-date-ctl"
-                                                                     value="#{propertySearchBB.searchParamsSelected.date_startEnd_ctl}" >
+                                            <p:outputLabel for="prop-search-date-ctl"
+                                                           value="Date range filter"
+                                                           styleClass="datum-label"/>
+                                            <p:selectBooleanCheckbox    id="prop-search-date-ctl"
+                                                                        value="#{propertySearchBB.searchParamsSelected.date_startEnd_ctl}" >
                                                 <p:ajax update="prop-search-date-field-val
                                                         prop-search-date-start-val
                                                         prop-search-date-end-val
                                                         prop-search-date-relative-ctl" />
                                             </p:selectBooleanCheckbox>
+                                        </h:panelGroup>
 
-                                            <p:outputLabel for="prop-search-date-ctl"
-                                                           value="Filter by Date Range"
-                                                           />
+                                        <h:panelGroup>
+                                            <p:outputLabel for="prop-search-date-field-val"
+                                                           value="Date field"
+                                                           styleClass="datum-label"/>
+                                            <p:selectOneMenu  id="prop-search-date-field-val"
+                                                              tabindex="1"
+                                                              value="#{propertySearchBB.searchParamsSelected.date_field}"
+                                                              disabled="#{!propertySearchBB.searchParamsSelected.date_startEnd_ctl}">
+                                                <f:selectItem itemLabel="select a date field..."
+                                                              noSelectionOption="true"
+                                                              itemDisabled="true"/>
+                                                <f:selectItems id="prop-search-date-field-val-items"
+                                                               value="#{propertySearchBB.searchParamsSelected.dateFieldList}"
+                                                               var="f" itemValue="#{f}" itemLabel="#{f.title}" />
+                                            </p:selectOneMenu>
+                                            <h:message for="prop-search-date-field-val" showDetail="true" showSummary="true"
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+                                    </h:panelGrid>
+                                </h:panelGroup>
 
-                                        </div>
-                                    </div>
+                                <h:panelGroup id="datepickers-pg">
+                                    <h:panelGrid    columns="2"
+                                                    cellpadding="10"
+                                                    columnClasses="topbottom-lines-left, topbottom-lines-right">
+                                        <h:panelGroup>
 
-                                    <!-- NESTED DATA CONTENT -->
-                                    <div class="restrict-main-contents-io-content" >
-                                        <p:selectOneMenu  id="prop-search-date-field-val"
-                                                          tabindex="1"
-                                                          style="width: 100%"
-                                                          value="#{propertySearchBB.searchParamsSelected.date_field}"
-                                                          disabled="#{!propertySearchBB.searchParamsSelected.date_startEnd_ctl}">
-                                            <f:selectItem itemLabel="select a date field..."
-                                                          noSelectionOption="true"
-                                                          itemDisabled="true"/>
-                                            <f:selectItems id="prop-search-date-field-val-items"
-                                                           value="#{propertySearchBB.searchParamsSelected.dateFieldList}"
-                                                           var="f" itemValue="#{f}" itemLabel="#{f.title}" />
-                                        </p:selectOneMenu>
-                                    </div>
-
-                                </div>
-
-                                <!--NESTED DATA FIELD -->
-                                <div class="ui-g-12 ui-md-4 ui-lg-4 restrict-data-field">
-
-                                    <!-- NESTED DATA TITLE -->
-                                    <div class="restrict-main-contents-io-title" >
-
-                                        <!-- NESTED DATA FILTER -->
-                                        <div class="restrict-main-contents-io-filter">
                                             <p:outputLabel for="prop-search-date-start-val"
-                                                           value="Start Date"/>
+                                                           value="Start date"/>
 
-                                        </div>
-                                    </div>
+                                            <p:spacer height="1px" />
 
-                                    <!-- NESTED DATA CONTENT -->
-                                    <div class="restrict-main-contents-io-content" >
-                                        <p:calendar id="prop-search-date-start-val"
-                                                    value="#{propertySearchBB.searchParamsSelected.startDate_val_utilDate}"
-                                                    disabled="#{(!propertySearchBB.searchParamsSelected.date_startEnd_ctl) or propertySearchBB.searchParamsSelected.date_relativeDates_ctl}"
-                                                    mode="popup"
-                                                    showOn="button"
-                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                    navigator="true"
-                                                    tabindex="16"
-                                                    timeInput="true"
-                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                    showButtonPanel="true"
-                                                    showTodayButton="true"
-                                                    required="false"
-                                                    style="width: 100%"/>
+                                            <p:calendar id="prop-search-date-start-val"
+                                                        value="#{propertySearchBB.searchParamsSelected.startDate_val_utilDate}"
+                                                        disabled="#{(!propertySearchBB.searchParamsSelected.date_startEnd_ctl) or propertySearchBB.searchParamsSelected.date_relativeDates_ctl}"
+                                                        mode="popup"
+                                                        showOn="button"
+                                                        pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                        navigator="true"
+                                                        tabindex="16"
+                                                        timeInput="true"
+                                                        showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                        showButtonPanel="true"
+                                                        showTodayButton="true"
+                                                        required="false"/>
+                                            <h:message for="prop-search-date-start-val" showDetail="false" showSummary="true"
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-                                    </div>
+                                        </h:panelGroup>
 
-                                </div>
+                                        <h:panelGroup>
 
-
-                                <!--NESTED DATA FIELD -->
-                                <div class="ui-g-12 ui-md-4 ui-lg-4 restrict-data-field">
-
-                                    <!-- NESTED DATA TITLE -->
-                                    <div class="restrict-main-contents-io-title" >
-
-                                        <!-- NESTED DATA FILTER -->
-                                        <div class="restrict-main-contents-io-filter">
                                             <p:outputLabel for="prop-search-date-end-val"
-                                                           value="End Date"/>
+                                                           value="Start date"/>
 
-                                        </div>
-                                    </div>
+                                            <p:spacer height="1px" />
 
-                                    <!-- NESTED DATA CONTENT -->
-                                    <div class="restrict-main-contents-io-content" >
-                                        <p:calendar id="prop-search-date-end-val"
-                                                    value="#{propertySearchBB.searchParamsSelected.endDate_val_utilDate}"
-                                                    disabled="#{(!propertySearchBB.searchParamsSelected.date_startEnd_ctl) or propertySearchBB.searchParamsSelected.date_relativeDates_ctl}"
-                                                    mode="popup"
-                                                    showOn="button"
-                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                    navigator="true"
-                                                    tabindex="16"
-                                                    timeInput="true"
-                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                    showButtonPanel="true"
-                                                    showTodayButton="true"
-                                                    required="false"
-                                                    style="width: 100%"/>
-                                    </div>
+                                            <p:calendar id="prop-search-date-end-val"
+                                                        value="#{propertySearchBB.searchParamsSelected.endDate_val_utilDate}"
+                                                        disabled="#{(!propertySearchBB.searchParamsSelected.date_startEnd_ctl) or propertySearchBB.searchParamsSelected.date_relativeDates_ctl}"
+                                                        mode="popup"
+                                                        showOn="button"
+                                                        pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                        navigator="true"
+                                                        tabindex="16"
+                                                        timeInput="true"
+                                                        showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                        showButtonPanel="true"
+                                                        showTodayButton="true"
+                                                        required="false"/>
+                                            <h:message for="prop-search-date-end-val" showDetail="false" showSummary="true"
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-                                </div>
+                                        </h:panelGroup>
+                                    </h:panelGrid>
+                                </h:panelGroup>
 
 
-                                <!--NESTED DATA FIELD -->
-                                <div class="ui-g-12 ui-md-4 ui-lg-4 restrict-data-field">
-
-                                    <!-- NESTED DATA TITLE -->
-                                    <div class="restrict-main-contents-io-title" >
-
-                                        <!-- NESTED DATA FILTER -->
-                                        <div class="restrict-main-contents-io-filter">
-
-                                            <p:selectBooleanCheckbox class="checkbox"
-                                                                     id="prop-search-date-relative-ctl"
+                                <h:panelGroup>
+                                    <h:panelGrid    columns="3"
+                                                    cellpadding="10"
+                                                    columnClasses="topbottom-lines-left, topbottom-lines-right">
+                                        <h:panelGroup>
+                                            <p:outputLabel for="prop-search-date-relative-ctl"
+                                                           value="Relative dates"
+                                                           styleClass="datum-label"/>
+                                            <p:selectBooleanCheckbox id="prop-search-date-relative-ctl"
                                                                      value="#{propertySearchBB.searchParamsSelected.date_relativeDates_ctl}"
                                                                      disabled="#{!propertySearchBB.searchParamsSelected.date_startEnd_ctl}">
                                                 <p:ajax update="prop-search-date-end-val
@@ -2034,163 +1816,181 @@
                                                         prop-search-date-relative-start-val
                                                         prop-search-date-relative-end-val" />
                                             </p:selectBooleanCheckbox>
-
-                                            <p:outputLabel for="prop-search-date-relative-ctl"
-                                                           value="Filter by Relative Date"
-                                                           />
-
-                                        </div>
-                                    </div>
-
-                                    <!-- NESTED DATA CONTENT -->
-                                    <div class="restrict-main-contents-io-content" >
-                                        -
-                                    </div>
-
-                                </div>
-
-
-                                <!--NESTED DATA FIELD -->
-                                <div class="ui-g-12 ui-md-4 ui-lg-4 restrict-data-field">
-
-                                    <!-- NESTED DATA TITLE -->
-                                    <div class="restrict-main-contents-io-title" >
-
-                                        <!-- NESTED DATA FILTER -->
-                                        <div class="restrict-main-contents-io-filter">
+                                        </h:panelGroup>
+                                        <h:panelGroup>
                                             <p:outputLabel for="prop-search-date-relative-start-val"
-                                                           value="Start Date"
-                                                           />
-                                        </div>
-                                    </div>
+                                                           value="Days start"/>
+                                            <p:spacer height="1px"/>
+                                            <p:inputText id="prop-search-date-relative-start-val"
+                                                         value="#{propertySearchBB.searchParamsSelected.date_relativeDates_start_val}"
+                                                         disabled="#{!(propertySearchBB.searchParamsSelected.date_startEnd_ctl and propertySearchBB.searchParamsSelected.date_relativeDates_ctl)}" />
+                                            <h:message for="prop-search-date-relative-start-val" showDetail="false" showSummary="true"
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-                                    <!-- NESTED DATA CONTENT -->
-                                    <div class="restrict-main-contents-io-content" >
-
-                                        <p:inputText id="prop-search-date-relative-start-val"
-                                                     value="#{propertySearchBB.searchParamsSelected.date_relativeDates_start_val}"
-                                                     disabled="#{!(propertySearchBB.searchParamsSelected.date_startEnd_ctl and propertySearchBB.searchParamsSelected.date_relativeDates_ctl)}" />
-                                    </div>
-
-                                </div>
-
-                                
-                                <!--NESTED DATA FIELD -->
-                                <div class="ui-g-12 ui-md-4 ui-lg-4 restrict-data-field">
-
-                                    <!-- NESTED DATA TITLE -->
-                                    <div class="restrict-main-contents-io-title" >
-
-                                        <!-- NESTED DATA FILTER -->
-                                        <div class="restrict-main-contents-io-filter">
+                                        </h:panelGroup>
+                                        <h:panelGroup>
                                             <p:outputLabel for="prop-search-date-relative-end-val"
-                                                           value="End Date"
-                                                           />
-                                        </div>
-                                    </div>
-
-                                    <!-- NESTED DATA CONTENT -->
-                                    <div class="restrict-main-contents-io-content" >
-
-                                        <p:inputText id="prop-search-date-relative-end-val"
-                                                     value="#{propertySearchBB.searchParamsSelected.date_realtiveDates_end_val}"
-                                                     disabled="#{!(propertySearchBB.searchParamsSelected.date_startEnd_ctl and propertySearchBB.searchParamsSelected.date_relativeDates_ctl)}" />
-                                    </div>
-
-                                </div>
+                                                           value="Days end"/>
+                                            <p:spacer height="1px"/>
+                                            <p:inputText id="prop-search-date-relative-end-val"
+                                                         value="#{propertySearchBB.searchParamsSelected.date_realtiveDates_end_val}"
+                                                         disabled="#{!(propertySearchBB.searchParamsSelected.date_startEnd_ctl and propertySearchBB.searchParamsSelected.date_relativeDates_ctl)}" />
+                                            <h:message for="prop-search-date-relative-end-val" showDetail="false" showSummary="true"
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+                                    </h:panelGrid>
+                                </h:panelGroup>
 
 
-                                <!--NESTED DATA FIELD -->
-                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                <h:panelGroup>
+                                    <h:panelGrid   columns="2"
+                                                   cellpadding="10"
+                                                   columnClasses="topbottom-lines-left, topbottom-lines-right">
+                                        <h:panelGroup>
+                                            <p:outputLabel for="prop-search-filter-id-ctl"
+                                                           value="Property id filter"/>
+                                            <p:selectBooleanCheckbox id="prop-search-filter-id-ctl"
+                                                                     value="#{propertySearchBB.searchParamsSelected.bobID_ctl}"
+                                                                     disabled="false">
+                                                <p:ajax update="prop-search-filter-id-val" />
+                                            </p:selectBooleanCheckbox>
 
-                                    <!-- NESTED DATA TITLE -->
-                                    <div class="restrict-main-contents-io-title" >
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <p:outputLabel for="prop-search-filter-id-val"
+                                                           value="property ID:" />
+                                            <p:spacer height="5px"/>
+                                            <p:inputText id="prop-search-filter-id-val"
+                                                         type="number"
+                                                         value="#{propertySearchBB.searchParamsSelected.bobID_val}"
+                                                         disabled="#{!propertySearchBB.searchParamsSelected.bobID_ctl}"/>
+                                            <h:message for="prop-search-filter-id-val" showDetail="false" showSummary="true"
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+                                    </h:panelGrid>
+                                </h:panelGroup>
 
-                                        <!-- NESTED DATA FILTER -->
-                                        <div class="restrict-main-contents-io-filter">
+                                <h:panelGroup>
+                                    <h:panelGrid   columns="2"
+                                                   cellpadding="10"
+                                                   columnClasses="topbottom-lines-left, topbottom-lines-right">
+                                        <h:panelGroup>
+                                            <p:outputLabel for="prop-search-filter-id-ctl"
+                                                           value="Parcel ID filter"/>
+                                            <p:selectBooleanCheckbox id="prop-search-filter-parcelid-ctl"
+                                                                     value="#{propertySearchBB.searchParamsSelected.parcelid_ctl}"
+                                                                     disabled="false">
+                                                <p:ajax update="prop-search-filter-parcelid-val" />
+                                            </p:selectBooleanCheckbox>
 
-                                            <p:selectBooleanCheckbox class="checkbox"
-                                                                     id="prop-search-appendresults-chkbox"
-                                                                     value="#{propertySearchBB.appendResultsToList}"
-                                                                     disabled="false" />
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <p:outputLabel for="prop-search-filter-parcelid-val"
+                                                           value="Parcel ID:" />
+                                            <p:spacer height="5px"/>
+                                            <p:inputText id="prop-search-filter-parcelid-val"
+                                                         type="number"
+                                                         value="#{propertySearchBB.searchParamsSelected.parcelid_val}"
+                                                         disabled="#{!propertySearchBB.searchParamsSelected.parcelid_ctl}"/>
+                                            <h:message for="prop-search-filter-parcelid-val" showDetail="false" showSummary="true"
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+                                    </h:panelGrid>
+                                </h:panelGroup>
 
+                                <h:panelGroup>
+                                    <h:panelGrid   columns="2"
+                                                   cellpadding="10"
+                                                   columnClasses="topbottom-lines-left, topbottom-lines-right">
+                                        <h:panelGroup>
+                                            <p:outputLabel for="prop-search-filter-usetype-ctl"
+                                                           value="Use type filter"/>
+                                            <p:selectBooleanCheckbox id="prop-search-filter-usetype-ctl"
+                                                                     value="#{propertySearchBB.searchParamsSelected.useType_ctl}"
+                                                                     disabled="false">
+                                                <p:ajax update="prop-search-filter-usetype-val" />
+                                            </p:selectBooleanCheckbox>
+
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <p:selectOneMenu    id="prop-search-filter-usetype-val"
+                                                                tabindex="1"
+                                                                value="#{propertySearchBB.searchParamsSelected.useType_val}"
+                                                                disabled="#{!propertySearchBB.searchParamsSelected.useType_ctl}">
+                                                <f:converter    converterId="propertyUseTypeConverter"/>
+                                                <f:selectItem   itemLabel="select a use type..." noSelectionOption="true" itemDisabled="true"/>
+                                                <f:selectItems  id="prop-search-filter-usetype-items"
+                                                                value="#{propertySearchBB.putList}"
+                                                                var="put" itemValue="#{put}" itemLabel="#{put.name}" />
+                                            </p:selectOneMenu>
+                                            <h:message for="prop-search-filter-usetype-val" showDetail="true" showSummary="true"
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+
+
+
+                                <h:panelGroup>
+                                    <h:panelGrid   columns="2"
+                                                   cellpadding="10"
+                                                   columnClasses="topbottom-lines-left, topbottom-lines-right">
+
+                                        <h:panelGroup>
                                             <p:outputLabel for="prop-search-filter-user-ctl"
-                                                           value="Append results to list? "/>
+                                                           value="User filter"/>
 
-                                        </div>
-                                    </div>
+                                            <p:selectBooleanCheckbox id="prop-search-filter-user-ctl"
+                                                                     value="#{propertySearchBB.searchParamsSelected.user_ctl}"
+                                                                     disabled="#{!(propertySearchBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
+                                                <p:ajax update="prop-search-filter-user-som" />
+                                            </p:selectBooleanCheckbox>
 
-                                </div>
+                                        </h:panelGroup>
 
-                                <!--NESTED DATA FIELD -->
-                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                                        <h:outputLabel for="prop-search-filter-user-ol" id="cecases-criteria-user-ol">
+                                            <h:outputText value="system user list:"/>
+                                        </h:outputLabel>
+                                        <p:spacer height="5px"/>
 
-                                    <div class="restrict-main-contents-io-button" style="float: left">
-                                        <p:commandButton id="prop-search-exec-cb"
-                                                         ajax="true"
-                                                         actionListener="#{propertySearchBB.executeQuery}"
-                                                         icon="fa fa-search"
-                                                         style="width: 100%"
-                                                         value="Search"
-                                                         disabled="#{propertySearchBB.querySelected.queryExecuted}"
-                                                         update=" prop-search-messages-form
-                                                         prop-search-results-form
-                                                         prop-search-log-form
-                                                         prop-search-exec-cb
-                                                         prop-search-clear-cb"/>
-
-                                    </div>
-                                    <div class="restrict-main-contents-io-button gray_button" style="float: left">
-                                        <p:commandButton id="prop-search-clear-cb"
-                                                         ajax="true"
-                                                         actionListener="#{propertySearchBB.resetQuery}"
-                                                         icon="fa fa-eraser"
-                                                         style="width: 100%"
-                                                         value="Clear search"
-                                                         disabled="#{!propertySearchBB.querySelected.queryExecuted}"
-                                                         update=" prop-search-messages-form
-                                                         prop-search-log-form
-                                                         @form
-                                                         prop-search-query-form"/>
-
-                                    </div>
-
-                                </div>
-
-                                <!--NESTED DATA FIELD -->
-                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
-
-                                    <div class="restrict-main-contents-io-button">
-                                        <p:commandButton id="prop-search-exec-cb-2"
-                                                         ajax="true"
-                                                         actionListener="#{propertySearchBB.executeQuery}"
-                                                         icon="fa fa-search"
-                                                         style="width: 100%"
-                                                         value="Search"
-                                                         oncomplete="PF('prop-search-advanced-var').hide()"
-                                                         disabled="#{propertySearchBB.querySelected.queryExecuted}"
-                                                         update=" prop-search-messages-form
-                                                         prop-search-results-form
-                                                         prop-search-log-form
-                                                         prop-search-exec-cb
-                                                         prop-search-clear-cb"/>
+                                        <p:selectOneMenu id="prop-search-filter-user-som" required="false"
+                                                         value="#{propertySearchBB.searchParamsSelected.user_val}"
+                                                         disabled="#{!(propertySearchBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
+                                            <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
+                                            <f:selectItems value="#{systemServicesBB.userListForSearch}"  var="u" itemValue="#{u}"
+                                                           itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
+                                            <f:converter converterId="userConverter"/>
+                                        </p:selectOneMenu>
+                                    </h:panelGrid>
+                                </h:panelGroup>
 
 
+                            </h:panelGrid>
 
-                                    </div>
-                                    <div class="restrict-main-contents-io-button gray_button">
-                                        <p:commandButton ajax="true"
-                                                         value="Cancel" 
-                                                         icon="fa fa-stop"
-                                                         style="width: 100%"
-                                                         onclick="PF('prop-search-advanced-var').hide()"
-                                                         tabindex="4"/>
+                            <p:commandButton   id="prop-search-exec-cb-2"
+                                               ajax="true"
+                                               actionListener="#{propertySearchBB.executeQuery}"
+                                               icon="fa fa-search"
+                                               styleClass="button"
+                                               value="Search"
+                                               oncomplete="PF('prop-search-advanced-var').hide()"
+                                               disabled="#{propertySearchBB.querySelected.queryExecuted}"
+                                               update=" prop-search-messages-form
+                                               prop-search-results-form
+                                               prop-search-log-form
+                                               prop-search-exec-cb
+                                               prop-search-clear-cb"/>
 
-                                    </div>
+                            <p:commandButton ajax="true"
+                                             value="Cancel" icon="fa fa-stop"
+                                             onclick="PF('prop-search-advanced-var').hide()"
+                                             tabindex="4"/>
 
-                                </div>
-                            </div>
                         </h:form>
+
+
+
                     </p:dialog>
 
                     <p:dialog    id="prop-addperiod-dialog"

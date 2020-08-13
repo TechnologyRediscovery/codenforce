@@ -974,7 +974,7 @@ img.headerImg{
 
 
 .ui-widget, .ui-widget .ui-widget {
-    font-size: 90% !important;
+    font-size: 95% !important;
 }
 
 
@@ -1003,9 +1003,7 @@ img.headerImg{
 
 
 
-.ui-panel {
-    margin: 10px;
-}
+
 
 .ui-dashboard-column {
     width:33%;
@@ -1276,9 +1274,6 @@ gridTd-bignum{
     color: white;
 }
 
-.ui-chkbox-box{
-    margin:5px;
-}
 
 /* ****************** CLOSE BUTTON STYLES ********************/
 
@@ -1548,6 +1543,7 @@ a.outputLink{
 .textArea{
     width: 400px;
     margin-bottom: 10px;
+    min-height: 120px;
 }
 
 select.selectOneListbox{   
@@ -2038,6 +2034,30 @@ body .ui-steps .ui-steps-item .ui-menuitem-link .ui-steps-number{
     height: 3.5em;
     padding-top: 1em;
 }
+body .ui-calendar.ui-trigger-calendar{
+    display: inline-flex;
+}
+
+body .ui-calendar.ui-trigger-calendar .ui-button{
+    background-color: #6C6D70;
+    border: 1px solid #6C6D70;
+}
+
+body .ui-fileupload-cancel{
+    background-color: #6C6D70;
+    border: 1px solid #6C6D70;
+}
+
+body .ui-fileupload-choose{
+    background-color: #6C6D70;
+    border: 1px solid #6C6D70;
+}
+
+body .ui-panel {
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
 
 
 /*body .ui-button{
@@ -2049,20 +2069,15 @@ body .ui-steps .ui-steps-item .ui-menuitem-link .ui-steps-number{
 /*button*/
 
 .selectButton{
-    min-width: 60px;
+    min-width: 70px;
 }
 .editButton{
     min-width: 60px;
 }
 
 
-/*muniManage.xhtml page*/
-.body .ui-selectbooleanbutton, body .ui-buttonset:not(.ui-splitbutton)>.ui-button {
-    width: 25%;
-    border: 1px white solid;
-    padding-top: 5px;
-    padding-bottom: 5px;
-}
+
+
 
 .MuniReadTableOutputLabel{
     width: 100%;
@@ -2119,13 +2134,11 @@ body .ui-datatable .ui-datatable-header, body .ui-datatable .ui-datatable-footer
 .public-menu-content{
     height: 100vh;
     background-color:#2F2F2F;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    padding-top: 75px;
 }
 
 .public-menu-logo{
-    padding-bottom: 10%;
+    padding-bottom: 30%;
     width: 95%;
     margin: 0 auto;
 }
@@ -2136,11 +2149,61 @@ body .ui-datatable .ui-datatable-header, body .ui-datatable .ui-datatable-footer
     margin: 0 auto;
 }
 
+.public-menu-nav-container{
+    width: 75%;
+    float: right;
+
+}
+
+.public-menu-nav-title{
+    color: #00B4ED;
+    font-size:125%!important;
+    padding-bottom: 30px;
+    font-weight: 700;
+}
+
+.public-menu-nav-seperateline{
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.public-menu-nav .ui-commandlink{
+    font-size: 115%!important;
+    color:white;
+}
+
+.public-menu-nav:hover{
+    border-bottom: 1px solid #00B4ED
+}
+
+.public-menu-nav a:hover{
+    text-decoration: none;
+}
+
+.public-arrow-container{
+    display: inline-block;
+    vertical-align: top;
+    min-width: 30px;
+}
+
+.public-arrow{
+    vertical-align: top;
+    color: #DEE461;
+    font-weight: 900;
+    display: none;
+}
+
+.public-menu-active{
+    display: inline-block;
+}
+
 .public-menu-button .ui-button {
     width: 100%;
 }
 
 .public-menu-text{
+    bottom:5vh;
+    position: absolute;
     display: flex;
     justify-content: center;
     text-align:center;
@@ -2168,6 +2231,7 @@ body .ui-datatable .ui-datatable-header, body .ui-datatable .ui-datatable-footer
 }
 
 .public-title{
+    padding-top: 75px;
     width: 71.25%;
     position: fixed;
     top:0;
@@ -2177,14 +2241,13 @@ body .ui-datatable .ui-datatable-header, body .ui-datatable .ui-datatable-footer
 }
 
 .public-title-main {
-    padding-top: 5vh;
-    font-size: 2.5em;
+
+    font-size: 3em;
     font-weight: bold;
 }
 
 .public-title-sub{
-    font-size: 1.5em;
-    font-weight: 300;
+    font-size: 1em;
     z-index: 120;
 }
 
@@ -2207,6 +2270,7 @@ body .ui-datatable .ui-datatable-header, body .ui-datatable .ui-datatable-footer
 }
 
 .public-main-contents-io{
+    position: relative;
     width: 100%;
     padding: 2%;
     min-height: 50vh;
@@ -2216,20 +2280,37 @@ body .ui-datatable .ui-datatable-header, body .ui-datatable .ui-datatable-footer
     background-color: #F3F3F3;
 }
 
-.public-main-contents-button{
-    display: flex;
-    padding-top: 1%;
-    padding-bottom: 1%;
-    float:right;
-    min-width: 25%;
+.public-main-contents-io-title{
+    position: absolute;
+    top:25px;
+    min-height: 30px;
+    font-weight: 600;
 }
 
-.public-main-contents-title{
+.public-main-contents-io-content{
+    padding-top: 30px;
+}
+
+.public-main-contents-button-left{
+    padding: 0.5%;
+    float:left;
+    min-width: 15%;
+
+}
+
+.public-main-contents-button-right{
+    padding: 0.5%;
+    float:right;
+    min-width: 25%;
+
+}
+
+.data_field_title{
     font-size: 1.2em;
     padding-top: 1%;
     padding-bottom: 0.5%;
     font-weight: bold;
-    
+
 }
 
 .mainContainer .ui-steps .ui-steps-item{
@@ -2241,7 +2322,7 @@ body .ui-datatable .ui-datatable-header, body .ui-datatable .ui-datatable-footer
 }
 
 .mainContainer .ui-steps.custom .ui-steps-item.complete .ui-menuitem-link .ui-steps-number {
-    background-color: #007AD9;
+    background-color: #00B4ED;
     color: #FFF;
 }
 
@@ -2435,7 +2516,7 @@ input{
 
 .data-container{
     padding-top: 10px;
-    padding-bottom: 30px;
+    padding-bottom: 20px;
 }
 
 .data_table_header{
@@ -2452,6 +2533,10 @@ input{
 .data_field{
     border-bottom: 1px solid #CECECE; 
     min-height: 80px;
+}
+.data_container_nested_public{
+    width: 100%;
+    min-height: 100px;
 }
 
 .data_field_card{
@@ -2474,16 +2559,136 @@ input{
 }
 
 .data_field_label{
-    min-height: 70px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    color: #6C6D70;
+    font-weight: 500;
+    padding-bottom: 5px;
     display: block;
 }
 
 .data_field_value{
-    font-weight: bold;
+    color: #6C6D70;
     display: block;
     width: 100%;
 }
 
+.gray_button .ui-button{
+    background-color: #6C6D70;
+    border:1px solid #6C6D70;
+}
+
+
+
+/* **************** RESTRICT PAGE -- SEARCH PAGE *******************/
+
+.list-data-container{
+    min-height: 100vh;
+}
+
+.object-data-container{
+
+}
+
+.list-data-container .ui-selectbooleanbutton, 
+.list-data-container .ui-buttonset:not(.ui-splitbutton)>.ui-button {
+    width: 25%;
+    border: 1px white solid;
+    font-size: 1.1em!important;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.list-data-container .ui-selectbooleanbutton.ui-state-active, 
+.list-data-container .ui-buttonset:not(.ui-splitbutton)>.ui-button.ui-state-active{
+    background-color: #99C221;
+    border:1px solid #99C221;
+}
+
+.list-data-container .ui-panel .ui-panel-content{
+    background-color: #EEEEEE;
+}
+
+.restrict-main-list-mode-button{
+    width: 100%;
+    min-height: 50px;
+}
+.restrict-main-object-title{
+    min-height: 50px;
+    width: 100%;
+    font-size: 1.5em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: right;
+    font-weight: 700;
+    color: #6C6D70;
+    padding: 5px;
+}
+
+.data_container_nested_restrict{
+    width: 100%;
+    padding-top: 15px;
+    margin-bottom: 20px;
+}
+
+.restrict-main-contents-io-title{
+    font-weight: 700;
+    padding-bottom: 10px;
+}
+
+.restrict-main-contents-io-link{
+    display: inline-block; 
+    float: right;
+    font-weight: 200;
+    border-bottom: 1px solid #6C6D70;
+}
+
+.restrict-main-contents-io-link a{
+    color: #6C6D70;
+}
+
+.restrict-main-contents-io-content{
+    min-height: 40px;
+}
+
+.restrict-main-contents-io-filter{
+    display: inline-block;
+    padding-top:15px;
+}
+.restrict-main-contents-io-filter .checkbox{
+    
+    padding-right: 10px;
+}
+
+.restrict-main-contents-io-button{
+    width: 150px;
+    float: right;
+    margin-left: 5px;
+}
+
+.restrict-data-field{
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.restrict-data-field-label-inline{
+    font-weight: 700;
+    display: inline-block;
+    min-width:150px;
+}
+
+.restrict-data-field-value-inline{
+    color: #6C6D70;
+    display: inline-block;
+    vertical-align: top;
+
+}
+
+.restrict-data-field-label-vertical{
+    min-height: 30px;
+    font-weight: 700;
+    border-bottom: 1px solid #CECECE;
+}
+
+.restrict-data-field-value-vertical{
+    padding-top: 15px;
+    display: block;
+}
