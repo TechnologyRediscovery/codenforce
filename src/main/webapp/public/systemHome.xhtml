@@ -28,7 +28,7 @@
                                     <div class="public-main-contents-io public-main-contents-login">
 
                                         <h:graphicImage styleClass="public-login-logo" value="/images/login-logo.png" />
-                                        
+
                                         <div class="publi-login-container">
 
                                             <div class="publi-login-title">
@@ -60,6 +60,10 @@
                             </div>
                         </div>
                     </h:form>
+                    <script>
+                        var y = document.getElementById('public-login-arrow-id');
+                        y.className += " public-menu-active";
+                    </script> 
                 </f:view>
             </ui:define>
         </ui:composition>

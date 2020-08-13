@@ -1,8 +1,9 @@
 import re
 from collections import namedtuple
 import bs4
-from _constants import OWNER, TAXINFO
-from _constants import SPAN
+from _constants import OWNER, TAXINFO, SPAN
+from typing import List
+
 
 def soupify_html(raw_html):
     return bs4.BeautifulSoup(raw_html, "html.parser")
@@ -27,7 +28,7 @@ def _extract_elementlist_from_soup(soup, element_id, element=SPAN, remove_tags=T
     cleaned_content = []
     for tag in content:
         if isinstance(
-                tag, bs4.element.Tag
+            tag, bs4.element.Tag
         ):  # Example: <br/> when evaluating the address
             continue
         cleaned_content.append(tag)
@@ -38,31 +39,43 @@ def _extract_elementlist_from_soup(soup, element_id, element=SPAN, remove_tags=T
     return cleaned_content
 
 
+# Todo: The replace_taxstatus really messes this up. Is there a way to use a single function?
+def replace_html_content(soup, id, new_str):
+    tag = soup.find(id=id)
+    tag.string = new_str
+    return soup
+
+
 TaxStatus = namedtuple(
     "tax_status",
-    ["year", "paidstatus", "tax", "penalty", "interest", "total", "date_paid", "blank"],
+    fields := [
+        "year",
+        "paidstatus",
+        "tax",
+        "penalty",
+        "interest",
+        "total",
+        "date_paid",
+        "blank",
+    ],
+    defaults=(None,) * len(fields),
 )
 
 
-def parse_tax_from_soup(soup):
+def parse_tax_from_soup(soup: bs4.BeautifulSoup, clean=True) -> TaxStatus:
     """
-    :param soup:
-    :return:
     """
     table = _extract_elementlist_from_soup(
         soup, element_id=TAXINFO, element=SPAN, remove_tags=False
     )
     row = table[0].contents[1]  # The most recent year's data
-    try:
-        return TaxStatus(*[clean_text(x.text) for x in row.contents])
-    except TypeError:  # When taxes are unpaid:
-        # Set date_paid and blank set to "" and eventually None. Todo: Make more pythonic?
-        rows = [
-            row.contents[0].text, row.contents[1].text, row.contents[2].text,
-            row.contents[3].text, row.contents[4].text, row.contents[5].text,
-            "", ""
-        ]
-        return TaxStatus(*[clean_text(x) for x in rows])
+    data = row.contents
+
+    # Todo: Document Intellej bug claiming TaxStatus recieved an unexpected argument.
+    if clean:
+        return TaxStatus(*[clean_text(x.text) for x in data])
+    return TaxStatus(*[x.text for x in data])
+
 
 # Function currently unused
 def clean_text(text):
@@ -76,12 +89,26 @@ def clean_text(text):
 
 def strip_whitespace(text):
     return re.sub(" {2,}", " ", text).strip()
+
+
 def strip_dollarsign(text):
     return re.sub(r"\$( )*", "", text)
+
+
 def remove_commas_from_numerics(text):
     if re.fullmatch(r"[\d,\.]+", text):
         return re.sub(r"[,\.]", "", text)
     return text
+
+
+def parse_owners_from_soup(
+    soup: bs4.BeautifulSoup,
+) -> List[
+    str,
+]:
+    return _extract_elementlist_from_soup(
+        soup, element_id=OWNER, element=SPAN, remove_tags=True
+    )
 
 
 class OwnerName:
@@ -89,21 +116,21 @@ class OwnerName:
 
     def __init__(self, parid=None):
         self.multientity = None
+
     def __str__(self):
         return self.clean
+
     def __repr__(self):
         return f"{self.__class__.__name__}<{self.clean}>"
 
-
-
     @classmethod
-    def get_Owner_from_soup(cls, soup: str):
+    def get_Owner_from_soup(cls, soup: bs4.BeautifulSoup):
         """ Factory method for creating OwnerNames from parcel ids.
         """
         o = OwnerName()
-        o.raw = o._parse_owners_from_soup(soup)
+        o.raw = parse_owners_from_soup(soup)
         o.clean = (
-            o._clean_raw_name()
+            o.clean_raw_name()
         )  # Method side effect: May change flag o.multientity
 
         # The Java side hasn't updated their code to match the cleanname, and instead concatenates fname and lname.
@@ -113,13 +140,7 @@ class OwnerName:
         o.compositelname = True
         return o
 
-    @staticmethod
-    def _parse_owners_from_soup(soup):
-        return _extract_elementlist_from_soup(
-            soup, element_id=OWNER, element=SPAN, remove_tags=True
-        )
-
-    def _clean_raw_name(self) -> str:
+    def clean_raw_name(self) -> str:
         if len(self.raw) > 1:
             self.multientity = True
             cleaned_names = []
