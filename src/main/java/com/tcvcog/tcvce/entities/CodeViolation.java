@@ -70,7 +70,7 @@ public  class       CodeViolation
     protected int complianceTFExpiryPropID;
     protected Proposal complianceTFExpiryProp;
     
-    protected int severityIntensityClassID;
+    protected IntensityClass severityIntensity;
     
     protected LocalDateTime lastUpdatedTS;
     protected User lastUpdatedUser;
@@ -607,17 +607,17 @@ public  class       CodeViolation
     }
 
     /**
-     * @return the severityIntensityClassID
+     * @return the severityIntensity
      */
-    public int getSeverityIntensityClassID() {
-        return severityIntensityClassID;
+    public IntensityClass getSeverityIntensity() {
+        return severityIntensity;
     }
 
     /**
-     * @param severityIntensityClassID the severityIntensityClassID to set
+     * @param severityIntensityClassID the severityIntensity to set
      */
-    public void setSeverityIntensityClassID(int severityIntensityClassID) {
-        this.severityIntensityClassID = severityIntensityClassID;
+    public void setSeverityIntensity(IntensityClass severityIntensityClassID) {
+        this.severityIntensity = severityIntensityClassID;
     }
 
     /**

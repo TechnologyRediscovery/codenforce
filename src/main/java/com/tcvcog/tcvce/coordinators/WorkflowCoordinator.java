@@ -79,6 +79,11 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
     // *************************************************************************
     
     
+    public Proposal getProposal(int propid) throws IntegrationException{
+        WorkflowIntegrator wi = getWorkflowIntegrator();
+        return wi.getProposal(propid);
+    }
+    
     /**
      * Database object retrieving method for acquiring all Proposals to inject
      * into our BObs

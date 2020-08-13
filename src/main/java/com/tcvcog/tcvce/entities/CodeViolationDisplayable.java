@@ -47,7 +47,7 @@ public class CodeViolationDisplayable extends CodeViolation {
         this.complianceUser = cv.complianceUser;
         this.complianceTFExpiryPropID = cv.complianceTFExpiryPropID;
         this.complianceTFExpiryProp = cv.complianceTFExpiryProp;
-        this.severityIntensityClassID = cv.severityIntensityClassID;
+        this.severityIntensity = cv.severityIntensity;
         this.lastUpdatedTS = cv.lastUpdatedTS;
         this.lastUpdatedUser = cv.lastUpdatedUser;
 

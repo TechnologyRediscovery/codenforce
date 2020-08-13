@@ -2463,6 +2463,7 @@ input{
     margin: 4%;
     min-height: 45vh;
 }
+
 .data_field_card_title{
     min-height: 130px;
     font-size: 1.5em;
@@ -2478,7 +2479,6 @@ input{
     padding-top: 10px;
     padding-bottom: 10px;
     color: #6C6D70;
-    display: block;
 }
 
 .data_field_value{

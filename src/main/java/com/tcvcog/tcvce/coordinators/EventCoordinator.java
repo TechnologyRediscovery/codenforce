@@ -426,17 +426,20 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         if(erg != null){
             if(erg instanceof CECaseDataHeavy){
                 cse = (CECaseDataHeavy) erg;
-                 if(cse.getStatusBundle().getPhase() == CasePhaseEnum.Closed && 
-                    (
-                        ec.getEventType() == EventType.Action
-                        || 
-                        ec.getEventType() == EventType.Origination
-                        ||
-                        ec.getEventType() == EventType.Compliance
-                    )
-                ){
-                    throw new BObStatusException("This event cannot be attached to a closed case");
-                }
+                if(cse.getStatusBundle() != null){
+                    
+                    if(cse.getStatusBundle().getPhase() == CasePhaseEnum.Closed && 
+                       (
+                           ec.getEventType() == EventType.Action
+                           || 
+                           ec.getEventType() == EventType.Origination
+                           ||
+                           ec.getEventType() == EventType.Compliance
+                       )
+                   ){
+                       throw new BObStatusException("This event cannot be attached to a closed case");
+                   }
+                } 
                 e.setCeCaseID(cse.getCaseID());
                 e.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
             } else if (erg instanceof OccPeriod){
