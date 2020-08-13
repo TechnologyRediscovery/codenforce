@@ -35,6 +35,7 @@ import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyExtData;
+import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
 import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.UserAuthorized;
@@ -46,7 +47,9 @@ import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -91,19 +94,18 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             qcse = sc.initQuery(QueryCECaseEnum.PROPINFOCASES, ua.getKeyCard());
             qcse.getPrimaryParams().setProperty_val(prop);
             pdh.setPropInfoCaseList(cc.assembleCECaseDataHeavyList(sc.runQuery(qcse).getBOBResultList(), ua));
-            
+
             // check list and see if it's emtpy; 
-            if(pdh.getPropInfoCaseList() == null){
+            if (pdh.getPropInfoCaseList() == null) {
                 pdh.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
             }
-                
-            if(pdh.getPropInfoCaseList().isEmpty()){
+
+            if (pdh.getPropInfoCaseList().isEmpty()) {
                 createPropertyInfoCase(pdh, ua);
             }
-            
 
             // UnitDataHeavy list
-            // remember that units data heavy contain all our occ periods and inspections
+            // remember that units data heavy contain all our occ periods, inspections, and PropertyUnitChangeOrders
             if (pdh.getUnitList() != null && !pdh.getUnitList().isEmpty()) {
                 pdh.setUnitWithListsList(getPropertyUnitWithListsList(pdh.getUnitList(), ua));
             }
@@ -113,35 +115,32 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             qp.getPrimaryParams().setProperty_val(prop);
             pdh.setPersonList(sc.runQuery(qp).getBOBResultList());
 
-            // change order list
-            //delay this
-//            pdh.setChangeList(pi.getPropertyUnitChangeListAll(pr));
             // wait on blobs
             //pdh.setBlobList(new ArrayList<Integer>());
-            
             // external data
             pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getPropertyID())));
-            
+
         } catch (EventException | AuthorizationException ex) {
             System.out.println(ex);
             System.out.println();
         }
         return pdh;
     }
-    
+
     /**
      * Utility method for calling the integrator method that creates a single
      * external data record given a list of record IDs
+     *
      * @param extIDList
      * @return
-     * @throws IntegrationException 
+     * @throws IntegrationException
      */
-    private List<PropertyExtData> fetchExternalDataRecords(List<Integer> extIDList) throws IntegrationException{
+    private List<PropertyExtData> fetchExternalDataRecords(List<Integer> extIDList) throws IntegrationException {
         PropertyIntegrator pi = getPropertyIntegrator();
         List<PropertyExtData> extList = new ArrayList<>();
-        if(extIDList != null && !extIDList.isEmpty()){
-            for(Integer i: extIDList){
-               extList.add(pi.getPropertyExternalDataRecord(i));
+        if (extIDList != null && !extIDList.isEmpty()) {
+            for (Integer i : extIDList) {
+                extList.add(pi.getPropertyExternalDataRecord(i));
             }
         }
         return extList;
@@ -288,34 +287,33 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
         return p;
     }
-    
+
     /**
-     * Logic container for checking requests to connect a person to a property 
-     * using a linkage table. The actual DB interaction is delegated to the 
+     * Logic container for checking requests to connect a person to a property
+     * using a linkage table. The actual DB interaction is delegated to the
      * PersonCoordinator who may check their own stuff
-     * 
+     *
      * @param pdh
      * @param pers
      * @throws IntegrationException
-     * @throws BObStatusException 
+     * @throws BObStatusException
      */
-    public void connectPersonToProperty(PropertyDataHeavy pdh, Person pers) throws IntegrationException, BObStatusException{
+    public void connectPersonToProperty(PropertyDataHeavy pdh, Person pers) throws IntegrationException, BObStatusException {
         boolean proceedWithConnect = true;
         PersonCoordinator pc = getPersonCoordinator();
-        if(pdh != null && pers != null){
-            for(Person p: pdh.getPersonList()){
-                if(p.getPersonID() == pers.getPersonID()){
+        if (pdh != null && pers != null) {
+            for (Person p : pdh.getPersonList()) {
+                if (p.getPersonID() == pers.getPersonID()) {
                     proceedWithConnect = false;
                 }
             }
         }
-        if(proceedWithConnect){
+        if (proceedWithConnect) {
             pc.connectPersonToProperty(pers, pdh);
         } else {
             throw new BObStatusException("Person Link Already Exists");
         }
-        
-        
+
     }
 
     public LocalDateTime configureDateTime(Date date) {
@@ -359,15 +357,15 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      *
      * @param p
      * @param ua
-     * @return 
-     * @throws com.tcvcog.tcvce.domain.SearchException 
+     * @return
+     * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public PropertyDataHeavy createPropertyInfoCase(PropertyDataHeavy p, UserAuthorized ua) throws SearchException{
+    public PropertyDataHeavy createPropertyInfoCase(PropertyDataHeavy p, UserAuthorized ua) throws SearchException {
         CaseCoordinator cc = getCaseCoordinator();
         UserCoordinator uc = getUserCoordinator();
         CECase cse = cc.initCECase(p, ua);
         //review all case mems and set app ones for info case
-        
+
 //        try {
 //            cse.setCaseManager(uc.getUser(ua.getMyCredential().getGoverningAuthPeriod().getUserID()));
 // TODO: Debug later
@@ -375,22 +373,22 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 //        } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
 //            System.out.println(ex);
 //        }
-        if(p.getPropInfoCaseList() == null){
+        if (p.getPropInfoCaseList() == null) {
             p.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
         }
-        
-            
+
         return p;
     }
 
     /**
-     * Primary pathway for the creation of new records in the property table--the biggie!!
+     * Primary pathway for the creation of new records in the property
+     * table--the biggie!!
+     *
      * @param prop
      * @param ua
      * @return
-     * @throws IntegrationException 
+     * @throws IntegrationException
      */
-    
     public int addProperty(Property prop, UserAuthorized ua) throws IntegrationException {
         PropertyIntegrator pi = getPropertyIntegrator();
         SystemIntegrator si = getSystemIntegrator();
@@ -424,7 +422,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         prop.setLastUpdatedTS(LocalDateTime.now());
         if (checkAllDates(prop) == false) {
             throw new BObStatusException("Date error in committing property updates; Ensure no end date is before a start date");
-            
+
         }
         pi.updateProperty(prop);
 
@@ -617,17 +615,17 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         prop.setMuni(muni);
         return prop;
     }
-    
-    
+
     /**
      * Creates a skeleton of a property
+     *
      * @param muni
      * @return whose ID is 0
      */
     public PropertyDataHeavy initPropertyDataHeavy(Municipality muni) {
         Property prop = new Property();
         PropertyDataHeavy pdh = new PropertyDataHeavy(prop);
-        
+
         prop.setMuni(muni);
         return pdh;
     }
@@ -655,20 +653,22 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * applies any changes (deactivations and insertions too) BUT BYPASSES THE
      * UNITCHANGEORDER WORKFLOW, so it should only be used internally.
      *
-     * @param unitList the edited unit list we would like to compare with the DB's list
-     * @param prop the property we would like to compare it with. Does not use the built in list, but fetches it from the DB
+     * @param unitList the edited unit list we would like to compare with the
+     * DB's list
+     * @param prop the property we would like to compare it with. Does not use
+     * the built in list, but fetches it from the DB
      * @return the new list grabbed from the Database!
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public List<PropertyUnit> applyUnitList(List<PropertyUnit> unitList, Property prop) 
+    public List<PropertyUnit> applyUnitList(List<PropertyUnit> unitList, Property prop)
             throws BObStatusException, IntegrationException {
 
         PropertyIntegrator pi = getPropertyIntegrator();
 
         sanitizePropertyUnitList(unitList);
-        
-        for(PropertyUnit unit : unitList) {
+
+        for (PropertyUnit unit : unitList) {
 
             // decide if we're updating a unit or inserting it based on initial value
             // newly created units don't have an ID, just a default unit number
@@ -683,16 +683,72 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
             }
         }
-        
-        
+
         List<PropertyUnit> listTwo = pi.getPropertyUnitList(prop);
-        
+
         prop.setUnitList(listTwo);
-        
+
         // mark parent property as updated now
         editProperty(prop, getSessionBean().getSessUser());
-        
+
         return listTwo;
+
+    }
+
+    /**
+     * Implements an existing change order and update its corresponding property
+     * unit, also deactivates and updates the change order to record who
+     * approved the transaction
+     *
+     * @param uc
+     * @throws IntegrationException
+     */
+    public void implementPropertyUnitChangeOrder(PropertyUnitChangeOrder uc) throws IntegrationException {
+
+        PropertyIntegrator pi = getPropertyIntegrator();
+
+        //If the user added the unit, their changes will already be in the database. No need to update
+        if (!uc.isAdded()) {
+
+            PropertyUnit skeleton = getPropertyUnit(uc.getUnitID());
+
+            if (uc.isRemoved()) {
+                skeleton.setActive(false); //just deactivate the unit.
+            } else {
+                if (uc.getUnitNumber() != null) {
+                    skeleton.setUnitNumber(uc.getUnitNumber());
+                }
+
+                /* TODO: What is this?
+                if (uc.getOtherKnownAddress() != null) {
+                    skeleton.setOtherKnownAddress("Updated");
+                } else {
+                    skeleton.setOtherKnownAddress("Updated");
+                }*/
+                
+                if(uc.getOtherKnownAddress() !=null){
+                    skeleton.setOtherKnownAddress(uc.getOtherKnownAddress());
+                }
+            
+                if (uc.getNotes() != null) {
+                    skeleton.setNotes(uc.getNotes());
+                }
+
+                if (uc.getRentalNotes() != null) {
+                    skeleton.setRentalNotes(uc.getRentalNotes());
+                }
+            }
+
+            pi.updatePropertyUnit(skeleton);
+        }
+
+        //Time to update the change order
+        
+        uc.setActive(false);
+        uc.setApprovedOn(Timestamp.valueOf(LocalDateTime.now()));
+        uc.setApprovedBy(getSessionBean().getSessUser());
+        
+        pi.updatePropertyUnitChange(uc);
         
     }
 }

@@ -78,19 +78,20 @@
 
                                     <div class="outlinedBox event-ds-box"> 
                                         <h3>
-                                            <h:outputText value="Unit Number: " />
-                                            <h:outputText value="#{unit.unitNumber.equalsIgnoreCase('-1')? 'Single unit structure' : unit.unitNumber}" />
+                                            <h:outputText value="Unit ID: #{unit.unitID}" />
                                         </h3>
 
                                         <p:spacer height="5px" />
 
-                                        <h:outputText value="Rental notes: " />
-                                        <h:outputText value="#{unit.rentalNotes}" />
+                                        <h:outputText value="Unit Number: #{unit.unitNumber.equalsIgnoreCase('-1')? 'Single unit structure' : unit.unitNumber}" />
 
                                         <p:spacer height="5px" />
 
-                                        <h:outputText value="Rental intent: " />
-                                        <h:outputText value="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop? 'Yes' : 'No'}" />
+                                        <h:outputText value="Rental notes: #{unit.rentalNotes}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Rental intent: #{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop? 'Yes' : 'No'}" />
 
                                         <p:spacer height="5px" />
 
@@ -99,18 +100,15 @@
 
                                         <p:spacer height="5px" rendered="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop}"/>
 
-                                        <h:outputText value="Unit Description: " />
-                                        <h:outputText value="#{unit.notes}" />
+                                        <h:outputText value="Unit Description: #{unit.notes}" />
 
                                         <p:spacer height="5px" />
 
-                                        <h:outputText value="Other known address: " />
-                                        <h:outputText value="#{unit.otherKnownAddress}" />
+                                        <h:outputText value="Other known address: #{unit.otherKnownAddress}" />
 
                                         <p:spacer height="5px" />
 
-                                        <h:outputText value="Active? " />
-                                        <h:outputText value="#{unit.active ? 'Yes' : 'No'}" />
+                                        <h:outputText value="Active? #{unit.active ? 'Yes' : 'No'}" />
 
                                         <h4>Proposed changes</h4>
 
@@ -124,8 +122,15 @@
                                             >                                         
 
                                             <div style="datum">
-                                                <h:outputText value="Change # " />
-                                                <h:outputText value="#{change.unitChangeID}" />
+                                                <h:outputText value="Change # #{change.unitChangeID}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText value="Active? #{change.active}" />
+                                            </div>
+                                            
+                                            <div style="datum">
+                                                <h:outputText value="Approved? #{propertyUnitChangesBB.approvedByWho(change)}" />
                                             </div>
 
                                             <div style="datum">
@@ -137,17 +142,17 @@
                                                 <h:outputText rendered="#{not empty change.rentalNotes}" 
                                                               value="Proposed rental notes: #{change.rentalNotes}" />
                                             </div>
-                                            
+
                                             <div style="datum">
                                                 <h:outputText rendered="#{not empty change.notes}" 
                                                               value="Proposed unit description: #{change.notes}" />
                                             </div>
-                                            
+
                                             <div style="datum">
                                                 <h:outputText rendered="#{not empty change.otherKnownAddress}" 
                                                               value="Proposed other known address: #{change.otherKnownAddress}" />
                                             </div>
-                                            
+
                                             <div style="datum">
                                                 <h:outputText value="Did the user want to add this unit? #{change.added ? 'Yes' : 'No'}" />
                                             </div>
@@ -158,7 +163,7 @@
                                             <p:commandButton       id="button-compare-change-order"
                                                                    ajax="true" 
                                                                    update="form-unitedit"
-                                                                   actionListener="#{PropertyUnitChangesBB.initializeChangeComparison()}"
+                                                                   actionListener="#{propertyUnitChangesBB.initializeChangeComparison(unit, change)}"
                                                                    oncomplete="PF('dialog-widvar-change-edit').show()"
                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                                                    disabled="#{not change.active}"
@@ -170,8 +175,8 @@
 
                                 <p:outputLabel 
                                     rendered="#{propertyUnitChangesBB.heavyDisplayList.isEmpty()}"
-                                    value="The current property has no proposed changes to any of its units!"/>
-                                
+                                    value="No changes matching the criteria were found on this property!"/>
+
                             </h:form>
 
                         </p:panel>
@@ -182,7 +187,7 @@
 
 
                     <p:dialog    id="dialog-compare-changes"
-                                 height="650" width="900"
+                                 height="300" width="600"
                                  widgetVar="dialog-widvar-change-edit"
                                  closable="true" >
                         <h2>Compare and Manage a change order</h2>
@@ -263,7 +268,7 @@
                                              icon="fa fa-thumbs-o-up"
                                              update="unit-changes-messages-form
                                              unit-changes-list-form"
-                                             value="Reject Change Order" 
+                                             value="Reject (Deactivate) Change Order" 
                                              tabindex="3"/>
 
                             <p:commandButton ajax="true"

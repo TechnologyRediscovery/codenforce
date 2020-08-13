@@ -16,6 +16,11 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
@@ -55,10 +60,92 @@ public class PropertyUnitChangesBB
 
         if (currentViewOption == null) {
 
-            setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ALL);
+            setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ACTIVE);
+        }
+    }
 
+    public void refreshCurrentObjects() {
+        PropertyCoordinator pc = getPropertyCoordinator();
+
+        //let's grab the latest copy of the prop from the database and set it on the session bean
+        try {
+
+            Property dbProp = pc.getProperty(currProp.getPropertyID());
+
+            currProp = pc.assemblePropertyDataHeavy(dbProp, getSessionBean().getSessUser());
+
+            getSessionBean().setSessProperty(currProp);
+        } catch (BObStatusException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.toString(), ""));
+            currProp = getSessionBean().getSessProperty();
+        } catch (IntegrationException | SearchException ex) {
+            System.out.println("PropertyUnitChangesBB.refreshCurrentObjects() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to load information from the database.", ""));
+            currProp = getSessionBean().getSessProperty();
         }
 
+        currPropUnit = new PropertyUnit();
+
+        currChangeOrder = new PropertyUnitChangeOrder();
+
+    }
+
+    public String approvedByWho(PropertyUnitChangeOrder change) {
+
+        if (change.getApprovedBy() != null) {
+            return "Approved by: " + change.getApprovedBy().getPerson().getFirstName()
+                    + " "
+                    + change.getApprovedBy().getPerson().getLastName()
+                    + " (ID# "
+                    + change.getApprovedBy().getPersonID()
+                    + ")";
+        } else if(change.isActive()) {
+            return "No action taken yet";
+        } else {
+            return "Rejected";
+        }
+
+    }
+
+    public void initializeChangeComparison(PropertyUnit unit, PropertyUnitChangeOrder change) {
+        currPropUnit = unit;
+        currChangeOrder = change;
+    }
+
+    public void rejectChangeOrder() {
+        PropertyIntegrator pi = getPropertyIntegrator();
+
+        currChangeOrder.setActive(false);
+
+        try {
+            pi.updatePropertyUnitChange(currChangeOrder);
+        } catch (IntegrationException ex) {
+            System.out.println("PropertyUnitChangesBB.rejectChangeOrder() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to update the database.", ""));
+        }
+
+        setCurrentViewOption(currentViewOption);
+    }
+
+    public void applyChangeOrder() {
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
+        try {
+            pc.implementPropertyUnitChangeOrder(currChangeOrder);
+        } catch (IntegrationException ex) {
+            System.out.println("PropertyUnitChangesBB.applyChangeOrder() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to update the database.", ""));
+        }
+
+        setCurrentViewOption(currentViewOption);
     }
 
     public String goToPropertyUnits() {
@@ -102,6 +189,9 @@ public class PropertyUnitChangesBB
     }
 
     public void setCurrentViewOption(ViewOptionsActiveListsEnum input) {
+
+        refreshCurrentObjects();
+
         currentViewOption = input;
 
         heavyDisplayList = new ArrayList<>();
@@ -122,7 +212,7 @@ public class PropertyUnitChangesBB
                             heavyDisplayList.add(unit);
                         }
                     }
-                    
+
                     break;
 
                 case VIEW_ACTIVE:
@@ -165,7 +255,7 @@ public class PropertyUnitChangesBB
 
                     break;
             }
-            
+
         }
 
     }
