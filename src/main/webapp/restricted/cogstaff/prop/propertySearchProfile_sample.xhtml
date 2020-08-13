@@ -1,0 +1,455 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Property Info</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="prop-info-view">
+                    <p:outputPanel id="body-panel">
+
+                        <!-- GLOBAL MESSAGES -->
+                        <h:form id="form-messages-global">
+                            <p:growl id="messages-global" showDetail="false"/>
+                        </h:form>
+
+                        <div class="mainContainer">
+
+                            <!-- DATA CONTAINER -->
+                            <div class="ui-g data-container">
+
+                                <!-- LIST DATA CONTAINER --> 
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 list-data-container">
+
+                                    <!-- MODE SELECTION --> 
+                                    <h:form id="mode-form">
+                                        <div class="restrict-main-list-mode-button">
+                                            <p:selectOneButton  value="#{propertyProfileBB.currentMode}"
+                                                                unselectable="false"
+                                                                tabindex="1"
+                                                                style="width: 100%"
+                                                                >
+                                                <f:selectItems value="#{propertyProfileBB.pageModes}"
+                                                               var="pmo"
+                                                               itemLabel="#{pmo.title}"
+                                                               itemDisabled="#{!propertyProfileBB.currentPropertySelected and pmo.objectSelectRequiredToEnable}"/>
+                                                <f:ajax render="@all"/>
+                                            </p:selectOneButton>
+                                        </div>
+                                    </h:form>
+
+                                    <!-- PANEL CONTAINER FOR SEARCH-->
+                                    <p:panel style="width:100%;"
+                                             header="Search(SAMPLE)"
+                                             rendered="#{propertyProfileBB.activeLookupMode}">
+
+                                        <!--MESSAGES -->
+                                        <h:form id="SAMPLE-search-messages-form">
+                                            <p:growl id="SAMPLE-search-messages" showDetail="false"/>
+                                        </h:form>
+
+                                        <h:form>
+
+                                            <!-- NESTED DATA CONTAINER FOR INPUT-->
+                                            <div class="ui-g data_container_nested_restrict">
+
+                                                <!--NESTED DATA FIELD GRID:12-->
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                                    <!-- NESTED DATA TITLE -->
+                                                    <div class="restrict-main-contents-io-title">
+                                                        <h:outputLabel value="Select Tpye of Search (SAMPLE)"/>
+                                                    </div>
+
+                                                    <!-- NESTED DATA CONTENT -->
+                                                    <div class="restrict-main-contents-io-content">
+                                                        <p:selectOneMenu value=""
+                                                                         style="width: 100%"
+                                                                         >
+
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- NESTED DATA CONTAINER FOR INPUT-->
+                                            <div class="ui-g data_container_nested_restrict">
+
+                                                <!--NESTED DATA FIELD GRID:12-->
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                                    <!-- NESTED DATA TITLE -->
+                                                    <div class="restrict-main-contents-io-title">
+                                                        <h:outputLabel value="Enter Search Criteria (SAMPLE)"/>
+
+                                                        <!-- NESTED DATA LINK FOR ADVANCED SEARCH -->
+                                                        <div class="restrict-main-contents-io-link">
+                                                            <p:commandLink ajax="true"
+                                                                           oncomplete="PF('SAMPLE-var').show()"
+                                                                           value="Advanced Search"
+                                                                           />
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- NESTED DATA CONTENT -->
+                                                    <div class="restrict-main-contents-io-content">
+                                                        <p:inputText value=""
+                                                                     style="width: 100%;"
+                                                                     />
+                                                    </div>
+
+                                                    <!-- NESTED DATA FILTER -->
+                                                    <div class="restrict-main-contents-io-filter">
+
+                                                        <p:selectBooleanCheckbox class="checkbox"
+                                                                                 value="" >
+                                                            <p:ajax update=""/>
+                                                        </p:selectBooleanCheckbox>
+
+                                                        <p:outputLabel value="Filter by (SAMPLE)"/>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                            <!-- NESTED DATA CONTAINER FOR BUTTON-->
+                                            <div class="ui-g data_container_nested_restrict">
+
+                                                <!--NESTED DATA FIELD GRID:12-->
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                                    <!-- NESTED DATA BUTTON -->
+                                                    <div class="restrict-main-contents-io-button">
+                                                        <p:commandButton icon="fa fa-search"
+                                                                         value="Search"
+                                                                         style="width: 100%"
+                                                                         />
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:form>
+                                    </p:panel>
+
+                                    <!-- PANEL CONTAINER FOR RESULT-->
+                                    <p:panel style="width:100%;"
+                                             header="Search Results (SAMPLE)"
+                                             >
+
+                                        <h:form>
+
+                                            <!-- NESTED DATA CONTAINER -->
+                                            <div class="ui-g data_container_nested_restrict">
+
+                                                <!--NESTED DATA FIELD GRID:12-->
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                                    <!-- NESTED DATA BUTTON -->
+                                                    <div class="restrict-main-contents-io-button gray_button">
+                                                        <p:commandButton icon="fa fa-eraser"
+                                                                         style="width: 100%"
+                                                                         value="Clear Results"
+                                                                         />
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <p:dataTable tableStyleClass="primeDataTable">
+
+                                                <p:column width="30%" style="text-align: center">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="SAMPLE"/>
+                                                    </f:facet>
+                                                    <h:outputText value="SAMPLE" />
+                                                </p:column>
+
+                                                <p:column width="30%" style="text-align: center">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="SAMPLE"/>
+                                                    </f:facet>
+                                                    <h:outputText value="SAMPLE" />
+                                                </p:column>
+
+                                                <p:column width="20%" style="text-align: center">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Load"/>
+                                                    </f:facet>
+                                                    <div class="gray_button">
+                                                        <p:commandButton icon="fa fa-folder-open-o"
+                                                                         value="Load (SAMPLE)"
+                                                                         />
+                                                    </div>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </h:form>
+                                    </p:panel>
+                                </div>
+
+                                <!-- OBJECT DATA CONTAINER --> 
+                                <div class="ui-g-12 ui-md-8 ui-lg-8 object-data-container">
+
+                                    <!-- OBJECT DATA TITLE --> 
+                                    <div class="restrict-main-object-title">
+                                        <h:outputText value="OBJECT TITLE " />
+                                    </div>
+
+                                    <!-- OBJECT DATA PANEL--> 
+                                    <p:panel header="SAMPLE">
+
+                                        <p:spacer height="10px"/>
+
+                                        <h:form>
+
+                                            <!-- NESTED DATA CONTAINER TO DISPLAY IN LINE-->
+                                            <div class="ui-g data_container_nested_restrict">
+
+                                                <!--NESTED DATA FIELD GRID:12-->
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                                    <!--NESTED DATA LABEL INLINE -->
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <h:outputLabel value="LABEL SAMPLE"/>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
+                                                        <h:outputLabel value="VALUE SAMPLE"/>
+                                                    </div>
+
+                                                </div>
+
+                                                <!--NESTED DATA FIELD GRID:12-->
+                                                <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field">
+
+                                                    <!-- NESTED DATA LABEL INLINE -->
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <h:outputLabel value="LABEL SAMPLE"/>
+                                                    </div>
+                                                    <!-- NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
+                                                        <h:outputLabel value="VALUE SAMPLE"/>
+                                                    </div>
+
+                                                </div>
+
+                                                <!--NESTED DATA FIELD GRID:12-->
+                                                <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field">
+
+                                                    <!-- NESTED DATA LABEL INLINE -->
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <h:outputLabel value="LABEL SAMPLE"/>
+                                                    </div>
+                                                    <!-- NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
+                                                        <h:outputLabel value="VALUE SAMPLE"/>
+                                                    </div>
+
+                                                </div>
+
+                                                <!--NESTED DATA FIELD GRID:12-->
+                                                <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field">
+
+                                                    <!-- NESTED DATA LABEL INLINE -->
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <h:outputLabel value="LABEL SAMPLE"/>
+                                                    </div>
+                                                    <!-- NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
+                                                        <h:outputLabel value="VALUE SAMPLE"/>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                            <!-- NESTED DATA CONTAINER FOR DISPLAY AS A TABLE-->
+                                            <div class="ui-g data_container_nested_restrict">
+
+                                                <!--NESTED DATA FIELD GRID:4-->
+                                                <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-vertical">
+                                                    <div class="restrict-data-field-label-vertical" >
+                                                        <h:outputLabel value=" "/>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-vertical" style="font-weight: 700;">
+                                                        SAMPLE Date:
+                                                    </div>
+                                                    <div class="restrict-data-field-value-vertical" style="font-weight: 700;">
+                                                        SAMPLE Date:
+                                                    </div>
+
+                                                </div>
+
+                                                <!--NESTED DATA FIELD GRID:4-->
+                                                <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-vertical">
+                                                    <div class="restrict-data-field-label-vertical" >
+                                                        <h:outputLabel value="SAMPLE"/>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText value="SAMPLE"/>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText value="SAMPLE"/>
+                                                    </div>
+
+                                                </div>
+
+                                                <!--NESTED DATA FIELD GRID:4-->
+                                                <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-vertical">
+                                                    <div class="restrict-data-field-label-vertical" >
+                                                        <h:outputLabel value="SAMPLE"/>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText value="SAMPLE"/>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText value="SAMPLE"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:form>
+                                    </p:panel>
+                                </div>
+                            </div>
+                        </div>
+
+                    </p:outputPanel>
+
+                    <p:dialog height="500" 
+                              width="800"
+                              modal="true"
+                              widgetVar="SAMPLE-var"
+                              closable="true"
+                              header="Advanced Search(SAMPLE)">
+
+                        <h:form>
+
+                            <!-- NESTED DATA CONTAINER -->
+                            <div class="ui-g data_container_nested_restrict">
+
+                                <!--NESTED DATA FIELD GRID:12 FOR FILTER-->
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                    <!-- NESTED DATA TITLE -->
+                                    <div class="restrict-main-contents-io-title" >
+
+                                        <!-- NESTED DATA FILTER -->
+                                        <div class="restrict-main-contents-io-filter">
+
+                                            <p:selectBooleanCheckbox class="checkbox"
+                                                                     value="" >
+                                                <p:ajax />
+                                            </p:selectBooleanCheckbox>
+
+                                            <p:outputLabel value="Filter by (SAMPLE)"/>
+
+                                        </div>
+                                    </div>
+
+                                    <!-- NESTED DATA CONTENT -->
+                                    <div class="restrict-main-contents-io-content" >
+
+                                        <p:inputText value=""
+                                                     style="width:100%"
+                                                     />
+
+                                    </div>
+                                </div>
+
+                                <!--NESTED DATA FIELD GRID:12 FOR FILTER-->
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                    <!-- NESTED DATA TITLE -->
+                                    <div class="restrict-main-contents-io-title" >
+
+                                        <!-- NESTED DATA FILTER -->
+                                        <div class="restrict-main-contents-io-filter">
+
+                                            <p:selectBooleanCheckbox class="checkbox"
+                                                                     value="" >
+                                                <p:ajax />
+                                            </p:selectBooleanCheckbox>
+
+                                            <p:outputLabel value="Filter by (SAMPLE)"/>
+
+                                        </div>
+                                    </div>
+
+                                    <!-- NESTED DATA CONTENT -->
+                                    <div class="restrict-main-contents-io-content" >
+
+                                        <p:inputText value=""
+                                                     style="width:100%"
+                                                     />
+
+                                    </div>
+                                </div>
+
+                                <!--NESTED DATA FIELD GRID:12 FOR FILTER-->
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                    <!-- NESTED DATA TITLE -->
+                                    <div class="restrict-main-contents-io-title" >
+
+                                        <!-- NESTED DATA FILTER -->
+                                        <div class="restrict-main-contents-io-filter">
+
+                                            <p:selectBooleanCheckbox class="checkbox"
+                                                                     value="" >
+                                                <p:ajax />
+                                            </p:selectBooleanCheckbox>
+
+                                            <p:outputLabel value="Filter by (SAMPLE)"/>
+
+                                        </div>
+                                    </div>
+
+                                    <!-- NESTED DATA CONTENT -->
+                                    <div class="restrict-main-contents-io-content" >
+
+                                        <p:inputText value=""
+                                                     style="width:100%"
+                                                     />
+
+                                    </div>
+
+                                </div>
+
+                                <!-- NESTED DATA CONTAINER -->
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                    <div class="restrict-main-contents-io-button">
+                                        <p:commandButton icon="fa fa-search"
+                                                         style="width: 100%"
+                                                         value="Search"
+                                                         />
+
+
+
+                                    </div>
+                                    <div class="restrict-main-contents-io-button gray_button">
+                                        <p:commandButton ajax="true"
+                                                         value="Cancel" 
+                                                         icon="fa fa-stop"
+                                                         style="width: 100%"
+                                                         onclick="PF('SAMPLE-var').hide()"
+                                                         />
+
+                                    </div>
+                                </div>
+                            </div>
+                        </h:form>
+                    </p:dialog>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

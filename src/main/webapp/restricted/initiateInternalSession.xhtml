@@ -204,7 +204,7 @@
                                     </div>
 
                                     <!-- CONTENT BUTTON -->
-                                    <div class="public-main-contents-button">
+                                    <div class="public-main-contents-button-right">
                                         <p:commandButton id="navcontres-button-logout"
                                                          action="#{systemServicesBB.logout}" 
                                                          value="Logout"
@@ -218,6 +218,10 @@
 
                         </div>
                     </h:form>
+                    <script>
+                        var y = document.getElementById('public-login-arrow-id');
+                        y.className += " public-menu-active";
+                    </script> 
                 </f:view>
             </ui:define>
         </ui:composition>
