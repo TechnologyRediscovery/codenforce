@@ -28,6 +28,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.PersonType;
+import com.tcvcog.tcvce.entities.PersonWithChanges;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
@@ -1457,7 +1458,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(10, order.getAddressCity());
             stmt.setString(11, order.getAddressZip());
             stmt.setString(12, order.getAddressState());
-            stmt.setBoolean(13, order.isUserSeparateMailingAddress());
+            stmt.setBoolean(13, order.isUseSeparateMailingAddress());
             stmt.setString(14, order.getMailingAddressStreet());
             stmt.setString(15, order.getMailingAddressThirdLine());
             stmt.setString(16, order.getMailingAddressCity());
@@ -1509,7 +1510,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(10, order.getAddressCity());
             stmt.setString(11, order.getAddressZip());
             stmt.setString(12, order.getAddressState());
-            stmt.setBoolean(13, order.isUserSeparateMailingAddress());
+            stmt.setBoolean(13, order.isUseSeparateMailingAddress());
             stmt.setString(14, order.getMailingAddressStreet());
             stmt.setString(15, order.getMailingAddressThirdLine());
             stmt.setString(16, order.getMailingAddressCity());
@@ -1535,7 +1536,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    public List<PersonChangeOrder> getPersonChangeOrderList(Person person) throws IntegrationException{
+    public List<PersonChangeOrder> getPersonChangeOrderList(int personID) throws IntegrationException{
         
         String query =  "SELECT personchangeid, person_personid, firstname, lastname, compositelastname, \n" +
 "       phonecell, phonehome, phonework, email, addressstreet, addresscity, \n" +
@@ -1552,7 +1553,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, person.getPersonID());
+            stmt.setInt(1, personID);
             
             ResultSet rs = stmt.executeQuery();
 
@@ -1573,7 +1574,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-        public List<PersonChangeOrder> getPersonChangeOrderListAll(Person person) throws IntegrationException{
+        public List<PersonChangeOrder> getPersonChangeOrderListAll(int personID) throws IntegrationException{
         
         String query =  "SELECT personchangeid, person_personid, firstname, lastname, compositelastname, \n" +
 "       phonecell, phonehome, phonework, email, addressstreet, addresscity, \n" +
@@ -1590,7 +1591,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, person.getPersonID());
+            stmt.setInt(1, personID);
             
             ResultSet rs = stmt.executeQuery();
 
@@ -1608,82 +1609,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
         
         return orderList;
-        
-    }
-    
-    public void implementPersonChangeOrder(PersonChangeOrder order) throws IntegrationException{
-        
-        Person skeleton = getPerson(order.getPersonID());
-        
-        if (order.getFirstName() != null) {
-            skeleton.setFirstName(order.getFirstName());
-        }
-        
-        if (order.getLastName() != null) {
-            skeleton.setLastName(order.getLastName());
-        }
-        
-        if (order.getCompositeLastName()!= null) {
-            skeleton.setCompositeLastName(order.isCompositeLastName());
-        }
-        
-        if (order.getPhoneCell()!= null) {
-            skeleton.setPhoneCell(order.getPhoneCell());
-        }
-        
-        if (order.getPhoneHome()!= null) {
-            skeleton.setPhoneHome(order.getPhoneHome());
-        }
-        
-        if (order.getPhoneWork()!= null) {
-            skeleton.setPhoneWork(order.getPhoneWork());
-        }
-        
-        if (order.getEmail()!= null) {
-            skeleton.setEmail(order.getEmail());
-        }
-        
-        if (order.getAddressStreet()!= null) {
-            skeleton.setAddressStreet(order.getAddressStreet());
-        }
-        
-        if (order.getAddressCity()!= null) {
-            skeleton.setAddressCity(order.getAddressCity());
-        }
-        
-        if (order.getAddressState()!= null) {
-            skeleton.setAddressState(order.getAddressState());
-        }
-        
-        if (order.getAddressZip()!= null) {
-            skeleton.setAddressZip(order.getAddressZip());
-        }
-        
-        if (order.getUseSeparateMailingAddress()!= null) {
-            skeleton.setUseSeparateMailingAddress(order.isUserSeparateMailingAddress());
-        }
-        
-        if (order.getMailingAddressStreet()!= null) {
-            skeleton.setMailingAddressStreet(order.getMailingAddressStreet());
-        }
-        
-        if (order.getMailingAddressThirdLine()!= null) {
-            skeleton.setMailingAddressThirdLine(order.getMailingAddressThirdLine());
-        }
-        
-        if (order.getMailingAddressCity()!= null) {
-            skeleton.setMailingAddressCity(order.getMailingAddressCity());
-        }
-        
-        if (order.getMailingAddressState()!= null) {
-            skeleton.setMailingAddressState(order.getMailingAddressState());
-        }
-        
-        if (order.getMailingAddressZip()!= null) {
-            skeleton.setMailingAddressZip(order.getMailingAddressZip());
-        }
-        
-        updatePerson(skeleton);
         
     }
     

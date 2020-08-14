@@ -861,6 +861,11 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
+    <managed-bean>
+        <managed-bean-name>personChangesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PersonChangesBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>personOccPeriodsBB</managed-bean-name>
@@ -901,6 +906,12 @@
         <navigation-case>
             <from-outcome>personInfo</from-outcome>
             <to-view-id>/restricted/cogstaff/person/personInfo.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>personChanges</from-outcome>
+            <to-view-id>/restricted/cogstaff/person/personChanges.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         

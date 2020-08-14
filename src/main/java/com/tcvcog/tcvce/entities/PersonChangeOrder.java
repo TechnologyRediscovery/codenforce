@@ -379,7 +379,7 @@ public class PersonChangeOrder extends ChangeOrder {
         return useSeparateMailingAddress;
     }
     
-    public boolean isUserSeparateMailingAddress(){
+    public boolean isUseSeparateMailingAddress(){
         return Boolean.getBoolean(useSeparateMailingAddress);
     }
 

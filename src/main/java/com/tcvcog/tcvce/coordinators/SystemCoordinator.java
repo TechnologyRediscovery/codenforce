@@ -42,11 +42,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**
@@ -452,6 +449,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     //Sub NavItem: Persons
     // listed in file order
     private final NavigationSubItem personCECases = getNavSubItem("CE Cases", "/restricted/cogstaff/person/personCECases.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem personChanges = getNavSubItem("Changes", "/restricted/cogstaff/person/personChanges.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem personEvents = getNavSubItem("Events", "/restricted/cogstaff/person/personEvents.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem personInfo = getNavSubItem("Info", "/restricted/cogstaff/person/personInfo.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem personOccPeriods = getNavSubItem("Occ periods", "/restricted/cogstaff/person/personOccPeriods.xhtml", "fa fa-sign-in", false);
@@ -471,6 +469,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         navList.add(personOccPeriods);
         navList.add(personCECases);
         navList.add(personPublic);
+        navList.add(personChanges);
         return navList;
     }
 

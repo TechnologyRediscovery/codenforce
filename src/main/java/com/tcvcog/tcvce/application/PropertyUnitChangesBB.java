@@ -147,7 +147,7 @@ public class PropertyUnitChangesBB
 
         setCurrentViewOption(currentViewOption);
     }
-
+    
     public String goToPropertyUnits() {
         return "propertyUnits";
     }

@@ -735,6 +735,23 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         return "applicationChangePeople";
     }
+    
+    public String goToPersonChangeOrders() {
+
+        List<Person> skeletonHorde = new ArrayList<>();
+        
+        for(PersonOccPeriod skeleton : selectedApplication.getAttachedPersons()){
+            
+            skeletonHorde.add(skeleton);
+            
+        }
+        
+        getSessionBean().setSessPersonList(skeletonHorde);
+
+        getSessionBean().getNavStack().pushCurrentPage();
+
+        return "personChanges";
+    }
 
     public String acceptUnitListChanges() {
 

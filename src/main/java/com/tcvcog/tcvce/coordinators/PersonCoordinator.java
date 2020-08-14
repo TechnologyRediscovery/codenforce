@@ -26,8 +26,10 @@ import com.tcvcog.tcvce.entities.Credential;
 
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonChangeOrder;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
 import com.tcvcog.tcvce.entities.PersonType;
+import com.tcvcog.tcvce.entities.PersonWithChanges;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
@@ -672,4 +674,123 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         
         return sb.toString();
     }
+    
+    public PersonWithChanges getPersonWithChanges(int personID) throws IntegrationException{
+        
+        PersonWithChanges skeleton = new PersonWithChanges(getPerson(personID));
+        
+        PersonIntegrator pi = getPersonIntegrator();
+        
+        skeleton.setChangeOrderList(pi.getPersonChangeOrderListAll(personID));
+        
+        return skeleton;
+        
+    }
+    
+    public List<PersonWithChanges> getPersonWithChangesList(List<Person> personList) throws IntegrationException{
+        
+        List<PersonWithChanges> skeletonHorde = new ArrayList<>();
+        
+        for(Person input : personList){
+            
+            skeletonHorde.add(getPersonWithChanges(input.getPersonID()));
+            
+        }
+        
+        return skeletonHorde;
+        
+    }
+    
+    public List<PersonWithChanges> getPersonWithChangesListUsingID(List<Integer> personIDList) throws IntegrationException{
+        
+        List<PersonWithChanges> skeletonHorde = new ArrayList<>();
+        
+        for(Integer input : personIDList){
+            
+            skeletonHorde.add(getPersonWithChanges(input));
+            
+        }
+        
+        return skeletonHorde;
+        
+    }
+    
+    public void implementPersonChangeOrder(PersonChangeOrder order) throws IntegrationException{
+        
+        Person skeleton = getPerson(order.getPersonID());
+        
+        PersonIntegrator pi = getPersonIntegrator();
+        
+        if (order.getFirstName() != null) {
+            skeleton.setFirstName(order.getFirstName());
+        }
+        
+        if (order.getLastName() != null) {
+            skeleton.setLastName(order.getLastName());
+        }
+        
+        if (order.getCompositeLastName()!= null) {
+            skeleton.setCompositeLastName(order.isCompositeLastName());
+        }
+        
+        if (order.getPhoneCell()!= null) {
+            skeleton.setPhoneCell(order.getPhoneCell());
+        }
+        
+        if (order.getPhoneHome()!= null) {
+            skeleton.setPhoneHome(order.getPhoneHome());
+        }
+        
+        if (order.getPhoneWork()!= null) {
+            skeleton.setPhoneWork(order.getPhoneWork());
+        }
+        
+        if (order.getEmail()!= null) {
+            skeleton.setEmail(order.getEmail());
+        }
+        
+        if (order.getAddressStreet()!= null) {
+            skeleton.setAddressStreet(order.getAddressStreet());
+        }
+        
+        if (order.getAddressCity()!= null) {
+            skeleton.setAddressCity(order.getAddressCity());
+        }
+        
+        if (order.getAddressState()!= null) {
+            skeleton.setAddressState(order.getAddressState());
+        }
+        
+        if (order.getAddressZip()!= null) {
+            skeleton.setAddressZip(order.getAddressZip());
+        }
+        
+        if (order.getUseSeparateMailingAddress()!= null) {
+            skeleton.setUseSeparateMailingAddress(order.isUseSeparateMailingAddress());
+        }
+        
+        if (order.getMailingAddressStreet()!= null) {
+            skeleton.setMailingAddressStreet(order.getMailingAddressStreet());
+        }
+        
+        if (order.getMailingAddressThirdLine()!= null) {
+            skeleton.setMailingAddressThirdLine(order.getMailingAddressThirdLine());
+        }
+        
+        if (order.getMailingAddressCity()!= null) {
+            skeleton.setMailingAddressCity(order.getMailingAddressCity());
+        }
+        
+        if (order.getMailingAddressState()!= null) {
+            skeleton.setMailingAddressState(order.getMailingAddressState());
+        }
+        
+        if (order.getMailingAddressZip()!= null) {
+            skeleton.setMailingAddressZip(order.getMailingAddressZip());
+        }
+        
+        pi.updatePerson(skeleton);
+        
+    }
+    
 }

@@ -1,0 +1,558 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!--
+Copyright (C) 2020 Technology Rediscovery LLC.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Person changes</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="person-changes-view">
+
+                    <div class="mainContainer">
+
+                        <h:form id="person-changes-messages-form">
+                            <h:messages id="person-changes-messages"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+                        </h:form>
+
+                        <h1>Person changes</h1>
+
+                        <p:panel    id="person-changes-list-panel"
+                                    toggleable="true"
+                                    widgetVar="person-changes-list-panel-var"
+                                    collapsed="false"
+                                    header="Change list">
+
+                            <h:form id="select-view-option-form">
+
+                                <p:commandButton rendered="#{personChangesBB.wasRedirected()}"
+                                                 value="Finish and return"
+                                                 action="#{personChangesBB.goBack()}"
+                                                 />
+                                
+                                <p:spacer height="10px"/>
+                                
+                                <p:outputLabel value="What changes would you like to edit?"/>
+
+                                <p:selectOneMenu style="width: 300px;" 
+                                                 id="person-changes-list-viewoptions" 
+                                                 value="#{personChangesBB.currentViewOption}"
+                                                 >
+
+                                    <p:ajax update="form-personedit
+                                            person-changes-list-form"/>
+
+                                    <f:selectItems  id="select-view-option-items"
+                                                    value="#{personChangesBB.allViewOptions}"
+                                                    var="vo"
+                                                    itemValue="#{vo}"
+                                                    itemLabel="#{vo.label}"/>
+                                </p:selectOneMenu>
+
+                                <p:spacer height="5px" />
+
+
+                            </h:form>
+
+
+                            <h:form id="person-changes-list-form" >
+
+                                <p:spacer height="5px" />
+
+                                <p:dataScroller
+                                    id="datascroller-person-changes"
+                                    var="person"
+                                    rowIndexVar="#{person.personID}"
+                                    value="#{personChangesBB.displayList}"
+                                    widgetVar="person-changes-ds"
+                                    >
+
+                                    <div class="outlinedBox event-ds-box"> 
+                                        <h3>
+                                            <h:outputText value="Person ID: #{person.personID}" />
+                                        </h3>
+
+                                        <p:commandButton id="button-editperson"
+                                                         action="#{personChangesBB.goToPerson(person)}"
+                                                         rendered="#{sessionBean.sessUser.keyCard.hasMuniStaffPermissions}"
+                                                         value="Edit person"  
+                                                         icon="fa fa-edit"
+                                                         />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="First Name: #{person.firstName}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Last Name: #{person.lastName}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Composite Last Name: #{person.isCompositeLastName() ? 'Yes' : 'No'}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Phone (Cell): #{person.phoneCell}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Phone (Home): #{person.phoneHome}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Phone (Work): #{person.phoneWork}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Email: #{person.email}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Street Address: #{person.addressStreet}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="City : #{person.addressCity}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="State: #{person.addressState}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Zip Code: #{person.addressZip}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Use Separate Mailing Address? #{person.isUseSeparateMailingAddress() ? 'Yes' : 'No'}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Street Address (Mailing Address): #{person.mailingAddressStreet}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Third Line (Mailing Address): #{person.mailingAddressThirdLine}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="City (Mailing Address): #{person.mailingAddressCity}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="State (Mailing Address): #{person.mailingAddressState}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Zip (Mailing Address): #{person.mailingAddressZip}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="Active? #{person.active ? 'Yes' : 'No'}" />
+
+                                        <h4>Proposed changes</h4>
+
+
+                                        <p:dataScroller
+                                            id="scroller-changelist"
+                                            widgetVar="var-scroller-changelist"
+                                            rowIndexVar="#{change.personChangeID}"
+                                            var="change"
+                                            value="#{person.changeOrderList}"
+                                            >                                         
+
+                                            <div style="datum">
+                                                <h:outputText value="Change # #{change.personChangeID}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText value="Active? #{change.active}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText value="Approved? #{personChangesBB.approvedByWho(change)}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.firstName}" 
+                                                              value="First Name: #{change.firstName}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.lastName}" 
+                                                              value="Last Name: #{change.lastName}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.compositeLastName}" 
+                                                              value="Composite Last Name: #{change.isCompositeLastName() ? 'Yes' : 'No'}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.phoneCell}" 
+                                                              value="Phone (Cell): #{change.phoneCell}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.phoneHome}" 
+                                                              value="Phone (Home): #{change.phoneHome}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.phoneWork}" 
+                                                              value="Phone (Work): #{change.phoneWork}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.email}" 
+                                                              value="Email: #{change.email}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.addressStreet}" 
+                                                              value="Street Address: #{change.addressStreet}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.addressCity}" 
+                                                              value="City: #{change.addressCity}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.addressState}" 
+                                                              value="State: #{change.addressState}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.addressZip}" 
+                                                              value="Zip Code: #{change.addressZip}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.useSeparateMailingAddress}" 
+                                                              value="Use separate mailing address? #{change.isUseSeparateMailingAddress() ? 'Yes' : 'No'}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.mailingAddressStreet}" 
+                                                              value="Street Address (Mailing Address): #{change.mailingAddressStreet}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.mailingAddressThirdLine}" 
+                                                              value="Third Line (Mailing Address): #{change.mailingAddressThirdLine}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.mailingAddressCity}" 
+                                                              value="City (Mailing Address): #{change.mailingAddressCity}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.mailingAddressState}" 
+                                                              value="State (Mailing Address): #{change.mailingAddressState}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText rendered="#{not empty change.mailingAddressZip}" 
+                                                              value="Zip (Mailing Address): #{change.mailingAddressZip}" />
+                                            </div>
+
+                                            <div style="datum">
+                                                <h:outputText value="Did the user want to add this person? #{change.added ? 'Yes' : 'No'}" />
+                                            </div>
+
+                                            <ui:remove>
+                                                <!--As the time I wrote this comment, it was impossible for public users to deactivate persons-->
+                                                <div style="datum">
+                                                    <h:outputText value="Did user want to remove (deactivate) this person? #{change.removed ? 'Yes' : 'No'}" />
+                                                </div>
+                                            </ui:remove>
+                                            <p:commandButton       id="button-compare-change-order"
+                                                                   ajax="true" 
+                                                                   update="form-personedit"
+                                                                   actionListener="#{personChangesBB.initializeChangeComparison(person, change)}"
+                                                                   oncomplete="PF('dialog-widvar-change-edit').show()"
+                                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                   disabled="#{not change.active}"
+                                                                   value="Compare and manage change order"  
+                                                                   icon="fa fa-edit"/>
+                                        </p:dataScroller>
+                                    </div>
+                                </p:dataScroller>
+
+                                <p:outputLabel 
+                                    rendered="#{personChangesBB.displayList.isEmpty()}"
+                                    value="No changes matching the criteria were found on this person/in this person list!"/>
+
+                            </h:form>
+
+                        </p:panel>
+
+
+                        <!--close main container-->
+                    </div>
+
+
+                    <p:dialog    id="dialog-compare-changes"
+                                 height="300" width="600"
+                                 widgetVar="dialog-widvar-change-edit"
+                                 closable="true" >
+                        <h2>Compare and Manage a change order</h2>
+
+                        <h:form id="form-personedit">
+                            <h:messages id="messages-properties-editperson"
+                                        globalOnly="true" showDetail="true" showSummary="true"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+
+                            <h:outputText value="Did the user want to add this person? " />
+                            <h:outputText value="#{personChangesBB.currChangeOrder.added ? 'Yes' : 'No'}" />
+
+                            <p:spacer height="5px" />
+
+                            <h:outputText value="Did user want to remove (deactivate) this person? " />
+                            <h:outputText value="#{personChangesBB.currChangeOrder.removed ? 'Yes' : 'No'}" />
+
+                            <p:panelGrid columns="2">
+
+                                <h:panelGroup>
+
+                                    <h:outputText value="First Name: " />
+                                    <h:outputText value="#{personChangesBB.currPerson.firstName}" />
+
+                                    <p:spacer height="5px" />
+
+                                    <h:outputText value="Last Name: " />
+                                    <h:outputText value="#{personChangesBB.currPerson.lastName}" />
+
+                                    <p:spacer height="5px" />
+
+                                    <h:outputText value="Composite Last Name? " />
+                                    <h:outputText value="#{personChangesBB.currPerson.useSeparateMailingAddress ? 'Yes' : 'No'}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Phone (Cell): " />
+                                    <h:outputText value="#{personChangesBB.currPerson.phoneCell}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Phone (Home): " />
+                                    <h:outputText value="#{personChangesBB.currPerson.phoneHome}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Phone (Work): " />
+                                    <h:outputText value="#{personChangesBB.currPerson.phoneWork}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Email: " />
+                                    <h:outputText value="#{personChangesBB.currPerson.email}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Street Address: " />
+                                    <h:outputText value="#{personChangesBB.currPerson.addressStreet}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="City: " />
+                                    <h:outputText value="#{personChangesBB.currPerson.addressCity}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="State: " />
+                                    <h:outputText value="#{personChangesBB.currPerson.addressState}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Zip: " />
+                                    <h:outputText value="#{personChangesBB.currPerson.addressZip}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Use Separate Mailing Address? " />
+                                    <h:outputText value="#{personChangesBB.currPerson.useSeparateMailingAddress ? 'Yes' : 'No'}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Street Address (Mailing Address): " />
+                                    <h:outputText value="#{personChangesBB.currPerson.mailingAddressStreet}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Third Line (Mailing Address): " />
+                                    <h:outputText value="#{personChangesBB.currPerson.mailingAddressThirdLine}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="City (Mailing Address): " />
+                                    <h:outputText value="#{personChangesBB.currPerson.mailingAddressCity}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="State (Mailing Address): " />
+                                    <h:outputText value="#{personChangesBB.currPerson.mailingAddressState}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Zip (Mailing Address): " />
+                                    <h:outputText value="#{personChangesBB.currPerson.mailingAddressZip}" />
+
+                                    <p:spacer height="5px" />
+
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+
+                                    <h:outputText value="Proposed First Name: " />
+                                    <h:outputText value="#{not empty personChangesBB.currChangeOrder.firstName ? personChangesBB.currChangeOrder.firstName : 'None'}" />
+
+                                    <p:spacer height="5px" />
+
+                                    <h:outputText value="Proposed Last Name: " />
+                                    <h:outputText value="#{not empty personChangesBB.currChangeOrder.lastName ? personChangesBB.currChangeOrder.lastName : 'None'}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Composite Last Name? " />
+                                    <h:outputText value="#{personChangesBB.checkForChangeBoolean(personChangesBB.currChangeOrder.compositeLastName)}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Proposed Phone (Cell): " />
+                                    <h:outputText value="#{not empty personChangesBB.currChangeOrder.phoneCell ? personChangesBB.currChangeOrder.phoneCell : 'None'}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Proposed Phone (Home): " />
+                                    <h:outputText value="#{not empty personChangesBB.currChangeOrder.phoneHome ? personChangesBB.currChangeOrder.phoneHome : 'None'}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Proposed Phone (Work): " />
+                                    <h:outputText value="#{not empty personChangesBB.currChangeOrder.phoneWork ? personChangesBB.currChangeOrder.phoneWork : 'None'}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Proposed Email: " />
+                                    <h:outputText value="#{not empty personChangesBB.currChangeOrder.email ? personChangesBB.currChangeOrder.email : 'None'}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Proposed Street Address: " />
+                                    <h:outputText value="#{not empty personChangesBB.currChangeOrder.addressStreet ? personChangesBB.currChangeOrder.addressStreet : 'None'}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Proposed City: " />
+                                    <h:outputText value="#{not empty personChangesBB.currChangeOrder.addressCity ? personChangesBB.currChangeOrder.addressCity : 'None'}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Proposed State: " />
+                                    <h:outputText value="#{not empty personChangesBB.currChangeOrder.addressState ? personChangesBB.currChangeOrder.addressState : 'None'}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Proposed Zip: " />
+                                    <h:outputText value="#{not empty personChangesBB.currChangeOrder.addressZip ? personChangesBB.currChangeOrder.addressZip : 'None'}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Use Separate Mailing Address? " />
+                                    <h:outputText value="#{personChangesBB.checkForChangeBoolean(personChangesBB.currChangeOrder.useSeparateMailingAddress)}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Proposed Street Address (Mailing Address): " />
+                                    <h:outputText value="#{not empty personChangesBB.currChangeOrder.mailingAddressStreet ? personChangesBB.currChangeOrder.mailingAddressStreet : 'None'}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Proposed Third Line (Mailing Address): " />
+                                    <h:outputText value="#{not empty personChangesBB.currChangeOrder.mailingAddressThirdLine ? personChangesBB.currChangeOrder.mailingAddressThirdLine : 'None'}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Proposed City (Mailing Address): " />
+                                    <h:outputText value="#{not empty personChangesBB.currChangeOrder.mailingAddressCity ? personChangesBB.currChangeOrder.mailingAddressCity : 'None'}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Proposed State (Mailing Address): " />
+                                    <h:outputText value="#{not empty personChangesBB.currChangeOrder.mailingAddressState ? personChangesBB.currChangeOrder.mailingAddressState : 'None'}" />
+
+                                    <p:spacer height="5px" />
+                                    
+                                    <h:outputText value="Proposed Zip (Mailing Address): " />
+                                    <h:outputText value="#{not empty personChangesBB.currChangeOrder.mailingAddressZip ? personChangesBB.currChangeOrder.mailingAddressZip : 'None'}" />
+
+                                    <p:spacer height="5px" />
+
+                                </h:panelGroup>
+
+                            </p:panelGrid>
+
+                            <p:spacer height="5px" />
+
+
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" 
+                                             onclick="PF('dialog-widvar-change-edit').hide()"
+                                             tabindex="4"/>
+
+                            <p:commandButton ajax="true"
+                                             actionListener="#{personChangesBB.rejectChangeOrder()}"
+                                             oncomplete="PF('dialog-widvar-change-edit').hide()"
+                                             icon="fa fa-thumbs-o-up"
+                                             update="person-changes-messages-form
+                                             person-changes-list-form"
+                                             value="Reject (Deactivate) Change Order" 
+                                             tabindex="3"/>
+
+                            <p:commandButton ajax="true"
+                                             actionListener="#{personChangesBB.applyChangeOrder()}"
+                                             oncomplete="PF('dialog-widvar-change-edit').hide()"
+                                             icon="fa fa-thumbs-o-up"
+                                             update="person-changes-messages-form
+                                             person-changes-list-form"
+                                             value="Apply Change Order" 
+                                             tabindex="3"/>
+                        </h:form>
+                    </p:dialog>
+
+
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+
