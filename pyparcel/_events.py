@@ -1,4 +1,4 @@
-from collections import namedtuple
+from typing import NamedTuple, Any
 from colorama import init
 
 init()
@@ -7,19 +7,33 @@ from colorama import Fore, Back, Style
 from _constants import BOT_ID
 
 
-# These structures help organize the creation of events. See query_propertyexternaldata_for_changes_and_write_events
-Changes = namedtuple("flag", ["name", "orig", "new"])
+class Changes(NamedTuple):
+    """ Help organize the creation of events representing a change.
+
+    See query_propertyexternaldata_for_changes_and_write_events
+    """
+
+    description: str
+    orig: Any
+    new: Any
 
 
 class EventDetails:
-    __slots__ = ["parid", "prop_id", "cecase_id", "changes", "db_cursor"]
+    __slots__ = ["parid", "prop_id", "cecase_id", "old", "new", "db_cursor"]
 
     def __init__(self, parid, prop_id, cecase_id, db_cursor):
         self.parid = parid
         self.prop_id = prop_id
         self.cecase_id = cecase_id
         self.db_cursor = db_cursor  # Although it technically isn't an event detail, passing the db_cursor makes life easier
-        self.changes = None
+        self.old = None
+        self.new = None
+
+    def unpack(self, old, new):
+        """ Sets the EventDetails old and new attributes to the given values.
+        """
+        self.old = old
+        self.new = new
 
 
 def query_propertyexternaldata_for_changes_and_write_events(
@@ -38,48 +52,54 @@ def query_propertyexternaldata_for_changes_and_write_events(
     details = EventDetails(parid, prop_id, cecase_id, db_cursor)
     db_cursor.execute(select_sql, {"prop_id": prop_id})
     selection = db_cursor.fetchall()
-    old = selection[0]
     try:
-        new = selection[1]
+        old = selection[1]
     except IndexError:  # If this is the first time the property_propertyid occurs in propertyexternaldata
-        print(
-            Fore.YELLOW,
-            "First time parcel has appeared in propertyexternaldata",
-            sep="",
-        )
-        print(Style.RESET_ALL, end="")
         if not new_parcel:
             # TODO: Add flag
             print(
-                "Error: Parcel appeared in public.propertyexternaldata for the first time even though the parcel ID is flagged as appearing in public.property before."
+                Fore.YELLOW,
+                "Error: Parcel appeared in public.propertyexternaldata for the first time even though the parcel ID is flagged as appearing in public.property before.",
+                Style.RESET_ALL,
+                sep="",
             )
-            NewParcelid(details).write_to_db()
+            return
+        # If it IS a new parcel id
+        print(
+            Fore.YELLOW,
+            "First time parcel has appeared in propertyexternaldata",
+            Style.RESET_ALL,
+            sep="",
+        )
+        NewParcelid(details).write_to_db()
         return
+    new = selection[0]
 
+    # details.unpack sets details.old and details.new
     if old[0] != new[0]:  # Todo: Clean name
-        details.changes = Changes("owner name", old[0], new[0])
+        details.unpack(old[0], new[0])
         DifferentOwner(details).write_to_db()
     if old[1] != new[1]:
-        details.changes = Changes("street", old[1], new[1])
+        details.unpack(old[1], new[1])
         DifferentStreet(details).write_to_db()
     if old[2] != new[2]:
-        details.changes = Changes("city, state, or zipcode", old[2], new[2])
+        details.unpack(old[2], new[2])
         DifferentCityStateZip(details).write_to_db()
     if old[3] != new[3]:
-        details.changes = Changes("living area size", old[3], new[3])
+        details.unpack(old[3], new[3])
         DifferentLivingArea(details).write_to_db()
     if old[4] != new[4]:
-        details.changes = Changes("condition", old[4], new[4])
+        details.unpack(old[4], new[4])
         DifferentCondition(details).write_to_db()
     # # # Todo: Since taxcodes are no longer are related to property, begin deprecating
     # if old[5] != new[5]:
     #     # Todo: Find pythonic way to put this in front of every column
     #     if old[5] is not None:  # The old value will likely only be None due to an API / Script change,
     #                             # opposed to a change in the actual change in tax status.
-    #         details.changes = Changes("tax code", old[5], new[5])
+    #         details.unpack(old[5], new[5])
     #         DifferentTaxCode(details).write_to_db()
 
-    if details.changes:
+    if details.new:
         return True
 
 
@@ -88,39 +108,27 @@ def query_propertyexternaldata_for_changes_and_write_events(
 class Event:
     """ Abstract base class for all events. """
 
+    # Returned after writing event to database
+    event_id: int
+
+    # To be filled in by subclasses
+    category_id: int
+    eventdescription: str
+    active: bool
+    notes: str
+    occperiod: str
+
     def __init__(self, details):
         self.prop_id = details.prop_id
         self.parid = details.parid
         self.cecase_id = details.cecase_id
         self.db_cursor = details.db_cursor
 
-        # Returned after writing event to database
-        self.event_id = None
-
-        # To be filled in by subclasses
-        self.category_id = None
-        self.eventdescription = None
-        self.active = None
-        self.notes = None
-        self.occperiod = None
-
     def write_to_db(self):
         """ Writes an event to the database. """
         self._write_event_dunder_dict()
         self.event_id = self._write_event_to_db()  # uses self.ce_caseid
-        print(Fore.RED, self.eventdescription, sep="")
-        print(Style.RESET_ALL, end="")
-
-    def _get_cecase_id(self, db_cursor):
-        select_sql = """
-            SELECT caseid FROM cecase
-            WHERE property_propertyid = %s
-            ORDER BY creationtimestamp DESC;"""
-        db_cursor.execute(select_sql, [self.prop_id])
-        try:
-            return db_cursor.fetchone()[0]  # Case ID
-        except TypeError:  # 'NoneType' object is not subscriptable:
-            return None
+        print(Fore.RED, self.eventdescription, Style.RESET_ALL, sep="")
 
     def _write_event_dunder_dict(self):
         assert self.category_id
@@ -166,9 +174,11 @@ class NewParcelid(Event):
 
 
 class ParcelChangedEvent(Event):
+    brief_description: str  # Used in self.eventdescription
+
     def __init__(self, d: EventDetails):
         super().__init__(d)
-        self.eventdescription = f"Parcel {d.parid}'s {d.changes.name} changed from {d.changes.orig} to {d.changes.new}"
+        self.eventdescription = f"Parcel {d.parid}'s {self.brief_description} changed from {d.old} to {d.new}"
         self.active = True
         self.ce_notes = " "
         self.notes = " "
@@ -177,48 +187,55 @@ class ParcelChangedEvent(Event):
 
 class DifferentOwner(ParcelChangedEvent):
     def __init__(self, details):
-        super().__init__(details)
         self.category_id = 301
+        self.brief_description = "owner name"
+        super().__init__(details)
 
 
 class DifferentStreet(ParcelChangedEvent):
     def __init__(self, details):
-        super().__init__(details)
         self.category_id = 302
+        self.brief_description = "street"
+        super().__init__(details)
 
 
 class DifferentCityStateZip(ParcelChangedEvent):
     def __init__(self, details):
-        super().__init__(details)
         self.category_id = 303
+        self.brief_description = "city, state, or zipcode"
+        super().__init__(details)
 
 
 class DifferentLivingArea(ParcelChangedEvent):
     def __init__(self, details):
-        super().__init__(details)
         self.category_id = 304
+        self.brief_description = "living area size"
+        super().__init__(details)
 
 
 class DifferentCondition(ParcelChangedEvent):
     def __init__(self, details):
-        super().__init__(details)
         self.category_id = 305
+        self.brief_description = "condition"
+        super().__init__(details)
 
 
 class DifferentTaxStatus(ParcelChangedEvent):
     def __init__(self, details):
-        super().__init__(details)
         self.category_id = 306
+        self.brief_description = "tax status"
+        super().__init__(details)
 
 
 class DifferentTaxCode(ParcelChangedEvent):
     def __init__(self, details):
-        super().__init__(details)
         self.category_id = 307
-        warnings.warn(
-            "DifferentTaxCode may be deprecated soon, as TaxCode is no longer an attribute on the property table",
-            DeprecationWarning,
-        )
+        self.brief_description = "tax code"
+        super().__init__(details)
+        # warnings.warn(
+        #     "DifferentTaxCode may be deprecated soon, as TaxCode is no longer an attribute on the property table",
+        #     DeprecationWarning,
+        # )
 
 
 # class ParcelNotInRecentRecords(Event):
