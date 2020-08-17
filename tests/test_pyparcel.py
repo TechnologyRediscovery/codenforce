@@ -205,7 +205,6 @@ class TestEventTriggers:
         event = pce.event
         with mock.patch.object(event, "write_to_db"):
             mocked_cursor = ParcelChangedCursor(pce)
-            event.write_to_db = MagicMock(spec=True)
             query_propertyexternaldata_for_changes_and_write_events(
                 parid=None,
                 prop_id=None,
