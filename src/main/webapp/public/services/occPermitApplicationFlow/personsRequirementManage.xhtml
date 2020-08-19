@@ -93,6 +93,142 @@
                                                                  tabindex="3" 
                                                                  placeholder="Filter by email"
                                                                  />
+                                            </div>
+                                        </div>
+
+                                        <p:outputLabel styleClass="public-main-contents-title" value="#{occPermitApplicationBB.currentApplication.reason.humanFriendlyDescription}"/>
+
+                                        <p>1. Attach People From Search Result</p>
+                                        <p:dataTable id="results-dt" 
+                                                     var="person" 
+                                                     value="#{occPermitApplicationBB.personSearchResults}" 
+                                                     scrollable="true" 
+                                                     scrollHeight="150">
+
+                                            <p:column headerText="Last Name">
+                                                <h:outputText value="#{person.bundledPerson.lastName}" />
+                                            </p:column>
+
+                                            <p:column headerText="First Name">
+                                                <h:outputText value="#{person.bundledPerson.firstName}" />
+                                            </p:column>
+
+                                            <p:column headerText="Street Address">
+                                                <h:outputText value="#{person.bundledPerson.addressStreet}" />
+                                            </p:column>
+
+                                            <p:column headerText="Home Phone">
+                                                <h:outputText value="#{person.bundledPerson.phoneHome}" />
+                                            </p:column>
+
+                                            <p:column headerText="Cell Phone">
+                                                <h:outputText value="#{person.bundledPerson.phoneCell}" />
+                                            </p:column>
+
+                                            <p:column headerText="Work Phone">
+                                                <h:outputText value="#{person.bundledPerson.phoneWork}" />
+                                            </p:column>
+
+                                            <p:column headerText="Email">
+                                                <h:outputText value="#{person.bundledPerson.email}" />
+                                            </p:column>
+
+                                            <p:column headerText="Attach" style="text-align: center">
+                                                <p:commandButton ajax="true" 
+                                                                 update=":personsRequirementManageForm" 
+                                                                 action="#{occPermitApplicationBB.addPersonToApplication(person)}" 
+                                                                 id="attach-person-cb" 
+                                                                 value="Attach" />
+                                            </p:column>
+
+                                        </p:dataTable>
+
+                                        <p>
+                                            2. Can't find the person you are looking for? Add a person to the table below and press the pencil to enter their information.
+                                            Click the arrow button below the pencil to fill in more of their contact information.
+                                        </p> 
+
+
+                                        <p:outputLabel value="- #{occPermitApplicationBB.personRequirementDescription.get(0)}"/>
+
+                                        <p:spacer height="10px"/>
+
+                                        <p:outputLabel value="- #{occPermitApplicationBB.personRequirementDescription.get(1)}"/>
+
+                                        <p:spacer height="10px"/>
+
+                                        <p:outputLabel value="- #{occPermitApplicationBB.personRequirementDescription.get(2)}"/>
+
+                                        <p:spacer height="10px"/>
+
+                                        <p:dataTable id="applicationPersonTable"
+                                                     widgetVar="datatable"
+                                                     rowIndexVar="rowIndex"
+                                                     var="applicationPerson" value="#{occPermitApplicationBB.attachedPersons}" 
+                                                     rowKey="#{applicationPerson.bundledPerson.personID}"
+                                                     editable="true">  
+
+                                            <p:column headerText="" style="width: 20px">
+                                                <p:rowToggler/>
+                                            </p:column>
+
+                                            <p:column headerText="Last Name">
+                                                <p:cellEditor>
+                                                    <f:facet name="output"><h:outputText value="#{applicationPerson.bundledPerson.lastName}"/></f:facet>
+                                                    <f:facet name="input">
+                                                        <p:inputText value="#{applicationPerson.bundledPerson.lastName}"
+                                                                     onkeydown="PF('datatable').onKeyDown(event)"
+                                                                     onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                    </f:facet>
+                                                </p:cellEditor>
+                                            </p:column>
+
+                                            <p:column headerText="First Name">
+                                                <p:cellEditor>
+                                                    <f:facet name="output"><h:outputText value="#{applicationPerson.bundledPerson.firstName}"/></f:facet>
+                                                    <f:facet name="input">
+                                                        <p:inputText value="#{applicationPerson.bundledPerson.firstName}"
+                                                                     onkeydown="PF('datatable').onKeyDown(event)"
+                                                                     onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                    </f:facet>
+                                                </p:cellEditor>
+                                            </p:column>
+
+                                            <p:column headerText="Person Type">
+                                                <p:selectOneMenu value="#{applicationPerson.bundledPerson.personType}">
+                                                    <f:selectItems value="#{occPermitApplicationBB.optAndReqPersons}" var="type" itemLabel="#{type.label}" itemValue="#{type}"/>
+                                                </p:selectOneMenu> 
+                                            </p:column>  
+
+                                            <p:column headerText="Edit" style="width: 20px; text-align: center">
+                                                <p:rowEditor/>
+                                            </p:column>
+
+                                            <p:column headerText="Applicant" style="text-align: center">
+                                                <p:commandButton ajax="true" value="Set as applicant" 
+                                                                 action="#{occPermitApplicationBB.setApplicant(applicationPerson)}"
+                                                                 update="#{p:component('currentApplicantLabel')} #{p:component('currentContactLabel')}"
+                                                                 /> 
+                                            </p:column>
+
+                                            <p:column headerText="Preferred Contact" style="text-align: center">
+                                                <p:commandButton ajax="true" value="Set as preferred contact" 
+                                                                 action="#{occPermitApplicationBB.setContactPerson(applicationPerson)}"
+                                                                 update="#{p:component('currentContactLabel')}"
+                                                                 /> 
+                                            </p:column>
+
+                                            <p:column headerText="Remove" style="text-align: center">
+                                                <p:commandButton ajax="true" value="Remove" 
+                                                                 action="#{occPermitApplicationBB.removePersonFromApplication(applicationPerson)}"
+                                                                 update="#{p:component('applicationPersonTable')}"
+                                                                 /> 
+                                            </p:column>
+
+                                            <p:rowExpansion>
+
+                                                <div class="public-main-contents-title">
+                                                    1. Remember to hit the enter key when you finish filling out a box!
                                                 </div>
 
                                                 <div class="ui-g-12 ui-md-6 ui-lg-2 ">

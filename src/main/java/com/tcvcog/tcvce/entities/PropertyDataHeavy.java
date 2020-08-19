@@ -42,8 +42,6 @@ public  class       PropertyDataHeavy
     
     private List<CECaseDataHeavy> propInfoCaseList;
     
-    private List<PropertyUnitChangeOrder> changeList;
-    
     private List<Integer> blobList;
     
     private String credentialSignature;
@@ -287,20 +285,6 @@ public  class       PropertyDataHeavy
      */
     public void setPropInfoCaseList(List<CECaseDataHeavy> propInfoCaseList) {
         this.propInfoCaseList = propInfoCaseList;
-    }
-
-    /**
-     * @return the changeList
-     */
-    public List getChangeList() {
-        return changeList;
-    }
-
-    /**
-     * @param changeList the changeList to set
-     */
-    public void setChangeList(List<PropertyUnitChangeOrder> changeList) {
-        this.changeList = changeList;
     }
 
     /**

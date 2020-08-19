@@ -570,7 +570,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </p:column>
 
                                                     <p:column headerText="Person type:">
-                                                        <h:outputText value="#{person.personType.label}" />
+                                                        <h:outputText value="#{person.applicationPersonType.label}" />
                                                     </p:column>
 
                                                     <p:column headerText="Applicant?:">
@@ -703,13 +703,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                 <p:spacer height="5px" />
 
+                                                <p:commandButton    id="go-to-change-list-cb"
+                                                                    value="Check for public-proposed changes to persons"
+                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                    disabled="#{empty occPermitApplicationManageBB.selectedApplication}"
+                                                                    action="#{occPermitApplicationManageBB.goToPersonChangeOrders()}"
+                                                                    icon="fa fa-gears"/>
                                                 <p:commandButton    id="edit-person-list-cb"
                                                                     value="Edit attached persons"
                                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                                                     disabled="#{empty occPermitApplicationManageBB.selectedApplication}"
                                                                     action="#{occPermitApplicationManageBB.editAttachedPersons()}"
                                                                     icon="fa fa-gears"/>
-
+                                             
                                                 <p:spacer height="5px" />
 
                                             </h:form>

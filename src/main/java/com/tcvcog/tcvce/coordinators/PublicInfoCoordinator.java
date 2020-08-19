@@ -1014,6 +1014,11 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             if (unbundled.getMailingAddressState() != null && !unbundled.getMailingAddressState().contains("*")) {
                 exportable.setMailingAddressState(unbundled.getMailingAddressState());
             }
+            
+            //The public-facing Occ Permit Application saves applicationPersonType in the person type field
+            //You should probably make sure to preserve the original person type if you need to do that.
+            exportable.setPersonType(unbundled.getPersonType());
+            
         }
 
         return exportable;
