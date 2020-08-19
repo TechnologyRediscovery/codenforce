@@ -320,7 +320,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                     <p:dialog    id="dialog-compare-changes"
-                                 height="300" width="600"
+                                 height="550" width="700"
                                  widgetVar="dialog-widvar-change-edit"
                                  closable="true" >
                         <h2>Compare and Manage a change order</h2>
@@ -532,7 +532,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             <p:commandButton ajax="true"
                                              actionListener="#{personChangesBB.rejectChangeOrder()}"
                                              oncomplete="PF('dialog-widvar-change-edit').hide()"
-                                             icon="fa fa-thumbs-o-up"
+                                             icon="fa fa-thumbs-o-down"
                                              update="person-changes-messages-form
                                              person-changes-list-form"
                                              value="Reject (Deactivate) Change Order" 

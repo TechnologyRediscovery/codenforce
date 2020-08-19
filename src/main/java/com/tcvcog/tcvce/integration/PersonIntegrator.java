@@ -1415,7 +1415,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         skeleton.setAdded(rs.getBoolean("added"));
         skeleton.setChangedOn(rs.getTimestamp("entryts"));
         skeleton.setApprovedOn(rs.getTimestamp("approvedondate"));
-        skeleton.setApprovedBy(uc.user_getUser(rs.getInt("approvedby")));
+        skeleton.setApprovedBy(uc.user_getUser(rs.getInt("approvedby_userid")));
         skeleton.setChangedBy(rs.getInt("changedby_personid"));
         skeleton.setActive(rs.getBoolean("active"));
         
@@ -1519,9 +1519,14 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(19, order.isRemoved());
             stmt.setBoolean(20, order.isAdded());
             stmt.setTimestamp(21, order.getApprovedOn());
-            stmt.setInt(22, order.getApprovedBy().getUserID());
+            if (order.getApprovedBy() != null) {
+                stmt.setInt(22, order.getApprovedBy().getUserID());
+            } else {
+                stmt.setNull(22, java.sql.Types.NULL);
+            }
             stmt.setInt(23, order.getChangedBy());
-            stmt.setInt(24, order.getPersonChangeID());
+            stmt.setBoolean(24, order.isActive());
+            stmt.setInt(25, order.getPersonChangeID());
             
             stmt.execute();
 

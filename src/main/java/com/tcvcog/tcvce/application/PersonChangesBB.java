@@ -19,8 +19,10 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.NavigationException;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
 import com.tcvcog.tcvce.entities.PersonWithChanges;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,7 +79,7 @@ public class PersonChangesBB
             }
 
         } catch (IntegrationException ex) {
-            System.out.println("PropertyUnitChangesBB.refreshCurrentObjects() | ERROR: " + ex);
+            System.out.println("PersonChangesBB.refreshCurrentObjects() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occurred while trying to load information from the database.", ""));
@@ -120,12 +122,81 @@ public class PersonChangesBB
         try{
         return getSessionBean().getNavStack().popLastPage();
         }catch(NavigationException ex){
-            System.out.println("PropertyUnitChangesBB.goBack() | ERROR: " + ex);
+            System.out.println("PersonChangesBB.goBack() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occurred while trying to redirect you back to the previous page!", ""));
             return "missionControl";
         }
+    }
+    
+    public String goToPerson(PersonWithChanges person){
+        PersonCoordinator pc = getPersonCoordinator();
+        
+        getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(person, getSessionBean().getSessUser().getMyCredential()));
+        
+        getSessionBean().getNavStack().pushCurrentPage();
+        
+        return "personInfo";
+        
+    }
+    
+    public void initializeChangeComparison(PersonWithChanges person, PersonChangeOrder change){
+        currPerson = person;
+        currChangeOrder = change;
+    }
+    
+    
+    
+    public String approvedByWho(PersonChangeOrder change) {
+
+        if (change.getApprovedBy() != null) {
+            return "Approved by: " + change.getApprovedBy().getPerson().getFirstName()
+                    + " "
+                    + change.getApprovedBy().getPerson().getLastName()
+                    + " (ID# "
+                    + change.getApprovedBy().getPersonID()
+                    + ")";
+        } else if(change.isActive()) {
+            return "No action taken yet";
+        } else {
+            return "Rejected";
+        }
+
+    }
+    
+    public void rejectChangeOrder(){
+        PersonIntegrator pi = getPersonIntegrator();
+        
+        currChangeOrder.setActive(false);
+        
+        try {
+            pi.updatePersonChangeOrder(currChangeOrder);
+        } catch (IntegrationException ex) {
+            System.out.println("PersonChangesBB.rejectChangeOrder() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to update the database.", ""));
+        }
+        
+        setCurrentViewOption(currentViewOption);
+        
+    }
+    
+    public void applyChangeOrder(){
+        PersonCoordinator pc = getPersonCoordinator();
+        
+        try {
+            pc.implementPersonChangeOrder(currChangeOrder);
+        } catch (IntegrationException ex) {
+            System.out.println("PersonChangesBB.applyChangeOrder() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to update the database.", ""));
+        }
+        
+        setCurrentViewOption(currentViewOption);
+        
     }
         
     public List<PersonWithChanges> getCurrPersonList() {
