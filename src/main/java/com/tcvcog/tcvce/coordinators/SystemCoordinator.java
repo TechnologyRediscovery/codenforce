@@ -400,29 +400,25 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     }
 
     //Sub NavItem: Code Enf
-    private final NavigationSubItem CEWorkflow = getNavSubItem("Workflow", "/restricted/cogstaff/ce/ceCaseWorkflow.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CECaseSearch = getNavSubItem("Search for Cases", "/restricted/cogstaff/ce/ceCaseSearchProfile.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CECaseProfile = getNavSubItem("Case Profile", "/restricted/cogstaff/ce/ceCaseSearchProfile.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CEViolations = getNavSubItem("Violations", "/restricted/cogstaff/ce/ceCaseViolations.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CENotices = getNavSubItem("Notices", "/restricted/cogstaff/ce/ceCaseNotices.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CECitations = getNavSubItem("Citations", "/restricted/cogstaff/ce/ceCaseCitations.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CEEvents = getNavSubItem("Events", "/restricted/cogstaff/ce/ceCaseEvents.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem CEPayments = getNavSubItem("Payments", "/restricted/cogstaff/ce/ceCasePayments.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CERequests = getNavSubItem("Requests", "/restricted/cogstaff/ce/ceActionRequests.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem CEFiles = getNavSubItem("Files", "/restricted/cogstaff/ce/ceCaseFiles.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem CEPublic = getNavSubItem("Public", "/restricted/cogstaff/ce/ceCasePublic.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Code Enf
     public List<NavigationSubItem> getCENavList() {
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
-        navList.add(CEWorkflow);
+        navList.add(CECaseSearch);
+        navList.add(CECaseProfile);
         navList.add(CEViolations);
         navList.add(CENotices);
         navList.add(CECitations);
         navList.add(CEEvents);
-        navList.add(CEPayments);
         navList.add(CERequests);
-        navList.add(CEFiles);
-        navList.add(CEPublic);
         return navList;
     }
 

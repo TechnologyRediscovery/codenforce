@@ -34,98 +34,110 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <f:view id="violations-view">
 
                     <p:outputPanel id="body-panel">
-
-                        <p:growl id="violations-messages-growl"
-                                 redisplay="false"
-                                 />
+                        <h:form id="form-messages-global">
+                            <p:growl id="violations-messages-growl"
+                                     />
+                        </h:form>
 
                         <h1>Violations</h1>
 
                         <div class="mainContainer">
-
-                            <div class ="two-column-page-flex-container">
-
-                                <div class="list-column" >
-
-
+                            <div class="ui-g data-container">
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 list-data-container">
                                     <h:form id="mode-form">
-                                        <p:selectOneButton style="  width: 100%;
-                                                           margin-top: 10px ;
-                                                           height: 20px;"
-                                                           value="#{violationBB.currentMode}"
-                                                           unselectable="false"
-                                                           >
-                                            <f:selectItems value="#{violationBB.pageModes}"
-                                                           var="pmo"
-                                                           itemLabel="#{pmo.title}"
-                                                           itemDisabled="#{empty userConfigBB.userSelected  and pmo.objectSelectRequiredToEnable}"/>
-                                            <f:ajax render="@all"/>
-                                        </p:selectOneButton>
+                                        <div class="restrict-main-list-mode-button">
+
+                                            <p:selectOneButton style="  width: 100%;
+                                                               margin-top: 10px ;
+                                                               height: 20px;"
+                                                               value="#{violationBB.currentMode}"
+                                                               unselectable="false"
+                                                               >
+                                                <f:selectItems value="#{violationBB.pageModes}"
+                                                               var="pmo"
+                                                               itemLabel="#{pmo.title}"/>
+                                                <f:ajax render="@all"/>
+                                            </p:selectOneButton>
+                                        </div>
                                     </h:form>
-
-                                    <p:spacer height="10px"/>
-
-
-
 
                                     <p:panel    id="violations-violations-list-panel"
                                                 toggleable="true"
+                                                style="width: 100%;"
                                                 widgetVar="violations-violations-list-panel-var"
                                                 collapsed="false"
+                                                rendered="#{violationBB.activeLookupMode}"
                                                 header="Violations on Case: #{violationBB.currentCase.caseName}">
 
-
                                         <h:form id="violations-violation-form">
-
-
                                             <p:dataTable
                                                 id="violation-table"
                                                 var="violation"
                                                 rowKey="#{violation.violationID}"
                                                 value="#{violationBB.currentCase.violationList}"
                                                 tableStyleClass="primeDataTable"
-                                                draggableColumns="true"
+                                                resizableColumns="true"
                                                 reflow="true">
 
 
-                                                <p:column width="15%"
+                                                <p:column width="25%"
+                                                          styleClass="content-align-center"
                                                           sortBy="#{violation.dateOfRecord}">
                                                     <f:facet name="header">
                                                         <h:outputText value="Date of record" />
                                                     </f:facet>
                                                     <h:outputText value="#{violationBB.getPrettyDateNoTime(violation.dateOfRecord)}"/>
                                                 </p:column>
+                                                <p:column width="8%"
+                                                          styleClass="content-align-center">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="ID" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{violation.violationID}"/>
+                                                </p:column>
 
-                                                <p:column width="50%"
+                                                <p:column width="40%"
+                                                          styleClass="content-align-center"
                                                           sortBy="#{violation.codeViolated.ordSubSecTitle}">
                                                     <f:facet name="header">
                                                         <h:outputText value="Ordinance" />
                                                     </f:facet>
                                                     <h:outputText value="#{violation}"/>
-                                                </p:column>
-
-
-                                                <p:column width="25%">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Source" />
-                                                    </f:facet>
+                                                    <p:spacer height="3px" />
                                                     <h:outputText value="#{violation.violatedEnfElement.codeElement.source.sourceName}"/>
                                                     <h:outputText value=" (#{violation.violatedEnfElement.codeElement.source.sourceYear})"/>
                                                 </p:column>
 
 
-                                                <p:column width="10%">
+                                                <p:column width="25%"
+                                                          styleClass="content-align-center">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Status" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{!(empty violation.status) ? violation.status.label : ''}" />
+                                                </p:column>
+
+
+                                                <p:column width="10%"
+                                                          styleClass="content-align-center">
                                                     <f:facet name="header">
                                                         <h:outputText value="View" />
                                                     </f:facet>
+                                                    <div class="gray_button">
 
-                                                    <p:commandButton ajax="false" 
-                                                                     action="#{violationBB.onObjetViewButtonChange(violation)}"
-                                                                     value="#{violation.violationID == violationBB.currentViolation.violationID ? 'Selected':'View'}"
-                                                                     icon="#{violation.violationID == violationBB.currentViolation.violationID ? 'fa fa-hand-o-right':'fa fa-gavel'}"
-                                                                     style="#{violation.violationID == violationBB.currentViolation.violationID ? 'background-color: #dee461; color:black; border:none;':''}"
-                                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                     />
+                                                        <p:commandButton ajax="true" 
+                                                                         actionListener="#{violationBB.onObjetViewButtonChange(violation)}"
+                                                                         icon="#{violation.violationID == violationBB.currentViolation.violationID ? 'fa fa-hand-o-right':'fa fa-gavel'}"
+                                                                         style="#{violation.violationID == violationBB.currentViolation.violationID ? 'background-color: #dee461; color:black; border:none;':''}"
+                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                         update="@form
+                                                                         violation-profile-panel
+                                                                         violation-add-panel
+                                                                         violation-photos-panel
+                                                                         violation-remove-panel
+                                                                         "
+                                                                         />
+                                                    </div>
                                                 </p:column>
 
 
@@ -135,213 +147,465 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </p:panel>
                                 </div>
 
-                                <div class ="object-column">
-
-                                    <h:form id="violationslists-launcher">
-                                        <h2>
+                                <div class="ui-g-12 ui-md-8 ui-lg-8 object-data-container">
+                                    <div class="restrict-main-object-title">
+                                        <h:form id="violationslists-launcher">
                                             <h:outputText id="violation-compactlist-line-ot" value="#{violationBB.currentViolation}"/>
                                             <h:outputText id="v-source-name-compactlist-ot" value="(#{violationBB.currentViolation.violatedEnfElement.codeElement.source.sourceName}" />
                                             <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
                                             <h:outputText id="v-source-year-compactlist-ot" value="#{violationBB.currentViolation.violatedEnfElement.codeElement.source.sourceYear})"/>
+                                        </h:form>
+                                    </div>
+
+                                    <p:panel    id="violation-profile-panel"
+                                                toggleable="true"
+                                                widgetVar="violation-profile-panel-var"
+                                                collapsed="false"
+                                                rendered="#{violationBB.activeLookupMode}"
+                                                header="Code Violation Info">
+
+                                        <h:form id="violation-profile-form">
+
+                                            <!-- NESTED DATA CONTAINER TO DISPLAY IN LINE-->
+                                            <div class="ui-g data_container_nested_restrict">
 
 
-                                        </h2>
-
-                                    </h:form>
-
-                                    <p:outputPanel id = "violation-profile-outpanel" >
-
-
-                                        <p:panel    id="violation-profile-panel"
-                                                    toggleable="true"
-                                                    widgetVar="violation-profile-panel-var"
-                                                    collapsed="false"
-                                                    rendered="#{violationBB.activeLookupMode}"
-                                                    header="Code Enforcement Case Info">
-
-                                            <h:form id="violation-profile-form">
-
-                                                <div    id="violation-profile-container-div"
-                                                        class="ui-g data-container">
-
-                                                    <div    id="violation-id-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
 
                                                         <p:outputLabel for="violation-id-ot"
                                                                        styleClass="data_field_label">
                                                             <h:outputText value="ID"/>
                                                         </p:outputLabel>
-
-                                                        <h:outputText    id="violation-no-ot"
+                                                    </div>
+                                                    <div class="restrict-data-field-value-inline" >
+                                                        <h:outputText    id="violation-id-ot"
                                                                          styleClass="data_field_value"
                                                                          value="#{violationBB.currentViolation.violationID}"/>
                                                     </div>
+                                                </div>
 
-                                                    <div    id="violation-ord-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
 
-                                                        <p:outputLabel for="violation-ord-ot"
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="violation-status-ot"
                                                                        styleClass="data_field_label">
-                                                            <h:outputText value="Ordinance"/>
+                                                            <h:outputText value="Status"/>
                                                         </p:outputLabel>
-
-                                                        <h:outputText value="ElementID: #{cse.codeSetElementID}"/>
-                                                        <p:spacer height="3px" />
-                                                        <h:outputText value="Source: #{cse.codeElement.source.sourceName}(#{cse.codeElement.source.sourceYear})"/>
-                                                        <h:outputText value="Chapter #{cse.codeElement.ordchapterNo}: "/>
-                                                        <h:outputText value="#{cse.codeElement.ordchapterTitle}"/>
-                                                        <p:spacer height="3px" />
-                                                        <h:outputText value="Section #{cse.codeElement.ordSecNum}: "/>
-                                                        <h:outputText value="#{cse.codeElement.ordSecTitle}"/>
-                                                        <p:spacer height="3px" />
-                                                        <h:outputText value="Subsection #{cse.codeElement.ordSubSecNum}: "/>
-                                                        <h:outputText value="#{cse.codeElement.ordSubSecTitle}"/>
-                                                        <p:spacer height="3px" />
-                                                        <h:outputText value="Category: #{cse.codeElement.guideEntry.category}"/>
-
-                                                        <div class="outlinedBox">
-                                                            <h2>Code Element Text</h2>
-
-                                                            <h:outputLabel styleClass="bold" value="Technical Text"/>
-                                                            <p:spacer height="15px"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText escape="false" value="#{cse.codeElement.ordTechnicalText}"/>
-                                                            </div>
-
-                                                            <p:spacer height="15px"/>
-
-                                                            <h:outputLabel styleClass="bold" value="Human friendly text"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText escape="false" value="#{cse.codeElement.ordHumanFriendlyText}"/>
-                                                            </div>
-                                                            <p:spacer height="15px"/>
-                                                            <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText escape="false" value="#{cse.codeElement.guideEntry.enforcementGuidelines}"/>
-                                                            </div>
-
-                                                            <p:spacer height="15px"/>
-
-                                                            <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText escape="false" value="#{cse.codeElement.guideEntry.inspectionGuidelines}"/>
-                                                            </div>
-                                                        </div>
-
                                                     </div>
-                                                     <div    id="violation-status-div"
-                                                         class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-                                                                 
-                                                          <p:outputLabel for="violation-status-ot"
-                                                                       styleClass="data_field_label">
-                                                            <h:outputText value="ID"/>
-                                                        </p:outputLabel>
 
+                                                    <div class="restrict-data-field-value-inline" >
                                                         <h:outputText    id="violation-status-ot"
                                                                          styleClass="data_field_value"
                                                                          value="#{violationBB.currentViolation.status.label}"/>
-                                                         
-                                                     </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <p:outputLabel for="violation-elementid-ot"
+                                                                       styleClass="data_field_label">
+                                                            <h:outputText value="Code Element ID"/>
+                                                        </p:outputLabel>
+
+                                                    </div>
+                                                    <div class="restrict-data-field-value-inline" >
+
+                                                        <h:outputText    id="violation-elementid-ot"
+                                                                         styleClass="data_field_value"
+                                                                         value="#{violationBB.currentViolation.violatedEnfElement.codeElement.elementID}"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <p:outputLabel for="violation-source-ot"
+                                                                       styleClass="data_field_label">
+                                                            <h:outputText value="Code Source"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-inline" >
+
+                                                        <h:outputText    id="violation-source-ot"
+                                                                         styleClass="data_field_value"
+                                                                         value="#{violationBB.currentViolation.violatedEnfElement.source.sourceName} (#{violationBB.currentViolation.violatedEnfElement.source.sourceYear})"/>
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <p:outputLabel for="violation-chapter-ot"
+                                                                       styleClass="data_field_label">
+                                                            <h:outputText value="Chapter"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-inline" >
+
+                                                        <h:outputText    id="violation-chapter-ot"
+                                                                         styleClass="data_field_value"
+                                                                         value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterNo}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterTitle}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <p:outputLabel for="violation-section-ot"
+                                                                       styleClass="data_field_label">
+                                                            <h:outputText value="Section"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-inline" >
+
+                                                        <h:outputText    id="violation-section-ot"
+                                                                         styleClass="data_field_value"
+                                                                         value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecTitle}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <p:outputLabel for="violation-subsection-ot"
+                                                                       styleClass="data_field_label">
+                                                            <h:outputText value="Sub-Section"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-inline" >
+
+                                                        <h:outputText    id="violation-subsection-ot"
+                                                                         styleClass="data_field_value"
+                                                                         value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <p:outputLabel for="violation-category-ot"
+                                                                       styleClass="data_field_label">
+                                                            <h:outputText value="Category"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-inline" >
+
+                                                        <h:outputText    id="violation-category-ot"
+                                                                         styleClass="data_field_value"
+                                                                         value="#{!(empty violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry.category :'' }"/>
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <h:outputLabel  for="violation-ord-text"
+                                                                        styleClass="data_field_label" >
+                                                            <h:outputText value="Technical Text" />
+                                                        </h:outputLabel>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-inline" >
+
+                                                        <h:outputText   id="violation-ord-text"
+                                                                        value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordTechnicalText}"
+                                                                        styleClass="data_field_value"
+                                                                        escape="false" />
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <h:outputLabel  for="violation-ord-text-hf"
+                                                                        styleClass="data_field_label" >
+                                                            <h:outputText value="Human Friendly Text" />
+                                                        </h:outputLabel>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-inline" >
+
+                                                        <h:outputText   id="violation-ord-text-hf"
+                                                                        value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordHumanFriendlyText}"
+                                                                        styleClass="data_field_value"
+                                                                        escape="false" />
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <p:outputLabel for="violation-enfguidelines-ot"
+                                                                       styleClass="data_field_label">
+                                                            <h:outputText value="Enforcement Guidelines"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-inline" >
+
+                                                        <h:outputText    id="violation-enfguidelines-ot"
+                                                                         styleClass="data_field_value"
+                                                                         value="#{!(empty violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry.enforcementGuidelines :'' }"/>
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <p:outputLabel for="violation-penalty-ot"
+                                                                       styleClass="data_field_label">
+                                                            <h:outputText value="Penalty"/>
+                                                        </p:outputLabel>
+
+                                                    </div>
+                                                    <div class="restrict-data-field-value-inline" >
+
+                                                        <h:outputText    id="violation-penalty-ot"
+                                                                         styleClass="data_field_value"
+                                                                         value="$#{violationBB.currentViolation.penalty}"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <p:outputLabel for="violation-description-ot"
+                                                                       styleClass="data_field_label">
+                                                            <h:outputText value="Description"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-inline" >
+
+                                                        <h:outputText    id="violation-description-ot"
+                                                                         styleClass="data_field_value"
+                                                                         value="#{violationBB.currentViolation.description}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <p:outputLabel for="violation-dor-ot"
+                                                                       styleClass="data_field_label">
+                                                            <h:outputText value="Date of Record"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-inline" >
+
+                                                        <h:outputText    id="violation-dor-ot"
+                                                                         styleClass="data_field_value"
+                                                                         value="#{violationBB.currentViolation.dateOfRecordPretty}"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <p:outputLabel for="violation-stipcompdate-ot"
+                                                                       styleClass="data_field_label">
+                                                            <h:outputText value="Stipulated Compliance Date"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-inline" >
+
+                                                        <h:outputText    id="violation-stipcompdate-ot"
+                                                                         styleClass="data_field_value"
+                                                                         value="#{violationBB.currentViolation.stipulatedComplianceDatePretty}"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <p:outputLabel for="violation-compdate-ot"
+                                                                       styleClass="data_field_label">
+                                                            <h:outputText value="Actual Compliance Date"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-inline" >
+
+                                                        <h:outputText    id="violation-compdate-ot"
+                                                                         styleClass="data_field_value"
+                                                                         value="#{violationBB.getPrettyDateNoTime(violationBB.currentViolation.actualComplianceDate)}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <p:outputLabel for="violation-compby-ot"
+                                                                       styleClass="data_field_label">
+                                                            <h:outputText value="Compliance Verified By"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-inline" >
+
+                                                        <h:outputText    id="violation-compby-ot"
+                                                                         styleClass="data_field_value"
+                                                                         value="#{!(empty violationBB.currentViolation.complianceUser) ? violationBB.currentViolation.complianceUser.person.lastName : ''}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </h:form>
+                                    </p:panel>
+
+                                    <p:panel    id="violation-add-panel"
+                                                toggleable="true"
+                                                widgetVar="violation-add-panel-var"
+                                                collapsed="false"
+                                                rendered="#{violationBB.activeInsertMode}"
+                                                header="Record New Code Violation @ #{violationBB.currentCase.property.address}">
+
+                                        <h:form id="violation-add-form">
+                                            <div class="ui-g data_container_nested_restrict">
+
+                                                <div class="restrict-main-contents-io-button">
+                                                    <p:commandButton   id="violation-notes-add-button"
+                                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                       value="Select Ordinance"  
+                                                                       icon="fa fa-search"
+                                                                       actionListener="#{violationBB.onViolationChooseButtonChange}"
+                                                                       oncomplete="PF('violation-choose-dialog-var').show()"
+                                                                       update="violation-note-form"/>
+                                                </div>
+                                                <!--NESTED DATA FIELD -->
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                                    <!--NESTED DATA LABEL INLINE -->
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <h:outputLabel value="Ordinance Details"/>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
+                                                        <h:outputText    id="violation-add-source-ot"
+                                                                         value="Source: #{violationBB.currentViolation.violatedEnfElement.source.sourceName} (#{violationBB.currentViolation.violatedEnfElement.source.sourceYear})"/>
+
+                                                        <p:spacer height="2px" />
+
+                                                        <h:outputText    id="violation-add-chapter-ot"
+                                                                         value="Chapter #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterNo}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterTitle}"/>
+
+                                                        <p:spacer height="2px" />
+
+                                                        <h:outputText    id="violation-add-section-ot"
+                                                                         value="Section #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecTitle}"/>
+
+                                                        <h:outputText value=" | " />
+
+                                                        <h:outputText    id="violation-add-subsection-ot"
+                                                                         value="Sub-Sec #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+
+                                                        <p:spacer height="2px" />
+
+                                                        <h:outputText    id="violation-add-category-ot"
+                                                                         value="Category: #{!(empty violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry.category :'' }"/>
+
+                                                        <p:spacer height="2px" />
+
+                                                        <h:outputText   id="violation-add-ord-text"
+                                                                        styleClass="monospace"
+                                                                        value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordTechnicalText}"
+                                                                        escape="false" />
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                                    <div class="restrict-main-contents-io-title" >
+                                                        <h:outputLabel for="viol-date-dor">
+                                                            <h:outputText value="Date of Record"/>
+                                                        </h:outputLabel>
+                                                    </div>
+
+                                                    <div class="restrict-main-contents-io-content" >
+                                                        <p:growl for="viol-date-dor" />
+                                                        <p:calendar id="viol-date-dor"
+                                                                    value="#{violationBB.currentViolation.dateOfRecordUtilDate}" 
+                                                                    mode="popup"  
+                                                                    showOn="button" 
+                                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                                    navigator="true" 
+                                                                    tabindex="2" 
+                                                                    timeInput="true" 
+                                                                    showHour="true" 
+                                                                    showMinute="true"
+                                                                    showButtonPanel="true" 
+                                                                    showTodayButton="true"
+                                                                    required="true"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                                    <div class="restrict-main-contents-io-title" >
+                                                        <h:outputLabel for="viol-date-stipcomp">
+                                                            <h:outputText value="Stipulated Compliance Date"/>
+                                                        </h:outputLabel>
+                                                    </div>
+
+                                                    <div class="restrict-main-contents-io-content" >
+                                                        <p:growl for="viol-date-stipcomp"/>
+
+                                                        <h:outputText value="(Default value is based on the ordinance's default days to comply of 
+                                                                      #{violationBB.currentViolation.codeViolated.normDaysToComply})"
+                                                                      style="font-style: italic"/>
+                                                        <p:spacer height="3px" />
+                                                        <p:calendar id="viol-date-stipcomp"
+                                                                    value="#{violationBB.currentViolation.stipulatedComplianceDateUtilDate}" 
+                                                                    mode="popup"  
+                                                                    showOn="button" 
+                                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                                    navigator="true" 
+                                                                    tabindex="1"
+                                                                    timeInput="true" 
+                                                                    showHour="true" 
+                                                                    showMinute="true"
+                                                                    showButtonPanel="true" 
+                                                                    showTodayButton="true"
+                                                                    required="true"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                                    <div class="restrict-main-contents-io-title" >
+
+                                                        <p:outputLabel for="viol-penalty">
+                                                            <h:outputText value="Penalty ($)"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <div class="restrict-main-contents-io-content" >
+                                                        <p:growl for="viol-penalty" />
+                                                        <p:inputText id="viol-penalty" 
+                                                                     value="#{violationBB.currentViolation.penalty}"
+                                                                     tabindex="3" 
+                                                                     required="true" 
+                                                                     type="number"/>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                                    <div class="restrict-main-contents-io-title" >
+                                                        <p:outputLabel for="viol-descr">
+                                                            <h:outputText value="Description of code violation"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <div class="restrict-main-contents-io-content" >
+                                                        <p:growl for="viol-descr" />
+                                                        <p:inputTextarea id="viol-descr" 
+                                                                         value="#{violationBB.currentViolation.description}"
+                                                                         tabindex="5" 
+                                                                         style="width: 100%"
+                                                                         required="true" />
+
+                                                    </div>
+
+                                                </div>
+
+                                                <p:spacer height="10px"/>
+
+                                                <div class="restrict-main-contents-io-button">
 
 
-
-                                                </div> 
-                                            </h:form>
-                                        </p:panel>
-
-                                        <p:panel    id="violation-add-panel"
-                                                    toggleable="true"
-                                                    widgetVar="violation-add-panel-var"
-                                                    collapsed="false"
-                                                    rendered="#{violationBB.activeInsertMode}"
-                                                    header="Issue New Citation">
-
-                                            <h:form id="violation-add-form">
-                                                <h2>Code Element Details:</h2>
-
-                                                <h:outputText value="#{violationBB.currentViolation.codeViolated.codeElement.ordchapterTitle}: 
-                                                              #{violationBB.currentViolation.codeViolated.codeElement.ordSecNum} 
-                                                              #{violationBB.currentViolation.codeViolated.codeElement.ordSecTitle}:
-                                                              #{violationBB.currentViolation.codeViolated.codeElement.ordSubSecNum} 
-                                                              #{violationBB.currentViolation.codeViolated.codeElement.ordSubSecTitle}"/>
-                                                <p:spacer height="5px"/>
-
-
-                                                <h:outputText style="font-family: monospace; text-align: center; font-size: 0.9em;" 
-                                                              escape="false"
-                                                              value="#{violationBB.currentViolation.codeViolated.codeElement.ordTechnicalText}"/>
-
-                                                <p:spacer height="5px"/>
-
-                                                <h:outputLabel value="Default Penalty:"/>
-                                                <h:outputText value="#{violationBB.currentViolation.codeViolated.normPenalty}"/>
-
-                                                <p:spacer height="5px"/>
-
-                                                <h:outputLabel value="Default days to comply: "/>
-                                                <h:outputText value="#{violationBB.currentViolation.codeViolated.normDaysToComply}"/>
-
-                                                <h:outputText style="text-align: left;" 
-                                                              value="Code Violation Input Form:"/>
-                                                <h:outputLabel for="stipCompDate">
-                                                    <h:outputText value="Stipulated Compliance Date"/>
-                                                </h:outputLabel>
-
-                                                <p:calendar value="#{violationBB.currentViolation.stipulatedComplianceDateUtilDate}" 
-                                                            mode="popup"  id="stipCompDate"
-                                                            showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                            navigator="true" tabindex="1"
-                                                            timeInput="true" showHour="true" showMinute="true"
-                                                            showButtonPanel="true" showTodayButton="true"
-                                                            required="true"/>
-
-                                                <h:outputText value="(Generated based on default days to comply of 
-                                                              #{violationBB.currentViolation.codeViolated.normDaysToComply})"
-                                                              style="font-style: italic"/>
-                                                <h:message for="stipCompDate" showDetail="false" showSummary="true" 
-                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" 
-                                                           errorClass="msgError" />
-                                                <h:outputLabel for="dateOfRecord">
-                                                    <h:outputText value="Date of Record"/>
-                                                </h:outputLabel>
-
-                                                <p:calendar value="#{violationBB.currentViolation.dateOfRecordUtilDate}" 
-                                                            mode="popup"  id="dateOfRecord"
-                                                            showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                            navigator="true" tabindex="2" timeInput="true" showHour="true" showMinute="true"
-                                                            showButtonPanel="true" showTodayButton="true"
-                                                            required="true"/>
-                                                <h:message for="dateOfRecord" showDetail="false" showSummary="true" 
-                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                                <p:outputLabel for="penalty">
-                                                    <h:outputText value="Penalty (exclude $)"/>
-                                                </p:outputLabel>
-                                                <p:inputText id="penalty" value="#{violationBB.currentViolation.penalty}"
-                                                             style="width: 20%;" tabindex="3" required="true" styleClass="inputText" type="currency"/>
-                                                <h:message for="penalty" showDetail="false" showSummary="true" 
-                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                                <p:outputLabel for="notes">
-                                                    <h:outputText value="Penalty Notes"/>
-                                                </p:outputLabel>
-                                                <p:inputText id="notes" value="#{violationBB.currentViolation.notes}"
-                                                             style="width: 100%;" tabindex="4" required="false" styleClass="inputText" type="text"/>
-                                                <h:message for="notes" showDetail="false" showSummary="true" 
-                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                                <h:panelGroup>
-                                                    <p:outputLabel for="desc">
-                                                        <h:outputText value="Description of code violation"/>
-                                                    </p:outputLabel>
-                                                    <p:inputTextarea id="desc" value="#{violationBB.currentViolation.description}"
-                                                                     style="width: 100%;" tabindex="5" required="true" styleClass="inputText"/>
-                                                    <h:message for="desc" showDetail="false" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-
-                                                    <p:spacer height="10px"/>
-
+                                                    <p:commandButton    id="violation-insert-button"
+                                                                        ajax="false" 
+                                                                        value="Record Violation" 
+                                                                        action="#{violationBB.onViolationAddCommitButtonChange}" 
+                                                                        icon="fa fa-warning" />
+                                                </div>
+                                                <div class="restrict-main-contents-io-button gray_button">
 
                                                     <p:commandButton    id="violation-insert-abort-button"
                                                                         ajax="false" 
@@ -350,357 +614,133 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                         immediate="true" 
                                                                         action="#{violationBB.onInsertUpdateAbortButtonChange}" 
                                                                         icon="fa fa-hand-o-left" />
-
-                                                    <p:commandButton    id="violation-insert-button"
-                                                                        ajax="false" 
-                                                                        value="Issue Citation" 
-                                                                        action="#{violationBB.onViolationAddCommitButtonChange}" 
-                                                                        icon="fa fa-warning" />
-
-                                            </h:form>
-                                        </p:panel>
-
-
-                                        <!--Update Table-->
-                                        <p:panel id="violation-photos-panel"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="Photos"
-                                                 rendered="#{violationBB.activeUpdateMode}"
-                                                 >
-
-                                            <h:form id="violationPhotosUploadForm" enctype="multipart/form-data">
-                                                <h2>Upload photos of this violation (3 max)</h2>
-                                                <p:fileUpload fileUploadListener="#{violationBB.handlePhotoUpload}"
-                                                              mode="advanced" 
-                                                              update=":violationPhotosViewForm:photoTable"
-                                                              multiple="true"
-                                                              fileLimit="3"
-                                                              sizeLimit="900000000" 
-                                                              allowTypes="/(\.|\/)(jpe?g|png)$/"/>    
-                                            </h:form>
-
-                                            <h:form id="violation-photos-form">
-                                                <p:spacer height="10px"/>
-
-                                                <h2>Review and describe uploaded photos</h2>
-                                                <p:dataTable
-                                                    id="photoTable"
-                                                    var="photo"
-                                                    value="#{violationBB.currentViolation.photoList}"
-                                                    rowKey="#{photo.photoID}"
-                                                    tableStyleClass="primeDataTable"
-                                                    draggableRows="false" tabindex="6">
-                                                    <p:column width="70%">
-                                                        <f:facet name="header">
-                                                            <h:outputText value="Photo"/>
-                                                        </f:facet>
-                                                        <p:graphicImage width="100%" value="#{imageServices.image}">
-                                                            <f:param name="photoID" value="#{photo.photoID}"/>
-                                                        </p:graphicImage>
-                                                    </p:column>
-                                                    <p:column>
-                                                        <f:facet name="header">
-                                                            <h:outputText value="Description"/>
-                                                        </f:facet>
-                                                        <p:inputTextarea id="desc" value="#{photo.description}"
-                                                                         style="width: 100%;" tabindex="5" required="true" styleClass="inputText">
-                                                            <p:ajax />
-                                                        </p:inputTextarea>
-                                                    </p:column>
-
-                                                </p:dataTable>
-
-                                                <p:spacer height="10px"/>
-
-
-                                                <p:commandButton    ajax="false" action="#{violationBB.photosConfirm}" icon="fa fa-disk"
-                                                                    value="Commit photos and descriptions to violation and return to case home" tabindex="6"/>
-                                                <p:commandButton    ajax="false" action="ceHome" icon="fa fa-disk"
-                                                                    value="Return to case home without commiting photos" tabindex="6"/>
-                                            </h:form>
-                                        </p:panel>
-
-                                        <!--Update Table-->
-                                        <p:panel id="violation-update-panel"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="Update Violation"
-                                                 rendered="#{violationBB.activeUpdateMode}"
-                                                 >
-                                            <h:form id="violation-update-form">
-
-                                                <h:outputLabel for="dateOfRecord">
-                                                    <h:outputText value="Date of Record"/>
-                                                </h:outputLabel>
-                                                <p:spacer height="0px"/>
-                                                <p:calendar value="#{violationBB.currentViolation.dateOfRecordUtilDate}" 
-                                                            mode="popup"  id="dateOfRecord"
-                                                            showOn="button" pattern="EEE, dd MMM, yyyy"
-                                                            navigator="true" tabindex="2"
-                                                            showButtonPanel="true" showTodayButton="true"
-                                                            required="true"/>
-                                                <h:message for="dateOfRecord" showDetail="false" showSummary="true" 
-                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                <h:outputLabel for="stipCompDate">
-                                                    <h:outputText value="Stipulated Compliance Date"/>
-                                                </h:outputLabel>
-                                                <p:spacer height="0px"/>
-                                                <p:calendar value="#{violationBB.currentViolation.stipulatedComplianceDateUtilDate}" 
-                                                            mode="popup"  id="stipCompDate"
-                                                            showOn="button" pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                            navigator="true" tabindex="1" timeInput="true" showHour="true" showMinute="true"
-                                                            showButtonPanel="true" showTodayButton="true"
-                                                            required="true"/>
-                                                <p:spacer height="0px"/>
-                                                <h:outputText value="(Generated based on default days to comply of 
-                                                              #{violationBB.currentViolation.codeViolated.normDaysToComply})"
-                                                              style="font-style: italic"/>
-                                                <h:message for="stipCompDate" showDetail="false" showSummary="true" 
-                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" 
-                                                           errorClass="msgError" />
-                                                <p:outputLabel for="penalty">
-                                                    <h:outputText value="Penalty (exclude $ sign)"/>
-                                                </p:outputLabel>
-                                                <p:inputText id="penalty" value="#{violationBB.currentViolation.penalty}"
-                                                             style="width: 20%;" tabindex="3" required="true" styleClass="inputText" type="currency"/>
-                                                <h:message for="penalty" showDetail="false" showSummary="true" 
-                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                <p:outputLabel for="notes-ot">
-                                                    <h:outputText value="Internal Notes: "/>
-                                                </p:outputLabel>
-                                                <h:outputText id="notes-ot" escape="false" value="#{violationBB.currentViolation.notes}"/>
-                                                <p:outputLabel for="desc">
-                                                    <h:outputText value="Description of code violation"/>
-                                                </p:outputLabel>
-                                                <p:inputTextarea id="desc" value="#{violationBB.currentViolation.description}"
-                                                                 style="width: 100%;" tabindex="5" required="true" styleClass="inputText"/>
-                                                <h:message for="desc" showDetail="false" showSummary="true" 
-                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                                <p:spacer height="10px"/>
-
-                                                <p:separator />
-
-                                                <p:spacer height="10px"/>
-                                                <p>This record change will generate a notice event for the case log and for this violation. Please populate the following event information fields. 
-                                                    For example: Describe in a sentence or two why these changes are necessary in the notes section</p>
-
-                                                <h:outputLabel for="discloseToMuniIS">
-                                                    <h:outputText value="Disclose to Municipalities"/>
-                                                </h:outputLabel>
-                                                <p:spacer height="0px"/>
-                                                <p:inputSwitch tabindex="18" id="discloseToMuniIS" value="#{violationBB.formDiscloseToMuni}" onLabel="Yes" offLabel="No" />
-                                                <h:outputLabel for="discloseToPublic">
-                                                    <h:outputText value="Disclose to Public"/>
-                                                </h:outputLabel>
-                                                <p:spacer height="0px"/>
-                                                <p:inputSwitch tabindex="18" id="discloseToPublic" value="#{violationBB.formDiscloseToPublic}" onLabel="Yes" offLabel="No" />
-
-
-                                                <p:spacer height="10px"/>
-
-
-                                                <p:commandButton    id="violation-update-status-abort-button"
-                                                                    ajax="false" 
-                                                                    value="Abort Update" 
-                                                                    process="@none" 
-                                                                    immediate="true" 
-                                                                    action="#{violationBB.onInsertUpdateAbortButtonChange}" 
-                                                                    icon="fa fa-hand-o-left" />
-
-                                                <p:commandButton    id="violation-update-status-commit-button"
-                                                                    ajax="false" 
-                                                                    value="Update Citation Status" 
-                                                                    action="#{violationBB.onViolationUpdateCommitButtonChange()}"  
-                                                                    icon="fa fa-edit"/>
-                                            </h:form>
-
-
-                                        </p:panel>
-
-                                        <!--Update info panel-->
-                                        <p:panel id="violation-update-panel"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="Update Citation"
-                                                 rendered="#{violationBB.activeUpdateMode and !violationBB.currentCitation.status.nonStatusEditsForbidden}"
-                                                 >
-                                            <h:form id="violation-update-form">
-
-
-                                                <div    id="violation-update-container-div"
-                                                        class="ui-g data-container">
-
-                                                    <div    id="violation-update-number-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel for="violation-update-no-it"
-                                                                       styleClass="data_field_label">
-                                                            <h:outputText value="Citation Number (Official)"/>
-                                                        </p:outputLabel>
-
-                                                        <p:inputText id="violation-update-no-it" 
-                                                                     value="#{violationBB.currentCitation.violationNo}" 
-                                                                     tabindex="1" 
-                                                                     required="true" 
-                                                                     styleClass="data_field_value"/>
-
-                                                        <h:message for="violation-update-no-it" showDetail="false" showSummary="true" 
-                                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                    </div>
-
-                                                    <div    id="violation-update-dor-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel for="violation-update-dor-it"
-                                                                       styleClass="data_field_label">
-                                                            <h:outputText value="Date of Record" />
-                                                        </p:outputLabel>
-
-                                                        <p:calendar id="violation-update-dor-it"
-                                                                    value="#{violationBB.currentCitation.dateOfRecordUtilDate}" 
-                                                                    mode="popup" tabindex="3"
-                                                                    showOn="button"
-                                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                    navigator="true" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
-                                                                    showButtonPanel="true"
-                                                                    showTodayButton="true"
-                                                                    required="true"/>
-
-                                                        <h:message for="violation-update-dor-it" showDetail="false" showSummary="true" 
-                                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                    </div>
-
-
-
-                                                    <div    id="violation-update-court-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel for="violation-update-court-som"
-                                                                       styleClass="data_field_label">
-                                                            <h:outputText value="Court Entity of Origin" />
-                                                        </p:outputLabel>
-
-                                                        <p:selectOneMenu id="violation-update-court-som" 
-                                                                         required="false" 
-                                                                         value="#{violationBB.currentCitation.origin_courtentity}">
-                                                            <f:converter converterId="courtEntityConverter"/>
-                                                            <f:selectItems value="#{violationBB.courtEntityList}"
-                                                                           var="ce" itemValue="#{ce}" itemLabel="#{ce.courtEntityName}"/>
-                                                        </p:selectOneMenu>
-
-                                                        <h:message for="violation-update-court-som" showDetail="false" showSummary="true" 
-                                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                                                    </div>
-
-                                                    <div    id="violation-update-text-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel for="violation-update-text-it"
-                                                                       styleClass="data_field_label">
-                                                            <h:outputText value="Official Text" />
-                                                        </p:outputLabel>
-
-                                                        <p:inputTextarea id="violation-update-text-it" 
-                                                                         value="#{violationBB.currentCitation.officialText}" 
-                                                                         tabindex="15" 
-                                                                         required="true" 
-                                                                         styleClass="data_field_value"/>
-                                                        <h:message for="violation-update-text-it" 
-                                                                   showDetail="false" 
-                                                                   showSummary="true" 
-                                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                        <p class="italic">note: each of the violations included in the upper table are permanently 
-                                                            linked with this violation and need not be described in these notes</p>
-                                                    </div>
-
-
                                                 </div>
 
-                                                <p:commandButton    id="violation-update-abort-button"
-                                                                    ajax="false" 
-                                                                    value="Abort Updates" 
-                                                                    process="@none" 
-                                                                    immediate="true" 
-                                                                    action="#{violationBB.onInsertUpdateAbortButtonChange}" 
-                                                                    icon="fa fa-hand-o-left" />
-
-                                                <p:commandButton    id="violation-update-commit-button"
-                                                                    ajax="false" 
-                                                                    value="Update Citation" 
-                                                                    action="#{violationBB.onUpdateCitationCommitButtonChange}"  
-                                                                    icon="fa fa-edit"/>
-                                            </h:form>
+                                            </div>
+                                        </h:form>
+                                    </p:panel>
 
 
-                                        </p:panel>
+                                    <!--Update Table-->
+                                    <p:panel id="violation-photos-panel"
+                                             toggleable="true"
+                                             collapsed="false"
+                                             header="Photos"
+                                             rendered="#{violationBB.activeUpdateMode}"
+                                             >
+
+                                        <h:form id="violationPhotosUploadForm" enctype="multipart/form-data">
+                                            <h2>Upload photos of this violation (3 max)</h2>
+                                            <p:fileUpload fileUploadListener="#{violationBB.handlePhotoUpload}"
+                                                          mode="advanced" 
+                                                          update=":violation-photos-form"
+                                                          multiple="true"
+                                                          fileLimit="3"
+                                                          sizeLimit="900000000" 
+                                                          allowTypes="/(\.|\/)(jpe?g|png)$/"/>    
+                                        </h:form>
+
+                                        <h:form id="violation-photos-form">
+                                            <p:spacer height="10px"/>
+
+                                            <h2>Review and describe uploaded photos</h2>
+                                            <p:dataTable
+                                                id="photoTable"
+                                                var="photo"
+                                                value="#{violationBB.currentViolation.photoList}"
+                                                rowKey="#{photo.photoID}"
+                                                tableStyleClass="primeDataTable"
+                                                draggableRows="false" tabindex="6">
+                                                <p:column width="70%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Photo"/>
+                                                    </f:facet>
+                                                    <p:graphicImage width="100%" value="#{imageServices.image}">
+                                                        <f:param name="photoID" value="#{photo.photoID}"/>
+                                                    </p:graphicImage>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Description"/>
+                                                    </f:facet>
+                                                    <p:inputTextarea id="desc" value="#{photo.description}"
+                                                                     style="width: 100%;" tabindex="5" required="true" styleClass="inputText">
+                                                        <p:ajax />
+                                                    </p:inputTextarea>
+                                                </p:column>
+
+                                            </p:dataTable>
+
+                                            <p:spacer height="10px"/>
+
+
+                                        </h:form>
+                                    </p:panel>
 
 
 
-                                        <!--Remove Panel-->
-                                        <p:panel id="violation-remove-panel"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="Remove Code Enforcement Case"
-                                                 rendered="#{violationBB.activeRemoveMode}"
-                                                 >
+                                    <!--Remove Panel-->
+                                    <p:panel id="violation-remove-panel"
+                                             toggleable="true"
+                                             collapsed="false"
+                                             header="Remove Code Violation"
+                                             rendered="#{violationBB.activeRemoveMode}"
+                                             >
 
-                                            <h:form id="violation-remove-form">
+                                        <h:form id="violation-remove-form">
 
-                                                <!--Remove Button-->
+                                            <!--Remove Button-->
+                                            <div class="restrict-main-contents-io-button red_button">
+
                                                 <p:commandButton 
                                                     icon="fa fa-trash"
                                                     ajax="false"
-                                                    action="#{violationBB.on}"
-                                                    value="Remove Violation ID:#{violationBB.currentCitation.violationNo}"
+                                                    action="#{violationBB.onViolationRemoveCommitButtonChange}"
+                                                    value="Remove Violation ID:#{violationBB.currentViolation.violationID}"
                                                     />
+                                            </div>
 
-                                            </h:form>
+                                        </h:form>
 
-                                        </p:panel>
-
-
-                                        <!--Remove Panel-->
-                                        <p:panel id="violation-notes-panel"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="Notes"
-                                                 rendered="#{violationBB.activeLookupMode}"
-                                                 >
-
-                                            <h:form id="violation-notes-form">
-
-                                                <p:commandButton   id="violation-notes-add-button"
-                                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                                   value="Add New Note"  
-                                                                   icon="fa fa-sticky-note-o"
-                                                                   actionListener="#{violationBB.onNoteInitButtonChange}"
-                                                                   oncomplete="PF('violation-note-dialog-var').show()"
-                                                                   update="violation-note-form"/>
-
-                                                <h:outputText id="violation-note-ot"
-                                                              value="#{violationBB.currentCitation.notes}"
-                                                              escape="false" />
-
-                                            </h:form>
-
-                                        </p:panel>
+                                    </p:panel>
 
 
+                                    <!--Remove Panel-->
+                                    <p:panel id="violation-notes-panel"
+                                             toggleable="true"
+                                             collapsed="false"
+                                             header="Notes"
+                                             rendered="#{violationBB.activeLookupMode}"
+                                             >
 
+                                        <h:form id="violation-notes-form">
 
-                                    </p:outputPanel>
+                                            <p:commandButton   id="violation-notes-add-button"
+                                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                               value="Add New Note"  
+                                                               icon="fa fa-sticky-note-o"
+                                                               actionListener="#{violationBB.onNoteInitButtonChange}"
+                                                               oncomplete="PF('violation-note-dialog-var').show()"
+                                                               update="violation-note-form"/>
+
+                                            <h:outputText id="violation-note-ot"
+                                                          value="#{violationBB.currentViolation.notes}"
+                                                          escape="false" />
+
+                                        </h:form>
+
+                                    </p:panel>
+
                                 </div>
                             </div>
                         </div>
+
                     </p:outputPanel>
 
 
                     <p:dialog   id="violation-choose-dialog"
                                 height="800" width="1000"
-                                widgetVar="violation-note-dialog-var"
+                                widgetVar="violation-choose-dialog-var"
                                 responsive="true"
                                 resizable="trie"
                                 closable="true"
@@ -731,23 +771,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:rowToggler/>
                                 </p:column>
 
-                                <p:column width="6%" >
-                                    <f:facet name="header">
-                                        <h:outputText value="Select" />
-                                    </f:facet>
-                                    <p:commandButton id="selectviolation-cb" 
-                                                     ajax="false" value="select"
-                                                     icon="fa fa-hand-o-right"
-                                                     action="#{violationSelectElementBB.useSelectedElement(cse)}" />
 
-                                </p:column>
-
-                                <p:column width="4%" >
-                                    <f:facet name="header">
-                                        <h:outputText value="ID" />
-                                    </f:facet>
-                                    <h:outputText value="#{cse.codeSetElementID}"/>
-                                </p:column>
 
                                 <p:column width="10%" sortBy="#{cse.codeElement.source.sourceName}"
                                           filterBy="#{cse.codeElement.source.sourceName}">
@@ -810,6 +834,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </f:facet>
                                     <h:outputText value="#{cse.codeElement.guideEntry.category}"/>
                                 </p:column>
+                                
 
 
                                 <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.subCategory}"
@@ -824,9 +849,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                                        value="Select"  
                                                        icon="fa fa-sticky-note-o"
-                                                       actionListener="#{violationBB.onNoteInitButtonChange}"
+                                                       actionListener="#{violationBB.onViolationSelectElementButtonChange(cse)}"
                                                        oncomplete="PF('violation-choose-dialog').hide()"
-                                                       update="@all"/>
+                                                       update="violation-add-form"/>
 
 
                                 </p:column>
@@ -834,6 +859,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                 <p:rowExpansion>
                                     <div class="outlinedBox">
+                                        
+                                
+                                        <h2>Details</h2>
+                                        <h:outputText escape="false" value="Code element ID: #{cse.elementID}"/>
+                                        
                                         <h2>Enforceability Info</h2>
                                         <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
                                                      columnClasses="gridTd, gridTd">
@@ -979,7 +1009,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     </p:dialog>
 
 
-                    <p:confirmDialog message="Photos attached to violation #{caseProfileBB.selectedViolation.violationID}" 
+                    <p:confirmDialog message="Photos attached to violation #{violationBB.currentViolation.violationID}" 
                                      severity="alert" widgetVar="photo-dialog"
                                      closable="true"
                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}">
@@ -989,7 +1019,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 <p:dataTable
                                     id="photoTable"
                                     var="photoid"
-                                    value="#{caseProfileBB.selectedViolation.blobIDList}"
+                                    value="#{violationBB.currentViolation.blobIDList}"
                                     rowKey="#{photoid}"
                                     tableStyleClass="primeDataTable"
                                     draggableRows="false" tabindex="6">
@@ -998,7 +1028,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h:outputText value="Manage"/>
                                         </f:facet>
                                         <p:commandButton ajax="true" 
-                                                         actionListener="#{caseProfileBB.deletePhoto(photoid)}"
+                                                         actionListener="#{violationBB.onPhotoRemoveButtonChange(photoid)}"
                                                          value="Delete" 
                                                          icon="fa fa-bomb"
                                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
@@ -1023,7 +1053,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             <p:spacer height="15px"/>
                             <p:commandButton ajax="true" 
                                              value="Continue" 
-                                             update=":violation-form:violation-table"
+                                             update="violation-photos-form"
                                              onclick="PF('photo-dialog').hide()"/>
                         </h:form>
                     </p:confirmDialog>

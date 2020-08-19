@@ -44,15 +44,15 @@ public class DataCoordinator extends BackingBeanUtils implements Serializable{
 
             phaseCountMap = new LinkedHashMap<>();
             phaseCountMap.put(CasePhaseEnum.PrelimInvestigationPending, 0);
-            phaseCountMap.put(CasePhaseEnum.NoticeDelivery, 0);
-            phaseCountMap.put(CasePhaseEnum.InitialComplianceTimeframe, 0);
-            phaseCountMap.put(CasePhaseEnum.SecondaryComplianceTimeframe, 0);
+            phaseCountMap.put(CasePhaseEnum.IssueNotice, 0);
+            phaseCountMap.put(CasePhaseEnum.InsideComplianceWindow, 0);
+            phaseCountMap.put(CasePhaseEnum.TimeframeExpiredNotCited, 0);
             phaseCountMap.put(CasePhaseEnum.AwaitingHearingDate, 0);
             phaseCountMap.put(CasePhaseEnum.HearingPreparation, 0);
-            phaseCountMap.put(CasePhaseEnum.InitialPostHearingComplianceTimeframe, 0);
-            phaseCountMap.put(CasePhaseEnum.SecondaryPostHearingComplianceTimeframe, 0);
+            phaseCountMap.put(CasePhaseEnum.InsideCourtOrderedComplianceTimeframe, 0);
+            phaseCountMap.put(CasePhaseEnum.CourtOrderedComplainceTimeframeExpired, 0);
             phaseCountMap.put(CasePhaseEnum.Closed, 0);
-            phaseCountMap.put(CasePhaseEnum.LegacyImported, 0);
+            phaseCountMap.put(CasePhaseEnum.Container, 0);
             phaseCountMap.put(CasePhaseEnum.InactiveHolding, 0);
             //CasePhase[] phaseValuesArray = CasePhaseEnum.values();
             Iterator<CECaseDataHeavy> caseIter = caseList.iterator();

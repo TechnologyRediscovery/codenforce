@@ -5,9 +5,13 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
+import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,9 +21,10 @@ import java.util.Objects;
  */
 public class        CECase 
         extends     CECasePublic
-        implements  IFace_Openable,
-                    Cloneable,
+        implements  Cloneable,
                     IFace_Loggable,
+                    IFace_EventHolder,
+                    IFace_StatusLogHolder,
                     Comparable<CECase>{
     
     protected int caseID;
@@ -41,6 +46,7 @@ public class        CECase
     protected String caseName;
     
     protected CECaseStatus statusBundle;
+    protected String statusAssignmentLog;
     
     protected LocalDateTime originationDate;
     protected LocalDateTime closingDate;
@@ -61,8 +67,14 @@ public class        CECase
     protected User lastUpdatedBy;
     protected LocalDateTime lastUpdatedTS;
     
+    protected List<EventCnF> eventList;
+    protected List<EventCnF> eventListMaster;
+    
     public CECase(){
+        
     }
+    
+    
 
     @Override
     public String toString() {
@@ -83,13 +95,47 @@ public class        CECase
         
     }
 
-    
-      @Override
-    public boolean isOpen() {
-        return this.getClosingDate() != null;
+     @Override
+    public List<EventCnF> getEventList() {
+        return eventList;
+    }
+     
+
+    @Override
+    public List<EventCnF> getEventList(ViewOptionsActiveHiddenListsEnum voahle) {
+        List<EventCnF> visEventList = new ArrayList<>();
+        if (eventList != null) {
+            for (EventCnF ev : eventList) {
+                switch (voahle) {
+                    case VIEW_ACTIVE_HIDDEN:
+                        if (ev.isActive()
+                                && ev.isHidden()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    case VIEW_ACTIVE_NOTHIDDEN:
+                        if (ev.isActive()
+                                && !ev.isHidden()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    case VIEW_ALL:
+                        visEventList.add(ev);
+                        break;
+                    case VIEW_INACTIVE:
+                        if (!ev.isActive()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    default:
+                        visEventList.add(ev);
+                } // close switch
+            } // close for   
+        } // close null check
+        return visEventList;
     }
 
-  
+   
     
     public long getCaseAge() {
         return EntityUtils.getTimePeriodAsDays(originationDate, LocalDateTime.now());
@@ -521,5 +567,37 @@ public class        CECase
         this.statusBundle = statusBundle;
     }
 
+   
+    public List<EventCnF> getEventListMaster() {
+        return eventListMaster;
+    }
+
+    @Override
+    public void setEventList(List<EventCnF> eventList) {
+        this.eventList = eventList;
+    }
+
+    public void setEventListMaster(List<EventCnF> eventListMaster) {
+        if (eventListMaster != null) {
+            this.eventListMaster = eventListMaster;
+        }
+    }
+
+    @Override
+    public String getStatusLog() {
+        return statusAssignmentLog;
+    }
+
+    @Override
+    public void logStatusNote(String note) {
+        StringBuilder sb;
+        if(note != null){
+            sb = new StringBuilder();
+            sb.append(statusAssignmentLog);
+            sb.append(Constants.FMT_HTML_BREAK);
+            sb.append(note);
+            statusAssignmentLog = sb.toString();
+        }
+    }
     
 }

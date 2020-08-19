@@ -40,6 +40,7 @@ import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -93,10 +94,12 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         pageModes.add(PageModeEnum.INSERT);
         pageModes.add(PageModeEnum.UPDATE);
         pageModes.add(PageModeEnum.REMOVE);
-        if (getSessionBean().getCeCaseSearchProfilePageModeRequest() != null) {
-            setCurrentMode(getSessionBean().getCeCaseSearchProfilePageModeRequest());
+        if (getSessionBean().getCeCaseViolationsPageModeRequest() != null) {
+            setCurrentMode(getSessionBean().getCeCaseViolationsPageModeRequest());
+        } else {
+            setCurrentMode(PageModeEnum.LOOKUP);
         }
-        setCurrentMode(PageModeEnum.LOOKUP);
+        System.out.println("ViolationBB.initBean()");
     }
 
      /**
@@ -116,7 +119,6 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             this.currentMode = tempCurMode;
         } else {
             this.currentMode = mode;
-            System.out.println("CECaseSearchProfileBB.setCurrentMode: " + currentMode.getTitle());
             switch (currentMode) {
                 case LOOKUP:
                     onModeLookupInit();
@@ -172,16 +174,16 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      * from the list and sets it on the selected user perch
      *
      * @param viol
-     * @return 
      */
-    public String onObjetViewButtonChange(CodeViolation viol) {
-        CaseCoordinator cc = getCaseCoordinator();
+    public void onObjetViewButtonChange(CodeViolation viol) {
+  
 
         if (viol != null) {
             getSessionBean().setSessCodeViolation(viol);
             currentViolation = viol;
         }
-        return "";
+        System.out.println("ViolationBB.onObjectViewButtonChange: currentViolation is now " + currentViolation.getViolationID());
+        
     }
 
     
@@ -197,8 +199,17 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      */
     public void onModeInsertInit() {
         CaseCoordinator cc = getCaseCoordinator();
+        System.out.println("violationBB.OnModeInsertInit");
         
-        currentViolation = cc.violation_getCodeViolationSkeleton(currentCase, null);
+        try {
+            currentViolation = cc.violation_getCodeViolationSkeleton(currentCase);
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                           ex.getMessage(), ""));
+        }
+        
     }
     
       /**
@@ -220,8 +231,26 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      * Listener for user selection of a violation from the code set violation table
      * @param ece
      */
-    public void onViolationSelectButtonChange(EnforcableCodeElement ece){
-        currentViolation.setCodeViolated(ece);
+    public void onViolationSelectElementButtonChange(EnforcableCodeElement ece){
+        if(currentViolation != null){
+            currentViolation.setCodeViolated(ece);
+        } else {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_WARN, 
+                        "Cannot add null ordinance","" ));
+
+        }
+        
+        
+    }
+    
+    /**
+     * Listener for the start of the violation choosing process
+     * @param ev 
+     */
+    public void onViolationChooseButtonChange(ActionEvent ev){
+        // do nothing yet
+        
         
         
     }
@@ -276,6 +305,39 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             return "ceCaseViolations";
     }
 
+    
+/**
+ * Listener for user requests to commit a violation compliance event
+ * @param cv 
+ */
+    public void onViolationRecordComplianceCommitButtonChange(CodeViolation cv) {
+        EventCoordinator ec = getEventCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
+        if(cv != null){
+            currentViolation = cv;
+            // build event details package
+            EventCnF e = null;
+            try {
+                currentViolation.setComplianceUser(getSessionBean().getSessUser());
+                e = ec.generateViolationComplianceEvent(currentViolation);
+                e.setUserCreator(getSessionBean().getSessUser());
+                e.setTimeStart(LocalDateTime.now());
+                cv.setActualComplianceDate(LocalDateTime.now());
+                cc.violation_recordCompliance(cv, getSessionBean().getSessUser());
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
+            
+        }
+        
+        
+        // the user is then shown the add event dialog, and when the
+        // event is added to the case, the CaseCoordinator will
+        // set the date of record on the violation to match that chosen
+        // for the event
+//        selectedEvent = e;
+
+    }
     
 
     
@@ -377,35 +439,19 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
 
         try {
-             cc.violation_attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, currentCase, getSessionBean().getSessUser());
+             cc.violation_attachViolationToCase(currentViolation, currentCase, getSessionBean().getSessUser());
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            "Success! Violation added.", ""));
-            getSessionBean().getSessionBean().setSessCECase(currentCase);
-            return "ceCases";
-        } catch (IntegrationException | SearchException ex) {
+                            "Success! Violation attached to case.", ""));
+            getSessionBean().getSessionBean().setSessCodeViolation(currentViolation);
+            System.out.println("ViolationBB.onViolationAddCommmitButtonChange | completed violation process");
+        } catch (IntegrationException | SearchException | BObStatusException | EventException | ViolationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to edit violation.",
-                            "This is a system-level error that msut be corrected by an administrator, Sorry!"));
-
-        } catch (ViolationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), "Stipulated compliance date must "
-                            + "be in the future; please revise the stipulated compliance date."));
-        } catch (BObStatusException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), "To preserve data integrity, this "
-                            + "case's phase restrictions forbid attaching new code violations."));
-        } catch (EventException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), "Violation event exception"));
-        }
+                            ex.getMessage(), ""));
+            return "";
+        } 
         return "ceCaseViolations";
 
     }
@@ -439,7 +485,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
 
         try {
-             currentViolation.setViolationID(cc.violation_attachViolationToCaseAndInsertTimeFrameEvent(currentViolation, currentCase, getSessionBean().getSessUser()));
+             currentViolation.setViolationID(cc.violation_attachViolationToCase(currentViolation, currentCase, getSessionBean().getSessUser()));
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Success! Violation added.", ""));
@@ -468,6 +514,21 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         }
         return "";
 
+    }
+    
+    /**
+     * Listener for user request to remove photo on violation
+     * @param photoid
+     * @return 
+     */
+    public String onPhotoRemoveButtonChange(int photoid){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Cannot remove photo yet: unsupported operation", ""));
+        
+        // do something here
+        return "ceCaseViolations";
+        
     }
 
     public String photosConfirm() {
@@ -511,7 +572,6 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      */
     public CodeViolation getCurrentViolation() {
 
-        currentViolation = getSessionBean().getSessCodeViolation();
         return currentViolation;
     }
 

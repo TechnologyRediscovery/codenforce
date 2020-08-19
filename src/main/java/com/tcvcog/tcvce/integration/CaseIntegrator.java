@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECase;
@@ -753,39 +754,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     }
     
    
-    /**
-     * Updates only the notes field on codeviolation table
-     
-     * 
-     * @param viol
-     * @throws IntegrationException
-     * @throws BObStatusException 
-     */
-    public void updateCodeViolationNotes(CodeViolation viol) 
-            throws IntegrationException, BObStatusException{
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-
-        if(viol == null){
-            throw new BObStatusException("cannot update notes on a null violation");
-        }
-        
-        try {
-            String s = "UPDATE public.codeviolation SET notes=? WHERE violationid=?";
-            stmt = con.prepareStatement(s);
-            stmt.setString(1, viol.getNotes());
-            stmt.setInt(2, viol.getViolationID());
-
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to update notes", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-    }
+ 
     
    
     /**
@@ -898,7 +867,11 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
 
             stmt.setInt(1, v.getViolatedEnfElement().getCodeSetElementID());
             stmt.setInt(2, v.getCeCaseID());
-            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(v.getDateOfRecord()));
+            if(v.getDateOfRecord() != null){
+                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(v.getDateOfRecord()));
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
 
             // entryts stamped by PG's now()
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(v.getStipulatedComplianceDate()));
@@ -912,11 +885,24 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setNull(10, java.sql.Types.NULL); // compliance TS
             
             stmt.setNull(11, java.sql.Types.NULL); // compliance user
-            stmt.setInt(12, v.getSeverityIntensityClassID());
+            if(v.getSeverityIntensity() != null){
+                stmt.setInt(12, v.getSeverityIntensity().getClassID() );
+            } else {
+                stmt.setNull(12, java.sql.Types.NULL);
+            }
             
-            stmt.setInt(13, v.getCreatedBy().getUserID());
+            if(v.getCreatedBy() != null){
+                stmt.setInt(13, v.getCreatedBy().getUserID());
+            } else {
+                stmt.setNull(13, java.sql.Types.NULL);
+            }
+
             stmt.setInt(14, v.getComplianceTFExpiryPropID());
-            stmt.setInt(15, v.getLastUpdatedUser().getUserID());
+            if(v.getLastUpdatedUser() != null){
+                stmt.setInt(15, v.getLastUpdatedUser().getUserID());
+            } else {
+                stmt.setNull(15, java.sql.Types.NULL);
+            }
             
             stmt.execute();
             
@@ -949,11 +935,11 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      */
     public void updateCodeViolation(CodeViolation v) throws IntegrationException {
         String query =  " UPDATE public.codeviolation\n" +
-                        "   SET codesetelement_elementid=?, cecase_caseid=?, dateofrecord=?, \n" +
-                        "       stipulatedcompliancedate=?, actualcompliancedate=?, \n" +
-                        "       penalty=?, description=?, notes=?, legacyimport=?, compliancetimestamp=?, \n" +
-                        "       complianceuser=?, severity_classid=?, createdby=?, compliancetfexpiry_proposalid=?, \n" +
-                        "       lastupdatedts=now(), lastupdated_userid=?, active=? \n" +
+                        "   SET codesetelement_elementid=?, cecase_caseid=?, dateofrecord=?, \n" + // 1-3
+                        "       stipulatedcompliancedate=?, actualcompliancedate=?, \n" + // 4-5
+                        "       penalty=?, description=?, legacyimport=?, \n" + // 6-8
+                        "       complianceuser=?, severity_classid=?, createdby=?, compliancetfexpiry_proposalid=?, \n" + // 9-12
+                        "       lastupdatedts=now(), lastupdated_userid=?, active=? \n" + // 13-14
                         " WHERE violationid = ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -968,32 +954,59 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }
+            
             if(v.getStipulatedComplianceDate()!= null){
                 stmt.setTimestamp(4, java.sql.Timestamp.valueOf(v.getStipulatedComplianceDate()));
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
-            if(v.getDateOfRecord() != null){
-                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(v.getDateOfRecord()));
+            if(v.getActualComplianceDate() != null){
+                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(v.getActualComplianceDate()));
             } else {
-                stmt.setNull(3, java.sql.Types.NULL);
+                stmt.setNull(5, java.sql.Types.NULL);
             }
             
-            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(v.getStipulatedComplianceDate()));
-            stmt.setTimestamp(5, java.sql.Timestamp.valueOf(v.getStipulatedComplianceDate()));
+            stmt.setDouble(6, v.getPenalty());
+            stmt.setString(7, v.getDescription());
+            stmt.setBoolean(8, v.isLeagacyImport());
             
-            stmt.setDouble(5, v.getPenalty());
-            stmt.setString((6), v.getDescription());
-            stmt.setString(7, v.getNotes());
-            stmt.setInt(8, v.getViolationID());
+            if(v.getComplianceUser() != null){
+                stmt.setInt(9, v.getComplianceUser().getUserID());
+            } else {
+                stmt.setNull(9, java.sql.Types.NULL);
+            }
+            if(v.getSeverityIntensity() != null){
+                stmt.setInt(10, v.getSeverityIntensity().getClassID());
+            } else {
+                stmt.setNull(10, java.sql.Types.NULL);
+            }
+            if(v.getCreatedBy() != null){
+                stmt.setInt(11, v.getCreatedBy().getUserID());
+            } else {
+                stmt.setNull(11, java.sql.Types.NULL);
+            }
+            if(v.getComplianceTFExpiryProp() != null){
+                stmt.setInt(12, v.getComplianceTFExpiryProp().getProposalID());
+            } else if(v.getComplianceTFExpiryPropID() != 0){
+                stmt.setInt(12, v.getComplianceTFExpiryPropID());
+            } else {
+                stmt.setNull(12, java.sql.Types.NULL);
+            }
+            
+            if(v.getLastUpdatedUser() != null){
+                stmt.setInt(13, v.getLastUpdatedUser().getUserID());
+            }else {
+                stmt.setNull(14, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(15, v.isActive());
+            
+            stmt.setInt(16, v.getViolationID());
 
-            System.out.println("CodeViolationIntegrator.updateViolation | stmt: " + stmt.toString());
-
-            stmt.execute();
+            stmt.executeUpdate();
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("cannot fetch code violation by ID, sorry.", ex);
+            throw new IntegrationException("cannot update code violation, sorry.", ex);
 
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -1016,6 +1029,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         CaseCoordinator cc = getCaseCoordinator();
         CodeIntegrator ci = getCodeIntegrator();
         UserIntegrator ui = getUserIntegrator();
+        WorkflowCoordinator wc = getWorkflowCoordinator();
         
         v.setViolationID(rs.getInt("violationid"));
         v.setViolatedEnfElement(ci.getEnforcableCodeElement(rs.getInt("codesetelement_elementid")));
@@ -1025,14 +1039,22 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         }
         
         v.setCeCaseID(rs.getInt("cecase_caseid"));
-        v.setDateOfRecord(rs.getTimestamp("dateofrecord").toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDateTime());
+        if(rs.getTimestamp("dateofrecord") != null){
+            v.setDateOfRecord(rs.getTimestamp("dateofrecord").toInstant()
+                    .atZone(ZoneId.systemDefault()).toLocalDateTime());
+        }
 
+        if(rs.getTimestamp("entrytimestamp") != null){
+            
         v.setCreationTS(rs.getTimestamp("entrytimestamp").toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
+        }
 
+        if(rs.getTimestamp("stipulatedcompliancedate") != null){
+            
         v.setStipulatedComplianceDate(rs.getTimestamp("stipulatedcompliancedate").toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
+        }
                 
                 
         if (!(rs.getTimestamp("actualcompliancedate") == null)) {
@@ -1050,7 +1072,11 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             v.setComplianceUser(ui.getUser(rs.getInt("complianceUser")));
         }
         
-        v.setComplianceTFExpiryPropID(rs.getInt("compliancetfexpiry_proposalid"));
+        if(rs.getInt("compliancetfexpiry_proposalid") != 0){
+            v.setComplianceTFExpiryPropID(rs.getInt("compliancetfexpiry_proposalid"));
+            v.setComplianceTFExpiryProp(wc.getProposal(rs.getInt("compliancetfexpiry_proposalid")));
+        }
+        
         loadViolationPhotoList(v);
         
         v.setCitationIDList(getCitations(v.getViolationID()));
@@ -1183,7 +1209,39 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
         return cv;
     }
-    
+       /**
+     * Updates only the notes field on codeviolation table
+     
+     * 
+     * @param viol
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public void updateCodeViolationNotes(CodeViolation viol) 
+            throws IntegrationException, BObStatusException{
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        if(viol == null){
+            throw new BObStatusException("cannot update notes on a null violation");
+        }
+        
+        try {
+            String s = "UPDATE public.codeviolation SET notes=? WHERE violationid=?";
+            stmt = con.prepareStatement(s);
+            stmt.setString(1, viol.getNotes());
+            stmt.setInt(2, viol.getViolationID());
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update notes", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
     
     
     

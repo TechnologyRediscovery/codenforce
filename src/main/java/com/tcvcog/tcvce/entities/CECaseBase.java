@@ -17,7 +17,6 @@ import java.util.Objects;
 public class CECaseBase 
         extends EntityUtils 
         implements Serializable, 
-                    IFace_Openable,
                     Cloneable{
     
     protected int caseID;
@@ -71,13 +70,6 @@ public class CECaseBase
         
     }
 
-    
-      @Override
-    public boolean isOpen() {
-        return this.casePhase.isCaseOpen();
-    }
-
-  
     
     public long getCaseAge() {
         return getTimePeriodAsDays(originationDate, LocalDateTime.now());
