@@ -92,6 +92,23 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return ev;
     }
     
+    /**
+     * Extracts events for bobs that hold them
+     * @param evHolder
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<EventCnF> getEventList(IFace_EventHolder evHolder) throws IntegrationException{
+        
+        EventIntegrator ei = getEventIntegrator();
+        List<Integer> evidl = ei.getEventList(evHolder);
+        List<EventCnF> evList = new ArrayList<>();
+        for(Integer i: evidl){
+            evList.add(getEvent(i));
+        }
+        
+        return evList;
+    }
     
     
     /**

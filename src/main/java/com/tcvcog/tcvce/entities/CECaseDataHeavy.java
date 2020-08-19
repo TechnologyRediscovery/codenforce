@@ -30,8 +30,6 @@ public class CECaseDataHeavy
     private Property property;
     private PropertyUnit propertyUnit;
     
-    private List<EventCnF> eventList;
-    private List<EventCnF> eventListMaster;
     
     private List<Proposal> proposalList;
     private List<EventRuleImplementation> eventRuleList;
@@ -43,9 +41,6 @@ public class CECaseDataHeavy
     
     private List<Blob> blobList;
     
-    protected boolean showHiddenEvents;
-    protected boolean showInactiveEvents;
-
    
     public CECaseDataHeavy(CECase cse){
         if(cse != null){
@@ -90,74 +85,6 @@ public class CECaseDataHeavy
     }
     
     
-    @Override
-    public List<EventCnF> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle) {
-        List<EventCnF> visEventList = new ArrayList<>();
-        if (eventList != null) {
-            for (EventCnF ev : eventList) {
-                switch (voahle) {
-                    case VIEW_ACTIVE_HIDDEN:
-                        if (ev.isActive()
-                                && ev.isHidden()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    case VIEW_ACTIVE_NOTHIDDEN:
-                        if (ev.isActive()
-                                && !ev.isHidden()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    case VIEW_ALL:
-                        visEventList.add(ev);
-                        break;
-                    case VIEW_INACTIVE:
-                        if (!ev.isActive()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    default:
-                        visEventList.add(ev);
-                } // close switch
-            } // close for   
-        } // close null check
-        return visEventList;
-    }
-
-    public boolean isShowHiddenEvents() {
-        return showHiddenEvents;
-    }
-
-    public void setShowHiddenEvents(boolean showHiddenEvents) {
-        this.showHiddenEvents = showHiddenEvents;
-    }
-
-    public boolean isShowInactiveEvents() {
-        return showInactiveEvents;
-    }
-
-    public void setShowInactiveEvents(boolean showInactiveEvents) {
-        this.showInactiveEvents = showInactiveEvents;
-    }
-
-    public List<EventCnF> getEventListMaster() {
-        return eventListMaster;
-    }
-
-    public void setEventListMaster(List<EventCnF> eventListMaster) {
-        if(eventListMaster != null){
-            this.eventListMaster = eventListMaster;
-        }
-    }
-
-    public List<EventCnF> getEventList() {
-        return eventList;
-    }
-
-    @Override
-    public void setEventList(List<EventCnF> eventList) {
-        this.eventList = eventList;
-    }
 
     
 
@@ -438,6 +365,15 @@ public class CECaseDataHeavy
      */
     public void setBlobList(List<Blob> blobList) {
         this.blobList = blobList;
+    }
+
+    @Override
+    public boolean isOpen() {
+        if(statusBundle != null){
+            return statusBundle.getPhase().isCaseOpen();
+        } 
+        return true;
+        
     }
 
 }

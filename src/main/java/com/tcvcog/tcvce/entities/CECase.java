@@ -5,9 +5,12 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,9 +20,9 @@ import java.util.Objects;
  */
 public class        CECase 
         extends     CECasePublic
-        implements  IFace_Openable,
-                    Cloneable,
+        implements  Cloneable,
                     IFace_Loggable,
+                    IFace_EventHolder,
                     Comparable<CECase>{
     
     protected int caseID;
@@ -61,6 +64,9 @@ public class        CECase
     protected User lastUpdatedBy;
     protected LocalDateTime lastUpdatedTS;
     
+    protected List<EventCnF> eventList;
+    protected List<EventCnF> eventListMaster;
+    
     public CECase(){
     }
 
@@ -83,13 +89,47 @@ public class        CECase
         
     }
 
-    
-      @Override
-    public boolean isOpen() {
-        return this.getClosingDate() != null;
+     @Override
+    public List<EventCnF> getEventList() {
+        return eventList;
+    }
+     
+
+    @Override
+    public List<EventCnF> getEventList(ViewOptionsActiveHiddenListsEnum voahle) {
+        List<EventCnF> visEventList = new ArrayList<>();
+        if (eventList != null) {
+            for (EventCnF ev : eventList) {
+                switch (voahle) {
+                    case VIEW_ACTIVE_HIDDEN:
+                        if (ev.isActive()
+                                && ev.isHidden()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    case VIEW_ACTIVE_NOTHIDDEN:
+                        if (ev.isActive()
+                                && !ev.isHidden()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    case VIEW_ALL:
+                        visEventList.add(ev);
+                        break;
+                    case VIEW_INACTIVE:
+                        if (!ev.isActive()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    default:
+                        visEventList.add(ev);
+                } // close switch
+            } // close for   
+        } // close null check
+        return visEventList;
     }
 
-  
+   
     
     public long getCaseAge() {
         return EntityUtils.getTimePeriodAsDays(originationDate, LocalDateTime.now());
@@ -519,6 +559,22 @@ public class        CECase
      */
     public void setStatusBundle(CECaseStatus statusBundle) {
         this.statusBundle = statusBundle;
+    }
+
+   
+    public List<EventCnF> getEventListMaster() {
+        return eventListMaster;
+    }
+
+    @Override
+    public void setEventList(List<EventCnF> eventList) {
+        this.eventList = eventList;
+    }
+
+    public void setEventListMaster(List<EventCnF> eventListMaster) {
+        if (eventListMaster != null) {
+            this.eventListMaster = eventListMaster;
+        }
     }
 
     

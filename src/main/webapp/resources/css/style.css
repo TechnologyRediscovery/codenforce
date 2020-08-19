@@ -781,6 +781,11 @@ i.status-display-icon-i{
     font-family: Heebo;
 }
 
+.monospace{
+    font-family: monospace;
+    font-size: 1.3em;
+}
+
 .datum-label{
     font-weight: bold;
 }
@@ -1513,6 +1518,10 @@ i.inspection-notinspected{
 
 
 /* -------------------- MISC --------------------------------- */
+
+.content-align-center{
+    text-align: center;
+}
 
 .nov-chosen-recipeint{
     margin: 10px;
@@ -2575,6 +2584,14 @@ input{
     background-color: #6C6D70;
     border:1px solid #6C6D70;
 }
+
+.red_button .ui-button{
+    background-color: darkred;
+    color: white;
+    border:1px solid #6C6D70;
+}
+
+
 
 
 

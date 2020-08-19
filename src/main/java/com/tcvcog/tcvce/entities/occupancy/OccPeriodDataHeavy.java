@@ -22,7 +22,6 @@ import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
-import com.tcvcog.tcvce.entities.IFace_Openable;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
@@ -48,8 +47,7 @@ import java.util.List;
 public  class       OccPeriodDataHeavy 
         extends     OccPeriod 
         implements  IFace_EventRuleGoverned, 
-                    IFace_CredentialSigned,
-                    IFace_Openable {
+                    IFace_CredentialSigned{
     
     protected OccPeriodStatusEnum status;
 
@@ -57,7 +55,6 @@ public  class       OccPeriodDataHeavy
     private List<PersonOccPeriod> personListApplicants;
     private List<Person> personList;
     
-    private List<EventCnF> eventList;
     private List<Proposal> proposalList;
     private List<EventRuleImplementation> eventRuleList;
     
@@ -75,16 +72,6 @@ public  class       OccPeriodDataHeavy
     public OccPeriodDataHeavy() {
     }
     
-     @Override
-    public boolean isOpen() {
-        // TEMPORARY until status flow is created
-        if(getStatus() != null){
-            return getStatus().isOpenPeriod();
-        } else {
-            return true;
-        }
-                
-    }
     
     /**
      * Populates superclass members and stamps the 
@@ -181,10 +168,6 @@ public  class       OccPeriodDataHeavy
         eventRuleList = lst;
     }
     
-      @Override
-    public void setEventList(List<EventCnF> lst) {
-        eventList = lst;
-    }
     
     @Override
     public boolean isAllRulesPassed() {
@@ -198,37 +181,7 @@ public  class       OccPeriodDataHeavy
         return allPassed;
     }
 
-    @Override
-    public List assembleEventList(ViewOptionsActiveHiddenListsEnum voahle) {
-        List<EventCnF> visEventList = new ArrayList<>();
-        if (eventList != null) {
-            for (EventCnF ev : eventList) {
-                switch (voahle) {
-                    case VIEW_ACTIVE_HIDDEN:
-                        if (ev.isActive() && ev.isHidden()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    case VIEW_ACTIVE_NOTHIDDEN:
-                        if (ev.isActive() && !ev.isHidden()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    case VIEW_ALL:
-                        visEventList.add(ev);
-                        break;
-                    case VIEW_INACTIVE:
-                        if (!ev.isActive()) {
-                            visEventList.add(ev);
-                        }
-                        break;
-                    default:
-                        visEventList.add(ev);
-                } // close switch
-            } // close for
-        } // close null check
-        return visEventList;
-    }
+    
 
     @Override
     public List assembleEventRuleList(ViewOptionsEventRulesEnum voere) {
@@ -483,6 +436,16 @@ public  class       OccPeriodDataHeavy
     
     public List<PersonOccPeriod> getPersonListApplicants(){
         return personListApplicants;
+    }
+
+    @Override
+    public boolean isOpen() {
+        if(status != null){
+            return status.isOpenPeriod();
+        } else {
+            return false;
+        }
+        
     }
 
    

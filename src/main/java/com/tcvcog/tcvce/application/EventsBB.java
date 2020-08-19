@@ -105,12 +105,12 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
             case CODE_ENFORCEMENT:
                 currentERGBOb = sb.getSessCECase();
                 // in this case our ERGBob is a CECase
-                eventList.addAll(currentERGBOb.assembleEventList(selectedEventView));
+                eventList.addAll(currentERGBOb.getEventList(selectedEventView));
                 break;
             case OCCUPANCY:
                 currentERGBOb = sb.getSessOccPeriod();
                 // in this case our ERGBOb is an OccPeriod
-                eventList.addAll(currentERGBOb.assembleEventList(selectedEventView));
+                eventList.addAll(currentERGBOb.getEventList(selectedEventView));
                 break;
             case UNIVERSAL:
                 // We'll just grab all the events on the session and load up

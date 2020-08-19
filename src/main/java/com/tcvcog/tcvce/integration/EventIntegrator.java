@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.IFace_EventHolder;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
@@ -160,26 +161,26 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     /**
      * Builds a List of EventCnF objects given an ERG, which in June 2020 were
      * only CECase and OccPeriod objects
-     * @param erg
+     * @param evHolder
      * @return
      * @throws IntegrationException 
      */
-     public List<EventCnF> getEventList(IFace_EventRuleGoverned erg) throws IntegrationException{
+     public List<Integer> getEventList(IFace_EventHolder evHolder) throws IntegrationException{
         
      StringBuilder queryStub = new StringBuilder("SELECT eventid FROM public.event WHERE ");
             
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        List<EventCnF> el = new ArrayList<>();
+        List<Integer> evidl = new ArrayList<>();
         
-        if(erg == null){
-            return el;
+        if(evHolder == null){
+            return evidl;
         }
         
-        if(erg instanceof OccPeriod){
+        if(evHolder instanceof OccPeriod){
             queryStub.append("occperiod_periodid=?;");
-        } else if(erg instanceof CECaseDataHeavy){
+        } else if(evHolder instanceof CECaseDataHeavy){
             queryStub.append("cecase_caseid=?;");
         }
 
@@ -187,18 +188,18 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
             stmt = con.prepareStatement(queryStub.toString());
             
-            if(erg instanceof OccPeriod){
-                OccPeriod op = (OccPeriod) erg;
+            if(evHolder instanceof OccPeriod){
+                OccPeriod op = (OccPeriod) evHolder;
                 stmt.setInt(1, op.getPeriodID());
-            } else if(erg instanceof CECaseDataHeavy){
-                CECaseDataHeavy cec = (CECaseDataHeavy) erg;
+            } else if(evHolder instanceof CECaseDataHeavy){
+                CECaseDataHeavy cec = (CECaseDataHeavy) evHolder;
                 stmt.setInt(1, cec.getCaseID());
             }
             
             rs = stmt.executeQuery();
             
             while (rs.next()) {
-                el.add(getEvent(rs.getInt("eventid")));
+                evidl.add(rs.getInt("eventid"));
             }
             
         } catch (SQLException ex) {
@@ -210,7 +211,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
-        return el;
+        return evidl;
     }
     
     /**

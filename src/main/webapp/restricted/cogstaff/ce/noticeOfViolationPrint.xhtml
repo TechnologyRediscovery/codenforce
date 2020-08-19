@@ -115,7 +115,7 @@
 
                                     <h:outputText style="bold" value="Number of photographs enclosed in attachments: " 
                                                   rendered="#{v.includeViolationPhotos}"/>
-                                    <h:outputText value="#{empty v.photoList ? '0' : v.photoList.size()}"
+                                    <h:outputText value="#{empty v.photoIDList ? '0' : v.photoIDList.size()}"
                                                   rendered="#{v.includeViolationPhotos}"/>
                                 </h:panelGroup>
 
@@ -183,10 +183,10 @@
                             <p:dataTable
                                 id="violation-photo-table"
                                 var="photoid"
-                                value="#{v.photoList}"
+                                value="#{v.photoIDList}"
                                 rowKey="#{photoid}"
                                 tableStyleClass="primeDataTable"
-                                rendered="#{v.photoList.size()>0}"
+                                rendered="#{photoIDListst.size()>0}"
                                 draggableRows="false" tabindex="6">
                                 <p:column width="100%">
                                     <f:facet name="header">

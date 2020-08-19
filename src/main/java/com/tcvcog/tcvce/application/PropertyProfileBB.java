@@ -626,7 +626,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
                                 "Could not load CE Case for viewing, sorry! " + ex.toString(), ""));
             }
         }
-        return "ceCaseProfile";
+        return "ceCaseSearchProfile";
     }
 
     /**

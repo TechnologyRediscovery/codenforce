@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Technology Rediscovery LLC
+ * Copyright (C) 2020 Technology Rediscovery LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +16,16 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
+import java.util.List;
+
 /**
- *
+ * Defines basic getters and 
  * @author sylvia
  */
-public interface IFace_Openable {
-    
-    public abstract boolean isOpen();
+public interface IFace_EventHolder {
+    public void setEventList(List<EventCnF> evList);
+    public List<EventCnF> getEventList(ViewOptionsActiveHiddenListsEnum evViewOpt);
+    public List<EventCnF> getEventList();
     
 }

@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application.interfaces;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
+import com.tcvcog.tcvce.entities.IFace_EventHolder;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
@@ -34,16 +35,16 @@ import java.util.List;
  *  
  * @author sylvia
  */
-public interface IFace_EventRuleGoverned {
+public interface IFace_EventRuleGoverned extends IFace_EventHolder {
     
     public EventDomainEnum discloseEventDomain();
     
     public int getBObID();
     
-    public void setEventList(List<EventCnF> lst);
-
-    public List<EventCnF> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle);
-    
+//    public void setEventList(List<EventCnF> lst);
+//
+//    public List<EventCnF> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle);
+//    
     public void setEventRuleList(List<EventRuleImplementation> lst);
 
     public List<EventRuleImplementation> assembleEventRuleList(ViewOptionsEventRulesEnum voere);
