@@ -344,8 +344,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             statusBundle.setPhase(CasePhaseEnum.Container);
         } else if (cse.getClosingDate() != null) {
             statusBundle.setPhase(CasePhaseEnum.Closed);
+            // jump right to court-based phase assignment if we have at least 1 elegible citation
+        } else if (!cecase_buildCitationListForPhaseAssignment(cse).isEmpty()){
+            statusBundle.setPhase(cecase_determineAndSetPhase_stageCITATION(cse));
         } else {
-
 
             // find overriding factors to have a closed 
             if (cse.getViolationList().isEmpty()) {
@@ -370,9 +372,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                         case 1: // all violations within compliance window
                             statusBundle.setPhase(CasePhaseEnum.InsideComplianceWindow);
                             break;
-                        case 2: // one or more EXPIRED compliance timeframes
+                        case 2: // one or more EXPIRED compliance timeframes but no citations
                             statusBundle.setPhase(CasePhaseEnum.TimeframeExpiredNotCited);
                             break;
+                            // we shouldn't hit this...
                         case 3: // at least 1 violation used in a citation that's attached to case
                             statusBundle.setPhase(cecase_determineAndSetPhase_stageCITATION(cse));
                             //                            cecase_determineAndSetPhase_stageCITATION(cse);
@@ -383,6 +386,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 } // close sent-notice-dependent block
             } // close violation-present-only block
         } // close non-container, non-closed block
+        
         cse.setStatusBundle(statusBundle);
 
         if (cse.getStatusBundle().getPhase() != null) {
@@ -393,17 +397,135 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         return cse;
     }
+    
+    /**
+     * Utility method for culling out inactive citations, deactivated, etc. 
+     * @param cse
+     * @return 
+     */
+    private List<Citation> cecase_buildCitationListForPhaseAssignment(CECase cse){
+        List<Citation> citList = new ArrayList<>();
+        if(cse == null || cse.getCitationList() == null || cse.getCitationList().isEmpty()){
+            return citList;
+        } else {
+            for(Citation cit: cse.getCitationList()){
+                if(cit.getStatus().isNonStatusEditsForbidden()){
+                    citList.add(cit);
+                }
+            }
+        }
+        
+        
+        return citList;
+        
+    }
 
     /**
-     * TODO: Finish logic
+     * Logic container for case phase assignment for cases with at least 1 citation
+     * 
+     * Assesses the list of events and citations on the case to determine the 
+     * appropriate post-hearing related case phase
+     * 
+     * 
      *
      * @param cse
      * @return
      */
     private CasePhaseEnum cecase_determineAndSetPhase_stageCITATION(CECase cse) {
+        CasePhaseEnum courtPhase = null;
         
+        int catIDCitationIssued = Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("court_citationissued"));
+        int catIDHearingSched = Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("court_scheduledhearing"));
+        int catIDHearingAttended = Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("court_hearingattended"));
+
+        List<EventCnF> courtEvList = cecase_getEventListSubset(cse.getEventList(), EventType.Court);
+        if(courtEvList == null || courtEvList.isEmpty()){
+            courtPhase = CasePhaseEnum.TimeframeExpiredNotCited;
+            cse.logStatusNote("COURT: GAP IN EVENT RECORDING! No court events found, but We should have citation issued events; falling back to " + courtPhase.getLabel() );
+            return courtPhase;
+        }
+       
         
-        return CasePhaseEnum.AwaitingHearingDate;
+        // if we have a citation but no hearing scheduled, we're AwaitingAHearingDate
+        LocalDateTime rightNow = LocalDateTime.now();
+        LocalDateTime rightMostScheduledHearingDate = determineRightmostDateByEventCategoryID(courtEvList, catIDHearingSched);
+        LocalDateTime rightMostHearingDate = determineRightmostDateByEventCategoryID(courtEvList, catIDHearingAttended);
+        if(rightMostScheduledHearingDate == null){
+            courtPhase = CasePhaseEnum.AwaitingHearingDate;
+            cse.logStatusNote("COURT: No hearing scheduled; assigned " + courtPhase.getLabel() );
+        } else {
+            // if a hearing is scheduled in the future, we're HEARING PREP
+            if(rightMostScheduledHearingDate.isAfter(rightNow)){
+                courtPhase = CasePhaseEnum.HearingPreparation;
+                cse.logStatusNote("COURT: Found hearing schduled in the future; assigned " + courtPhase.getLabel() );
+            // if we've attended court and violations are still in the window, we're at InsideCourt....
+            } else if(rightMostHearingDate.isBefore(rightNow)){
+                
+                int maxVStage = violation_determineMaxViolationStatus(cse.getViolationList());
+                switch (maxVStage) {
+                    case 0:  // all violations resolved
+                        courtPhase = CasePhaseEnum.Closed;
+                        break;
+                    case 1: // all violations within compliance window
+                        courtPhase = CasePhaseEnum.InsideCourtOrderedComplianceTimeframe;
+                        break;
+                    case 2: // one or more EXPIRED compliance timeframes but no citations
+                        courtPhase = CasePhaseEnum.CourtOrderedComplainceTimeframeExpired;
+                        break;
+                        // we shouldn't hit this...
+                    default: // unintentional dumping ground 
+                        courtPhase = CasePhaseEnum.CourtOrderedComplainceTimeframeExpired;
+                } // close violation and citation block 
+            }
+        }
+        return courtPhase;
+    }
+    
+    
+    /**
+     * Utility method for extracting an event subset
+     * @param evList
+     * @param et
+     * @return 
+     */
+    private List<EventCnF> cecase_getEventListSubset(List<EventCnF> evList, EventType et){
+         // get the events we want
+        List<EventCnF> selectedEvents;
+        selectedEvents = new ArrayList<>();
+        if(evList != null && !evList.isEmpty()){
+            for(EventCnF ev: evList){
+                if(ev.getCategory().getEventType() == EventType.Court){
+                    selectedEvents.add(ev);
+                }
+            }
+        }
+        
+        return selectedEvents;
+    }
+    
+    /**
+     * Utility method for searching through a list of events and finding the "highest" 
+     * (i.e. right-most) event of a certain category
+     * 
+     * @param evList complete event list to search
+     * @param catID the category ID by which to create a comparison subset
+     * @return if no event of this type is found, null is returned
+     */
+    private LocalDateTime determineRightmostDateByEventCategoryID(List<EventCnF> evList, int catID){
+        LocalDateTime highestDate = null;
+        if(evList != null && !evList.isEmpty()){
+            for(EventCnF ev: evList){
+                if(ev.getCategory().getCategoryID() == catID && ev.getTimeStart() != null){
+                    if(highestDate == null){
+                        highestDate = ev.getTimeStart();
+                    } else if (highestDate.isBefore(ev.getTimeStart())){
+                        highestDate = ev.getTimeStart();
+                    }
+                }
+            }
+        }
+        
+        return highestDate;
     }
 
     /**

@@ -158,7 +158,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         if(cse != null){
             getSessionBean().setSessCECase(cse);
         }
-        return "ceCaseWorkflow";
+        return "ceCaseSearchProfile";
     }
     
     public String onViewOccPeriodButtonChange(OccPeriod per){

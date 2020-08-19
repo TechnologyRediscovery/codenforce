@@ -77,6 +77,9 @@ public class CECaseDataHeavy
         this.lastUpdatedTS = cse.getLastUpdatedTS();
         this.statusBundle = cse.getStatusBundle();
         
+        this.eventList = cse.eventList;
+        this.statusAssignmentLog = cse.statusAssignmentLog;
+        
         eventListMaster = new ArrayList<>();
         } else {
             System.out.println("CECaseDataHeavy.const: null input case");

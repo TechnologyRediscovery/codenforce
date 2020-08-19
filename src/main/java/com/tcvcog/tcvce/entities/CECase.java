@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
+import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -23,6 +24,7 @@ public class        CECase
         implements  Cloneable,
                     IFace_Loggable,
                     IFace_EventHolder,
+                    IFace_StatusLogHolder,
                     Comparable<CECase>{
     
     protected int caseID;
@@ -44,6 +46,7 @@ public class        CECase
     protected String caseName;
     
     protected CECaseStatus statusBundle;
+    protected String statusAssignmentLog;
     
     protected LocalDateTime originationDate;
     protected LocalDateTime closingDate;
@@ -68,7 +71,10 @@ public class        CECase
     protected List<EventCnF> eventListMaster;
     
     public CECase(){
+        
     }
+    
+    
 
     @Override
     public String toString() {
@@ -577,5 +583,21 @@ public class        CECase
         }
     }
 
+    @Override
+    public String getStatusLog() {
+        return statusAssignmentLog;
+    }
+
+    @Override
+    public void logStatusNote(String note) {
+        StringBuilder sb;
+        if(note != null){
+            sb = new StringBuilder();
+            sb.append(statusAssignmentLog);
+            sb.append(Constants.FMT_HTML_BREAK);
+            sb.append(note);
+            statusAssignmentLog = sb.toString();
+        }
+    }
     
 }

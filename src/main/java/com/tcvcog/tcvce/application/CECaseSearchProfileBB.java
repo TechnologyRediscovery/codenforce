@@ -473,6 +473,11 @@ public class CECaseSearchProfileBB
         
     }
     
+    public void onHowToNextStepButtonChange(ActionEvent ev){
+        System.out.println("ceCaseSearchProfileBB.onHowToNextStepButtonChange");
+        
+    }
+    
     public String onNOVAddButtonChange(){
         
         return "ceCaseNotices";

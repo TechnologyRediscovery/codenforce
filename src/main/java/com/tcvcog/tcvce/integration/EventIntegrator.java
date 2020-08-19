@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
@@ -180,7 +181,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
         if(evHolder instanceof OccPeriod){
             queryStub.append("occperiod_periodid=?;");
-        } else if(evHolder instanceof CECaseDataHeavy){
+        } else if(evHolder instanceof CECase){
             queryStub.append("cecase_caseid=?;");
         }
 
@@ -191,8 +192,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             if(evHolder instanceof OccPeriod){
                 OccPeriod op = (OccPeriod) evHolder;
                 stmt.setInt(1, op.getPeriodID());
-            } else if(evHolder instanceof CECaseDataHeavy){
-                CECaseDataHeavy cec = (CECaseDataHeavy) evHolder;
+            } else if(evHolder instanceof CECase){
+                CECase cec = (CECase) evHolder;
                 stmt.setInt(1, cec.getCaseID());
             }
             
