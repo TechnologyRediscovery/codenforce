@@ -19,20 +19,31 @@ package com.tcvcog.tcvce.application;
 
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CodeViolationDisplayable;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
+import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -44,12 +55,17 @@ import javax.faces.event.ActionEvent;
  */
 public class NoticeOfViolationBB extends BackingBeanUtils implements Serializable {
     
+    private PageModeEnum currentMode;
+    private List<PageModeEnum> pageModes;
+    
     private CECaseDataHeavy currentCase;
 
     private NoticeOfViolation currentNotice;
     private List<CodeViolation> activeVList;
     
     private Person noticePerson;
+    
+    private String formNoteText;
     
     private List<TextBlock> blockList;
     
@@ -63,6 +79,9 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private int recipientPersonID;
     
     private boolean showTextBlocksAllMuni;
+    
+    private List<ViewOptionsActiveListsEnum> viewOptionList;
+    private ViewOptionsActiveListsEnum selectedViewOption;
     
     
     
@@ -89,8 +108,141 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             
         manualRetrievedPersonList = new ArrayList<>();
         showTextBlocksAllMuni = false;
+         
+        setPageModes(new ArrayList<PageModeEnum>());
+        getPageModes().add(PageModeEnum.LOOKUP);
+        getPageModes().add(PageModeEnum.INSERT);
+        getPageModes().add(PageModeEnum.UPDATE);
+        getPageModes().add(PageModeEnum.REMOVE);
+        if (getSessionBean().getCeCaseNoticesPageModeRequest() != null) {
+            setCurrentMode(getSessionBean().getCeCaseNoticesPageModeRequest());
+        } else {
+            setCurrentMode(PageModeEnum.LOOKUP);
+        }
         
+        viewOptionList = Arrays.asList(ViewOptionsActiveListsEnum.values());
+        selectedViewOption = ViewOptionsActiveListsEnum.VIEW_ACTIVE;
         
+    } // close initbean
+    
+    /**
+     * Responds to the user clicking one of the page modes: LOOKUP, ADD, UPDATE,
+     * REMOVE
+     *
+     * @param mode
+     */
+    public void setCurrentMode(PageModeEnum mode) {
+
+        //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
+        PageModeEnum tempCurMode = this.currentMode;
+        //reset default setting every time the Mode has been selected 
+//        loadDefaultPageConfig();
+        //check the currentMode == null or not
+        if (mode == null) {
+            this.currentMode = tempCurMode;
+        } else {
+            this.currentMode = mode;
+            switch (currentMode) {
+                case LOOKUP:
+                    onModeLookupInit();
+                    break;
+                case INSERT:
+                    onModeInsertInit();
+                    break;
+                case UPDATE:
+                    onModeUpdateInit();
+                    break;
+                case REMOVE:
+                    onModeRemoveInit();
+                    break;
+                default:
+                    break;
+
+            }
+        }
+    }
+
+    //check if current mode == Lookup
+    public boolean getActiveLookupMode() {
+        // hard-wired on since there's always a property loaded
+        return PageModeEnum.LOOKUP.equals(currentMode);
+    }
+
+    /**
+     * Provide UI elements a boolean true if the mode is UPDATE
+     *
+     * @return
+     */
+    public boolean getActiveUpdateMode() {
+        return PageModeEnum.UPDATE.equals(currentMode);
+    }
+
+    //check if current mode == Insert
+    public boolean getActiveInsertUpdateMode() {
+        return PageModeEnum.INSERT.equals(currentMode) || PageModeEnum.UPDATE.equals(currentMode);
+    }
+
+    //check if current mode == Insert
+    public boolean getActiveInsertMode() {
+        return PageModeEnum.INSERT.equals(currentMode);
+    }
+
+    //check if current mode == Remove
+    public boolean getActiveRemoveMode() {
+        return PageModeEnum.REMOVE.equals(currentMode);
+    }
+
+    /**
+     * Primary listener method which copies a reference to the selected user
+     * from the list and sets it on the selected user perch
+     *
+     * @param nov
+     */
+    public void onObjetViewButtonChange(NoticeOfViolation nov) {
+
+        if (nov != null) {
+            getSessionBean().setSessNotice(nov);
+            currentNotice = nov;
+        }
+
+    }
+
+    /**
+     * Internal logic container for changes to page mode: Lookup
+     */
+    private void onModeLookupInit() {
+    }
+
+    /**
+     * Internal logic container for beginning the user creation change process
+     * Delegated from the mode button router
+     */
+    public void onModeInsertInit() {
+        CaseCoordinator cc = getCaseCoordinator();
+
+        try {
+            currentNotice = cc.nov_GetNewNOVSkeleton(currentCase, getSessionBean().getSessMuni());
+        } catch (AuthorizationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+        }
+
+    }
+
+    /**
+     * Listener for beginning of update process
+     */
+    public void onModeUpdateInit() {
+        // nothign to do here yet since the user is selected
+    }
+
+    /**
+     * Listener for the start of the case remove process
+     */
+    public void onModeRemoveInit() {
+
     }
     
     public void loadBlocksAllMunis(){
@@ -220,7 +372,190 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     } // close method
     
 
+    public String createNewNotice() throws SQLException {
+        NoticeOfViolation nov;
+        PropertyCoordinator pc = getPropertyCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
+            if (!currentCase.getViolationListUnresolved().isEmpty()) {
+                try {
+                    getSessionBean().getSessPropertyList().add(0, pc.getProperty(currentCase.getPropertyID()));
+//                    positionCurrentCaseAtHeadOfQueue();
+                    nov = cc.nov_GetNewNOVSkeleton(currentCase, getSessionBean().getSessMuni());
+                    nov.setCreationBy(getSessionBean().getSessUser());
+                    getSessionBean().setSessNotice(nov);
+                    return "noticeOfViolationBuilder";
+                } catch (AuthorizationException | IntegrationException ex) {
+                    System.out.println(ex);
+                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Cannot build new notice", ""));
+                }
+            } else {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "No unresolved violations exist for building a letter", ""));
+            }
+        return "";
+    }
 
+    public void resetNotice(NoticeOfViolation nov) {
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            cc.nov_ResetMailing(nov, getSessionBean().getSessUser());
+//            refreshCurrentCase();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Notice mailing status has been reset", ""));
+        } catch (IntegrationException | AuthorizationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        }
+    }
+
+    
+
+    public String printNotice(NoticeOfViolation nov) {
+        getSessionBean().setSessNotice(nov);
+//        positionCurrentCaseAtHeadOfQueue();
+        return "noticeOfViolationPrint";
+    }
+
+    public String editNoticeOfViolation(NoticeOfViolation nov) {
+        getSessionBean().setSessNotice(nov);
+//        positionCurrentCaseAtHeadOfQueue();
+        return "noticeOfViolationEditor";
+    }
+
+    public void lockNoticeAndQueueForMailing(NoticeOfViolation nov) {
+        CaseCoordinator caseCoord = getCaseCoordinator();
+        
+        try {
+            caseCoord.nov_LockAndQueue(currentCase, nov, getSessionBean().getSessUser());
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        } catch (EventException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            "The automatic event generation associated with this action has thrown an error. "
+                            + "Please create an event manually which logs this letter being queued for mailing", ""));
+
+        } catch (ViolationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            "Unable to queue notice of violatio. "
+                            + "Please create an event manually which logs this letter being queued for mailing", ""));
+        }
+    }
+
+    public void deleteSelectedEvent() {
+
+    }
+
+    public String deleteNoticeOfViolation(NoticeOfViolation nov) {
+        CaseCoordinator caseCoord = getCaseCoordinator();
+        try {
+            caseCoord.nov_delete(nov);
+            currentCase = caseCoord.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Notice no. " + nov.getNoticeID() + " has been nuked forever", ""));
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to delete this notice of violation, "
+                            + "probably because it has been sent already", ""));
+        } catch (IntegrationException | SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+
+        }
+        return "ceCaseNotices";
+        
+    }
+
+    public void markNoticeOfViolationAsSent(NoticeOfViolation nov) {
+        CaseCoordinator caseCoord = getCaseCoordinator();
+        try {
+            caseCoord.nov_markAsSent(currentCase, nov, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Marked notice as sent and added event to case",
+                            ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,ex.getMessage(),""));
+        }catch (EventException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to generate case event to log phase change",
+                            "Note that because this message is being displayed, the phase change"
+                            + "has probably succeeded"));
+        }
+    }
+
+    public void markNoticeOfViolationAsReturned(NoticeOfViolation nov) {
+        CaseCoordinator caseCoord = getCaseCoordinator();
+        try {
+            caseCoord.nov_markAsReturned(currentCase, nov, getSessionBean().getSessUser());
+            currentCase = caseCoord.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Notice no. " + nov.getNoticeID()
+                            + " has been marked as returned on today's date", ""));
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        }
+    }
+
+    
+      /**
+     * Listener for commencement of note writing process
+     *
+     * @param ev
+     */
+    public void onNoteInitButtonChange(ActionEvent ev) {
+        setFormNoteText(null);
+
+    }
+
+    /**
+     * Listener for user requests to commit new note content to the current
+     * object
+     *
+     * @return
+     */
+    public String onNoteCommitButtonChange() {
+        CaseCoordinator cc = getCaseCoordinator();
+
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        mbp.setCred(getSessionBean().getSessUser().getKeyCard());
+        mbp.setExistingContent(currentNotice.getNotes());
+        mbp.setNewMessageContent(getFormNoteText());
+        mbp.setHeader("Notice of Violation Note");
+        mbp.setUser(getSessionBean().getSessUser());
+
+        try {
+
+            cc.nov_updateNotes(mbp, currentNotice);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Succesfully appended note!", ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Fatal error appending note; apologies!", ""));
+            return "";
+        }
+
+        return "ceCaseNotices";
+
+    }
     /**
      * @return the currentNotice
      */
@@ -409,6 +744,62 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setNoticePerson(Person noticePerson) {
         this.noticePerson = noticePerson;
+    }
+
+    /**
+     * @return the viewOptionList
+     */
+    public List<ViewOptionsActiveListsEnum> getViewOptionList() {
+        return viewOptionList;
+    }
+
+    /**
+     * @return the selectedViewOption
+     */
+    public ViewOptionsActiveListsEnum getSelectedViewOption() {
+        return selectedViewOption;
+    }
+
+    /**
+     * @param viewOptionList the viewOptionList to set
+     */
+    public void setViewOptionList(List<ViewOptionsActiveListsEnum> viewOptionList) {
+        this.viewOptionList = viewOptionList;
+    }
+
+    /**
+     * @param selectedViewOption the selectedViewOption to set
+     */
+    public void setSelectedViewOption(ViewOptionsActiveListsEnum selectedViewOption) {
+        this.selectedViewOption = selectedViewOption;
+    }
+
+    /**
+     * @return the pageModes
+     */
+    public List<PageModeEnum> getPageModes() {
+        return pageModes;
+    }
+
+    /**
+     * @param pageModes the pageModes to set
+     */
+    public void setPageModes(List<PageModeEnum> pageModes) {
+        this.pageModes = pageModes;
+    }
+
+    /**
+     * @return the formNoteText
+     */
+    public String getFormNoteText() {
+        return formNoteText;
+    }
+
+    /**
+     * @param formNoteText the formNoteText to set
+     */
+    public void setFormNoteText(String formNoteText) {
+        this.formNoteText = formNoteText;
     }
     
 }

@@ -168,6 +168,37 @@ public class        CECase
     }
     
     /**
+     * Builds our violation list based on inputted view options
+     * @param viewOption
+     * @return 
+     */
+    public List<NoticeOfViolation> assembleNoticeList(ViewOptionsActiveListsEnum viewOption){
+        List<NoticeOfViolation> displayedNOVs = new ArrayList<>();
+        if(noticeList != null){
+            for(NoticeOfViolation nov: noticeList){
+                switch(viewOption){
+                    case VIEW_ACTIVE:
+                        if(nov.isActive()){
+                            displayedNOVs.add(nov);
+                        }
+                        break;
+                    case VIEW_ALL:
+                            displayedNOVs.add(nov);
+                        break;
+                    case VIEW_INACTIVE:
+                        if(!nov.isActive()){
+                            displayedNOVs.add(nov);
+                        }
+                        break;
+                    default: 
+                        
+                }
+            }
+        }
+        return displayedNOVs;
+    }
+    
+    /**
      * Builds our citation list based on inputted view options
      * @param viewOption
      * @return 

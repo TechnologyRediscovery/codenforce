@@ -1135,15 +1135,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param cse
      * @param mdh
      * @return
-     * @throws SQLException
      * @throws AuthorizationException
      */
-    public NoticeOfViolation nov_GetNewNOVSkeleton(CECaseDataHeavy cse, MunicipalityDataHeavy mdh) throws SQLException, AuthorizationException {
+    public NoticeOfViolation nov_GetNewNOVSkeleton(CECaseDataHeavy cse, MunicipalityDataHeavy mdh) throws AuthorizationException {
         SystemIntegrator si = getSystemIntegrator();
         NoticeOfViolation nov = new NoticeOfViolation();
+        
         nov.setViolationList(new ArrayList<CodeViolationDisplayable>());
         nov.setDateOfRecord(LocalDateTime.now());
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
 
         try {
             nov.setStyle(si.getPrintStyle(mdh.getDefaultNOVStyleID()));
@@ -1156,6 +1155,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         while (iter.hasNext()) {
             CodeViolation cv = iter.next();
             CodeViolationDisplayable cvd = new CodeViolationDisplayable(cv);
+            // start with sensible default values
             cvd.setIncludeHumanFriendlyText(false);
             cvd.setIncludeOrdinanceText(true);
             cvd.setIncludeViolationPhotos(false);
@@ -1197,12 +1197,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
         EventCnF noticeEvent = evCoord.initEvent(c, evCoord.initEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("noticeQueued"))));
+        
         String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
+        
         noticeEvent.setDescription(queuedNoticeEventNotes);
         noticeEvent.setUserCreator(ua);
-        ArrayList<Person> al = new ArrayList();
-        al.add(nov.getRecipient());
-        noticeEvent.setPersonList(al);
+        
+        ArrayList<Person> persList = new ArrayList();
+        persList.add(nov.getRecipient());
+        noticeEvent.setPersonList(persList);
         evCoord.addEvent(noticeEvent, c, ua);
     }
 

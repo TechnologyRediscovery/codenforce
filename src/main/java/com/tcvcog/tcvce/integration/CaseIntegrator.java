@@ -1660,7 +1660,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      */
     public void novDelete(NoticeOfViolation notice) throws IntegrationException {
-        String query = "DELETE FROM public.noticeofviolation\n"
+        String query = "UPDATE noticeofviolation SET active=FALSE "
                 + "  WHERE noticeid=?;";
         // note that original time stamp is not altered on an update
 
@@ -1721,7 +1721,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         String query =  "SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
                         "       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
                         "       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
-                        "       returnedby, notes, creationby, printstyle_styleid \n" +
+                        "       returnedby, notes, creationby, printstyle_styleid, active \n" +
                         "  FROM public.noticeofviolation WHERE noticeid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -1872,6 +1872,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         notice.setStyle(si.getPrintStyle(rs.getInt("printstyle_styleid")));
         
         notice.setNotes(rs.getString("notes"));
+        
+        notice.setActive(rs.getBoolean("active"));
 
         return notice;
 

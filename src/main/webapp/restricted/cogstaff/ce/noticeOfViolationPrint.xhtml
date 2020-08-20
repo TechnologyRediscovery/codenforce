@@ -22,8 +22,7 @@
                     </p:graphicImage>
                 </div>
 
-                <div class="addressee" style="left: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_left}px; 
-                     top: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_top}px">
+                <div class="addressee" style="left: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_left}px; top: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_top}px">
                     <f:subview id="subview-addressee-normaladdress"
                                rendered="#{!(noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress)}">
                         <h:outputText value="#{noticeOfViolationBB.currentNotice.recipient.firstName} #{noticeOfViolationBB.currentNotice.recipient.lastName}"/>
