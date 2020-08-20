@@ -752,6 +752,25 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         return "personChanges";
     }
+    
+    public String goToUnitChangeOrders() {
+
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
+        try{
+        
+            getSessionBean().setSessProperty(pc.getPropertyByPropUnitID(selectedApplication.getApplicationPropertyUnit().getUnitID()));
+
+            getSessionBean().getNavStack().pushCurrentPage();
+
+        return "unitsChanges";
+        } catch(IntegrationException ex){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Something when wrong while trying to redirect you to unit changes!", ""));
+            return "";
+        }
+    }
 
     public String acceptUnitListChanges() {
 

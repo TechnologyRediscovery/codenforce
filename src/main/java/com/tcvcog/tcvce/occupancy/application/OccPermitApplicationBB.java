@@ -741,13 +741,26 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             return "";
         }
 
-        while (!getSessionBean().getNavStack().peekLastPage().contains("occPermitAddPropertyUnit.xhtml")) { //Clear the navstack until we reach occPermitAddPropertyUnit.xhtml
-            try {
-                getSessionBean().getNavStack().popLastPage();
-            } catch (NavigationException ex) {
-                //nothing, we just wanted to clear the stack anyway.
+        if(redir.contentEquals("selectuntil we reach occPermitAddPropertyUnit.xhtmlForApply")){
+        
+            while (!getSessionBean().getNavStack().peekLastPage().contains("occPermitAddPropertyUnit.xhtml")) { //Clear the navstack until we reach occPermitAddPropertyUnit.xhtml
+                try {
+                    getSessionBean().getNavStack().popLastPage();
+                } catch (NavigationException ex) {
+                    //nothing, we just wanted to clear the stack anyway.
+                }
+            }
+        
+        } else {
+            while (getSessionBean().getNavStack().peekLastPage() != null) { //Clear the navstack completely
+                try {
+                    getSessionBean().getNavStack().popLastPage();
+                } catch (NavigationException ex) {
+                    //nothing, we just wanted to clear the stack anyway.
+                }
             }
         }
+        
 
         return redir;
     }

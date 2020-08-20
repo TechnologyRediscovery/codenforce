@@ -49,6 +49,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                             <h:form id="select-view-option-form">
 
+                                <p:commandButton rendered="#{propertyUnitChangesBB.wasRedirected()}"
+                                                 value="Finish and return"
+                                                 action="#{propertyUnitChangesBB.goBack()}"
+                                                 />
+                                
+                                <p:spacer height="10px"/>
+                                
                                 <p:outputLabel value="What changes would you like to edit?"/>
 
                                 <p:selectOneMenu style="width: 300px;" 
