@@ -597,6 +597,17 @@ public class    SessionBean
         
     }
     
+    public void setSessCECase(CECase cse){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            sessCECase = cc.cecase_assembleCECaseDataHeavy(cse, sessUser);
+        } catch (BObStatusException | IntegrationException | SearchException ex) {
+            System.out.println(ex);
+        }
+        
+        
+    }
+    
     /**
      * @param sessCECaseList the sessCECaseList to set
      */

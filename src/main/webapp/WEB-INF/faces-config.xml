@@ -470,12 +470,6 @@
         <managed-bean-class>com.tcvcog.tcvce.integration.CourtEntityIntegrator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
-
-    <managed-bean>
-        <managed-bean-name>userAuthMuniManageBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.UserAuthMuniManageBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>municipalityManageBB</managed-bean-name>
@@ -1234,15 +1228,7 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
-    <managed-bean>
-        <managed-bean-name>cECaseCitationsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseCitationsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules code enforcement ~~~~~~~~~~~~~~~~ --> 
-
-
-
 
 
     <navigation-rule>

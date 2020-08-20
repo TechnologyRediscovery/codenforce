@@ -53,6 +53,7 @@ public enum ViolationStatusEnum {
     private final String iconPropertyName;
     private final int phaseOrder;
     
+    
     private ViolationStatusEnum(String label, String lt, String icn, int ord){
         this.label = label;
         this.leadText = lt;

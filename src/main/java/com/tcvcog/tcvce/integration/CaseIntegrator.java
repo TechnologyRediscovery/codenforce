@@ -897,7 +897,12 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 stmt.setNull(13, java.sql.Types.NULL);
             }
 
-            stmt.setInt(14, v.getComplianceTFExpiryPropID());
+            if(v.getComplianceTFExpiryPropID() != 0){
+                stmt.setInt(14, v.getComplianceTFExpiryPropID());
+            } else {
+                stmt.setNull(14, java.sql.Types.NULL);
+            }
+            
             if(v.getLastUpdatedUser() != null){
                 stmt.setInt(15, v.getLastUpdatedUser().getUserID());
             } else {
@@ -926,9 +931,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
 
     }
     
-     
-    
-    /**
+        /**
      * Pathway for updating CodeViolatio objects
      * @param v
      * @throws IntegrationException 
@@ -936,9 +939,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     public void updateCodeViolation(CodeViolation v) throws IntegrationException {
         String query =  " UPDATE public.codeviolation\n" +
                         "   SET codesetelement_elementid=?, cecase_caseid=?, dateofrecord=?, \n" + // 1-3
-                        "       stipulatedcompliancedate=?, actualcompliancedate=?, \n" + // 4-5
+                        "       stipulatedcompliancedate=?, \n" + // 4-5
                         "       penalty=?, description=?, legacyimport=?, \n" + // 6-8
-                        "       complianceuser=?, severity_classid=?, createdby=?, compliancetfexpiry_proposalid=?, \n" + // 9-12
+                        "       severity_classid=?, compliancetfexpiry_proposalid=?, \n" + // 9-12
                         "       lastupdatedts=now(), lastupdated_userid=?, active=? \n" + // 13-14
                         " WHERE violationid = ?;";
         Connection con = getPostgresCon();
@@ -960,53 +963,93 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
-            if(v.getActualComplianceDate() != null){
-                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(v.getActualComplianceDate()));
+            
+            stmt.setDouble(5, v.getPenalty());
+            stmt.setString(6, v.getDescription());
+            stmt.setBoolean(7, v.isLeagacyImport());
+            
+           
+            if(v.getSeverityIntensity() != null){
+                stmt.setInt(8, v.getSeverityIntensity().getClassID());
             } else {
-                stmt.setNull(5, java.sql.Types.NULL);
+                stmt.setNull(8, java.sql.Types.NULL);
             }
             
-            stmt.setDouble(6, v.getPenalty());
-            stmt.setString(7, v.getDescription());
-            stmt.setBoolean(8, v.isLeagacyImport());
-            
-            if(v.getComplianceUser() != null){
-                stmt.setInt(9, v.getComplianceUser().getUserID());
+            if(v.getComplianceTFExpiryProp() != null){
+                stmt.setInt(9, v.getComplianceTFExpiryProp().getProposalID());
+            } else if(v.getComplianceTFExpiryPropID() != 0){
+                stmt.setInt(9, v.getComplianceTFExpiryPropID());
             } else {
                 stmt.setNull(9, java.sql.Types.NULL);
             }
-            if(v.getSeverityIntensity() != null){
-                stmt.setInt(10, v.getSeverityIntensity().getClassID());
-            } else {
-                stmt.setNull(10, java.sql.Types.NULL);
-            }
-            if(v.getCreatedBy() != null){
-                stmt.setInt(11, v.getCreatedBy().getUserID());
-            } else {
-                stmt.setNull(11, java.sql.Types.NULL);
-            }
-            if(v.getComplianceTFExpiryProp() != null){
-                stmt.setInt(12, v.getComplianceTFExpiryProp().getProposalID());
-            } else if(v.getComplianceTFExpiryPropID() != 0){
-                stmt.setInt(12, v.getComplianceTFExpiryPropID());
-            } else {
-                stmt.setNull(12, java.sql.Types.NULL);
-            }
             
             if(v.getLastUpdatedUser() != null){
-                stmt.setInt(13, v.getLastUpdatedUser().getUserID());
+                stmt.setInt(10, v.getLastUpdatedUser().getUserID());
             }else {
-                stmt.setNull(14, java.sql.Types.NULL);
+                stmt.setNull(10, java.sql.Types.NULL);
             }
-            stmt.setBoolean(15, v.isActive());
+            stmt.setBoolean(11, v.isActive());
             
-            stmt.setInt(16, v.getViolationID());
+            stmt.setInt(12, v.getViolationID());
 
             stmt.executeUpdate();
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("cannot update code violation, sorry.", ex);
+
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+    }
+    
+    
+    /**
+     * Pathway for recording compliance data on a single code violation record
+     * @param v
+     * @throws IntegrationException 
+     */
+    public void updateCodeViolationCompliance(CodeViolation v) throws IntegrationException {
+        String query =  " UPDATE public.codeviolation\n" +
+                        "   SET actualcompliancedate=?, compliancenote=?, \n" + // 4-5
+                        "       complianceuser=?, compliancetimestamp=now(), \n" + // 9-12
+                        "       lastupdatedts=now(), lastupdated_userid=? \n" + // 13-14
+                        " WHERE violationid = ?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            if(v.getActualComplianceDate() != null){
+                stmt.setTimestamp(1, java.sql.Timestamp.valueOf(v.getActualComplianceDate()));
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            
+            stmt.setString(2, v.getComplianceNote());
+            
+            if(v.getComplianceUser() != null){
+                stmt.setInt(3, v.getComplianceUser().getUserID());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            
+            if(v.getLastUpdatedUser() != null){
+                stmt.setInt(4, v.getLastUpdatedUser().getUserID());
+            }else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(5, v.getViolationID());
+
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Integration error: cannot record violation compliance, sorry.", ex);
 
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -1026,7 +1069,6 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     private CodeViolation generateCodeViolationFromRS(ResultSet rs) throws SQLException, IntegrationException {
 
         CodeViolation v = new CodeViolation();
-        CaseCoordinator cc = getCaseCoordinator();
         CodeIntegrator ci = getCodeIntegrator();
         UserIntegrator ui = getUserIntegrator();
         WorkflowCoordinator wc = getWorkflowCoordinator();
@@ -1067,20 +1109,22 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         v.setDescription(rs.getString("description"));
         v.setNotes(rs.getString("notes"));
         v.setLeagacyImport(rs.getBoolean("legacyimport"));
+
         if(rs.getTimestamp("compliancetimestamp") != null){
             v.setComplianceTimeStamp(rs.getTimestamp("compliancetimestamp").toLocalDateTime());
             v.setComplianceUser(ui.getUser(rs.getInt("complianceUser")));
         }
+        
+        v.setComplianceNote(rs.getString("compliancenote"));
         
         if(rs.getInt("compliancetfexpiry_proposalid") != 0){
             v.setComplianceTFExpiryPropID(rs.getInt("compliancetfexpiry_proposalid"));
             v.setComplianceTFExpiryProp(wc.getProposal(rs.getInt("compliancetfexpiry_proposalid")));
         }
         
-        loadViolationPhotoList(v);
+        v.setActive(rs.getBoolean("active"));
         
-        v.setCitationIDList(getCitations(v.getViolationID()));
-        cc.violation_configureCodeViolation(v);
+     
         return v;
     }
 
@@ -1095,7 +1139,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                         "       entrytimestamp, stipulatedcompliancedate, actualcompliancedate, \n" +
                         "       penalty, description, notes, legacyimport, compliancetimestamp, \n" +
                         "       complianceuser, severity_classid, createdby, compliancetfexpiry_proposalid, \n" +
-                        "       lastupdatedts, lastupdated_userid, active\n" +
+                        "       lastupdatedts, lastupdated_userid, active, compliancenote \n" +
                         "  FROM public.codeviolation WHERE violationid = ?";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -1129,13 +1173,12 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public List<CodeViolation> getCodeViolations(int caseID) throws IntegrationException {
+    public List<Integer> getCodeViolations(int caseID) throws IntegrationException {
         String query = "SELECT violationid FROM codeviolation WHERE cecase_caseid = ?";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        ArrayList<CodeViolation> cvList = new ArrayList();
-        CodeViolation cv;
+        List<Integer> idl = new ArrayList();
 
         try {
             stmt = con.prepareStatement(query);
@@ -1143,9 +1186,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                cv = getCodeViolation(rs.getInt("violationid"));
-                loadViolationPhotoList(cv);
-                cvList.add(cv);
+                
+                idl.add(rs.getInt("violationid"));
 
             }
 
@@ -1158,7 +1200,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return cvList;
+        return idl;
        
     }
     
@@ -1168,7 +1210,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public List<CodeViolation> getCodeViolations(CECaseDataHeavy c) throws IntegrationException {
+    public List<Integer> getCodeViolationIDList(CECaseDataHeavy c) throws IntegrationException {
         return getCodeViolations(c.getCaseID());
     }
     
@@ -1715,12 +1757,12 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public List<NoticeOfViolation> novGetList(CECase ceCase) throws IntegrationException {
+    public List<Integer> novGetList(CECase ceCase) throws IntegrationException {
         String query = "SELECT noticeid FROM public.noticeofviolation WHERE caseid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        ArrayList<NoticeOfViolation> al = new ArrayList();
+        List<Integer> idl = new ArrayList();
 
         try {
             stmt = con.prepareStatement(query);
@@ -1728,7 +1770,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                al.add(novGet(rs.getInt("noticeid")));
+                idl.add(rs.getInt("noticeid"));
             }
 
         } catch (SQLException ex) {
@@ -1741,7 +1783,42 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
-        return al;
+        return idl;
+    }
+    /**
+     * Grabs all the NOVs for a given CECase
+     * @param cv
+     * @return of Notice letter IDs
+     * @throws IntegrationException 
+     */
+    public List<Integer> novGetNOVIDList(CodeViolation cv) throws IntegrationException {
+        String query = "SELECT noticeofviolation_noticeid FROM public.noticeofviolationcodeviolation "
+                + "WHERE codeviolation_violationid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        List<Integer> idl = new ArrayList<>();
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, cv.getViolationID());
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                idl.add(rs.getInt("noticeofviolation_noticeid"));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("cannot fetch code violation by ID, sorry.", ex);
+
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return idl;
     }
 
     /**
@@ -2347,7 +2424,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    private List<CodeViolation> getCodeViolations(Citation cid) throws IntegrationException{
+    private List<Integer> getCodeViolations(Citation cid) throws IntegrationException{
         
         String query =  "SELECT codeviolation_violationid FROM public.citationviolation 	\n" +
                         "	INNER JOIN public.citation ON citation.citationid = citationviolation.citation_citationid\n" +
@@ -2357,7 +2434,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         CaseIntegrator ci = getCaseIntegrator();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        ArrayList<CodeViolation> violationList = new ArrayList<>();
+        List<Integer> idl = new ArrayList<>();
         
         try {
             stmt = con.prepareStatement(query);
@@ -2365,7 +2442,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                violationList.add(ci.getCodeViolation(rs.getInt("codeviolation_violationid")));
+                idl.add(rs.getInt("codeviolation_violationid"));
                 
             }
             
@@ -2378,7 +2455,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return violationList;
+        return idl;
     }
     
     /**
@@ -2402,7 +2479,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             cit.setTimeStamp(rs.getTimestamp("transTimeStamp").toLocalDateTime());
             cit.setIsActive(rs.getBoolean("isActive"));
             cit.setNotes(rs.getString("notes"));
-            cit.setViolationList(getCodeViolations(cit));
+            
             cit.setOfficialText(rs.getString("officialtext"));
         } catch (SQLException | IntegrationException ex) {
             System.out.println(ex);

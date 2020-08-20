@@ -50,6 +50,13 @@ public class CodeViolationDisplayable extends CodeViolation {
         this.severityIntensity = cv.severityIntensity;
         this.lastUpdatedTS = cv.lastUpdatedTS;
         this.lastUpdatedUser = cv.lastUpdatedUser;
+        
+        this.allowDORUpdate = cv.allowDORUpdate;
+        this.allowHostCaseUpdate = cv.allowHostCaseUpdate;
+        this.allowOrdinanceUpdates = cv.allowOrdinanceUpdates;
+        this.allowStipCompDateUpdate = cv.allowStipCompDateUpdate;
+        this.complianceNote = cv.complianceNote;
+        this.photoList = cv.photoList;
 
     }
 
