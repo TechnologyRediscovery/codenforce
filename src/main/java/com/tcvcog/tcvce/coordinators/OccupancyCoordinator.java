@@ -1034,11 +1034,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             
             /* If the person  is the applicantPerson on the 
             OccPermitApplication, set applicant to true*/
-            person.setApplicant(application.getApplicantPerson() != null && application.getApplicantPerson().equals(person));
+            person.setApplicant(application.getApplicantPerson().getPersonID() == person.getPersonID());
 
             /* If the person is the preferredContact on the 
             OccPermitApplication, set preferredcontact to true */
-            person.setPreferredContact(application.getPreferredContact() != null && application.getPreferredContact().equals(person));
+            person.setPreferredContact(application.getPreferredContact().getPersonID() == person.getPersonID());
             
             oi.insertOccApplicationPerson(person, application.getId());
             

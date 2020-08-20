@@ -30,6 +30,8 @@ public class        PropertyUnitDataHeavy
 
     private List<OccPeriod> periodList;
     
+    private List<PropertyUnitChangeOrder> changeOrderList;
+    
     private String credentialSignature;
     
     
@@ -90,6 +92,12 @@ public class        PropertyUnitDataHeavy
         this.credentialSignature = credentialSignature;
     }
 
-    
-    
+    public List<PropertyUnitChangeOrder> getChangeOrderList() {
+        return changeOrderList;
+    }
+
+    public void setChangeOrderList(List<PropertyUnitChangeOrder> changeOrderList) {
+        this.changeOrderList = changeOrderList;
+    }
+
 }
