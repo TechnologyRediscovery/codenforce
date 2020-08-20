@@ -40,11 +40,13 @@ import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,10 +68,12 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
     private CECaseDataHeavy currentCase;
     private List<Blob> blobList;
     
+    private List<ViewOptionsActiveListsEnum> viewOptionList;
+    private ViewOptionsActiveListsEnum selectedViewOption;
+    
     private List<IntensityClass> severityList;
     
     private String formNoteText;
-    private String complianceNoteText;
     private List<EnforcableCodeElement> filteredElementList;
     private CodeSet currentCodeSet;
 
@@ -112,7 +116,6 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         filteredElementList = null;
         extendStipCompUsingDate = true;
         currentCodeSet = getSessionBean().getSessCodeSet();
-        complianceNoteText = "";
 
         pageModes = new ArrayList<>();
         pageModes.add(PageModeEnum.LOOKUP);
@@ -124,6 +127,9 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         } else {
             setCurrentMode(PageModeEnum.LOOKUP);
         }
+        viewOptionList = Arrays.asList(ViewOptionsActiveListsEnum.values());
+        selectedViewOption = ViewOptionsActiveListsEnum.VIEW_ACTIVE;
+        
         System.out.println("ViolationBB.initBean()");
     }
 
@@ -751,19 +757,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         this.extendStipCompUsingDate = extendStipCompUsingDate;
     }
 
-    /**
-     * @return the complianceNoteText
-     */
-    public String getComplianceNoteText() {
-        return complianceNoteText;
-    }
-
-    /**
-     * @param complianceNoteText the complianceNoteText to set
-     */
-    public void setComplianceNoteText(String complianceNoteText) {
-        this.complianceNoteText = complianceNoteText;
-    }
+  
 
     /**
      * @return the severityList
@@ -777,6 +771,34 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      */
     public void setSeverityList(List<IntensityClass> severityList) {
         this.severityList = severityList;
+    }
+
+    /**
+     * @return the selectedViewOption
+     */
+    public ViewOptionsActiveListsEnum getSelectedViewOption() {
+        return selectedViewOption;
+    }
+
+    /**
+     * @param selectedViewOption the selectedViewOption to set
+     */
+    public void setSelectedViewOption(ViewOptionsActiveListsEnum selectedViewOption) {
+        this.selectedViewOption = selectedViewOption;
+    }
+
+    /**
+     * @return the viewOptionList
+     */
+    public List<ViewOptionsActiveListsEnum> getViewOptionList() {
+        return viewOptionList;
+    }
+
+    /**
+     * @param viewOptionList the viewOptionList to set
+     */
+    public void setViewOptionList(List<ViewOptionsActiveListsEnum> viewOptionList) {
+        this.viewOptionList = viewOptionList;
     }
 
 }

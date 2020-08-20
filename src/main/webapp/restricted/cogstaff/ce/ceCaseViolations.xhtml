@@ -68,14 +68,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 widgetVar="violations-violations-list-panel-var"
                                                 collapsed="false"
                                                 rendered="#{violationBB.activeLookupMode}"
-                                                header="Violations on Case: #{violationBB.currentCase.caseName}, ID:#{violationBB.currentCase.caseID} @ #{violationBB.currentCase.property.address}">
+                                                header="Violation list" >
 
                                         <h:form id="violations-violation-form">
+                                            <h2>
+                                                <h:outputText value="Case: #{violationBB.currentCase.caseName}, ID:#{violationBB.currentCase.caseID}" />
+                                                <p:spacer height="3px" />
+                                                <h:outputText value="Property: #{violationBB.currentCase.property.address} (#{violationBB.currentCase.property.muni.muniName})" />
+                                            </h2>
+                                            
+                                            <p:selectOneMenu    id="violations-viewoptions-som"
+                                                                value="#{violationBB.selectedViewOption}"
+                                                                tabindex="10">
+
+                                                    <f:selectItems  id="violations-viewoptions-selitems"
+                                                                    value="#{violationBB.viewOptionList}"
+                                                                    var="vo"
+                                                                    itemValue="#{vo}"
+                                                                    itemLabel="#{vo.label}"/>
+                                                    <p:ajax update="violation-table"
+                                                            immediate="true"/>
+                                                </p:selectOneMenu>
+                                            <p:spacer height="5px" />
+
                                             <p:dataTable
                                                 id="violation-table"
                                                 var="violation"
                                                 rowKey="#{violation.violationID}"
-                                                value="#{violationBB.currentCase.violationList}"
+                                                value="#{violationBB.currentCase.assembleViolationList(violationBB.selectedViewOption)}"
                                                 tableStyleClass="primeDataTable"
                                                 resizableColumns="true"
                                                 reflow="true">
@@ -89,32 +109,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </f:facet>
                                                     <h:outputText value="#{violationBB.getPrettyDateNoTime(violation.dateOfRecord)}"/>
                                                 </p:column>
-                                                <p:column width="8%"
-                                                          styleClass="content-align-center">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="ID" />
-                                                    </f:facet>
-                                                    <h:outputText value="#{violation.violationID}"/>
-                                                </p:column>
 
-                                                <p:column width="40%"
+
+                                                <p:column width="35%"
                                                           styleClass="content-align-center"
                                                           sortBy="#{violation.codeViolated.ordSubSecTitle}">
                                                     <f:facet name="header">
                                                         <h:outputText value="Ordinance" />
                                                     </f:facet>
-                                                    <h:outputText value="#{violation}"/>
+                                                    <h:outputText value="#{violation.violatedEnfElement.codeElement.ordSubSecNum}: #{violation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
                                                     <p:spacer height="3px" />
                                                     <h:outputText value="#{violation.violatedEnfElement.codeElement.source.sourceName}"/>
                                                     <h:outputText value=" (#{violation.violatedEnfElement.codeElement.source.sourceYear})"/>
                                                 </p:column>
 
 
-                                                <p:column width="25%"
-                                                          styleClass="content-align-center">
+                                                <p:column width="20%"
+                                                          styleClass="content-align-center"
+                                                          sortBy="#{violation.status.label}">
                                                     <f:facet name="header">
                                                         <h:outputText value="Status" />
                                                     </f:facet>
+
                                                     <h:outputText value="#{!(empty violation.status) ? violation.status.label : ''}" />
                                                 </p:column>
 
@@ -158,7 +174,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 header="Code Violation #{violationBB.currentViolation.violationID} | Last updated: #{violationBB.getPrettyDateNoTime(violationBB.currentViolation.lastUpdatedTS)} by user #{!(empty violationBB.currentViolation.lastUpdatedUser) ? violationBB.currentViolation.lastUpdatedUser.person.lastName : ''}">
 
                                         <h:form id="violation-profile-form">
-                                        
+
                                             <!-- Violation status; single line-->
                                             <div class="ui-g data_container_nested_restrict">
 
@@ -177,7 +193,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
                                                 </div>
                                             </div>
-                                            
+
                                             <!-- DOR, stipdate, and compliance date table-->
                                             <div class="ui-g data_container_nested_restrict">
 
@@ -211,8 +227,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
                                                     <!--NESTED DATA VALUE VERTICAL -->
                                                     <div class="restrict-data-field-value-vertical" >
-                                                        <h:outputText id="propinfo-ot-unfitstop-1"
-                                                                      value=" " />
+                                                        <h:outputText   id="violation-creator-ot0"
+                                                                        value="#{!(empty violationBB.currentViolation.createdBy) ? 'Declared by ' : ''}"/>
+                                                        <h:outputText   id="violation-creator-ot1"
+                                                                        value="#{!(empty violationBB.currentViolation.createdBy) ? violationBB.currentViolation.createdBy.person.firstName : ''}"/>
+                                                        <h:outputText   id="violation-creator-ot2"
+                                                                        value=" "/>
+                                                        <h:outputText   id="violation-creator-ot3"
+                                                                        value="#{!(empty violationBB.currentViolation.complianceUser) ? violationBB.currentViolation.createdBy.person.lastName : ''}"/>
                                                     </div>
 
                                                 </div>
@@ -266,11 +288,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
                                                 </div>
                                             </div>
-                                            
-                                          
+
+
 
                                             <div class="ui-g data_container_nested_restrict">
-                                                      <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
                                                     <div class="restrict-data-field-label-inline" >
 
                                                         <p:outputLabel for="violation-description-ot">
@@ -284,8 +306,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                          value="#{violationBB.currentViolation.description}"/>
                                                     </div>
                                                 </div>
-                                                
-                                                
+
+
                                                 <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
                                                     <div class="restrict-data-field-label-inline" >
 
@@ -304,7 +326,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                          value="#{!(empty violationBB.currentViolation.severityIntensity) ? violationBB.currentViolation.severityIntensity.title: ''}"/>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
                                                     <div class="restrict-data-field-label-inline" >
 
@@ -318,7 +340,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                          value="$#{violationBB.currentViolation.penalty}"/>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
                                                     <div class="restrict-data-field-label-inline" >
 
@@ -332,13 +354,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                          value="#{violationBB.currentViolation.leagacyImport ? 'Yes' : 'No' }"/>
                                                     </div>
                                                 </div>
-                                                
-                                                
+
+
                                                 <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
                                                     <div class="restrict-data-field-label-inline" >
 
-                                                        <p:outputLabel for="violation-active-ot"
-                                                                       styleClass="data_field_label">
+                                                        <p:outputLabel for="violation-active-ot">
                                                             <h:outputText value="Active"/>
                                                         </p:outputLabel>
 
@@ -348,16 +369,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                          value="#{violationBB.currentViolation.active ? 'Yes' : 'No' }"/>
                                                     </div>
                                                 </div>
-                                                
-                                                
-                                                
+
+
+
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
                                                     <div class="restrict-data-field-label-inline" >
                                                         <h:outputLabel value="Ordinance ID: #{violationBB.currentViolation.violatedEnfElement.codeElement.elementID} Details"/>
                                                     </div>
                                                     <div class="restrict-data-field-value-inline" >
                                                         <h:outputText    id="violation-add-source-ot"
-                                                                         value="Source: #{violationBB.currentViolation.violatedEnfElement.source.sourceName} (#{violationBB.currentViolation.violatedEnfElement.source.sourceYear})"/>
+                                                                         value="Source: #{violationBB.currentViolation.violatedEnfElement.codeElement.source.sourceName} (#{violationBB.currentViolation.violatedEnfElement.codeElement.source.sourceYear})"/>
 
                                                         <p:spacer height="2px" />
 
@@ -1066,15 +1087,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                         <h:form id="violation-remove-form">
 
-                                            <!--Remove Button-->
-                                            <div class="restrict-main-contents-io-button red_button">
+                                            <div class="ui-g data_container_nested_restrict">
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
 
-                                                <p:commandButton 
-                                                    icon="fa fa-trash"
-                                                    ajax="false"
-                                                    action="#{violationBB.onViolationRemoveCommitButtonChange}"
-                                                    value="Remove Violation ID:#{violationBB.currentViolation.violationID}"
-                                                    />
+                                                        <h:outputLabel  for="violation-remove-button">
+                                                            <h:outputText value="Violations cannot be removed if they have been used in a notice of violation or citation." />
+                                                        </h:outputLabel>
+                                                    </div>
+                                                </div>
+                                                <div class="restrict-main-contents-io-button red_button">
+
+
+                                                    <p:commandButton 
+                                                        id="violation-remove-button"
+                                                        icon="fa fa-trash"
+                                                        ajax="false"
+                                                        action="#{violationBB.onViolationRemoveCommitButtonChange}"
+                                                        value="Remove Violation ID:#{violationBB.currentViolation.violationID}"
+                                                        />
+                                                </div>
                                             </div>
 
                                         </h:form>

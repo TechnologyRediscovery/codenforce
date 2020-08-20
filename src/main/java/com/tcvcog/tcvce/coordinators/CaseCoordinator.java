@@ -1715,6 +1715,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 //        sb.append(cv.getViolatedEnfElement().getCodeElement().getHeaderString());
 //        tfEvent.setDescription(sb.toString());
         violation_verifyCodeViolationAttributes(cse, cv);
+        cv.setCreatedBy(ua);
         insertedViolationID = ci.insertCodeViolation(cv);
         pc.insertAutoAssignedFees(cse, cv);
         return insertedViolationID;
