@@ -85,6 +85,7 @@ class ParcelChangedCursor(MagicMixin):
         super().__init__(spec, *args, **kwargs)
         self.old = [_pce.old for _pce in parcel_changed_events]
         self.new = []
+        # Todo: This is janky. Make it clean.
         for _pce in parcel_changed_events:
             if _pce not in [*args]:
                 self.new.append(_pce.old)
@@ -284,24 +285,22 @@ except psycopg2.OperationalError:
 
 
 with conn:
-    # Now we need to actually test Event.write_to_db, so we have to unmock it
-    # Todo: Consider using mockito
 
-    def transaction(func):
-        """ transaction is a decorator that allows each unittest to be run in its own transaction
-        """
-
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            cursor = conn.cursor()
-            try:
-                cursor.execute("BEGIN;")
-                func(*args, **kwargs)
-            finally:
-                cursor.execute("ROLLBACK;")
-                cursor.close()
-
-        return wrapper
+    # def transaction(func):
+    #     """ transaction is a decorator that allows each unittest to be run in its own transaction
+    #     """
+    #
+    #     @functools.wraps(func)
+    #     def wrapper(*args, **kwargs):
+    #         cursor = conn.cursor()
+    #         try:
+    #             cursor.execute("BEGIN;")
+    #             func(*args, **kwargs)
+    #         finally:
+    #             cursor.execute("ROLLBACK;")
+    #             cursor.close()
+    #
+    #     return wrapper
 
     def db_connection_established():
         """ db_connection_established is a flag representing if a database connection could be made.
@@ -314,59 +313,9 @@ with conn:
     )
     class TestsRequiringADatabaseConnection:
         class TestWrites:
-            """ TestWrites tests check that the code write to the database properly.
             """
-
-            @transaction
-            def test_property(self, person1_prop_imap):
-                with conn.cursor() as cursor:
-                    write.property(person1_prop_imap, cursor)
-
-            # # @pytest.mark.parametrize(
-            # #     "event,old,new",
-            # #     parcel_changed_event_categories
-            # # )
-            # def test_parcel_changed_event_writes(self):
-            #     with conn.cursor() as cursor:
-            #         mock_details = _events.EventDetails(
-            #             parid = None,
-            #             prop_id = None,
-            #             cecase_id=None,
-            #             db_cursor=cursor
-            #         )
-            #         mock_details.unpack("old", "new")
-            #         DifferentStreet(mock_details).write_to_db()
-
-            # assert type(DifferentStreet(mock_details).write_to_db) == type(MagicMock)
-
-            # @transaction
-            # def write_event(event_instance):
-            #     DifferentStreet.write_to_db()
-            # write_event(event(mock_details))
-
-            # # Requires a property id
-            # @transaction
-            # def test_unit(self):
-            #     with conn.cursor() as cursor:
-            #         write.unit(unit_imap, cursor)
-            #
-            # @transaction
-            # def test_person(self, person1_owner_imap):
-            #     with conn.cursor() as cursor:
-            #         write.person(person1_owner_imap, cursor)
-            #
-            # # def test_connect_property_to_person(self):
-            # #     with conn.cursor() as cursor:
-            # #         write.connect_property_to_person(prop_id, person_id, cursor)
-            #
-            # def test_taxstatus(self):
-            #     with conn.cursor() as cursor:
-            #         write.taxstatus(tax_status, cursor)
-            #
-            # @transaction
-            # def test_propertyexternaldata(self, person1_propertyexternaldata_imap):
-            #     with conn.cursor() as cursor:
-            #         write.propertyexternaldata(person1_propertyexternaldata_imap, cursor)
+            TestWrites tests check that the code write to the database properly.
+            """
 
         class TestEventCategories:
             """ Ensures events in _events.py share the same attributes of their counterpart in the database.
