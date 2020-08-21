@@ -49,7 +49,10 @@ public class PersonChangeOrder extends ChangeOrder {
     private String mailingAddressZip;
 
     private String mailingAddressState;
-
+    
+    //Needed by the public occ application flow
+    private PersonType personType;
+    
     public PersonChangeOrder() {
     }
 
@@ -129,11 +132,14 @@ public class PersonChangeOrder extends ChangeOrder {
         if (!compareStrings(original.getMailingAddressZip(), proposed.getMailingAddressZip())) {
             addressZip = proposed.getMailingAddressZip();
         }
+        
+        personType = proposed.getPersonType();
 
     }
 
     public PersonChangeOrder(Person input) {
         personID = input.getPersonID();
+        personType = input.getPersonType();
         firstName = input.getFirstName();
         lastName = input.getLastName();
         setCompositeLastName(input.isCompositeLastName());
@@ -158,6 +164,7 @@ public class PersonChangeOrder extends ChangeOrder {
         Person skeleton = new Person();
 
         skeleton.setPersonID(personID);
+        skeleton.setPersonType(personType);
         skeleton.setFirstName(firstName);
         skeleton.setLastName(lastName);
         skeleton.setCompositeLastName(Boolean.getBoolean(compositeLastName));
@@ -379,7 +386,7 @@ public class PersonChangeOrder extends ChangeOrder {
         return useSeparateMailingAddress;
     }
     
-    public boolean isUserSeparateMailingAddress(){
+    public boolean isUseSeparateMailingAddress(){
         return Boolean.getBoolean(useSeparateMailingAddress);
     }
 
@@ -429,6 +436,14 @@ public class PersonChangeOrder extends ChangeOrder {
 
     public void setMailingAddressState(String mailingAddressState) {
         this.mailingAddressState = mailingAddressState;
+    }
+
+    public PersonType getPersonType() {
+        return personType;
+    }
+
+    public void setPersonType(PersonType personType) {
+        this.personType = personType;
     }
 
 }

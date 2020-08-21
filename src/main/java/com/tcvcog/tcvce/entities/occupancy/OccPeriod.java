@@ -7,9 +7,14 @@ package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.entities.BOBSource;
+import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.IFace_EventHolder;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Primary Business Object BOB for holding data about Occupancy Periods
@@ -19,6 +24,7 @@ import java.time.ZoneId;
 public  class       OccPeriod 
         extends     OccPeriodPublic  
         implements  IFace_Loggable,
+                    IFace_EventHolder,
                     Comparable<OccPeriod>{
     
     protected int periodID;
@@ -55,6 +61,7 @@ public  class       OccPeriod
     protected String notes;
     
     protected boolean active;
+    protected List<EventCnF> eventList;
     
     
     
@@ -412,6 +419,63 @@ public  class       OccPeriod
      */
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    /**
+     *
+     * @param lst
+     */
+    @Override
+    public void setEventList(List<EventCnF> lst) {
+        eventList = lst;
+    }
+
+    /** 
+     * Iterates over the BOb's internal list of events and selects only those
+     * specified by the enum constant's member vals
+     *
+     * @param voahle an instance of the enum representing which events you want
+     * @return
+     */
+    @Override
+    public List<EventCnF> getEventList(ViewOptionsActiveHiddenListsEnum voahle) {
+        List<EventCnF> visEventList = new ArrayList<>();
+        if (eventList != null) {
+            for (EventCnF ev : eventList) {
+                switch (voahle) {
+                    case VIEW_ACTIVE_HIDDEN:
+                        if (ev.isActive() && ev.isHidden()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    case VIEW_ACTIVE_NOTHIDDEN:
+                        if (ev.isActive() && !ev.isHidden()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    case VIEW_ALL:
+                        visEventList.add(ev);
+                        break;
+                    case VIEW_INACTIVE:
+                        if (!ev.isActive()) {
+                            visEventList.add(ev);
+                        }
+                        break;
+                    default:
+                        visEventList.add(ev);
+                } // close switch
+            } // close for
+        } // close null check
+        return visEventList;
+    }
+    
+    /**
+     * Retrieves all events
+     * @return 
+     */
+    @Override
+    public List<EventCnF> getEventList(){
+        return eventList;
     }
 
 }

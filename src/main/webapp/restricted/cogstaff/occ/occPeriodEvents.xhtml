@@ -135,7 +135,7 @@
                                             id="occperiod-events-datatable"
                                             var="e"
                                             rowKey="#{e.eventID}"
-                                            value="#{occInspectionBB.currentOccPeriod.assembleEventList(occInspectionBB.selectedEventView)}"
+                                            value="#{occInspectionBB.currentOccPeriod.getEventList(occInspectionBB.selectedEventView)}"
                                             tableStyleClass="primeDataTable"
                                             resizableColumns="true"
                                             rowExpandMode="multiple"

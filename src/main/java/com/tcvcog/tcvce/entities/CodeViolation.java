@@ -61,8 +61,9 @@ public  class       CodeViolation
     protected LocalDateTime actualComplianceDate;
     
     protected boolean leagacyImport;
+    private List<Photograph> photoList;
     protected List<Integer> blobIDList;
-    protected List<Integer> photoList;
+    protected List<Integer> photoIDList;
     
     protected LocalDateTime complianceTimeStamp;
     protected User complianceUser;
@@ -70,7 +71,7 @@ public  class       CodeViolation
     protected int complianceTFExpiryPropID;
     protected Proposal complianceTFExpiryProp;
     
-    protected int severityIntensityClassID;
+    protected IntensityClass severityIntensity;
     
     protected LocalDateTime lastUpdatedTS;
     protected User lastUpdatedUser;
@@ -420,9 +421,7 @@ public  class       CodeViolation
     
     protected String getStrElement(){
         StringBuilder sb = new StringBuilder();
-        sb.append(violatedEnfElement.getCodeElement().getOrdSubSecNum());
-        sb.append(": ");
-        sb.append(violatedEnfElement.getCodeElement().getOrdSubSecTitle());
+        sb.append("Done use toString()!");
         return sb.toString();
         
     }
@@ -607,17 +606,17 @@ public  class       CodeViolation
     }
 
     /**
-     * @return the severityIntensityClassID
+     * @return the severityIntensity
      */
-    public int getSeverityIntensityClassID() {
-        return severityIntensityClassID;
+    public IntensityClass getSeverityIntensity() {
+        return severityIntensity;
     }
 
     /**
-     * @param severityIntensityClassID the severityIntensityClassID to set
+     * @param severityIntensityClassID the severityIntensity to set
      */
-    public void setSeverityIntensityClassID(int severityIntensityClassID) {
-        this.severityIntensityClassID = severityIntensityClassID;
+    public void setSeverityIntensity(IntensityClass severityIntensityClassID) {
+        this.severityIntensity = severityIntensityClassID;
     }
 
     /**
@@ -635,10 +634,10 @@ public  class       CodeViolation
     }
 
     /**
-     * @return the photoList
+     * @return the photoIDList
      */
-    public List<Integer> getPhotoList() {
-        return photoList;
+    public List<Integer> getPhotoIDList() {
+        return photoIDList;
     }
 
     /**
@@ -656,10 +655,10 @@ public  class       CodeViolation
     }
 
     /**
-     * @param photoList the photoList to set
+     * @param photoIDList the photoIDList to set
      */
-    public void setPhotoList(List<Integer> photoList) {
-        this.photoList = photoList;
+    public void setPhotoIDList(List<Integer> photoIDList) {
+        this.photoIDList = photoIDList;
     }
 
     /**
@@ -702,6 +701,20 @@ public  class       CodeViolation
      */
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    /**
+     * @return the photoList
+     */
+    public List<Photograph> getPhotoList() {
+        return photoList;
+    }
+
+    /**
+     * @param photoList the photoList to set
+     */
+    public void setPhotoList(List<Photograph> photoList) {
+        this.photoList = photoList;
     }
 
    

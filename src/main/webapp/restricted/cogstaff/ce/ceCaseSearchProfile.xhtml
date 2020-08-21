@@ -271,7 +271,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     widgetVar="cecase-profile-panel-var"
                                                     collapsed="false"
                                                     rendered="#{ceCaseSearchProfileBB.activeLookupMode}"
-                                                    header="Code Enforcement Case Info">
+                                                    header="Code Enforcement Case | ID: #{ceCaseSearchProfileBB.currentCase.caseID} | last updated: #{ceCaseSearchProfileBB.getPrettyDateNoTime(ceCaseSearchProfileBB.currentCase.lastUpdatedTS)}">
 
                                             <h:form id="cecase-profile-form">
 
@@ -280,8 +280,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                              columnClasses="gridTd, gridTd">
                                                     <h:panelGroup>
                                                         <h:outputLabel styleClass="bold" value="Case Status: #{ceCaseSearchProfileBB.currentCase.statusBundle.phase.caseOpen ? 'Open' : 'Closed'}" />
-                                                    </h:panelGroup>      
-                                                    <h:panelGroup>
                                                         <h:outputLabel styleClass="bold" value="Opening Date: "/>
                                                         <h:outputText id="selcase-odate-it" value="#{ceCaseSearchProfileBB.currentCase.originiationDatePretty}"/>
                                                         <h:outputText id="selcase-age-it" 
@@ -297,8 +295,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                       #{ceCaseSearchProfileBB.currentCase.caseManager.person.lastName} 
                                                                       (#{ceCaseSearchProfileBB.currentCase.caseManager.username})"/>  
                                                         <p:spacer height="5px"/>
+                                                        
                                                         <h:outputLabel styleClass="bold" value="Case Phase: "/>
-                                                        <h:outputText id="casephase-ot" value="#{ceCaseSearchProfileBB.currentCase.statusBundle.phase.label}"/>
+                                                        <div class="#{ceCaseSearchProfileBB.currentCase.statusBundle.phaseIcon.styleClass}">
+                                                            <i class="material-icons status-display-icon-i"><h:outputText value="#{ceCaseSearchProfileBB.currentCase.statusBundle.phaseIcon.materialIcon}"/></i>
+                                                        </div>
+                                                        <h:outputText id="casephase-ot-profile" 
+                                                                      value="#{ceCaseSearchProfileBB.currentCase.statusBundle.phase.label}"/>
+                                                        
+                                                        <p:spacer height="5px"/>
+                                                        
+                                                        <h:outputLabel styleClass="bold" value="Next Step: "/>
+                                                        
+                                                        <h:outputText id="casephase-nextstep" 
+                                                                      value="#{ceCaseSearchProfileBB.currentCase.statusBundle.phase.nextStep}"/>
+                                                        <p:spacer height="5px"/>
+                                                        
+                                                        <div class="gray_button">
+
+                                                            <p:commandButton   id="howto-nextstep-button" 
+                                                                       ajax="true" 
+                                                                       actionListener="#{ceCaseSearchProfileBB.onHowToNextStepButtonChange}"
+                                                                       icon="fa fa-question-circle-o" 
+                                                                       styleClass="noFill"
+                                                                       oncomplete="PF('#{ceCaseSearchProfileBB.currentCase.statusBundle.phase.nextStepHelpPanelID}-panel-var').show()"
+                                                                       value="Help on next step" />
+                                                        </div>
+                                                        
                                                     </h:panelGroup>      
 
                                                     <f:facet name="footer" class="leftalign">
@@ -313,7 +336,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </f:facet>
                                                 </h:panelGrid>
 
-                                                <h:outputText id="header-id-ot" value="Case ID: #{ceCaseSearchProfileBB.currentCase.caseID}"/><br />
+                                                
                                                 <p:commandButton    id="view-property-cb" 
                                                                     ajax="false" 
                                                                     action="#{ceCaseSearchProfileBB.exploreProperty}"
@@ -352,7 +375,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                  toggleable="true"
                                                  widgetVar="caseprofile-panel-todos-var"
                                                  collapsed="false"
-                                                 rendered="#{ceCaseSearchProfileBB.activeLookupMode}"
+                                                 rendered="false"
                                                  header="TODOs (#{ceCaseWorkflowBB.currentCase.proposalList.size()})">
 
                                        
@@ -751,155 +774,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             </h:form>
 
                                         </p:panel>
-
-
-                                        <p:panel id="cecase-events-panel"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="Events (#{ceCaseSearchProfileBB.currentCase.eventListMaster.size()})"
-                                                 rendered="#{ceCaseSearchProfileBB.activeLookupMode}"
-                                                 >
-
-
-
-                                            <h:form id="cecase-events-form">
-
-                                                <p:commandButton    id="cecase-events-add-button"
-                                                                    ajax="false"
-                                                                    styleClass="noFill button-size-small"
-                                                                    action="#{ceCaseSearchProfileBB.onEventAddButtonChange}"
-                                                                    value="Add Event"
-                                                                    icon="fa fa-plus"
-                                                                    />
-
-                                                <p:spacer height="5px" />
-
-
-                                                <p:selectOneMenu style="width: 300px;" 
-                                                                 id="prop-viewoptionsevents-solb" 
-                                                                 value="#{ceCaseSearchProfileBB.eventViewOptionSelected}" 
-                                                                 tabindex="10">
-
-                                                    <p:ajax update="cecase-events-table"                                                           
-                                                            immediate="true"/>
-
-                                                    <f:selectItems  id="prop-events-selitems" 
-                                                                    value="#{ceCaseSearchProfileBB.eventViewOptions}" 
-                                                                    var="evo" 
-                                                                    itemValue="#{evo}" 
-                                                                    itemLabel="#{evo.label}"/>
-                                                </p:selectOneMenu>
-
-                                                <p:spacer height="5px" />
-
-
-                                                <p:dataTable id="cecase-events-table"
-                                                             var="event"
-                                                             value="#{ceCaseSearchProfileBB.currentCase.eventList}"
-                                                             tableStyleClass="primeDataTable"
-                                                             rowKey="#{event.eventID}"
-                                                             >
-
-
-                                                    <p:column headerText="Date"
-                                                              styleClass="centeredColumnContent">
-                                                        <h:outputText value="#{event.timeStartPretty}" />
-
-
-                                                    </p:column>
-
-                                                    <p:column headerText="Category"
-                                                              styleClass="centeredColumnContent">
-                                                        <h:outputText value="#{event.category.eventCategoryTitle}" />
-
-
-                                                    </p:column>
-
-                                                    <p:column headerText="Description"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <h:outputText value="#{event.description}"/>
-
-                                                    </p:column>
-                                                    <p:column headerText="ID"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <h:outputText value="#{event.eventID}"/>
-
-                                                    </p:column>
-                                                    <p:column headerText="Options"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <p:commandButton    id="prop-events-open-button"
-                                                                            ajax="false"
-                                                                            styleClass="noFill button-size-small"
-                                                                            action="#{propertyProfileBB.onEventViewButtonChange(event)}"
-                                                                            value="View Event"
-                                                                            icon="fa fa-folder-open-o"
-                                                                            />
-
-
-                                                    </p:column>
-                                                </p:dataTable>
-
-
-                                            </h:form>
-
-                                        </p:panel>
-
-                                        <p:panel id="cecase-cears-panel"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="Action Requests (#{ceCaseSearchProfileBB.currentCase.ceActionRequestList.size()})"
-                                                 rendered="#{ceCaseSearchProfileBB.activeLookupMode}"
-                                                 >
-
-                                            <h:form id="cecase-cears-form">
-                                                <p:dataTable id="requestTable"
-                                                             var="r"
-                                                             rowKey="#{r.requestID}"
-                                                             value="#{ceCaseSearchProfileBB.currentCase.ceActionRequestList}"
-                                                             tableStyleClass="primeDataTable"
-                                                             >
-
-                                                    <p:column headerText="Date"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDateNoTime(r.dateOfRecord)}"/>
-
-                                                    </p:column>
-                                                    <p:column headerText="Issue Type"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <h:outputText value="#{r.issue.name}"/>
-
-                                                    </p:column>
-
-                                                    <p:column headerText="Status"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <h:outputText value="#{r.requestStatus.statusTitle}"/>
-
-                                                    </p:column>
-                                                    <p:column width="10%">
-                                                        <f:facet name="header">
-                                                            <h:outputText value="View" />
-                                                        </f:facet>
-                                                        <p:commandButton    id="ceacase-cears-view-button" 
-                                                                            ajax="false" 
-                                                                            action="#{ceCaseSearchProfileBB.onBlobAddButtonChange()}"
-                                                                            icon="fa fa-warning"
-                                                                            disabled="#{!(empty caseProfileBB.currentCase.closingDate)}"/>
-                                                    </p:column>
-
-
-                                                </p:dataTable>
-
-
-                                            </h:form>
-
-                                        </p:panel>
-
+                                        
+                                        
                                         <p:panel id="cecase-violations-panel"
                                                  toggleable="true"
                                                  collapsed="false"
@@ -913,7 +789,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <p:commandButton    id="cecase-violation-add-button"
                                                                     ajax="false"
                                                                     styleClass="noFill button-size-small"
-                                                                    action="#{ceCaseSearchProfileBB.onEventAddButtonChange}"
+                                                                    action="#{ceCaseSearchProfileBB.onViolationAddButtonChange}"
                                                                     value="Add Violation"
                                                                     icon="fa fa-warning"
                                                                     />
@@ -1111,6 +987,157 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                 </p:dataTable>
 
+
+
+                                            </h:form>
+
+                                        </p:panel>
+
+
+
+                                        <p:panel id="cecase-events-panel"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Events (#{ceCaseSearchProfileBB.currentCase.eventList.size()})"
+                                                 rendered="#{ceCaseSearchProfileBB.activeLookupMode}"
+                                                 >
+
+
+
+                                            <h:form id="cecase-events-form">
+
+                                                <p:commandButton    id="cecase-events-add-button"
+                                                                    ajax="false"
+                                                                    styleClass="noFill button-size-small"
+                                                                    action="#{ceCaseSearchProfileBB.onEventAddButtonChange}"
+                                                                    value="Add Event"
+                                                                    icon="fa fa-plus"
+                                                                    />
+
+                                                <p:spacer height="5px" />
+
+
+                                                <p:selectOneMenu style="width: 300px;" 
+                                                                 id="prop-viewoptionsevents-solb" 
+                                                                 value="#{ceCaseSearchProfileBB.eventViewOptionSelected}" 
+                                                                 tabindex="10">
+
+                                                    <p:ajax update="cecase-events-table"                                                           
+                                                            immediate="true"/>
+
+                                                    <f:selectItems  id="prop-events-selitems" 
+                                                                    value="#{ceCaseSearchProfileBB.eventViewOptions}" 
+                                                                    var="evo" 
+                                                                    itemValue="#{evo}" 
+                                                                    itemLabel="#{evo.label}"/>
+                                                </p:selectOneMenu>
+
+                                                <p:spacer height="5px" />
+
+
+                                                <p:dataTable id="cecase-events-table"
+                                                             var="event"
+                                                             value="#{ceCaseSearchProfileBB.currentCase.eventList}"
+                                                             tableStyleClass="primeDataTable"
+                                                             rowKey="#{event.eventID}"
+                                                             >
+
+
+                                                    <p:column headerText="Date"
+                                                              styleClass="centeredColumnContent">
+                                                        <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDate(event.creationts)}" />
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Category"
+                                                              styleClass="centeredColumnContent">
+                                                        <div class="#{event.category.icon.styleClass}">
+                                                            <i class="material-icons status-display-icon-i"><h:outputText value="#{event.category.icon.materialIcon}"/></i>
+                                                        </div>
+                                                        <h:outputText value="#{event.category.eventCategoryTitle}" />
+
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Description"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{event.description}"/>
+
+                                                    </p:column>
+                                                    <p:column headerText="ID"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{event.eventID}"/>
+
+                                                    </p:column>
+                                                    <p:column headerText="Options"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <p:commandButton    id="prop-events-open-button"
+                                                                            ajax="false"
+                                                                            styleClass="noFill button-size-small"
+                                                                            action="#{propertyProfileBB.onEventViewButtonChange(event)}"
+                                                                            value="View Event"
+                                                                            icon="fa fa-folder-open-o"
+                                                                            />
+
+
+                                                    </p:column>
+                                                </p:dataTable>
+
+
+                                            </h:form>
+
+                                        </p:panel>
+
+                                        <p:panel id="cecase-cears-panel"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Action Requests (#{ceCaseSearchProfileBB.currentCase.ceActionRequestList.size()})"
+                                                 rendered="#{ceCaseSearchProfileBB.activeLookupMode}"
+                                                 >
+
+                                            <h:form id="cecase-cears-form">
+                                                <p:dataTable id="requestTable"
+                                                             var="r"
+                                                             rowKey="#{r.requestID}"
+                                                             value="#{ceCaseSearchProfileBB.currentCase.ceActionRequestList}"
+                                                             tableStyleClass="primeDataTable"
+                                                             >
+
+                                                    <p:column headerText="Date"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDateNoTime(r.dateOfRecord)}"/>
+
+                                                    </p:column>
+                                                    <p:column headerText="Issue Type"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{r.issue.name}"/>
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Status"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{r.requestStatus.statusTitle}"/>
+
+                                                    </p:column>
+                                                    <p:column width="10%">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="View" />
+                                                        </f:facet>
+                                                        <p:commandButton    id="ceacase-cears-view-button" 
+                                                                            ajax="false" 
+                                                                            action="#{ceCaseSearchProfileBB.onBlobAddButtonChange()}"
+                                                                            icon="fa fa-warning"
+                                                                            disabled="#{!(empty caseProfileBB.currentCase.closingDate)}"/>
+                                                    </p:column>
+
+
+                                                </p:dataTable>
 
 
                                             </h:form>
@@ -2239,8 +2266,172 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                         </h:form>
                     </p:dialog>
-
-
+                    
+                    <p:confirmDialog id= "howto-violation-add-panel"
+                                     widgetVar="howto-violation-add-panel-var"
+                                     closable="true"
+                                     closeOnEscape="true"
+                                     responsive="true"
+                                     header="Adding a code violation to a case"
+                                     >
+                        <p>Bullets, screen shots, etc.</p>
+                        
+                    </p:confirmDialog>
+                    
+                    <p:confirmDialog id="howto-notices-panel"
+                                     widgetVar="howto-notices-panel-var"
+                                     closable="true"
+                                     closeOnEscape="true"
+                                     responsive="true"
+                                     header="Generating a notice of violation"
+                                     >
+                        
+                        <p>Click "Build new notice" in the section "Notices of Violation"</p>
+                        
+                    </p:confirmDialog>
+                    
+                    
+                    <p:confirmDialog id="howto-insidetimeframe-panel"
+                                     widgetVar="howto-insidetimeframe-panel-var"
+                                     closable="true"
+                                     closeOnEscape="true"
+                                     responsive="true"
+                                     header="Monitoring a case during compliance timeframe"
+                                     >
+                        
+                        <p>Violation compliance timeframe is still open. Passively monitor the property for changes that might impact case management.</p>
+                        
+                    </p:confirmDialog>
+                    
+                    
+                    <p:confirmDialog id="howto-expiredtimeframe-panel"
+                                     widgetVar="howto-expiredtimeframe-panel-var"
+                                     closable="true"
+                                     closeOnEscape="true"
+                                     responsive="true"
+                                     header="Pathways after compliance window expiery"
+                                     >
+                        
+                        <ol>
+                            <li>Visit the property and re-inspect the code violations attached to the case</li>
+                            <li>If compliance has been achieved, mark the violations as such</li>
+                            <li>If the violation is outstanding, discuss issue with property owner or tenants</li>
+                            <li>Extend compliance window</li>
+                            <li>Issue a citation</li>
+                        </ol>
+                        
+                    </p:confirmDialog>
+                    
+                    
+                    <p:confirmDialog id="howto-recordhearingdate-panel"
+                                     widgetVar="howto-recordhearingdate-panel-var"
+                                     closable="true"
+                                     closeOnEscape="true"
+                                     responsive="true"
+                                     header="Recording a scheduled hearing"
+                                     >
+                        
+                        <p>Click: Log new event</p>
+                        
+                    </p:confirmDialog>
+                    
+                    
+                    <p:confirmDialog id="howto-hearingprep-panel"
+                                     widgetVar="howto-hearingprep-panel-var"
+                                     closable="true"
+                                     closeOnEscape="true"
+                                     responsive="true"
+                                     header="Preparing for a hearing"
+                                     >
+                        
+                        <p>Attach and annotate photographs</p>
+                        <p>Generate a case profile report</p>
+                        
+                    </p:confirmDialog>
+                    
+                    
+                    <p:confirmDialog id="howto-insidecourttimeframe-panel"
+                                     widgetVar="howto-insidecourttimeframe-panel-var"
+                                     closable="true"
+                                     closeOnEscape="true"
+                                     responsive="true"
+                                     header="Monitoring a case during court-ordered compliance timeframe"
+                                     >
+                        
+                        <p>The court has extended the complianec timeframe, so mark violations with the new date</p>
+                        
+                    </p:confirmDialog>
+                    
+                    
+                    <p:confirmDialog id="howto-expiredcourttimeframe-panel"
+                                     widgetVar="howto-expiredcourttimeframe-panel-var"
+                                     closable="true"
+                                     closeOnEscape="true"
+                                     responsive="true"
+                                     header="Options following court-ordered compliance timeframe expiery"
+                                     >
+                        
+                        <ol>
+                            <li>Visit the property and re-inspect the code violations attached to the case</li>
+                            <li>If compliance has been achieved, mark the violations as such</li>
+                            <li>If the violation is outstanding, discuss issue with property owner or tenants</li>
+                            <li>Extend compliance window</li>
+                            <li>Request a new court hearing</li>
+                        </ol>
+                        
+                    </p:confirmDialog>
+                    
+                    
+                    <p:confirmDialog id="howto-inactive-panel"
+                                     widgetVar="howto-inactive-panel-var"
+                                     closable="true"
+                                     closeOnEscape="true"
+                                     responsive="true"
+                                     header="Stalled case options"
+                                     >
+                        
+                        <ol>
+                            <li>Open a new case with the same violation and start the managment cycle again</li>
+                        </ol>
+                        
+                    </p:confirmDialog>
+                    
+                    
+                    
+                    <p:confirmDialog id="howto-closed-panel"
+                                     widgetVar="howto-closed-panel-var"
+                                     closable="true"
+                                     closeOnEscape="true"
+                                     responsive="true"
+                                     header="About closed cases"
+                                     >
+                        
+                        <ul>
+                            <li>You may add events noting follow-up, but no new violations can be added</li>
+                            <li>If new code violations have been found, open a new case</li>
+                        </ul>
+                        
+                    </p:confirmDialog>
+                    
+                    
+                    
+                    <p:confirmDialog id="howto-container-panel"
+                                     widgetVar="howto-container-panel-var"
+                                     closable="true"
+                                     closeOnEscape="true"
+                                     responsive="true"
+                                     header="About container cases"
+                                     >
+                        
+                        <ul>
+                            <li>These are data storage containers that simply use the case infrastructure</li>
+                            <li>They cannot have new violations attached to them, nor any actions associated with violation mitigation</li>
+                        </ul>
+                        
+                    </p:confirmDialog>
+                    
+                    
+ 
                 </f:view>
             </ui:define>
         </ui:composition>

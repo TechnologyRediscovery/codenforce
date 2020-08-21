@@ -692,12 +692,6 @@
         <managed-bean-name>propertyIntegrator</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.integration.PropertyIntegrator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
-   
-    <managed-bean>
-        <managed-bean-name>unitChangesBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.UnitChangesBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>    
    
     <managed-bean>
@@ -757,6 +751,12 @@
     <managed-bean>
         <managed-bean-name>propertyUnitsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PropertyUnitsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>    
+    
+    <managed-bean>
+        <managed-bean-name>propertyUnitChangesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PropertyUnitChangesBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>    
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
@@ -822,6 +822,12 @@
             <redirect />
         </navigation-case>
         
+        <navigation-case>
+            <from-outcome>unitsChanges</from-outcome>
+            <to-view-id>/restricted/cogstaff/prop/propertyUnitChanges.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
     </navigation-rule>
       
     
@@ -864,6 +870,11 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
+    <managed-bean>
+        <managed-bean-name>personChangesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PersonChangesBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>personOccPeriodsBB</managed-bean-name>
@@ -904,6 +915,12 @@
         <navigation-case>
             <from-outcome>personInfo</from-outcome>
             <to-view-id>/restricted/cogstaff/person/personInfo.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>personChanges</from-outcome>
+            <to-view-id>/restricted/cogstaff/person/personChanges.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         
@@ -1183,12 +1200,6 @@
     <managed-bean>
         <managed-bean-name>violationBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.ViolationBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
-
-    <managed-bean>
-        <managed-bean-name>violationSelectElementBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ViolationSelectElementBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
@@ -1212,20 +1223,8 @@
     </managed-bean>
 
     <managed-bean>
-        <managed-bean-name>violationEditBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ViolationEditBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-
-    <managed-bean>
         <managed-bean-name>textBlockBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.TextBlockBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-
-    <managed-bean>
-        <managed-bean-name>cECaseViolationsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseViolationsBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
@@ -1288,12 +1287,12 @@
         <from-view-id>/restricted/cogview/cECases.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>violationEdit</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/violationEdit.xhtml</to-view-id>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseViolations.xhtml</to-view-id>
         </navigation-case>
         <navigation-case>
             <from-action>#{ceCaseViolations.addViolation}</from-action>
             <from-outcome>violationSelectElement</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</to-view-id>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseViolations.xhtml</to-view-id>
         </navigation-case>
     </navigation-rule>
 

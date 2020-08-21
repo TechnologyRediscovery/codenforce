@@ -24,70 +24,157 @@ package com.tcvcog.tcvce.entities;
 public enum CasePhaseEnum {
 
     PrelimInvestigationPending      (   "Preliminary Investigation Pending", 
+                                        "Record violation of a specific ordinance",
+                                        "howto-violation-add",
                                         1, 
                                         CaseStageEnum.Investigation, 
-                                        true                                    ),
+                                        true,
+                                        true,
+                                        true,
+                                        true,
+                                        true),
     
-    NoticeDelivery                  (   "Notice of Violation Delivery", 
+    IssueNotice                  (   "Generating and sending notice of violation", 
+                                        "Print and mail notice of violation",
+                                        "howto-notices",
                                         2, 
                                         CaseStageEnum.Investigation, 
-                                        true                                    ),
+                                        true,
+                                        true,
+                                        true,
+                                        true,
+                                        true),
     
-    InitialComplianceTimeframe      (   "Initial Compliance Timeframe", 
+    InsideComplianceWindow      (   "Inside violation complaince window", 
+                                    "Allow time for violation resolution; monitor property for intensifications",
+                                    "howto-insidetimeframe",
                                         3, 
                                         CaseStageEnum.Enforcement, 
-                                        true                                    ),
+                                        true,
+                                        true,
+                                        true,
+                                        true,
+                                        true),
     
-    SecondaryComplianceTimeframe    (   "Secondary Compliance Timeframe",
-                                        4, 
-                                        CaseStageEnum.Enforcement, 
-                                        true                                    ),
+    TimeframeExpiredNotCited    (   "Compliance window has expired; no citations issued",
+                                    "Verify compliance status; record compliance, extend timeframe, or issue a citation",
+                                    "howto-expiredtimeframe",
+                                    4, 
+                                    CaseStageEnum.Enforcement, 
+                                    true,
+                                    true,
+                                    true,
+                                    true,
+                                    true),
     
-    AwaitingHearingDate             (   "Awaiting Hearing", 
+    AwaitingHearingDate             (   "Citation issued; Awaiting Hearing Date", 
+                                        "Monitor mail for court documents; create event when hearing is scheduled",
+                                        "howto-recordhearingdate",
                                         5, 
                                         CaseStageEnum.Citation, 
-                                        true                                    ),
+                                        true,
+                                        true,
+                                        true,
+                                        true,
+                                        true),
     
-    HearingPreparation              (   "Hearing Preparation", 
+    HearingPreparation              (   "Hearing scheduled; Case preparation", 
+                                        "Print case profile and prepare for court hearing",
+                                        "howto-hearingprep",
                                         6, 
                                         CaseStageEnum.Citation, 
-                                        true                                    ),
+                                        true,
+                                        true,
+                                        true,
+                                        true,
+                                        true),
     
-    InitialPostHearingComplianceTimeframe("Initial Post-Hearing Compliance Timeframe", 
+    InsideCourtOrderedComplianceTimeframe("Inside court-ordered extended violation compliance timeframe", 
+                                            "Allow time for violation resolution; monitor property for intensification",
+                                            "howto-insidecourttimeframe",
                                             7, 
                                             CaseStageEnum.Citation, 
-                                            true                                ),
+                                            true,
+                                            true,
+                                            true,
+                                            true,
+                                            true),
     
-    SecondaryPostHearingComplianceTimeframe("Secondary Post-Hearing Compliance Timeframe", 
+    CourtOrderedComplainceTimeframeExpired("Court-ordered complaince window extension expired", 
+                                            "Verify compliance status; record compliance, issue additional notices, or extend timeframe ",
+                                            "howto-expiredcourttimeframe",
                                             8, 
                                             CaseStageEnum.Citation, 
-                                            true                                ),
+                                            true,
+                                            true,
+                                            true,
+                                            true,
+                                            true),
     
     InactiveHolding                 (       "Inactive Holding", 
+                                            "Case is stuck; monitor for changes in property status",
+                                            "howto-inactive",
                                             9, 
                                             CaseStageEnum.Unknown, 
-                                            false                               ),
+                                            true,
+                                            true,
+                                            true,
+                                            true,
+                                            true),
     
     Closed                          (       "Closed", 
+                                            "No next steps; if code violations exist, open a new case",
+                                            "howto-closed",
                                             10, 
                                             CaseStageEnum.Closed, 
-                                            false                               ),
+                                            true,
+                                            true,
+                                            true,
+                                            true,
+                                            true),
     
-    LegacyImported                  (       "Legacy data container case", 
+    Container                  (       "Data container case for property and persons", 
+                                        "Not a real case; used for storing administrative data",
+                                        "howto-container",
                                             11, 
                                             CaseStageEnum.Unknown, 
-                                            false                               );
+                                            true,
+                                            true,
+                                            true,
+                                            true,
+                                            true);
     
     private final String label;
+    private final String nextStep;
+    private final String nextStepHelpPanelID;
     private final int phaseOrder;
     private final CaseStageEnum stage;
-    private final Boolean caseOpen;
+    private final boolean caseOpen;
+    private final boolean allowPropertyChange;
+    private final boolean allowNewViolations;
+    private final boolean allowNewNotices;
+    private final boolean allowNewCitations;
     
-    private CasePhaseEnum(String label, int ord, CaseStageEnum s, Boolean oc){
+    private CasePhaseEnum(  String label, 
+                            String nextDescr,
+                            String nextStepHelp,
+                            int ord, 
+                            CaseStageEnum s, 
+                            boolean openCase,
+                            boolean propChange,
+                            boolean attachViol,
+                            boolean createnotices,
+                            boolean issueCitations){
         this.label = label;
+        this.nextStep = nextDescr;
+        this.nextStepHelpPanelID = nextStepHelp;
         this.phaseOrder = ord;
         this.stage = s;
-        this.caseOpen = oc;
+        this.caseOpen = openCase;
+        this.allowPropertyChange = propChange;
+        this.allowNewViolations = attachViol;
+        this.allowNewNotices = createnotices;
+        this.allowNewCitations = issueCitations;
     }
     
     public String getLabel(){
@@ -95,15 +182,71 @@ public enum CasePhaseEnum {
     }
     
     public int getOrder(){
-        return phaseOrder;
+        return getPhaseOrder();
     }
     
     public CaseStageEnum getCaseStage(){
-        return stage;
+        return getStage();
     }
     
     public boolean isCaseOpen(){
         return caseOpen;
+    }
+
+    /**
+     * @return the allowPropertyChange
+     */
+    public boolean isAllowPropertyChange() {
+        return allowPropertyChange;
+    }
+
+    /**
+     * @return the allowNewViolations
+     */
+    public boolean isAllowNewViolations() {
+        return allowNewViolations;
+    }
+
+    /**
+     * @return the allowNewNotices
+     */
+    public boolean isAllowNewNotices() {
+        return allowNewNotices;
+    }
+
+    /**
+     * @return the allowNewCitations
+     */
+    public boolean isAllowNewCitations() {
+        return allowNewCitations;
+    }
+
+    /**
+     * @return the nextStep
+     */
+    public String getNextStep() {
+        return nextStep;
+    }
+
+    /**
+     * @return the phaseOrder
+     */
+    public int getPhaseOrder() {
+        return phaseOrder;
+    }
+
+    /**
+     * @return the stage
+     */
+    public CaseStageEnum getStage() {
+        return stage;
+    }
+
+    /**
+     * @return the nextStepHelpPanelID
+     */
+    public String getNextStepHelpPanelID() {
+        return nextStepHelpPanelID;
     }
     
 }

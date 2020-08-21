@@ -79,6 +79,11 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
     // *************************************************************************
     
     
+    public Proposal getProposal(int propid) throws IntegrationException{
+        WorkflowIntegrator wi = getWorkflowIntegrator();
+        return wi.getProposal(propid);
+    }
+    
     /**
      * Database object retrieving method for acquiring all Proposals to inject
      * into our BObs
@@ -439,13 +444,23 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
      * implements that directive by assigning it via a Proposal given sensible initial values
      * @param dir Extracted from the EventCnF to be implemented
      * @param erg which in beta v.0.9 are CECaseDataHeavy and OccPeriod objects
-     * @param ev 
+     * @param ev if not null, this event's id will be attached to the implementation of the directive 
+     * as having been triggered by this object
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
     public void implementDirective(Directive dir, IFace_EventRuleGoverned erg, EventCnF ev) 
-            throws IntegrationException{
+            throws IntegrationException, BObStatusException{
         
         WorkflowIntegrator wi = getWorkflowIntegrator();
+        
+        if(erg == null){
+            throw new BObStatusException("Cannot implement a directive on a null erg");
+        }
+        if(dir == null){
+            throw new BObStatusException("Cannot implement a null directive");
+        }
+        
         Proposal pr = new Proposal();
         pr.setDirective(dir);
         if(dir.isActive()){
@@ -474,8 +489,8 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
             
         } else if(erg instanceof CECaseDataHeavy){
             CECaseDataHeavy cse = (CECaseDataHeavy) erg;
-            if(!cse.isOpen() && !dir.isApplyToClosedBOBs()){
-                return;
+            if(cse.getStatusBundle() != null && !cse.getStatusBundle().getPhase().isCaseOpen() && !dir.isApplyToClosedBOBs()){
+                throw new BObStatusException("Directive does not allow attachment to closed entities");
             }
             ProposalCECase pcec = new ProposalCECase(pr, cse.getCaseID());
             wi.insertProposal(pcec);

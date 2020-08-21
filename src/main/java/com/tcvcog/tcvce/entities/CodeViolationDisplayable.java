@@ -42,12 +42,12 @@ public class CodeViolationDisplayable extends CodeViolation {
         this.actualComplianceDate = cv.actualComplianceDate;
         this.leagacyImport = cv.leagacyImport;
         this.blobIDList = cv.blobIDList;
-        this.photoList = cv.photoList;
+        this.photoIDList = cv.photoIDList;
         this.complianceTimeStamp = cv.complianceTimeStamp;
         this.complianceUser = cv.complianceUser;
         this.complianceTFExpiryPropID = cv.complianceTFExpiryPropID;
         this.complianceTFExpiryProp = cv.complianceTFExpiryProp;
-        this.severityIntensityClassID = cv.severityIntensityClassID;
+        this.severityIntensity = cv.severityIntensity;
         this.lastUpdatedTS = cv.lastUpdatedTS;
         this.lastUpdatedUser = cv.lastUpdatedUser;
 
