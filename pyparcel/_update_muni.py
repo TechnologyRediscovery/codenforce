@@ -16,7 +16,7 @@ from _constants import Tally
 from _constants import DEFAULT_PROP_UNIT
 from _constants import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
 
-from _events import ParcelNotInRecentRecords
+# from _events import ParcelNotInRecentRecords
 
 
 def parcel_not_in_db(parid, cursor):
