@@ -106,7 +106,7 @@ def query_propertyexternaldata_for_changes_and_write_events(
 # For simplicity sake, EVENTS ARE CURRENTLY ONLY FOR PROPERTY INFO CASES
 # THE EVENT CLASS REQUIRES AN OVERHAUL FOR USE WITH PERSON INFO CASES
 class Event:
-    """ Abstract base class for all events. """
+    """ Base class for all events. """
 
     # Returned after writing event to database
     event_id: int

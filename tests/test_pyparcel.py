@@ -6,36 +6,30 @@ Unit tests for the parcelupdate package.
 The test suite assumes you have an up to date local copy of cogdb database and writes test_data to the copy.
 The database (as of August 2020) is not very large, so a subset of the data is not provided.
 A link to database dumps can be provided to interested contributors.
+
+See the readme for notes on style.
 """
-
-#   A note on multi-leveled classes.
-#   Some test classes may only contain a single test class.
-#   This is intentional:
-#       It allows for more test classes to be added under the umbrella of an outer class without refactoring
-
-# Todo: Custom Black config for 3 lines after module level classes, or just ignore file.
-# Todo: Get pre-commit working for new IDE. Have tests run automatically on commit
-
+import json
 import sys
 import pytest
 from copy import copy
 import psycopg2
 from os import path
 import functools
+
+import _update_muni
 from pyparcel._events import *  # Hacky way to test all events
-from pyparcel import _parse, _events
-from pyparcel import _write as write
+from pyparcel import _parse
 from pyparcel._parse import TaxStatus
 
-# Instead of calling the patch function directly, tests in this suite call mock.patch
-# This way it is clear when patch is a variable compared to a function
-from unittest import mock  # For calls to mock.patch()
+
+from unittest import mock
 from unittest.mock import MagicMock, MagicMixin
 from typing import NamedTuple, Type, Any, Optional
 import pickle
 
 HERE = path.abspath(path.dirname(__file__))
-PICKLES = path.join(HERE, "pickles", "")  # Represents the path to the folder
+MOCKS = path.join(HERE, "mocks", "")  # Represents the path to the folder
 
 # Generates a list of every eventcategory class in _events
 event_categories = []
@@ -166,30 +160,6 @@ def taxstatus_none():
     )
 
 
-@pytest.fixture
-def person1_prop_imap():
-    with open(PICKLES + "person1_prop_imap.pickle", "rb") as p:
-        return pickle.load(p)
-
-
-@pytest.fixture
-def person1_cecase_imap():
-    with open(PICKLES + "person1_cecase_imap.pickle", "rb") as p:
-        return pickle.load(p)
-
-
-@pytest.fixture
-def person1_owner_imap():
-    with open(PICKLES + "person1_owner_imap.pickle", "rb") as p:
-        return pickle.load(p)
-
-
-@pytest.fixture
-def person1_propertyexternaldata_imap():
-    with open(PICKLES + "person1_propertyexternaldata_imap.pickle", "rb") as p:
-        return pickle.load(p)
-
-
 class TestEventTriggers:
     """ These tests ensure that an event calls write_to_db when it is supposed to
     """
@@ -249,23 +219,23 @@ class TestParse:
         """
 
         def test_paid(self, taxstatus_paid):
-            with open(PICKLES + "paid.pickle", "rb") as p:
+            with open(MOCKS + "paid.pickle", "rb") as p:
                 soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) == taxstatus_paid
 
         def test_unpaid(self, taxstatus_unpaid):
-            with open(PICKLES + "unpaid.pickle", "rb") as p:
+            with open(MOCKS + "unpaid.pickle", "rb") as p:
                 soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) == taxstatus_unpaid
 
         def test_balancedue(self, taxstatus_balancedue):
-            with open(PICKLES + "balancedue.pickle", "rb") as p:
+            with open(MOCKS + "balancedue.pickle", "rb") as p:
                 soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) == taxstatus_balancedue
 
         def test_none(self, taxstatus_none):
             # Todo: Does the truly represent no taxes, or is it representative of blank data?
-            with open(PICKLES + "none.pickle", "rb") as p:
+            with open(MOCKS + "none.pickle", "rb") as p:
                 soup = pickle.load(p)
             assert _parse.parse_tax_from_soup(soup) == taxstatus_none
 
@@ -314,8 +284,35 @@ with conn:
     class TestsRequiringADatabaseConnection:
         class TestWrites:
             """
-            TestWrites tests check that the code write to the database properly.
+            Instead of doing proper unit testing, we take the easy way out and write an integration test.
+
+            The methods to create insert maps are assumed to work.
+            As of August 2020 the following functions write to the database:
+                    write.property()
+                    write.cecase()
+                    write.person()
+                    write.connect_property_to_person()
+                    write.taxstatus()
+                    write.propertyexternaldata()
             """
+
+            def test_insert_and_update_database(self):
+                with open(path.join(MOCKS, "record.json"), "r") as f:
+                    mock_record = json.load(f)
+                with open(path.join(MOCKS, "real_estate_portal.html"), "r") as f:
+                    mocked_html = f.read()
+
+                with conn.cursor() as cursor:
+
+                    with mock.patch(
+                        "_update_muni.scrape.county_property_assessment",
+                        return_value=mocked_html,
+                    ):
+
+                        _update_muni.insert_and_update_database(
+                            mock_record, conn, cursor, commit=False
+                        )
+                        None
 
         class TestEventCategories:
             """ Ensures events in _events.py share the same attributes of their counterpart in the database.
@@ -326,7 +323,7 @@ with conn:
                 """ Compares the class's name to the database's event category's title.
                 """
                 with conn.cursor() as cursor:
-                    instance = event(MagicMock())
+                    instance = event(MagicMock())  # Initialize event with no data
                     info = {}
                     info["column"] = event.__name__
                     info["category_id"] = instance.category_id
