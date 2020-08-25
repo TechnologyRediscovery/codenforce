@@ -396,10 +396,10 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         return "";
     }
 
-    public void resetNotice(NoticeOfViolation nov) {
+    public void resetNotice(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            cc.nov_ResetMailing(nov, getSessionBean().getSessUser());
+            cc.nov_ResetMailing(currentNotice, getSessionBean().getSessUser());
 //            refreshCurrentCase();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -413,23 +413,18 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
     
 
-    public String printNotice(NoticeOfViolation nov) {
-        getSessionBean().setSessNotice(nov);
+    public String printNotice() {
+        getSessionBean().setSessNotice(currentNotice);
 //        positionCurrentCaseAtHeadOfQueue();
         return "noticeOfViolationPrint";
     }
 
-    public String editNoticeOfViolation(NoticeOfViolation nov) {
-        getSessionBean().setSessNotice(nov);
-//        positionCurrentCaseAtHeadOfQueue();
-        return "noticeOfViolationEditor";
-    }
-
-    public void lockNoticeAndQueueForMailing(NoticeOfViolation nov) {
+    
+    public void lockNoticeAndQueueForMailing(ActionEvent ev) {
         CaseCoordinator caseCoord = getCaseCoordinator();
         
         try {
-            caseCoord.nov_LockAndQueue(currentCase, nov, getSessionBean().getSessUser());
+            caseCoord.nov_LockAndQueue(currentCase, currentNotice, getSessionBean().getSessUser());
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
@@ -453,14 +448,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
     }
 
-    public String deleteNoticeOfViolation(NoticeOfViolation nov) {
+    public String deleteNoticeOfViolation(ActionEvent ev) {
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
-            caseCoord.nov_delete(nov);
+            caseCoord.nov_delete(currentNotice);
             currentCase = caseCoord.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Notice no. " + nov.getNoticeID() + " has been nuked forever", ""));
+                            "Notice no. " + currentNotice.getNoticeID() + " has been nuked forever", ""));
         } catch (BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -476,10 +471,10 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         
     }
 
-    public void markNoticeOfViolationAsSent(NoticeOfViolation nov) {
+    public void markNoticeOfViolationAsSent(ActionEvent ev) {
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
-            caseCoord.nov_markAsSent(currentCase, nov, getSessionBean().getSessUser());
+            caseCoord.nov_markAsSent(currentCase, currentNotice, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Marked notice as sent and added event to case",
@@ -497,14 +492,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         }
     }
 
-    public void markNoticeOfViolationAsReturned(NoticeOfViolation nov) {
+    public void markNoticeOfViolationAsReturned(ActionEvent ev) {
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
-            caseCoord.nov_markAsReturned(currentCase, nov, getSessionBean().getSessUser());
+            caseCoord.nov_markAsReturned(currentCase, currentNotice, getSessionBean().getSessUser());
             currentCase = caseCoord.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Notice no. " + nov.getNoticeID()
+                            "Notice no. " + currentNotice.getNoticeID()
                             + " has been marked as returned on today's date", ""));
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);

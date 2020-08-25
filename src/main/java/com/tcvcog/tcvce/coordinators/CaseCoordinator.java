@@ -1077,6 +1077,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     }
 
     // *************************************************************************
+    
     // *                     NOTICES OF VIOLATION                              *
     // *************************************************************************
     /**

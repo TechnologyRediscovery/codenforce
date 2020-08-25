@@ -158,28 +158,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                             <p:commandButton    id="nov-print-cb"
-                                                                ajax="false" action="#{ceCaseNoticesBB.printNotice(notice)}"
+                                                                ajax="false" action="#{noticeOfViolationBB.printNotice()}"
                                                                 value="Print/View" styleClass="noFill button-size-small"
                                                                 icon="fa fa-print" disabled="#{(empty notice.lockedAndqueuedTS)}" />
+                                            
                                             <p:commandButton id="nov-edit-cb"
-                                                             ajax="false" action="#{ceCaseNoticesBB.editNoticeOfViolation(notice)}"
+                                                             ajax="false" action="#{noticeOfViolationBB.editNoticeOfViolation()}"
                                                              value="Edit notice" styleClass="noFill"
                                                              icon="fa fa-edit " 
-                                                             disabled="#{!(empty notice.lockedAndqueuedTS)}" />
+                                                             disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}" />
 
                                             <p:commandButton id="nov-delete-cb"
-                                                             ajax="true" actionListener="#{ceCaseNoticesBB.deleteNoticeOfViolation(notice)}"
-                                                             value="Nuke notice" styleClass="noFill"
+                                                             ajax="true" actionListener="#{noticeOfViolationBB.deleteNoticeOfViolation()}"
+                                                             value="Delete notice" styleClass="noFill"
                                                              icon="fa fa-bomb" 
-                                                             disabled="#{!(empty notice.lockedAndqueuedTS)}"
+                                                             disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
                                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                                              update="notices-messages-form:notices-messages-global
                                                              notices-ds"/>
+                                            
                                             <p:commandButton id="nov-queuenotice-cb"
-                                                             ajax="true" action="#{ceCaseNoticesBB.lockNoticeAndQueueForMailing(notice)}"
+                                                             ajax="true" action="#{noticeOfViolationBB.lockNoticeAndQueueForMailing()}"
                                                              value="Lock notice: ready to print and mail" styleClass="noFill"
                                                              icon="fa fa-edit" 
-                                                             disabled="#{!(empty notice.lockedAndqueuedTS)}"
+                                                             disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
                                                              update="notices-messages-form:notices-messages-global
                                                              nov-queuenotice-cb
                                                              nov-queued-ot
@@ -187,26 +189,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                              nov-delete-cb
                                                              nov-sent-cb
                                                              nov-print-cb"/>
+                                            
                                             <p:commandButton id="nov-sent-cb"
-                                                             ajax="true" actionListener="#{ceCaseNoticesBB.markNoticeOfViolationAsSent(notice)}"
+                                                             ajax="true" actionListener="#{noticeOfViolationBB.markNoticeOfViolationAsSent()}"
                                                              value="Mark notice as mailed!" styleClass="noFill"
                                                              icon="fa fa-paper-plane" 
-                                                             disabled="#{(empty notice.lockedAndqueuedTS) || (!(empty notice.sentTS) and !(empty notice.lockedAndqueuedTS))}"
+                                                             disabled="#{(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS) || (!(empty noticeOfViolationBB.currentNotice.sentTS) and !(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS))}"
                                                              update="notices-messages-form:notices-messages-global
                                                              nov-sent-date
                                                              nov-returned-cb
                                                              nov-sent-cb
                                                              "/>
+                                            
                                             <p:commandButton id="nov-returned-cb"
-                                                             ajax="true" actionListener="#{ceCaseNoticesBB.markNoticeOfViolationAsReturned(notice)}"
+                                                             ajax="true" actionListener="#{noticeOfViolationBB.markNoticeOfViolationAsReturned()}"
                                                              value="Mark notice as returned" styleClass="noFill"
                                                              icon="fa fa-mail-reply" 
-                                                             disabled="#{(empty notice.sentTS) || !(empty notice.returnedTS)}"
+                                                             disabled="#{(empty noticeOfViolationBB.currentNotice.sentTS) || !(empty noticeOfViolationBB.currentNotice.returnedTS)}"
                                                              update="notices-messages-form:notices-messages-global
                                                              nov-returned-date
                                                              nov-returned-cb"/>
+                                            
                                             <p:commandButton id="nov-reset-cb"
-                                                             ajax="true" actionListener="#{ceCaseNoticesBB.resetNotice(notice)}"
+                                                             ajax="true" actionListener="#{noticeOfViolationBB.resetNotice()}"
                                                              value="Reset mailing status" styleClass="noFill"
                                                              icon="fa fa-window-close-o" 
                                                              disabled="false"
@@ -221,8 +226,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                              nov-queued-ot
                                                              nov-sent-date
                                                              nov-returned-date"/>
-
-
 
                                         </h:form>
                                     </p:panel>
