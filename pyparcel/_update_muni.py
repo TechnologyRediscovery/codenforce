@@ -122,13 +122,14 @@ def insert_and_update_database(record, conn, cursor, commit):
     print(SHORT_DASHES)
 
 
-def create_events_for_parcels_which_did_not_appear_in_records(
+def create_events_for_parcels_in_db_but_not_in_records(
     record, municdode, db_conn, cursor, commit
 ):
     """
     Writes an event to the database for every parcel in a municipality that appears in the database but was not in the WPRDC's data.
     If a property doesn't have an associated unit and cecase, one is created.
     """
+    # Get parcels in the database but not in the WPRDC record
     all_parcels = fetch.all_parids_in_muni(municdode, cursor)
     remaining_parcels = copy.copy(all_parcels)
     for i, parcel in enumerate(all_parcels):
@@ -137,12 +138,13 @@ def create_events_for_parcels_which_did_not_appear_in_records(
                 remaining_parcels.pop(i)
                 continue
     # At this point, `parcels` contains a list of muni's parcels that appeared in the database but not in the most recent record from the WPRDC.
+    # Now, write each event to the database.
     for parcel_id in remaining_parcels:
         prop_id = fetch.prop_id(parcel_id, cursor)
         cecase_id = fetch.cecase_id(prop_id, cursor)
         details = _events.EventDetails(parcel_id, prop_id, cecase_id, cursor)
 
-        ParcelNotInRecentRecords(details).write_to_db()
+        _events.ParcelNotInRecentRecords(details).write_to_db()
     if commit:
         db_conn.execute()
 
@@ -167,7 +169,7 @@ def update_muni(muni, db_conn, commit=True):
             insert_and_update_database(record, db_conn, cursor, commit)
         print(DASHES)
 
-        create_events_for_parcels_which_did_not_appear_in_records(
-            records, muni.municode, db_conn, cursor, commit
-        )
-        print(DASHES)
+        # create_events_for_parcels_in_db_but_not_in_records(
+        #     records, muni.municode, db_conn, cursor, commit
+        # )
+        # print(DASHES)
