@@ -2,8 +2,9 @@
 
 import time
 import click
+import psycopg2
+
 import _fetch as fetch
-from _connection import connection_and_cursor
 from _update_muni import update_muni
 from _constants import Tally, DASHES, COG_DB
 
@@ -30,17 +31,18 @@ def main(municodes, commit, u, password, port):
     click.echo(DASHES)
 
     try:
-        with connection_and_cursor(
+        with psycopg2.connect(
             database=COG_DB, user=u, password=password, port=port
-        ) as (conn, cursor):
-            if municodes == ():
-                # Update ALL municipalities.
-                municodes = [muni for muni in fetch.munis(cursor)]
-            for _municode in municodes:
-                muni = fetch.muniname_from_municode(_municode, cursor)
-                update_muni(muni, conn, commit)
-                Tally.muni_count += 1
-                print("Updated", Tally.muni_count, "municipalities.")
+        ) as conn:
+            with conn.cursor() as cursor:
+                if municodes == ():
+                    # Update ALL municipalities.
+                    municodes = [muni for muni in fetch.munis(cursor)]
+                for _municode in municodes:
+                    muni = fetch.muniname_from_municode(_municode, cursor)
+                    update_muni(muni, conn, commit)
+                    Tally.muni_count += 1
+                    print("Updated", Tally.muni_count, "municipalities.")
     finally:
         try:
             print("Current muni:", muni.name)

@@ -15,9 +15,9 @@ import pytest
 from copy import copy
 import psycopg2
 from os import path
-import functools
 
-import _update_muni
+from pyparcel import _update_muni
+from _constants import COG_DB
 from pyparcel._events import *  # Hacky way to test all events
 from pyparcel import _parse
 from pyparcel._parse import TaxStatus
@@ -165,8 +165,6 @@ class TestEventTriggers:
     """
 
     # Todo: Test the test (call with parameters that will not trigger assert called once)
-    #   I have had an absurdly difficult time trying to automate testing of this test
-    #   (Manual testing (changing a parameter so that it doesn't trigger write_to_db) does show the test works)
     @pytest.mark.parametrize("pce", parcel_changed_events)
     def test_property_external_data(self, pce):
         """
@@ -244,9 +242,7 @@ class TestParse:
 
 
 try:
-    conn = psycopg2.connect(
-        database="cogdb", user="sylvia", password="c0d3", host="localhost", port="5432"
-    )
+    conn = psycopg2.connect(database=COG_DB, user="sylvia", password="c0d3", port=5432)
 except psycopg2.OperationalError:
     conn = MagicMock()
     warnings.warn(
@@ -312,7 +308,6 @@ with conn:
                         _update_muni.insert_and_update_database(
                             mock_record, conn, cursor, commit=False
                         )
-                        None
 
         class TestEventCategories:
             """ Ensures events in _events.py share the same attributes of their counterpart in the database.
