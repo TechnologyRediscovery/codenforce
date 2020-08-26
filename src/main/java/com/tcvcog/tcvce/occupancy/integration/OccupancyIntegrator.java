@@ -1036,8 +1036,10 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         String query = "INSERT INTO public.occpermitapplication(applicationid,  "
                 + "reason_reasonid, submissiontimestamp, "
                 + "submitternotes, internalnotes, propertyunitid, "
-                + "declaredtotaladults, declaredtotalyouth, rentalintent, occperiod_periodid, externalnotes, status) "
-                + "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::occapplicationstatus) "
+                + "declaredtotaladults, declaredtotalyouth, rentalintent, "
+                + "occperiod_periodid, externalnotes, status, "
+                + "applicationpubliccc, paccenabled, allowuplinkaccess) "
+                + "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::occapplicationstatus, ?, ?, ?) "
                 + "RETURNING applicationid;";
 
         Connection con = null;
@@ -1071,6 +1073,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setInt(9, application.getConnectedPeriod().getPeriodID());
             stmt.setString(10, application.getExternalPublicNotes());
             stmt.setString(11, OccApplicationStatusEnum.Waiting.name());
+            stmt.setInt(12, application.getPublicControlCode());
+            stmt.setBoolean(13, application.isPaccEnabled());
+            stmt.setBoolean(14, application.isUplinkAccess());
                     
             stmt.execute();
             ResultSet inserted_application = stmt.getResultSet();
@@ -1127,7 +1132,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         OccPermitApplication occpermitapp = null;
         String query = "   SELECT applicationid, reason_reasonid, submissiontimestamp, \n"
                 + "       submitternotes, internalnotes, propertyunitid, declaredtotaladults, \n"
-                + "       declaredtotalyouth, occperiod_periodid, rentalintent, status, externalnotes\n"
+                + "       declaredtotalyouth, occperiod_periodid, rentalintent, status, externalnotes,\n"
+                + "       applicationpubliccc, paccenabled, allowuplinkaccess\n"
                 + "  FROM public.occpermitapplication WHERE applicationid=?;";
 
         Connection con = null;
@@ -1167,6 +1173,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             occpermitapp.setConnectedPeriod(getOccPeriod(rs.getInt("occperiod_periodid")));
             occpermitapp.setStatus(OccApplicationStatusEnum.valueOf(rs.getString("status")));
             occpermitapp.setExternalPublicNotes(rs.getString("externalnotes"));
+            occpermitapp.setPublicControlCode(rs.getInt("applicationpubliccc"));
+            occpermitapp.setPaccEnabled(rs.getBoolean("paccenabled"));
+            occpermitapp.setUplinkAccess(rs.getBoolean("allowuplinkaccess"));
             
             if(occpermitapp.getConnectedPeriod() != null)
             {
@@ -1261,7 +1270,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     public void updateOccPermitApplication(OccPermitApplication application) throws IntegrationException {
         String query = "UPDATE public.occpermitapplication "
                 + "SET reason_reasonid=?, submissiontimestamp=?, "
-                + "submitternotes=?, internalnotes=?, propertyunitid=?, externalnotes=?, status=?::occapplicationstatus "
+                + "submitternotes=?, internalnotes=?, propertyunitid=?, externalnotes=?, status=?::occapplicationstatus, "
+                + "applicationpubliccc=?, paccenabled=?, allowuplinkaccess=? "
                 + "WHERE occpermitapplication.applicationid = ?;";
 
         Connection con = getPostgresCon();
@@ -1276,7 +1286,10 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setString(5, String.valueOf(application.getApplicationPropertyUnit().getUnitID()));
             stmt.setString(6, application.getExternalPublicNotes());
             stmt.setString(7, application.getStatus().name());
-            stmt.setInt(8, application.getId());
+            stmt.setInt(8, application.getPublicControlCode());
+            stmt.setBoolean(9, application.isPaccEnabled());
+            stmt.setBoolean(10, application.isUplinkAccess());
+            stmt.setInt(11, application.getId());
             stmt.executeUpdate();
 
         } catch (SQLException ex) {
@@ -1291,6 +1304,10 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
     }
 
+    /**
+     * Doesn't do anything yet.
+     * @param application 
+     */
     public void deleteOccPermitApplication(OccPermitApplication application) {
     }
 

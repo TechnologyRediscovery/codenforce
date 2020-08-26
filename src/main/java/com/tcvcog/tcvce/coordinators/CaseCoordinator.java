@@ -597,8 +597,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param p
      * @param ua
      * @return
+     * @throws com.tcvcog.tcvce.domain.IntegrationException If an error occurs while generating a control code
      */
-    public CECase cecase_initCECase(Property p, UserAuthorized ua) {
+    public CECase cecase_initCECase(Property p, UserAuthorized ua) throws IntegrationException {
         UserCoordinator uc = getUserCoordinator();
         CECase newCase = new CECase();
 

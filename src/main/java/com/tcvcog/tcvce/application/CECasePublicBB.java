@@ -50,15 +50,15 @@ public class CECasePublicBB
     }
 
     
-    public void generateNewPublicCC(){
+    public void generateNewPublicCC() {
         CaseIntegrator ci = getCaseIntegrator();
-        
-        freshPACC = generateControlCodeFromTime();
-        
+
         try {
+            freshPACC = generateControlCodeFromTime();
+
             currentCase.setPublicControlCode(freshPACC);
             ci.updateCECaseMetadata(currentCase);
-            
+
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Done! Public access control code for case : " + currentCase.getCaseID()
                     + "is now " + freshPACC, ""));
@@ -68,7 +68,7 @@ public class CECasePublicBB
                     "Unable to add change public access code ",
                     getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
         }
-        
+
     }
     
     public void changePACCAccess() {

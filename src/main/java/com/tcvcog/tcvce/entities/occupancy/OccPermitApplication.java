@@ -42,6 +42,9 @@ public class OccPermitApplication {
     private Person applicantPerson;
     private Person preferredContact;
     private OccPeriod connectedPeriod;
+    private int publicControlCode;
+    private boolean paccEnabled;
+    private boolean uplinkAccess;
     
     /**
     * This will contain either existing Person objects, new Person objects created by user, or 
@@ -205,6 +208,30 @@ public class OccPermitApplication {
 
     public void setExternalPublicNotes(String externalPublicNotes) {
         this.externalPublicNotes = externalPublicNotes;
+    }
+
+    public int getPublicControlCode() {
+        return publicControlCode;
+    }
+
+    public void setPublicControlCode(int publicControlCode) {
+        this.publicControlCode = publicControlCode;
+    }
+
+    public boolean isPaccEnabled() {
+        return paccEnabled;
+    }
+
+    public void setPaccEnabled(boolean paccEnabled) {
+        this.paccEnabled = paccEnabled;
+    }
+
+    public boolean isUplinkAccess() {
+        return uplinkAccess;
+    }
+
+    public void setUplinkAccess(boolean uplinkAccess) {
+        this.uplinkAccess = uplinkAccess;
     }
     
 }
