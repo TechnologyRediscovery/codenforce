@@ -1430,7 +1430,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 + "FROM\n"
                 + "propertyunitchange\n"
                 + "JOIN propertyunit ON propertyunitchange.propertyunit_unitid = propertyunit.unitid\n"
-                + "WHERE unitid=? AND propertyunitchange.active = true AND propertyunitchange.approvedon IS null;";
+                + "WHERE unitid=? AND propertyunitchange.active = true AND propertyunitchange.approvedondate IS null;";
 
         Connection con = getPostgresCon();
         ResultSet rs = null;

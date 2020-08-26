@@ -7,7 +7,6 @@ package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
-import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
@@ -26,7 +25,6 @@ import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
-import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePerson;
 import com.tcvcog.tcvce.entities.PublicInfoBundleProperty;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePropertyUnit;
@@ -347,17 +345,17 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                             "Please select a property.", ""));
             return "";
         }
-        
+
         //We must remove all units that are not active
         Iterator itr = selectedProperty.getUnitList().iterator();
-        
-        while(itr.hasNext()){
+
+        while (itr.hasNext()) {
             PublicInfoBundlePropertyUnit temp = (PublicInfoBundlePropertyUnit) itr.next();
-            if(!temp.getBundledUnit().isActive()){
+            if (!temp.getBundledUnit().isActive()) {
                 itr.remove();
             }
         }
-        
+
         getSessionBean().setOccPermitAppActiveProp(selectedProperty);
 
         if (selectedProperty.getUnitList().size() == 1) {
@@ -713,7 +711,6 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     public String submitApplication(String redir) {
 
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        PublicInfoCoordinator pic = getPublicInfoCoordinator();
         try {
 
             //so we'll have person records for the export methods to grab
@@ -739,13 +736,13 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             return "";
         }
 
-        if(redir.contentEquals("selectForApply")){
-        
+        if (redir.contentEquals("selectForApply")) {
+
             //We are returning to the unit list to apply for occupancy on more units
             //so let's set the unit and person lists we just inserted into the database onto the sess bean
             //so we don't have to insert them again.
             refreshUnitsAndPersons();
-            
+
             while (!getSessionBean().getNavStack().peekLastPage().contains("occPermitAddPropertyUnit.xhtml")) { //Clear the navstack until we reach occPermitAddPropertyUnit.xhtml
                 try {
                     getSessionBean().getNavStack().popLastPage();
@@ -753,7 +750,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                     //nothing, we just wanted to clear the stack anyway.
                 }
             }
-        
+
         } else {
             while (getSessionBean().getNavStack().peekLastPage() != null) { //Clear the navstack completely
                 try {
@@ -776,12 +773,13 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         PropertyIntegrator pri = getPropertyIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
-        UserCoordinator uc = getUserCoordinator();
 
         List<PropertyUnitChangeOrder> changeList = new ArrayList<>();
 
         newUnitList = new ArrayList<>();
 
+        int changedbyID = applicant.getBundledPerson().getPersonID();
+        
         //Grab the unit list that is currently attached to the property in the database
         Property existingProp = pc.getProperty(prop.getBundledProperty().getPropertyID());
 
@@ -828,11 +826,11 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
                 changeList.add(skeleton);
             }
-            
-                if (workingUnit.getUnitNumber().equals(selectedUnit.getBundledUnit().getUnitNumber())) {
-                    currentApplication.setApplicationPropertyUnit(workingUnit);//To make sure the application gets linked to this unit
-                }
-            
+
+            if (workingUnit.getUnitNumber().equals(selectedUnit.getBundledUnit().getUnitNumber())) {
+                currentApplication.setApplicationPropertyUnit(workingUnit);//To make sure the application gets linked to this unit
+            }
+
         }
 
         //We checked for changes and added units. We will now check for removed units
@@ -844,30 +842,47 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             for (PropertyUnit workingUnit : newUnitList) {
 
-                if (workingUnit.getUnitID() == activeUnit.getUnitID()) {
+                //If the unit is in the working list or if they weren't active to begin with,
+                //then don't add them to the change orders.
+                if (workingUnit.getUnitID() == activeUnit.getUnitID() || !activeUnit.isActive()) {
 
                     removed = false;
+                    
+                    break;
 
                 }
 
             }
-
+ 
             if (removed == true) {
 
+                boolean duplicate = false;
+                
+                //We need to make sure there are no active change ordes that ask for removal. If the
+                for(PropertyUnitChangeOrder change : pri.getPropertyUnitChangeList(activeUnit.getUnitID())){
+                    
+                    if(change.isRemoved() && change.getChangedBy() == changedbyID){
+                        //We already inserted a remove on this unit. No need to do it again.
+                        duplicate = true;
+                        
+                        break;
+                    }
+                    
+                }
+                
+                if(!duplicate){
                 //Only the unitID and removed flag are needed to deactivate a unit from the database
                 skeleton.setUnitID(activeUnit.getUnitID());
 
                 skeleton.setRemoved(removed);
 
                 changeList.add(skeleton);
-
+                }
             }
 
         }
 
         //We are done getting change orders. It's time to get them ready for the database and insert them.
-        int changedbyID = applicant.getBundledPerson().getPersonID();
-
         for (PropertyUnitChangeOrder order : changeList) {
 
             //save who made this change order
@@ -993,11 +1008,11 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                 workingPerson.setMuniCode(getSessionBean().getSessMuniQueued().getMuniCode());
 
                 workingPerson.setPersonID(pi.insertPerson(workingPerson));
-                
+
                 skeleton = new PersonChangeOrder(workingPerson);
-                
+
                 pi.insertPersonChangeOrder(skeleton);
-                
+
             }
 
             skeleton.setAdded(added);
@@ -1016,101 +1031,100 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             pi.insertPersonChangeOrder(order);
 
         }
-        
+
         //Set the persons on the application so they'll be there when we insert the person links.
         currentApplication.setAttachedPersons(currentPersonList);
 
         System.out.println("end of submitting person change list");
     }
-    
-    public void refreshUnitsAndPersons(){
+
+    public void refreshUnitsAndPersons() {
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
-        PersonCoordinator psc = getPersonCoordinator();
-        PropertyCoordinator prc = getPropertyCoordinator();
-        
+
         //First let's get a new list of persons and transport over the user's changes
-        
         List<PublicInfoBundlePerson> bundledPersons = new ArrayList<>();
-        
-        for(Person donor : currentApplication.getAttachedPersons()){
-            
-            PublicInfoBundlePerson bundle = pic.extractPublicInfo(donor);
-            
+
+        for (Person donor : currentApplication.getAttachedPersons()) {
+
+            PublicInfoBundlePerson bundle = pic.extractPublicInfo(new Person(donor));
+
             bundle.getBundledPerson().setFirstName(donor.getFirstName());
-            
+
             bundle.getBundledPerson().setLastName(donor.getLastName());
-            
+
             bundle.getBundledPerson().setPersonType(donor.getPersonType());
-            
+
             bundle.getBundledPerson().setPhoneCell(donor.getPhoneCell());
-            
+
             bundle.getBundledPerson().setPhoneHome(donor.getPhoneHome());
-            
+
             bundle.getBundledPerson().setPhoneWork(donor.getPhoneWork());
-            
+
             bundle.getBundledPerson().setEmail(donor.getEmail());
-            
+
             bundle.getBundledPerson().setAddressStreet(donor.getAddressStreet());
-            
+
             bundle.getBundledPerson().setAddressCity(donor.getAddressCity());
-            
+
             bundle.getBundledPerson().setAddressState(donor.getAddressState());
-            
+
             bundle.getBundledPerson().setAddressZip(donor.getAddressZip());
-            
+
             bundle.getBundledPerson().setBusinessEntity(donor.isBusinessEntity());
-            
+
             bundle.getBundledPerson().setUnder18(donor.isUnder18());
-            
+
             bundle.getBundledPerson().setUseSeparateMailingAddress(donor.isUseSeparateMailingAddress());
-            
+
             bundle.getBundledPerson().setMailingAddressStreet(donor.getMailingAddressStreet());
-            
+
             bundle.getBundledPerson().setMailingAddressThirdLine(donor.getMailingAddressThirdLine());
-            
+
             bundle.getBundledPerson().setMailingAddressCity(donor.getMailingAddressCity());
-            
+
             bundle.getBundledPerson().setMailingAddressState(donor.getMailingAddressState());
-            
+
             bundle.getBundledPerson().setMailingAddressZip(donor.getMailingAddressZip());
-            
+
             bundledPersons.add(bundle);
-            
+
         }
-        
+
         getSessionBean().setOccPermitAttachedPersons(bundledPersons);
-        
+
         //Now, let's refresh the unit list.
-        
         List<PublicInfoBundlePropertyUnit> bundledUnits = new ArrayList<>();
-        
-        for(PropertyUnit donor : newUnitList){
-            
+
+        for (PropertyUnit donor : newUnitList) {
+
             try {
-            PublicInfoBundlePropertyUnit bundle = pic.extractPublicInfo(donor);
-            
-            bundle.getBundledUnit().setUnitNumber(donor.getUnitNumber());
-            
-            bundle.getBundledUnit().setRentalNotes(donor.getRentalNotes());
-            
-            bundle.getBundledUnit().setNotes(donor.getNotes());
-            
-            } catch(IntegrationException | AuthorizationException | 
-                    BObStatusException | EventException | SearchException ex){
+
+                PublicInfoBundlePropertyUnit bundle = pic.extractPublicInfo(new PropertyUnit(donor));
+
+                bundle.getBundledUnit().setUnitNumber(donor.getUnitNumber());
+
+                bundle.getBundledUnit().setRentalNotes(donor.getRentalNotes());
+
+                bundle.getBundledUnit().setNotes(donor.getNotes());
+
+                bundledUnits.add(bundle);
+
+            } catch (IntegrationException | AuthorizationException
+                    | BObStatusException | EventException | SearchException ex) {
                 System.out.println("OccPermitApplicationBB.refreshUnitsAndPersons() | ERROR: " + ex);
-                
+
                 //Oh no it failed, let's just directly put the donor in.
                 //Some info will be lost but not the ID, which is more important
                 PublicInfoBundlePropertyUnit bundle = new PublicInfoBundlePropertyUnit();
-                
+
                 bundle.setBundledUnit(donor);
-                
+
                 bundledUnits.add(bundle);
             }
         }
-        
+
         getSessionBean().getOccPermitAppActiveProp().setUnitList(bundledUnits);
-        
+
     }
 
     /**
