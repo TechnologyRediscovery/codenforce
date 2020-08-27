@@ -54,24 +54,24 @@ public class PropertyUnitChangeOrder extends ChangeOrder {
      */
     public PropertyUnitChangeOrder(PropertyUnit original, PropertyUnit proposed){
         
-                    unitID = proposed.getUnitID();
+        unitID = proposed.getUnitID();
 
-                    //check each field for changes
-                    if (!compareStrings(original.getUnitNumber(), proposed.getUnitNumber())) {
-                        unitNumber = proposed.getUnitNumber();
-                    }
+        //check each field for changes
+        if (!compareStrings(original.getUnitNumber(), proposed.getUnitNumber())) {
+            unitNumber = proposed.getUnitNumber();
+        }
 
-                    if (!compareStrings(original.getOtherKnownAddress(), proposed.getOtherKnownAddress())) {
-                        otherKnownAddress = proposed.getOtherKnownAddress();
-                    }
+        if (!compareStrings(original.getOtherKnownAddress(), proposed.getOtherKnownAddress())) {
+            otherKnownAddress = proposed.getOtherKnownAddress();
+        }
 
-                    if (!compareStrings(original.getNotes(), proposed.getNotes())) {
-                        notes = proposed.getNotes();
-                    }
+        if (!compareStrings(original.getNotes(), proposed.getNotes())) {
+            notes = proposed.getNotes();
+        }
 
-                    if (!compareStrings(original.getRentalNotes(), proposed.getRentalNotes())) {
-                        rentalNotes = proposed.getRentalNotes();
-                    }
+        if (!compareStrings(original.getRentalNotes(), proposed.getRentalNotes())) {
+            rentalNotes = proposed.getRentalNotes();
+        }
         
     }
     

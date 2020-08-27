@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
@@ -109,6 +110,27 @@ public class PropertyUnitChangesBB
             return "Rejected";
         }
 
+    }
+    
+    /**
+     * were we redirected to this page from another?
+     *
+     * @return
+     */
+    public boolean wasRedirected() {
+        return getSessionBean().getNavStack().peekLastPage() != null;
+    }
+
+    public String goBack() {
+        try {
+            return getSessionBean().getNavStack().popLastPage();
+        } catch (NavigationException ex) {
+            System.out.println("PropertyUnitChangesBB.goBack() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to redirect you back to the previous page!", ""));
+            return "missionControl";
+        }
     }
 
     public void initializeChangeComparison(PropertyUnit unit, PropertyUnitChangeOrder change) {

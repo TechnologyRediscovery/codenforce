@@ -533,6 +533,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:outputLabel value="Edit unit list for this property?"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="cearActionsTableOutputLabel">
+                                                            <p:commandButton    id="go-to-unit-change-list-cb"
+                                                                    value="Check for public-proposed changes to units"
+                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                    disabled="#{empty occPermitApplicationManageBB.selectedApplication}"
+                                                                    action="#{occPermitApplicationManageBB.goToUnitChangeOrders()}"
+                                                                    icon="fa fa-gears"/>
                                                             <p:commandButton    id="edit-unit-list-cb"
                                                                                 value="Edit"
                                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
