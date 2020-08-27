@@ -1232,9 +1232,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param nov
      * @throws IntegrationException
      */
-    public void nov_update(NoticeOfViolation nov) throws IntegrationException {
+    public void nov_update(NoticeOfViolation nov) throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
-        ci.novUpdateNotice(nov);
+        if(nov != null){
+            if(nov.getLockedAndqueuedTS() == null){
+                ci.novUpdateNotice(nov);
+            } else {
+                throw new BObStatusException("Cannot update the text of a locked notice.");
+            }
+            
+        }
     }
 
     /**

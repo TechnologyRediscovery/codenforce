@@ -47,4 +47,4 @@ ALTER TABLE noticeofviolation ADD COLUMN active BOOLEAN DEFAULT TRUE;
 
 --IF datepublished IS NULL the patch is still open and receiving changes
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (30, 'database/patches/dbpatch_beta30.sql', NULL 'ecd', 'mid august 2020 changes');
+    VALUES (30, 'database/patches/dbpatch_beta30.sql', '08-25-2020' 'ecd', 'mid august 2020 changes');
