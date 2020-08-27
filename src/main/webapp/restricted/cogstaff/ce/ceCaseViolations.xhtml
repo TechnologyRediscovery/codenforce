@@ -157,282 +157,291 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </h:form>
                                     </div>
 
-                                    <p:panel    id="violation-profile-panel"
-                                                toggleable="true"
-                                                widgetVar="violation-profile-panel-var"
-                                                collapsed="false"
-                                                rendered="#{violationBB.activeLookupMode}"
-                                                header="Code Violation Info">
+                                    <p:panel id="violation-profile-panel"
+                                             toggleable="true"
+                                             widgetVar="violation-profile-panel-var"
+                                             collapsed="false"
+                                             rendered="#{violationBB.activeLookupMode}"
+                                             header="Code Violation Info"
+                                             >
+
+                                        <p:spacer height="10px"/>
 
                                         <h:form id="violation-profile-form">
 
-                                            <!-- NESTED DATA CONTAINER TO DISPLAY IN LINE-->
+                                            <!-- NESTED DATA CONTAINER -->
                                             <div class="ui-g data_container_nested_restrict">
 
-
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
                                                     <div class="restrict-data-field-label-inline" >
-
-                                                        <p:outputLabel for="violation-id-ot"
-                                                                       styleClass="data_field_label">
+                                                        <p:outputLabel for="violation-id-ot">
                                                             <h:outputText value="ID"/>
                                                         </p:outputLabel>
                                                     </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
-                                                        <h:outputText    id="violation-id-ot"
-                                                                         styleClass="data_field_value"
-                                                                         value="#{violationBB.currentViolation.violationID}"/>
+                                                        <h:outputText id="violation-id-ot"
+                                                                      value="#{violationBB.currentViolation.violationID}"
+                                                                      />
                                                     </div>
                                                 </div>
 
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <p:outputLabel for="violation-status-ot"
-                                                                       styleClass="data_field_label">
+                                                        <p:outputLabel for="violation-status-ot">
                                                             <h:outputText value="Status"/>
                                                         </p:outputLabel>
                                                     </div>
-
+                                                    <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
-                                                        <h:outputText    id="violation-status-ot"
-                                                                         styleClass="data_field_value"
-                                                                         value="#{violationBB.currentViolation.status.label}"/>
+                                                        <h:outputText id="violation-status-ot"
+                                                                      value="#{violationBB.currentViolation.status.label}"
+                                                                      />
                                                     </div>
                                                 </div>
 
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
                                                     <div class="restrict-data-field-label-inline" >
-
-                                                        <p:outputLabel for="violation-elementid-ot"
-                                                                       styleClass="data_field_label">
+                                                        <p:outputLabel for="violation-elementid-ot">
                                                             <h:outputText value="Code Element ID"/>
                                                         </p:outputLabel>
 
                                                     </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
-
-                                                        <h:outputText    id="violation-elementid-ot"
-                                                                         styleClass="data_field_value"
-                                                                         value="#{violationBB.currentViolation.violatedEnfElement.codeElement.elementID}"/>
+                                                        <h:outputText id="violation-elementid-ot"
+                                                                      value="#{violationBB.currentViolation.violatedEnfElement.codeElement.elementID}"
+                                                                      />
                                                     </div>
                                                 </div>
 
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
                                                     <div class="restrict-data-field-label-inline" >
-
-                                                        <p:outputLabel for="violation-source-ot"
-                                                                       styleClass="data_field_label">
+                                                        <p:outputLabel for="violation-source-ot">
                                                             <h:outputText value="Code Source"/>
                                                         </p:outputLabel>
                                                     </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
-
-                                                        <h:outputText    id="violation-source-ot"
-                                                                         styleClass="data_field_value"
-                                                                         value="#{violationBB.currentViolation.violatedEnfElement.source.sourceName} (#{violationBB.currentViolation.violatedEnfElement.source.sourceYear})"/>
+                                                        <h:outputText id="violation-source-ot"
+                                                                      value="#{violationBB.currentViolation.violatedEnfElement.source.sourceName} (#{violationBB.currentViolation.violatedEnfElement.source.sourceYear})"
+                                                                      />
                                                     </div>
                                                 </div>
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-                                                    <div class="restrict-data-field-label-inline" >
 
-                                                        <p:outputLabel for="violation-chapter-ot"
-                                                                       styleClass="data_field_label">
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="violation-chapter-ot">
                                                             <h:outputText value="Chapter"/>
                                                         </p:outputLabel>
                                                     </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
-
-                                                        <h:outputText    id="violation-chapter-ot"
-                                                                         styleClass="data_field_value"
-                                                                         value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterNo}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterTitle}"/>
+                                                        <h:outputText id="violation-chapter-ot"
+                                                                      value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterNo}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterTitle}"
+                                                                      />
                                                     </div>
                                                 </div>
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-                                                    <div class="restrict-data-field-label-inline" >
 
-                                                        <p:outputLabel for="violation-section-ot"
-                                                                       styleClass="data_field_label">
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="violation-section-ot">
                                                             <h:outputText value="Section"/>
                                                         </p:outputLabel>
                                                     </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
-
-                                                        <h:outputText    id="violation-section-ot"
-                                                                         styleClass="data_field_value"
-                                                                         value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecTitle}"/>
+                                                        <h:outputText id="violation-section-ot"
+                                                                      value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecTitle}"
+                                                                      />
                                                     </div>
                                                 </div>
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-                                                    <div class="restrict-data-field-label-inline" >
 
-                                                        <p:outputLabel for="violation-subsection-ot"
-                                                                       styleClass="data_field_label">
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="violation-subsection-ot">
                                                             <h:outputText value="Sub-Section"/>
                                                         </p:outputLabel>
                                                     </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
-
-                                                        <h:outputText    id="violation-subsection-ot"
-                                                                         styleClass="data_field_value"
-                                                                         value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                        <h:outputText id="violation-subsection-ot"
+                                                                      value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecTitle}"
+                                                                      />
                                                     </div>
                                                 </div>
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-                                                    <div class="restrict-data-field-label-inline" >
 
-                                                        <p:outputLabel for="violation-category-ot"
-                                                                       styleClass="data_field_label">
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="violation-category-ot">
                                                             <h:outputText value="Category"/>
                                                         </p:outputLabel>
                                                     </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
-
-                                                        <h:outputText    id="violation-category-ot"
-                                                                         styleClass="data_field_value"
-                                                                         value="#{!(empty violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry.category :'' }"/>
+                                                        <h:outputText id="violation-category-ot"
+                                                                      value="#{!(empty violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry.category :'' }"/>
                                                     </div>
                                                 </div>
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
                                                     <div class="restrict-data-field-label-inline" >
-
-                                                        <h:outputLabel  for="violation-ord-text"
-                                                                        styleClass="data_field_label" >
-                                                            <h:outputText value="Technical Text" />
-                                                        </h:outputLabel>
-                                                    </div>
-                                                    <div class="restrict-data-field-value-inline" >
-
-                                                        <h:outputText   id="violation-ord-text"
-                                                                        value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordTechnicalText}"
-                                                                        styleClass="data_field_value"
-                                                                        escape="false" />
-                                                    </div>
-                                                </div>
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-                                                    <div class="restrict-data-field-label-inline" >
-
-                                                        <h:outputLabel  for="violation-ord-text-hf"
-                                                                        styleClass="data_field_label" >
+                                                        <h:outputLabel  for="violation-ord-text-hf" >
                                                             <h:outputText value="Human Friendly Text" />
                                                         </h:outputLabel>
                                                     </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
-
-                                                        <h:outputText   id="violation-ord-text-hf"
-                                                                        value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordHumanFriendlyText}"
-                                                                        styleClass="data_field_value"
-                                                                        escape="false" />
+                                                        <h:outputText id="violation-ord-text-hf"
+                                                                      value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordHumanFriendlyText}"
+                                                                      escape="false" />
                                                     </div>
                                                 </div>
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
 
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
                                                     <div class="restrict-data-field-label-inline" >
-
-                                                        <p:outputLabel for="violation-enfguidelines-ot"
-                                                                       styleClass="data_field_label">
+                                                        <p:outputLabel for="violation-enfguidelines-ot">
                                                             <h:outputText value="Enforcement Guidelines"/>
                                                         </p:outputLabel>
                                                     </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
 
-                                                        <h:outputText    id="violation-enfguidelines-ot"
-                                                                         styleClass="data_field_value"
-                                                                         value="#{!(empty violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry.enforcementGuidelines :'' }"/>
+                                                        <h:outputText id="violation-enfguidelines-ot"
+                                                                      value="#{!(empty violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry.enforcementGuidelines :'' }"/>
                                                     </div>
                                                 </div>
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-                                                    <div class="restrict-data-field-label-inline" >
 
-                                                        <p:outputLabel for="violation-penalty-ot"
-                                                                       styleClass="data_field_label">
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="violation-penalty-ot">
                                                             <h:outputText value="Penalty"/>
                                                         </p:outputLabel>
-
                                                     </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
 
-                                                        <h:outputText    id="violation-penalty-ot"
-                                                                         styleClass="data_field_value"
-                                                                         value="$#{violationBB.currentViolation.penalty}"/>
+                                                        <h:outputText id="violation-penalty-ot"
+                                                                      value="$#{violationBB.currentViolation.penalty}"
+                                                                      />
                                                     </div>
                                                 </div>
 
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
                                                     <div class="restrict-data-field-label-inline" >
 
-                                                        <p:outputLabel for="violation-description-ot"
-                                                                       styleClass="data_field_label">
+                                                        <p:outputLabel for="violation-description-ot" >
                                                             <h:outputText value="Description"/>
                                                         </p:outputLabel>
                                                     </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
-
-                                                        <h:outputText    id="violation-description-ot"
-                                                                         styleClass="data_field_value"
-                                                                         value="#{violationBB.currentViolation.description}"/>
+                                                        <h:outputText id="violation-description-ot"
+                                                                      value="#{violationBB.currentViolation.description}"
+                                                                      />
                                                     </div>
                                                 </div>
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-                                                    <div class="restrict-data-field-label-inline" >
 
-                                                        <p:outputLabel for="violation-dor-ot"
-                                                                       styleClass="data_field_label">
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="violation-dor-ot">
                                                             <h:outputText value="Date of Record"/>
                                                         </p:outputLabel>
                                                     </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
-
-                                                        <h:outputText    id="violation-dor-ot"
-                                                                         styleClass="data_field_value"
-                                                                         value="#{violationBB.currentViolation.dateOfRecordPretty}"/>
+                                                        <h:outputText id="violation-dor-ot"
+                                                                      value="#{violationBB.currentViolation.dateOfRecordPretty}"/>
                                                     </div>
                                                 </div>
 
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
                                                     <div class="restrict-data-field-label-inline" >
 
-                                                        <p:outputLabel for="violation-stipcompdate-ot"
-                                                                       styleClass="data_field_label">
+                                                        <p:outputLabel for="violation-stipcompdate-ot">
                                                             <h:outputText value="Stipulated Compliance Date"/>
                                                         </p:outputLabel>
                                                     </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
 
-                                                        <h:outputText    id="violation-stipcompdate-ot"
-                                                                         styleClass="data_field_value"
-                                                                         value="#{violationBB.currentViolation.stipulatedComplianceDatePretty}"/>
+                                                        <h:outputText id="violation-stipcompdate-ot"
+                                                                      value="#{violationBB.currentViolation.stipulatedComplianceDatePretty}"/>
                                                     </div>
                                                 </div>
 
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
                                                     <div class="restrict-data-field-label-inline" >
-
-                                                        <p:outputLabel for="violation-compdate-ot"
-                                                                       styleClass="data_field_label">
+                                                        <p:outputLabel for="violation-compdate-ot">
                                                             <h:outputText value="Actual Compliance Date"/>
                                                         </p:outputLabel>
                                                     </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
-
-                                                        <h:outputText    id="violation-compdate-ot"
-                                                                         styleClass="data_field_value"
-                                                                         value="#{violationBB.getPrettyDateNoTime(violationBB.currentViolation.actualComplianceDate)}"/>
+                                                        <h:outputText id="violation-compdate-ot"
+                                                                      value="#{violationBB.getPrettyDateNoTime(violationBB.currentViolation.actualComplianceDate)}"/>
                                                     </div>
                                                 </div>
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-                                                    <div class="restrict-data-field-label-inline" >
 
-                                                        <p:outputLabel for="violation-compby-ot"
-                                                                       styleClass="data_field_label">
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="violation-compby-ot">
                                                             <h:outputText value="Compliance Verified By"/>
                                                         </p:outputLabel>
                                                     </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
+                                                        <h:outputText id="violation-compby-ot"
+                                                                      value="#{!(empty violationBB.currentViolation.complianceUser) ? violationBB.currentViolation.complianceUser.person.lastName : ''}"/>
+                                                    </div>
+                                                </div>
 
-                                                        <h:outputText    id="violation-compby-ot"
-                                                                         styleClass="data_field_value"
-                                                                         value="#{!(empty violationBB.currentViolation.complianceUser) ? violationBB.currentViolation.complianceUser.person.lastName : ''}"/>
+                                                <!--NESTED DATA FIELD (MULTI-LINE) -->
+                                                <div class="ui-g-12 ui-md-6 ui-lg-12 restrict-data-field-multi-line" >
+                                                    <!--NESTED DATA LABEL INLINE -->
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <h:outputLabel  for="violation-ord-text" >
+                                                            <h:outputText value="Technical Text" />
+                                                        </h:outputLabel>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
+                                                        <h:outputText id="violation-ord-text"
+                                                                      value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordTechnicalText}"
+
+                                                                      />
                                                     </div>
                                                 </div>
                                             </div>
@@ -834,7 +843,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </f:facet>
                                     <h:outputText value="#{cse.codeElement.guideEntry.category}"/>
                                 </p:column>
-                                
+
 
 
                                 <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.subCategory}"
@@ -859,11 +868,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                 <p:rowExpansion>
                                     <div class="outlinedBox">
-                                        
-                                
+
+
                                         <h2>Details</h2>
                                         <h:outputText escape="false" value="Code element ID: #{cse.elementID}"/>
-                                        
+
                                         <h2>Enforceability Info</h2>
                                         <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
                                                      columnClasses="gridTd, gridTd">
