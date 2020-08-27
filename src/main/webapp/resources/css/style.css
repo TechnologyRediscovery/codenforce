@@ -2690,15 +2690,28 @@ input{
 .restrict-data-field-label-inline{
     font-weight: 700;
     display: inline-block;
-    min-width:150px;
+    min-width:180px;
 }
 
 .restrict-data-field-value-inline{
     color: #6C6D70;
     display: inline-block;
     vertical-align: top;
-
 }
+
+.restrict-data-field-multi-line{
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.restrict-data-field-multi-line .restrict-data-field-label-inline{
+    display: block;
+}
+.restrict-data-field-multi-line .restrict-data-field-value-inline{
+    display: block;
+    
+}
+
 
 .restrict-data-field-label-vertical{
     min-height: 30px;
