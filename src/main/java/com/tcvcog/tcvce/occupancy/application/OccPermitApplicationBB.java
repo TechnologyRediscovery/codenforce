@@ -200,7 +200,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         PropertyIntegrator pi = getPropertyIntegrator();
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
 
-        OccPermitApplication occpermitapp = oc.getNewOccPermitApplication();
+        OccPermitApplication occpermitapp = oc.initOccPermitApplication();
         getSessionBean().setSessOccPermitApplication(occpermitapp);
 
         getSessionBean().setOccPermitAppActiveProp(pi.getProperty(getSessionBean().getSessProperty().getPropertyID()));
@@ -229,10 +229,18 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         }
         getSessionBean().setSessMuniQueued(selectedMuni);
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        OccPermitApplication occpermitapp = oc.getNewOccPermitApplication();
-        getSessionBean().setSessOccPermitApplication(occpermitapp);
+        try{
+        OccPermitApplication occpermitapp = oc.initOccPermitApplication();
+         getSessionBean().setSessOccPermitApplication(occpermitapp);
         getSessionBean().getNavStack().pushCurrentPage();
         return "chooseProperty";
+        } catch(IntegrationException ex){
+            System.out.println("OccPermitApplicationBB.recordSelectedMuni() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to record ", ""));
+            return "";
+        }
     }
 
     /**

@@ -802,8 +802,14 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
     }
     
-    public OccPermitApplication getNewOccPermitApplication() {
+    /**
+     * Factory method for creating new OccPermitApplications
+     * @return
+     * @throws IntegrationException If an error occurs while generating a control code
+     */
+    public OccPermitApplication initOccPermitApplication() throws IntegrationException {
         OccPermitApplication occpermitapp = new OccPermitApplication();
+        occpermitapp.setPublicControlCode(generateControlCodeFromTime());
         occpermitapp.setSubmissionDate(LocalDateTime.now());
         return occpermitapp;
     }

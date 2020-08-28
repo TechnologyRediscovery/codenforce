@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
@@ -34,6 +35,7 @@ import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
@@ -44,8 +46,10 @@ import com.tcvcog.tcvce.entities.PublicInfoBundleEventCnF;
 import com.tcvcog.tcvce.entities.PublicInfoBundleFeeAssigned;
 import com.tcvcog.tcvce.entities.PublicInfoBundleOccInspection;
 import com.tcvcog.tcvce.entities.PublicInfoBundleOccPeriod;
+import com.tcvcog.tcvce.entities.PublicInfoBundleOccPermitApplication;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePayment;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePerson;
+import com.tcvcog.tcvce.entities.PublicInfoBundlePersonOccPeriod;
 import com.tcvcog.tcvce.entities.PublicInfoBundleProperty;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePropertyUnit;
 import com.tcvcog.tcvce.entities.UserAuthorized;
@@ -53,9 +57,12 @@ import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -102,11 +109,17 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      * @throws com.tcvcog.tcvce.domain.SearchException
      * @throws com.tcvcog.tcvce.domain.EventException
      * @throws com.tcvcog.tcvce.domain.AuthorizationException
+     * @throws com.tcvcog.tcvce.domain.ViolationException
      */
-    public List<PublicInfoBundle> getPublicInfoBundles(int pacc) throws IntegrationException, BObStatusException, SearchException, EventException, AuthorizationException {
+    public List<PublicInfoBundle> getPublicInfoBundles(int pacc)
+            throws IntegrationException,
+            BObStatusException,
+            SearchException,
+            EventException,
+            AuthorizationException,
+            ViolationException {
 
         CaseIntegrator caseInt = getCaseIntegrator();
-        List<CEActionRequest> requestList;
         SearchCoordinator sc = getSearchCoordinator();
 
         // this list will store bundles from all sources polled in this method
@@ -116,7 +129,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         // start with CE action requests
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
 
-        requestList = ceari.getCEActionRequestByControlCode(pacc);
+        List<CEActionRequest> requestList = ceari.getCEActionRequestByControlCode(pacc);
 
         for (CEActionRequest cear : requestList) {
             PublicInfoBundleCEActionRequest bundle = extractPublicInfo(cear);
@@ -144,6 +157,16 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 //            // and access control issues
 //            infoBundleList.add(extractPublicInfo(c));
 //        }
+
+        //then grab OccPermitApplications
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+
+        List<OccPermitApplication> applicationList = oi.getOccPermitApplicationListByControlCode(pacc);
+
+        for (OccPermitApplication opa : applicationList) {
+
+        }
+
         return infoBundleList;
     }
 
@@ -324,6 +347,43 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
+     * Bundles a PersonOccPeriod into a PublicInfoBundlePerson by stripping out its
+     * private information.
+     *
+     * @param input
+     * @return
+     */
+    public PublicInfoBundlePerson extractPublicInfo(PersonOccPeriod input) {
+
+        PublicInfoBundlePerson pib = new PublicInfoBundlePerson();
+        //the Person object does not have a PACC Enabled field, 
+        //but I figure that a person under 18 should probably not be revealed to the public.
+        if (!input.isUnder18()) {
+
+            PersonCoordinator pc = getPersonCoordinator();
+
+            input = pc.anonymizePersonData(input);
+
+            pib.setBundledPerson(input);
+
+            pib.setTypeName("Person");
+            pib.setPaccStatusMessage("Public access enabled");
+
+            pib.setShowAddMessageButton(false);
+            pib.setShowDetailsPageButton(true);
+        } else {
+            Person skeleton = new Person();
+            skeleton.setPersonID(input.getPersonID());
+            pib.setBundledPerson(skeleton);
+            pib.setPaccStatusMessage("A public information bundle was found but public "
+                    + "access was switched off by a code officer. Please contact your municipal office. ");
+
+        }
+
+        return pib;
+    }
+    
+    /**
      * Bundles a Property into a PublicInfoBundleProperty by stripping out its
      * private information.
      *
@@ -454,6 +514,40 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         return pib;
     }
+    
+    /**
+     * Bundles an OccInspection into a PublicInfoBundleOccPermitApplication by
+     * stripping out its private information. One of the more resource-intense
+     * extraction methods, as it has to bundle a list of OccPeriods.
+     *
+     * @param input
+     * @return
+     */
+    public PublicInfoBundleOccPermitApplication extractPublicInfo(OccPermitApplication input) {
+        PublicInfoBundleOccPermitApplication pib = new PublicInfoBundleOccPermitApplication();
+
+        if (input.isPaccEnabled()) {
+
+            pib.setBundledApplication(input);
+
+            //TODO: Complete
+            
+            pib.setTypeName("OccPermitApplication");
+            pib.setPaccStatusMessage("Public access enabled");
+
+            pib.setShowAddMessageButton(false);
+            pib.setShowDetailsPageButton(true);
+        } else {
+            OccPermitApplication skeleton = new OccPermitApplication();
+            skeleton.setId(input.getId());
+            pib.setBundledApplication(skeleton);
+            pib.setPaccStatusMessage("A public information bundle was found but public "
+                    + "access was switched off by a code officer. Please contact your municipal office. ");
+
+        }
+
+        return pib;
+    }    
 
     /**
      * Bundles an OccInspection into a PublicInfoBundleOccInspection by
@@ -477,7 +571,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setShowDetailsPageButton(true);
         } else {
             OccInspection skeleton = new OccInspection();
-            skeleton.setInspectionID(skeleton.getInspectionID());
+            skeleton.setInspectionID(input.getInspectionID());
             pib.setBundledInspection(skeleton);
             pib.setPaccStatusMessage("A public information bundle was found but public "
                     + "access was switched off by a code officer. Please contact your municipal office. ");
@@ -1024,6 +1118,102 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         return exportable;
     }
 
+    /**
+     * Converts a bundled PublicInfoBundlePersonOccPeriods to an unbundled PersonOccPeriod for
+     * internal use. Currently does check for changes.
+     *
+     * @param input
+     * @return
+     * @throws IntegrationException
+     */
+    public PersonOccPeriod export(PublicInfoBundlePersonOccPeriod input, boolean isApplicationPerson) throws IntegrationException {
+        PersonIntegrator pi = getPersonIntegrator();
+        PersonOccPeriod unbundled = input.getBundledPersonOccPeriod();
+        
+        if(isApplicationPerson){
+        
+        PersonOccPeriod exportable = pi.getPersonOccApplication(unbundled.getPersonID());
+        } else{
+            //todo: extract persons for occ periods.
+        }
+
+        if (exportable == null) {
+
+            //the person is new, so skip the comparison
+            exportable = unbundled;
+
+        } else {
+            //fields are anonymized by being overwritten with asterisks. If these fields no longer contain asterisks,
+            //then the field has been edited by the user.
+            if (unbundled.getFirstName() != null && !unbundled.getFirstName().contains("*")) {
+                exportable.setFirstName(unbundled.getFirstName());
+            }
+
+            if (unbundled.getLastName() != null && !unbundled.getLastName().contains("*")) {
+                exportable.setLastName(unbundled.getLastName());
+            }
+
+            if (unbundled.getPhoneCell() != null && !unbundled.getPhoneCell().contains("*")) {
+                exportable.setPhoneCell(unbundled.getPhoneCell());
+            }
+
+            if (unbundled.getPhoneHome() != null && !unbundled.getPhoneHome().contains("*")) {
+                exportable.setPhoneHome(unbundled.getPhoneHome());
+            }
+
+            if (unbundled.getPhoneWork() != null && !unbundled.getPhoneWork().contains("*")) {
+                exportable.setPhoneWork(unbundled.getPhoneWork());
+            }
+
+            if (unbundled.getEmail() != null && !unbundled.getEmail().contains("*")) {
+                exportable.setEmail(unbundled.getEmail());
+            }
+
+            if (unbundled.getAddressStreet() != null && !unbundled.getAddressStreet().contains("*")) {
+                exportable.setAddressStreet(unbundled.getAddressStreet());
+            }
+
+            if (unbundled.getAddressCity() != null && !unbundled.getAddressCity().contains("*")) {
+                exportable.setAddressCity(unbundled.getAddressCity());
+            }
+
+            if (unbundled.getAddressZip() != null && !unbundled.getAddressZip().contains("*")) {
+                exportable.setAddressZip(unbundled.getAddressZip());
+            }
+
+            if (unbundled.getAddressState() != null && !unbundled.getAddressState().contains("*")) {
+                exportable.setAddressState(unbundled.getAddressState());
+            }
+
+            if (unbundled.getMailingAddressStreet() != null && !unbundled.getMailingAddressStreet().contains("*")) {
+                exportable.setMailingAddressStreet(unbundled.getMailingAddressStreet());
+            }
+
+            if (unbundled.getMailingAddressThirdLine() != null && !unbundled.getMailingAddressThirdLine().contains("*")) {
+                exportable.setMailingAddressThirdLine(unbundled.getMailingAddressThirdLine());
+            }
+
+            if (unbundled.getMailingAddressCity() != null && !unbundled.getMailingAddressCity().contains("*")) {
+                exportable.setMailingAddressCity(unbundled.getMailingAddressCity());
+            }
+
+            if (unbundled.getMailingAddressZip() != null && !unbundled.getMailingAddressZip().contains("*")) {
+                exportable.setMailingAddressZip(unbundled.getMailingAddressZip());
+            }
+
+            if (unbundled.getMailingAddressState() != null && !unbundled.getMailingAddressState().contains("*")) {
+                exportable.setMailingAddressState(unbundled.getMailingAddressState());
+            }
+            
+            //The public-facing Occ Permit Application saves applicationPersonType in the person type field
+            //You should probably make sure to preserve the original person type if you need to do that.
+            exportable.setPersonType(unbundled.getPersonType());
+            
+        }
+
+        return exportable;
+    }
+    
     /**
      * Accepts a List of PublicInfoBundlePropertyUnit objects, validates the
      * input to make sure it is acceptable, sanitizes it, then tosses it back.

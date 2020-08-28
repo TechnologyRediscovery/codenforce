@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
+import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.PersonWithChanges;
 import com.tcvcog.tcvce.entities.Property;
@@ -480,7 +481,80 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return person;
     }
     
-    
+    /**
+     * Anonymizes Person object member variables, for use in the case of a public search. The 
+     * anonymized fields should still be recognizable if one knows what they are likely to be, but
+     * someone without that knowledge should not be able to guess the address, phone number, email etc.
+     * @param person
+     * @return 
+     */
+    public PersonOccPeriod anonymizePersonData(PersonOccPeriod person){
+        
+        // anonymize all but first two characters of first name
+        if(person.getFirstName() != null) {
+            StringBuilder first = new StringBuilder(person.getFirstName());
+            for (int i = 2; i < first.length() && i >=0; i++){
+                first.setCharAt(i, '*');
+            }
+            person.setFirstName(first.toString());
+        }
+        
+        // anonymize all but first two characters of last name
+        if(person.getLastName() != null) {
+            StringBuilder last = new StringBuilder(person.getLastName());
+            for (int i = 2; i < last.length() && i >= 0; i++){
+                last.setCharAt(i, '*');
+            }
+            person.setLastName(last.toString());
+        }
+        
+        // anonymize all but first three characters and the domain of an email address
+        if (person.getEmail() != null) {
+            StringBuilder email = new StringBuilder(person.getEmail());
+            for (int i = 3; i < email.length() &&  email.charAt(i) != '@' && i >= 0; i++){
+                email.setCharAt(i, '*');
+            }
+            person.setEmail(email.toString());
+        }
+        
+        // anonymize all but last four digits of cell phone number
+        if(person.getPhoneCell() != null) {        
+            StringBuilder cellNumber = new StringBuilder(person.getPhoneCell());
+            for (int i = cellNumber.length() - 5; i >= 0; i--){
+                cellNumber.setCharAt(i, '*');
+            }
+            person.setPhoneCell(cellNumber.toString());
+        }
+
+        // anonymize all but last four digits of work phone number
+        if(person.getPhoneWork() != null) {
+            StringBuilder workNumber = new StringBuilder(person.getPhoneWork());
+            for (int i = workNumber.length() - 5; i >= 0; i--){
+                workNumber.setCharAt(i, '*');
+            }
+            person.setPhoneWork(workNumber.toString());
+        }     
+        
+        // anonymize all but last four digits of home phone number
+        if(person.getPhoneHome() != null) {
+            StringBuilder homeNumber = new StringBuilder(person.getPhoneHome());
+            for (int i = homeNumber.length() - 5; i >= 0; i--){
+                homeNumber.setCharAt(i, '*');
+            }
+            person.setPhoneHome(homeNumber.toString());      
+        }
+           
+        // anonymize all but first five characters of address
+        if(person.getAddressStreet() != null) {
+            StringBuilder address = new StringBuilder(person.getAddressStreet());
+            for (int i = 5; i < address.length() && i >= 0; i++){
+                address.setCharAt(i, '*');
+            }
+            person.setAddressStreet(address.toString());
+        }
+        
+        return person;
+    }
     
     public String dumpPerson(Person p){
         SystemCoordinator sc = getSystemCoordinator();

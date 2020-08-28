@@ -236,6 +236,47 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     /**
+     * We have a special type of Person which are those who have been attached to an application
+     * or OccPeriod, and this method fetches those connected to an OccApplication
+     * 
+     * @param personID
+     * @param applicationID
+     * @return
+     * @throws IntegrationException 
+     */
+    public PersonOccPeriod getPersonOccApplication(int personID, int applicationID) throws IntegrationException{
+        String selectQuery =  "SELECT person_personid, applicant, preferredcontact, \n" +
+                                "   applicationpersontype, active\n" +
+                                "   FROM public.occpermitapplicationperson "
+                              + "WHERE occpermitapplication_applicationid=? AND person_personID=?;";
+        PersonOccPeriod output = null;
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = con.prepareStatement(selectQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            stmt.setInt(1, applicationID);
+            stmt.setInt(1, personID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                output = generatePersonOccPeriod(rs);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to get persons connected to OccPermitApplication", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return output;
+        
+    }
+    
+    /**
      * Gets a list that includes inactive links
      * 
      * @param application

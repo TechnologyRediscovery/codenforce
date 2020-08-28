@@ -1267,6 +1267,33 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return occpermitappList;
     }
 
+    public List<OccPermitApplication> getOccPermitApplicationListByControlCode(int pacc) throws IntegrationException, EventException, AuthorizationException, BObStatusException, ViolationException {
+        List<OccPermitApplication> occpermitappList = new ArrayList<>();
+        String query = "SELECT occpermitapp_applicationid\n"
+                + "  FROM public.occperiodpermitapplication WHERE applicationpubliccc = ?;   ";
+
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, pacc);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                occpermitappList.add(getOccPermitApplication(rs.getInt("occpermitapp_applicationid")));
+            }
+        } catch (SQLException ex) {
+            throw new IntegrationException("OccupancyIntegrator.getOccPermitApplicationList", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        }
+        return occpermitappList;
+    }
+    
     public void updateOccPermitApplication(OccPermitApplication application) throws IntegrationException {
         String query = "UPDATE public.occpermitapplication "
                 + "SET reason_reasonid=?, submissiontimestamp=?, "
