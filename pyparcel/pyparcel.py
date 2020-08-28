@@ -17,7 +17,7 @@ from _constants import Tally, DASHES, COG_DB
 @click.option("--password", nargs=1, default="c0d3")
 @click.option(
     "--commit/--test",
-    default=True,
+    default=False,
     help="Choose whether to commit to the database or to just run as a test",
 )
 @click.option("--port", nargs=1, default=5432)
