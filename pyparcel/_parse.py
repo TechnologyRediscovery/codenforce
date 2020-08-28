@@ -40,7 +40,7 @@ def _extract_elementlist_from_soup(soup, element_id, element=SPAN, remove_tags=T
 
 
 # Todo: The replace_taxstatus really messes this up. Is there a way to use a single function?
-def replace_html_content(soup, id, new_str):
+def replace_html_content(new_str, soup, id):
     tag = soup.find(id=id)
     tag.string = new_str
     return soup
@@ -96,9 +96,15 @@ def strip_dollarsign(text):
 
 
 def remove_commas_from_numerics(text):
+    # Only remove commas if the text is a number
+    # (It will not
     if re.fullmatch(r"[\d,\.]+", text):
         return re.sub(r"[,\.]", "", text)
     return text
+
+
+def remove_hyphnes(text):
+    return re.sub("-", "", text)
 
 
 def parse_owners_from_soup(

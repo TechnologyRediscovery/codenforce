@@ -15,7 +15,8 @@ DEFAULT_PROP_UNIT = -1
 OWNER = "BasicInfo1_lblOwner"
 ADDRESS = "BasicInfo1_lblAddress"
 MUNICIPALITY = "BasicInfo1_lblMuni"
-PARCEL_ID = "BasicInfo1_lblParcelID"
+PARCEL_ID_LoB = "BasicInfo1_lblParcelID"
+MORTGAGE = "lblMortgage"
 TAXINFO = "lblTaxInfo"
 
 # HTML Elements

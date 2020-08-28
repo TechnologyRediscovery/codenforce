@@ -23,12 +23,10 @@ def reverse_names(eventdescription):
     return g.group(1) + g.group(3) + " to " + g.group(2)
 
 
-@click.option("--port", nargs=1, default=5432)
-def main(port):
-    conn = psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", port=port)
+def main():
+    conn = psycopg2.connect(database="cogdb", user="sylvia", password="c0d3", port=5432)
     with conn:
-        with conn.cursor as cursor:
-            cursor.execte("BEGIN;")
+        with conn.cursor() as cursor:
 
             select_sql = """
                 select * from event
@@ -47,14 +45,12 @@ def main(port):
                 # Transform description
                 fixeddescription = reverse_names(eventdescription)
                 update_sql = """
-                    UPDATE EVENTS
-                    SET eventdescription = %(fixed)s
-                    AnD lastupdatedts = now()
+                    UPDATE EVENT
+                    SET eventdescription = %(fixed)s,
+                    lastupdatedts = now()
                     WHERE eventid = %(id)s
                 """
                 cursor.execute(update_sql, {"fixed": fixeddescription, "id": eventid})
-
-        # Manually run COMMIT;
 
 
 if __name__ == "__main__":
