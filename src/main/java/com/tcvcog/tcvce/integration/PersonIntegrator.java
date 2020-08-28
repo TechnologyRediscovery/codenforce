@@ -294,8 +294,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     "  FROM public.propertyperson WHERE property_propertyid = ? AND person_personid = ?;";
 
         String query = "INSERT INTO public.propertyperson(\n"
-                + " property_propertyid, person_personid)\n"
-                + " VALUES (?, ?);";
+                + " property_propertyid, person_personid, creationts)\n"
+                + " VALUES (?, ?, now());";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;

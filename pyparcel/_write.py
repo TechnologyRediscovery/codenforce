@@ -83,10 +83,10 @@ def connect_property_to_person(prop_id, person_id, cursor):
     propperson = {"prop_id": prop_id, "person_id": person_id}
     insert_sql = """
         INSERT INTO public.propertyperson(
-            property_propertyid, person_personid    
+            property_propertyid, person_personid, creationts
         )
         VALUES(
-            %(prop_id)s, %(person_id)s
+            %(prop_id)s, %(person_id)s, now()
         );
     """
     cursor.execute(insert_sql, propperson)
@@ -104,8 +104,10 @@ def taxstatus(tax_status, cursor):
         )
         returning taxstatusid;
     """
-    cursor.execute(insert_sql, tax_status._asdict())    # Todo: For fun, learn speed of tuple -> dict
-    return cursor.fetchone()[0] # taxstatus_id
+    cursor.execute(
+        insert_sql, tax_status._asdict()
+    )  # Todo: For fun, learn speed of tuple -> dict
+    return cursor.fetchone()[0]  # taxstatus_id
 
 
 def propertyexternaldata(propextern_map, cursor):
