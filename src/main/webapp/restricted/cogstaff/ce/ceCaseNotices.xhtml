@@ -164,7 +164,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 toggleable="true"
                                                 widgetVar="nov-profile-panel-var"
                                                 collapsed="false"
-                                                rendered="#{noticeOfViolationBB.activeViewMode}"
+                                                rendered="true"
                                                 header="Notice of Violation #{noticeOfViolationBB.currentNotice.dateOfRecordPretty} | ID:#{noticeOfViolationBB.currentNotice.noticeID} | Created by #{!(empty noticeOfViolationBB.currentNotice.creationBy) ? noticeOfViolationBB.currentNotice.creationBy.person.lastName : ''} #{noticeOfViolationBB.getPrettyDateNoTime(noticeOfViolationBB.currentNotice.creationTS)}">
 
                                         <h:form id="nov-profile-form">
@@ -325,7 +325,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             value="Print/View" 
                                                                             styleClass="noFill button-size-small"
                                                                             icon="fa fa-print" 
-                                                                            disabled="#{(empty notice.lockedAndqueuedTS)}" />
+                                                                            disabled="#{(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}" />
                                                         <p:spacer height="3px" />
 
                                                         <p:commandButton id="nov-sent-cb"

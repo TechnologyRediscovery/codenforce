@@ -181,7 +181,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     }
 
     public boolean getActiveViewMode() {
-        if (PageModeEnum.LOOKUP.equals(currentMode)) {
+        if (PageModeEnum.LOOKUP.equals(currentMode) || PageModeEnum.VIEW.equals(currentMode)) {
             if (currentNotice != null) {
                 return true;
             }
@@ -474,7 +474,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                             + "Please create an event manually which logs this letter being queued for mailing", ""));
             return "";
         }
-        return "ceCaseViolations";
+        return "ceCaseNotices";
 
     }
 

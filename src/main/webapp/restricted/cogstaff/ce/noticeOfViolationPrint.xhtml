@@ -21,6 +21,12 @@
                         <f:param name="photoID" value="#{noticeOfViolationBB.currentNotice.style.header_img_id}"/>
                     </p:graphicImage>
                 </div>
+                
+                <div class="barcode-nov">
+                    <p:barcode id="nov-barcode"
+                        type="code128"
+                        value="300#{noticeOfViolationBB.currentNotice.noticeID}"/>
+                </div>
 
                 <div class="addressee" style="left: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_left}px; top: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_top}px">
                     <f:subview id="subview-addressee-normaladdress"

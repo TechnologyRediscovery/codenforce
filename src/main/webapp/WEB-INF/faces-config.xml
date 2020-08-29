@@ -1358,6 +1358,7 @@
             <to-view-id>/restricted/cogstaff/ce/textBlockManage.xhtml</to-view-id>
             <redirect/>
         </navigation-case>
+        
         <navigation-case>
             <from-outcome>occPermitApplications</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/permitApplications.xhtml</to-view-id>
@@ -1371,7 +1372,7 @@
  
         <navigation-case>
             <from-outcome>noticeOfViolationPrint</from-outcome>
-            <to-view-id>/restricted/cogview/noticeOfViolationPrint.xhtml</to-view-id>
+            <to-view-id>/restricted/cogstaff/ce/noticeOfViolationPrint.xhtml</to-view-id>
         </navigation-case>
 
         <navigation-case>
