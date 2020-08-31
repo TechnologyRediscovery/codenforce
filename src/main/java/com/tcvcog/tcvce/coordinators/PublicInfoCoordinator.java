@@ -35,7 +35,7 @@ import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonOccPeriod;
+import com.tcvcog.tcvce.entities.PersonOccApplication;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
@@ -49,7 +49,7 @@ import com.tcvcog.tcvce.entities.PublicInfoBundleOccPeriod;
 import com.tcvcog.tcvce.entities.PublicInfoBundleOccPermitApplication;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePayment;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePerson;
-import com.tcvcog.tcvce.entities.PublicInfoBundlePersonOccPeriod;
+import com.tcvcog.tcvce.entities.PublicInfoBundlePersonOccApplication;
 import com.tcvcog.tcvce.entities.PublicInfoBundleProperty;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePropertyUnit;
 import com.tcvcog.tcvce.entities.UserAuthorized;
@@ -165,6 +165,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         for (OccPermitApplication opa : applicationList) {
 
+            infoBundleList.add(extractPublicInfo(opa));
+            
         }
 
         return infoBundleList;
@@ -347,15 +349,15 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Bundles a PersonOccPeriod into a PublicInfoBundlePerson by stripping out its
+     * Bundles a PersonOccApplication into a PublicInfoBundlePersonoccApplication by stripping out its
      * private information.
      *
      * @param input
      * @return
      */
-    public PublicInfoBundlePerson extractPublicInfo(PersonOccPeriod input) {
+    public PublicInfoBundlePersonOccApplication extractPublicInfo(PersonOccApplication input) {
 
-        PublicInfoBundlePerson pib = new PublicInfoBundlePerson();
+        PublicInfoBundlePersonOccApplication pib = new PublicInfoBundlePersonOccApplication();
         //the Person object does not have a PACC Enabled field, 
         //but I figure that a person under 18 should probably not be revealed to the public.
         if (!input.isUnder18()) {
@@ -366,14 +368,15 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             pib.setBundledPerson(input);
 
-            pib.setTypeName("Person");
+            pib.setTypeName("PersonOccApplication");
             pib.setPaccStatusMessage("Public access enabled");
 
             pib.setShowAddMessageButton(false);
             pib.setShowDetailsPageButton(true);
         } else {
-            Person skeleton = new Person();
+            PersonOccApplication skeleton = new PersonOccApplication();
             skeleton.setPersonID(input.getPersonID());
+            skeleton.setApplicationID(input.getApplicationID());
             pib.setBundledPerson(skeleton);
             pib.setPaccStatusMessage("A public information bundle was found but public "
                     + "access was switched off by a code officer. Please contact your municipal office. ");
@@ -522,15 +525,38 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      *
      * @param input
      * @return
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.EventException
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public PublicInfoBundleOccPermitApplication extractPublicInfo(OccPermitApplication input) {
+    public PublicInfoBundleOccPermitApplication extractPublicInfo(OccPermitApplication input) 
+            throws IntegrationException, 
+            EventException,
+            AuthorizationException,
+            BObStatusException,
+            SearchException {
         PublicInfoBundleOccPermitApplication pib = new PublicInfoBundleOccPermitApplication();
 
         if (input.isPaccEnabled()) {
 
             pib.setBundledApplication(input);
 
-            //TODO: Complete
+            pib.setApplicationPropertyUnit(extractPublicInfo(input.getApplicationPropertyUnit()));
+            pib.setApplicantPerson(extractPublicInfo(input.getApplicantPerson()));
+            pib.setPreferredContact(extractPublicInfo(input.getPreferredContact()));
+            pib.setConnectedPeriod(extractPublicInfo(input.getConnectedPeriod()));
+            
+            List<PublicInfoBundlePersonOccApplication> attachedPersonBundles = new ArrayList<>();
+            
+            for (PersonOccApplication p : input.getAttachedPersons()){
+                
+                attachedPersonBundles.add(extractPublicInfo(p));
+                
+            }
+            
+            pib.setAttachedPersons(attachedPersonBundles);
             
             pib.setTypeName("OccPermitApplication");
             pib.setPaccStatusMessage("Public access enabled");
@@ -1119,24 +1145,19 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Converts a bundled PublicInfoBundlePersonOccPeriods to an unbundled PersonOccPeriod for
-     * internal use. Currently does check for changes.
+     * Converts a bundled PublicInfoBundlePersonOccPeriods to an unbundled PersonOccApplication for
+ internal use. Currently does check for changes.
      *
      * @param input
      * @return
      * @throws IntegrationException
      */
-    public PersonOccPeriod export(PublicInfoBundlePersonOccPeriod input, boolean isApplicationPerson) throws IntegrationException {
+    public PersonOccApplication export(PublicInfoBundlePersonOccApplication input) throws IntegrationException {
         PersonIntegrator pi = getPersonIntegrator();
-        PersonOccPeriod unbundled = input.getBundledPersonOccPeriod();
+        PersonOccApplication unbundled = input.getBundledPerson();
         
-        if(isApplicationPerson){
+        PersonOccApplication exportable = pi.getPersonOccApplication(unbundled.getPersonID(), unbundled.getApplicationID());
         
-        PersonOccPeriod exportable = pi.getPersonOccApplication(unbundled.getPersonID());
-        } else{
-            //todo: extract persons for occ periods.
-        }
-
         if (exportable == null) {
 
             //the person is new, so skip the comparison
@@ -1212,6 +1233,55 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         }
 
         return exportable;
+    }
+    
+    /**
+     * Converts a bundled PublicInfoBundleOccPermitApplication to an unbundled OccPermitApplication for
+     * internal use. Currently does check for changes.
+     *
+     * @param input
+     * @return
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.EventException
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.ViolationException
+     * @throws com.tcvcog.tcvce.domain.SearchException
+     */
+    public OccPermitApplication export(PublicInfoBundleOccPermitApplication input) 
+            throws IntegrationException, 
+            EventException, 
+            AuthorizationException, 
+            BObStatusException, 
+            ViolationException,
+            SearchException {
+
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+
+        OccPermitApplication unbundled = input.getBundledApplication();
+        OccPermitApplication exportable = oi.getOccPermitApplication(input.getBundledApplication().getId());
+
+        exportable.setSubmissionNotes(unbundled.getSubmissionNotes());
+        exportable.setExternalPublicNotes(unbundled.getExternalPublicNotes());
+        
+        exportable.setApplicationPropertyUnit(export(input.getApplicationPropertyUnit()));
+        exportable.setApplicantPerson(export(input.getApplicantPerson()));
+        exportable.setPreferredContact(export(input.getPreferredContact()));
+        exportable.setConnectedPeriod(export(input.getConnectedPeriod()));
+        
+        ArrayList<PersonOccApplication> personHorde = new ArrayList<>();
+        
+        if (input.getAttachedPersons()!= null) {
+
+            for (PublicInfoBundlePersonOccApplication skeleton : input.getAttachedPersons()) {
+                personHorde.add(export(skeleton));
+            }
+        }
+
+        exportable.setAttachedPersons(personHorde);
+
+        return exportable;
+
     }
     
     /**

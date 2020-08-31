@@ -26,7 +26,7 @@ import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
-import com.tcvcog.tcvce.entities.PersonOccPeriod;
+import com.tcvcog.tcvce.entities.PersonOccApplication;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.PersonWithChanges;
 import com.tcvcog.tcvce.entities.Property;
@@ -204,9 +204,9 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public List<PersonOccPeriod> getPersonOccApplicationList(OccPermitApplication application) throws IntegrationException{
-        List<PersonOccPeriod> personList = new ArrayList<>();
-        String selectQuery =  "SELECT person_personid, applicant, preferredcontact, \n" +
+    public List<PersonOccApplication> getPersonOccApplicationList(OccPermitApplication application) throws IntegrationException{
+        List<PersonOccApplication> personList = new ArrayList<>();
+        String selectQuery =  "SELECT person_personid, occpermitapplication_applicationid, applicant, preferredcontact, \n" +
                                 "   applicationpersontype, active\n" +
                                 "   FROM public.occpermitapplicationperson WHERE occpermitapplication_applicationid=? AND active=true;";
 
@@ -244,19 +244,19 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public PersonOccPeriod getPersonOccApplication(int personID, int applicationID) throws IntegrationException{
+    public PersonOccApplication getPersonOccApplication(int personID, int applicationID) throws IntegrationException{
         String selectQuery =  "SELECT person_personid, applicant, preferredcontact, \n" +
                                 "   applicationpersontype, active\n" +
                                 "   FROM public.occpermitapplicationperson "
                               + "WHERE occpermitapplication_applicationid=? AND person_personID=?;";
-        PersonOccPeriod output = null;
+        PersonOccApplication output = null;
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             stmt = con.prepareStatement(selectQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             stmt.setInt(1, applicationID);
-            stmt.setInt(1, personID);
+            stmt.setInt(2, personID);
             rs = stmt.executeQuery();
             while(rs.next()){
                 output = generatePersonOccPeriod(rs);
@@ -283,9 +283,9 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public List<PersonOccPeriod> getPersonOccApplicationListWithInactive(OccPermitApplication application) throws IntegrationException{
-        List<PersonOccPeriod> personList = new ArrayList<>();
-        String selectQuery =  "SELECT person_personid, applicant, preferredcontact, \n" +
+    public List<PersonOccApplication> getPersonOccApplicationListWithInactive(OccPermitApplication application) throws IntegrationException{
+        List<PersonOccApplication> personList = new ArrayList<>();
+        String selectQuery =  "SELECT person_personid, occpermitapplication_applicationid, applicant, preferredcontact, \n" +
                                 "   applicationpersontype, active\n" +
                                 "   FROM public.occpermitapplicationperson WHERE occpermitapplication_applicationid=?;";
 
@@ -314,8 +314,9 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         return personList;
     }
     
-    private PersonOccPeriod generatePersonOccPeriod(ResultSet rs) throws SQLException, IntegrationException{
-        PersonOccPeriod pop = new PersonOccPeriod(getPerson(rs.getInt("person_personid")));
+    private PersonOccApplication generatePersonOccPeriod(ResultSet rs) throws SQLException, IntegrationException{
+        PersonOccApplication pop = new PersonOccApplication(getPerson(rs.getInt("person_personid")));
+        pop.setApplicationID(rs.getInt("occpermitapplication_applicationid"));
         pop.setApplicant(rs.getBoolean("applicant"));
         pop.setPreferredContact(rs.getBoolean("preferredcontact"));
         pop.setApplicationPersonType(PersonType.valueOf(rs.getString("applicationpersontype")));

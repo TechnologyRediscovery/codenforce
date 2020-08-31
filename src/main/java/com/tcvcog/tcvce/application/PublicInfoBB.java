@@ -57,14 +57,14 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
                 publicInfoBundleList = null;
             }
         } catch (IntegrationException ex) {
-            System.out.println(ex);  
+            System.out.println("PublicInfoBB.submitPacc() | ERROR: " + ex.toString());  
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to search for info bundles, sorry!", "This is a system error."));
         } catch ( SearchException 
                 | EventException 
                 | AuthorizationException 
                 | ViolationException ex) {
-            System.out.println(ex);
+            System.out.println("PublicInfoBB.submitPacc() | ERROR: " +ex);
         } catch (BObStatusException ex){
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         }

@@ -18,7 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonOccPeriod;
+import com.tcvcog.tcvce.entities.PersonOccApplication;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -52,7 +52,7 @@ public class OccPermitApplication {
  application. The occupancy coordinator will digest this list to determine if the requirements 
     * have been satisfied.
     */
-    private List<PersonOccPeriod> attachedPersons;
+    private List<PersonOccApplication> attachedPersons;
 
     /**
      * @return the id
@@ -161,14 +161,14 @@ public class OccPermitApplication {
     /**
      * @return the attachedPersons
      */
-    public List<PersonOccPeriod> getAttachedPersons() {
+    public List<PersonOccApplication> getAttachedPersons() {
         return attachedPersons;
     }
 
     /**
      * @param attachedPersons the attachedPersons to set
      */
-    public void setAttachedPersons(List<PersonOccPeriod> attachedPersons) {
+    public void setAttachedPersons(List<PersonOccApplication> attachedPersons) {
         this.attachedPersons = attachedPersons;
     }
 

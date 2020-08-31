@@ -63,6 +63,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.util.Constants;
 import java.sql.ResultSet;
@@ -245,7 +246,7 @@ public class        BackingBeanUtils
                 bundles = pic.getPublicInfoBundles(controlCode);
             } catch (AuthorizationException | BObStatusException
                     | EventException | IntegrationException
-                    | SearchException ex) {
+                    | SearchException | ViolationException ex) {
                 //Getting PACCs failed!
                 attempts++;
                 if(attempts >= 5){

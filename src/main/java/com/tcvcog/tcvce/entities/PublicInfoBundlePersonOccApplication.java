@@ -20,20 +20,20 @@ package com.tcvcog.tcvce.entities;
  *
  * @author Nathan Dietz
  */
-public class PublicInfoBundlePersonOccPeriod {
+public class PublicInfoBundlePersonOccApplication extends PublicInfoBundle {
     
-    private PersonOccPeriod bundledPersonOccPeriod;
+    private PersonOccApplication bundledPerson;
     
     @Override
     public String toString(){
-        return this.getClass().getName() + bundledPersonOccPeriod.getPersonID();
+        return this.getClass().getName() + bundledPerson.getPersonID();
     }
 
-    public PersonOccPeriod getBundledPersonOccPeriod() {
-        return bundledPersonOccPeriod;
+    public PersonOccApplication getBundledPerson() {
+        return bundledPerson;
     }
 
-    public void setBundledPersonOccPeriod(PersonOccPeriod input) {
+    public void setBundledPerson(PersonOccApplication input) {
         
         //PersonOccPeriod and person share most of the same fields,
         //so let's use its anonymization method
@@ -41,8 +41,8 @@ public class PublicInfoBundlePersonOccPeriod {
         
         temp.setBundledPerson(input);
         
-        //take it out and then transfer the PersonOccPeriod-specific fields
-        PersonOccPeriod skeleton = new PersonOccPeriod(temp.getBundledPerson());
+        //take it out and then transfer the PersonOccApplication-specific fields
+        PersonOccApplication skeleton = new PersonOccApplication(temp.getBundledPerson());
         
         skeleton.setApplicant(input.isApplicant());
         
@@ -52,7 +52,9 @@ public class PublicInfoBundlePersonOccPeriod {
         
         skeleton.setLinkActive(input.isLinkActive());
         
-        bundledPersonOccPeriod = input;
+        skeleton.setApplicationID(input.getApplicationID());
+        
+        bundledPerson = input;
     }
     
     

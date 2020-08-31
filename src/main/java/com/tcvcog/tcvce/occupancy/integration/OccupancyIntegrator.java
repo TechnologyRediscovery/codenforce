@@ -26,7 +26,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonOccPeriod;
+import com.tcvcog.tcvce.entities.PersonOccApplication;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.UserAuthorized;
@@ -1180,9 +1180,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             if(occpermitapp.getConnectedPeriod() != null)
             {
             
-                occpermitapp.setAttachedPersons(new ArrayList<PersonOccPeriod>());
+                occpermitapp.setAttachedPersons(new ArrayList<PersonOccApplication>());
                 
-                for (PersonOccPeriod skeleton : pi.getPersonOccApplicationList(occpermitapp)) {
+                for (PersonOccApplication skeleton : pi.getPersonOccApplicationList(occpermitapp)) {
 
                     if (skeleton.isApplicant()){
                         occpermitapp.setApplicantPerson(skeleton);
@@ -1269,8 +1269,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
     public List<OccPermitApplication> getOccPermitApplicationListByControlCode(int pacc) throws IntegrationException, EventException, AuthorizationException, BObStatusException, ViolationException {
         List<OccPermitApplication> occpermitappList = new ArrayList<>();
-        String query = "SELECT occpermitapp_applicationid\n"
-                + "  FROM public.occperiodpermitapplication WHERE applicationpubliccc = ?;   ";
+        String query = "SELECT applicationid\n"
+                + "  FROM public.occpermitapplication WHERE applicationpubliccc = ?;   ";
 
         Connection con = null;
         PreparedStatement stmt = null;
@@ -1282,10 +1282,10 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                occpermitappList.add(getOccPermitApplication(rs.getInt("occpermitapp_applicationid")));
+                occpermitappList.add(getOccPermitApplication(rs.getInt("applicationid")));
             }
         } catch (SQLException ex) {
-            throw new IntegrationException("OccupancyIntegrator.getOccPermitApplicationList", ex);
+            throw new IntegrationException("OccupancyIntegrator.getOccPermitApplicationListByControlCode() | ERROR: " + ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -1539,7 +1539,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
      * @param applicationID
      * @throws IntegrationException
      */
-    public void insertOccApplicationPerson(PersonOccPeriod person, int applicationID) throws IntegrationException {
+    public void insertOccApplicationPerson(PersonOccApplication person, int applicationID) throws IntegrationException {
 
         String query = "INSERT INTO public.occpermitapplicationperson(occpermitapplication_applicationid, "
                 + "person_personid, applicant, preferredcontact, active, applicationpersontype)\n"
@@ -1567,7 +1567,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             }
     }
     
-    public void updatePersonOccPeriod(PersonOccPeriod input, OccPermitApplication app) throws IntegrationException{
+    public void updatePersonOccPeriod(PersonOccApplication input, OccPermitApplication app) throws IntegrationException{
         Connection con = getPostgresCon();
         String query = "UPDATE occpermitapplicationperson "
                 + "SET applicant = ?, preferredcontact = ?, applicationpersontype = ?::persontype, active = ? "

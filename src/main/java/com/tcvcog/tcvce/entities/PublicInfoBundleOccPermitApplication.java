@@ -32,7 +32,7 @@ public class PublicInfoBundleOccPermitApplication extends PublicInfoBundle {
     private PublicInfoBundlePerson applicantPerson;
     private PublicInfoBundlePerson preferredContact;
     private PublicInfoBundleOccPeriod connectedPeriod;
-    private List<PublicInfoBundlePerson> attachedPersons;
+    private List<PublicInfoBundlePersonOccApplication> attachedPersons;
     
     @Override
     public String toString(){
@@ -55,7 +55,7 @@ public class PublicInfoBundleOccPermitApplication extends PublicInfoBundle {
         
         input.setPreferredContact(new Person());
         
-        input.setAttachedPersons(new ArrayList<PersonOccPeriod>());
+        input.setAttachedPersons(new ArrayList<PersonOccApplication>());
         
         input.setConnectedPeriod(new OccPeriod());
         
@@ -94,11 +94,11 @@ public class PublicInfoBundleOccPermitApplication extends PublicInfoBundle {
         this.connectedPeriod = connectedPeriod;
     }
 
-    public List<PublicInfoBundlePerson> getAttachedPersons() {
+    public List<PublicInfoBundlePersonOccApplication> getAttachedPersons() {
         return attachedPersons;
     }
 
-    public void setAttachedPersons(List<PublicInfoBundlePerson> attachedPersons) {
+    public void setAttachedPersons(List<PublicInfoBundlePersonOccApplication> attachedPersons) {
         this.attachedPersons = attachedPersons;
     }
     
