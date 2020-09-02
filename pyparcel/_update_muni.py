@@ -82,7 +82,7 @@ def insert_and_update_database(record, conn, cursor, commit):
         prop_id = fetch.prop_id(parid, cursor)
         # If a property doesn't have an associated unit and cecase, one is created.
         unit_id = fetch.unit_id(prop_id, cursor)
-        cecase_id = fetch.cecase_id(unit_id, cursor)
+        cecase_id = fetch.cecase_id(prop_id, cursor)
 
     validate_data(record, tax_status)
     tax_status_id = write.taxstatus(tax_status, cursor)
