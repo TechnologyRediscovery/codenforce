@@ -67,6 +67,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     private int actionRequestorAssignmentMethod;
     private List<Person> personCandidateList;
     private boolean disabledPersonFormFields;
+    private List<PersonType> submittingPersonTypes;
 
     private TabView tabView;
     private int currentTabIndex;
@@ -122,6 +123,17 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             initializeReqAndMuni();
 
         }
+        
+        submittingPersonTypes = new ArrayList<>();
+        
+        //Manually add what person types we want.
+        submittingPersonTypes.add(PersonType.MuniStaff);
+        submittingPersonTypes.add(PersonType.Owner);
+        submittingPersonTypes.add(PersonType.Tenant);
+        submittingPersonTypes.add(PersonType.Manager);
+        submittingPersonTypes.add(PersonType.Public);
+        submittingPersonTypes.add(PersonType.LawEnforcement);
+        
     }
 
     public void initializeReqAndMuni() {
@@ -674,9 +686,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     /**
      * @return the submittingPersonTypes
      */
-    public PersonType[] getSubmittingPersonTypes() {
+    public List<PersonType> getSubmittingPersonTypes() {
 
-        return PersonType.values();
+        return submittingPersonTypes;
     }
 
     /**

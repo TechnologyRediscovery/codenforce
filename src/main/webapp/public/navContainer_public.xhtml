@@ -30,12 +30,14 @@
 
                     <f:view id="sideBarView">
 
-                        <h:graphicImage styleClass="public-menu-logo" value="/images/Logo-N_Font.png" />
-
                         <h:form id="panelMenu">
 
+                            <p:commandLink action="systemHome">
+                                <h:graphicImage styleClass="public-menu-logo" value="/images/Logo-N_Font.png" />
+                            </p:commandLink>
+
                             <div class="public-menu-nav-container">
-                                
+
                                 <div class="public-menu-nav-title">I would like to...</div>
 
                                 <div class="public-menu-nav">
@@ -44,7 +46,7 @@
                                             ❯ 
                                         </div>
                                     </div>
-                                    <p:commandLink value="Report a Concern" action="requestCEActionFlow" ajax="false"/>
+                                    <p:commandLink value="Report a New Concern" action="requestCEActionFlow" ajax="false"/>
                                 </div>
 
                                 <div class="public-menu-nav">
@@ -53,7 +55,7 @@
                                             ❯ 
                                         </div>
                                     </div>
-                                    <p:commandLink value="Review a Case" action="paccSearch" ajax="false"/>
+                                    <p:commandLink value="View/Edit Existing Concern" action="paccSearch" ajax="false"/>
                                 </div>
 
                                 <div class="public-menu-nav">
@@ -62,7 +64,7 @@
                                             ❯ 
                                         </div>
                                     </div>
-                                    <p:commandLink value="Apply for Occupancy Permit" action="occPermitApplicationFlow" ajax="false"/>
+                                    <p:commandLink value="Apply for an Occupancy Permit" action="occPermitApplicationFlow" ajax="false"/>
                                 </div>
 
                                 <div class="public-menu-nav-seperateline">
