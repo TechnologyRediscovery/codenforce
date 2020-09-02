@@ -238,12 +238,20 @@ class DifferentTaxCode(ParcelChangedEvent):
         # )
 
 
-# class ParcelNotInRecentRecords(Event):
-#     def __init__(self, details):
-#         super().__init__(details)
-#         raise NotImplementedError(
-#             "The Event Category has not been added to the database."
-#         )
+class ParcelNotInCountyPortal(Event):
+    def __init__(self, details):
+        super().__init__(details)
+        self.category_id = 308
+        self.eventdescription = "Parcel {} was in the CodeNForce database but not in the Allegheny County Real Estate Portal..".format(
+            self.parid
+        )
+        self.active = True
+        self.ce_notes = " "
+        self.notes = (
+            "Deprecated link: http://www2.alleghenycounty.us/RealEstate/Tax.aspx?ParcelID="
+            + self.parid
+        )
+        self.occ_period = None
 
 
 def main():

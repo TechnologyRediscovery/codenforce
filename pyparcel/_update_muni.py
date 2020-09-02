@@ -16,7 +16,7 @@ from _constants import Tally
 from _constants import DEFAULT_PROP_UNIT
 from _constants import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
 
-# from _events import ParcelNotInRecentRecords
+# from _events import ParcelNotInCountyPortal
 
 
 def parcel_not_in_db(parid, cursor):
@@ -140,13 +140,15 @@ def create_events_for_parcels_in_db_but_not_in_records(
     # At this point, `parcels` contains a list of muni's parcels that appeared in the database but not in the most recent record from the WPRDC.
     # Now, write each event to the database.
     for parcel_id in remaining_parcels:
+        html = scrape.county_property_assessment(parcel_id)
         prop_id = fetch.prop_id(parcel_id, cursor)
         cecase_id = fetch.cecase_id(prop_id, cursor)
         details = _events.EventDetails(parcel_id, prop_id, cecase_id, cursor)
 
-        _events.ParcelNotInRecentRecords(details).write_to_db()
+        _events.ParcelNotInCountyPortal(details).write_to_db()
     if commit:
         db_conn.execute()
+        db_conn.commit()
 
 
 def update_muni(muni, db_conn, commit=True):
@@ -169,7 +171,7 @@ def update_muni(muni, db_conn, commit=True):
             insert_and_update_database(record, db_conn, cursor, commit)
         print(DASHES)
 
-        # create_events_for_parcels_in_db_but_not_in_records(
-        #     records, muni.municode, db_conn, cursor, commit
-        # )
-        # print(DASHES)
+        create_events_for_parcels_in_db_but_not_in_records(
+            records, muni.municode, db_conn, cursor, commit
+        )
+        print(DASHES)
