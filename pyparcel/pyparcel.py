@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-
 import time
+from datetime import timedelta
+
 import click
 import psycopg2
 
@@ -50,7 +51,12 @@ def main(municodes, commit, u, password, port):
         except NameError:
             pass
         end = time.time()
-        print("Total time: {:.0f} seconds".format(end - start))
+        print(
+            "Total time: {}".format(
+                # Strips milliseconds from elapsed time
+                str(timedelta(seconds=(end - start))).split(".")[0]
+            )
+        )
 
 
 if __name__ == "__main__":
