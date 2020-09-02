@@ -28,6 +28,7 @@ def main(municodes, commit, u, password, port):
         click.echo("Data will be committed to the database")
     else:
         click.echo("This is a test. Data will NOT be committed.")
+    click.echo("Port = {}".format(port))
     click.echo(DASHES)
 
     try:
