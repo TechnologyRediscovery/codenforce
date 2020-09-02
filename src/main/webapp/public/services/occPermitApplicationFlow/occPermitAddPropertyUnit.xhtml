@@ -59,7 +59,7 @@
                                         <div class="public-main-contents-io-title" >
                                             3. Configure unit list
                                         </div>
-                                        
+
                                         <!-- CONTENT IO COMPONENT: CONTENT -->
                                         <div class="public-main-contents-io-content" >
 
@@ -90,7 +90,14 @@
                                                          rowKey="#{unit.bundledUnit.unitID}"
                                                          editable="true">                                         
 
-                                                <p:column>
+                                                <p:column style="width: 5%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Edit" />
+                                                    </f:facet>
+                                                    <p:rowEditor/>
+                                                </p:column>
+
+                                                <p:column style="width: 15%">
                                                     <f:facet name="header">
                                                         <h:outputText value="Unit Number" />
                                                     </f:facet>
@@ -104,7 +111,7 @@
                                                     </p:cellEditor>
                                                 </p:column>
 
-                                                <p:column>
+                                                <p:column style="width: 15%">
                                                     <f:facet name="header">
                                                         <h:outputText value="Rental notes" />
                                                     </f:facet>
@@ -136,14 +143,8 @@
                                                     </p:cellEditor>
                                                 </p:column>
 
-                                                <p:column style="text-align: center">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Edit" />
-                                                    </f:facet>
-                                                    <p:rowEditor/>
-                                                </p:column>
 
-                                                <p:column style="text-align: center">
+                                                <p:column style="width: 15%; align-content: center">
                                                     <f:facet name="header">
                                                         <h:outputText value="Remove" />
                                                     </f:facet>
