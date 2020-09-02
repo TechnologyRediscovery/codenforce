@@ -103,7 +103,9 @@ def cecase_id(
 def all_parids_in_muni(municdode, cursor) -> List[str]:
     select_sql = "SELECT parid FROM property WHERE municipality_municode = %s;"
     cursor.execute(select_sql, [municdode])
-    return cursor.fetchall()
+    all_parcels = cursor.fetchall()
+    # Each parcel returned in all_parcels is a tuple rather than the string we want, so we unpack it.
+    return [p[0] for p in all_parcels]
 
 
 def valid_json(file_name):
