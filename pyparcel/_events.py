@@ -1,6 +1,8 @@
 from typing import NamedTuple, Any
 from colorama import init
 
+import _scrape
+
 init()
 import warnings
 from colorama import Fore, Back, Style
@@ -118,7 +120,7 @@ class Event:
     notes: str
     occperiod: str
 
-    def __init__(self, details):
+    def __init__(self, details: EventDetails):
         self.prop_id = details.prop_id
         self.parid = details.parid
         self.cecase_id = details.cecase_id
@@ -238,18 +240,18 @@ class DifferentTaxCode(ParcelChangedEvent):
         # )
 
 
-class ParcelNotInCountyPortal(Event):
+class ParcelNotInWprdcData(Event):
     def __init__(self, details):
         super().__init__(details)
         self.category_id = 308
-        self.eventdescription = "Parcel {} was in the CodeNForce database but not in the Allegheny County Real Estate Portal..".format(
+        self.eventdescription = "Parcel {} was in the CodeNForce database but not in WPRDC dataset.".format(
             self.parid
         )
         self.active = True
         self.ce_notes = " "
         self.notes = (
-            "Deprecated link: http://www2.alleghenycounty.us/RealEstate/Tax.aspx?ParcelID="
-            + self.parid
+            "Allegheny County Real Estate Portal link:"
+            + _scrape.county_property_assessment(self.parid, full_response=True).url
         )
         self.occ_period = None
 

@@ -16,7 +16,7 @@ from _constants import Tally
 from _constants import DEFAULT_PROP_UNIT
 from _constants import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
 
-# from _events import ParcelNotInCountyPortal
+# from _events import ParcelNotInWprdcData
 
 
 def parcel_not_in_db(parid, cursor):
@@ -145,7 +145,7 @@ def create_events_for_parcels_in_db_but_not_in_records(
         cecase_id = fetch.cecase_id(prop_id, cursor)
         details = _events.EventDetails(parcel_id, prop_id, cecase_id, cursor)
 
-        _events.ParcelNotInCountyPortal(details).write_to_db()
+        _events.ParcelNotInWprdcData(details).write_to_db()
     if commit:
         db_conn.execute()
         db_conn.commit()
