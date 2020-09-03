@@ -8,18 +8,7 @@ import _scrape
 init()
 import warnings
 from colorama import Fore, Back, Style
-from _constants import BOT_ID
-
-
-class Changes(NamedTuple):
-    """ Help organize the creation of events representing a change.
-
-    See query_propertyexternaldata_for_changes_and_write_events
-    """
-
-    description: str
-    orig: Any
-    new: Any
+from common import BOT_ID
 
 
 # Todo: Weigh benefits of making a dataclass
@@ -34,9 +23,10 @@ class EventDetails:
     old: Optional[Any] = None
     new: Optional[Any] = None
 
-    # # Attributes created dynamically
-    # url: Optional[str] = None
-    # raw_muni: Optional[List[str]] = None
+    # Todo: Make Pythonic. Should these be here or should they be created dynamically?
+    #   The majority of Events do not require them.
+    url: Optional[str] = None
+    muniname: Optional[str] = None
 
     def unpack(self, old, new):
         """ Sets the EventDetails old and new attributes to the given values.
@@ -265,9 +255,9 @@ def parcel_not_in_wprdc_data(details: EventDetails) -> Event:
     response = _scrape.county_property_assessment(details.parid, full_response=True)
     details.url = response.url
 
-    details.raw_muni = _parse.validate_county_municode_against_portal(response.text)
-    if details.raw_muni:
-        raise RuntimeError("THIS CODE ISN'T COMPLETE")
+    raw_muni = _parse.validate_county_municode_against_portal(response.text)
+    if raw_muni:
+        details.new, details.muniname = _parse.Municipality.from_raw(raw_muni)
         return DifferentMunicode(details)
     return NotInRealEstatePortal(details)
 
@@ -278,6 +268,8 @@ class DifferentMunicode(ParcelChangedEvent):
         super().__init__(details)
         self.category_id = 308
         self.notes = details.url
+        # Example: ... from 821 to 930 (North Versailles)
+        self.eventdescription += "".join([" (", details.muniname, ")"])
 
 
 class NotInRealEstatePortal(Event):

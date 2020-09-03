@@ -1,5 +1,5 @@
-from _constants import BOT_ID
-from _constants import SPACE
+from common import BOT_ID
+from common import SPACE
 
 
 def cecase_imap(prop_id, unit_id):

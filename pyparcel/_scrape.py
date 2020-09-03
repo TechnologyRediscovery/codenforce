@@ -1,5 +1,5 @@
 import requests
-from _constants import GENERALINFO, BUILDING, TAX, SALES, IMAGES, COMPS, APPEAL, MAP
+from common import GENERALINFO, BUILDING, TAX, SALES, IMAGES, COMPS, APPEAL, MAP
 
 
 def county_property_assessment(

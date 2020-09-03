@@ -5,14 +5,14 @@ Miscellaneous code to be used in the creation of this package. Should not appear
 import pickle
 import sys
 from os import path
-from _constants import MEDIUM_DASHES, MORTGAGE
+from common import MEDIUM_DASHES, MORTGAGE
 import itertools
 
 
-from _constants import SPAN, PARCEL_ID_LoB, OWNER, TAXINFO
+from common import SPAN, PARCEL_ID_LoB, OWNER, TAXINFO
 import _scrape as scrape
 import _parse
-from _parse import TaxStatus
+from _common import TaxStatus
 from typing import Dict, NamedTuple, Any, Optional, Tuple, List
 import bs4  # Todo: Only imported BS4 for typing. Is that Pythonic?
 
