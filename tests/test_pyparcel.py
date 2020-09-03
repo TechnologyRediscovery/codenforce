@@ -109,9 +109,17 @@ parcel_changed_events = [
     PCE(_events.DifferentOwner, '{"OWNER OLD     "}', '{"OWNER NEW     "}'),
     PCE(_events.DifferentStreet, "0 Old St ", "0 New St "),
     PCE(_events.DifferentCityStateZip, "OLDCITY PA 12345", "NEWCITY PA 00000"),
-    PCE(_events.DifferentLivingArea, 653, 639),
+    PCE(_events.DifferentLivingArea, 1000, 2600),
     PCE(_events.DifferentCondition, 8, 1),
+    # PCE(_events.DifferentMunicode, 653, 639)
 ]
+
+
+@dataclass
+class PatchMaker:
+    production_class: Any  # Todo: Correct typing
+    method: str
+    return_value: Any
 
 
 @pytest.fixture
@@ -311,7 +319,7 @@ with conn:
                         return_value=mocked_html,
                     ):
 
-                        _update_muni.insert_and_update_database(
+                        _update_muni.update_database(
                             mock_record, conn, cursor, commit=False
                         )
 
@@ -319,26 +327,21 @@ with conn:
             """ Ensures events in _events.py share the same attributes of their counterpart in the database.
             """
 
-            @dataclass
-            class PatchMaker:
-                production_class: Any  # Todo: Correct typing
-                method: str
-                return_value: Any
-
+            # Todo: HEAVY documentation.
             # Some events require mocked methods to be instantiated
-            events_and_mocks = [
-                # PatchMaker(
-                #     production_class=pyparcel._events.ParcelNotInWprdcData,
-                #     method="write_notes",
-                #     return_value=""
-                # )
+            patches = [
+                PatchMaker(
+                    production_class=pyparcel._events.DifferentMunicode,
+                    method="_extend_eventdescription",
+                    return_value="",
+                )
             ]
 
             @contextlib.contextmanager
             def setup_mocks(self):
                 try:
                     stack = contextlib.ExitStack()
-                    for _mock in self.events_and_mocks:
+                    for _mock in self.patches:
                         stack.enter_context(
                             mock.patch.object(
                                 _mock.production_class,

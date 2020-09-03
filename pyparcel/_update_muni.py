@@ -3,7 +3,7 @@
 #
 #   Otherwise, treat the name as the module name.
 #   Example: _parse.strip_whitespace strips whitespace, _parse.OwnerName is a class
-import copy
+
 import json
 import _create as create
 import _fetch as fetch
@@ -16,7 +16,19 @@ from common import Tally
 from common import DEFAULT_PROP_UNIT
 from common import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
 
-# from _events import ParcelNotInWprdcData
+
+def download_and_read_records_from_Wprdc(muni):
+    print("Updating {} ({})".format(muni.name, muni.municode))
+    print(MEDIUM_DASHES)
+    filename = fetch.muni_data_and_write_to_file(muni)
+    if not valid_json(filename):
+        print(DASHES)
+        return
+
+    with open(filename, "r") as f:
+        file = json.load(f)
+        records = file["result"]["records"]
+    return records
 
 
 def parcel_not_in_db(parid, cursor):
@@ -45,7 +57,7 @@ def validate_data(r, tax):  #   Example data as applicable to explain transforma
     compare(r["TAXYEAR"], int(tax.year))  #   2020.0              2020
 
 
-def insert_and_update_database(record, conn, cursor, commit):
+def update_database(record, conn, cursor, commit):
     """
     """
     parid = record["PARID"]
@@ -142,33 +154,7 @@ def create_events_for_parcels_in_db_but_not_in_records(
         # If DifferentMunicode, supplies the new muni
         event = _events.parcel_not_in_wprdc_data(details)
         event.write_to_db()
+        Tally.diff_count += 1
     if commit:
         # db_conn.execute()
         db_conn.commit()
-
-
-def update_muni(muni, db_conn, commit=True):
-    """
-    The core functionality of the script.
-    """
-    print("Updating {} ({})".format(muni.name, muni.municode))
-    print(MEDIUM_DASHES)
-    filename = fetch.muni_data_and_write_to_file(muni)
-    if not valid_json(filename):
-        print(DASHES)
-        return
-
-    with open(filename, "r") as f:
-        file = json.load(f)
-        records = file["result"]["records"]
-
-    with db_conn.cursor() as cursor:
-        for record in records:
-            while Tally.total < 10:
-                insert_and_update_database(record, db_conn, cursor, commit)
-        print(DASHES)
-
-        create_events_for_parcels_in_db_but_not_in_records(
-            records, muni.municode, db_conn, cursor, commit
-        )
-        print(DASHES)
