@@ -1,6 +1,7 @@
-from typing import NamedTuple, Any
+from typing import NamedTuple, Any, Optional
 from colorama import init
 
+import _parse
 import _scrape
 
 init()
@@ -117,8 +118,8 @@ class Event:
     category_id: int
     eventdescription: str
     active: bool
-    notes: str
-    occperiod: str
+    notes: Optional[str]
+    occperiod: Optional[str]
 
     def __init__(self, details: EventDetails):
         self.prop_id = details.prop_id
@@ -131,12 +132,13 @@ class Event:
         self._write_event_dunder_dict()
         self.event_id = self._write_event_to_db()  # uses self.ce_caseid
         print(Fore.RED, self.eventdescription, Style.RESET_ALL, sep="")
+        if self.notes:
+            print(Fore.RED, self.notes, Style.RESET_ALL, sep="")
 
     def _write_event_dunder_dict(self):
         assert self.category_id
         assert self.eventdescription
         assert self.active
-        assert self.notes
 
         self.cecase_caseid = self.cecase_id
         self.creator_userid = BOT_ID
@@ -170,8 +172,7 @@ class NewParcelid(Event):
         self.category_id = 300
         self.eventdescription = "Parcel {} was added.".format(self.parid)
         self.active = True
-        self.ce_notes = " "
-        self.notes = " "
+        self.notes = None  # Todo: Add notes
         self.occ_period = None
 
 
@@ -182,8 +183,7 @@ class ParcelChangedEvent(Event):
         super().__init__(d)
         self.eventdescription = f"Parcel {d.parid}'s {self.brief_description} changed from {d.old} to {d.new}"
         self.active = True
-        self.ce_notes = " "
-        self.notes = " "
+        self.notes = None  # Todo: Add notes
         self.occ_period = None
 
 
@@ -234,10 +234,10 @@ class DifferentTaxCode(ParcelChangedEvent):
         self.category_id = 307
         self.brief_description = "tax code"
         super().__init__(details)
-        # warnings.warn(
-        #     "DifferentTaxCode may be deprecated soon, as TaxCode is no longer an attribute on the property table",
-        #     DeprecationWarning,
-        # )
+        warnings.warn(
+            "DifferentTaxCode may be deprecated soon, as TaxCode is no longer an attribute on the property table",
+            DeprecationWarning,
+        )
 
 
 class ParcelNotInWprdcData(Event):
@@ -248,12 +248,21 @@ class ParcelNotInWprdcData(Event):
             self.parid
         )
         self.active = True
-        self.ce_notes = " "
-        self.notes = (
-            "Allegheny County Real Estate Portal link:"
-            + _scrape.county_property_assessment(self.parid, full_response=True).url
-        )
+        self.notes = self.write_notes()
         self.occ_period = None
+
+    # Todo: Rename method
+    def write_notes(self) -> str:
+        """
+        Returns:
+            A message detailing if the Allegheny County Real Estate Portal url points to a parcel in their database.
+        """
+        response = _scrape.county_property_assessment(self.parid, full_response=True)
+        if _parse.validate_county_response(response.text):
+            msg = "County link:"
+        else:
+            msg = "Broken link:"
+        return msg + response.url
 
 
 def main():
