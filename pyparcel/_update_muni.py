@@ -130,25 +130,16 @@ def create_events_for_parcels_in_db_but_not_in_records(
     If a property doesn't have an associated unit and cecase, one is created.
     """
     # Get parcels in the database but not in the WPRDC record
-    all_parcels = fetch.all_parids_in_muni(municdode, cursor)
-    remaining_parcels = copy.copy(all_parcels)
-    # Todo: Optimize
+    db_parcels = fetch.all_parids_in_muni(municdode, cursor)
     wprdc_parcels = [r["PARID"] for r in records]
-    for i, parcel in enumerate(all_parcels):
-        if parcel in wprdc_parcels:
-            remaining_parcels[i] = None
-    # At this point, `parcels` contains a list of muni's parcels that appeared in the database but not in the most recent record from the WPRDC.
-    # Now, write each event to the database.
-    j = 1
-    for parcel_id in remaining_parcels:
-        if parcel_id is None:
-            continue
+    extra_parcels = set(db_parcels) - set(wprdc_parcels)
+    for parcel_id in extra_parcels:
         prop_id = fetch.prop_id(parcel_id, cursor)
         cecase_id = fetch.cecase_id(prop_id, cursor)
         details = _events.EventDetails(parcel_id, prop_id, cecase_id, cursor)
-        print(j, parcel_id, sep="\t")
-        j += 1
-        # _events.ParcelNotInWprdcData(details).write_to_db()
+        details.old = municdode
+        event = _events.parcel_not_in_wprdc_data(details)
+        event.write_to_db()
     if commit:
         db_conn.execute()
         db_conn.commit()
