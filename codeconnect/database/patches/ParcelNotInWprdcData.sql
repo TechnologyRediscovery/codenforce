@@ -6,7 +6,7 @@ INSERT INTO public.eventcategory(
          hosteventdescriptionsuggtext, directive_directiveid, defaultdurationmins,
          active, userrankminimumtoenact, userrankminimumtoview, userrankminimumtoupdate)
  VALUES (308, 'PropertyInfoCase'::eventtype,
- 		 'ParcelNotInCountyPortal',
+ 		 'ParcelNotInWprdcData',
  		 'Documents when a parcel is in the CodeNForce database that was not in the WPRDC data',
  		 TRUE, TRUE, NULL, 0, 0,
          NULL, NULL, 1,
