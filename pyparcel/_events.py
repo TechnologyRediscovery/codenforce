@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import NamedTuple, Any, Optional
 from colorama import init
 
@@ -21,8 +22,17 @@ class Changes(NamedTuple):
     new: Any
 
 
+# Todo: Weigh benefits of making a dataclass
+# @dataclass
 class EventDetails:
-    __slots__ = ["parid", "prop_id", "cecase_id", "old", "new", "db_cursor"]
+    #   # Code to convert class to dataclass?
+    # parid: str
+    # prop_id: int
+    # cecase_id: int
+    # # Todo: Cursor typing
+    # db_cursor: Any   # Although it technically isn't an event detail, passing the db_cursor makes life easier
+    # old: Optional[Any] = None
+    # new: Optional[Any] = None
 
     def __init__(self, parid, prop_id, cecase_id, db_cursor):
         self.parid = parid
@@ -31,6 +41,7 @@ class EventDetails:
         self.db_cursor = db_cursor  # Although it technically isn't an event detail, passing the db_cursor makes life easier
         self.old = None
         self.new = None
+        self.url = None
 
     def unpack(self, old, new):
         """ Sets the EventDetails old and new attributes to the given values.
@@ -161,7 +172,7 @@ class Event:
             )
             RETURNING eventid;"""
         self.db_cursor.execute(insert_sql, self.__dict__)
-        return self.db_cursor.fetchone()[0]
+        return self.db_cursor.fetchone()[0]  # eventid
 
 
 class NewParcelid(Event):
@@ -189,80 +200,98 @@ class ParcelChangedEvent(Event):
 
 class DifferentOwner(ParcelChangedEvent):
     def __init__(self, details):
-        self.category_id = 301
         self.brief_description = "owner name"
         super().__init__(details)
+        self.category_id = 301
 
 
 class DifferentStreet(ParcelChangedEvent):
     def __init__(self, details):
-        self.category_id = 302
         self.brief_description = "street"
         super().__init__(details)
+        self.category_id = 302
 
 
 class DifferentCityStateZip(ParcelChangedEvent):
     def __init__(self, details):
-        self.category_id = 303
         self.brief_description = "city, state, or zipcode"
         super().__init__(details)
+        self.category_id = 303
 
 
 class DifferentLivingArea(ParcelChangedEvent):
     def __init__(self, details):
-        self.category_id = 304
         self.brief_description = "living area size"
         super().__init__(details)
+        self.category_id = 304
 
 
 class DifferentCondition(ParcelChangedEvent):
     def __init__(self, details):
-        self.category_id = 305
         self.brief_description = "condition"
         super().__init__(details)
+        self.category_id = 305
 
 
 class DifferentTaxStatus(ParcelChangedEvent):
     def __init__(self, details):
-        self.category_id = 306
         self.brief_description = "tax status"
         super().__init__(details)
+        self.category_id = 306
 
 
 class DifferentTaxCode(ParcelChangedEvent):
     def __init__(self, details):
-        self.category_id = 307
         self.brief_description = "tax code"
         super().__init__(details)
+        self.category_id = 307
         warnings.warn(
             "DifferentTaxCode may be deprecated soon, as TaxCode is no longer an attribute on the property table",
             DeprecationWarning,
         )
 
 
-class ParcelNotInWprdcData(Event):
+def parcel_not_in_wprdc_data(details: EventDetails) -> Event:
+    """
+    Factory function to be called when a parcel is in our database but not the WPRDC data.
+
+    The function assumes the parcel did not appear in the WPRDC data.
+    There is no safeguard to check for this, so be dilligent with your code.
+    Only call this function if the parcel did not appear in the WPRDC data.
+
+    Returns:
+        An Event indicating whether the Allegheny County Real Estate Portal for the parcel id points to a real page.
+            If the page exists: DifferentMunicode
+            else: NotInRealEstatePortal
+    """
+    response = _scrape.county_property_assessment(details.parid, full_response=True)
+    details.url = response.url
+    # An important note: details.old contains JUST the municode
+    # validate_county_response contains string representing
+    # the municode and name of municipality, scraped from the
+    # Allegheny County Real Estate Portal
+    details.new = _parse.validate_county_response(response.html)
+    if details.new:
+        return DifferentMunicode(details)
+    return NotInRealEstatePortal(details)
+
+
+class DifferentMunicode(ParcelChangedEvent):
     def __init__(self, details):
+        self.brief_description = "municode"
         super().__init__(details)
         self.category_id = 308
-        self.eventdescription = "Parcel {} was in the CodeNForce database but not in WPRDC dataset.".format(
-            self.parid
-        )
-        self.active = True
-        self.notes = self.write_notes()
-        self.occ_period = None
+        self.notes = details.url
 
-    # Todo: Rename method
-    def write_notes(self) -> str:
-        """
-        Returns:
-            A message detailing if the Allegheny County Real Estate Portal url points to a parcel in their database.
-        """
-        response = _scrape.county_property_assessment(self.parid, full_response=True)
-        if _parse.validate_county_response(response.text):
-            msg = "County link:"
-        else:
-            msg = "Broken link:"
-        return msg + response.url
+
+class NotInRealEstatePortal(Event):
+    def __init__(self, details):
+        super().__init__(details)
+        self.category_id = 309
+        self.eventdescription = "Parcel {} was added.".format(self.parid)
+        self.active = True
+        self.occ_period = None
+        self.notes = details.url
 
 
 def main():

@@ -1,8 +1,8 @@
 import re
 from collections import namedtuple
 import bs4
-from _constants import OWNER, TAXINFO, SPAN
-from typing import List
+from _constants import OWNER, ADDRESS, MUNICIPALITY, TAXINFO, SPAN
+from typing import List, Any
 
 
 def soupify_html(raw_html):
@@ -71,13 +71,32 @@ def parse_tax_from_soup(soup: bs4.BeautifulSoup, clean=True) -> TaxStatus:
     row = table[0].contents[1]  # The most recent year's data
     data = row.contents
 
-    # Todo: Document Intellej bug claiming TaxStatus recieved an unexpected argument.
+    # Todo: Document Intellej bug claiming TaxStatus received an unexpected argument.
     if clean:
         return TaxStatus(*[clean_text(x.text) for x in data])
     return TaxStatus(*[x.text for x in data])
 
 
-# Function currently unused
+def validate_county_response(html) -> Any:
+    """
+
+    Args:
+        html: Allegheny County Real Estate Portal html
+
+    Returns:
+        The municipality and name if the html points to a real page.
+        False if the parcel's page does not exist on the site.
+    """
+    soup = soupify_html(html)
+    # Makes the assumption that a page without an owner is invalid.
+    try:
+        if _extract_elementlist_from_soup(soup, OWNER)[0] != "":
+            return _extract_elementlist_from_soup(soup, MUNICIPALITY)
+        raise RuntimeError()
+    except IndexError:
+        return None
+
+
 def clean_text(text):
     text = strip_whitespace(text)
     text = strip_dollarsign(text)
