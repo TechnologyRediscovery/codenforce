@@ -22,7 +22,7 @@ from os import path
 
 import pyparcel
 from pyparcel import _update_muni
-from _constants import COG_DB
+from common import COG_DB
 from pyparcel import _events  # Hacky way to test all events
 from pyparcel import _parse
 from pyparcel._parse import TaxStatus

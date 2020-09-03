@@ -2,13 +2,14 @@ import requests
 import json
 import os
 from typing import List
-from collections import namedtuple
 
+# TODO: Refactor these imports somewhere else
+#   These files should not read from each other.
+#   If not refactored, this file should somehow be designated a higher level than the others
 import _create
 import _write
-from _constants import PARCEL_ID_LISTS, DEFAULT_PROP_UNIT
-
-Municipality = namedtuple("Municipalicty", ["municode", "name"])
+import _parse
+from common import PARCEL_ID_LISTS, DEFAULT_PROP_UNIT
 
 
 def munis(cursor):
@@ -24,7 +25,7 @@ def muniname_from_municode(municode, cursor):
     cursor.execute(select_sql, [municode])
     row = cursor.fetchone()
     try:
-        return Municipality(*row)
+        return _parse.Municipality(*row)
     except TypeError as e:
         if row is None:
             raise TypeError(
@@ -34,16 +35,16 @@ def muniname_from_municode(municode, cursor):
             raise e
 
 
-def muni_data_and_write_to_file(Municipality):
+def muni_data_and_write_to_file(muni: _parse.Municipality):
     # Note: The WPRDC limits 50,000 parcels
     script_dir = os.path.dirname(__file__)
-    rel_path = os.path.join(PARCEL_ID_LISTS, Municipality.name + "_parcelids.json")
+    rel_path = os.path.join(PARCEL_ID_LISTS, muni.name + "_parcelids.json")
     abs_path = os.path.join(script_dir, rel_path)
 
     with open(abs_path, "w") as f:
         wprdc_url = """https://data.wprdc.org/api/3/action/datastore_search_sql?sql=
         SELECT * FROM "518b583f-7cc8-4f60-94d0-174cc98310dc" WHERE "MUNICODE" = '{}'""".format(
-            Municipality.municode
+            muni.municode
         )
         req = requests.get(wprdc_url)
         try:

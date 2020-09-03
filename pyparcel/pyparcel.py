@@ -7,7 +7,7 @@ import psycopg2
 
 import _fetch as fetch
 from _update_muni import update_muni
-from _constants import Tally, DASHES, COG_DB
+from common import Tally, DASHES, COG_DB
 
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))

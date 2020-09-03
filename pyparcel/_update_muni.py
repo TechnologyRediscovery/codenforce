@@ -12,9 +12,9 @@ import _write as write
 import _scrape as scrape
 import _events
 import _parse
-from _constants import Tally
-from _constants import DEFAULT_PROP_UNIT
-from _constants import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
+from common import Tally
+from common import DEFAULT_PROP_UNIT
+from common import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
 
 # from _events import ParcelNotInWprdcData
 
@@ -51,7 +51,7 @@ def insert_and_update_database(record, conn, cursor, commit):
     parid = record["PARID"]
     html = scrape.county_property_assessment(parid)
     soup = _parse.soupify_html(html)
-    owner_name = _parse.OwnerName.get_Owner_from_soup(soup)
+    owner_name = _parse.OwnerName.from_soup(soup)
     tax_status = _parse.parse_tax_from_soup(soup)
 
     if parcel_not_in_db(parid, cursor):
@@ -138,6 +138,8 @@ def create_events_for_parcels_in_db_but_not_in_records(
         cecase_id = fetch.cecase_id(prop_id, cursor)
         details = _events.EventDetails(parcel_id, prop_id, cecase_id, cursor)
         details.old = municdode
+        # Creates DifferentMunicode or NotInRealEstatePortal
+        # If DifferentMunicode, supplies the new muni
         event = _events.parcel_not_in_wprdc_data(details)
         event.write_to_db()
     if commit:
