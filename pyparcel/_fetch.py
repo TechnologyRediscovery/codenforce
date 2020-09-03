@@ -73,7 +73,7 @@ def unit_id(prop_id, cursor):
     try:
         return cursor.fetchone()[0]  # unit id
     except TypeError:
-        # TODO: ERROR: Property exists without property unit
+        # TODO: Raise Warning: Property exists without property unit
         _unit_id = _write.unit(
             {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id}, cursor,
         )

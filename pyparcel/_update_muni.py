@@ -141,7 +141,7 @@ def create_events_for_parcels_in_db_but_not_in_records(
         event = _events.parcel_not_in_wprdc_data(details)
         event.write_to_db()
     if commit:
-        db_conn.execute()
+        # db_conn.execute()
         db_conn.commit()
 
 
@@ -161,9 +161,10 @@ def update_muni(muni, db_conn, commit=True):
         records = file["result"]["records"]
 
     with db_conn.cursor() as cursor:
-        # for record in records:
-        #     insert_and_update_database(record, db_conn, cursor, commit)
-        # print(DASHES)
+        for record in records:
+            while Tally.total < 10:
+                insert_and_update_database(record, db_conn, cursor, commit)
+        print(DASHES)
 
         create_events_for_parcels_in_db_but_not_in_records(
             records, muni.municode, db_conn, cursor, commit

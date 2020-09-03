@@ -77,24 +77,18 @@ def parse_tax_from_soup(soup: bs4.BeautifulSoup, clean=True) -> TaxStatus:
     return TaxStatus(*[x.text for x in data])
 
 
-def validate_county_response(html) -> Any:
+def validate_county_municode_against_portal(html) -> List[str]:
     """
-
     Args:
         html: Allegheny County Real Estate Portal html
 
     Returns:
         The municipality and name if the html points to a real page.
-        False if the parcel's page does not exist on the site.
+        None if the parcel's page does not exist on the site.
     """
     soup = soupify_html(html)
     # Makes the assumption that a page without an owner is invalid.
-    try:
-        if _extract_elementlist_from_soup(soup, OWNER)[0] != "":
-            return _extract_elementlist_from_soup(soup, MUNICIPALITY)
-        raise RuntimeError()
-    except IndexError:
-        return None
+    return parse_municipality_from_soup(soup)
 
 
 def clean_text(text):
@@ -126,13 +120,15 @@ def remove_hyphnes(text):
     return re.sub("-", "", text)
 
 
-def parse_owners_from_soup(
-    soup: bs4.BeautifulSoup,
-) -> List[
-    str,
-]:
+def parse_owners_from_soup(soup: bs4.BeautifulSoup,) -> List[str]:
     return _extract_elementlist_from_soup(
         soup, element_id=OWNER, element=SPAN, remove_tags=True
+    )
+
+
+def parse_municipality_from_soup(soup: bs4.BeautifulSoup,) -> List[str]:
+    return _extract_elementlist_from_soup(
+        soup, element_id=MUNICIPALITY, element=SPAN, remove_tags=True
     )
 
 
@@ -150,7 +146,7 @@ class OwnerName:
 
     @classmethod
     def get_Owner_from_soup(cls, soup: bs4.BeautifulSoup):
-        """ Factory method for creating OwnerNames from parcel ids.
+        """ Factory method for creating OwnerNames from a soup.
         """
         o = OwnerName()
         o.raw = parse_owners_from_soup(soup)
