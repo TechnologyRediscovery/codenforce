@@ -77,6 +77,9 @@ def query_propertyexternaldata_for_changes_and_write_events(
         return
     new = selection[0]
 
+    # TODO: propertyexternaldata does not currently track municode
+    #   Add a write to DifferentMunicode in the case that the column is added.
+
     # details.unpack sets details.old and details.new
     if old[0] != new[0]:  # Todo: Clean name
         details.unpack(old[0], new[0])
@@ -268,8 +271,18 @@ class DifferentMunicode(ParcelChangedEvent):
         super().__init__(details)
         self.category_id = 308
         self.notes = details.url
+        self._extend_eventdescription(details.muniname)
         # Example: ... from 821 to 930 (North Versailles)
-        self.eventdescription += "".join([" (", details.muniname, ")"])
+
+    def _extend_eventdescription(self, muniname):
+        """
+        Example: ... from 821 to 930 (North Versailles)
+
+            Operations within an Event __init__ (such as concatenating a string)
+            are made into methods. This makes it easy to automate tests.
+            See the ReadMe for more detail.
+        """
+        self.eventdescription += "".join([" (", muniname, ")"])
 
 
 class NotInRealEstatePortal(Event):

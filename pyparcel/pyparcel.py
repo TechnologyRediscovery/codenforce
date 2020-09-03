@@ -6,7 +6,11 @@ import click
 import psycopg2
 
 import _fetch as fetch
-from _update_muni import update_muni
+from _update_muni import (
+    create_events_for_parcels_in_db_but_not_in_records,
+    download_and_read_records_from_Wprdc,
+    update_database,
+)
 from common import Tally, DASHES, COG_DB
 
 
@@ -16,13 +20,24 @@ from common import Tally, DASHES, COG_DB
 )
 @click.option("-u", nargs=1, default="sylvia")
 @click.option("--password", nargs=1, default="c0d3")
+@click.option("--port", nargs=1, default=5432)
+@click.option(
+    "--main/--skip-main",  # Todo: Find more descriptive name
+    default=True,
+    help="Choose whether to run the main functionality of the script "
+    "(Adding new properties and updating propertyexternaldata based on the latest information from the WPRDC.)",
+)
+@click.option(
+    "--diff/--skip-diff",
+    default=True,
+    help="Choose whether to check for parcels in our database that aren't in the WPRDC records",
+)
 @click.option(
     "--commit/--test",
     default=False,
     help="Choose whether to commit to the database or to just run as a test",
 )
-@click.option("--port", nargs=1, default=5432)
-def main(municodes, commit, u, password, port):
+def main(municodes, u, password, port, main, diff, commit):
     """Updates the CodeNForce database with the most recent data provided by the WPRDC."""
     start = time.time()
     if commit:
@@ -40,11 +55,26 @@ def main(municodes, commit, u, password, port):
                 if municodes == ():
                     # Update ALL municipalities.
                     municodes = [muni for muni in fetch.munis(cursor)]
+
                 for _municode in municodes:
                     muni = fetch.muniname_from_municode(_municode, cursor)
-                    update_muni(muni, conn, commit)
+                    records = download_and_read_records_from_Wprdc(muni)
+
+                    if main:
+                        for record in records:
+                            update_database(record, conn, cursor, commit)
+                        print(DASHES)
+
+                    if diff:
+                        create_events_for_parcels_in_db_but_not_in_records(
+                            records, muni.municode, conn, cursor, commit
+                        )
+                        print(DASHES)
+
                     Tally.muni_count += 1
                     print("Updated", Tally.muni_count, "municipalities.")
+                    print(DASHES)
+
     finally:
         try:
             print("Current muni:", muni.name)

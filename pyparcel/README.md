@@ -48,3 +48,18 @@ $ pre-commit install
 <h4 id=parcel-change>What constitutes a Parcel Change?</h4>
 A regular, month to month change.
 Examples include DifferentTaxStatus and DifferentOwner, but do not include events such as NewParcelid and ParcelNotInWprdcData.
+
+### Mocking Event Initialization (For Testing)
+Sometimes, your new Event contains setup code that causes the automatic testing of your event to fail.
+Creating a custom mocked patch is easy: add your patch to `TestsRequiringADatabaseConnection.TestEventCategories.patches` using the provided format.
+```
+patches = [
+    ...,
+    PatchMaker(
+        production_class=pyparcel._events.YourNewEvent,
+        method="method_to_mock",
+        return_value="return_value"
+    )
+]
+```
+The method `setup_mocks` then automatically adds your patch to a stack of context managers.
