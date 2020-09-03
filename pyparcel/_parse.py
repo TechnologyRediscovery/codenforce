@@ -1,8 +1,10 @@
 import re
-from collections import namedtuple
+from dataclasses import dataclass
+
 import bs4
-from _constants import OWNER, ADDRESS, MUNICIPALITY, TAXINFO, SPAN
-from typing import List, Any
+from common import OWNER, ADDRESS, MUNICIPALITY, TAXINFO, SPAN
+from common import TaxStatus
+from typing import List, Any, NamedTuple
 
 
 def soupify_html(raw_html):
@@ -44,22 +46,6 @@ def replace_html_content(new_str, soup, id):
     tag = soup.find(id=id)
     tag.string = new_str
     return soup
-
-
-TaxStatus = namedtuple(
-    "tax_status",
-    fields := [
-        "year",
-        "paidstatus",
-        "tax",
-        "penalty",
-        "interest",
-        "total",
-        "date_paid",
-        "blank",
-    ],
-    defaults=(None,) * len(fields),
-)
 
 
 def parse_tax_from_soup(soup: bs4.BeautifulSoup, clean=True) -> TaxStatus:
@@ -132,6 +118,22 @@ def parse_municipality_from_soup(soup: bs4.BeautifulSoup,) -> List[str]:
     )
 
 
+class Municipality(NamedTuple):
+    municode: int
+    name: str
+
+    @classmethod
+    def from_raw(cls, raw_muni: List[str]):
+        """
+        Factory method for creating Municipalities from the raw text on Allegheny County Real Estate Portal's site.
+
+            >>> muni = Municipality.from_raw(['843\xa0North Braddock  '])
+            Municipality(municode='843', name='North Braddock')
+        """
+        # Makes the assumption that there will only ever be one muni
+        return Municipality(*clean_text(raw_muni[0]).split("\xa0"))
+
+
 class OwnerName:
     __slots__ = ["raw", "clean", "first", "last", "multientity", "compositelname"]
 
@@ -145,7 +147,7 @@ class OwnerName:
         return f"{self.__class__.__name__}<{self.clean}>"
 
     @classmethod
-    def get_Owner_from_soup(cls, soup: bs4.BeautifulSoup):
+    def from_soup(cls, soup: bs4.BeautifulSoup):
         """ Factory method for creating OwnerNames from a soup.
         """
         o = OwnerName()
