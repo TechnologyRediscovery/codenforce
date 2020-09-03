@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import NamedTuple, Any, Optional
+from typing import NamedTuple, Any, Optional, List
 from colorama import init
 
 import _parse
@@ -23,25 +23,20 @@ class Changes(NamedTuple):
 
 
 # Todo: Weigh benefits of making a dataclass
-# @dataclass
+@dataclass
 class EventDetails:
-    #   # Code to convert class to dataclass?
-    # parid: str
-    # prop_id: int
-    # cecase_id: int
-    # # Todo: Cursor typing
-    # db_cursor: Any   # Although it technically isn't an event detail, passing the db_cursor makes life easier
-    # old: Optional[Any] = None
-    # new: Optional[Any] = None
+    parid: str
+    prop_id: int
+    cecase_id: int
+    # Todo: Cursor typing
+    db_cursor: Any  # Although it technically isn't an event detail, passing the db_cursor makes life easier
 
-    def __init__(self, parid, prop_id, cecase_id, db_cursor):
-        self.parid = parid
-        self.prop_id = prop_id
-        self.cecase_id = cecase_id
-        self.db_cursor = db_cursor  # Although it technically isn't an event detail, passing the db_cursor makes life easier
-        self.old = None
-        self.new = None
-        self.url = None
+    old: Optional[Any] = None
+    new: Optional[Any] = None
+
+    # # Attributes created dynamically
+    # url: Optional[str] = None
+    # raw_muni: Optional[List[str]] = None
 
     def unpack(self, old, new):
         """ Sets the EventDetails old and new attributes to the given values.
@@ -73,7 +68,10 @@ def query_propertyexternaldata_for_changes_and_write_events(
             # TODO: Add flag
             print(
                 Fore.YELLOW,
-                "Error: Parcel appeared in public.propertyexternaldata for the first time even though the parcel ID is flagged as appearing in public.property before.",
+                "Error: Parcel {} appeared in public.propertyexternaldata for the first time "
+                "even though the parcel ID is flagged as appearing in public.property before.\n".format(
+                    parid
+                ),
                 Style.RESET_ALL,
                 sep="",
             )
@@ -192,7 +190,7 @@ class ParcelChangedEvent(Event):
 
     def __init__(self, d: EventDetails):
         super().__init__(d)
-        self.eventdescription = f"Parcel {d.parid}'s {self.brief_description} changed from {d.old} to {d.new}"
+        self.eventdescription = f"Parcel {d.parid}'s {self.brief_description} should be changed from {d.old} to {d.new}"
         self.active = True
         self.notes = None  # Todo: Add notes
         self.occ_period = None
@@ -262,16 +260,14 @@ def parcel_not_in_wprdc_data(details: EventDetails) -> Event:
     Returns:
         An Event indicating whether the Allegheny County Real Estate Portal for the parcel id points to a real page.
             If the page exists: DifferentMunicode
-            else: NotInRealEstatePortal
+            Else: NotInRealEstatePortal
     """
     response = _scrape.county_property_assessment(details.parid, full_response=True)
     details.url = response.url
-    # An important note: details.old contains JUST the municode
-    # validate_county_response contains string representing
-    # the municode and name of municipality, scraped from the
-    # Allegheny County Real Estate Portal
-    details.new = _parse.validate_county_response(response.html)
-    if details.new:
+
+    details.raw_muni = _parse.validate_county_municode_against_portal(response.text)
+    if details.raw_muni:
+        raise RuntimeError("THIS CODE ISN'T COMPLETE")
         return DifferentMunicode(details)
     return NotInRealEstatePortal(details)
 
@@ -288,7 +284,10 @@ class NotInRealEstatePortal(Event):
     def __init__(self, details):
         super().__init__(details)
         self.category_id = 309
-        self.eventdescription = "Parcel {} was added.".format(self.parid)
+        self.eventdescription = (
+            "Parcel {} was not found in the "
+            "Allegheny County Real Estate Portal.".format(self.parid)
+        )
         self.active = True
         self.occ_period = None
         self.notes = details.url
