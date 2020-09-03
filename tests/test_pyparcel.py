@@ -9,16 +9,21 @@ A link to database dumps can be provided to interested contributors.
 
 See the readme for notes on style.
 """
+import contextlib
 import json
 import sys
+import warnings
+from dataclasses import dataclass
+
 import pytest
 from copy import copy
 import psycopg2
 from os import path
 
+import pyparcel
 from pyparcel import _update_muni
 from _constants import COG_DB
-from pyparcel._events import *  # Hacky way to test all events
+from pyparcel import _events  # Hacky way to test all events
 from pyparcel import _parse
 from pyparcel._parse import TaxStatus
 
@@ -33,13 +38,14 @@ MOCKS = path.join(HERE, "mocks", "")  # Represents the path to the folder
 
 # Generates a list of every eventcategory class in _events
 event_categories = []
-d = copy(sys.modules[__name__].__dict__)
-for k in d:
+this_module = copy(sys.modules[__name__].__dict__)
+events_dict = this_module["_events"].__dict__
+for k in events_dict:
     try:
-        if issubclass(d[k], Event):
+        if issubclass(events_dict[k], _events.Event):
             # Skip over base classes
-            if d[k].__name__ not in ("Event", "ParcelChangedEvent"):
-                event_categories.append(d[k])
+            if events_dict[k].__name__ not in ("Event", "ParcelChangedEvent"):
+                event_categories.append(events_dict[k])
     except TypeError:
         continue
 
@@ -50,7 +56,7 @@ class PCE:
     """
 
     def __init__(
-        self, event: Type[ParcelChangedEvent], old: Any, new: Any,
+        self, event: Type[_events.ParcelChangedEvent], old: Any, new: Any,
     ):
         """
         Args:
@@ -100,11 +106,11 @@ class ParcelChangedCursor(MagicMixin):
 
 # A manually maintained list of Parcel Changed Event categories
 parcel_changed_events = [
-    PCE(DifferentOwner, '{"OWNER OLD     "}', '{"OWNER NEW     "}'),
-    PCE(DifferentStreet, "0 Old St ", "0 New St "),
-    PCE(DifferentCityStateZip, "OLDCITY PA 12345", "NEWCITY PA 00000"),
-    PCE(DifferentLivingArea, 653, 639),
-    PCE(DifferentCondition, 8, 1),
+    PCE(_events.DifferentOwner, '{"OWNER OLD     "}', '{"OWNER NEW     "}'),
+    PCE(_events.DifferentStreet, "0 Old St ", "0 New St "),
+    PCE(_events.DifferentCityStateZip, "OLDCITY PA 12345", "NEWCITY PA 00000"),
+    PCE(_events.DifferentLivingArea, 653, 639),
+    PCE(_events.DifferentCondition, 8, 1),
 ]
 
 
@@ -174,7 +180,7 @@ class TestEventTriggers:
         event = pce.event
         with mock.patch.object(event, "write_to_db"):
             mocked_cursor = ParcelChangedCursor(pce)
-            query_propertyexternaldata_for_changes_and_write_events(
+            _events.query_propertyexternaldata_for_changes_and_write_events(
                 parid=None,
                 prop_id=None,
                 cecase_id=None,
@@ -196,7 +202,7 @@ class TestEventTriggers:
         mocked_cursor = ParcelChangedCursor(*[pce for pce in parcel_changed_events])
 
         # The actual "act" of testing. Everything else is arrange and assert.
-        query_propertyexternaldata_for_changes_and_write_events(
+        _events.query_propertyexternaldata_for_changes_and_write_events(
             parid=None,
             prop_id=None,
             cecase_id=None,
@@ -313,23 +319,55 @@ with conn:
             """ Ensures events in _events.py share the same attributes of their counterpart in the database.
             """
 
+            @dataclass
+            class PatchMaker:
+                production_class: Any  # Todo: Correct typing
+                method: str
+                return_value: Any
+
+            # Some events require mocked methods to be instantiated
+            events_and_mocks = [
+                # PatchMaker(
+                #     production_class=pyparcel._events.ParcelNotInWprdcData,
+                #     method="write_notes",
+                #     return_value=""
+                # )
+            ]
+
+            @contextlib.contextmanager
+            def setup_mocks(self):
+                try:
+                    stack = contextlib.ExitStack()
+                    for _mock in self.events_and_mocks:
+                        stack.enter_context(
+                            mock.patch.object(
+                                _mock.production_class,
+                                _mock.method,
+                                return_value=_mock.return_value,
+                            )
+                        )
+                    yield stack
+                finally:
+                    stack.close()
+
             @pytest.mark.parametrize("event", event_categories)
             def test_name_integrity(self, event):
                 """ Compares the class's name to the database's event category's title.
                 """
                 with conn.cursor() as cursor:
-                    instance = event(MagicMock())  # Initialize event with no data
-                    info = {}
-                    info["column"] = event.__name__
-                    info["category_id"] = instance.category_id
-                    select_sql = """
-                            SELECT title
-                            FROM eventcategory
-                            WHERE categoryid = %(category_id)s;
-                            """
-                    cursor.execute(select_sql, info)
-                    row = cursor.fetchone()
-                    assert event.__name__ == row[0]
+
+                    with self.setup_mocks():
+                        instance = event(MagicMock())  # Initialize event with no data
+                        info = {}
+                        info["category_id"] = instance.category_id
+                        select_sql = """
+                                    SELECT title
+                                    FROM eventcategory
+                                    WHERE categoryid = %(category_id)s;
+                                    """
+                        cursor.execute(select_sql, info)
+                        row = cursor.fetchone()
+                        assert event.__name__ == row[0]
 
             # Todo: Refactor
             @pytest.mark.parametrize("event", event_categories)
@@ -337,18 +375,18 @@ with conn:
                 """ Compares the class's default active status to the database's.
                 """
                 with conn.cursor() as cursor:
-                    instance = event(MagicMock())
-                    info = {}
-                    info["column"] = instance.active
-                    info["category_id"] = instance.category_id
-                    select_sql = """
-                            SELECT active
-                            FROM eventcategory
-                            WHERE categoryid = %(category_id)s;
-                            """
-                    cursor.execute(select_sql, info)
-                    row = cursor.fetchone()
-                    assert instance.active == row[0]
+                    with self.setup_mocks():
+                        instance = event(MagicMock())
+                        info = {}
+                        info["category_id"] = instance.category_id
+                        select_sql = """
+                                SELECT active
+                                FROM eventcategory
+                                WHERE categoryid = %(category_id)s;
+                                """
+                        cursor.execute(select_sql, info)
+                        row = cursor.fetchone()
+                        assert instance.active == row[0]
 
 
 if __name__ == "__main__":
