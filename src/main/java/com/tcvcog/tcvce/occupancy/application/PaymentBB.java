@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 
 /**
  *
@@ -368,11 +369,14 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             return getSessionBean().getNavStack().popLastPage();
         } catch (NavigationException ex) {
             System.out.println("PaymentBB.finishAndRedir() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
+            //We must do things a little bit different here to make sure messages are kept after the redirect.
+            FacesContext context = getFacesContext();
+                    context.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occured while trying to direct you back to the page you were on."
                             + " No changes to the database were saved. Please return to the page manually.",
                             "Do not hit the return button again but note the error."));
+                    context.getExternalContext().getFlash().setKeepMessages(true);
             return "";
         }
     }

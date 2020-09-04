@@ -181,11 +181,15 @@
                                     <!-- CONTENT BUTTON -->
                                     <div class="public-main-contents-button-left">
                                         <div class="gray_button">
-                                            <p:commandButton ajax="false" styleClass="buttonOwnLine"
-                                                             id="goBack" value="Go Back" tabindex="7"
-                                                             process="@none" immediate="true"
+                                            <p:commandButton id="goBack"
+                                                              tabindex="7"
+                                                             value="Go Back" styleClass="buttonOwnLine"
                                                              action="#{cEActionRequestSubmitBB.goBack()}"
-                                                             style="float: left"/>
+                                                             style="float: left">
+                                                <p:confirm header="Are you sure?" 
+                                                           message="Going back could cause your changes to this page to be lost. Continue?" 
+                                                           icon="pi pi-exclamation-triangle"/>
+                                            </p:commandButton>
 
                                         </div>
                                     </div>
@@ -203,6 +207,12 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                            <p:commandButton value="Yes" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
+                            <p:commandButton value="No" styleClass="ui-confirmdialog-no" icon="pi pi-times"/>
+                        </p:confirmDialog>
+                        
                     </h:form>
                     <script>
                         var y = document.getElementById('public-reportconcern-arrow-id');

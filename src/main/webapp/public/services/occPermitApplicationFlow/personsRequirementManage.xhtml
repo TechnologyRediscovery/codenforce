@@ -426,10 +426,14 @@
                                     <!-- CONTENT BUTTON -->
                                     <div class="public-main-contents-button-left">
                                         <div class="gray_button">
-                                            <p:commandButton id="goBack" ajax="false"
-                                                             process="@none" immediate="true" tabindex="9" 
+                                            <p:commandButton id="goBack"
+                                                              tabindex="9"
                                                              value="Go Back" styleClass="buttonOwnLine"
-                                                             action="#{occPermitApplicationBB.goBack()}"/>
+                                                             action="#{occPermitApplicationBB.goBack()}">
+                                                <p:confirm header="Are you sure?" 
+                                                           message="Going back could cause your changes to this page to be lost. Continue?" 
+                                                           icon="pi pi-exclamation-triangle"/>
+                                            </p:commandButton>
                                         </div>
                                     </div>
 
@@ -445,6 +449,12 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                            <p:commandButton value="Yes" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
+                            <p:commandButton value="No" styleClass="ui-confirmdialog-no" icon="pi pi-times"/>
+                        </p:confirmDialog>
+                        
                     </h:form>
 
                     <script>

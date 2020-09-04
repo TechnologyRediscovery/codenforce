@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 
 /**
  *
@@ -125,9 +126,12 @@ public class PersonChangesBB
             return getSessionBean().getNavStack().popLastPage();
         } catch (NavigationException ex) {
             System.out.println("PersonChangesBB.goBack() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
+            //We must do things a little bit different here to make sure messages are kept after the redirect.
+            FacesContext context = getFacesContext();
+                    context.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occurred while trying to redirect you back to the previous page!", ""));
+                             "An error occurred while trying to redirect you back to the previous page!", ""));
+                    context.getExternalContext().getFlash().setKeepMessages(true);
             return "missionControl";
         }
     }
