@@ -52,9 +52,9 @@ def compare(WPRDC_data, AlleghenyCountyData):
 
 
 # Todo: Validate more data
-def validate_data(r, tax):  #   Example data as applicable to explain transformations
-    #   WPRDC               Allegheny County
-    compare(r["TAXYEAR"], int(tax.year))  #   2020.0              2020
+def validate_data(r, tax):
+    #                                       #   WPRDC               Allegheny County
+    compare(r["TAXYEAR"], int(tax.year))  # #   2020.0              2020
 
 
 def update_database(record, conn, cursor, commit):
@@ -70,17 +70,15 @@ def update_database(record, conn, cursor, commit):
         new_parcel = True
         imap = create.property_insertmap(record)
         prop_id = write.property(imap, cursor)
+        #
         if record["PROPERTYUNIT"] == " ":
-            unit_id = write.unit(
-                {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
-                cursor,
-            )
+            unit_num = DEFAULT_PROP_UNIT
         else:
-            print(record["PROPERTYUNIT"])
-            unit_id = write.unit(
-                {"unitnumber": record["PROPERTYUNIT"], "property_propertyid": prop_id,},
-                cursor,
-            )
+            unit_num = record["PROPERTYUNIT"]
+        unit_id = write.unit(
+            {"unitnumber": unit_num, "property_propertyid": prop_id}, cursor
+        )
+        #
         cecase_map = create.cecase_imap(prop_id, unit_id)
         cecase_id = write.cecase(cecase_map, cursor)
         #
