@@ -224,6 +224,26 @@ class TestEventTriggers:
             event.write_to_db.reset_mock()
             patch.stop()
 
+    @mock.patch(
+        "_events._parse.Municipality.from_raw",
+        return_value=_parse.Municipality(999, "COGLand"),
+    )
+    @mock.patch("_events._scrape.county_property_assessment",)
+    @mock.patch("_events._parse.validate_county_municode_against_portal")
+    def test_parcel_not_in_wprdc_data_DifferentMunicode(self, m1, m2, m3):
+        event = _events.parcel_not_in_wprdc_data(MagicMock())
+        assert isinstance(event, _events.DifferentMunicode)
+
+    @mock.patch("_events._scrape.county_property_assessment")
+    @mock.patch(
+        "_events._parse.validate_county_municode_against_portal", return_value=[]
+    )
+    def test_parcel_not_in_wprdc_data_NotInRealEstatePortal(
+        self, m1, m2,
+    ):
+        event = _events.parcel_not_in_wprdc_data(MagicMock())
+        assert isinstance(event, _events.NotInRealEstatePortal)
+
 
 class TestParse:
     class TestParseTaxFromSoup:
