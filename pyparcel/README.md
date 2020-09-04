@@ -1,5 +1,5 @@
 # PyParcel
-###### A command line interface for keeping Turtle Creek COG's CodeNForce's data up to date.
+###### A command line interface for Turtle Creek COG's CodeNForce's database to maintain current data.
 ## Using the code
 ### Quick Start
 After setting up a local copy of `cogdb` for testing, run ```python pyparcel.py``` to update your database with the latest data from the WPRDC!
