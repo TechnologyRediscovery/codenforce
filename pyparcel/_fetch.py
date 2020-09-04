@@ -114,8 +114,11 @@ def valid_json(file_name):
         f = json.load(file)
         if not (f["success"] and len(f["result"]["records"]) > 0):
             # Check and see if it's a test municipality
-            if file.name.startswith(os.path.join(PARCEL_ID_LISTS, "COG Land")):
+            _, tail = os.path.split(file_name)
+            if tail.startswith("COG Land"):
                 return False
-            os.rename(file_name, file_name + "_corrupt")
-            raise ValueError("{} not valid".format(file.name))
+            else:
+                os.rename(file_name, file_name + "_corrupt")
+                # Note: This doesn't actually work, since we get a WinError 32
+                raise ValueError("{} not valid".format(file.name))
         return True

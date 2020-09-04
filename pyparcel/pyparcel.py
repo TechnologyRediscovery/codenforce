@@ -60,28 +60,34 @@ def main(municodes, u, password, port, main, diff, commit):
                     muni = fetch.muniname_from_municode(_municode, cursor)
                     records = download_and_read_records_from_Wprdc(muni)
 
+                    # Skip muni if the records are invalid (for example, for the test muni COG Land),
+                    if not records:
+                        click.echo("Skipping {}: Invalid JSON".format(muni.name))
+                        click.echo(DASHES)
+                        continue
+
                     if main:
                         for record in records:
                             update_database(record, conn, cursor, commit)
-                        print(DASHES)
+                        click.echo(DASHES)
 
                     if diff:
                         create_events_for_parcels_in_db_but_not_in_records(
                             records, muni.municode, conn, cursor, commit
                         )
-                        print(DASHES)
+                        click.echo(DASHES)
 
                     Tally.muni_count += 1
-                    print("Updated", Tally.muni_count, "municipalities.")
-                    print(DASHES)
+                    click.echo("Updated {} municipalities.".format(Tally.muni_count))
+                    click.echo(DASHES)
 
     finally:
         try:
-            print("Current muni:", muni.name)
+            click.echo("Current muni {}:".format(muni.name))
         except NameError:
             pass
         end = time.time()
-        print(
+        click.echo(
             "Total time: {}".format(
                 # Strips milliseconds from elapsed time
                 str(timedelta(seconds=(end - start))).split(".")[0]
