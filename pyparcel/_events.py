@@ -96,13 +96,6 @@ def query_propertyexternaldata_for_changes_and_write_events(
     if old[4] != new[4]:
         details.unpack(old[4], new[4])
         DifferentCondition(details).write_to_db()
-    # # # Todo: Since taxcodes are no longer are related to property, begin deprecating
-    # if old[5] != new[5]:
-    #     # Todo: Find pythonic way to put this in front of every column
-    #     if old[5] is not None:  # The old value will likely only be None due to an API / Script change,
-    #                             # opposed to a change in the actual change in tax status.
-    #         details.unpack(old[5], new[5])
-    #         DifferentTaxCode(details).write_to_db()
 
     if details.new:
         return True

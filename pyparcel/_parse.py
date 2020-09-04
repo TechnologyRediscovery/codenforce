@@ -69,8 +69,9 @@ def validate_county_municode_against_portal(html) -> List[str]:
         html: Allegheny County Real Estate Portal html
 
     Returns:
-        The municipality and name if the html points to a real page.
-        None if the parcel's page does not exist on the site.
+        The municipality's municode and name if the html points to a real page.
+            Example: ['843\xa0North Braddock  ']
+        An invalid page returns an empty list
     """
     soup = soupify_html(html)
     # Makes the assumption that a page without an owner is invalid.
