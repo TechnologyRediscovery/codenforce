@@ -30,7 +30,7 @@ import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonOccPeriod;
+import com.tcvcog.tcvce.entities.PersonOccApplication;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -94,7 +94,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     private List<OccPermitApplication> applicationList;
 
     private List<PropertyUnit> unitList;
-    private List<PersonOccPeriod> attachedPersons;
+    private List<PersonOccApplication> attachedPersons;
 
     private String internalNoteText;
     private String externalNoteText;
@@ -428,18 +428,18 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         } else {
 
-            attachedPersons.add(new PersonOccPeriod(person));
+            attachedPersons.add(new PersonOccApplication(person));
 
         }
     }
 
-    public void removePersonFromApplication(PersonOccPeriod person) {
+    public void removePersonFromApplication(PersonOccApplication person) {
         attachedPersons.remove(person);
     }
 
     public String addANewPerson() {
 
-        attachedPersons.add(new PersonOccPeriod());
+        attachedPersons.add(new PersonOccApplication());
 
         return "";
     }
@@ -740,7 +740,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         List<Person> skeletonHorde = new ArrayList<>();
         
-        for(PersonOccPeriod skeleton : selectedApplication.getAttachedPersons()){
+        for(PersonOccApplication skeleton : selectedApplication.getAttachedPersons()){
             
             skeletonHorde.add(skeleton);
             
@@ -1142,11 +1142,11 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
     }
 
-    public List<PersonOccPeriod> getAttachedPersons() {
+    public List<PersonOccApplication> getAttachedPersons() {
         return attachedPersons;
     }
 
-    public void setAttachedPersons(List<PersonOccPeriod> attachedPersons) {
+    public void setAttachedPersons(List<PersonOccApplication> attachedPersons) {
         this.attachedPersons = attachedPersons;
     }
 

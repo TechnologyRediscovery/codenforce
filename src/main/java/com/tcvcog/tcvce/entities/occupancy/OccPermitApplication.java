@@ -18,7 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonOccPeriod;
+import com.tcvcog.tcvce.entities.PersonOccApplication;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -42,6 +42,9 @@ public class OccPermitApplication {
     private Person applicantPerson;
     private Person preferredContact;
     private OccPeriod connectedPeriod;
+    private int publicControlCode;
+    private boolean paccEnabled;
+    private boolean uplinkAccess;
     
     /**
     * This will contain either existing Person objects, new Person objects created by user, or 
@@ -49,7 +52,7 @@ public class OccPermitApplication {
  application. The occupancy coordinator will digest this list to determine if the requirements 
     * have been satisfied.
     */
-    private List<PersonOccPeriod> attachedPersons;
+    private List<PersonOccApplication> attachedPersons;
 
     /**
      * @return the id
@@ -158,14 +161,14 @@ public class OccPermitApplication {
     /**
      * @return the attachedPersons
      */
-    public List<PersonOccPeriod> getAttachedPersons() {
+    public List<PersonOccApplication> getAttachedPersons() {
         return attachedPersons;
     }
 
     /**
      * @param attachedPersons the attachedPersons to set
      */
-    public void setAttachedPersons(List<PersonOccPeriod> attachedPersons) {
+    public void setAttachedPersons(List<PersonOccApplication> attachedPersons) {
         this.attachedPersons = attachedPersons;
     }
 
@@ -205,6 +208,30 @@ public class OccPermitApplication {
 
     public void setExternalPublicNotes(String externalPublicNotes) {
         this.externalPublicNotes = externalPublicNotes;
+    }
+
+    public int getPublicControlCode() {
+        return publicControlCode;
+    }
+
+    public void setPublicControlCode(int publicControlCode) {
+        this.publicControlCode = publicControlCode;
+    }
+
+    public boolean isPaccEnabled() {
+        return paccEnabled;
+    }
+
+    public void setPaccEnabled(boolean paccEnabled) {
+        this.paccEnabled = paccEnabled;
+    }
+
+    public boolean isUplinkAccess() {
+        return uplinkAccess;
+    }
+
+    public void setUplinkAccess(boolean uplinkAccess) {
+        this.uplinkAccess = uplinkAccess;
     }
     
 }

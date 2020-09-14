@@ -407,7 +407,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @return
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public PropertyDataHeavy createPropertyInfoCase(PropertyDataHeavy p, UserAuthorized ua) throws SearchException {
+    public PropertyDataHeavy createPropertyInfoCase(PropertyDataHeavy p, UserAuthorized ua) throws SearchException, IntegrationException {
         CaseCoordinator cc = getCaseCoordinator();
         UserCoordinator uc = getUserCoordinator();
         CECase cse = cc.cecase_initCECase(p, ua);

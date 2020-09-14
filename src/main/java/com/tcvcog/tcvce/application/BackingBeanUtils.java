@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
@@ -57,6 +58,13 @@ import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.util.Constants;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -65,6 +73,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -215,17 +224,41 @@ public class        BackingBeanUtils
    
     /**
      * Chops up the current time to get seven random digits
-     * @return 
+     *
+     * @return
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public int generateControlCodeFromTime(){
-         long dateInMs = new Date().getTime();
-         
-         String numAsString = String.valueOf(dateInMs);
-         String reducedNum = numAsString.substring(7);
-         int controlCode = Integer.parseInt(reducedNum);
-         
-            
-         return controlCode;
+    public int generateControlCodeFromTime() throws IntegrationException {
+
+        PublicInfoCoordinator pic = getPublicInfoCoordinator();
+        List<PublicInfoBundle> bundles = new ArrayList<>();
+        int controlCode;
+        int attempts = 0;
+
+        do {
+            long dateInMs = new Date().getTime();
+            String numAsString = String.valueOf(dateInMs);
+            String reducedNum = numAsString.substring(7);
+            controlCode = Integer.parseInt(reducedNum);
+
+            //Let's make sure this PACC doesn't already exist in the database!
+            try {
+                bundles = pic.getPublicInfoBundles(controlCode);
+            } catch (AuthorizationException | BObStatusException
+                    | EventException | IntegrationException
+                    | SearchException | ViolationException ex) {
+                //Getting PACCs failed!
+                attempts++;
+                if(attempts >= 5){
+                    //We've run out of attempts. Throw an error.
+                    throw new IntegrationException(ex);
+                }
+            }
+            //if there aren't any bundles, then this PACC is free to use.
+            //If the bundles list is null, then the attempt failed. Try again
+        } while (bundles == null || !bundles.isEmpty());
+
+        return controlCode;
     }
     
     /**

@@ -20,7 +20,7 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
-import com.tcvcog.tcvce.entities.PersonOccPeriod;
+import com.tcvcog.tcvce.entities.PersonOccApplication;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -199,7 +199,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         PropertyIntegrator pi = getPropertyIntegrator();
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
 
-        OccPermitApplication occpermitapp = oc.getNewOccPermitApplication();
+        OccPermitApplication occpermitapp = oc.initOccPermitApplication();
         getSessionBean().setSessOccPermitApplication(occpermitapp);
 
         getSessionBean().setOccPermitAppActiveProp(pi.getProperty(getSessionBean().getSessProperty().getPropertyID()));
@@ -228,10 +228,18 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         }
         getSessionBean().setSessMuniQueued(selectedMuni);
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        OccPermitApplication occpermitapp = oc.getNewOccPermitApplication();
-        getSessionBean().setSessOccPermitApplication(occpermitapp);
+        try{
+        OccPermitApplication occpermitapp = oc.initOccPermitApplication();
+         getSessionBean().setSessOccPermitApplication(occpermitapp);
         getSessionBean().getNavStack().pushCurrentPage();
         return "chooseProperty";
+        } catch(IntegrationException ex){
+            System.out.println("OccPermitApplicationBB.recordSelectedMuni() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to record ", ""));
+            return "";
+        }
     }
 
     /**
@@ -662,13 +670,13 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     public String reviewApplication() {
 
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        List<PersonOccPeriod> unbundledPersons = new ArrayList<>();
+        List<PersonOccApplication> unbundledPersons = new ArrayList<>();
 
         //An application we'll use to test if the person requirements have been met.
         OccPermitApplication temp = new OccPermitApplication();
 
         for (PublicInfoBundlePerson p : attachedPersons) {
-            unbundledPersons.add(new PersonOccPeriod(p.getBundledPerson()));
+            unbundledPersons.add(new PersonOccApplication(p.getBundledPerson()));
         }
 
         temp.setAttachedPersons(unbundledPersons);
@@ -902,7 +910,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         List<PersonChangeOrder> changeList = new ArrayList<>();
 
-        List<PersonOccPeriod> currentPersonList = new ArrayList<>();
+        List<PersonOccApplication> currentPersonList = new ArrayList<>();
 
         List<Person> existingPersonList = new ArrayList<>();
 
@@ -944,7 +952,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         //Export the workingPropUnits list from PublicInfoBundles to PersonOccPeriods. This should preserve changes made by the user.
         for (PublicInfoBundlePerson bundle : attachedPersons) {
-            currentPersonList.add(new PersonOccPeriod(pic.export(bundle))); //This must be a PersonOccPeriod in order to store the person type data in the correct field.
+            currentPersonList.add(new PersonOccApplication(pic.export(bundle))); //This must be a PersonOccApplication in order to store the person type data in the correct field.
         }
 
         //Grab the persons that are currently in the database
@@ -952,7 +960,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             existingPersonList.add(pi.getPerson(p.getPersonID()));
         }
 
-        for (PersonOccPeriod workingPerson : currentPersonList) {
+        for (PersonOccApplication workingPerson : currentPersonList) {
 
             //Intialize change order so it's ready to receive edits.
             PersonChangeOrder skeleton = new PersonChangeOrder();
