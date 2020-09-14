@@ -148,6 +148,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         }
 
         // now go and get CECaseDataHeavy bundles and add them to the list
+        setPublicUser();
         QueryCECase qc = sc.initQuery(QueryCECaseEnum.PACC, publicUser.getMyCredential());
      
         List<CECase> caseList = qc.getBOBResultList();

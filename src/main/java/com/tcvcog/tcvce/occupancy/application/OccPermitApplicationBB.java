@@ -731,6 +731,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             oc.insertOccPermitApplication(currentApplication);
 
+            getSessionBean().setSessOccPermitApplication(currentApplication);
+            
         } catch (IntegrationException | AuthorizationException | EventException | SearchException ex) {
             System.out.println("OccPermitApplicationBB.submitApplication() | ERROR: " + ex);
             getFacesContext().addMessage(null,

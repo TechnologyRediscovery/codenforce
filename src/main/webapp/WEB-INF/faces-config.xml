@@ -1170,6 +1170,12 @@
             <redirect />
         </navigation-case>
         
+        <navigation-case>
+            <from-outcome>occAppSuccess</from-outcome>
+            <to-view-id>/public/services/occPermitAppConf.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
     </navigation-rule>
          
     

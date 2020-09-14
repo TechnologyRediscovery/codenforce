@@ -23,12 +23,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Action Request submission confirmation</title>
+        <title>Occupancy Permit Application submission confirmation</title>
     </h:head>
     <h:body>
         <ui:composition template="../navContainer_public.xhtml">
             <ui:define name="content">
-                <h:form id="actionRequestSubConfForm">
+                <h:form id="occAppSubConfForm">
 
                     <!-- VALIDATION MESSAGE -->
                     <p:growl id="growl" showDetail="false"/>
@@ -39,7 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         <!-- TITLE COMPONENT -->
                         <div class="public-title">
                             <div class="public-title-main">
-                                Your Request Has Been Submitted
+                                Your Application Has Been Submitted
                             </div>
                             <div class="public-title-sub">
 
@@ -70,27 +70,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <!-- CONTENT IO COMPONENT: CONTENT -->
                                         <div class="public-main-contents-io-content" >
                                             <p>
-                                                This is your Public Access Control Code(PACC) and you will need it to access updated information on your request.
+                                                This is your Public Access Control Code(PACC) and you will need it to access updated information on your application.
                                                 You may check on the status of this request at any time by entering the PACC code into the "Review a Case" 
                                                 section on this site.
                                             </p>
                                             <p>
-                                                Submitted requests are immediately sent to the code enforcement official handing cases in the selected municipality.
+                                                Submitted applications are immediately sent to the code enforcement official handing cases in the selected municipality.
                                             </p>
 
                                             <p>
-                                                PACC Number:<span class="paccode">#{sessionBean.sessCEAR.requestPublicCC}</span>
+                                                PACC Number:<span class="paccode">#{occPermitApplicationBB.currentApplication.publicControlCode}</span>
                                             </p>
 
                                             <p>
-                                                Please allow at least 1-2 business days for the team to conduct an initial case investigation before following up with the code
-                                                enforcement team directly. Code enforcement officials will contact you and concerned parties directly during the investigation process.
+                                                Please allow at least 1-2 business days for the team to process your application before following up with the code
+                                                enforcement team directly. Code enforcement officials will contact you or your preferred contact directly during the application process.
                                                 With your tracking number, you may login at any time to view the status of your request.
                                             </p>
 
                                             <p> 
-                                                Requests submitted here are immediately sent to the code enforcement official 
-                                                handling cases in the selected municipality. 
+                                                Applications submitted here are immediately sent to the code enforcement official 
+                                                handling applications in the selected municipality. 
                                             </p>
 
                                         </div>
