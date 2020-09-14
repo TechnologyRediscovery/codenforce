@@ -25,7 +25,6 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
@@ -53,6 +52,8 @@ import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
+import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
@@ -134,16 +135,16 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         }
 
         // now go and get CECaseDataHeavy bundles and add them to the list
-//        QueryCECase qc = sc.initQuery(QueryCECaseEnum.PACC, cred);
-//     
-//        List<CECase> caseList = 
-//        System.out.println("PublicInfoCoordinator.getPublicInfoBundles | num CE cases found: " + caseList.size());;
-//      
-//        for(CECase c: caseList){
-//            // let the extraction method deal with all the assembly logic
-//            // and access control issues
-//            infoBundleList.add(extractPublicInfo(c));
-//        }
+        QueryCECase qc = sc.initQuery(QueryCECaseEnum.PACC, publicUser.getMyCredential());
+     
+        List<CECase> caseList = qc.getBOBResultList();
+        System.out.println("PublicInfoCoordinator.getPublicInfoBundles | num CE cases found: " + caseList.size());;
+      
+        for(CECase c: caseList){
+            // let the extraction method deal with all the assembly logic
+            // and access control issues
+            infoBundleList.add(extractPublicInfo(c));
+        }
         return infoBundleList;
     }
 
@@ -162,8 +163,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     private PublicInfoBundleCECase extractPublicInfo(CECase cse) throws IntegrationException, SearchException, EventException, AuthorizationException, BObStatusException {
         CaseCoordinator cc = getCaseCoordinator();
         setPublicUser();
-        CECasePropertyUnitHeavy c = cc.cecase_assembleCECasePropertyUnitHeavy(cse);
-
+        CECaseDataHeavy c = cc.cecase_assembleCECaseDataHeavy(cse, publicUser);
+        
         PublicInfoBundleCECase pib = new PublicInfoBundleCECase();
 
         pib.setTypeName("CECASE");
@@ -178,13 +179,11 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 pib.setPropertyAddress(c.getProperty().getAddress());
             }
             
-            // TODO: Deal with these implications
-//            pib.setPublicEventList(new ArrayList<EventCnF>());
-//            for (EventCnF ev : c.getVisibleEventList()) {
-//                if (ev.getCategory().getUserRankMinimumToView() >= PUBLIC_VIEW_USER_RANK) {
-//                    pib.getPublicEventList().add(ev);
-//                }
-//            }
+            pib.setPublicEventList(new ArrayList<PublicInfoBundleEventCnF>());
+            
+            for (EventCnF ev : c.getEventList()) {
+                pib.getPublicEventList().add(extractPublicInfo(ev));
+            }
             pib.setAddress(c.getProperty());
             pib.setShowAddMessageButton(false);
             pib.setPaccStatusMessage("Public access enabled");
@@ -565,36 +564,45 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      */
     public PublicInfoBundleEventCnF extractPublicInfo(EventCnF input) throws IntegrationException, EventException, AuthorizationException, BObStatusException, SearchException {
         PublicInfoBundleEventCnF pib = new PublicInfoBundleEventCnF();
-
-        if (input.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
-            CaseCoordinator cc = getCaseCoordinator();
-            CECase c = cc.cecase_getCECase(input.getCeCaseID());
-            pib.setCecase(extractPublicInfo(c));
-        } else if (input.getDomain() == EventDomainEnum.OCCUPANCY) {
-            OccupancyCoordinator oc = getOccupancyCoordinator();
-            OccPeriod period = oc.getOccPeriod(input.getOccPeriodID());
-            pib.setPeriod(extractPublicInfo(period));
-        }
-
-        ArrayList<PublicInfoBundlePerson> personHorde = new ArrayList<>();
-
-        if (input.getPersonList() != null) {
-            for (Person skeleton : input.getPersonList()) {
-
-                personHorde.add(extractPublicInfo(skeleton));
-
+        
+        if(input.getCategory().getUserRankMinimumToView() <= PUBLIC_VIEW_USER_RANK){
+        
+            if (input.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
+                CaseCoordinator cc = getCaseCoordinator();
+                CECase c = cc.cecase_getCECase(input.getCeCaseID());
+                pib.setCecase(extractPublicInfo(c));
+            } else if (input.getDomain() == EventDomainEnum.OCCUPANCY) {
+                OccupancyCoordinator oc = getOccupancyCoordinator();
+                OccPeriod period = oc.getOccPeriod(input.getOccPeriodID());
+                pib.setPeriod(extractPublicInfo(period));
             }
+
+            ArrayList<PublicInfoBundlePerson> personHorde = new ArrayList<>();
+
+            if (input.getPersonList() != null) {
+                for (Person skeleton : input.getPersonList()) {
+
+                    personHorde.add(extractPublicInfo(skeleton));
+
+                }
+            }
+
+            pib.setPersonList(personHorde);
+
+            pib.setBundledEvent(input);
+
+            pib.setTypeName("EventCnF");
+            pib.setPaccStatusMessage("Public access enabled");
+
+            pib.setShowAddMessageButton(false);
+            pib.setShowDetailsPageButton(true);
+        } else {
+            EventCnF skeleton = new EventCnF();
+            skeleton.setEventID(input.getEventID());
+            pib.setBundledEvent(skeleton);
+            pib.setPaccStatusMessage("A public information bundle was found but public "
+                    + "access was switched off by a code officer. Please contact your municipal office. ");
         }
-
-        pib.setPersonList(personHorde);
-
-        pib.setBundledEvent(input);
-
-        pib.setTypeName("EventCnF");
-        pib.setPaccStatusMessage("Public access enabled");
-
-        pib.setShowAddMessageButton(false);
-        pib.setShowDetailsPageButton(true);
 
         return pib;
     }
