@@ -148,6 +148,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         }
 
         // now go and get CECaseDataHeavy bundles and add them to the list
+        //TODO: Fix this, it does not retrieve cases
         setPublicUser();
         QueryCECase qc = sc.initQuery(QueryCECaseEnum.PACC, publicUser.getMyCredential());
      
@@ -256,7 +257,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setBundledRequest(req);
             pib.setPaccStatusMessage("Public access enabled");
 
-            pib.setTypeName("Code enforcement action request");
+            pib.setTypeName("CEAR");
 
             pib.setShowAddMessageButton(true);
             pib.setShowDetailsPageButton(false);

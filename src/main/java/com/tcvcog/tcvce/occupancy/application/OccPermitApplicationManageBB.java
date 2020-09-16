@@ -64,6 +64,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     private String currentMode;
     private boolean currentApplicationSelected;
     private boolean unitAlreadyDetermined; //used by occPermitNewPeriod.xhtml to flag whether or not the selected path has already determined a unit.
+    private boolean disablePACCControl;
     private Property propertyForApplication;
     private List<ViewOptionsActiveListsEnum> allViewOptions;
     private ViewOptionsActiveListsEnum currentViewOption;
@@ -717,6 +718,23 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
                             "This is a system level error that must be corrected by a sys admin--sorries!."));
         }
     }
+    
+    public void changePACCAccess() {
+        System.out.println("CEActionRequestsBB.changePACCAccess");
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+
+        try {
+            oi.updatePACCAccess(selectedApplication);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Done! Public access status is now: " + String.valueOf(selectedApplication.isPaccEnabled())
+                    + " for application ID: " + selectedApplication.getId(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Unable to add change public access code status",
+                    getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+        }
+    }
 
     public String editAttachedUnits() {
 
@@ -923,6 +941,17 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         return selectedApplication.getStatus() != OccApplicationStatusEnum.Waiting; //paths should be disabled if the occ application is not waiting to be reviewed.
 
+    }
+    
+    /**
+     * @return if the user should not be able to change public access on an object
+     */
+    public boolean isDisablePACCControl() {
+        disablePACCControl = false;
+        if (getSessionBean().getSessUser().getMyCredential().isHasMuniStaffPermissions() == false) {
+            disablePACCControl = true;
+        }
+        return disablePACCControl;
     }
 
     public boolean isCurrentApplicationSelected() {

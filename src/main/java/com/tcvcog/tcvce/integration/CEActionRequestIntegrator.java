@@ -482,7 +482,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequest | Integration Error: Unable to update action request", ex);
+            throw new IntegrationException("CEActionRequestIntegrator.updatePACCAccess | Integration Error: Unable to update action request", ex);
         } finally {
             
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -490,8 +490,6 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         } // close finally
 
     }
-    
-    
     
     public void updateActionRequestProperty(CEActionRequest req) throws IntegrationException {
 

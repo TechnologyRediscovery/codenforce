@@ -1294,6 +1294,32 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return occpermitappList;
     }
     
+    public void updatePACCAccess(OccPermitApplication permit) throws IntegrationException {
+
+        String q = "UPDATE occpermitapplication SET paccenabled = ? WHERE applicationid = ?;";
+
+        Connection con = null;
+        PreparedStatement stmt = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(q);
+            stmt.setBoolean(1, permit.isPaccEnabled());
+            stmt.setInt(2, permit.getId());
+            // Retrieve action data from postgres
+            stmt.executeUpdate();
+
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("OccupancyIntegrator.updatePACCAccess | Integration Error: Unable to update OccPermitApplication", ex);
+        } finally {
+            
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+    }
+    
     public void updateOccPermitApplication(OccPermitApplication application) throws IntegrationException {
         String query = "UPDATE public.occpermitapplication "
                 + "SET reason_reasonid=?, submissiontimestamp=?, "

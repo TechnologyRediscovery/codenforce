@@ -41,7 +41,7 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void submitPACC(ActionEvent ae){
+    public String submitPACC(){
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
         try {
             publicInfoBundleList = pic.getPublicInfoBundles(submittedPACC);
@@ -49,6 +49,22 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Retrieved " + String.valueOf(publicInfoBundleList.size()) + " bundles!",""));
+                
+                //Now look through the bundles and see which interface we need to send the user to
+                for(PublicInfoBundle bundle : publicInfoBundleList){
+                    
+                    if(bundle.getTypeName().equalsIgnoreCase("CECASE") 
+                            || bundle.getTypeName().equalsIgnoreCase("CEAR")) {
+                        //Code enforcement it is!
+                        return "cePaccView";
+                    }
+                    
+                    if(bundle.getTypeName().equalsIgnoreCase("OccPermitApplication")
+                            || bundle.getTypeName().equalsIgnoreCase("OccInspection") ){
+                        //Occupancy it is!
+                        return "occPaccView";
+                    }
+                }
             } else {
                 
                 getFacesContext().addMessage(null,
@@ -68,6 +84,9 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
         } catch (BObStatusException ex){
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         }
+        
+        //something went wrong, try again
+        return "";
         
     }
     
