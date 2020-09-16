@@ -298,7 +298,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    private List<EventCnF> addEvent_processStack(List<EventCnF> qu) throws IntegrationException{
+    private List<EventCnF> addEvent_processStack(List<EventCnF> qu) throws IntegrationException, BObStatusException{
         EventIntegrator ei = getEventIntegrator();
         List<EventCnF> doneList = new ArrayList<>();
         if(qu != null && !qu.isEmpty()){
@@ -386,6 +386,17 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         }
     }
     
+    public void auditEventPersonList(EventCnF ev){
+        List<Person> pl;
+        if(ev != null){
+            pl = ev.getPersonList();
+            if(pl != null && !pl.isEmpty()){
+                
+            }
+        }
+        
+    }
+    
     
     /**
      * Business rule aware pathway to update fields on EventCnF objects
@@ -393,24 +404,56 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * and rebuilds the mapping from scratch on each update.
      * 
      * @param ev
+     * @param ua
      * @throws IntegrationException 
      * @throws com.tcvcog.tcvce.domain.EventException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public void editEvent(EventCnF ev) throws IntegrationException, EventException{
+    public void updateEvent(EventCnF ev, UserAuthorized ua) throws IntegrationException, EventException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();
         EventIntegrator ei = getEventIntegrator();
         
         auditEvent(ev);
+        if(ua!= null){
+            ev.setLastUpdatedBy(ua);
+        }
+        ev.setLastUpdatedTS(LocalDateTime.now());
         ei.updateEvent(ev);
         pi.eventPersonClear(ev);
-        pi.eventPersonConnect(ev, ev.getPersonList());
+        pi.eventPersonConnect(ev);
         
     }
     
+    /**
+     * Writes the given mbp to the notes field of a given event
+     * @param mbp
+     * @param ev
+     * @param ua 
+     */
+    public void updateEventNotes(MessageBuilderParams mbp, EventCnF ev, UserAuthorized ua) throws IntegrationException, BObStatusException{
+        SystemCoordinator sc = getSystemCoordinator();
+        EventIntegrator ei = getEventIntegrator();
+        if(mbp == null || ev == null || ua == null){
+            throw new BObStatusException("Cannot update notes with null message, ev, or user");
+        }
+        ev.setNotes(sc.appendNoteBlock(mbp));
+        ei.updateEventNotes(ev);        
+        
+    }
+    
+    
+    /**
+     * Akin to delete
+     * @param ev
+     * @param ua
+     * @throws IntegrationException 
+     */
     public void deactivateEvent(EventCnF ev, UserAuthorized ua) throws IntegrationException{
         SystemCoordinator sc = getSystemCoordinator();
         EventIntegrator ei = getEventIntegrator();
         ev.setActive(false);
+        ev.setLastUpdatedBy(ua);
+        ev.setLastUpdatedTS(LocalDateTime.now());
         ev.setNotes(sc.formatAndAppendNote(ua, "Event deactivated by User with credential sig " + ua.getMyCredential().getSignature(), ev.getNotes()));
         ei.updateEvent(ev);
         

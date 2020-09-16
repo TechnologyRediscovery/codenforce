@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
+import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
@@ -159,6 +160,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return ev;
     }
     
+   
+    
     /**
      * Builds a List of EventCnF objects given an ERG, which in June 2020 were
      * only CECase and OccPeriod objects
@@ -225,9 +228,10 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException when the system is unable to store event in
      * DB
      */
-    public int insertEvent(EventCnF event) throws IntegrationException {
+    public int insertEvent(EventCnF event) throws IntegrationException, BObStatusException {
         if(event == null) return 0;
         PersonIntegrator pi = getPersonIntegrator();
+        EventCoordinator ec = getEventCoordinator();
         int insertedEventID = 0;
 
         String query = "INSERT INTO public.event(\n" +
@@ -311,14 +315,13 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
 
         // now connect people to event that has already been logged
-        List<Person> persList = event.getPersonList();
-        event.setEventID(insertedEventID);
+        event = ec.getEvent(insertedEventID);
 
-        if (persList != null) {
-            if (persList.size() > 0 && event.getEventID() != 0) {
-                pi.eventPersonConnect(event, persList);
-            }
+
+        if (event.getEventID() != 0 && event.getPersonList() != null && !event.getPersonList().isEmpty()) {
+            pi.eventPersonConnect(event);
         }
+
         
         return insertedEventID;
 
@@ -395,6 +398,55 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             }
             
             stmt.setInt(11, event.getEventID());
+            
+            stmt.executeUpdate();
+            
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot retrive event", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+ 
+    
+
+    /**
+     * Updates only the notes field and lastupdatedby field
+     * @param event
+     * @throws IntegrationException 
+     */
+    public void updateEventNotes(EventCnF event) throws IntegrationException {
+        if(event == null) return;
+        PersonIntegrator pi = getPersonIntegrator();
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE public.event\n");
+        sb.append("   SET notes=?, lastupdatedby_userid=?, lastupdatedts=now() \n" );
+        sb.append(" WHERE eventid=?;");
+
+        // TO DO: finish clearing view confirmation
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+           
+
+            stmt.setString(1, event.getNotes());
+            
+        
+            
+            if(event.getLastUpdatedBy() != null){
+                stmt.setInt(2, event.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(3, event.getEventID());
             
             stmt.executeUpdate();
             

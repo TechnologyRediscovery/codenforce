@@ -21,22 +21,36 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
+import com.tcvcog.tcvce.entities.EventListTypeEnum;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.NoticeOfViolation;
+import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PropertyUseType;
+import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
+import com.tcvcog.tcvce.entities.search.QueryEvent;
+import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -49,17 +63,22 @@ import javax.faces.event.ActionEvent;
  */
 public class EventsBB extends BackingBeanUtils implements Serializable{
     
+    private PageModeEnum currentMode;
+    private List<PageModeEnum> pageModes;
+    
     private EventDomainEnum currentEventDomain;
     private IFace_EventRuleGoverned currentERGBOb;
-    private EventCnF currentEvent;
+    private EventCnFPropUnitCasePeriodHeavy currentEvent;
     
-    private List<EventCnF> eventList;
-    private List<EventCnF> filteredEventList;
+    private EventListTypeEnum listType;
+    private List<EventListTypeEnum> listTypeList;
+    private List<EventCnFPropUnitCasePeriodHeavy> eventList;
+    private List<EventCnFPropUnitCasePeriodHeavy> filteredEventList;
     
     private List<ViewOptionsActiveHiddenListsEnum> eventsViewOptionsCandidates;
     private ViewOptionsActiveHiddenListsEnum selectedEventView;
     
-    protected Map<EventType, List<EventCategory>> typeCatMap;
+    private Map<EventType, List<EventCategory>> typeCatMap;
     
     private List<EventType> eventTypeCandidates;
     private EventType eventTypeSelected;
@@ -69,6 +88,26 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     
     private List<Person> personCandidates;
     private Person personSelected;
+    
+    private String formNoteText;
+    
+    // Absorbed from EventSearchBB
+    
+    private boolean appendResultsToList;
+    
+    private List<QueryEvent> queryList;
+    private QueryEvent querySelected;
+    
+    private SearchParamsEvent searchParamsSelected;
+    
+    private List<EventCategory> eventCategoryListSearch;
+    private List<EventType> eventTypeListSearch;
+    
+    private int actionRequestsUserType;
+    
+    private ReportConfigCEEventList reportConfig;
+    
+    private List<PropertyUseType> propUseTypeList;
   
     /**
      * Creates a new instance of EventsBB
@@ -91,177 +130,381 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         EventCoordinator ec = getEventCoordinator();
         MunicipalityCoordinator mc = getMuniCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
+        SearchCoordinator sc = getSearchCoordinator();
         SessionBean sb = getSessionBean();
         
         eventsViewOptionsCandidates = Arrays.asList(ViewOptionsActiveHiddenListsEnum.values());
         selectedEventView = ec.determineDefaultEventView(sb.getSessUser());
+        listTypeList = Arrays.asList(EventListTypeEnum.values());
         
-        eventList = new ArrayList<>();
+        eventList = getSessionBean().getSessEventList();
+         if(eventList == null){
+            eventList = new ArrayList<>();
+        }
+        
         
         // Based on who sent us to this page, we'll load in either the CECase or OccPeriod
         // on the SessionBean
-        EventDomainEnum domain = sb.getSessEventDomain();
-        switch(domain){
-            case CODE_ENFORCEMENT:
-                currentERGBOb = sb.getSessCECase();
-                // in this case our ERGBob is a CECase
-                eventList.addAll(currentERGBOb.getEventList(selectedEventView));
-                break;
-            case OCCUPANCY:
-                currentERGBOb = sb.getSessOccPeriod();
-                // in this case our ERGBOb is an OccPeriod
-                eventList.addAll(currentERGBOb.getEventList(selectedEventView));
-                break;
-            case UNIVERSAL:
-                // We'll just grab all the events on the session and load up
-                // the muni property info
-                eventList.addAll(sb.getSessEventList());
-                // ask the Prop Coor to figure out a sensible ERG when we're viewing
-                // an arbitrary event list
-                currentERGBOb = (IFace_EventRuleGoverned) pc.determineGoverningPropertyInfoCase(sb.getSessMuni().getMuniPropertyDH());
-                break;
-            // "Shouldn't happen"
-            default:
-                eventList.addAll(sb.getSessEventList());
-                currentERGBOb = (IFace_EventRuleGoverned) pc.determineGoverningPropertyInfoCase(sb.getSessMuni().getMuniPropertyDH());
+        EventDomainEnum domain = sb.getSessEventsPageEventDomainRequest();
+        // uses domain in a switch{} for setting property values of other page modes
+        configureEventDomain(domain);
+        
+        setPersonCandidates(new ArrayList<Person>());
+        getPersonCandidates().addAll(getSessionBean().getSessPersonList());
+        
+        setTypeCatMap(ec.assembleEventTypeCatMap_toEnact(getCurrentEventDomain(), getCurrentERGBOb(), getSessionBean().getSessUser()));
+        
+        setEventTypeCandidates(new ArrayList<>(getTypeCatMap().keySet()));
+        setEventCategoryCandidates(new ArrayList<EventCategory>());
+        
+        if(getEventTypeCandidates() != null && !eventTypeCandidates.isEmpty()){
+            setEventTypeSelected(getEventTypeCandidates().get(0));
+            setEventCategoryCandidates(getTypeCatMap().get(getEventTypeSelected())) ;
         }
         
-        personCandidates = new ArrayList<>();
-        personCandidates.addAll(getSessionBean().getSessPersonList());
         
-        typeCatMap = ec.assembleEventTypeCatMap_toEnact(currentEventDomain, currentERGBOb, getSessionBean().getSessUser());
+        setPageModes(new ArrayList<PageModeEnum>());
+        getPageModes().add(PageModeEnum.LOOKUP);
+        getPageModes().add(PageModeEnum.INSERT);
+        getPageModes().add(PageModeEnum.UPDATE);
+        getPageModes().add(PageModeEnum.REMOVE);
+        if (getSessionBean().getCeCaseNoticesPageModeRequest() != null) {
+            setCurrentMode(getSessionBean().getCeCaseNoticesPageModeRequest());
+        } else {
+            setCurrentMode(PageModeEnum.LOOKUP);
+        }
         
-        eventTypeCandidates = new ArrayList<>(typeCatMap.keySet());
-        eventCategoryCandidates = new ArrayList<>();
+        // From EventSearchBB
+         
+        queryList = sc.buildQueryEventList(getSessionBean().getSessUser().getMyCredential());
         
-        if(eventTypeCandidates != null && !eventTypeCandidates.isEmpty()){
-            eventTypeSelected = eventTypeCandidates.get(0);
-            eventCategoryCandidates = typeCatMap.get(eventTypeSelected) ;
+        // Setting default query
+        if(queryList != null && !queryList.isEmpty()){
+            querySelected = queryList.get(0);
+        }
+        
+        
+       
+        typeCatMap = ec.assembleEventTypeCatMap_toView(getSessionBean().getSessUser());
+        
+        eventTypeListSearch = new ArrayList(getTypeCatMap().keySet());
+        eventCategoryListSearch = typeCatMap.get(eventTypeListSearch.get(0));
+        
+        propUseTypeList = pc.getPropertyUseTypeList();
+        
+        appendResultsToList = false;
+        
+        
+        // grab previously loaded event config from the session bean
+        // which would have been placed there by the generateReport method in this bean
+        reportConfig = getSessionBean().getReportConfigCEEventList();
+        configureParameters();
+    }
+    
+    /**
+     * Based on the requested domain, session objects are grabbed and 
+     * used for setting the bean's central members
+     * @param domain 
+     */
+    private void configureEventDomain(EventDomainEnum domain){
+        SessionBean sb = getSessionBean();
+        EventCoordinator ec = getEventCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
+         try {
+            switch(domain){
+                case CODE_ENFORCEMENT:
+                    currentERGBOb = sb.getSessCECase();
+                    // in this case our ERGBob is a CECase
+                    eventList.addAll(ec.assembleEventCnFPropUnitCasePeriodHeavyList(getCurrentERGBOb().getEventList(getSelectedEventView())));
+                    listType = EventListTypeEnum.CODE_ENFORCEMENT;
+                    break;
+                case OCCUPANCY:
+                    currentERGBOb = sb.getSessOccPeriod();
+                    // in this case our ERGBOb is an OccPeriod
+                    eventList.addAll(ec.assembleEventCnFPropUnitCasePeriodHeavyList(getCurrentERGBOb().getEventList(getSelectedEventView())));
+                    listType = EventListTypeEnum.OCCUPANCY;
+                    break;
+                case UNIVERSAL:
+                    // We'll just grab all the events on the session and load up
+                    // the muni property info
+                    listType = EventListTypeEnum.CUSTOM;
+                    getEventList().addAll(sb.getSessEventList());
+                    // ask the Prop Coor to figure out a sensible ERG when we're viewing
+                    // an arbitrary event list
+                    setCurrentERGBOb((IFace_EventRuleGoverned) pc.determineGoverningPropertyInfoCase(sb.getSessMuni().getMuniPropertyDH()));
+                    break;
+                // "Shouldn't happen"
+                default:
+                    listType = EventListTypeEnum.CUSTOM;
+                    getEventList().addAll(sb.getSessEventList());
+                    setCurrentERGBOb((IFace_EventRuleGoverned) pc.determineGoverningPropertyInfoCase(sb.getSessMuni().getMuniPropertyDH()));
+            }
+        } catch (EventException |IntegrationException | SearchException ex) {
+                System.out.println("EventsBB.initBean: problem setting page event domain");
+                System.out.println(ex);
+        }
+    }
+    
+      
+    /**
+     * Event search setup infrastructure
+     */
+    private void configureParameters(){
+        if(querySelected != null 
+                && 
+            querySelected.getParamsList() != null 
+                && 
+            !querySelected.getParamsList().isEmpty()){
+            
+            searchParamsSelected = querySelected.getParamsList().get(0);
+        } else {
+            searchParamsSelected = null;
         }
     }
     
     
-     /**
-     * Actionlistener Called when the user selects their own EventCategory to add to the case
-     * and is a pass-through method to the initiateNewEvent method
+    //check if current mode == Lookup
+    public boolean getActiveLookupMode() {
+        // hard-wired on since there's always a property loaded
+        return PageModeEnum.LOOKUP.equals(currentMode);
+    }
+
+    /**
+     * Provide UI elements a boolean true if the mode is UPDATE
+     *
+     * @return
+     */
+    public boolean getActiveUpdateMode() {
+        return PageModeEnum.UPDATE.equals(currentMode);
+    }
+
+    public boolean getActiveViewMode() {
+        if (PageModeEnum.LOOKUP.equals(currentMode) || PageModeEnum.VIEW.equals(currentMode)) {
+            if (currentEvent != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //check if current mode == Insert
+    public boolean getActiveInsertUpdateMode() {
+        return PageModeEnum.INSERT.equals(currentMode) || PageModeEnum.UPDATE.equals(currentMode);
+    }
+
+    //check if current mode == Insert
+    public boolean getActiveInsertMode() {
+        return PageModeEnum.INSERT.equals(getCurrentMode());
+    }
+
+    //check if current mode == Remove
+    public boolean getActiveRemoveMode() {
+        return PageModeEnum.REMOVE.equals(getCurrentMode());
+    }
+
+    /**
+     * Primary listener method which copies a reference to the selected user
+     * from the list and sets it on the selected user perch
      *
      * @param ev
      */
-    public void initiateUserChosenEventCreation(ActionEvent ev) {
-        initiateNewEvent();
+    public void onObjectViewButtonChange(EventCnFPropUnitCasePeriodHeavy ev) {
+
+        if (ev != null) {
+            getSessionBean().setSessEvent(ev);
+            currentEvent = ev;
+            System.out.println("EventsBB.onObjectViewButtonChange: " + ev.getEventID());
+        }
+
+    }
+    
+    public int getEventListSize(){
+        int s = 0;
+        if(eventList != null && !eventList.isEmpty()){
+            s = eventList.size();
+        }
+        return s;
+    }
+    
+    
+    public void clearEventList(ActionEvent ev){
+        if(eventList != null){
+            eventList.clear();
+        }
+    
+    }
+    
+    public void loadEventHistory(ActionEvent ev){
+        eventList = getSessionBean().getSessEventList();
+        
+    }
+    
+    
+    public String jumpToParentObject(EventCnFPropUnitCasePeriodHeavy ev){
+        if(ev != null){
+            switch(ev.getDomain()){
+                case CODE_ENFORCEMENT:
+                    return "ceCaseWorkflow";
+                case OCCUPANCY:
+                    return "occPeriodWorkflow";
+            }
+        }
+        return "";
+    }
+    
+    /**
+     * Listener for changes to the event list mode, which will
+     * trigger changes to the overall event domain
+     * 
+     * @param elte
+     * @return 
+     */
+    public String onListTypeMenuChange(EventListTypeEnum elte){
+        
+        listType = elte;
+        switch(elte){
+            case CODE_ENFORCEMENT:
+                configureEventDomain(EventDomainEnum.CODE_ENFORCEMENT);
+                break;
+            case OCCUPANCY:
+                configureEventDomain(EventDomainEnum.OCCUPANCY);
+                break;
+            case SEARCH_RESULT:
+                configureEventDomain(EventDomainEnum.UNIVERSAL);
+                break;
+            case CUSTOM:
+                configureEventDomain(EventDomainEnum.UNIVERSAL);
+                break;
+        }
+
+        return "";
+        
     }
     
     
     /**
-     * Listener method for starting event edits
+     * Action listener pass-through method for calling executeQuery from the front end
      * @param ev 
      */
-    public void initiateEventEdit(EventCnF ev){
-        currentEvent = ev;
-    }
+    public void runQuery(ActionEvent ev){
+        executeQuery();
+    }  
     
-
-    /**
-     * Logic container for setting up new event which will be displayed 
-     * in the overlay window for the User
-     */
-    public void initiateNewEvent() {
-        EventCoordinator ec = getEventCoordinator();
-        
-        EventCnF ev = null;
-        if (eventTypeSelected != null && eventCategorySelected != null ) {
-            
-            try {
-                ev = ec.initEvent(currentERGBOb, getEventCategorySelected());
-                ev.setCategory(eventCategorySelected);
-                switch(currentEventDomain){
-                    case CODE_ENFORCEMENT:
-                        ev.setCeCaseID(currentERGBOb.getBObID());
-                        break;
-                    case OCCUPANCY:
-                        ev.setOccPeriodID(currentERGBOb.getBObID());
-                        break;
-                }
-                ev.setUserCreator(getSessionBean().getSessUser());
-                
-            } catch (BObStatusException | EventException ex) {
-                System.out.println(ex);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-            }
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select an event category to create a new event.", ""));
-        }
-        currentEvent = ev;
-    }
-
-    /**
-     * All Code Enforcement case events are funneled through this method which
-     * has to carry out a number of checks based on the type of event being
-     * created. The event is then passed to the addEvent_processForCECaseDomain on the
-     * CaseCoordinator who will do some more checking about the event before
-     * writing it to the DB
-     *
-     * @param ev unused
-     * @throws ViolationException
-     */
-    public void addNewEvent(ActionEvent ev) throws ViolationException {
-        EventCoordinator ec = getEventCoordinator();
-        CaseCoordinator cc = getCaseCoordinator();
-        List<EventCnF> evDoneList = null;
-            
-        // category is already set from initialization sequence
-
+    public void executeQuery(){
+        System.out.println("EventSearchBB.executeQuery");
+        SearchCoordinator sc = getSearchCoordinator();
         try {
-            
-            evDoneList = ec.addEvent(currentEvent, currentERGBOb, getSessionBean().getSessUser());
-
-            if(evDoneList != null && !evDoneList.isEmpty()){
-                for(EventCnF evt: evDoneList){
-                    
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                    "Successfully logged event with an ID " + evt.getEventID() + " ", ""));
+            if(eventList != null){
+                if(!appendResultsToList){
+                    eventList.clear();
                 }
-                currentEvent = evDoneList.get(0);
-
-            }
-
-    
-        } catch (IntegrationException | BObStatusException | EventException ex) {
+                eventList = sc.runQuery(querySelected).getBOBResultList();
+                    Collections.sort(eventList);
+                    Collections.reverse(eventList);
+                }
+            listType = EventListTypeEnum.SEARCH_RESULT;
+            
+            generateQueryResultMessage();
+        } catch (SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(),
-                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
-        } 
-
-        // nullify the session's case so that the reload of currentCase
-        // no the cecaseProfile.xhtml will trigger a new DB read
-    }
-  
-    /**
-     * Listener method for changes in EventType selected by User
-     */
-    public void refreshAvailableEventCategories(){
-        EventCoordinator ec = getEventCoordinator();
-        if(eventTypeSelected != null){
-            eventCategoryCandidates.clear();
-            eventCategoryCandidates.addAll(typeCatMap.get(eventTypeSelected));
+                            "Could not query the database, sorry.", ""));
         }
     }
     
+    public void resetQuery(ActionEvent ev){
+        
+        SearchCoordinator sc = getSearchCoordinator();
+        queryList = sc.buildQueryEventList(getSessionBean().getSessUser().getMyCredential());
+        if(queryList != null && !queryList.isEmpty()){
+            querySelected = queryList.get(0);
+        }
+        
+    }
+    
+    public void changeQuerySelected(){
+        System.out.println("EventSearchBB.changeQuerySelected()");
+        configureParameters();
+        getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "New query loaded!", ""));
+        
+    }
+      
+      
+    private void generateQueryResultMessage(){
+        int listSize = 0;
+        if(eventList != null){
+            listSize = eventList.size();
+        }
+        getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Your query completed with " + listSize + " results", ""));
+    }
+    
+    
+   public void prepareEventReport(){
+       if(eventList != null && eventList.size() > 0){
+           
+            EventCoordinator ec = getEventCoordinator();
+            reportConfig = ec.initDefaultReportConfigEventList();
+            reportConfig.setMuni(getSessionBean().getSessMuni());
+            reportConfig.setCreator(getSessionBean().getSessUser());
+            if(querySelected != null){
+                 reportConfig.setTitle(querySelected.getQueryTitle());
+            }
+//            reportConfig.setQueryParams(searchParamsSelected);
+       } else {
+           getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Yikes! No events; You may only generate a report for an event list of size 1 or greater. "
+                                    + "Please revise your query.", ""));
+       }
+   }
+   
+   public String generateEventReport(){
+       SearchCoordinator sc = getSearchCoordinator();
+       // put the current event list on the session bean for extraction when
+       // we generate the report (and must reload the backing bean)
+       if(eventList != null){
+            Collections.sort(eventList);
+            if(reportConfig.isSortInRevChrono()){
+                Collections.reverse(eventList);
+            } 
+       }
+       
+       if(querySelected.getExecutionTimestamp() == null){
+            
+            
+        }
+       reportConfig.setBOBQuery(querySelected);
+//       getSessionBean().setSessionEventWithCasePropList(eventList);
+
+       getSessionBean().setReportConfigCEEventList(reportConfig);
+       getSessionBean().setSessReport(reportConfig);
+       return "reportCEEventList";
+   }
+
+   
     /**
-     * Toggles the hidden property on an EventCnF object to true
-     * Remember: Hidden/notHidden is a JavaLand property only
-     * for the decluttering of lists of events and has no
-     * reflected field in the database
-     * 
-     * @param event 
+     * @return the eventTypesList
      */
-     public void hideEvent(EventCnF event){
+    public List<EventType> getEventTypesList() {
+        
+        return eventTypeListSearch;
+    }
+
+    /**
+     * @return the eventCatList
+     */
+    public List<EventCategory> getEventCatList() {
+        return eventCategoryListSearch;
+    }
+    
+    
+    public void hideEvent(EventCnF event){
         EventIntegrator ei = getEventIntegrator();
         event.setHidden(true);
         try {
@@ -277,13 +520,6 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         }
     }
     
-     /**
-      * Toggles the hidden property on the given event object to false
-      * Remember: Hidden/notHidden is a JavaLand property only
-      * for the decluttering of lists of events and has no
-      * reflected field in the database
-      * @param event 
-      */
     public void unHideEvent(EventCnF event){
         EventIntegrator ei = getEventIntegrator();
         event.setHidden(false);
@@ -300,6 +536,135 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         }
     }
     
+     /**
+     * Actionlistener Called when the user selects their own EventCategory to add to the case
+     * and is a pass-through method to the initiateNewEvent method
+     *
+     * @param ev
+     */
+    public void initiateUserChosenEventCreation(ActionEvent ev) {
+        initiateNewEvent();
+    }
+    
+    
+    /**
+     * Listener method for starting event edits
+     * @param ev 
+     */
+    public void initiateEventEdit(EventCnFPropUnitCasePeriodHeavy ev){
+        currentEvent = ev;
+    }
+    
+
+    /**
+     * Logic container for setting up new event which will be displayed 
+     * in the overlay window for the User
+     */
+    public void initiateNewEvent() {
+        EventCoordinator ec = getEventCoordinator();
+        
+        EventCnF ev = null;
+        if (getEventTypeSelected() != null && getEventCategorySelected() != null ) {
+            
+            try {
+                ev = ec.initEvent(getCurrentERGBOb(), getEventCategorySelected());
+                ev.setCategory(getEventCategorySelected());
+                switch(getCurrentEventDomain()){
+                    case CODE_ENFORCEMENT:
+                        ev.setCeCaseID(getCurrentERGBOb().getBObID());
+                        break;
+                    case OCCUPANCY:
+                        ev.setOccPeriodID(getCurrentERGBOb().getBObID());
+                        break;
+                }
+                ev.setUserCreator(getSessionBean().getSessUser());
+                currentEvent = ec.assembleEventCnFPropUnitCasePeriodHeavy(ev);
+                
+            } catch (BObStatusException | EventException | IntegrationException | SearchException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+            }
+        } else {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select an event category to create a new event.", ""));
+        }
+    }
+
+    /**
+     * All Code Enforcement case events are funneled through this method which
+     * has to carry out a number of checks based on the type of event being
+     * created. The event is then passed to the addEvent_processForCECaseDomain on the
+     * Event Coordinator who will do some more checking about the event before
+     * writing it to the DB
+     *
+     * @return 
+     */
+    public String onEventAddCommitButtonChange() {
+        EventCoordinator ec = getEventCoordinator();
+        
+        List<EventCnFPropUnitCasePeriodHeavy> evDoneList = null;
+            
+        // category is already set from initialization sequence
+
+        try {
+            
+            evDoneList = ec.assembleEventCnFPropUnitCasePeriodHeavyList(ec.addEvent(getCurrentEvent(), getCurrentERGBOb(), getSessionBean().getSessUser()));
+
+            if(evDoneList != null && !evDoneList.isEmpty()){
+                for(EventCnF evt: evDoneList){
+                    
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                    "Successfully logged event with an ID " + evt.getEventID() + " ", ""));
+                }
+                setCurrentEvent(evDoneList.get(0));
+
+            }
+            return "events";
+    
+        } catch (IntegrationException | BObStatusException | EventException | SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(),
+                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
+        } 
+
+        // nullify the session's case so that the reload of currentCase
+        // no the cecaseProfile.xhtml will trigger a new DB read
+        return "";
+    }
+    
+    /**
+     * Listener for user requests to update an event
+     * @return 
+     */
+    public String onEventUpdateCommitButtonChange(){
+        
+        return "events";
+    }
+    
+    public void onPersonListCommitButtonChange(ActionEvent ev){
+        
+        // nothing to do on the back end
+        
+    }
+  
+    /**
+     * Listener method for changes in EventType selected by User
+     */
+    public void refreshAvailableEventCategories(){
+        EventCoordinator ec = getEventCoordinator();
+        if(getEventTypeSelected() != null){
+            getEventCategoryCandidates().clear();
+            getEventCategoryCandidates().addAll(getTypeCatMap().get(getEventTypeSelected()));
+        }
+    }
+    
+   
+    
 
     /**
      * Listener pass through method for finalizing event edits
@@ -315,10 +680,10 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     public void finalizeEventUpdate() {
         EventCoordinator ec = getEventCoordinator();
         try {
-            ec.editEvent(currentEvent);
+            ec.updateEvent(getCurrentEvent(), getSessionBean().getSessUser());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Event udpated!", ""));
-        } catch (IntegrationException | EventException ex) {
+        } catch (IntegrationException | EventException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     ex.getMessage(),
@@ -332,8 +697,9 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
      * @param ev 
      */
     public void queueSelectedPerson(ActionEvent ev) {
+        EventCoordinator ec = getEventCoordinator();
         if (getPersonSelected() != null) {
-            currentEvent.getPersonList().add(personSelected);
+            getCurrentEvent().getPersonList().add(getPersonSelected());
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -343,14 +709,56 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     }
 
     public void deQueuePersonFromEvent(Person p) {
-        if (currentEvent.getPersonList() != null) {
-            currentEvent.getPersonList().remove(p);
+        if (getCurrentEvent().getPersonList() != null) {
+            getCurrentEvent().getPersonList().remove(p);
         }
     }
 
-    public void editEvent(EventCnF ev) {
-        currentEvent = ev;
+   
+      /**
+     * Listener for commencement of note writing process
+     *
+     * @param ev
+     */
+    public void onNoteInitButtonChange(ActionEvent ev) {
+        setFormNoteText(null);
+
     }
+
+    /**
+     * Listener for user requests to commit new note content to the current
+     * object
+     *
+     * @return
+     */
+    public String onNoteCommitButtonChange() {
+        EventCoordinator ec = getEventCoordinator();
+
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        mbp.setCred(getSessionBean().getSessUser().getKeyCard());
+        mbp.setExistingContent(getCurrentEvent().getNotes());
+        mbp.setNewMessageContent(getFormNoteText());
+        mbp.setHeader("Notice of Violation Note");
+        mbp.setUser(getSessionBean().getSessUser());
+
+        try {
+
+            ec.updateEventNotes(mbp, getCurrentEvent(), getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Succesfully appended note!", ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Fatal error appending note; apologies!", ""));
+            return "";
+        }
+
+        return "events";
+
+    }
+
 
 
     /**
@@ -419,7 +827,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     /**
      * @param currentEvent the currentEvent to set
      */
-    public void setCurrentEvent(EventCnF currentEvent) {
+    public void setCurrentEvent(EventCnFPropUnitCasePeriodHeavy currentEvent) {
         this.currentEvent = currentEvent;
     }
 
@@ -457,7 +865,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the filteredEventList
      */
-    public List<EventCnF> getFilteredEventList() {
+    public List<EventCnFPropUnitCasePeriodHeavy> getFilteredEventList() {
         return filteredEventList;
     }
 
@@ -486,7 +894,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     /**
      * @param filteredEventList the filteredEventList to set
      */
-    public void setFilteredEventList(List<EventCnF> filteredEventList) {
+    public void setFilteredEventList(List<EventCnFPropUnitCasePeriodHeavy> filteredEventList) {
         this.filteredEventList = filteredEventList;
     }
 
@@ -529,15 +937,229 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the eventList
      */
-    public List<EventCnF> getEventList() {
+    public List<EventCnFPropUnitCasePeriodHeavy> getEventList() {
         return eventList;
     }
 
     /**
      * @param eventList the eventList to set
      */
-    public void setEventList(List<EventCnF> eventList) {
+    public void setEventList(List<EventCnFPropUnitCasePeriodHeavy> eventList) {
         this.eventList = eventList;
+    }
+
+    /**
+     * @return the pageModes
+     */
+    public List<PageModeEnum> getPageModes() {
+        return pageModes;
+    }
+
+    /**
+     * @param pageModes the pageModes to set
+     */
+    public void setPageModes(List<PageModeEnum> pageModes) {
+        this.pageModes = pageModes;
+    }
+
+    /**
+     * @return the currentMode
+     */
+    public PageModeEnum getCurrentMode() {
+        return currentMode;
+    }
+
+    /**
+     * @param currentMode the currentMode to set
+     */
+    public void setCurrentMode(PageModeEnum currentMode) {
+        this.currentMode = currentMode;
+    }
+
+    /**
+     * @return the formNoteText
+     */
+    public String getFormNoteText() {
+        return formNoteText;
+    }
+
+    /**
+     * @param formNoteText the formNoteText to set
+     */
+    public void setFormNoteText(String formNoteText) {
+        this.formNoteText = formNoteText;
+    }
+
+    /**
+     * @return the typeCatMap
+     */
+    public Map<EventType, List<EventCategory>> getTypeCatMap() {
+        return typeCatMap;
+    }
+
+    /**
+     * @return the appendResultsToList
+     */
+    public boolean isAppendResultsToList() {
+        return appendResultsToList;
+    }
+
+    /**
+     * @return the queryList
+     */
+    public List<QueryEvent> getQueryList() {
+        return queryList;
+    }
+
+    /**
+     * @return the querySelected
+     */
+    public QueryEvent getQuerySelected() {
+        return querySelected;
+    }
+
+    /**
+     * @return the searchParamsSelected
+     */
+    public SearchParamsEvent getSearchParamsSelected() {
+        return searchParamsSelected;
+    }
+
+   
+
+    /**
+     * @return the eventCategoryListSearch
+     */
+    public List<EventCategory> getEventCategoryListSearch() {
+        return eventCategoryListSearch;
+    }
+
+    /**
+     * @return the eventTypeListSearch
+     */
+    public List<EventType> getEventTypeListSearch() {
+        return eventTypeListSearch;
+    }
+
+    /**
+     * @return the actionRequestsUserType
+     */
+    public int getActionRequestsUserType() {
+        return actionRequestsUserType;
+    }
+
+    /**
+     * @return the reportConfig
+     */
+    public ReportConfigCEEventList getReportConfig() {
+        return reportConfig;
+    }
+
+    /**
+     * @return the propUseTypeList
+     */
+    public List<PropertyUseType> getPropUseTypeList() {
+        return propUseTypeList;
+    }
+
+    /**
+     * @param typeCatMap the typeCatMap to set
+     */
+    public void setTypeCatMap(Map<EventType, List<EventCategory>> typeCatMap) {
+        this.typeCatMap = typeCatMap;
+    }
+
+    /**
+     * @param appendResultsToList the appendResultsToList to set
+     */
+    public void setAppendResultsToList(boolean appendResultsToList) {
+        this.appendResultsToList = appendResultsToList;
+    }
+
+    /**
+     * @param queryList the queryList to set
+     */
+    public void setQueryList(List<QueryEvent> queryList) {
+        this.queryList = queryList;
+    }
+
+    /**
+     * @param querySelected the querySelected to set
+     */
+    public void setQuerySelected(QueryEvent querySelected) {
+        this.querySelected = querySelected;
+    }
+
+    /**
+     * @param searchParamsSelected the searchParamsSelected to set
+     */
+    public void setSearchParamsSelected(SearchParamsEvent searchParamsSelected) {
+        this.searchParamsSelected = searchParamsSelected;
+    }
+
+   
+
+    /**
+     * @param eventCategoryListSearch the eventCategoryListSearch to set
+     */
+    public void setEventCategoryListSearch(List<EventCategory> eventCategoryListSearch) {
+        this.eventCategoryListSearch = eventCategoryListSearch;
+    }
+
+    /**
+     * @param eventTypeListSearch the eventTypeListSearch to set
+     */
+    public void setEventTypeListSearch(List<EventType> eventTypeListSearch) {
+        this.eventTypeListSearch = eventTypeListSearch;
+    }
+
+    /**
+     * @param actionRequestsUserType the actionRequestsUserType to set
+     */
+    public void setActionRequestsUserType(int actionRequestsUserType) {
+        this.actionRequestsUserType = actionRequestsUserType;
+    }
+
+    /**
+     * @param reportConfig the reportConfig to set
+     */
+    public void setReportConfig(ReportConfigCEEventList reportConfig) {
+        this.reportConfig = reportConfig;
+    }
+
+    /**
+     * @param propUseTypeList the propUseTypeList to set
+     */
+    public void setPropUseTypeList(List<PropertyUseType> propUseTypeList) {
+        this.propUseTypeList = propUseTypeList;
+    }
+
+    /**
+     * @return the listType
+     */
+    public EventListTypeEnum getListType() {
+        return listType;
+    }
+
+    /**
+     * @param listType the listType to set
+     */
+    public void setListType(EventListTypeEnum listType) {
+        this.listType = listType;
+    }
+
+    /**
+     * @return the listTypeList
+     */
+    public List<EventListTypeEnum> getListTypeList() {
+        return listTypeList;
+    }
+
+    /**
+     * @param listTypeList the listTypeList to set
+     */
+    public void setListTypeList(List<EventListTypeEnum> listTypeList) {
+        this.listTypeList = listTypeList;
     }
 
 }
