@@ -521,7 +521,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      * @throws BObStatusException
      * @throws SearchException
      */
-    public PublicInfoBundlePropertyUnit extractPublicInfo(PropertyUnit input) throws IntegrationException, EventException, AuthorizationException, BObStatusException, SearchException {
+    public PublicInfoBundlePropertyUnit extractPublicInfo(PropertyUnit input)
+            throws IntegrationException, EventException,
+            AuthorizationException, BObStatusException, SearchException {
         PublicInfoBundlePropertyUnit pib = new PublicInfoBundlePropertyUnit();
         PropertyCoordinator pc = getPropertyCoordinator();
         setPublicUser();

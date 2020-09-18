@@ -122,6 +122,67 @@ public  class       Person
     protected ArrayList<Integer> ghostsList;
     protected ArrayList<Integer> cloneList;
     protected ArrayList<Integer> mergedList;
+
+    public Person() {
+    }
+
+    /**
+     * Method for cloning Person objects
+     * 
+     * @param input The person we would like to clone
+     */
+    public Person(Person input) {
+        personID = input.getPersonID(); 
+        personType = input.getPersonType();
+        muniCode = input.getMuniCode();
+        muniName = input.getMuniName();
+        source = input.getSource();
+        creatorUserID = input.getCreatorUserID();
+        creationTimeStamp = input.getCreationTimeStamp();
+        firstName = input.getFirstName();
+        lastName = input.getLastName();
+        compositeLastName = input.isCompositeLastName();
+        businessEntity = input.isBusinessEntity();
+        jobTitle = input.getJobTitle();
+        phoneCell = input.getPhoneCell();
+        phoneHome = input.getPhoneHome();
+        phoneWork = input.getPhoneWork();
+        email = input.getEmail();
+        addressStreet = input.getAddressStreet();
+        addressCity = input.getAddressCity();
+        addressZip = input.getAddressZip();
+        addressState = input.getAddressState();
+        useSeparateMailingAddress = input.isUseSeparateMailingAddress();
+        mailingAddressStreet = input.getMailingAddressStreet();
+        mailingAddressThirdLine = input.getMailingAddressThirdLine();
+        mailingAddressCity = input.getMailingAddressCity();
+        mailingAddressZip = input.getMailingAddressZip();
+        mailingAddressState = input.getMailingAddressState();
+        notes = input.getNotes();
+        lastUpdated = input.getLastUpdated();
+        lastUpdatedPretty = input.getLastUpdatedPretty();
+        canExpire = input.isCanExpire();
+        expiryDate = input.getExpiryDate();
+        expireString = input.getExpireString();
+        expiryDateUtilDate = input.getExpiryDateUtilDate();
+        expiryNotes = input.getExpiryNotes();
+        active = input.isActive();
+        linkedUserID = input.getLinkedUserID();
+        under18 = input.isUnder18();
+        verifiedByUserID = input.getVerifiedByUserID();
+        referencePerson = input.isReferencePerson();
+        ghostCreatedDate = input.getGhostCreatedDate();
+        ghostCreatedDatePretty = input.getGhostCreatedDatePretty();
+        ghostOf = input.getGhostOf();
+        ghostCreatedByUserID = input.getGhostCreatedByUserID();
+        cloneCreatedDate = input.getCloneCreatedDate();
+        cloneCreatedDatePretty = input.getCloneCreatedDatePretty();
+        cloneOf = input.getCloneOf();
+        cloneCreatedByUserID = input.getCloneCreatedByUserID();
+        ghostsList = input.getGhostsList();
+        cloneList = input.getCloneList();
+        mergedList = input.getMergedList();
+    }
     
     
     

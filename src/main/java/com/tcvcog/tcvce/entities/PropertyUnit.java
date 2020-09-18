@@ -36,6 +36,24 @@ public class    PropertyUnit
     protected int conditionIntensityClassID;
     protected LocalDateTime lastUpdatedTS;
 
+    public PropertyUnit() {
+    }
+
+    public PropertyUnit(PropertyUnit input){
+        unitID = input.getUnitID();
+        propertyID = input.getPropertyID();
+        unitNumber = input.getUnitNumber();
+        otherKnownAddress = input.getOtherKnownAddress();
+        rentalIntentDateStart = input.getRentalIntentDateStart();
+        rentalIntentDateStop = input.getRentalIntentDateStop();
+        rentalIntentLastUpdatedBy = input.getRentalIntentLastUpdatedBy();
+        notes = input.getNotes();
+        rentalNotes = input.getRentalNotes();
+        active = input.isActive();
+        conditionIntensityClassID = input.getConditionIntensityClassID();
+        lastUpdatedTS = input.getLastUpdatedTS();
+    }
+    
     @Override
     public int hashCode() {
         int hash = 5;

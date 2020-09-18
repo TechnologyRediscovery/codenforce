@@ -5,16 +5,16 @@ Miscellaneous code to be used in the creation of this package. Should not appear
 import pickle
 import sys
 from os import path
-from _constants import MEDIUM_DASHES
+from _constants import MEDIUM_DASHES, MORTGAGE
 import itertools
-import bs4
 
 
-from _constants import SPAN, PARCEL_ID, OWNER, TAXINFO
+from _constants import SPAN, PARCEL_ID_LoB, OWNER, TAXINFO
 import _scrape as scrape
 import _parse
 from _parse import TaxStatus
 from typing import Dict, NamedTuple, Any, Optional, Tuple, List
+import bs4  # Todo: Only imported BS4 for typing. Is that Pythonic?
 
 HERE = path.abspath(path.dirname(__file__))
 MOCKS = path.join(HERE, "..", "tests", "mocks", "")  # The mock folder
@@ -91,20 +91,30 @@ def pickler(obj, filename, path_to_file=MOCKS, incr=True):
 
 def replace_parid(new_parid, soup, r) -> Tuple[bs4.BeautifulSoup, Dict]:
     """
+    Args:
+        new_parid: A parcel id with hyphens.
+        soup:
+        r:
     """
-    r["PARID"] = new_parid
-    new_soup = _parse.replace_html_content(soup, PARCEL_ID, new_parid)
-    # # TODO: REPLACE LOT AND BLOCK AS WELL
+    hyphenless_parid = _parse.remove_hyphnes(new_parid)
+    r["PARID"] = hyphenless_parid
+    # Replaces the Parcel ID (Lot and Block)
+    # Does not add hyphens
+    new_soup = _parse.replace_html_content(new_parid, soup, PARCEL_ID_LoB)
+    # Note: Does not replace the url in <form> or Footer1$TtPID
     return new_soup, r
 
 
 def replace_name(new_name, soup) -> bs4.BeautifulSoup:
     """
     """
-    return _parse.replace_html_content(soup, OWNER, new_name)
+    new_soup = _parse.replace_html_content(new_name, soup, OWNER)
+    # Todo: Replace mortage and footer
+    # new_soup = _parse.replace_html_content(new_name, new_soup, MORTGAGE)
+    return new_soup
 
 
-def replace_taxstatus(taxes, soup) -> bs4.BeautifulSoup:
+def replace_taxstatus(taxes, soup, r) -> bs4.BeautifulSoup:
     """
     """
     # Setup: We want taxes to be a list of at least 4 TaxStatuses or Nones, but we accept any number, including a single TaxStatus instance
@@ -153,7 +163,10 @@ def replace_taxstatus(taxes, soup) -> bs4.BeautifulSoup:
             except TypeError as E:  # NoneType takes no arguments
                 tag.contents.append(field)
 
-    return soup
+    most_recent_taxyear = taxes[0].year
+    r["TAXYEAR"] = int(most_recent_taxyear)
+
+    return soup, r
 
 
 def anonymize_html_and_record(
@@ -164,6 +177,8 @@ def anonymize_html_and_record(
 ) -> Tuple[str, Dict[str, Any]]:
     """
     anonymize_html_and_record creates a custom Allegheny County Real Estate html based upon a real page.
+
+    Passing a record without optional arguments returns the record and county real estate html as is.
 
     Args:
         r: A real record the anonymized output is based upon.
@@ -184,9 +199,8 @@ def anonymize_html_and_record(
     if new_name:
         soup = replace_name(new_name, soup)
     if new_taxstatus:
-        soup = replace_taxstatus(new_taxstatus, soup)
-    mocked_html = soup.text
-    return mocked_html, r
+        soup, r = replace_taxstatus(new_taxstatus, soup, r)
+    return str(soup), r
 
 
 if __name__ == "__main__":

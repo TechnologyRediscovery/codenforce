@@ -35,20 +35,14 @@ INSERT INTO public.eventcategory(
            details.changes = Changes("your flag", old[i], new[i])
            YourNewEvent.write_to_db()
     ~~~
-  * Add your event to the MockedCursor class in tests/test_pyparcel.py.
-    ~~~(
-    Class MockedCursor(mock.MagicMixin):
-        def __init__(self, new_yourevent):
-            self.old_yourevent = "OLD EXAMPLE"
-            
-            self.new_yourevent = "NEW EXAMPLE" if new_yourevent else self.old_condition
+   
+  * Add your event to the list parcel_changed_events in tests/test_pyparcel.py
     ~~~
-  * Add your event to the function _propertyexternaldata_events_and_corresponding_cursors
-  ~~~
-  return(
-      EnC(YourEvent, MockedCursor(new_yourevent=True)), # Event and Cursor
-  )
-  ~~~
+    # A manually maintained list of Parcel Changed Event categories
+    parcel_changed_events = [
+        PCE(YourEvent, "Example starting data" "Example new data",
+        ...
+    ~~~
     The parametrization takes care of running the tests.
 
 

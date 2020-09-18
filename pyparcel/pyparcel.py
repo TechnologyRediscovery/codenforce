@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-
 import time
+from datetime import timedelta
+
 import click
+import psycopg2
+
 import _fetch as fetch
-from _connection import connection_and_cursor
 from _update_muni import update_muni
 from _constants import Tally, DASHES, COG_DB
 
@@ -16,7 +18,7 @@ from _constants import Tally, DASHES, COG_DB
 @click.option("--password", nargs=1, default="c0d3")
 @click.option(
     "--commit/--test",
-    default=True,
+    default=False,
     help="Choose whether to commit to the database or to just run as a test",
 )
 @click.option("--port", nargs=1, default=5432)
@@ -27,27 +29,34 @@ def main(municodes, commit, u, password, port):
         click.echo("Data will be committed to the database")
     else:
         click.echo("This is a test. Data will NOT be committed.")
+    click.echo("Port = {}".format(port))
     click.echo(DASHES)
 
     try:
-        with connection_and_cursor(
+        with psycopg2.connect(
             database=COG_DB, user=u, password=password, port=port
-        ) as (conn, cursor):
-            if municodes == ():
-                # Update ALL municipalities.
-                municodes = [muni for muni in fetch.munis(cursor)]
-            for _municode in municodes:
-                muni = fetch.muniname_from_municode(_municode, cursor)
-                update_muni(muni, conn, commit)
-                Tally.muni_count += 1
-                print("Updated", Tally.muni_count, "municipalities.")
+        ) as conn:
+            with conn.cursor() as cursor:
+                if municodes == ():
+                    # Update ALL municipalities.
+                    municodes = [muni for muni in fetch.munis(cursor)]
+                for _municode in municodes:
+                    muni = fetch.muniname_from_municode(_municode, cursor)
+                    update_muni(muni, conn, commit)
+                    Tally.muni_count += 1
+                    print("Updated", Tally.muni_count, "municipalities.")
     finally:
         try:
             print("Current muni:", muni.name)
         except NameError:
             pass
         end = time.time()
-        print("Total time: {:.0f} seconds".format(end - start))
+        print(
+            "Total time: {}".format(
+                # Strips milliseconds from elapsed time
+                str(timedelta(seconds=(end - start))).split(".")[0]
+            )
+        )
 
 
 if __name__ == "__main__":

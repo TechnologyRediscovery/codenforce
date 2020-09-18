@@ -57,7 +57,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
     public void attachMessageToCEActionRequest(PublicInfoBundleCEActionRequest request, String message) throws IntegrationException {
         String q = "UPDATE public.ceactionrequest\n"
-                + "   SET publicexternalnotes = ? WHERE requestid = ?;";
+                + "   SET publicexternalnotes = ? WHERE requestpubliccc = ?;";
 
         // for degugging
         // System.out.println("Select Statement: ");
@@ -69,7 +69,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             con = getPostgresCon();
             stmt = con.prepareStatement(q);
             stmt.setString(1, message);
-            stmt.setInt(2, request.getBundledRequest().getCaseID());
+            stmt.setInt(2, request.getPacc());
             System.out.println("CEActionRequestorIntegrator.attachMessageToCEActionRequest | statement: " + stmt.toString());
             // Retrieve action data from postgres
             stmt.execute();

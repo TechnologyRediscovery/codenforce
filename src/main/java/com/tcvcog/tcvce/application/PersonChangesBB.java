@@ -29,20 +29,21 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 
 /**
  *
  * @author Nathan Dietz
  */
-public class PersonChangesBB 
-        extends BackingBeanUtils{
-    
+public class PersonChangesBB
+        extends BackingBeanUtils {
+
     private List<PersonWithChanges> currPersonList;
     private PersonWithChanges currPerson;
     private PersonChangeOrder currChangeOrder;
-    
+
     private List<PersonWithChanges> displayList;
-    
+
     private List<ViewOptionsActiveListsEnum> allViewOptions;
     private ViewOptionsActiveListsEnum currentViewOption;
 
@@ -59,22 +60,22 @@ public class PersonChangesBB
             setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ACTIVE);
         }
     }
-    
-    public void refreshCurrentObjects(){
-        
+
+    public void refreshCurrentObjects() {
+
         PersonCoordinator pc = getPersonCoordinator();
 
         //let's grab the latest copy of the prop from the database and set it on the session bean
         try {
 
-            if(getSessionBean().getSessPersonList() != null){
-                
+            if (getSessionBean().getSessPersonList() != null) {
+
                 currPersonList = pc.getPersonWithChangesList(getSessionBean().getSessPersonList());
-                
+
             } else {
-                
+
                 currPersonList = new ArrayList<>();
-                
+
                 currPersonList.add(pc.getPersonWithChanges(getSessionBean().getSessPerson().getPersonID()));
             }
 
@@ -84,70 +85,73 @@ public class PersonChangesBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occurred while trying to load information from the database.", ""));
         }
-        
+
         currPerson = new PersonWithChanges();
-        
+
         currChangeOrder = new PersonChangeOrder();
-        
+
     }
-    
+
     /**
-     * Just a little method used by the UI to display 
-     * whether a public user wanted to change a boolean value,
-     * and if so what they want to change it to.
+     * Just a little method used by the UI to display whether a public user
+     * wanted to change a boolean value, and if so what they want to change it
+     * to.
+     *
      * @param input
-     * @return 
+     * @return
      */
-        public String checkForChangeBoolean(String input){
-        
-        if (input == null){
+    public String checkForChangeBoolean(String input) {
+
+        if (input == null) {
             return "No change";
-        } else if (Boolean.valueOf(input)){
+        } else if (Boolean.valueOf(input)) {
             return "Yes";
         } else {
             return "No";
         }
-        
+
     }
-    
-        /**
-         * were we redirected to this page from another?
-         * @return 
-         */
-   public boolean wasRedirected(){
-       return getSessionBean().getNavStack().peekLastPage() != null;
-   }
-        
-    public String goBack(){
-        try{
-        return getSessionBean().getNavStack().popLastPage();
-        }catch(NavigationException ex){
+
+    /**
+     * were we redirected to this page from another?
+     *
+     * @return
+     */
+    public boolean wasRedirected() {
+        return getSessionBean().getNavStack().peekLastPage() != null;
+    }
+
+    public String goBack() {
+        try {
+            return getSessionBean().getNavStack().popLastPage();
+        } catch (NavigationException ex) {
             System.out.println("PersonChangesBB.goBack() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
+            //We must do things a little bit different here to make sure messages are kept after the redirect.
+            FacesContext context = getFacesContext();
+                    context.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occurred while trying to redirect you back to the previous page!", ""));
+                             "An error occurred while trying to redirect you back to the previous page!", ""));
+                    context.getExternalContext().getFlash().setKeepMessages(true);
             return "missionControl";
         }
     }
-    
-    public String goToPerson(PersonWithChanges person){
+
+    public String goToPerson(PersonWithChanges person) {
         PersonCoordinator pc = getPersonCoordinator();
-        
+
         getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(person, getSessionBean().getSessUser().getMyCredential()));
-        
+
         getSessionBean().getNavStack().pushCurrentPage();
-        
+
         return "personInfo";
-        
+
     }
-    
-    public void initializeChangeComparison(PersonWithChanges person, PersonChangeOrder change){
+
+    public void initializeChangeComparison(PersonWithChanges person, PersonChangeOrder change) {
         currPerson = person;
         currChangeOrder = change;
     }
-    
-    
-    
+
     public String approvedByWho(PersonChangeOrder change) {
 
         if (change.getApprovedBy() != null) {
@@ -157,19 +161,19 @@ public class PersonChangesBB
                     + " (ID# "
                     + change.getApprovedBy().getPersonID()
                     + ")";
-        } else if(change.isActive()) {
+        } else if (change.isActive()) {
             return "No action taken yet";
         } else {
             return "Rejected";
         }
 
     }
-    
-    public void rejectChangeOrder(){
+
+    public void rejectChangeOrder() {
         PersonIntegrator pi = getPersonIntegrator();
-        
+
         currChangeOrder.setActive(false);
-        
+
         try {
             pi.updatePersonChangeOrder(currChangeOrder);
         } catch (IntegrationException ex) {
@@ -178,14 +182,14 @@ public class PersonChangesBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occurred while trying to update the database.", ""));
         }
-        
+
         setCurrentViewOption(currentViewOption);
-        
+
     }
-    
-    public void applyChangeOrder(){
+
+    public void applyChangeOrder() {
         PersonCoordinator pc = getPersonCoordinator();
-        
+
         try {
             pc.implementPersonChangeOrder(currChangeOrder);
         } catch (IntegrationException ex) {
@@ -194,11 +198,11 @@ public class PersonChangesBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occurred while trying to update the database.", ""));
         }
-        
+
         setCurrentViewOption(currentViewOption);
-        
+
     }
-        
+
     public List<PersonWithChanges> getCurrPersonList() {
         return currPersonList;
     }
@@ -245,7 +249,7 @@ public class PersonChangesBB
 
     public void setCurrentViewOption(ViewOptionsActiveListsEnum input) {
         currentViewOption = input;
-        
+
         refreshCurrentObjects();
 
         currentViewOption = input;
@@ -314,5 +318,5 @@ public class PersonChangesBB
 
         }
     }
-    
+
 }

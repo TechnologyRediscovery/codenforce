@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import org.primefaces.event.FileUploadEvent;
 
@@ -67,6 +68,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     private int actionRequestorAssignmentMethod;
     private List<Person> personCandidateList;
     private boolean disabledPersonFormFields;
+    private List<PersonType> submittingPersonTypes;
 
     private TabView tabView;
     private int currentTabIndex;
@@ -122,6 +124,17 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             initializeReqAndMuni();
 
         }
+        
+        submittingPersonTypes = new ArrayList<>();
+        
+        //Manually add what person types we want.
+        submittingPersonTypes.add(PersonType.MuniStaff);
+        submittingPersonTypes.add(PersonType.Owner);
+        submittingPersonTypes.add(PersonType.Tenant);
+        submittingPersonTypes.add(PersonType.Manager);
+        submittingPersonTypes.add(PersonType.Public);
+        submittingPersonTypes.add(PersonType.LawEnforcement);
+        
     }
 
     public void initializeReqAndMuni() {
@@ -186,9 +199,12 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             return getSessionBean().getNavStack().popLastPage();
         } catch (NavigationException ex) {
             System.out.println("CEActionRequestSubmitBB.goBack() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
+            //We must do things a little bit different here to make sure messages are kept after the redirect.
+            FacesContext context = getFacesContext();
+                    context.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Something went wrong when we tried to direct you back a page!", ""));
+                    context.getExternalContext().getFlash().setKeepMessages(true);
             return "requestCEActionFlow";
         }
     }
@@ -674,9 +690,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     /**
      * @return the submittingPersonTypes
      */
-    public PersonType[] getSubmittingPersonTypes() {
+    public List<PersonType> getSubmittingPersonTypes() {
 
-        return PersonType.values();
+        return submittingPersonTypes;
     }
 
     /**

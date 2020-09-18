@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
@@ -32,6 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 
 /**
  *
@@ -109,6 +111,30 @@ public class PropertyUnitChangesBB
             return "Rejected";
         }
 
+    }
+    
+    /**
+     * were we redirected to this page from another?
+     *
+     * @return
+     */
+    public boolean wasRedirected() {
+        return getSessionBean().getNavStack().peekLastPage() != null;
+    }
+
+    public String goBack() {
+        try {
+            return getSessionBean().getNavStack().popLastPage();
+        } catch (NavigationException ex) {
+            System.out.println("PropertyUnitChangesBB.goBack() | ERROR: " + ex);
+            //We must do things a little bit different here to make sure messages are kept after the redirect.
+            FacesContext context = getFacesContext();
+                    context.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to redirect you back to the previous page!", ""));
+                    context.getExternalContext().getFlash().setKeepMessages(true);
+            return "missionControl";
+        }
     }
 
     public void initializeChangeComparison(PropertyUnit unit, PropertyUnitChangeOrder change) {
