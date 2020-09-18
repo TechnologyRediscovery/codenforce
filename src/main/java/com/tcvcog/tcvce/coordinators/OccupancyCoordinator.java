@@ -592,6 +592,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             OccPeriodType perType,
             User u,
             MunicipalityDataHeavy muni) throws IntegrationException {
+        
+        
+        
         SystemIntegrator si = getSystemIntegrator();
         OccPeriod period = new OccPeriod();
         

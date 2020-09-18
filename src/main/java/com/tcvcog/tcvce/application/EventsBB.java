@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -44,6 +45,7 @@ import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -79,6 +81,8 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     private ViewOptionsActiveHiddenListsEnum selectedEventView;
     
     private Map<EventType, List<EventCategory>> typeCatMap;
+    private boolean updateNewEventFieldsWithCatChange;
+    private Map<EventType, List<EventCategory>> typeCatMapForSearch;
     
     private List<EventType> eventTypeCandidates;
     private EventType eventTypeSelected;
@@ -87,6 +91,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     private EventCategory eventCategorySelected;
     
     private List<Person> personCandidates;
+    private int personIDForLookup;
     private Person personSelected;
     
     private String formNoteText;
@@ -143,23 +148,42 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         }
         
         
-        // Based on who sent us to this page, we'll load in either the CECase or OccPeriod
-        // on the SessionBean
-        EventDomainEnum domain = sb.getSessEventsPageEventDomainRequest();
-        // uses domain in a switch{} for setting property values of other page modes
-        configureEventDomain(domain);
+        EventCnF sessEv =  getSessionBean().getSessEvent();
+        if(sessEv != null){
+            try {
+                currentEvent = ec.assembleEventCnFPropUnitCasePeriodHeavy(sessEv);
+                
+            } catch (EventException | IntegrationException | SearchException ex) {
+                System.out.println("EventsBB.initbean: Current event loading error");
+            }
+            currentEventDomain = currentEvent.getDomain();
+                
+        } else { // we don't have a session event, so set page domain based on domain request on sessionbean
+            
+            // Based on who sent us to this page, we'll load in either the CECase or OccPeriod
+            // on the SessionBean
+            EventDomainEnum domain = sb.getSessEventsPageEventDomainRequest();
+            // uses domain in a switch{} for setting property values of other page modes
+            if(domain == null){
+                // set a default value
+                domain = EventDomainEnum.OCCUPANCY;
+            }
+            currentEventDomain = domain;
+        }
+        configureEventDomain(currentEventDomain);
         
         setPersonCandidates(new ArrayList<Person>());
-        getPersonCandidates().addAll(getSessionBean().getSessPersonList());
         
-        setTypeCatMap(ec.assembleEventTypeCatMap_toEnact(getCurrentEventDomain(), getCurrentERGBOb(), getSessionBean().getSessUser()));
         
-        setEventTypeCandidates(new ArrayList<>(getTypeCatMap().keySet()));
-        setEventCategoryCandidates(new ArrayList<EventCategory>());
+        typeCatMap = ec.assembleEventTypeCatMap_toEnact(currentEventDomain, currentERGBOb, getSessionBean().getSessUser());
+        updateNewEventFieldsWithCatChange = true;
+        
+        eventTypeCandidates = new ArrayList<>(getTypeCatMap().keySet());
+        eventCategoryCandidates = new ArrayList<>();
         
         if(getEventTypeCandidates() != null && !eventTypeCandidates.isEmpty()){
-            setEventTypeSelected(getEventTypeCandidates().get(0));
-            setEventCategoryCandidates(getTypeCatMap().get(getEventTypeSelected())) ;
+            eventTypeSelected = getEventTypeCandidates().get(0);
+            eventCategoryCandidates.addAll(typeCatMap.get(eventTypeSelected));
         }
         
         
@@ -185,10 +209,10 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         
         
        
-        typeCatMap = ec.assembleEventTypeCatMap_toView(getSessionBean().getSessUser());
+        typeCatMapForSearch = ec.assembleEventTypeCatMap_toView(getSessionBean().getSessUser());
         
         eventTypeListSearch = new ArrayList(getTypeCatMap().keySet());
-        eventCategoryListSearch = typeCatMap.get(eventTypeListSearch.get(0));
+        eventCategoryListSearch = typeCatMapForSearch.get(eventTypeListSearch.get(0));
         
         propUseTypeList = pc.getPropertyUseTypeList();
         
@@ -201,12 +225,78 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         configureParameters();
     }
     
+      /**
+     * Responds to the user clicking one of the page modes: LOOKUP, ADD, UPDATE,
+     * REMOVE
+     *
+     * @param mode
+     */
+    public void setCurrentMode(PageModeEnum mode) {
+
+        //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
+        PageModeEnum tempCurMode = this.getCurrentMode();
+        //reset default setting every time the Mode has been selected 
+//        loadDefaultPageConfig();
+        //check the currentMode == null or not
+        if (mode == null) {
+            this.currentMode = tempCurMode;
+        } else {
+            this.currentMode = mode;
+        }
+        switch (currentMode) {
+            case LOOKUP:
+                onModeLookupInit();
+                break;
+            case INSERT:
+                onModeInsertInit();
+                break;
+            case UPDATE:
+                onModeUpdateInit();
+                break;
+            case REMOVE:
+                onModeRemoveInit();
+                break;
+            default:
+                break;
+        }
+    }
+    
+    
+    /**
+     * Internal logic container for changes to page mode: Lookup
+     */
+    private void onModeLookupInit() {
+    }
+    
+    /**
+     * Internal container for mode add init
+     */
+    private void onModeInsertInit(){
+        initiateNewEvent();
+    }
+
+    
+     /**
+     * Listener for beginning of update process
+     */
+    public void onModeUpdateInit() {
+        // nothign to do here yet since the user is selected
+    }
+
+    /**
+     * Listener for the start of the case remove process
+     */
+    public void onModeRemoveInit() {
+
+    }
+    
     /**
      * Based on the requested domain, session objects are grabbed and 
      * used for setting the bean's central members
      * @param domain 
      */
     private void configureEventDomain(EventDomainEnum domain){
+        
         SessionBean sb = getSessionBean();
         EventCoordinator ec = getEventCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
@@ -380,6 +470,42 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
 
         return "";
         
+    }
+    
+    /**
+     * Listener for user changes to the selected event type
+     */
+    public void onEventTypeMunuChange(){
+        System.out.println("EventsBB.onEventTypeMenuChange");
+        refreshAvailableEventCategories();
+        
+    }
+    
+    /**
+     * Listener for user changes to the event category list on event add
+     */
+    public void onEventCategoryMenuChange(){
+        
+        configureCurrentEventFields();
+    }
+    
+    
+    /**
+     * Sets current event field values to those suggested by the 
+     * selected event category
+     */
+    private void configureCurrentEventFields(){
+        if(eventCategorySelected != null 
+                && currentEvent != null 
+                && updateNewEventFieldsWithCatChange){
+            currentEvent.setTimeStart(LocalDateTime.now());
+            currentEvent.setTimeEnd(LocalDateTime.now().plusMinutes(eventCategorySelected.getDefaultdurationmins()));
+            currentEvent.setDescription(eventCategorySelected.getHostEventDescriptionSuggestedText());
+        }
+    }
+    
+    public void onTimeStartChange(){
+        currentEvent.setTimeEnd(LocalDateTime.now().plusMinutes(eventCategorySelected.getDefaultdurationmins()));
     }
     
     
@@ -560,21 +686,25 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
      * Logic container for setting up new event which will be displayed 
      * in the overlay window for the User
      */
-    public void initiateNewEvent() {
+    private void initiateNewEvent() {
+        System.out.println("EventsBB.initiateNewEvent");
         EventCoordinator ec = getEventCoordinator();
         
         EventCnF ev = null;
-        if (getEventTypeSelected() != null && getEventCategorySelected() != null ) {
             
             try {
-                ev = ec.initEvent(getCurrentERGBOb(), getEventCategorySelected());
-                ev.setCategory(getEventCategorySelected());
-                switch(getCurrentEventDomain()){
+                ev = ec.initEvent(currentERGBOb, null);
+//                ev.setCategory(eventCategorySelected);
+                switch(currentEventDomain){
                     case CODE_ENFORCEMENT:
                         ev.setCeCaseID(getCurrentERGBOb().getBObID());
                         break;
                     case OCCUPANCY:
                         ev.setOccPeriodID(getCurrentERGBOb().getBObID());
+                        break;
+                    default:
+                        getFacesContext().addMessage(null,
+                                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Cannot add event to non CE or Occ domain", ""));
                         break;
                 }
                 ev.setUserCreator(getSessionBean().getSessUser());
@@ -585,11 +715,6 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
             }
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select an event category to create a new event.", ""));
-        }
     }
 
     /**
@@ -602,27 +727,43 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
      * @return 
      */
     public String onEventAddCommitButtonChange() {
+        System.out.println("EventsBB.onEventAddCommitButtonChange");
         EventCoordinator ec = getEventCoordinator();
         
-        List<EventCnFPropUnitCasePeriodHeavy> evDoneList = null;
+        List<EventCnFPropUnitCasePeriodHeavy> evDoneList;
             
         // category is already set from initialization sequence
 
         try {
-            
-            evDoneList = ec.assembleEventCnFPropUnitCasePeriodHeavyList(ec.addEvent(getCurrentEvent(), getCurrentERGBOb(), getSessionBean().getSessUser()));
-
-            if(evDoneList != null && !evDoneList.isEmpty()){
-                for(EventCnF evt: evDoneList){
-                    
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                    "Successfully logged event with an ID " + evt.getEventID() + " ", ""));
-                }
-                setCurrentEvent(evDoneList.get(0));
-
+            currentEvent.setCategory(eventCategorySelected);
+            currentEvent.setDomain(currentEventDomain);
+            if(currentEvent.getDomain() == null && currentEvent.getDomain() == EventDomainEnum.UNIVERSAL){
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Event must have a domain that's not universal", ""));
+                return "";
             }
-            return "events";
+            if(eventCategorySelected == null){
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Event must have a category ", ""));
+                return "";
+            } else {
+                List<EventCnF> evSimpleList = ec.addEvent(currentEvent, currentERGBOb, getSessionBean().getSessUser());
+                evDoneList = ec.assembleEventCnFPropUnitCasePeriodHeavyList(evSimpleList);
+
+                if(evDoneList != null && !evDoneList.isEmpty()){
+                    for(EventCnF evt: evDoneList){
+
+                        getFacesContext().addMessage(null,
+                                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                        "Successfully logged event with an ID " + evt.getEventID() + " ", ""));
+                    }
+                    currentEvent = evDoneList.get(0);
+                }
+                getSessionBean().setSessEvent(currentEvent);
+                return "events";
+            }
     
         } catch (IntegrationException | BObStatusException | EventException | SearchException ex) {
             System.out.println(ex);
@@ -651,15 +792,49 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         // nothing to do on the back end
         
     }
+    
+    /**
+     * Listener for user requests to search for a person by ID
+     * @param ev 
+     */
+    public void onPersonLookupByIDButtonChange(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        if(personIDForLookup == 0){
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Shall not look up person with ID of 0",
+                            "Please enter a positive, non-zero ID"));
+             return;
+            
+        }
+        try {
+            personCandidates.add(pc.getPerson(personIDForLookup));
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Located " + personCandidates.size() + " persons with this ID",
+                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
+        } catch (IntegrationException ex) {
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(),
+                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
+        }
+        
+        
+    }
   
     /**
      * Listener method for changes in EventType selected by User
      */
     public void refreshAvailableEventCategories(){
-        EventCoordinator ec = getEventCoordinator();
-        if(getEventTypeSelected() != null){
-            getEventCategoryCandidates().clear();
-            getEventCategoryCandidates().addAll(getTypeCatMap().get(getEventTypeSelected()));
+        
+        if(eventTypeSelected != null){
+            eventCategoryCandidates.clear();
+            eventCategoryCandidates.addAll(typeCatMap.get(eventTypeSelected));
+            if(!eventCategoryCandidates.isEmpty()){
+                eventCategorySelected = eventCategoryCandidates.get(0);
+            }
+            System.out.println("EventsBB.refreshavailableEventCategories");
         }
     }
     
@@ -969,12 +1144,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         return currentMode;
     }
 
-    /**
-     * @param currentMode the currentMode to set
-     */
-    public void setCurrentMode(PageModeEnum currentMode) {
-        this.currentMode = currentMode;
-    }
+   
 
     /**
      * @return the formNoteText
@@ -1160,6 +1330,48 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
      */
     public void setListTypeList(List<EventListTypeEnum> listTypeList) {
         this.listTypeList = listTypeList;
+    }
+
+    /**
+     * @return the personIDForLookup
+     */
+    public int getPersonIDForLookup() {
+        return personIDForLookup;
+    }
+
+    /**
+     * @param personIDForLookup the personIDForLookup to set
+     */
+    public void setPersonIDForLookup(int personIDForLookup) {
+        this.personIDForLookup = personIDForLookup;
+    }
+
+    /**
+     * @return the typeCatMapForSearch
+     */
+    public Map<EventType, List<EventCategory>> getTypeCatMapForSearch() {
+        return typeCatMapForSearch;
+    }
+
+    /**
+     * @param typeCatMapForSearch the typeCatMapForSearch to set
+     */
+    public void setTypeCatMapForSearch(Map<EventType, List<EventCategory>> typeCatMapForSearch) {
+        this.typeCatMapForSearch = typeCatMapForSearch;
+    }
+
+    /**
+     * @return the updateNewEventFieldsWithCatChange
+     */
+    public boolean isUpdateNewEventFieldsWithCatChange() {
+        return updateNewEventFieldsWithCatChange;
+    }
+
+    /**
+     * @param updateNewEventFieldsWithCatChange the updateNewEventFieldsWithCatChange to set
+     */
+    public void setUpdateNewEventFieldsWithCatChange(boolean updateNewEventFieldsWithCatChange) {
+        this.updateNewEventFieldsWithCatChange = updateNewEventFieldsWithCatChange;
     }
 
 }

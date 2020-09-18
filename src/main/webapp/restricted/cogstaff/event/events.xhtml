@@ -1,21 +1,5 @@
-
 <?xml version='1.0' encoding='UTF-8' ?>
-<!--
-Copyright (C) 2020 Turtle Creek Valley
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
--->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
@@ -56,7 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                >
                                                 <f:selectItems value="#{eventsBB.pageModes}"
                                                                var="pmo"
-                                                               itemDisabled="#{pmo.objectSelectRequiredToEnable and empty eventsBB.currentNotice}"
+                                                               itemDisabled="#{pmo.objectSelectRequiredToEnable and empty eventsBB.currentEvent}"
                                                                itemLabel="#{pmo.title}"/>
                                                 <f:ajax render="@all"/>
                                             </p:selectOneButton>
@@ -93,7 +77,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             var="listtype"
                                                                             itemValue="#{listtype}"
                                                                             itemLabel="#{listtype.title}"/>
-                                                            <p:ajax update="events-table"
+                                                            <p:ajax update="event-list-panel"
                                                                     immediate="true" 
                                                                     listener="#{eventsBB.onListTypeMenuChange(eventsBB.listType)}"/>
                                                         </p:selectOneMenu>
@@ -114,13 +98,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                         <p:selectOneMenu id="eventquery-som" 
                                                                          tabindex="1" 
-                                                                         value="#{eventSearchBB.querySelected}"
+                                                                         value="#{eventsBB.querySelected}"
                                                                          style="margin-right: 10px;">
                                                             <f:converter converterId="bOBQueryConverter"/>
                                                             <f:selectItem itemLabel="select a query..." noSelectionOption="true" itemDisabled="true"/>
-                                                            <f:selectItems id="querylist-si" value="#{eventSearchBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
-                                                            <p:ajax listener="#{eventSearchBB.changeQuerySelected}"
-                                                                    update="event-search-messages-form
+                                                            <f:selectItems id="querylist-si" value="#{eventsBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
+                                                            <p:ajax listener="#{eventsBB.changeQuerySelected}"
+                                                                    update="form-messages-global
                                                                     @form"/>
                                                         </p:selectOneMenu>
                                                     </div>
@@ -131,29 +115,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                     <div class="restrict-main-contents-io-button">
 
-                                                        <p:commandButton    id="execute-selected-query" 
-                                                                            ajax="true"
-                                                                            value="perform selected query" 
-                                                                            actionListener="#{eventSearchBB.runQuery}"
-                                                                            disabled="#{eventSearchBB.querySelected.queryExecuted}"
-                                                                            icon="fa fa-flash"
-                                                                            update="
-                                                                            @form
-                                                                            events-datatable-form
-                                                                            event-search-messages-form
-                                                                            event-search-log-form
-                                                                            "/>
+
                                                     </div>
 
                                                     <div class="restrict-main-contents-io-button">
                                                         <p:commandButton   id="event-search-clear-cb" 
                                                                            ajax="true" 
-                                                                           actionListener="#{eventSearchBB.resetQuery}"
+                                                                           actionListener="#{eventsBB.resetQuery}"
                                                                            icon="fa fa-eraser" 
                                                                            styleClass="button inline-button"
                                                                            value="clear query" 
-                                                                           disabled="#{!eventSearchBB.querySelected.queryExecuted}"
-                                                                           update=" event-search-messages-form
+                                                                           disabled="#{!eventsBB.querySelected.queryExecuted}"
+                                                                           update="form-messages-global
                                                                            @form
                                                                            event-search-log-form"/>
 
@@ -164,12 +137,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                         <p:commandButton   id="event-search-clear-button" 
                                                                            ajax="true" 
-                                                                           actionListener="#{eventSearchBB.clearEventList}"
+                                                                           actionListener="#{eventsBB.clearEventList}"
                                                                            icon="fa fa-eraser" 
                                                                            styleClass="button"
                                                                            value="clear results list" 
-                                                                           update="events-datatable-form
-                                                                           event-search-messages-form"/>
+                                                                           update="event-list-panel
+                                                                           form-messages-global"/>
+                                                    </div>
+                                                    <div class="restrict-main-contents-io-button">
+                                                        <p:commandLink id="textblock-manager-commandlink"
+                                                                       type="button"
+                                                                       update="event-search-advanced-dialog"
+                                                                       oncomplete="PF('event-search-advanced-dialog-var').show()" />
                                                     </div>
                                                 </div>
 
@@ -184,7 +163,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
                                                     <div class="restrict-data-field-value-inline" >
                                                         <p:selectBooleanCheckbox   id="event-search-appendresults-chkbox" 
-                                                                                   value="#{eventSearchBB.appendResultsToList}" >
+                                                                                   value="#{eventsBB.appendResultsToList}" >
                                                             <p:ajax />
                                                         </p:selectBooleanCheckbox>
                                                     </div>
@@ -197,25 +176,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                                         <p:commandButton   id="print-event-list-report-cb" 
-                                                                           ajax="true" actionListener="#{eventSearchBB.prepareEventReport}"
+                                                                           ajax="true" actionListener="#{eventsBB.prepareEventReport}"
                                                                            icon="fa fa-print" styleClass="button"
                                                                            oncomplete="PF('report-event-diaglog-var').show()"
                                                                            value="prepare event report" 
                                                                            update="report-eventlist-form
-                                                                           event-search-messages-form
-                                                                           events-reportconfig-messages-form"/>
+                                                                           form-messages-global"/>
 
                                                     </div>
 
                                                     <div class="restrict-main-contents-io-button">
                                                         <p:commandButton   id="event-search-loadhistory-button" 
                                                                            ajax="true" 
-                                                                           actionListener="#{eventSearchBB.loadEventHistory}"
+                                                                           actionListener="#{eventsBB.loadEventHistory}"
                                                                            icon="fa fa-clock-o" 
                                                                            styleClass="button"
                                                                            value="load event history" 
-                                                                           update="events-datatable-form
-                                                                           event-search-messages-form"/>
+                                                                           update="event-list-panel
+                                                                           form-messages-global"/>
                                                     </div>
                                                     <div class="restrict-main-contents-io-button">
                                                         <p:commandButton  value="help" 
@@ -240,11 +218,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                         <h:form id="event-list-form">
 
-                                            <h2>
-                                                <h:outputText value="Case: #{eventsBB.currentCase.caseName}, ID:#{eventsBB.currentCase.caseID}" />
-                                                <p:spacer height="3px" />
-                                                <h:outputText value="Property: #{eventsBB.currentCase.property.address} (#{eventsBB.currentCase.property.muni.muniName})" />
-                                            </h2>
+
 
                                             <div class="ui-g data_container_nested_restrict">
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
@@ -257,15 +231,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="restrict-data-field-value-inline" >
 
                                                         <p:selectOneMenu    id="event-viewoptions-som"
-                                                                            value="#{eventsBB.selectedViewOption}"
+                                                                            value="#{eventsBB.selectedEventView}"
                                                                             tabindex="10">
 
                                                             <f:selectItems  id="event-viewoptions-selitems"
-                                                                            value="#{eventsBB.viewOptionList}"
+                                                                            value="#{eventsBB.eventsViewOptionsCandidates}"
                                                                             var="vo"
                                                                             itemValue="#{vo}"
                                                                             itemLabel="#{vo.label}"/>
-                                                            <p:ajax update="event-scroller"
+                                                            <p:ajax update="events-table
+                                                                    events-datascroller"
                                                                     immediate="true"/>
                                                         </p:selectOneMenu>
 
@@ -278,13 +253,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 id="events-table"
                                                 var="e"
                                                 rowKey="#{e.eventID}"
-                                                value="#{ceCaseEventsBB.currentCase.visibleEventList}"
+                                                value="#{eventsBB.eventList}"
                                                 tableStyleClass="primeDataTable"
                                                 resizableColumns="true"
                                                 rowExpandMode="multiple"
                                                 expandedRow="false"
                                                 scrollHeight="400"
-                                                filteredValue="#{ceCaseEventsBB.filteredEventList}"
+                                                filteredValue="#{eventsBB.filteredEventList}"
                                                 widgetVar="caseEventTable"
                                                 >
                                                 <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
@@ -375,17 +350,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                      ajax="true"
                                                                      disabled="#{e.hidden}"
                                                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                     actionListener="#{ceCaseEventsBB.hideEvent(e)}" 
+                                                                     actionListener="#{eventsBB.hideEvent(e)}" 
                                                                      update="caseEventTable
-                                                                     event-messages-form"
+                                                                     form-messages-global"
                                                                      />
                                                     <p:commandButton icon="fa fa-eye"
                                                                      ajax="true"
                                                                      disabled="#{!e.hidden}"
-                                                                     actionListener="#{ceCaseEventsBB.unHideEvent(e)}" 
+                                                                     actionListener="#{eventsBB.unHideEvent(e)}" 
                                                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                                                      update="caseEventTable
-                                                                     event-messages-form"
+                                                                     form-messages-global"
                                                                      />
 
                                                 </p:column>
@@ -604,7 +579,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:form id="event-search-log-form">
                                             <div class='search-query-desc'>
                                                 <h:outputText id="event-search-log-ot" 
-                                                              value="#{eventSearchBB.querySelected.queryLog}"
+                                                              value="#{eventsBB.querySelected.queryLog}"
                                                               escape="false"/>
                                             </div>
                                         </h:form>
@@ -619,7 +594,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 toggleable="true"
                                                 widgetVar="event-profile-panel-var"
                                                 collapsed="false"
-                                                rendered="true"
+                                                rendered="#{eventsBB.activeViewMode}"
                                                 header="Event Info (ID:#{eventsBB.currentEvent.eventID}) | Created by #{!(empty eventsBB.currentEvent.userCreator) ? eventsBB.currentEvent.userCreator.person.lastName : ''} | last updated on #{eventsBB.getPrettyDate(eventsBB.currentEvent.lastUpdatedTS)} by #{!(empty eventsBB.currentEvent.lastUpdatedBy) ? eventsBB.currentEvent.lastUpdatedBy.person.lastName: ''}">
 
                                         <h:form id="event-profile-form">
@@ -660,7 +635,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <p:outputLabel for="event-cat-ot">
+                                                        <p:outputLabel for="event-ec-ot">
                                                             <h:outputText value="Category"/>
                                                         </p:outputLabel>
 
@@ -671,6 +646,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                       value="#{eventsBB.currentEvent.category.eventCategoryTitle}"/>
                                                     </div>
                                                     <p:commandLink id="event-cat-details-cl" 
+                                                                   disabled="false"
                                                                    type="button"
                                                                    value="details" />
                                                 </div>
@@ -708,7 +684,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <p:outputLabel for="event-et-ot">
+                                                        <p:outputLabel for="event-time-end-ot">
                                                             <h:outputText value="End time"/>
                                                         </p:outputLabel>
 
@@ -716,7 +692,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                                     <div class="restrict-data-field-value-inline" >
-                                                        <h:outputText id="event-et-ot" 
+                                                        <h:outputText id="event-time-end-ot" 
                                                                       value="#{eventsBB.getPrettyDate(eventsBB.currentEvent.timeEnd)}" />
 
 
@@ -727,7 +703,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
 
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <p:outputLabel for="event-mintotiew-ot">
+                                                        <p:outputLabel for="event-mintoview-ot">
                                                             <h:outputText value="Rank req. to view"/>
                                                         </p:outputLabel>
 
@@ -775,7 +751,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </p:panel>
 
                                     <p:overlayPanel id="event-cat-details-overlay"
-                                                    for="event-cat-details-cl"
+                                                    for="event-profile-form:event-cat-details-cl "
                                                     widgetVar="event-cat-details-overlay-var" 
                                                     showEffect="fade" 
                                                     hideEffect="fade"
@@ -804,12 +780,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 widgetVar="event-add-panel-var"
                                                 collapsed="false"
                                                 rendered="#{eventsBB.activeInsertMode}"
-                                                header="Create a new event ">
+                                                header="Create a new event">
 
 
                                         <h:form id="event-add-form">
+                                            
                                             <div class="ui-g data_container_nested_restrict">
 
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                    <h:outputText id="event-add-header-domain"
+                                                                  value="Attaching new event to #{!(empty eventsBB.currentEventDomain) ? eventsBB.currentEventDomain.title : ''} " />
+                                                    <h:outputText id="event-add-header-id"
+                                                                  value="Object ID #{!(empty eventsBB.currentERGBOb) ? eventsBB.currentERGBOb.BObID : ''} " />
+                                                    <p:spacer height="5px" />
+                                                    <h2><h:outputText id="event-add-currtypecat-type-ot"
+                                                                      value="#{eventsBB.eventTypeSelected.label}"
+                                                                      />
+                                                        <h:outputText value=": " />
+                                                        <h:outputText id="event-add-currtypecat-cat-ot"
+                                                                       value="#{eventsBB.eventCategorySelected.eventCategoryTitle}" 
+                                                                      />
+                                                    </h2>
+                                                    
+                                                     <h:outputText id="selectedEventCategoryDescription"
+                                                                      value="#{eventsBB.eventCategorySelected.eventCategoryDesc}" 
+                                                                      />
+                                                     <p:spacer height="4px" />
+                                                            <p:commandLink id="event-add-cat-details-cl" 
+                                                                   disabled="#{empty eventsBB.eventCategorySelected}"
+                                                                   type="button"
+                                                                   value="details" />
+                                                </div>
                                                 <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field">
                                                     <div class="restrict-main-contents-io-title" >
                                                         <h:outputLabel for="event-add-type-solb">
@@ -819,15 +820,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                     <div class="restrict-main-contents-io-content" >
                                                         <p:growl for="event-add-type-solb" />
-                                                                 <p:selectOneListbox id="event-add-type-solb" 
+                                                        <p:selectOneListbox id="event-add-type-solb" 
                                                                             required="true" 
-                                                                            value="#{cECaseEventsBB.selectedEventType}" 
+                                                                            value="#{eventsBB.eventTypeSelected}" 
                                                                             tabindex="10">
-                                                                <p:ajax update="categoryList
-                                                                        event-add-dialog-show-cb" 
-                                                                        immediate="true"/> 
-                                                                <f:selectItems value="#{eventsBB.availableEventTypeList}" var="et" itemLabel="#{et.label}" />
-                                                            </p:selectOneListbox>
+                                                            <p:ajax listener="#{eventsBB.onEventTypeMunuChange}"
+                                                                    update="categoryList
+                                                                    event-add-dialog-show-cb
+                                                                    event-add-currtypecat-type-ot" /> 
+                                                            <f:selectItems value="#{eventsBB.eventTypeCandidates}" var="et" itemLabel="#{et.label}" />
+                                                        </p:selectOneListbox>
 
                                                     </div>
                                                 </div>
@@ -843,27 +845,45 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="restrict-main-contents-io-content" >
                                                         <p:selectOneListbox style="width: 100%;" 
                                                                             id="categoryList" 
-                                                                            value="#{cECaseEventsBB.selectedEventCategory}" 
+                                                                            value="#{eventsBB.eventCategorySelected}" 
                                                                             tabindex="11">
                                                             <p:ajax update="selectedEventCategoryDescription
                                                                     selectedEventCategoryDescription 
-                                                                    selectedEventCateogryNotifiesCaseMonitors
+                                                                    event-add-cat-details-cl
                                                                     event-add-dialog-show-cb
+                                                                    event-add-currtypecat-cat-ot
+                                                                    event-add-time-start-cal
+                                                                    event-add-time-end-cal
+                                                                    event-add-descr-it
                                                                     " 
-                                                                    immediate="true"/>
+                                                                    listener="#{eventsBB.onEventCategoryMenuChange}"
+                                                                    />
                                                             <f:converter converterId="eventCategoryConverter"/>
                                                             <f:selectItems  id="catItemsList" 
-                                                                            value="#{eventsBB.eventCategoryList}" 
+                                                                            value="#{eventsBB.eventCategoryCandidates}" 
                                                                             var="ec" 
                                                                             itemValue="#{ec}" 
                                                                             itemLabel="#{ec.eventCategoryTitle}"/>
                                                         </p:selectOneListbox>
-
-                                                        <p:spacer height="3px" />
-                                                      <h:outputText id="selectedEventCategoryDescription"
-                                                                    value="Event Cateogry Description: #{cECaseEventsBB.selectedEventCategory.eventCategoryDesc}" 
-                                                                    />
+                                                       
                                                     </div>
+                                                    
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <div class="restrict-main-contents-io-content" >
+                                                        
+
+                                                        <p:selectBooleanButton  id="event-add-updatefields-sbb" 
+                                                                            onLabel="Update event values"
+                                                                            onIcon="fa fa-indent"
+                                                                            offLabel="Custom event values"
+                                                                            offIcon="fa fa-eraser"
+                                                                            value="#{eventsBB.updateNewEventFieldsWithCatChange}" 
+                                                                            disabled="false" />
+
+                                                    </div>
+                                            
+                                                    
                                                 </div>
 
                                                 <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field">
@@ -876,7 +896,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                     <div class="restrict-main-contents-io-content" >
                                                         <p:growl for="event-add-time-start-cal" />
-                                                        <p:calendar value="#{eventsBB.currentEvent.timeStart}" 
+                                                        <p:calendar value="#{eventsBB.currentEvent.timeStartUtilDate}" 
                                                                     id="event-add-time-start-cal"
                                                                     mode="popup"  
                                                                     showOn="button" 
@@ -884,7 +904,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                     navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
                                                                     showButtonPanel="true" 
                                                                     showTodayButton="true"
-                                                                    required="true"/>
+                                                                    required="true">
+                                                            <p:ajax update="event-add-time-end-cal" 
+                                                                    listener="#{eventsBB.onTimeStartChange}"/>
+                                                        </p:calendar>
                                                     </div>
                                                 </div>
 
@@ -897,7 +920,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                     <div class="restrict-main-contents-io-content" >
                                                         <p:growl for="event-add-time-end-cal" />
-                                                        <p:calendar value="#{eventsBB.currentEvent.timeEnd}" 
+                                                        <p:calendar value="#{eventsBB.currentEvent.timeEndUtilDate}" 
                                                                     id="event-add-time-end-cal"
                                                                     mode="popup"  
                                                                     showOn="button" 
@@ -910,17 +933,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                                                     <div class="restrict-main-contents-io-title" >
-                                                        <h:outputLabel for="event-add-descr">
+                                                        <h:outputLabel for="event-add-descr-it">
                                                             <h:outputText value="Description"/>
                                                         </h:outputLabel>
                                                     </div>
-                                                    
+
                                                     <div class="restrict-main-contents-io-content" >
-                                                          <p:inputText  id="eventDesc" 
-                                                                        value="#{eventsBB.currentEvent.description}" 
-                                                                        style="width: 100%;" 
-                                                                        tabindex="3" 
-                                                                        required="false" />
+                                                        <p:inputText  id="event-add-descr-it" 
+                                                                      value="#{eventsBB.currentEvent.description}" 
+                                                                      style="width: 100%;" 
+                                                                      tabindex="3" 
+                                                                      required="false" />
                                                     </div>
                                                 </div>
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
@@ -930,13 +953,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         </h:outputLabel>
                                                     </div>
                                                     <div class="restrict-main-contents-io-button gray_button">
-                                                         <p:commandButton  value="Manage person connections" 
+                                                        <p:commandButton  value="Manage person connections" 
                                                                           onclick="PF('event-personchoose-dialog-var').show()" 
                                                                           update="event-personchoose-dialog"
                                                                           icon="fa fa-user"/>    
                                                     </div>
                                                     <div class="restrict-main-contents-io-content" >
-                                                        
+
                                                         <p:dataScroller
                                                             id="event-add-personlist"
                                                             value="#{eventsBB.currentEvent.personList}"
@@ -951,12 +974,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             </div>
                                             <div class="restrict-main-contents-io-button">
-                                                
+
 
                                                 <p:commandButton    id="event-add-dialog-show-cb"
                                                                     ajax="false" 
                                                                     action="#{eventsBB.onEventAddCommitButtonChange}" 
-                                                                    disabled="#{empty eventsBB.selectedEventCategory}"
+                                                                    disabled="#{empty eventsBB.eventCategorySelected}"
                                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                                     value="Create new event "  
                                                                     icon="fa fa-bolt"/>
@@ -966,7 +989,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </p:panel>
 
 
-                                    <!--Remove Panel-->
                                     <p:panel id="event-update-panel"
                                              toggleable="true"
                                              collapsed="false"
@@ -977,7 +999,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:form id="event-update-form">
                                             <div class="ui-g data_container_nested_restrict">
 
-                                             
+
 
                                                 <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field">
 
@@ -1027,13 +1049,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             <h:outputText value="Description"/>
                                                         </h:outputLabel>
                                                     </div>
-                                                    
+
                                                     <div class="restrict-main-contents-io-content" >
-                                                          <p:inputText  id="eventDesc" 
-                                                                        value="#{eventsBB.currentEvent.description}" 
-                                                                        style="width: 100%;" 
-                                                                        tabindex="3" 
-                                                                        required="false" />
+                                                        <p:inputText  id="eventDesc" 
+                                                                      value="#{eventsBB.currentEvent.description}" 
+                                                                      style="width: 100%;" 
+                                                                      tabindex="3" 
+                                                                      required="false" />
                                                     </div>
                                                 </div>
 
@@ -1043,7 +1065,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <p:commandButton    id="event-update-dialog-show-cb"
                                                                     ajax="false" 
                                                                     action="#{eventsBB.onEventUpdateCommitButtonChange}" 
-                                                                    disabled="#{empty eventsBB.selectedEventCategory}"
                                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                                     value="Save edits"  
                                                                     icon="fa fa-edit"/>
@@ -1172,255 +1193,272 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 header="Choose persons to connect to this event"
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                 >
-                        
-
-                        <h:form id="add-person-to-event-form">
-
-                            <h:panelGroup>
-                                <p:outputLabel id="person-list-menu-ol" for="person-list-menu" value="Current person list:"/>
-                                <p:selectOneMenu id="person-list-menu" required="false" value="#{eventsBB.personSelected}">
-                                    <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
-                                    <f:selectItems value="#{systemServicesBB.bbSessionPersonList}"  var="p" itemValue="#{p}" 
-                                                   itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
-                                    <f:converter converterId="personConverter"/>
-                                </p:selectOneMenu>
-                                <h:message for="person-list-menu" showDetail="false" showSummary="true" 
-                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                            </h:panelGroup>
-
-                            <p:commandButton    ajax="true" actionListener="#{eventsBB.queueSelectedPerson}"
-                                                value="Add selected person to event" disabled="true"
-                                                update="persons-to-add-ds"/>
-                            <p:spacer height="5px"/>
-
-                            <p:dataScroller     id="persons-to-add-ds"
-                                                value="#{eventsBB.currentEvent.personList}"
-                                                var="pers">
-                                <h:outputText value="#{pers.firstName} #{pers.lastName} (id:#{pers.personID})"/>
-                                <p:commandButton    ajax="true" icon="fa fa-stop"
-                                                    process="persons-to-add-ds" immediate="true"
-                                                    actionListener="#{eventsBB.deQueuePersonFromEvent(pers)}"
-                                                    update="persons-to-add-ds"/>
-                            </p:dataScroller>
 
 
-                            <h2>Option 2: Manual person lookup</h2>
+                        <h:form id="event-person-form">
 
-                            <p>If you wish to send the letter to a person not on the list above, 
-                                enter the Person's ID number in the box below and click "Look Up Person". 
-                                You can open the Persons's search page by "right-clicking" the link to "Persons" 
-                                on the left side bar and opening that page in its own browser tab.</p>
+                            <div class="ui-g data_container_nested_restrict">
 
-                            <h:commandLink  class="bold" target="_blank" action="persons" value="Open person search in new tab ---> "/>
-                            <p:spacer height="5px"/>
-
-                            <h:outputLabel for="personIDIT" value="Person ID Number: "/>
-
-                            <p:inputText id="personIDIT" value="#{eventsBB.recipientPersonID}"/>
-
-                            <p:spacer height="10px"/>
+                                <div class="ui-g-12 ui-md-8 ui-lg-8 restrict-data-field">
 
 
-                            <p:commandButton id="event-add-lookupperson-button" 
-                                             value="Look up person" 
-                                             actionListener="#{eventsBB.checkNOVRecipient}" 
-                                             ajax="true" 
-                                             update="form-messages-global
-                                             person-scroller"/>
-                            <p:spacer height="5px"/>
-
-                            <p:dataTable
-                                id="newRecipientPersonTD"
-                                var="person"
-                                rowKey="#{person.personID}"
-                                value="#{eventsBB.personCandidateList}"
-                                tableStyleClass="primeDataTable"
-                                expandedRow="false"
-                                rowExpandMode="single"
-                                rowIndexVar="rowIndex">
-
-
-                                <p:column width="5%">
-                                    <p:rowToggler />
-                                </p:column>
-                                <p:column width="50%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Last" />
-                                    </f:facet>
-                                    <h:outputText value="#{person.firstName}"/>
-                                    <h:outputText value=" "/>
-                                    <h:outputText value="#{person.lastName}"/>
-                                    <h:outputText value="(ID: #{person.personID})"/>
-                                    <p:spacer height="2px" />
-                                    <h:outputText value="#{person.addressStreet}"/>
-                                    <p:spacer height="2px" />
-                                    <h:outputText value="#{person.addressCity}"/>
-                                    <h:outputText value=" "/>
-                                    <h:outputText value="#{person.addressState}"/>
-                                    <h:outputText value=", "/>
-                                    <h:outputText value="#{person.addressZip}"/>
-                                </p:column>
-                                <p:column width="8%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Person Type" />
-                                    </f:facet>
-                                    <h:outputText value="#{person.personType.label}"/>
-                                </p:column>
-                                <p:column width="15%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Municipality" />
-                                    </f:facet>
-                                    <h:outputText value="#{person.muniName}"/>
-                                </p:column>
-                               
-
-                                <p:rowExpansion>
-                                    <div class="outlinedBox">
-                                        <h2><h:outputText value="#{person.firstName} #{person.lastName}"/>, Person ID:<h:outputText value="#{person.personID}"/> </h2>
-                                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                                     columnClasses="gridTd, gridTd, gridTd, gridTd">
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Person Type: "/>
-                                                <h:outputText value="#{person.personType.label}"/>
-
-                                                <p:spacer height="5px"/>
-
-                                                <h:outputLabel styleClass="bold" value="Job Title: "/>
-                                                <h:outputText value="#{person.jobTitle}"/>
-
-                                                <p:spacer height="5px"/>
-
-                                                <h:outputLabel styleClass="bold" value="Email: "/>
-                                                <h:outputText value="#{person.email}"/>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Last Updated: "/>
-                                                <h:outputText value="#{person.lastUpdatedPretty}"/>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Address: "/>
-                                                <p:spacer height="5px"/>
-                                                <h:outputText escape="false" value="#{person.addressStreet}"/>
-                                                <p:spacer height="5px"/>
-                                                <h:outputText value="#{person.addressCity}, #{person.addressState} #{person.addressZip}"/>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Use separate mailing address?"/>
-                                                <h:outputText value="#{person.useSeparateMailingAddress ? 'Yes':'No'}"/>
-                                                <p:spacer height="5px"/>
-                                                <h:outputText escape="false" value="#{person.mailingAddressStreet}"/>
-                                                <p:spacer height="5px"/>
-                                                <h:outputText value="#{person.mailingAddressCity}, #{person.mailingAddressState} #{person.mailingAddressZip}"/>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Under 18? "/>
-                                                <h:outputText value="#{person.under18 ? 'Yes':'No'}"/>
-
-                                                <p:spacer height="5px"/>
-
-                                                <h:outputLabel styleClass="bold" value="Active? "/>
-                                                <h:outputText value="#{person.active ? 'Yes':'No'}"/>
-
-                                                <p:spacer height="5px"/>
-
-                                                <h:outputLabel styleClass="bold" value="Composite last name? "/>
-                                                <h:outputText value="#{person.compositeLastName? 'Yes':'No'}"/>
-                                            </h:panelGroup>
-
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Allowed to expire? "/>
-                                                <h:outputText value="#{person.canExpire ? 'Yes':'No'}"/>
-                                                <p:spacer height="5px"/>
-
-                                                <h:outputLabel styleClass="bold" value="Expires: "/>
-                                                <h:outputText value="#{person.expireString}"/>
-
-                                                <p:spacer height="5px"/>
-                                                <h:outputLabel styleClass="bold" value="Expiry Notes: "/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{person.expiryNotes}"/>
-                                                </div>
-
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Phone(h): "/>
-                                                <h:outputText value="#{person.phoneHome}"/>
-                                                <p:spacer height="5px"/>
-
-                                                <h:outputLabel styleClass="bold" value="Phone(w): "/>
-                                                <h:outputText value="#{person.phoneWork}"/>
-                                                <p:spacer height="5px"/>
-
-                                                <h:outputLabel styleClass="bold" value="Phone(m): "/>
-                                                <h:outputText value="#{person.phoneCell}"/>
-                                            </h:panelGroup>
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Linked to user? "/>
-                                                <h:outputText value="#{person.linkedUserID == 0 ? 'No':'Yes'}"/>
-                                                <p:spacer height="5px"/>
-
-                                            </h:panelGroup>
-                                        </h:panelGrid>
+                                    <div class="restrict-main-contents-io-title" >
+                                        <p:outputLabel id="person-list-menu-ol" 
+                                                       for="person-list-menu" 
+                                                       value="Current person list:"/>
                                     </div>
-                                </p:rowExpansion>
-                            </p:dataTable>
+
+                                    <div class="restrict-main-contents-io-content" >
+
+                                        <p:selectOneMenu id="person-list-menu" required="false" value="#{eventsBB.personSelected}">
+                                            <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                            <f:selectItems value="#{systemServicesBB.bbSessionPersonList}"  var="p" itemValue="#{p}" 
+                                                           itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                                            <f:converter converterId="personConverter"/>
+                                        </p:selectOneMenu>
+                                        <h:message for="person-list-menu" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 restrict-data-field">
+                                    <div class="restrict-main-contents-io-button">   
 
 
-                            <p:dataScroller
-                                id="person-scroller"
-                                value="#{eventsBB.manualRetrievedPersonList}"
-                                var="per" 
-                                widgetVar="noticebuilder-pers-ds-var">
+                                        <p:commandButton    ajax="true" actionListener="#{eventsBB.queueSelectedPerson}"
+                                                            value="Add selected person to event" disabled="true"
+                                                            update="person-scroller"/>
+                                    </div>
 
-                                <h:outputText value="#{per.firstName} #{per.lastName}"/>
-                                <p:spacer height="5px"/>
-                                <p:commandButton id="use-person-from-lookup-cb1"
-                                                 rendered="#{eventsBB.currentNotice.noticeID!=0}"
-                                                 ajax="true"
-                                                 value="Replace"
-                                                 actionListener="#{eventsBB.storeRecipient(per)}" 
-                                                 oncomplete="PF('event-personchoose-dialog-var').hide()."
-                                                 update="event-edit-form
-                                                 form-messages-global:events-messages-growl"
-                                                 />
-                                <p:commandButton id="use-person-from-lookup-cb2"
-                                                 rendered="#{eventsBB.currentNotice.noticeID==0}"
-                                                 ajax="true"
-                                                 value="Select"
-                                                 actionListener="#{eventsBB.storeRecipient(per)}" 
-                                                 oncomplete="PF('event-personchoose-dialog-var').hide()."
-                                                 update="chosen-recipient-form
-                                                 form-messages-global:events-messages-growl"
-                                                 />
-                            </p:dataScroller>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                    <h2>Option 2: Manual person lookup</h2>
+
+                                    <p>If you wish to send the letter to a person not on the list above, 
+                                        enter the Person's ID number in the box below and click "Look Up Person". 
+                                        You can open the Persons's search page by "right-clicking" the link to "Persons" 
+                                        on the left side bar and opening that page in its own browser tab.</p>
+
+                                    <p>You can also go and find a person in the Person search tool, view a person of interest, and then return to this page. The person will appear in the session list above
+                                        <h:commandLink  class="bold" target="_blank" action="persons" value="Open person search in new tab ---> "/>
+                                    </p>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
 
 
-                            <h2>Submit form</h2>
+                                    <div class="restrict-main-contents-io-title" >
+                                        <h:outputLabel for="personIDIT" value="Person ID Number: "/>
+                                    </div>
 
-                            <p:commandButton ajax="true" 
-                                             value="Cancel" icon="fa fa-stop" 
-                                             onclick="PF('event-personchoose-dialog-var').hide()"/>
+                                    <div class="restrict-main-contents-io-content" >
 
-                            <p:commandButton actionListener="#{eventsBB.onPersonListCommitButtonChange}"
-                                                ajax="true" 
-                                                value="Save person list" 
-                                                icon="fa fa-edit"
-                                                oncomplete="PF('event-personchoose-dialog-var').hide()"
-                                                disabled="#{!(eventsBB.currentEvent.eventID == 0)}"
-                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                update="
-                                                case-details-form
-                                                event-dt-form:caseEventTable
-                                                violation-form
-                                                case-profile-messages-form:case-profile-messages-global
-                                                events-datascroller-form"/>
+                                        <p:inputText id="personIDIT" value="#{eventsBB.personIDForLookup}"/>
+                                        <p:spacer height="5px" />
+                                        <p:commandButton id="event-add-lookupperson-button" 
+                                                         value="Look up person" 
+                                                         actionListener="#{eventsBB.onPersonLookupByIDButtonChange}" 
+                                                         ajax="true" 
+                                                         immediate="true"
+                                                         update="form-messages-global
+                                                         person-scroller"/>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                                    <p:dataScroller
+                                        id="person-scroller"
+                                        value="#{eventsBB.personCandidates}"
+                                        var="per" 
+                                        widgetVar="noticebuilder-pers-ds-var">
 
+                                        <h:outputText value="#{per.firstName} #{per.lastName}"/>
+                                        <p:spacer height="5px"/>
+
+                                        <p:commandButton id="use-person-from-lookup-cb2"
+                                                         rendered="#{eventsBB.currentNotice.noticeID==0}"
+                                                         ajax="true"
+                                                         value="Select"
+                                                         actionListener="#{eventsBB.storeRecipient(per)}" 
+                                                         oncomplete="PF('event-personchoose-dialog-var').hide()."
+                                                         update="event-lookupperson-table
+                                                         "
+                                                         />
+                                    </p:dataScroller>
+
+
+                                </div>
+
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+
+
+                                    <p:dataTable
+                                        id="event-lookupperson-table"
+                                        var="person"
+                                        rowKey="#{person.personID}"
+                                        value="#{eventsBB.currentEvent.personList}"
+                                        tableStyleClass="primeDataTable"
+                                        expandedRow="false"
+                                        rowExpandMode="single"
+                                        rowIndexVar="rowIndex">
+
+
+                                        <p:column width="5%">
+                                            <p:rowToggler />
+                                        </p:column>
+                                        <p:column width="50%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Last" />
+                                            </f:facet>
+                                            <h:outputText value="#{person.firstName}"/>
+                                            <h:outputText value=" "/>
+                                            <h:outputText value="#{person.lastName}"/>
+                                            <h:outputText value="(ID: #{person.personID})"/>
+                                            <p:spacer height="2px" />
+                                            <h:outputText value="#{person.addressStreet}"/>
+                                            <p:spacer height="2px" />
+                                            <h:outputText value="#{person.addressCity}"/>
+                                            <h:outputText value=" "/>
+                                            <h:outputText value="#{person.addressState}"/>
+                                            <h:outputText value=", "/>
+                                            <h:outputText value="#{person.addressZip}"/>
+                                        </p:column>
+                                        <p:column width="8%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Person Type" />
+                                            </f:facet>
+                                            <h:outputText value="#{person.personType.label}"/>
+                                        </p:column>
+                                        <p:column width="15%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Municipality" />
+                                            </f:facet>
+                                            <h:outputText value="#{person.muniName}"/>
+                                        </p:column>
+
+
+                                        <p:rowExpansion>
+                                            <div class="outlinedBox">
+                                                <h2><h:outputText value="#{person.firstName} #{person.lastName}"/>, Person ID:<h:outputText value="#{person.personID}"/> </h2>
+                                                <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd">
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Person Type: "/>
+                                                        <h:outputText value="#{person.personType.label}"/>
+
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Job Title: "/>
+                                                        <h:outputText value="#{person.jobTitle}"/>
+
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Email: "/>
+                                                        <h:outputText value="#{person.email}"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Last Updated: "/>
+                                                        <h:outputText value="#{person.lastUpdatedPretty}"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Address: "/>
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputText escape="false" value="#{person.addressStreet}"/>
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputText value="#{person.addressCity}, #{person.addressState} #{person.addressZip}"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Use separate mailing address?"/>
+                                                        <h:outputText value="#{person.useSeparateMailingAddress ? 'Yes':'No'}"/>
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputText escape="false" value="#{person.mailingAddressStreet}"/>
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputText value="#{person.mailingAddressCity}, #{person.mailingAddressState} #{person.mailingAddressZip}"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Under 18? "/>
+                                                        <h:outputText value="#{person.under18 ? 'Yes':'No'}"/>
+
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Active? "/>
+                                                        <h:outputText value="#{person.active ? 'Yes':'No'}"/>
+
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Composite last name? "/>
+                                                        <h:outputText value="#{person.compositeLastName? 'Yes':'No'}"/>
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Allowed to expire? "/>
+                                                        <h:outputText value="#{person.canExpire ? 'Yes':'No'}"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Expires: "/>
+                                                        <h:outputText value="#{person.expireString}"/>
+
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputLabel styleClass="bold" value="Expiry Notes: "/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{person.expiryNotes}"/>
+                                                        </div>
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Phone(h): "/>
+                                                        <h:outputText value="#{person.phoneHome}"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Phone(w): "/>
+                                                        <h:outputText value="#{person.phoneWork}"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Phone(m): "/>
+                                                        <h:outputText value="#{person.phoneCell}"/>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Linked to user? "/>
+                                                        <h:outputText value="#{person.linkedUserID == 0 ? 'No':'Yes'}"/>
+                                                        <p:spacer height="5px"/>
+
+                                                    </h:panelGroup>
+                                                </h:panelGrid>
+                                            </div>
+                                        </p:rowExpansion>
+                                    </p:dataTable>
+
+
+                                </div>
+
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                    <div class="restrict-main-contents-io-button gray_button">   
+
+                                        <p:commandButton ajax="true" 
+                                                         value="Cancel" icon="fa fa-stop" 
+                                                         onclick="PF('event-personchoose-dialog-var').hide()"/>
+                                    </div>
+                                    <div class="restrict-main-contents-io-button">   
+
+                                        <p:commandButton actionListener="#{eventsBB.onPersonListCommitButtonChange}"
+                                                         ajax="true" 
+                                                         value="Save person list" 
+                                                         icon="fa fa-edit"
+                                                         oncomplete="PF('event-personchoose-dialog-var').hide()"
+                                                         disabled="#{!(eventsBB.currentEvent.eventID == 0)}"
+                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                         update="event-update-panel
+                                                         event-add-panel"/>
+
+                                    </div>
+                                </div>
+                            </div>
 
                         </h:form>
                     </p:dialog>
@@ -1428,85 +1466,101 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                     <p:dialog   id="event-search-advanced-dialog"
                                 height="300" width="750"
-                                widgetVar="event-search-advanced-dialog"
+                                widgetVar="event-search-advanced-dialog-var"
                                 closable="true"
                                 header="Advanced search"
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                 >
+                        <h:form id="event-search-advanced-form">
 
 
-                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                     columnClasses="topbottom-lines-left, topbottom-lines-right">
-
-                            <h:panelGroup>
-                                <p:outputLabel id="event-filter-muni-ol" 
-                                               for="seev-filter-muni-chkbx" 
-                                               value="filter by municipality "/>
-                                <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" value="#{eventSearchBB.searchParamsSelected.muni_ctl}" >
-                                    <p:ajax update="event-search-muni-som"/>
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup>
-
-                            <h:panelGroup>
-                                <p:selectOneMenu id="event-search-muni-som" tabindex="1" value="#{eventSearchBB.searchParamsSelected.muni_val}"
-                                                 disabled="#{!eventSearchBB.searchParamsSelected.muni_ctl}">
-                                    <f:converter converterId="muniConverter"/>
-                                    <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
-                                    <f:selectItems id="muniNameList" value="#{systemServicesBB.municipalityListForSearch}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
-                                </p:selectOneMenu>
-                                <h:message for="event-search-muni-som" showDetail="true" showSummary="true" 
-                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                            </h:panelGroup>
-
-                            <h:panelGroup>
-                                <p:outputLabel id="event-search-startend-chkbx-ol" 
-                                               for="event-search-startend-chkbx" 
-                                               value="filter by date range "/>
-                                <p:selectBooleanCheckbox id="event-search-startend-chkbx" 
-                                                         value="#{eventSearchBB.searchParamsSelected.date_startEnd_ctl}" >
-                                    <p:ajax update="event-search-date-field-val
-                                            event-search-date-start-val
-                                            event-search-date-end-val
-                                            event-search-date-relative-ctl" />
-                                </p:selectBooleanCheckbox>
-
-                            </h:panelGroup>
-
-                            <h:panelGroup>
+                            <div class="ui-g data_container_nested_restrict">
 
 
-                                <p:selectOneMenu  id="event-search-date-field-val" 
-                                                  tabindex="1" 
-                                                  value="#{eventSearchBB.searchParamsSelected.date_field}"
-                                                  disabled="#{!eventSearchBB.searchParamsSelected.date_startEnd_ctl}">
-                                    <f:selectItem itemLabel="select a date field..." 
-                                                  noSelectionOption="true" 
-                                                  itemDisabled="true"/>
-                                    <f:selectItems id="event-search-date-field-val-items" 
-                                                   value="#{eventSearchBB.searchParamsSelected.dateFieldList}" 
-                                                   var="f" itemValue="#{f}" itemLabel="#{f.title}" />
-                                </p:selectOneMenu>
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
 
-                            </h:panelGroup>
 
-                            <h:panelGroup styleClass="pgspacer">
-                                <h:outputText value=" " />
-                            </h:panelGroup>
+                                    <div class="restrict-main-contents-io-title" >
+                                        <p:outputLabel id="event-filter-muni-ol" 
+                                                       for="seev-filter-muni-chkbx" 
+                                                       value="filter by municipality "/>
 
-                            <h:panelGroup id="datepickers-pg">
-                                <h:panelGrid    columns="1" 
-                                                cellpadding="10" 
-                                                columnClasses="gridTd">
-                                    <h:panelGroup>
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" value="#{eventsBB.searchParamsSelected.muni_ctl}" >
+                                            <p:ajax update="event-search-muni-som"/>
+                                        </p:selectBooleanCheckbox>
+
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:selectOneMenu id="event-search-muni-som" tabindex="1" value="#{eventsBB.searchParamsSelected.muni_val}"
+                                                         disabled="#{!eventsBB.searchParamsSelected.muni_ctl}">
+                                            <f:converter converterId="muniConverter"/>
+                                            <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
+                                            <f:selectItems id="muniNameList" value="#{systemServicesBB.municipalityListForSearch}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                        </p:selectOneMenu>
+
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+
+                                    <div class="restrict-main-contents-io-title" >
+                                        <p:outputLabel id="event-search-startend-chkbx-ol" 
+                                                       for="event-search-startend-chkbx" 
+                                                       value="filter by date range "/>
+
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:selectBooleanCheckbox id="event-search-startend-chkbx" 
+                                                                 value="#{eventsBB.searchParamsSelected.date_startEnd_ctl}" >
+                                            <p:ajax update="event-search-date-field-val
+                                                    event-search-date-start-val
+                                                    event-search-date-end-val
+                                                    event-search-date-relative-ctl" />
+                                        </p:selectBooleanCheckbox>
+
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+
+                                    <div class="restrict-main-contents-io-content" >
+
+                                        <p:selectOneMenu  id="event-search-date-field-val" 
+                                                          tabindex="1" 
+                                                          value="#{eventsBB.searchParamsSelected.date_field}"
+                                                          disabled="#{!eventsBB.searchParamsSelected.date_startEnd_ctl}">
+                                            <f:selectItem itemLabel="select a date field..." 
+                                                          noSelectionOption="true" 
+                                                          itemDisabled="true"/>
+                                            <f:selectItems id="event-search-date-field-val-items" 
+                                                           value="#{eventsBB.searchParamsSelected.dateFieldList}" 
+                                                           var="f" itemValue="#{f}" itemLabel="#{f.title}" />
+                                        </p:selectOneMenu>
+
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
 
                                         <p:outputLabel for="event-search-date-start-val" 
                                                        value="start date"/>
 
-                                        <p:spacer height="1px" />
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
 
                                         <p:calendar id="event-search-date-start-val" 
-                                                    value="#{eventSearchBB.searchParamsSelected.startDate_val_utilDate}" 
-                                                    disabled="#{(!eventSearchBB.searchParamsSelected.date_startEnd_ctl) or eventSearchBB.searchParamsSelected.date_relativeDates_ctl}"
+                                                    value="#{eventsBB.searchParamsSelected.startDate_val_utilDate}" 
+                                                    disabled="#{(!eventsBB.searchParamsSelected.date_startEnd_ctl) or eventsBB.searchParamsSelected.date_relativeDates_ctl}"
                                                     mode="popup" 
                                                     showOn="button" 
                                                     pattern="EEE, dd MMM, yyyy HH:mm:ss"
@@ -1520,18 +1574,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:message for="event-search-date-start-val" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-                                    </h:panelGroup>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
 
-                                    <h:panelGroup>
+
+                                    <div class="restrict-main-contents-io-title" >
 
                                         <p:outputLabel for="event-search-date-end-val" 
                                                        value="end date"/>
 
-                                        <p:spacer height="1px" />
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+
 
                                         <p:calendar id="event-search-date-end-val" 
-                                                    value="#{eventSearchBB.searchParamsSelected.endDate_val_utilDate}" 
-                                                    disabled="#{(!eventSearchBB.searchParamsSelected.date_startEnd_ctl) or eventSearchBB.searchParamsSelected.date_relativeDates_ctl}"
+                                                    value="#{eventsBB.searchParamsSelected.endDate_val_utilDate}" 
+                                                    disabled="#{(!eventsBB.searchParamsSelected.date_startEnd_ctl) or eventsBB.searchParamsSelected.date_relativeDates_ctl}"
                                                     mode="popup" 
                                                     showOn="button" 
                                                     pattern="EEE, dd MMM, yyyy HH:mm:ss"
@@ -1545,367 +1605,490 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:message for="event-search-date-end-val" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-                                    </h:panelGroup>
-                                </h:panelGrid>
-                            </h:panelGroup>
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
 
 
-                            <h:panelGroup styleClass="pgspacer">
-                                <h:outputText value=" " />
-                            </h:panelGroup>
+                                    <div class="restrict-main-contents-io-title" >
 
-                            <h:panelGroup>
-                                <h:panelGrid    columns="1" 
-                                                columnClasses="gridTd">
-                                    <h:panelGroup>
                                         <p:outputLabel for="event-search-date-relative-ctl" 
                                                        value="Relative dates"
                                                        styleClass="datum-label"/>
+
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+
                                         <p:selectBooleanCheckbox id="event-search-date-relative-ctl" 
-                                                                 value="#{eventSearchBB.searchParamsSelected.date_relativeDates_ctl}" 
-                                                                 disabled="#{!eventSearchBB.searchParamsSelected.date_startEnd_ctl}">
+                                                                 value="#{eventsBB.searchParamsSelected.date_relativeDates_ctl}" 
+                                                                 disabled="#{!eventsBB.searchParamsSelected.date_startEnd_ctl}">
                                             <p:ajax update="event-search-date-end-val
                                                     event-search-date-start-val
                                                     event-search-date-end-val
                                                     event-search-date-relative-start-val
                                                     event-search-date-relative-end-val" />
                                         </p:selectBooleanCheckbox>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
+                                    </div>
+                                </div>
+
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
                                         <p:outputLabel for="event-search-date-relative-start-val" 
                                                        value="start x days from today"/>
-                                        <p:spacer height="1px"/>
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
                                         <p:inputText id="event-search-date-relative-start-val" 
-                                                     value="#{eventSearchBB.searchParamsSelected.date_relativeDates_start_val}" 
-                                                     disabled="#{!(eventSearchBB.searchParamsSelected.date_startEnd_ctl and eventSearchBB.searchParamsSelected.date_relativeDates_ctl)}" />
+                                                     value="#{eventsBB.searchParamsSelected.date_relativeDates_start_val}" 
+                                                     disabled="#{!(eventsBB.searchParamsSelected.date_startEnd_ctl and eventsBB.searchParamsSelected.date_relativeDates_ctl)}" />
                                         <h:message for="event-search-date-relative-start-val" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-                                    </h:panelGroup>
-                                    <h:panelGroup>
+                                    </div>
+                                </div>
+
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
                                         <p:outputLabel for="event-search-date-relative-end-val" 
                                                        value="end x days from today"/>
-                                        <p:spacer height="1px"/>
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
                                         <p:inputText id="event-search-date-relative-end-val" 
-                                                     value="#{eventSearchBB.searchParamsSelected.date_realtiveDates_end_val}" 
-                                                     disabled="#{!(eventSearchBB.searchParamsSelected.date_startEnd_ctl and eventSearchBB.searchParamsSelected.date_relativeDates_ctl)}" />
+                                                     value="#{eventsBB.searchParamsSelected.date_realtiveDates_end_val}" 
+                                                     disabled="#{!(eventsBB.searchParamsSelected.date_startEnd_ctl and eventsBB.searchParamsSelected.date_relativeDates_ctl)}" />
                                         <h:message for="event-search-date-relative-end-val" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
-                                </h:panelGrid>
-                            </h:panelGroup>
+
+                                    </div>
+                                </div>
 
 
-                            <h:panelGroup>
-                                <p:outputLabel for="event-search-filter-id-ctl" 
-                                               value="filter by event id"/>
-
-                                <p:selectBooleanCheckbox id="event-search-filter-id-ctl" 
-                                                         value="#{eventSearchBB.searchParamsSelected.bobID_ctl}"
-                                                         disabled="false">
-                                    <p:ajax update="event-search-filter-id-val" />
-                                </p:selectBooleanCheckbox>
-
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <p:outputLabel for="event-search-filter-id-val" 
-                                               value="id:" />
-
-                                <p:spacer height="5px"/>
-
-                                <p:inputText id="event-search-filter-id-val"
-                                             type="number"
-                                             value="#{eventSearchBB.searchParamsSelected.bobID_val}"
-                                             disabled="#{!eventSearchBB.searchParamsSelected.bobID_ctl}"/>
-                                <h:message for="event-search-filter-id-val" showDetail="false" showSummary="true"
-                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                            </h:panelGroup>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
 
 
-                            <h:panelGroup>
-                                <p:outputLabel for="event-search-filter-user-ctl" 
-                                               value="User filter"/>
+                                    <div class="restrict-main-contents-io-title" >
 
-                                <p:selectBooleanCheckbox id="event-search-filter-user-ctl" 
-                                                         value="#{eventSearchBB.searchParamsSelected.user_ctl}"
-                                                         disabled="#{!(eventSearchBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
-                                    <p:ajax update="event-search-filter-user-som
-                                            event-search-user-field-val" />
-                                </p:selectBooleanCheckbox>
+                                        <p:outputLabel for="event-search-filter-id-ctl" 
+                                                       value="filter by event id"/>
+                                    </div>
 
-                            </h:panelGroup>
+                                    <div class="restrict-main-contents-io-content" >
 
+                                        <p:selectBooleanCheckbox id="event-search-filter-id-ctl" 
+                                                                 value="#{eventsBB.searchParamsSelected.bobID_ctl}"
+                                                                 disabled="false">
+                                            <p:ajax update="event-search-filter-id-val" />
+                                        </p:selectBooleanCheckbox>
 
-                            <h:panelGroup>
-                                <p:selectOneMenu  id="event-search-user-field-val" 
-                                                  tabindex="1" 
-                                                  value="#{eventSearchBB.searchParamsSelected.user_field}"
-                                                  disabled="#{!eventSearchBB.searchParamsSelected.user_ctl}">
-                                    <f:selectItem itemLabel="select a user field..." 
-                                                  noSelectionOption="true" 
-                                                  itemDisabled="true"/>
-                                    <f:selectItems id="event-search-user-field-val-items" 
-                                                   value="#{eventSearchBB.searchParamsSelected.userFieldList}" 
-                                                   var="uf" itemValue="#{uf}" itemLabel="#{uf.title}" />
-                                </p:selectOneMenu>
-                            </h:panelGroup>
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
 
 
-                            <h:panelGroup styleClass="pgspacer">
-                                <h:outputText value=" " />
-                            </h:panelGroup>
+                                    <div class="restrict-main-contents-io-title" >
+                                        <p:outputLabel for="event-search-filter-id-val" 
+                                                       value="id:" />
+                                    </div>
 
-                            <h:panelGroup>
-                                <p:selectOneMenu id="event-search-filter-user-som" required="false" 
-                                                 value="#{eventSearchBB.searchParamsSelected.user_val}"
-                                                 disabled="#{!eventSearchBB.searchParamsSelected.user_ctl}">
-                                    <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
-                                    <f:selectItems value="#{systemServicesBB.userListForSearch}"  var="u" itemValue="#{u}" 
-                                                   itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
-                                    <f:converter converterId="userConverter"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:inputText id="event-search-filter-id-val"
+                                                     type="number"
+                                                     value="#{eventsBB.searchParamsSelected.bobID_val}"
+                                                     disabled="#{!eventsBB.searchParamsSelected.bobID_ctl}"/>
 
-                            <h:panelGroup>
-                                <p:outputLabel for="event-search-filter-domain-ctl" 
-                                               value="User filter"/>
+                                        <h:message for="event-search-filter-id-val" showDetail="false" showSummary="true"
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-                                <p:selectBooleanCheckbox id="event-search-filter-domain-ctl" 
-                                                         value="#{eventSearchBB.searchParamsSelected.eventDomain_ctl}"
-                                                         disabled="#{!(eventSearchBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
-                                    <p:ajax update="event-search-filter-domain-val" />
-                                </p:selectBooleanCheckbox>
+                                    </div>
+                                </div>
 
-                            </h:panelGroup>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
 
 
-                            <h:panelGroup>
-                                <p:selectOneMenu  id="event-search-filter-domain-val" 
-                                                  tabindex="1" 
-                                                  value="#{eventSearchBB.searchParamsSelected.eventDomain_val}"
-                                                  disabled="#{!eventSearchBB.searchParamsSelected.eventDomain_ctl}">
-                                    <f:selectItem itemLabel="select an event domain..." 
-                                                  noSelectionOption="true" 
-                                                  itemDisabled="true"/>
-                                    <f:selectItems id="event-search-filter-domain-items" 
-                                                   value="#{eventSearchBB.searchParamsSelected.eventDomainList}" 
-                                                   var="ed" itemValue="#{ed}" itemLabel="#{ed.title}" />
-                                    <f:converter converterId="eventDomainConverter" />
-                                </p:selectOneMenu>
-                            </h:panelGroup>
+                                    <div class="restrict-main-contents-io-title" >
+                                        <p:outputLabel for="event-search-filter-user-ctl" 
+                                                       value="User filter"/>
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
 
 
 
-                            <h:panelGroup>
-                                <p:outputLabel id="event-filter-property-ol" 
-                                               for="event-filter-property" 
-                                               value="filter by property "/>
+                                        <p:selectBooleanCheckbox id="event-search-filter-user-ctl" 
+                                                                 value="#{eventsBB.searchParamsSelected.user_ctl}"
+                                                                 disabled="#{!(eventsBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
+                                            <p:ajax update="event-search-filter-user-som
+                                                    event-search-user-field-val" />
+                                        </p:selectBooleanCheckbox>
 
-                                <p:selectBooleanCheckbox id="event-filter-property" value="#{eventSearchBB.searchParamsSelected.property_ctl}" >
-                                    <p:ajax update="event-criteria-property-som" />
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup>
+                                    </div>
+                                </div>
 
-                            <h:panelGroup>
-                                <p:selectOneMenu id="event-criteria-property-som" required="false" 
-                                                 value="#{eventSearchBB.searchParamsSelected.property_val}"
-                                                 disabled="#{!eventSearchBB.searchParamsSelected.property_ctl}">
-
-                                    <f:selectItem itemLabel="select a propery..." noSelectionOption="true" />
-                                    <f:selectItems value="#{systemServicesBB.propertyListForSearch}"  var="prop" itemValue="#{prop}" 
-                                                   itemLabel="#{prop.address} (#{prop.muni.muniName})"/>
-                                    <f:converter converterId="propertyConverter"/>
-
-                                </p:selectOneMenu>
-                            </h:panelGroup>
-
-                            <h:panelGroup>
-                                <p:outputLabel for="event-search-filter-usetype-ctl" 
-                                               value="Use type filter"/>
-                                <p:selectBooleanCheckbox id="event-search-filter-usetype-ctl" 
-                                                         value="#{eventSearchBB.searchParamsSelected.propertyUseType_ctl}"
-                                                         disabled="false">
-                                    <p:ajax update="event-search-filter-usetype-val" />
-                                </p:selectBooleanCheckbox>
-
-                            </h:panelGroup>
-
-                            <h:panelGroup>
-                                <p:selectOneMenu    id="event-search-filter-usetype-val" 
-                                                    tabindex="1" 
-                                                    value="#{eventSearchBB.searchParamsSelected.propertyUseType_val}" 
-                                                    disabled="#{!eventSearchBB.searchParamsSelected.propertyUseType_ctl}">
-                                    <f:selectItem   itemLabel="select a use type..." noSelectionOption="true" itemDisabled="true"/>
-                                    <f:selectItems  id="event-search-filter-usetype-items" 
-                                                    value="#{eventSearchBB.propUseTypeList}" 
-                                                    var="put" itemValue="#{put}" itemLabel="#{put.name}" />
-                                    <f:converter    converterId="propertyUseTypeConverter"/>
-                                </p:selectOneMenu>
-                                <h:message for="event-search-filter-usetype-val" showDetail="true" showSummary="true" 
-                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                            </h:panelGroup>
-
-                            <h:panelGroup>
-                                <p:outputLabel id="event-filter-person-ol" 
-                                               for="event-criteria-person-val" 
-                                               value="filter by person"/>
-
-                                <p:selectBooleanCheckbox id="event-filter-person-ctl" 
-                                                         value="#{eventSearchBB.searchParamsSelected.person_ctl}" >
-                                    <p:ajax update="event-criteria-person-val" />
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup>
-
-                            <h:panelGroup>
-                                <p:selectOneMenu id="event-criteria-person-val" required="false" 
-                                                 value="#{eventSearchBB.searchParamsSelected.person_val}"
-                                                 disabled="#{!eventSearchBB.searchParamsSelected.person_ctl}">
-
-                                    <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
-                                    <f:selectItems value="#{systemServicesBB.personListForSearch}"  var="p" itemValue="#{p}" 
-                                                   itemLabel="#{p.firstName} #{p.lastName} (ID:#{p.personID})"/>
-                                    <f:converter converterId="personConverter"/>
-
-                                </p:selectOneMenu>
-                            </h:panelGroup>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
 
 
-                            <h:panelGroup>
-                                <p:outputLabel for="event-search-filter-dismuni-ctl" 
-                                               value="filter by disclosed to muni"/>
-                                <p:selectBooleanCheckbox id="event-search-filter-dismuni-ctl" 
-                                                         value="#{eventSearchBB.searchParamsSelected.discloseToMuni_ctl}"
-                                                         disabled="false">
-                                    <p:ajax update="event-search-filter-dismuni-val" />
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup>
+                                    <div class="restrict-main-contents-io-title" >
+                                        <p:selectOneMenu  id="event-search-user-field-val" 
+                                                          tabindex="1" 
+                                                          value="#{eventsBB.searchParamsSelected.user_field}"
+                                                          disabled="#{!eventsBB.searchParamsSelected.user_ctl}">
+                                            <f:selectItem itemLabel="select a user field..." 
+                                                          noSelectionOption="true" 
+                                                          itemDisabled="true"/>
+                                            <f:selectItems id="event-search-user-field-val-items" 
+                                                           value="#{eventsBB.searchParamsSelected.userFieldList}" 
+                                                           var="uf" itemValue="#{uf}" itemLabel="#{uf.title}" />
+                                        </p:selectOneMenu>
+                                    </div>
 
-                            <h:panelGroup>
-                                <p:outputLabel for="event-search-filter-dismuni-val" 
-                                               value="is disclosed to muni"/>
-                                <p:selectBooleanCheckbox id="event-search-filter-dismuni-val" 
-                                                         value="#{eventSearchBB.searchParamsSelected.discloseToMuni_val}"
-                                                         disabled="#{!eventSearchBB.searchParamsSelected.discloseToMuni_ctl}">
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup>
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:selectOneMenu id="event-search-filter-user-som" required="false" 
+                                                         value="#{eventsBB.searchParamsSelected.user_val}"
+                                                         disabled="#{!eventsBB.searchParamsSelected.user_ctl}">
+                                            <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
+                                            <f:selectItems value="#{systemServicesBB.userListForSearch}"  var="u" itemValue="#{u}" 
+                                                           itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
+                                            <f:converter converterId="userConverter"/>
+                                        </p:selectOneMenu>
 
-                            <h:panelGroup>
-                                <p:outputLabel for="event-search-filter-dispublic-ctl" 
-                                               value="filter by disclosed to muni"/>
-                                <p:selectBooleanCheckbox id="event-search-filter-dispublic-ctl" 
-                                                         value="#{eventSearchBB.searchParamsSelected.discloseToPublic_ctl}"
-                                                         disabled="false">
-                                    <p:ajax update="event-search-filter-dispublic-val" />
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup>
+                                    </div>
+                                </div>
 
-                            <h:panelGroup>
-                                <p:outputLabel for="event-search-filter-dispublic-val" 
-                                               value="is disclosed to muni"/>
-                                <p:selectBooleanCheckbox id="event-search-filter-dispublic-val" 
-                                                         value="#{eventSearchBB.searchParamsSelected.discloseToPublic_val}"
-                                                         disabled="#{!eventSearchBB.searchParamsSelected.discloseToPublic_ctl}">
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
 
-                            <h:panelGroup>
-                                <p:outputLabel for="event-search-filter-landbank-ctl" 
-                                               value="filter by land bank held"/>
-                                <p:selectBooleanCheckbox id="event-search-filter-landbank-ctl" 
-                                                         value="#{eventSearchBB.searchParamsSelected.propertyLandBankHeld_ctl}"
-                                                         disabled="false">
-                                    <p:ajax update="event-search-filter-landbank-val" />
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup>
 
-                            <h:panelGroup>
-                                <p:outputLabel for="event-search-filter-landbank-val" 
-                                               value="is in land bank"/>
-                                <p:selectBooleanCheckbox id="event-search-filter-landbank-val" 
-                                                         value="#{eventSearchBB.searchParamsSelected.propertyLandBankHeld_val}"
-                                                         disabled="#{!eventSearchBB.searchParamsSelected.propertyLandBankHeld_ctl}">
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup>
+                                    <div class="restrict-main-contents-io-title" >
+                                        <p:outputLabel for="event-search-filter-domain-ctl" 
+                                                       value="User filter"/>
+                                    </div>
 
-                            <h:panelGroup>
-                                <p:outputLabel for="event-search-filter-active-ctl" 
-                                               value="filter by active"/>
-                                <p:selectBooleanCheckbox id="event-search-filter-active-ctl" 
-                                                         value="#{eventSearchBB.searchParamsSelected.active_ctl}"
-                                                         disabled="false">
-                                    <p:ajax update="event-search-filter-active-val" />
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup>
+                                    <div class="restrict-main-contents-io-content" >
 
-                            <h:panelGroup>
-                                <p:outputLabel for="event-search-filter-active-val" 
-                                               value="is active"/>
-                                <p:selectBooleanCheckbox id="event-search-filter-active-val" 
-                                                         value="#{eventSearchBB.searchParamsSelected.active_val}"
-                                                         disabled="#{!eventSearchBB.searchParamsSelected.active_ctl}">
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup>
 
-                            <h:panelGroup>
-                                <p:outputLabel id="event-query-limit-ol" 
-                                               for="event-query-limit" 
-                                               value="limit results"/>
-                                <p:selectBooleanCheckbox id="event-query-limit" 
-                                                         value="#{eventSearchBB.searchParamsSelected.limitResultCount_ctl}" />
-                            </h:panelGroup>
+                                        <p:selectBooleanCheckbox id="event-search-filter-domain-ctl" 
+                                                                 value="#{eventsBB.searchParamsSelected.eventDomain_ctl}"
+                                                                 disabled="#{!(eventsBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
+                                            <p:ajax update="event-search-filter-domain-val" />
+                                        </p:selectBooleanCheckbox>
 
-                            <h:panelGroup>
-                                <p:inputText id="event-filter-limit-it"
-                                             type="number"
-                                             value="#{eventSearchBB.searchParamsSelected.limitResultCount_val}"
-                                             disabled="#{!eventSearchBB.searchParamsSelected.limitResultCount_ctl}"/>
-                                <h:message for="event-filter-limit-it" showDetail="false" showSummary="true"
-                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                            </h:panelGroup>
+                                    </div>
+                                </div>
 
-                            <h:panelGroup>
-                                <p:outputLabel id="seev-filter-type-ol" for="seev-filter-type" value="filter by event type"/>
-                                <p:selectBooleanCheckbox id="seev-filter-type" 
-                                                         value="#{eventSearchBB.searchParamsSelected.eventType_ctl}">
-                                    <p:ajax update="ceev-critera-type" />
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
 
-                            <h:panelGroup>
-                                <p:selectOneMenu id="ceev-critera-type" required="false" 
-                                                 value="#{eventSearchBB.searchParamsSelected.eventType_val}" tabindex="10"
-                                                 disabled="#{!eventSearchBB.searchParamsSelected.eventType_ctl}">
-                                    <f:selectItem itemLabel="select an event type..." noSelectionOption="true" />
-                                    <p:ajax update="ceev-criteria-cat" immediate="true"/> 
-                                    <f:selectItems value="#{eventSearchBB.eventTypesList}"/>
-                                </p:selectOneMenu>
-                                <h:message for="ceev-critera-type" showDetail="false" showSummary="true" 
-                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                            </h:panelGroup>
+                                    <div class="restrict-main-contents-io-content" >
 
-                            <h:panelGroup>
-                                <p:outputLabel id="ceev-filter-cat-ol" for="ceev-filter-cat" value="filter by event category "/>
-                                <p:selectBooleanCheckbox id="ceev-filter-cat" value="#{eventSearchBB.searchParamsSelected.eventCat_ctl}">
-                                    <p:ajax update="ceev-criteria-cat" />
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup>
+                                        <p:selectOneMenu  id="event-search-filter-domain-val" 
+                                                          tabindex="1" 
+                                                          value="#{eventsBB.searchParamsSelected.eventDomain_val}"
+                                                          disabled="#{!eventsBB.searchParamsSelected.eventDomain_ctl}">
+                                            <f:selectItem itemLabel="select an event domain..." 
+                                                          noSelectionOption="true" 
+                                                          itemDisabled="true"/>
+                                            <f:selectItems id="event-search-filter-domain-items" 
+                                                           value="#{eventsBB.searchParamsSelected.eventDomainList}" 
+                                                           var="ed" itemValue="#{ed}" itemLabel="#{ed.title}" />
+                                            <f:converter converterId="eventDomainConverter" />
+                                        </p:selectOneMenu>
+                                    </div>
+                                </div>
 
-                            <h:panelGroup>
-                                <h:outputLabel for="ceev-criteria-cat" id="ceev-criteria-cat-ol">
-                                    <h:outputText value="event Categories in selected event type:"/>
-                                </h:outputLabel>
-                                <p:spacer height="1px" />
-                                <p:selectOneMenu id="ceev-criteria-cat" style="width: 300px;" 
-                                                 value="#{eventSearchBB.searchParamsSelected.eventCat_val}" tabindex="10"
-                                                 disabled="#{!eventSearchBB.searchParamsSelected.eventCat_ctl}">
-                                    <f:selectItem itemLabel="select an event category..." noSelectionOption="true" />
-                                    <f:converter converterId="eventCategoryConverter"/>
-                                    <f:selectItems  id="catItemsList" value="#{eventSearchBB.eventCatList}" var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
-                                </p:selectOneMenu>
-                                <h:message for="ceev-criteria-cat" showDetail="false" showSummary="true"  
-                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                            </h:panelGroup>
-                        </h:panelGrid>                                        
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
+                                        <p:outputLabel id="event-filter-property-ol" 
+                                                       for="event-filter-property" 
+                                                       value="filter by property "/>
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+
+                                        <p:selectBooleanCheckbox id="event-filter-property" value="#{eventsBB.searchParamsSelected.property_ctl}" >
+                                            <p:ajax update="event-criteria-property-som" />
+                                        </p:selectBooleanCheckbox>
+
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+
+                                        <p:selectOneMenu id="event-criteria-property-som" required="false" 
+                                                         value="#{eventsBB.searchParamsSelected.property_val}"
+                                                         disabled="#{!eventsBB.searchParamsSelected.property_ctl}">
+
+                                            <f:selectItem itemLabel="select a propery..." noSelectionOption="true" />
+                                            <f:selectItems value="#{systemServicesBB.propertyListForSearch}"  var="prop" itemValue="#{prop}" 
+                                                           itemLabel="#{prop.address} (#{prop.muni.muniName})"/>
+                                            <f:converter converterId="propertyConverter"/>
+
+                                        </p:selectOneMenu>
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
+                                        <p:outputLabel for="event-search-filter-usetype-ctl" 
+                                                       value="Property use type filter"/>
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:selectBooleanCheckbox id="event-search-filter-usetype-ctl" 
+                                                                 value="#{eventsBB.searchParamsSelected.propertyUseType_ctl}"
+                                                                 disabled="false">
+                                            <p:ajax update="event-search-filter-usetype-val" />
+                                        </p:selectBooleanCheckbox>
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:selectOneMenu    id="event-search-filter-usetype-val" 
+                                                            tabindex="1" 
+                                                            value="#{eventsBB.searchParamsSelected.propertyUseType_val}" 
+                                                            disabled="#{!eventsBB.searchParamsSelected.propertyUseType_ctl}">
+                                            <f:selectItem   itemLabel="select a use type..." noSelectionOption="true" itemDisabled="true"/>
+                                            <f:selectItems  id="event-search-filter-usetype-items" 
+                                                            value="#{eventsBB.propUseTypeList}" 
+                                                            var="put" itemValue="#{put}" itemLabel="#{put.name}" />
+                                            <f:converter    converterId="propertyUseTypeConverter"/>
+                                        </p:selectOneMenu>
+                                        <h:message for="event-search-filter-usetype-val" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
+                                        <p:outputLabel id="event-filter-person-ol" 
+                                                       for="event-criteria-person-val" 
+                                                       value="filter by person"/>
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+
+
+
+                                        <p:selectBooleanCheckbox id="event-filter-person-ctl" 
+                                                                 value="#{eventsBB.searchParamsSelected.person_ctl}" >
+                                            <p:ajax update="event-criteria-person-val" />
+                                        </p:selectBooleanCheckbox>
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:selectOneMenu id="event-criteria-person-val" required="false" 
+                                                         value="#{eventsBB.searchParamsSelected.person_val}"
+                                                         disabled="#{!eventsBB.searchParamsSelected.person_ctl}">
+
+                                            <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                            <f:selectItems value="#{systemServicesBB.personListForSearch}"  var="p" itemValue="#{p}" 
+                                                           itemLabel="#{p.firstName} #{p.lastName} (ID:#{p.personID})"/>
+                                            <f:converter converterId="personConverter"/>
+
+                                        </p:selectOneMenu>
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
+
+                                        <p:outputLabel for="event-search-filter-active-ctl" 
+                                                       value="filter by active"/>
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:selectBooleanCheckbox id="event-search-filter-active-ctl" 
+                                                                 value="#{eventsBB.searchParamsSelected.active_ctl}"
+                                                                 disabled="false">
+                                            <p:ajax update="event-search-filter-active-val" />
+                                        </p:selectBooleanCheckbox>
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
+                                        <p:outputLabel for="event-search-filter-active-val" 
+                                                       value="is active"/>
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:selectBooleanCheckbox id="event-search-filter-active-val" 
+                                                                 value="#{eventsBB.searchParamsSelected.active_val}"
+                                                                 disabled="#{!eventsBB.searchParamsSelected.active_ctl}">
+                                        </p:selectBooleanCheckbox>
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
+                                        <p:outputLabel id="event-query-limit-ol" 
+                                                       for="event-query-limit" 
+                                                       value="limit results"/>
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:selectBooleanCheckbox id="event-query-limit" 
+                                                                 value="#{eventsBB.searchParamsSelected.limitResultCount_ctl}" />
+
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:inputText id="event-filter-limit-it"
+                                                     type="number"
+                                                     value="#{eventsBB.searchParamsSelected.limitResultCount_val}"
+                                                     disabled="#{!eventsBB.searchParamsSelected.limitResultCount_ctl}"/>
+                                        <h:message for="event-filter-limit-it" showDetail="false" showSummary="true"
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
+                                        <p:outputLabel id="seev-filter-type-ol" for="seev-filter-type" value="filter by event type"/>
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+
+                                        <p:selectBooleanCheckbox id="seev-filter-type" 
+                                                                 value="#{eventsBB.searchParamsSelected.eventType_ctl}">
+                                            <p:ajax update="ceev-critera-type" />
+                                        </p:selectBooleanCheckbox>
+
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
+
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:selectOneMenu id="ceev-critera-type" required="false" 
+                                                         value="#{eventsBB.searchParamsSelected.eventType_val}" tabindex="10"
+                                                         disabled="#{!eventsBB.searchParamsSelected.eventType_ctl}">
+                                            <f:selectItem itemLabel="select an event type..." noSelectionOption="true" />
+                                            <p:ajax update="ceev-criteria-cat" immediate="true"/> 
+                                            <f:selectItems value="#{eventsBB.eventTypesList}"/>
+                                        </p:selectOneMenu>
+                                        <h:message for="ceev-critera-type" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
+                                        <p:outputLabel id="ceev-filter-cat-ol" for="ceev-filter-cat" value="filter by event category "/>
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+
+                                        <p:selectBooleanCheckbox id="ceev-filter-cat" value="#{eventsBB.searchParamsSelected.eventCat_ctl}">
+                                            <p:ajax update="ceev-criteria-cat" />
+                                        </p:selectBooleanCheckbox>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
+
+                                    <div class="restrict-main-contents-io-title" >
+                                        <h:outputLabel for="ceev-criteria-cat" id="ceev-criteria-cat-ol">
+                                            <h:outputText value="event Categories in selected event type:"/>
+                                        </h:outputLabel>
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:selectOneMenu id="ceev-criteria-cat" style="width: 300px;" 
+                                                         value="#{eventsBB.searchParamsSelected.eventCat_val}" tabindex="10"
+                                                         disabled="#{!eventsBB.searchParamsSelected.eventCat_ctl}">
+                                            <f:selectItem itemLabel="select an event category..." noSelectionOption="true" />
+                                            <f:converter converterId="eventCategoryConverter"/>
+                                            <f:selectItems  id="catItemsList" value="#{eventsBB.eventCatList}" var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
+                                        </p:selectOneMenu>
+                                        <h:message for="ceev-criteria-cat" showDetail="false" showSummary="true"  
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                    <div class="restrict-main-contents-io-button gray_button">
+
+                                        <p:commandButton ajax="true" 
+                                                         immediate="true"
+                                                         process="@none"
+                                                         value="Cancel" 
+                                                         icon="fa fa-stop" 
+                                                         onclick="PF('event-search-advanced-dialog-var').hide()"/>
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-button">
+                                        <p:commandButton    id="execute-selected-query" 
+                                                            ajax="true"
+                                                            value="perform selected query" 
+                                                            actionListener="#{eventsBB.runQuery}"
+                                                            disabled="#{eventsBB.querySelected.queryExecuted}"
+                                                            icon="fa fa-flash"
+                                                            oncomplete="PF('event-search-advanced-dialog-var').hide()"
+                                                            update="event-settings-panel
+                                                            event-list-panel
+                                                            form-messages-global
+                                                            event-search-log-form
+                                                            "/>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </h:form>
+
                     </p:dialog>
 
 
@@ -1971,97 +2154,141 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         </h:form>
 
                         <h:form id="report-eventlist-form">
+                            <div class="ui-g data_container_nested_restrict">
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                                    <div class="restrict-main-contents-io-title" >
+                                        <h:outputLabel for="report-case-profile-title-it" 
+                                                       value="Report title"/>
+                                    </div>
 
-                            <h:panelGrid columns="1" border="0" 
-                                         cellpadding="5" columnClasses="gridTd"
-                                         footerClass="gridFooter">
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{eventsBB.reportConfig.title}"/>
+                                        <p:spacer height="5px" />
+                                        <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
 
-                                <f:facet name="header">
+                                    </div>
+                                </div>
 
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                                    <div class="restrict-main-contents-io-title" >
+                                        <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
+                                    </div>
 
-                                    <h:outputLabel for="report-case-profile-title-it" value="Report title"/>
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{eventsBB.reportConfig.notes}"/>
+                                    </div>
+                                </div>
 
-                                    <p:spacer height="5px"/>
-
-                                    <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{eventSearchBB.reportConfig.title}"/>
-                                    <p:spacer height="2px"/>
-                                    <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
-
-                                    <p:spacer height="10px"/>
-
-                                    <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
-                                    <p:spacer height="5px"/>
-                                    <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{eventSearchBB.reportConfig.notes}"/>
-                                    <p:spacer height="5px"/>
-                                </f:facet>
-
-                                <h:panelGroup>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                                     <h2>Event display options</h2>
 
-                                    <h:outputLabel class="bold" value="Sort events: " for="sort-reverse-chrono-is" />
-                                    <p:spacer height="1px"/>
-                                    <p:inputSwitch  id="sort-reverse-chrono-is"
-                                                    value="#{eventSearchBB.reportConfig.sortInRevChrono}" 
-                                                    onLabel="Reverse chrono (newest first)" offLabel="Timeline order (oldest first)" />
+                                </div>
 
-                                    <p:spacer height="5px"/>
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                                    <div class="restrict-main-contents-io-title" >
+                                        <h:outputLabel value="Sort events: " 
+                                                       for="sort-reverse-chrono-is" />
+                                    </div>
 
-                                    <h:outputLabel class="bold" value="Include persons attached to events" for="include-attached-persons-is" />
-                                    <p:spacer height="1px"/>
-                                    <p:inputSwitch  id="include-attached-persons-is"
-                                                    value="#{eventSearchBB.reportConfig.includeAttachedPersons}" 
-                                                    onLabel="Yes" offLabel="No" />
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:inputSwitch  id="sort-reverse-chrono-is"
+                                                        value="#{eventsBB.reportConfig.sortInRevChrono}" 
+                                                        onLabel="Reverse chrono (newest first)" 
+                                                        offLabel="Timeline order (oldest first)" />
 
-                                    <p:spacer height="5px"/>
+                                    </div>
+                                </div>
 
-                                    <h:outputLabel class="bold" value="Include event summary chart on page 1" for="include-event-summary-chart-is" />
-                                    <p:spacer height="1px"/>
-                                    <p:inputSwitch  id="include-event-summary-chart-is"
-                                                    value="#{eventSearchBB.reportConfig.includeEventTypeSummaryChart}" 
-                                                    onLabel="Yes" offLabel="No" />
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                                    <div class="restrict-main-contents-io-title" >
+                                        <h:outputLabel value="Include persons attached to events" 
+                                                       for="include-attached-persons-is" />
+                                    </div>
 
-                                    <p:spacer height="5px"/>
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:inputSwitch  id="include-attached-persons-is"
+                                                        value="#{eventsBB.reportConfig.includeAttachedPersons}" 
+                                                        onLabel="Yes" offLabel="No" />
+                                    </div>
+                                </div>
 
-                                    <h:outputLabel class="bold" value="Include list of all active cases" for="include-active-case-list-is" />
-                                    <p:spacer height="1px"/>
-                                    <p:inputSwitch  id="include-active-case-list-is"
-                                                    value="#{eventSearchBB.reportConfig.includeActiveCaseListing}" 
-                                                    onLabel="Yes" offLabel="No" />
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                                    <div class="restrict-main-contents-io-title" >
+                                        <h:outputLabel value="Include event summary chart on page 1" 
+                                                       for="include-event-summary-chart-is" />
 
-                                    <p:spacer height="5px"/>
+                                    </div>
 
-                                    <h:outputLabel class="bold" value="Include info about events requesting user action" for="include-action-requests-is" />
-                                    <p:spacer height="1px"/>
-                                    <p:inputSwitch  id="include-action-requests-is"
-                                                    value="#{eventSearchBB.reportConfig.includeCaseActionRequestInfo}" 
-                                                    onLabel="Yes" offLabel="No" />
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:inputSwitch  id="include-event-summary-chart-is"
+                                                        value="#{eventsBB.reportConfig.includeEventTypeSummaryChart}" 
+                                                        onLabel="Yes" offLabel="No" />
+                                    </div>
+                                </div>
 
-                                    <p:spacer height="5px"/>
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                                    <div class="restrict-main-contents-io-title" >
+                                        <h:outputLabel value="Include list of all active cases" 
+                                                       for="include-active-case-list-is" />
 
-                                    <h:outputLabel class="bold" value="Include complete query parameters" for="include-queryparams-is" />
-                                    <p:spacer height="1px"/>
-                                    <p:inputSwitch  id="include-queryparams-is"
-                                                    value="#{eventSearchBB.reportConfig.includeCompleteQueryParamsDump}" 
-                                                    onLabel="Yes" offLabel="No" />
+                                    </div>
 
-                                    <p:spacer height="5px"/>
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:inputSwitch  id="include-active-case-list-is"
+                                                        value="#{eventsBB.reportConfig.includeActiveCaseListing}" 
+                                                        onLabel="Yes" offLabel="No" />
+                                    </div>
+                                </div>
 
-                                </h:panelGroup>
-                            </h:panelGrid>
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                                    <div class="restrict-main-contents-io-title" >
+                                        <h:outputLabel value="Include info about events requesting user action" 
+                                                       for="include-action-requests-is" />
 
-                            <p:commandButton ajax="true" 
-                                             value="Cancel" icon="fa fa-stop" 
-                                             onclick="PF('report-event-diaglog-var').hide()"/>
+                                    </div>
 
-                            <p:commandButton ajax="false" action="#{eventSearchBB.generateEventReport}"
-                                             value="Generate report" icon="fa fa-print" 
-                                             rendered="#{sessionBsessionUserUser.keyCard.hasMuniReaderPermissions}"
-                                             />
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:inputSwitch  id="include-action-requests-is"
+                                                        value="#{eventsBB.reportConfig.includeCaseActionRequestInfo}" 
+                                                        onLabel="Yes" offLabel="No" />
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                                    <div class="restrict-main-contents-io-title" >
+                                        <h:outputLabel value="Include complete query parameters" 
+                                                       for="include-queryparams-is" />
+
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:inputSwitch  id="include-queryparams-is"
+                                                        value="#{eventsBB.reportConfig.includeCompleteQueryParamsDump}" 
+                                                        onLabel="Yes" offLabel="No" />
+
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+
+                                    <div class="restrict-main-contents-io-button gray_button">
+
+                                        <p:commandButton ajax="true" 
+                                                         value="Cancel" icon="fa fa-stop" 
+                                                         onclick="PF('report-event-diaglog-var').hide()"/>
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-button">
+                                        <p:commandButton ajax="false" action="#{eventsBB.generateEventReport}"
+                                                         value="Generate report" icon="fa fa-print" 
+                                                         rendered="#{sessionBsessionUserUser.keyCard.hasMuniReaderPermissions}"
+                                                         />
+                                    </div>
+
+                                </div>
+                            </div>
 
                         </h:form>
                     </p:dialog>
-
-
                 </f:view>
             </ui:define>
         </ui:composition>
