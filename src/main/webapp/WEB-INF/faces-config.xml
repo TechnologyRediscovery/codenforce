@@ -960,12 +960,6 @@
         <managed-bean-class>com.tcvcog.tcvce.coordinators.EventCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
-        
-    <managed-bean>
-        <managed-bean-name>eventSearchBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.EventSearchBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
 
     <managed-bean>
         <managed-bean-name>eventsBB</managed-bean-name>

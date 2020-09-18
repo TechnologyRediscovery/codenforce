@@ -103,8 +103,9 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         blockListBeforeViolations = new ArrayList<>();
         blockListAfterViolations = new ArrayList<>();
         PropertyDataHeavy pdh = getSessionBean().getSessProperty();
-
-        personCandidateList = pdh.getPersonList();
+        if(pdh != null){
+            personCandidateList = pdh.getPersonList();
+        }
         if (personCandidateList != null) {
             System.out.println("NoticeOfViolationBuilderBB.initbean "
                     + "| person candidate list size: " + personCandidateList.size());

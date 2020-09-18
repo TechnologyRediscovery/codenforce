@@ -913,7 +913,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return the database identifier of the sent in Person's very own ghost
      * @throws IntegrationException 
      */
-    public int createGhost(Person p, User u) throws IntegrationException {
+    public int createGhost(Person p, User u) throws IntegrationException, BObStatusException {
+        if(p == null || u == null){
+            throw new BObStatusException("Cannot make ghost with null peson or U");
+            
+        }
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;

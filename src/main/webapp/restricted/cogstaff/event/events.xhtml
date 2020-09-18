@@ -77,12 +77,22 @@
                                                                             var="listtype"
                                                                             itemValue="#{listtype}"
                                                                             itemLabel="#{listtype.title}"/>
-                                                            <p:ajax update="event-list-panel"
-                                                                    immediate="true" 
-                                                                    listener="#{eventsBB.onListTypeMenuChange(eventsBB.listType)}"/>
+                                                           
                                                         </p:selectOneMenu>
 
                                                     </div>
+                                                     <h:outputText id="events-header-domain"
+                                                                  value="Attaching new event to #{!(empty eventsBB.currentEventDomain) ? eventsBB.currentEventDomain.title : ''} " />
+                                                    <h:outputText id="events-header-id"
+                                                                  value=" Object ID #{!(empty eventsBB.currentERGBOb) ? eventsBB.currentERGBOb.BObID : ''} " />
+                                                    <p:spacer height="5px" />
+                                                     <p:commandButton   id="event-list-change-button" 
+                                                                           ajax="false" 
+                                                                           action="#{eventsBB.onListTypeMenuChange(eventsBB.listType)}"
+                                                                           icon="fa fa-settings" 
+                                                                           styleClass="button inline-button"
+                                                                           value="Update page" />
+                                                    
                                                 </div>
 
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
@@ -260,7 +270,7 @@
                                                 expandedRow="false"
                                                 scrollHeight="400"
                                                 filteredValue="#{eventsBB.filteredEventList}"
-                                                widgetVar="caseEventTable"
+                                                widgetVar="events-table-var"
                                                 >
                                                 <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
