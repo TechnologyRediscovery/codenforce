@@ -53,6 +53,7 @@ import java.util.Iterator;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 /**
@@ -600,11 +601,14 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
                             "An error occured while trying to attach the application to an Occ Period: " + ex, ""));
         } catch (NavigationException ex) {
             System.out.println("OccPermitApplicationManageBB.attachToOccPeriod() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
+            //We must do things a little bit different here to make sure messages are kept after the redirect.
+            FacesContext context = getFacesContext();
+                    context.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occured while trying to direct you back to the page you were last on."
                             + " Your changes to the database were saved. Please return to the page manually.",
                             "Do not hit the return button again but note the error."));
+                    context.getExternalContext().getFlash().setKeepMessages(true);
         }
         return ""; //only reached if an error was thrown.
     }
@@ -619,11 +623,14 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
             return getSessionBean().getNavStack().popLastPage();
         } catch (NavigationException ex) {
             System.out.println("OccPermitApplicationManageBB.cancelAttachment() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
+            //We must do things a little bit different here to make sure messages are kept after the redirect.
+            FacesContext context = getFacesContext();
+                    context.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occured while trying to direct you back to the page you were last on."
+                             "An error occured while trying to direct you back to the page you were last on."
                             + " No changes to the database were saved. Please return to the page manually.",
                             "Do not hit the return button again but note the error."));
+                    context.getExternalContext().getFlash().setKeepMessages(true);
             return "";
         }
     }
@@ -819,11 +826,14 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
                             "An error occured while trying to save your changes: " + ex, ""));
         } catch (NavigationException ex) {
             System.out.println("OccPermitManageBB.acceptUnitListChanges() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
+            //We must do things a little bit different here to make sure messages are kept after the redirect.
+            FacesContext context = getFacesContext();
+                    context.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occured while trying to direct you back to the page you were on."
                             + " Your changes to the database were saved. Please return to the page manually.",
                             "Do not hit the return button again but note the error."));
+                    context.getExternalContext().getFlash().setKeepMessages(true);
         }
         return "";
 
@@ -854,11 +864,14 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
                             ex.toString(), ""));
         } catch(NavigationException ex){
             System.out.println("OccPermitApplicationManageBB.acceptAttachedPersonChanges() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
+            //We must do things a little bit different here to make sure messages are kept after the redirect.
+            FacesContext context = getFacesContext();
+                    context.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occured while trying to direct you back to the page you were on."
                             + " Your changes to the database were saved. Please return to the page manually.",
                             "Do not hit the return button again but note the error."));
+                    context.getExternalContext().getFlash().setKeepMessages(true);
         }
 
         return "";
