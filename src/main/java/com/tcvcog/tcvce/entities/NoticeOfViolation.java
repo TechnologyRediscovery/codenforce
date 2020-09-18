@@ -63,6 +63,9 @@ public class NoticeOfViolation  implements Serializable, Comparable<NoticeOfViol
     private PrintStyle style;
     private boolean useSignatureImage;
     private boolean includeViolationPhotoAttachment;
+    
+    private boolean active;
+    
 
     @Override
     public int compareTo(NoticeOfViolation nv) {
@@ -453,6 +456,20 @@ public class NoticeOfViolation  implements Serializable, Comparable<NoticeOfViol
      */
     public void setStyle(PrintStyle style) {
         this.style = style;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
     }
     
 }

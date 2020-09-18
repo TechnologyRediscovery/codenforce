@@ -273,7 +273,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
                     ec.getEventCategory(Integer.parseInt(
                             getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                                     .getString("propertyinfoeventcatid"))));
-            getSessionBean().setSessEventQueued(ev);
+            getSessionBean().setSessEvent(ev);
         } catch (IntegrationException | BObStatusException | EventException ex) {
             System.out.println(ex);
         }
@@ -600,7 +600,7 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
      */
     public String onViewEventButtonChange(EventCnF ev) {
         if (ev != null) {
-            getSessionBean().setSessEventQueued(ev);
+            getSessionBean().setSessEvent(ev);
             return "eventAddEdit";
         }
         return "";

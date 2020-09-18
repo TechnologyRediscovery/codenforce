@@ -17,10 +17,12 @@
             <ui:define name="content">
                 <f:view id="missionControlView">
                     <div class="mainContainer">
-                        <h:messages id="missionControlMessages" globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
-
+                        
+                        <h:form id="growl-form">
+                            <p:growl showSummary="true" 
+                                     showDetail="false"/>
+                        </h:form>
+                        
                         <h:form id="missionControlForm">
                             <h1><h:outputText value="codeNforce Dashboard: #{systemServicesBB.bbSessionMuni.muniName}"/> </h1>
 

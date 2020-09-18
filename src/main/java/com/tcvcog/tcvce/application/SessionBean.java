@@ -149,12 +149,17 @@ public class    SessionBean
     /* >>>                   V Event                                      <<< */
     /* >>> -------------------------------------------------------------- <<< */
     
-    
-    private EventDomainEnum sessEventDomain;
+    /**
+     * There is no longer a notion of a session event domain, only a requested
+     * event domain for event manipulators to use as guidance to figure out 
+     * if the relevant event list is extracted from the proper session business 
+     * objects
+     */
+    private PageModeEnum sessEventsPagePageModeRequest;
+    private EventDomainEnum sessEventsPageEventDomainRequest;
     private List<EventCnFPropUnitCasePeriodHeavy> sessEventList;
-    private EventCnF sessEventQueued;
+    private EventCnF sessEvent;
     
-    private PageModeEnum eventPageModeRequest;
     
     /* >>> QUERY EVENT <<< */
     private QueryEvent queryEvent;
@@ -594,6 +599,17 @@ public class    SessionBean
             }
             sessCECaseList = cseListPDH;
         }
+        
+    }
+    
+    public void setSessCECase(CECase cse){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            sessCECase = cc.cecase_assembleCECaseDataHeavy(cse, sessUser);
+        } catch (BObStatusException | IntegrationException | SearchException ex) {
+            System.out.println(ex);
+        }
+        
         
     }
     
@@ -1323,17 +1339,17 @@ public class    SessionBean
     }
 
     /**
-     * @return the sessEventQueued
+     * @return the sessEvent
      */
-    public EventCnF getSessEventQueued() {
-        return sessEventQueued;
+    public EventCnF getSessEvent() {
+        return sessEvent;
     }
 
     /**
-     * @param sessEventQueued the sessEventQueued to set
+     * @param sessEvent the sessEvent to set
      */
-    public void setSessEventQueued(EventCnF sessEventQueued) {
-        this.sessEventQueued = sessEventQueued;
+    public void setSessEvent(EventCnF sessEvent) {
+        this.sessEvent = sessEvent;
     }
 
     /**
@@ -1393,17 +1409,17 @@ public class    SessionBean
     }
 
     /**
-     * @return the sessEventDomain
+     * @return the sessEventsPageEventDomainRequest
      */
-    public EventDomainEnum getSessEventDomain() {
-        return sessEventDomain;
+    public EventDomainEnum getSessEventsPageEventDomainRequest() {
+        return sessEventsPageEventDomainRequest;
     }
 
     /**
-     * @param sessEventDomain the sessEventDomain to set
+     * @param sessEventsPageEventDomainRequest the sessEventsPageEventDomainRequest to set
      */
-    public void setSessEventDomain(EventDomainEnum sessEventDomain) {
-        this.sessEventDomain = sessEventDomain;
+    public void setSessEventsPageEventDomainRequest(EventDomainEnum sessEventsPageEventDomainRequest) {
+        this.sessEventsPageEventDomainRequest = sessEventsPageEventDomainRequest;
     }
 
     /**
@@ -1509,17 +1525,17 @@ public class    SessionBean
     }
 
     /**
-     * @return the eventPageModeRequest
+     * @return the sessEventsPagePageModeRequest
      */
-    public PageModeEnum getEventPageModeRequest() {
-        return eventPageModeRequest;
+    public PageModeEnum getSessEventsPagePageModeRequest() {
+        return sessEventsPagePageModeRequest;
     }
 
     /**
-     * @param eventPageModeRequest the eventPageModeRequest to set
+     * @param sessEventsPagePageModeRequest the sessEventsPagePageModeRequest to set
      */
-    public void setEventPageModeRequest(PageModeEnum eventPageModeRequest) {
-        this.eventPageModeRequest = eventPageModeRequest;
+    public void setSessEventsPagePageModeRequest(PageModeEnum sessEventsPagePageModeRequest) {
+        this.sessEventsPagePageModeRequest = sessEventsPagePageModeRequest;
     }
 
     /**

@@ -470,12 +470,6 @@
         <managed-bean-class>com.tcvcog.tcvce.integration.CourtEntityIntegrator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
-
-    <managed-bean>
-        <managed-bean-name>userAuthMuniManageBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.UserAuthMuniManageBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>municipalityManageBB</managed-bean-name>
@@ -966,12 +960,6 @@
         <managed-bean-class>com.tcvcog.tcvce.coordinators.EventCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
-        
-    <managed-bean>
-        <managed-bean-name>eventSearchBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.EventSearchBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
 
     <managed-bean>
         <managed-bean-name>eventsBB</managed-bean-name>
@@ -1228,21 +1216,8 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
-    <managed-bean>
-        <managed-bean-name>cECaseNoticesBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseNoticesBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
 
-    <managed-bean>
-        <managed-bean-name>cECaseCitationsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseCitationsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules code enforcement ~~~~~~~~~~~~~~~~ --> 
-
-
-
 
 
     <navigation-rule>
@@ -1377,6 +1352,7 @@
             <to-view-id>/restricted/cogstaff/ce/textBlockManage.xhtml</to-view-id>
             <redirect/>
         </navigation-case>
+        
         <navigation-case>
             <from-outcome>occPermitApplications</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/permitApplications.xhtml</to-view-id>
@@ -1390,7 +1366,7 @@
  
         <navigation-case>
             <from-outcome>noticeOfViolationPrint</from-outcome>
-            <to-view-id>/restricted/cogview/noticeOfViolationPrint.xhtml</to-view-id>
+            <to-view-id>/restricted/cogstaff/ce/noticeOfViolationPrint.xhtml</to-view-id>
         </navigation-case>
 
         <navigation-case>

@@ -42,6 +42,8 @@ public class Constants implements Serializable {
     public final static String DEFAULT_UNIT_NUMBER = "-1";
     public final static String TEMP_UNIT_NUM = "-9";
     
+    
+    
     // Object management configuration parameters
     public final static int MAX_BOB_HISTORY_SIZE = 30;
     

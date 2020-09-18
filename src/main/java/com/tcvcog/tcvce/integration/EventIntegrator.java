@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
+import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
@@ -159,6 +160,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return ev;
     }
     
+   
+    
     /**
      * Builds a List of EventCnF objects given an ERG, which in June 2020 were
      * only CECase and OccPeriod objects
@@ -224,10 +227,12 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @return the id of the event just inserted
      * @throws IntegrationException when the system is unable to store event in
      * DB
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public int insertEvent(EventCnF event) throws IntegrationException {
+    public int insertEvent(EventCnF event) throws IntegrationException, BObStatusException {
         if(event == null) return 0;
         PersonIntegrator pi = getPersonIntegrator();
+        EventCoordinator ec = getEventCoordinator();
         int insertedEventID = 0;
 
         String query = "INSERT INTO public.event(\n" +
@@ -246,7 +251,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             
             stmt.setInt(1, event.getCategory().getCategoryID());
             
-            if(event.getCeCaseID() != 0){
+            if(event.getDomain() == EventDomainEnum.CODE_ENFORCEMENT && event.getCeCaseID() != 0){
                 stmt.setInt(2, event.getCeCaseID());
             } else {
                 stmt.setNull(2, java.sql.Types.NULL);
@@ -265,7 +270,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(5, event.isActive());
             stmt.setString(6, event.getNotes());
             
-            if(event.getOccPeriodID() != 0){
+            if(event.getDomain() == EventDomainEnum.OCCUPANCY && event.getOccPeriodID() != 0){
                 stmt.setInt(7, event.getOccPeriodID());
             } else {
                 stmt.setNull(7, java.sql.Types.NULL);
@@ -311,14 +316,13 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
 
         // now connect people to event that has already been logged
-        List<Person> persList = event.getPersonList();
-        event.setEventID(insertedEventID);
+        event = ec.getEvent(insertedEventID);
 
-        if (persList != null) {
-            if (persList.size() > 0 && event.getEventID() != 0) {
-                pi.eventPersonConnect(event, persList);
-            }
+
+        if (event.getEventID() != 0 && event.getPersonList() != null && !event.getPersonList().isEmpty()) {
+            pi.eventPersonConnect(event);
         }
+
         
         return insertedEventID;
 
@@ -336,8 +340,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         PersonIntegrator pi = getPersonIntegrator();
         StringBuilder sb = new StringBuilder();
         sb.append("UPDATE public.event\n");
-        sb.append("   SET category_catid=?, cecase_caseid=?, eventdescription=?, \n");
-        sb.append("       creator_userid=?, active=?, notes=?, occperiod_periodid=?, timestart=?, \n" );
+        sb.append("   SET cecase_caseid=?, eventdescription=?, \n");
+        sb.append("       creator_userid=?, active=?, occperiod_periodid=?, timestart=?, \n" );
         sb.append("       timeend=?, lastupdatedby_userid=?, lastupdatedts=now() \n" );
         sb.append(" WHERE eventid=?;");
 
@@ -347,54 +351,101 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         try {
             stmt = con.prepareStatement(sb.toString());
-           
-            stmt.setInt(1, event.getCategory().getCategoryID());
             
-            if(event.getCeCaseID() != 0){
-                stmt.setInt(2, event.getCeCaseID());
+            
+            if(event.getDomain() == EventDomainEnum.CODE_ENFORCEMENT && event.getCeCaseID() != 0){
+                stmt.setInt(1, event.getCeCaseID());
             } else {
-                stmt.setNull(2, java.sql.Types.NULL);
+                stmt.setNull(1, java.sql.Types.NULL);
             }
 
             // note that the timestamp is set by a call to postgres's now()
    
-            stmt.setString(3, event.getDescription());
+            stmt.setString(2, event.getDescription());
             
             if(event.getUserCreator() != null){
-                stmt.setInt(4, event.getUserCreator().getUserID());
+                stmt.setInt(3, event.getUserCreator().getUserID());
             } else {
-                stmt.setNull(4, java.sql.Types.NULL);
+                stmt.setNull(3, java.sql.Types.NULL);
             }
             
-            stmt.setBoolean(5, event.isActive());
-            stmt.setString(6, event.getNotes());
+            stmt.setBoolean(4, event.isActive());
             
-            if(event.getOccPeriodID() != 0){
-                stmt.setInt(7, event.getOccPeriodID());
+            if(event.getDomain() == EventDomainEnum.OCCUPANCY && event.getOccPeriodID() != 0){
+                stmt.setInt(5, event.getOccPeriodID());
             } else {
-                stmt.setNull(7, java.sql.Types.NULL);
+                stmt.setNull(5, java.sql.Types.NULL);
             }
             
             if (event.getTimeStart() != null) {
-                stmt.setTimestamp(8, java.sql.Timestamp.valueOf(event.getTimeStart()));
+                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(event.getTimeStart()));
             } else {
-                stmt.setNull(8, java.sql.Types.NULL);
+                stmt.setNull(6, java.sql.Types.NULL);
             }
             
             
             if (event.getTimeEnd() != null) {
-                stmt.setTimestamp(9, java.sql.Timestamp.valueOf(event.getTimeEnd()));
+                stmt.setTimestamp(7, java.sql.Timestamp.valueOf(event.getTimeEnd()));
             } else {
-                stmt.setNull(9, java.sql.Types.NULL);
+                stmt.setNull(7, java.sql.Types.NULL);
             }
             
             if(event.getLastUpdatedBy() != null){
-                stmt.setInt(10, event.getLastUpdatedBy().getUserID());
+                stmt.setInt(8, event.getLastUpdatedBy().getUserID());
             } else {
-                stmt.setNull(10, java.sql.Types.NULL);
+                stmt.setNull(8, java.sql.Types.NULL);
             }
             
-            stmt.setInt(11, event.getEventID());
+            stmt.setInt(9, event.getEventID());
+            
+            stmt.executeUpdate();
+            
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot retrive event", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+ 
+    
+
+    /**
+     * Updates only the notes field and lastupdatedby field
+     * @param event
+     * @throws IntegrationException 
+     */
+    public void updateEventNotes(EventCnF event) throws IntegrationException {
+        if(event == null) return;
+        PersonIntegrator pi = getPersonIntegrator();
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE public.event\n");
+        sb.append("   SET notes=?, lastupdatedby_userid=?, lastupdatedts=now() \n" );
+        sb.append(" WHERE eventid=?;");
+
+        // TO DO: finish clearing view confirmation
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+           
+
+            stmt.setString(1, event.getNotes());
+            
+        
+            
+            if(event.getLastUpdatedBy() != null){
+                stmt.setInt(2, event.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(3, event.getEventID());
             
             stmt.executeUpdate();
             

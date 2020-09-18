@@ -393,7 +393,7 @@ public  class       EventCnF
      */
     public void setTimeEndUtilDate(java.util.Date teud) {
         if(teud != null){
-            teud.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            timeEnd = teud.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
     }
 

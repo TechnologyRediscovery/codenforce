@@ -57,6 +57,8 @@ import javax.faces.application.FacesMessage;
 public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
     final CasePhaseEnum initialCECasePphase = CasePhaseEnum.PrelimInvestigationPending;
+    final int FALLBACK_DAYSTOCOMPLY = 30;
+    public final static int DEFAULT_EXTENSIONDAYS = 14;
 
     /**
      * Creates a new instance of CaseCoordinator
@@ -221,13 +223,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             cse = ci.getCECase(caseID);
             if (cse != null) {
 
-                cse.setNoticeList(ci.novGetList(cse));
+                cse.setNoticeList(nov_getNoticeOfViolationList(ci.novGetList(cse)));
                 Collections.sort(cse.getNoticeList());
                 Collections.reverse(cse.getNoticeList());
 
                 cse.setCitationList(ci.getCitations(cse));
 
-                cse.setViolationList(ci.getCodeViolations(cse.getCaseID()));
+                cse.setViolationList(violation_getCodeViolations(ci.getCodeViolations(cse.getCaseID())));
                 Collections.sort(cse.getViolationList());
                 
                 cse.setEventList(ec.getEventList(cse));
@@ -1075,6 +1077,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     }
 
     // *************************************************************************
+    
     // *                     NOTICES OF VIOLATION                              *
     // *************************************************************************
     /**
@@ -1096,20 +1099,51 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     }
 
     /**
+     * Configuration intermediary for NOVs
+     * @param noticeID
+     * @return
+     * @throws IntegrationException 
+     */
+    public NoticeOfViolation nov_getNoticeOfViolation(int noticeID) throws IntegrationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        return ci.novGet(noticeID);
+    }
+    
+    
+    /**
+     *  Utility method for extracting a list of NOV ID's from the db
+     * @param idl
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public List<NoticeOfViolation> nov_getNoticeOfViolationList(List<Integer> idl) throws IntegrationException{
+        List<NoticeOfViolation> novl = new ArrayList<>();
+        if(idl != null && !idl.isEmpty()){
+            for(Integer i: idl){
+                novl.add(nov_getNoticeOfViolation(i));
+            }
+        }
+        return novl;
+    }
+    
+    
+    
+    
+    
+    /**
      * Called when first creating a notice of violation
      *
      * @param cse
      * @param mdh
      * @return
-     * @throws SQLException
      * @throws AuthorizationException
      */
-    public NoticeOfViolation nov_GetNewNOVSkeleton(CECaseDataHeavy cse, MunicipalityDataHeavy mdh) throws SQLException, AuthorizationException {
+    public NoticeOfViolation nov_GetNewNOVSkeleton(CECaseDataHeavy cse, MunicipalityDataHeavy mdh) throws AuthorizationException {
         SystemIntegrator si = getSystemIntegrator();
         NoticeOfViolation nov = new NoticeOfViolation();
+        
         nov.setViolationList(new ArrayList<CodeViolationDisplayable>());
         nov.setDateOfRecord(LocalDateTime.now());
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
 
         try {
             nov.setStyle(si.getPrintStyle(mdh.getDefaultNOVStyleID()));
@@ -1122,6 +1156,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         while (iter.hasNext()) {
             CodeViolation cv = iter.next();
             CodeViolationDisplayable cvd = new CodeViolationDisplayable(cv);
+            // start with sensible default values
             cvd.setIncludeHumanFriendlyText(false);
             cvd.setIncludeOrdinanceText(true);
             cvd.setIncludeViolationPhotos(false);
@@ -1163,12 +1198,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
         EventCnF noticeEvent = evCoord.initEvent(c, evCoord.initEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("noticeQueued"))));
+        
         String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
+        
         noticeEvent.setDescription(queuedNoticeEventNotes);
         noticeEvent.setUserCreator(ua);
-        ArrayList<Person> al = new ArrayList();
-        al.add(nov.getRecipient());
-        noticeEvent.setPersonList(al);
+        
+        ArrayList<Person> persList = new ArrayList();
+        persList.add(nov.getRecipient());
+        noticeEvent.setPersonList(persList);
         evCoord.addEvent(noticeEvent, c, ua);
     }
 
@@ -1194,9 +1232,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param nov
      * @throws IntegrationException
      */
-    public void nov_update(NoticeOfViolation nov) throws IntegrationException {
+    public void nov_update(NoticeOfViolation nov) throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
-        ci.novUpdateNotice(nov);
+        if(nov != null){
+            if(nov.getLockedAndqueuedTS() == null){
+                ci.novUpdateNotice(nov);
+            } else {
+                throw new BObStatusException("Cannot update the text of a locked notice.");
+            }
+            
+        }
     }
 
     /**
@@ -1680,12 +1725,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 //        sb.append("; Violation: ");
 //        sb.append(cv.getViolatedEnfElement().getCodeElement().getHeaderString());
 //        tfEvent.setDescription(sb.toString());
-        if (violation_verifyCodeViolationAttributes(cse, cv)) {
-            insertedViolationID = ci.insertCodeViolation(cv);
-        } else {
-            throw new ViolationException("Failed violation verification");
-        }
-
+        violation_verifyCodeViolationAttributes(cse, cv);
+        cv.setCreatedBy(ua);
+        insertedViolationID = ci.insertCodeViolation(cv);
         pc.insertAutoAssignedFees(cse, cv);
         return insertedViolationID;
     }
@@ -1705,8 +1747,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return the CodeViolation with correct icon and status
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public CodeViolation violation_configureCodeViolation(CodeViolation cv) throws IntegrationException {
+    private CodeViolation violation_configureCodeViolation(CodeViolation cv) throws IntegrationException {
         SystemIntegrator si = getSystemIntegrator();
+        CaseIntegrator ci = getCaseIntegrator();
+        ci.loadViolationPhotoList(cv);
+        
+        cv.setCitationIDList(ci.getCitations(cv.getViolationID()));
+        cv.setNoticeIDList(ci.novGetNOVIDList(cv));
+        
         if (cv.getActualComplianceDate() == null) {
             // violation still within compliance timeframe
             if (cv.getDaysUntilStipulatedComplianceDate() >= 0) {
@@ -1746,7 +1794,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws ViolationException
      */
-    private boolean violation_verifyCodeViolationAttributes(CECaseDataHeavy cse, CodeViolation cv) throws ViolationException {
+    private void violation_verifyCodeViolationAttributes(CECaseDataHeavy cse, CodeViolation cv) throws ViolationException {
         if (cse.getStatusBundle().getPhase() == CasePhaseEnum.Closed) {
             throw new ViolationException("Cannot update code violations on closed cases!");
 
@@ -1754,8 +1802,50 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         if (cv.getStipulatedComplianceDate().isBefore(cv.getDateOfRecord())) {
             throw new ViolationException("Stipulated compliance date cannot be before the violation's date of record");
         }
+        
+        
+    }
+    
+    /**
+     * Logic holder for injecting a code element into a code violation and setting sensible default values
+     * based on preferences by muni 
+     * @param cse
+     * @param cv
+     * @param ece to be injected
+     * @param mdh if not null, will be asked for its auto-config settings (e.g. don't set compliance dates on weekends).
+     * @return
+     * @throws BObStatusException 
+     */
+    public CodeViolation violation_injectOrdinance(CECase cse, CodeViolation cv, EnforcableCodeElement ece, MunicipalityDataHeavy mdh ) throws BObStatusException{
 
-        return true;
+        if(cse != null && cv != null && ece != null){
+            List<CodeViolation> vlst = new ArrayList<>();
+            vlst.addAll(cse.getViolationList());
+            if(!vlst.isEmpty()){
+                // check to make sure that particular ordinance isn't already on the case
+                for (CodeViolation tempCv : vlst) {
+                    if(tempCv.getViolatedEnfElement().getCodeSetElementID() == ece.getCodeSetElementID()){
+                        throw new BObStatusException("Violatio of ordiance with ID " + ece.getCodeSetElementID());
+                    }
+                }
+            }
+            int daysInFuture;
+            if(ece.getNormDaysToComply() != 0){
+                daysInFuture = ece.getNormDaysToComply();
+            } else {
+                daysInFuture = FALLBACK_DAYSTOCOMPLY;
+            }
+            cv.setViolatedEnfElement(ece);
+            cv.setStipulatedComplianceDate(LocalDateTime.now().plusDays(daysInFuture));
+            cv.setDateOfRecord(LocalDateTime.now());
+            cv.setPenalty(ece.getNormPenalty());
+            
+            
+            
+        } else {
+            throw new BObStatusException("Cannot inject null ordinance or cannot inject into null code violation");
+        }
+        return cv;
     }
 
     /**
@@ -1766,27 +1856,31 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param u
      * @throws ViolationException
      * @throws IntegrationException
-     * @throws EventException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public void violation_updateCodeViolation(CECaseDataHeavy cse,
             CodeViolation cv,
             UserAuthorized u)
             throws ViolationException,
             IntegrationException,
-            EventException {
+            BObStatusException {
 
         EventCoordinator ec = getEventCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
         EventIntegrator ei = getEventIntegrator();
 
-        if (violation_verifyCodeViolationAttributes(cse, cv)) {
-            ci.updateCodeViolation(cv);
+        if(cse == null || cv == null || u == null){
+            throw new BObStatusException("Cannot update a code violation given a null case, violation, or user");
         }
+        
+        cv.setLastUpdatedUser(u);
+        ci.updateCodeViolation(cv);
 
     } // close method
 
     /**
-     * Updates only the notes field on Citation
+     * Updates only the notes field on violation. This method takes care of 
+     * pulling out existing notes and prepending the new notes
      *
      * @param mbp
      * @param viol
@@ -1831,6 +1925,54 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     }
 
     /**
+     * Logic gateway for updates to a code violation's stipulated compliance date
+     * @param cv
+     * @param daysToExtend the number of days in the future FROM TODAY to extend the window
+     * @param cse
+     * @param ua 
+     */
+    public void violation_extendStipulatedComplianceDate(CodeViolation cv, long daysToExtend, CECaseDataHeavy cse, UserAuthorized ua) throws BObStatusException, ViolationException, IntegrationException{
+
+        if(cv == null || cse == null || ua == null){
+            throw new BObStatusException("Cannot extend compliance date given a null violation, case, or user");
+        }
+        
+        if(cv.getStipulatedComplianceDate() == null){
+            throw new BObStatusException("Cannot extend a null stipulated compliance date");
+        }
+        
+        if(daysToExtend == 0){
+            throw new BObStatusException("I, the mighty CaseCoordinator, shall not extend the compliance window by 0 days");
+        }
+        
+        if(cv.isAllowStipCompDateUpdate()){
+            LocalDateTime oldStipDate = cv.getStipulatedComplianceDate();
+            cv.setStipulatedComplianceDate(LocalDateTime.now().plusDays(daysToExtend));
+            violation_updateCodeViolation(cse, cv, ua);
+            
+            // now generate a note
+            
+            MessageBuilderParams mbp = new MessageBuilderParams();
+            mbp.setUser(ua);
+            mbp.setHeader("Stipulated compliance date extended");
+            StringBuilder sb = new StringBuilder();
+            sb.append("Previous stipulated compliance date of ");
+            sb.append(getPrettyDate(oldStipDate));
+            sb.append(" has been extended by ");
+            sb.append(daysToExtend);
+            sb.append(" days to ");
+            sb.append(getPrettyDate(cv.getStipulatedComplianceDate()));
+            sb.append(".");
+            
+            mbp.setNewMessageContent(sb.toString());
+            violation_updateNotes(mbp, cv);
+            
+        } else {
+            throw new BObStatusException("Code violation status does not permit updates to compliance date");
+        }
+    }
+    
+    /**
      * CodeViolation should have the actual compliance date set from the user's
      * event date of record
      *
@@ -1844,13 +1986,24 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         // update violation record for compliance
         cv.setComplianceUser(u);
-        cv.setComplianceTimeStamp(LocalDateTime.now());
         cv.setLastUpdatedUser(u);
-        cv.setLastUpdatedTS(LocalDateTime.now());
 
-        ci.updateCodeViolation(cv);
+        ci.updateCodeViolationCompliance(cv);
     }
 
+    public List<CodeViolation> violation_getCodeViolations(List<Integer> cvIDList) throws IntegrationException{
+        List<CodeViolation> vl = new ArrayList<>();
+        
+        if(cvIDList != null && !cvIDList.isEmpty()){
+            for(Integer i: cvIDList){
+                vl.add(violation_getCodeViolation(i));
+            }
+        }
+        
+        return vl;
+        
+    }
+    
     /**
      * Utility method for grabbing a list of CodeViolations given a CECase
      *
@@ -1858,10 +2011,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException
      */
-    public List<CodeViolation> violation_getCodeViolations(CECaseDataHeavy ceCase) throws IntegrationException {
+    public List<CodeViolation> violation_getCodeViolations(CECaseDataHeavy ceCase) throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
-        List<CodeViolation> al = ci.getCodeViolations(ceCase);
-        return al;
+        if (ceCase == null){
+            throw new BObStatusException("Cannot get violation list for a null case");
+        }
+        List<CodeViolation> vlist = violation_getCodeViolations(ceCase);
+              
+        return vlist;
     }
 
 } // close class

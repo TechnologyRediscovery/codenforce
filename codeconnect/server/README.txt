@@ -1,6 +1,8 @@
 Directions for inserting the postgres driver in wildfly:
 --------------------------------------------------------
-In this directory, you see a module.xml file.
+"Install" wildfly 14 by inserting its directory into a sensible place, like in your home directory.
+
+In the same directory as this readme, you see a module.xml file.
 
 GO AND DOWNLOAD the current postgreSQL database driver from 
 
