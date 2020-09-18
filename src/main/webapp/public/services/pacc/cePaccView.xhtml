@@ -35,17 +35,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                         <p:growl id="paccSearchMessages" showDetail="false"/>
 
-                        <!-- TITLE COMPONENT -->
-                        <div class="public-title">
-                            <div class="public-title-main">
-                                View/Edit Existing Code Enforcement Request/Case
-                            </div>
-                            <div class="public-title-sub">
-                                Check the status of an existing code enforcement request or case, 
-                                or add information to an existing request or case.
-                            </div>
-                        </div>
-
                         <!-- CONTENTS CONTAINER -->
                         <div class="public-main-contents-containner">
 
@@ -59,13 +48,134 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                 <h:form id="viewPublicBundlesForm">
 
+                                    <!-- TITLE COMPONENT -->
+                                    <div class="public-title">
+                                        <div class="public-title-main">
+                                            View/Edit Existing Code Enforcement Request/Case
+                                        </div>
+                                        <div class="public-title-sub">
+                                            Check the status of an existing code enforcement requests or cases, 
+                                            or add information to an existing request or case.
+                                        </div>
+                                    </div>
+
+                                    <p>
+                                        Please review the request(s) below for their status, or add additional information to this request. 
+                                        Note that additional information will be sent directly to the code enforcement staff. Any additional 
+                                        information received here become part of the permanent case record and may become public record.
+                                    </p>
+
                                     <!-- CONTENT IO COMPONENT -->
                                     <div class="public-main-contents-io">
-
                                         <!-- CONTENT IO COMPONENT: CONTENT -->
                                         <div class="public-main-contents-io-content" >
 
-                                            
+                                            <!--BUNDLED CE CASES LIST-->
+                                            <p:repeat rendered="#{not empty publicInfoBB.bundledCases}" value="#{publicInfoBB.bundledCases}" var="case">
+
+                                                <p:tabView>
+                                                    <p:tab title="Case Information">
+
+                                                        <p:panelGrid columns="4" 
+                                                                     layout="grid"
+                                                                     columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                                     >
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Case ID:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{case.bundledCase.caseID}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Case Name:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{case.bundledCase.caseName}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Case Manager:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160; Name: #{case.bundledCase.caseManager.person.firstName} #{case.bundledCase.caseManager.person.lastName}"/>
+                                                                    <p:spacer height="5px"/>
+                                                                    <p:outputLabel value="&#160; Email: #{case.bundledCase.caseManager.person.email}"/>
+                                                                    <p:spacer height="5px"/>
+                                                                    <p:outputLabel value="&#160; Phone: #{case.bundledCase.caseManager.person.phoneWork}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Status:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{case.bundledCase.statusBundle.phase.label}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+                                                            
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Origination Date:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{case.bundledCase.originiationDatePretty}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+                                                            
+                                                            <h:panelGroup rendered="#{case.bundledCase.closingDatePretty}">
+                                                                <p:outputLabel value="Closing Date:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{case.bundledCase.closingDatePretty }"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+                                                            
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Active?"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{case.bundledCase.active ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                        </p:panelGrid>
+
+                                                    </p:tab>
+                                                    <p:tab title="Events">
+
+                                                    </p:tab>
+                                                    <p:tab title="Violations">
+
+                                                    </p:tab>
+                                                </p:tabView>
+
+                                            </p:repeat>
+
+                                            <!--BUNDLED CEARS LIST-->
+                                            <p:repeat rendered="#{not empty publicInfoBB.bundledRequests}" value="#{publicInfoBB.bundledRequests}" var="request">
+
+                                                <p:tabView>
+                                                    <p:tab title="Messages">
+
+
+
+                                                    </p:tab>
+                                                    <p:tab title="Request Information">
+
+                                                    </p:tab>
+                                                </p:tabView>
+
+                                            </p:repeat>
 
                                         </div>
                                     </div>

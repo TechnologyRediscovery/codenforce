@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
@@ -41,6 +42,7 @@ import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
+import com.tcvcog.tcvce.entities.PublicInfoBundleCodeViolation;
 import com.tcvcog.tcvce.entities.PublicInfoBundleEventCnF;
 import com.tcvcog.tcvce.entities.PublicInfoBundleFeeAssigned;
 import com.tcvcog.tcvce.entities.PublicInfoBundleOccInspection;
@@ -61,6 +63,7 @@ import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
@@ -149,13 +152,17 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         // now go and get CECaseDataHeavy bundles and add them to the list
         //TODO: Fix this, it does not retrieve cases
-        setPublicUser();
-        QueryCECase qc = sc.initQuery(QueryCECaseEnum.PACC, publicUser.getMyCredential());
-     
-        List<CECase> caseList = qc.getBOBResultList();
+        //setPublicUser();
+        //QueryCECase qc = sc.initQuery(QueryCECaseEnum.PACC, publicUser.getMyCredential());
+
+        //List<CECase> caseList = qc.getBOBResultList();
+        
+        //quick patch up
+        List<CECase> caseList = caseInt.getCECasesByPACC(pacc);
+        
         System.out.println("PublicInfoCoordinator.getPublicInfoBundles | num CE cases found: " + caseList.size());;
-      
-        for(CECase c: caseList){
+
+        for (CECase c : caseList) {
             // let the extraction method deal with all the assembly logic
             // and access control issues
             infoBundleList.add(extractPublicInfo(c));
@@ -169,7 +176,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         for (OccPermitApplication opa : applicationList) {
 
             infoBundleList.add(extractPublicInfo(opa));
-            
+
         }
 
         return infoBundleList;
@@ -191,7 +198,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         CaseCoordinator cc = getCaseCoordinator();
         setPublicUser();
         CECaseDataHeavy c = cc.cecase_assembleCECaseDataHeavy(cse, publicUser);
-        
+
         PublicInfoBundleCECase pib = new PublicInfoBundleCECase();
 
         pib.setTypeName("CECASE");
@@ -205,12 +212,24 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 pib.setAddressAssociated(true);
                 pib.setPropertyAddress(c.getProperty().getAddress());
             }
-            
-            pib.setPublicEventList(new ArrayList<PublicInfoBundleEventCnF>());
-            
+
+            ArrayList<PublicInfoBundleEventCnF> eventBundles = new ArrayList<>();
+
             for (EventCnF ev : c.getEventList()) {
-                pib.getPublicEventList().add(extractPublicInfo(ev));
+                eventBundles.add(extractPublicInfo(ev));
             }
+            
+            pib.setPublicEventList(eventBundles);
+            
+            ArrayList<PublicInfoBundleCodeViolation> violationBundles = new ArrayList<>();
+            
+            //We only need the unresolved ones.
+            for(CodeViolation vio : c.getViolationListUnresolved()){
+                violationBundles.add(extractPublicInfo(vio));
+            }
+            
+            pib.setViolationList(violationBundles);
+            
             pib.setAddress(c.getProperty());
             pib.setShowAddMessageButton(false);
             pib.setPaccStatusMessage("Public access enabled");
@@ -228,6 +247,30 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         return pib;
 
+    }
+
+   /**
+     * Bundles a CodeViolation into a PublicInfoBundleCodeViolation by stripping out its
+     * private information.
+     *
+     * @param input
+     * @return
+     */
+    public PublicInfoBundleCodeViolation extractPublicInfo(CodeViolation input) {
+
+        PublicInfoBundleCodeViolation pib = new PublicInfoBundleCodeViolation();
+        //the CodeViolation object does not have a PACC Enabled field
+        //And probably shouldn't because public users need to know what is wrong with their properties
+
+        pib.setBundledViolation(input);
+
+        pib.setTypeName("CodeViolation");
+        pib.setPaccStatusMessage("Public access enabled");
+
+        pib.setShowAddMessageButton(false);
+        pib.setShowDetailsPageButton(true);
+
+        return pib;
     }
 
     /**
@@ -350,8 +393,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Bundles a PersonOccApplication into a PublicInfoBundlePersonoccApplication by stripping out its
-     * private information.
+     * Bundles a PersonOccApplication into a
+     * PublicInfoBundlePersonoccApplication by stripping out its private
+     * information.
      *
      * @param input
      * @return
@@ -386,7 +430,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         return pib;
     }
-    
+
     /**
      * Bundles a Property into a PublicInfoBundleProperty by stripping out its
      * private information.
@@ -518,7 +562,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         return pib;
     }
-    
+
     /**
      * Bundles an OccInspection into a PublicInfoBundleOccPermitApplication by
      * stripping out its private information. One of the more resource-intense
@@ -532,8 +576,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public PublicInfoBundleOccPermitApplication extractPublicInfo(OccPermitApplication input) 
-            throws IntegrationException, 
+    public PublicInfoBundleOccPermitApplication extractPublicInfo(OccPermitApplication input)
+            throws IntegrationException,
             EventException,
             AuthorizationException,
             BObStatusException,
@@ -548,17 +592,17 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setApplicantPerson(extractPublicInfo(input.getApplicantPerson()));
             pib.setPreferredContact(extractPublicInfo(input.getPreferredContact()));
             pib.setConnectedPeriod(extractPublicInfo(input.getConnectedPeriod()));
-            
+
             List<PublicInfoBundlePersonOccApplication> attachedPersonBundles = new ArrayList<>();
-            
-            for (PersonOccApplication p : input.getAttachedPersons()){
-                
+
+            for (PersonOccApplication p : input.getAttachedPersons()) {
+
                 attachedPersonBundles.add(extractPublicInfo(p));
-                
+
             }
-            
+
             pib.setAttachedPersons(attachedPersonBundles);
-            
+
             pib.setTypeName("OccPermitApplication");
             pib.setPaccStatusMessage("Public access enabled");
 
@@ -574,7 +618,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         }
 
         return pib;
-    }    
+    }
 
     /**
      * Bundles an OccInspection into a PublicInfoBundleOccInspection by
@@ -686,9 +730,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      */
     public PublicInfoBundleEventCnF extractPublicInfo(EventCnF input) throws IntegrationException, EventException, AuthorizationException, BObStatusException, SearchException {
         PublicInfoBundleEventCnF pib = new PublicInfoBundleEventCnF();
-        
-        if(input.getCategory().getUserRankMinimumToView() <= PUBLIC_VIEW_USER_RANK){
-        
+
+        if (input.getCategory().getUserRankMinimumToView() <= PUBLIC_VIEW_USER_RANK) {
+
             if (input.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
                 CaseCoordinator cc = getCaseCoordinator();
                 CECase c = cc.cecase_getCECase(input.getCeCaseID());
@@ -936,6 +980,23 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
+     * Converts a bundled PublicInfoBundleCodeViolation to an unbundled CodeViolation for
+     * internal use. Does not check for changes.
+     *
+     * @param input
+     * @return
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public CodeViolation export(PublicInfoBundleCodeViolation input) throws IntegrationException {
+
+        CaseCoordinator cc = getCaseCoordinator();
+        CodeViolation exportable = cc.violation_getCodeViolation(input.getBundledViolation().getViolationID());
+
+        return exportable;
+
+    }
+    
+    /**
      * Converts a bundled PublicInfoBundleProperty to an unbundled Property for
      * internal use. Currently does check for changes.
      *
@@ -1146,19 +1207,19 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             if (unbundled.getMailingAddressState() != null && !unbundled.getMailingAddressState().contains("*")) {
                 exportable.setMailingAddressState(unbundled.getMailingAddressState());
             }
-            
+
             //The public-facing Occ Permit Application saves applicationPersonType in the person type field
             //You should probably make sure to preserve the original person type if you need to do that.
             exportable.setPersonType(unbundled.getPersonType());
-            
+
         }
 
         return exportable;
     }
 
     /**
-     * Converts a bundled PublicInfoBundlePersonOccPeriods to an unbundled PersonOccApplication for
- internal use. Currently does check for changes.
+     * Converts a bundled PublicInfoBundlePersonOccPeriods to an unbundled
+     * PersonOccApplication for internal use. Currently does check for changes.
      *
      * @param input
      * @return
@@ -1167,9 +1228,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     public PersonOccApplication export(PublicInfoBundlePersonOccApplication input) throws IntegrationException {
         PersonIntegrator pi = getPersonIntegrator();
         PersonOccApplication unbundled = input.getBundledPerson();
-        
+
         PersonOccApplication exportable = pi.getPersonOccApplication(unbundled.getPersonID(), unbundled.getApplicationID());
-        
+
         if (exportable == null) {
 
             //the person is new, so skip the comparison
@@ -1237,19 +1298,19 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             if (unbundled.getMailingAddressState() != null && !unbundled.getMailingAddressState().contains("*")) {
                 exportable.setMailingAddressState(unbundled.getMailingAddressState());
             }
-            
+
             //The public-facing Occ Permit Application saves applicationPersonType in the person type field
             //You should probably make sure to preserve the original person type if you need to do that.
             exportable.setPersonType(unbundled.getPersonType());
-            
+
         }
 
         return exportable;
     }
-    
+
     /**
-     * Converts a bundled PublicInfoBundleOccPermitApplication to an unbundled OccPermitApplication for
-     * internal use. Currently does check for changes.
+     * Converts a bundled PublicInfoBundleOccPermitApplication to an unbundled
+     * OccPermitApplication for internal use. Currently does check for changes.
      *
      * @param input
      * @return
@@ -1260,11 +1321,11 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      * @throws com.tcvcog.tcvce.domain.ViolationException
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public OccPermitApplication export(PublicInfoBundleOccPermitApplication input) 
-            throws IntegrationException, 
-            EventException, 
-            AuthorizationException, 
-            BObStatusException, 
+    public OccPermitApplication export(PublicInfoBundleOccPermitApplication input)
+            throws IntegrationException,
+            EventException,
+            AuthorizationException,
+            BObStatusException,
             ViolationException,
             SearchException {
 
@@ -1275,15 +1336,15 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         exportable.setSubmissionNotes(unbundled.getSubmissionNotes());
         exportable.setExternalPublicNotes(unbundled.getExternalPublicNotes());
-        
+
         exportable.setApplicationPropertyUnit(export(input.getApplicationPropertyUnit()));
         exportable.setApplicantPerson(export(input.getApplicantPerson()));
         exportable.setPreferredContact(export(input.getPreferredContact()));
         exportable.setConnectedPeriod(export(input.getConnectedPeriod()));
-        
+
         ArrayList<PersonOccApplication> personHorde = new ArrayList<>();
-        
-        if (input.getAttachedPersons()!= null) {
+
+        if (input.getAttachedPersons() != null) {
 
             for (PublicInfoBundlePersonOccApplication skeleton : input.getAttachedPersons()) {
                 personHorde.add(export(skeleton));
@@ -1295,7 +1356,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         return exportable;
 
     }
-    
+
     /**
      * Accepts a List of PublicInfoBundlePropertyUnit objects, validates the
      * input to make sure it is acceptable, sanitizes it, then tosses it back.
@@ -1358,7 +1419,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         System.out.println("PublicInfoCoordinator.attachmessagToBundle: In coordinator");
 
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        if (bundle.getTypeName().equals("Code enforcement action request")) {
+        if (bundle.getTypeName().equals("CEAR")) {
             requestBundle = (PublicInfoBundleCEActionRequest) bundle;
             StringBuilder sb = new StringBuilder();
             sb.append(requestBundle.getBundledRequest().getPublicExternalNotes());

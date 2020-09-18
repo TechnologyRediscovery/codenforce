@@ -13,9 +13,14 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
+import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
+import com.tcvcog.tcvce.entities.PublicInfoBundleOccInspection;
+import com.tcvcog.tcvce.entities.PublicInfoBundleOccPermitApplication;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -23,105 +28,152 @@ import javax.faces.event.ActionEvent;
  *
  * @author sylvia
  */
-public class PublicInfoBB extends BackingBeanUtils implements Serializable{
+public class PublicInfoBB extends BackingBeanUtils implements Serializable {
 
     private List<PublicInfoBundle> publicInfoBundleList;
     private PublicInfoBundle selectedBundle;
     private int submittedPACC;
     private String publicMessage;
-    
-    
+
+    //cePaccView.xhtml fields
+    private List<PublicInfoBundleCECase> bundledCases;
+    private List<PublicInfoBundleCEActionRequest> bundledRequests;
+
+    //occView.xhtml fields
+    private List<PublicInfoBundleOccInspection> bundledInspections;
+    private List<PublicInfoBundleOccPermitApplication> bundledApplications;
+
     /**
      * Creates a new instance of CEPublicAccessBB
      */
     public PublicInfoBB() {
     }
-    
-    public void initBean(){
+
+    @PostConstruct
+    public void initBean() {
+
+        publicInfoBundleList = getSessionBean().getInfoBundleList();
         
+        if (publicInfoBundleList != null) {
+            
+            //Lists are only initialized if we need them
+            
+            for (PublicInfoBundle bundle : publicInfoBundleList) {
+                if (bundle instanceof PublicInfoBundleCEActionRequest) {
+                    if(bundledRequests == null){
+                        bundledRequests = new ArrayList<>();
+                    }
+                    bundledRequests.add((PublicInfoBundleCEActionRequest) bundle);
+                    continue;
+                }
+
+                if (bundle instanceof PublicInfoBundleCECase) {
+                    if(bundledCases == null){
+                        bundledCases = new ArrayList<>();
+                    }
+                    bundledCases.add((PublicInfoBundleCECase) bundle);
+                    continue;
+                }
+
+                if (bundle instanceof PublicInfoBundleOccInspection) {
+                    if(bundledInspections == null){
+                        bundledInspections = new ArrayList<>();
+                    }
+                    bundledInspections.add((PublicInfoBundleOccInspection) bundle);
+                    continue;
+                }
+
+                if (bundle instanceof PublicInfoBundleOccPermitApplication) {
+                    if(bundledApplications == null){
+                        bundledApplications = new ArrayList<>();
+                    }
+                    bundledApplications.add((PublicInfoBundleOccPermitApplication) bundle);
+                    continue;
+                }
+            }
+        }
     }
-    
-    public String submitPACC(){
+
+    public String submitPACC() {
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
         try {
             publicInfoBundleList = pic.getPublicInfoBundles(submittedPACC);
-            if(!publicInfoBundleList.isEmpty()){
+            if (!publicInfoBundleList.isEmpty()) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Retrieved " + String.valueOf(publicInfoBundleList.size()) + " bundles!",""));
+                                "Retrieved " + String.valueOf(publicInfoBundleList.size()) + " bundles!", ""));
+
+                getSessionBean().setInfoBundleList(publicInfoBundleList);
                 
                 //Now look through the bundles and see which interface we need to send the user to
-                for(PublicInfoBundle bundle : publicInfoBundleList){
-                    
-                    if(bundle.getTypeName().equalsIgnoreCase("CECASE") 
+                for (PublicInfoBundle bundle : publicInfoBundleList) {
+
+                    if (bundle.getTypeName().equalsIgnoreCase("CECASE")
                             || bundle.getTypeName().equalsIgnoreCase("CEAR")) {
                         //Code enforcement it is!
                         return "cePaccView";
                     }
-                    
-                    if(bundle.getTypeName().equalsIgnoreCase("OccPermitApplication")
-                            || bundle.getTypeName().equalsIgnoreCase("OccInspection") ){
+
+                    if (bundle.getTypeName().equalsIgnoreCase("OccPermitApplication")
+                            || bundle.getTypeName().equalsIgnoreCase("OccInspection")) {
                         //Occupancy it is!
                         return "occPaccView";
                     }
                 }
             } else {
-                
+
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "No info bundles found for this control code",""));
+                                "No info bundles found for this control code", ""));
                 publicInfoBundleList = null;
             }
         } catch (IntegrationException ex) {
-            System.out.println("PublicInfoBB.submitPacc() | ERROR: " + ex.toString());  
+            System.out.println("PublicInfoBB.submitPacc() | ERROR: " + ex.toString());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to search for info bundles, sorry!", "This is a system error."));
-        } catch ( SearchException 
-                | EventException 
-                | AuthorizationException 
+        } catch (SearchException
+                | EventException
+                | AuthorizationException
                 | ViolationException ex) {
-            System.out.println("PublicInfoBB.submitPacc() | ERROR: " +ex);
-        } catch (BObStatusException ex){
+            System.out.println("PublicInfoBB.submitPacc() | ERROR: " + ex);
+        } catch (BObStatusException ex) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         }
-        
+
         //something went wrong, try again
         return "";
-        
+
     }
-    
-    public String viewPACCRecordDetails(PublicInfoBundle pib){
-        if(pib instanceof PublicInfoBundleCECase){
+
+    public String viewPACCRecordDetails(PublicInfoBundle pib) {
+        if (pib instanceof PublicInfoBundleCECase) {
             PublicInfoBundleCECase pibCase = (PublicInfoBundleCECase) pib;
             getSessionBean().setPibCECase(pibCase);
             return "publicInfoCECase";
-            
+
         }
         return "";
     }
-    
-    public void attachMessage(ActionEvent ev){
+
+    public void attachMessage(ActionEvent ev) {
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
         try {
             pic.attachMessageToBundle(selectedBundle, publicMessage);
             getFacesContext().addMessage(null,
-                  new FacesMessage(FacesMessage.SEVERITY_INFO,
-                          "Public case note added", ""));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Public case note added", ""));
 
         } catch (IntegrationException ex) {
             System.out.println(ex);
-              getFacesContext().addMessage(null,
+            getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to attach messages at this time, sorry!", 
+                            "Unable to attach messages at this time, sorry!",
                             "This is a system error and has been logged for debugging."));
-        
+
         }
         publicMessage = null;
-        
-        
+
     }
-    
-    
 
     /**
      * @return the publicInfoBundleList
@@ -179,12 +231,42 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable{
     public void setPublicMessage(String publicMessage) {
         this.publicMessage = publicMessage;
     }
-    
-    
-    public String goToIntensityManage(){
-        
+
+    public String goToIntensityManage() {
+
         return "intensityManage";
     }
-    
-    
+
+    public List<PublicInfoBundleCECase> getBundledCases() {
+        return bundledCases;
+    }
+
+    public void setBundledCases(List<PublicInfoBundleCECase> bundledCases) {
+        this.bundledCases = bundledCases;
+    }
+
+    public List<PublicInfoBundleCEActionRequest> getBundledRequests() {
+        return bundledRequests;
+    }
+
+    public void setBundledRequests(List<PublicInfoBundleCEActionRequest> bundledRequests) {
+        this.bundledRequests = bundledRequests;
+    }
+
+    public List<PublicInfoBundleOccInspection> getBundledInspections() {
+        return bundledInspections;
+    }
+
+    public void setBundledInspections(List<PublicInfoBundleOccInspection> bundledInspections) {
+        this.bundledInspections = bundledInspections;
+    }
+
+    public List<PublicInfoBundleOccPermitApplication> getBundledApplications() {
+        return bundledApplications;
+    }
+
+    public void setBundledApplications(List<PublicInfoBundleOccPermitApplication> bundledApplications) {
+        this.bundledApplications = bundledApplications;
+    }
+
 }
