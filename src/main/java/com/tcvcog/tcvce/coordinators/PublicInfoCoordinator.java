@@ -198,7 +198,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         CaseCoordinator cc = getCaseCoordinator();
         setPublicUser();
         CECaseDataHeavy c = cc.cecase_assembleCECaseDataHeavy(cse, publicUser);
-
+        
+        cse = new CECase(c);
         PublicInfoBundleCECase pib = new PublicInfoBundleCECase();
 
         pib.setTypeName("CECASE");
@@ -216,6 +217,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             ArrayList<PublicInfoBundleEventCnF> eventBundles = new ArrayList<>();
 
             for (EventCnF ev : c.getEventList()) {
+                //TODO: filter events by category or add "private event" flag on event.
                 eventBundles.add(extractPublicInfo(ev));
             }
             
@@ -736,11 +738,13 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             if (input.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
                 CaseCoordinator cc = getCaseCoordinator();
                 CECase c = cc.cecase_getCECase(input.getCeCaseID());
-                pib.setCecase(extractPublicInfo(c));
+                pib.setCaseManager(c.getCaseManager());
+                pib.setCecaseID(c.getCaseID());
             } else if (input.getDomain() == EventDomainEnum.OCCUPANCY) {
                 OccupancyCoordinator oc = getOccupancyCoordinator();
                 OccPeriod period = oc.getOccPeriod(input.getOccPeriodID());
-                pib.setPeriod(extractPublicInfo(period));
+                pib.setCaseManager(period.getManager());
+                pib.setPeriodID(period.getPeriodID());
             }
 
             ArrayList<PublicInfoBundlePerson> personHorde = new ArrayList<>();
@@ -919,6 +923,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         EventCnF unbundled = input.getBundledEvent();
         EventCnFPropUnitCasePeriodHeavy exportable;
         CaseCoordinator cc = getCaseCoordinator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
 
         try {
 
@@ -932,11 +937,13 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         if (unbundled.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
 
-            exportable.setCecase(cc.cecase_assembleCECasePropertyUnitHeavy(export(input.getCecase())));
+            CECase ceLight = cc.cecase_getCECase(input.getCecaseID());
+            
+            exportable.setCecase(cc.cecase_assembleCECasePropertyUnitHeavy(ceLight));
 
         } else if (unbundled.getDomain() == EventDomainEnum.OCCUPANCY) {
 
-            OccPeriod opLight = export(input.getPeriod());
+            OccPeriod opLight = oc.getOccPeriod(input.getPeriodID());
 
             exportable.setPeriod(new OccPeriodPropertyUnitHeavy(opLight));
         }

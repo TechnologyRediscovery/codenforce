@@ -100,9 +100,6 @@ public class PublicInfoBundleCECase extends PublicInfoBundle{
 
         setPacc(input.getPublicControlCode());
 
-        setCaseManager(input.getCaseManager());
-        input.setCaseManager(new User());
-
         if (input.getViolationList() != null) {
             countViolations = input.getViolationList().size();
         }

@@ -2357,7 +2357,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         CaseIntegrator ci = getCaseIntegrator();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        ArrayList<CodeViolation> violationList = new ArrayList<>();
+        List<CodeViolation> violationList = new ArrayList<>();
         
         try {
             stmt = con.prepareStatement(query);

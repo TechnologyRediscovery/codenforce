@@ -82,6 +82,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                      >
 
                                                             <h:panelGroup>
+                                                                <p:outputLabel value="PACC Status:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{case.paccStatusMessage}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
                                                                 <p:outputLabel value="Case ID:"/>
                                                                 <p:spacer height="5px"/>
                                                                 <div>
@@ -115,12 +124,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             <h:panelGroup>
                                                                 <p:outputLabel value="Status:"/>
                                                                 <p:spacer height="5px"/>
+                                                                <div class="#{case.bundledCase.statusBundle.phaseIcon.styleClass}">
+                                                                    <i class="material-icons status-display-icon-i"><h:outputText value="#{case.bundledCase.statusBundle.phaseIcon.materialIcon}"/></i>
+                                                                </div>
+                                                                <p:spacer height="5px"/>
                                                                 <div>
                                                                     <p:outputLabel value="&#160;#{case.bundledCase.statusBundle.phase.label}"/>
                                                                 </div>
                                                                 <p:spacer height="10px"/>
                                                             </h:panelGroup>
-                                                            
+
                                                             <h:panelGroup>
                                                                 <p:outputLabel value="Origination Date:"/>
                                                                 <p:spacer height="5px"/>
@@ -129,7 +142,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 </div>
                                                                 <p:spacer height="10px"/>
                                                             </h:panelGroup>
-                                                            
+
                                                             <h:panelGroup rendered="#{case.bundledCase.closingDatePretty}">
                                                                 <p:outputLabel value="Closing Date:"/>
                                                                 <p:spacer height="5px"/>
@@ -138,7 +151,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 </div>
                                                                 <p:spacer height="10px"/>
                                                             </h:panelGroup>
-                                                            
+
                                                             <h:panelGroup>
                                                                 <p:outputLabel value="Active?"/>
                                                                 <p:spacer height="5px"/>
@@ -152,6 +165,87 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                     </p:tab>
                                                     <p:tab title="Events">
+
+                                                        <p:dataTable
+                                                            id="caseEventTable"
+                                                            var="e"
+                                                            rowKey="#{e.bundledEvent.eventID}"
+                                                            value="#{case.publicEventList}"
+                                                            tableStyleClass="primeDataTable"
+                                                            resizableColumns="true"
+                                                            rowExpandMode="multiple"
+                                                            expandedRow="false"
+                                                            scrollHeight="400"
+                                                            widgetVar="caseEventTable"
+                                                            >
+
+                                                            <p:column width="3%" exportable="false">
+                                                                <p:rowToggler/>
+                                                            </p:column>
+
+                                                            <p:column width="4%">
+                                                                <i class="material-icons"><h:outputText value="#{e.bundledEvent.category.icon.materialIcon}"/></i>
+                                                            </p:column>
+                                                            
+                                                            <p:column width="12%" sortBy="#{e.bundledEvent.category.eventCategoryTitle}"
+                                                                      filterBy="#{e.bundledEvent.category.eventCategoryTitle}"
+                                                                      headerText="Category">
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{e.bundledEvent.category.eventCategoryTitle}"/>
+                                                                </div>
+                                                            </p:column>
+
+                                                            <p:column width="8%" sortBy="#{e.bundledEvent.category.eventType.label}"
+                                                                      filterBy="#{e.bundledEvent.category.eventType.label}"
+                                                                      headerText="Type">
+                                                                <h:outputText value="#{e.bundledEvent.category.eventType.label}"/>
+                                                            </p:column>
+
+                                                            <p:column width="4%" sortBy="#{e.bundledEvent.eventID}"
+                                                                      headerText="ID">
+                                                                <h:outputText value="#{e.bundledEvent.eventID}"/>
+                                                            </p:column>
+
+                                                            <p:column width="9%" sortBy="#{e.bundledEvent.timeStart}"
+                                                                      headerText="Start Date">
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{e.bundledEvent.timeStartPretty}"/>
+                                                                </div>
+                                                            </p:column>
+                                                            <p:column width="9%" sortBy="#{e.bundledEvent.timeEnd}"
+                                                                      headerText="End Date">
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{e.bundledEvent.timeEndPretty}"/>
+                                                                </div>
+                                                            </p:column>
+
+                                                            <p:rowExpansion>
+
+                                                                <div class="outlinedBox">
+                                                                    <h2><h:outputText value="#{e.bundledEvent.category.eventType.label}:#{e.bundledEvent.category.eventCategoryTitle}"/>
+                                                                        ; Event ID: <h:outputText value="#{e.bundledEvent.eventID}"/> </h2>
+                                                                    <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                                                 columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                                        <h:panelGroup>
+                                                                            <h:outputText styleClass="bold" value="Description" />
+                                                                            <div class="rowExpansion">
+                                                                                <h:outputText value="#{e.bundledEvent.description}"/>
+                                                                            </div>
+                                                                        </h:panelGroup>
+
+                                                                        <h:panelGroup>
+                                                                            <h:outputText styleClass="bold" value="Active Event?"/>
+                                                                            <div class="rowExpansion">
+                                                                                <h:outputText value="#{e.bundledEvent.active}"/>
+                                                                            </div>
+                                                                        </h:panelGroup>
+
+                                                                    </h:panelGrid>
+                                                                </div>
+                                                            </p:rowExpansion>
+
+                                                        </p:dataTable>
 
                                                     </p:tab>
                                                     <p:tab title="Violations">
