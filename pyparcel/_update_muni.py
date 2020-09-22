@@ -116,8 +116,9 @@ def update_database(record, conn, cursor, commit):
             for attr in [parid, new_parcel, prop_id, unit_id, cecase_id]
         ]
 
-    # from _utils import pickler
-    # pickler(html, "html", incr=False)
+    # from utils import pickler
+    # pickler(record, "record", to_json=True, incr=False)
+    # pickler(html, "html", incr=True)
     # pickler(owner_name, "own", incr=False)
     # pickler(soup, "soup", incr=False)
     # pickler(imap, "prop_imap", incr=False)

@@ -2,6 +2,7 @@
 Miscellaneous code to be used in the creation of this package. Should not appear in production.
 """
 # Todo: Create git hook that fails if any function in utils.py appears in the other files.
+import json
 import pickle
 import sys
 from os import path
@@ -12,7 +13,7 @@ import itertools
 from common import SPAN, PARCEL_ID_LoB, OWNER, TAXINFO
 import _scrape as scrape
 import _parse
-from _common import TaxStatus
+from common import TaxStatus
 from typing import Dict, NamedTuple, Any, Optional, Tuple, List
 import bs4  # Todo: Only imported BS4 for typing. Is that Pythonic?
 
@@ -23,11 +24,9 @@ THE_PICKLER_COUNT = 0
 
 
 # Todo: Discuss merits of permanent calls to the pickler left in source code with @click.option(--pickle/--nopickle)
-def pickler(obj, filename, path_to_file=MOCKS, incr=True):
+def pickler(obj, filename, path_to_file=MOCKS, incr=True, to_json=False):
     """
     A quick and dirty way to pickle objects. Useful for creating mocks.
-
-    Don't forget to delete your call to the pickler after you are done!
 
     How to use:
         Given the following source code, assuming we want to pickle foo
@@ -52,7 +51,7 @@ def pickler(obj, filename, path_to_file=MOCKS, incr=True):
         Modify the source code!
             >>> from utils import pickler
             >>> class Foo: pass
-            >>> class Bar: pass
+            >>> Bar = {"This is a dict": "It should become a JSON file"}
             >>> class Baz: pass
             >>> for i in range(0,3):
             >>>     foo = Foo(); bar = Bar(); baz = Baz()
@@ -60,33 +59,38 @@ def pickler(obj, filename, path_to_file=MOCKS, incr=True):
             >>>     pickler(bar, "bar", incr=False)
             >>>     pickler(baz, "baz", incr=True)
 
+        Pickler also can return raw JSON!
+            >>> from utils import pickler
+            >>> foo = {"This is a dict": "Let's make it JSON"}
+            >>> pickler(foo, "foo", to_json=True)
         """
     global THE_PICKLER_COUNT
     initial_recursion = sys.getrecursionlimit()
     try:
         sys.setrecursionlimit(100000)
-        with open(
-            path.join(
-                path_to_file, str(THE_PICKLER_COUNT) + "_" + filename + ".pickle"
-            ),
-            "wb",
-        ) as f:
-            pickle.dump(obj, f)
+        if not to_json:
+            with open(
+                path.join(
+                    path_to_file, str(THE_PICKLER_COUNT) + "_" + filename + ".pickle"
+                ),
+                "wb",
+            ) as f:
+                pickle.dump(obj, f)
+
+        else:
+            with open(
+                path.join(
+                    path_to_file, str(THE_PICKLER_COUNT) + "_" + filename + ".json"
+                ),
+                "w",
+            ) as f:
+                json.dump(obj, f)
+
         if incr:
             THE_PICKLER_COUNT += 1
+
     finally:
         sys.setrecursionlimit(initial_recursion)
-
-
-########################################################################################
-# from _utils import pickler
-# pickler(owner_name, "own", incr=False)
-# pickler(soup, "soup", incr=False)
-# pickler(imap, "prop_imap", incr=False)
-# pickler(cecase_map, "cecase_imap", incr=False)
-# pickler(owner_map, "owner_imap", incr=False)
-# pickler(propextern_map, "propext_imap", incr=True)
-########################################################################################
 
 
 def replace_parid(new_parid, soup, r) -> Tuple[bs4.BeautifulSoup, Dict]:
