@@ -24,9 +24,13 @@ THE_PICKLER_COUNT = 0
 
 
 # Todo: Discuss merits of permanent calls to the pickler left in source code with @click.option(--pickle/--nopickle)
-def pickler(obj, filename, path_to_file=MOCKS, incr=True, to_json=False):
+def pickler(obj, filename, path_to_file=MOCKS, incr=True, to_type=None):
     """
     A quick and dirty way to pickle objects. Useful for creating mocks.
+
+    Args
+        to_tupe: Defaults to None. Leaving it as is pickles the object, otherwise it writes the file type.
+            Setting it to "json" uses json.dump
 
     How to use:
         Given the following source code, assuming we want to pickle foo
@@ -51,7 +55,7 @@ def pickler(obj, filename, path_to_file=MOCKS, incr=True, to_json=False):
         Modify the source code!
             >>> from utils import pickler
             >>> class Foo: pass
-            >>> Bar = {"This is a dict": "It should become a JSON file"}
+            >>> class Bar: pass
             >>> class Baz: pass
             >>> for i in range(0,3):
             >>>     foo = Foo(); bar = Bar(); baz = Baz()
@@ -59,16 +63,16 @@ def pickler(obj, filename, path_to_file=MOCKS, incr=True, to_json=False):
             >>>     pickler(bar, "bar", incr=False)
             >>>     pickler(baz, "baz", incr=True)
 
-        Pickler also can return raw JSON!
+        Pickler also can return raw files!
             >>> from utils import pickler
             >>> foo = {"This is a dict": "Let's make it JSON"}
-            >>> pickler(foo, "foo", to_json=True)
+            >>> pickler(foo, "foo", to_type="json")
         """
     global THE_PICKLER_COUNT
     initial_recursion = sys.getrecursionlimit()
     try:
         sys.setrecursionlimit(100000)
-        if not to_json:
+        if not to_type:
             with open(
                 path.join(
                     path_to_file, str(THE_PICKLER_COUNT) + "_" + filename + ".pickle"
@@ -77,7 +81,7 @@ def pickler(obj, filename, path_to_file=MOCKS, incr=True, to_json=False):
             ) as f:
                 pickle.dump(obj, f)
 
-        else:
+        elif to_type == "json":
             with open(
                 path.join(
                     path_to_file, str(THE_PICKLER_COUNT) + "_" + filename + ".json"
@@ -85,6 +89,17 @@ def pickler(obj, filename, path_to_file=MOCKS, incr=True, to_json=False):
                 "w",
             ) as f:
                 json.dump(obj, f)
+
+        else:
+            with open(
+                path.join(
+                    path_to_file,
+                    str(THE_PICKLER_COUNT) + "_" + filename + "." + to_type,
+                ),
+                "w",
+                newline="",
+            ) as f:
+                f.write(obj,)
 
         if incr:
             THE_PICKLER_COUNT += 1

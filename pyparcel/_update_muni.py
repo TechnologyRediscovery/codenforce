@@ -117,8 +117,8 @@ def update_database(record, conn, cursor, commit):
         ]
 
     # from utils import pickler
-    # pickler(record, "record", to_json=True, incr=False)
-    # pickler(html, "html", incr=True)
+    # pickler(record, "record", to_type="json", incr=False)
+    # pickler(html, "html", to_type="html", incr=True)
     # pickler(owner_name, "own", incr=False)
     # pickler(soup, "soup", incr=False)
     # pickler(imap, "prop_imap", incr=False)
