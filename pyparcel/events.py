@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from typing import NamedTuple, Any, Optional, List
 from colorama import init
 
-import _parse
-import _scrape
+import parse
+import scrape
 
 init()
 import warnings
@@ -248,12 +248,12 @@ def parcel_not_in_wprdc_data(details: EventDetails) -> Event:
             If the page exists: DifferentMunicode
             Else: NotInRealEstatePortal
     """
-    response = _scrape.county_property_assessment(details.parid, full_response=True)
+    response = scrape.county_property_assessment(details.parid, full_response=True)
     details.url = response.url
 
-    raw_muni = _parse.validate_county_municode_against_portal(response.text)
+    raw_muni = parse.validate_county_municode_against_portal(response.text)
     if raw_muni:
-        details.new, details.muniname = _parse.Municipality.from_raw(raw_muni)
+        details.new, details.muniname = parse.Municipality.from_raw(raw_muni)
         return DifferentMunicode(details)
     return NotInRealEstatePortal(details)
 

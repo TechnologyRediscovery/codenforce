@@ -11,8 +11,8 @@ import itertools
 
 
 from common import SPAN, PARCEL_ID_LoB, OWNER, TAXINFO
-import _scrape as scrape
-import _parse
+import scrape as scrape
+import parse
 from common import TaxStatus
 from typing import Dict, NamedTuple, Any, Optional, Tuple, List
 import bs4  # Todo: Only imported BS4 for typing. Is that Pythonic?
@@ -115,11 +115,11 @@ def replace_parid(new_parid, soup, r) -> Tuple[bs4.BeautifulSoup, Dict]:
         soup:
         r:
     """
-    hyphenless_parid = _parse.remove_hyphnes(new_parid)
+    hyphenless_parid = parse.remove_hyphnes(new_parid)
     r["PARID"] = hyphenless_parid
     # Replaces the Parcel ID (Lot and Block)
     # Does not add hyphens
-    new_soup = _parse.replace_html_content(new_parid, soup, PARCEL_ID_LoB)
+    new_soup = parse.replace_html_content(new_parid, soup, PARCEL_ID_LoB)
     # Note: Does not replace the url in <form> or Footer1$TtPID
     return new_soup, r
 
@@ -127,7 +127,7 @@ def replace_parid(new_parid, soup, r) -> Tuple[bs4.BeautifulSoup, Dict]:
 def replace_name(new_name, soup) -> bs4.BeautifulSoup:
     """
     """
-    new_soup = _parse.replace_html_content(new_name, soup, OWNER)
+    new_soup = parse.replace_html_content(new_name, soup, OWNER)
     # Todo: Replace mortage and footer
     # new_soup = _parse.replace_html_content(new_name, new_soup, MORTGAGE)
     return new_soup
@@ -212,7 +212,7 @@ def anonymize_html_and_record(
     """
     orig_parid = r["PARID"]
     html = scrape.county_property_assessment(orig_parid)
-    soup = _parse.soupify_html(html)
+    soup = parse.soupify_html(html)
     if new_parid:
         soup, r = replace_parid(new_parid, soup, r)
     if new_name:

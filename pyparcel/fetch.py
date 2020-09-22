@@ -6,9 +6,9 @@ from typing import List
 # TODO: Refactor these imports somewhere else
 #   These files should not read from each other.
 #   If not refactored, this file should somehow be designated a higher level than the others
-import _create
-import _write
-import _parse
+import create
+import write
+import parse
 from common import PARCEL_ID_LISTS, DEFAULT_PROP_UNIT
 
 
@@ -25,7 +25,7 @@ def muniname_from_municode(municode, cursor):
     cursor.execute(select_sql, [municode])
     row = cursor.fetchone()
     try:
-        return _parse.Municipality(*row)
+        return parse.Municipality(*row)
     except TypeError as e:
         if row is None:
             raise TypeError(
@@ -35,7 +35,7 @@ def muniname_from_municode(municode, cursor):
             raise e
 
 
-def muni_data_and_write_to_file(muni: _parse.Municipality):
+def muni_data_and_write_to_file(muni: parse.Municipality):
     # Note: The WPRDC limits 50,000 parcels
     script_dir = os.path.dirname(__file__)
     rel_path = os.path.join(PARCEL_ID_LISTS, muni.name + "_parcelids.json")
@@ -75,7 +75,7 @@ def unit_id(prop_id, cursor):
         return cursor.fetchone()[0]  # unit id
     except TypeError:
         # TODO: Raise Warning: Property exists without property unit
-        _unit_id = _write.unit(
+        _unit_id = write.unit(
             {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id}, cursor,
         )
         return _unit_id
@@ -96,8 +96,8 @@ def cecase_id(
     except TypeError:  # 'NoneType' object is not subscriptable:
         # TODO: ERROR: Property exists without cecase
         _unit_id = unit_id(prop_id, cursor)  # Function _fetch.unit_id
-        cecase_map = _create.cecase_imap(prop_id, _unit_id)
-        case_id = _write.cecase(cecase_map, cursor)
+        cecase_map = create.cecase_imap(prop_id, _unit_id)
+        case_id = write.cecase(cecase_map, cursor)
         return case_id
 
 

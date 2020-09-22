@@ -5,8 +5,8 @@ from datetime import timedelta
 import click
 import psycopg2
 
-import _fetch as fetch
-from _update_muni import (
+import fetch as fetch
+from update_muni import (
     create_events_for_parcels_in_db_but_not_in_records,
     download_and_read_records_from_Wprdc,
     update_database,

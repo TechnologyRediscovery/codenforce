@@ -3,10 +3,10 @@ Home for Magic Strings and classes that are used across different files.
     If a class uses functions that lay beyond its defined methods,
     the class is unlikely to belong here.
 
-    For example, the class OwnerName resides in _parse.py
+    For example, the class OwnerName resides in parse.py
     because it calls the function _parse.parse_owners_from_soup.
 
-    Likewise, EventDetails resides in _events.py
+    Likewise, EventDetails resides in events.py
     because its usage is strongly tied to events.
 """
 
@@ -73,7 +73,7 @@ Jordan Tax Service, Inc. at (412) 835-5243. """
 # --------------------------------------------------------------------------------------
 # Classes
 # --------------------------------------------------------------------------------------
-#   Although they are stuck in _parse.py for now, I would love to move
+#   Although they are stuck in parse.py for now, I would love to move
 #       OwnerName and Municipality to this file.
 
 

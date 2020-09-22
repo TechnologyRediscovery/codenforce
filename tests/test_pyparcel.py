@@ -21,11 +21,11 @@ import psycopg2
 from os import path
 
 import pyparcel
-from pyparcel import _update_muni
+from pyparcel import update_muni
 from common import COG_DB
-from pyparcel import _events  # Hacky way to test all events
-from pyparcel import _parse
-from pyparcel._parse import TaxStatus
+from pyparcel import events  # Hacky way to test all events
+from pyparcel import parse
+from pyparcel.parse import TaxStatus
 
 
 from unittest import mock
@@ -39,10 +39,10 @@ MOCKS = path.join(HERE, "mocks", "")  # Represents the path to the folder
 # Generates a list of every eventcategory class in _events
 event_categories = []
 this_module = copy(sys.modules[__name__].__dict__)
-events_dict = this_module["_events"].__dict__
+events_dict = this_module["events"].__dict__
 for k in events_dict:
     try:
-        if issubclass(events_dict[k], _events.Event):
+        if issubclass(events_dict[k], events.Event):
             # Skip over base classes
             if events_dict[k].__name__ not in ("Event", "ParcelChangedEvent"):
                 event_categories.append(events_dict[k])
@@ -56,7 +56,7 @@ class PCE:
     """
 
     def __init__(
-        self, event: Type[_events.ParcelChangedEvent], old: Any, new: Any,
+        self, event: Type[events.ParcelChangedEvent], old: Any, new: Any,
     ):
         """
         Args:
@@ -96,7 +96,7 @@ class ParcelChangedCursor(MagicMixin):
         return None
 
     def fetchall(self):
-        """ Represents _events.query_propertyexternaldata_for_changes_and_write_events sql's returned value.
+        """ Represents events.query_propertyexternaldata_for_changes_and_write_events sql's returned value.
         """
         return [self.new, self.old]
 
@@ -106,12 +106,12 @@ class ParcelChangedCursor(MagicMixin):
 
 # A manually maintained list of Parcel Changed Event categories
 parcel_changed_events = [
-    PCE(_events.DifferentOwner, '{"OWNER OLD     "}', '{"OWNER NEW     "}'),
-    PCE(_events.DifferentStreet, "0 Old St ", "0 New St "),
-    PCE(_events.DifferentCityStateZip, "OLDCITY PA 12345", "NEWCITY PA 00000"),
-    PCE(_events.DifferentLivingArea, 1000, 2600),
-    PCE(_events.DifferentCondition, 8, 1),
-    # PCE(_events.DifferentMunicode, 653, 639)
+    PCE(events.DifferentOwner, '{"OWNER OLD     "}', '{"OWNER NEW     "}'),
+    PCE(events.DifferentStreet, "0 Old St ", "0 New St "),
+    PCE(events.DifferentCityStateZip, "OLDCITY PA 12345", "NEWCITY PA 00000"),
+    PCE(events.DifferentLivingArea, 1000, 2600),
+    PCE(events.DifferentCondition, 8, 1),
+    # PCE(events.DifferentMunicode, 653, 639)
 ]
 
 
@@ -182,13 +182,13 @@ class TestEventTriggers:
     @pytest.mark.parametrize("pce", parcel_changed_events)
     def test_property_external_data(self, pce):
         """
-        Test _events.query_propertyexternaldata_for_changes_and_write_events calls write_to_db
+        Test events.query_propertyexternaldata_for_changes_and_write_events calls write_to_db
         whenever there is a difference in selection data.
         """
         event = pce.event
         with mock.patch.object(event, "write_to_db"):
             mocked_cursor = ParcelChangedCursor(pce)
-            _events.query_propertyexternaldata_for_changes_and_write_events(
+            events.query_propertyexternaldata_for_changes_and_write_events(
                 parid=None,
                 prop_id=None,
                 cecase_id=None,
@@ -210,7 +210,7 @@ class TestEventTriggers:
         mocked_cursor = ParcelChangedCursor(*[pce for pce in parcel_changed_events])
 
         # The actual "act" of testing. Everything else is arrange and assert.
-        _events.query_propertyexternaldata_for_changes_and_write_events(
+        events.query_propertyexternaldata_for_changes_and_write_events(
             parid=None,
             prop_id=None,
             cecase_id=None,
@@ -225,24 +225,22 @@ class TestEventTriggers:
             patch.stop()
 
     @mock.patch(
-        "_events._parse.Municipality.from_raw",
-        return_value=_parse.Municipality(999, "COGLand"),
+        "events.parse.Municipality.from_raw",
+        return_value=parse.Municipality(999, "COGLand"),
     )
-    @mock.patch("_events._scrape.county_property_assessment",)
-    @mock.patch("_events._parse.validate_county_municode_against_portal")
+    @mock.patch("events.scrape.county_property_assessment",)
+    @mock.patch("events.parse.validate_county_municode_against_portal")
     def test_parcel_not_in_wprdc_data_DifferentMunicode(self, m1, m2, m3):
-        event = _events.parcel_not_in_wprdc_data(MagicMock())
-        assert isinstance(event, _events.DifferentMunicode)
+        event = events.parcel_not_in_wprdc_data(MagicMock())
+        assert isinstance(event, events.DifferentMunicode)
 
-    @mock.patch("_events._scrape.county_property_assessment")
-    @mock.patch(
-        "_events._parse.validate_county_municode_against_portal", return_value=[]
-    )
+    @mock.patch("events.scrape.county_property_assessment")
+    @mock.patch("events.parse.validate_county_municode_against_portal", return_value=[])
     def test_parcel_not_in_wprdc_data_NotInRealEstatePortal(
         self, m1, m2,
     ):
-        event = _events.parcel_not_in_wprdc_data(MagicMock())
-        assert isinstance(event, _events.NotInRealEstatePortal)
+        event = events.parcel_not_in_wprdc_data(MagicMock())
+        assert isinstance(event, events.NotInRealEstatePortal)
 
 
 class TestParse:
@@ -253,23 +251,23 @@ class TestParse:
         def test_paid(self, taxstatus_paid):
             with open(MOCKS + "paid.pickle", "rb") as p:
                 soup = pickle.load(p)
-            assert _parse.parse_tax_from_soup(soup) == taxstatus_paid
+            assert parse.parse_tax_from_soup(soup) == taxstatus_paid
 
         def test_unpaid(self, taxstatus_unpaid):
             with open(MOCKS + "unpaid.pickle", "rb") as p:
                 soup = pickle.load(p)
-            assert _parse.parse_tax_from_soup(soup) == taxstatus_unpaid
+            assert parse.parse_tax_from_soup(soup) == taxstatus_unpaid
 
         def test_balancedue(self, taxstatus_balancedue):
             with open(MOCKS + "balancedue.pickle", "rb") as p:
                 soup = pickle.load(p)
-            assert _parse.parse_tax_from_soup(soup) == taxstatus_balancedue
+            assert parse.parse_tax_from_soup(soup) == taxstatus_balancedue
 
         def test_none(self, taxstatus_none):
             # Todo: Does the truly represent no taxes, or is it representative of blank data?
             with open(MOCKS + "none.pickle", "rb") as p:
                 soup = pickle.load(p)
-            assert _parse.parse_tax_from_soup(soup) == taxstatus_none
+            assert parse.parse_tax_from_soup(soup) == taxstatus_none
 
     class TestParseOwnerFromSoup:
         pass
@@ -335,23 +333,23 @@ with conn:
                 with conn.cursor() as cursor:
 
                     with mock.patch(
-                        "_update_muni.scrape.county_property_assessment",
+                        "update_muni.scrape.county_property_assessment",
                         return_value=mocked_html,
                     ):
 
-                        _update_muni.update_database(
+                        update_muni.update_database(
                             mock_record, conn, cursor, commit=False
                         )
 
         class TestEventCategories:
-            """ Ensures events in _events.py share the same attributes of their counterpart in the database.
+            """ Ensures events in events.py share the same attributes of their counterpart in the database.
             """
 
             # Todo: HEAVY documentation.
             # Some events require mocked methods to be instantiated
             patches = [
                 PatchMaker(
-                    production_class=pyparcel._events.DifferentMunicode,
+                    production_class=pyparcel.events.DifferentMunicode,
                     method="_extend_eventdescription",
                     return_value="",
                 )

@@ -56,7 +56,7 @@ Creating a custom mocked patch is easy: add your patch to `TestsRequiringADataba
 patches = [
     ...,
     PatchMaker(
-        production_class=pyparcel._events.YourNewEvent,
+        production_class=pyparcel.events.YourNewEvent,
         method="method_to_mock",
         return_value="return_value"
     )

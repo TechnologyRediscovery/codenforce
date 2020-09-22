@@ -5,13 +5,13 @@
 #   Example: _parse.strip_whitespace strips whitespace, _parse.OwnerName is a class
 
 import json
-import _create as create
-import _fetch as fetch
-from _fetch import valid_json
-import _write as write
-import _scrape as scrape
-import _events
-import _parse
+import create as create
+import fetch as fetch
+from fetch import valid_json
+import write as write
+import scrape as scrape
+import events
+import parse
 from common import Tally
 from common import DEFAULT_PROP_UNIT
 from common import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
@@ -62,9 +62,9 @@ def update_database(record, conn, cursor, commit):
     """
     parid = record["PARID"]
     html = scrape.county_property_assessment(parid)
-    soup = _parse.soupify_html(html)
-    owner_name = _parse.OwnerName.from_soup(soup)
-    tax_status = _parse.parse_tax_from_soup(soup)
+    soup = parse.soupify_html(html)
+    owner_name = parse.OwnerName.from_soup(soup)
+    tax_status = parse.parse_tax_from_soup(soup)
 
     if parcel_not_in_db(parid, cursor):
         new_parcel = True
@@ -102,7 +102,7 @@ def update_database(record, conn, cursor, commit):
     # Property external data is a misnomer. It's just a log of the data from every time stuff
     write.propertyexternaldata(propextern_map, cursor)
 
-    if _events.query_propertyexternaldata_for_changes_and_write_events(
+    if events.query_propertyexternaldata_for_changes_and_write_events(
         parid, prop_id, cecase_id, new_parcel, cursor
     ):
         Tally.updated += 1
@@ -147,11 +147,11 @@ def create_events_for_parcels_in_db_but_not_in_records(
     for parcel_id in extra_parcels:
         prop_id = fetch.prop_id(parcel_id, cursor)
         cecase_id = fetch.cecase_id(prop_id, cursor)
-        details = _events.EventDetails(parcel_id, prop_id, cecase_id, cursor)
+        details = events.EventDetails(parcel_id, prop_id, cecase_id, cursor)
         details.old = municdode
         # Creates DifferentMunicode or NotInRealEstatePortal
         # If DifferentMunicode, supplies the new muni
-        event = _events.parcel_not_in_wprdc_data(details)
+        event = events.parcel_not_in_wprdc_data(details)
         event.write_to_db()
         Tally.diff_count += 1
     if commit:
