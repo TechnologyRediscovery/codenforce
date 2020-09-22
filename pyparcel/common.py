@@ -78,6 +78,7 @@ Jordan Tax Service, Inc. at (412) 835-5243. """
 
 
 class _Tally:
+    # Perhaps Tally should be replaced with collections.Counter?
     def __init__(self):
         self.total = 0
         self.inserted = 0
