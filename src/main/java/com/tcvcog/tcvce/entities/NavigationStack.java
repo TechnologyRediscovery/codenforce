@@ -52,7 +52,7 @@ public class NavigationStack {
      * Returns the last page to be pushed on the stack.
      * Put this in the return line of a BB method that redirects the user.
      * @return the url or ID of the last page.
-     * @throws com.tcvcog.tcvce.domain.NavigationException @throws NoSuchElementException
+     * @throws NavigationException when stack @throws NoSuchElementException
      */
     public String popLastPage() throws NavigationException{
 
