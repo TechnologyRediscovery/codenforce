@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.event.ActionEvent;
 
 /**
  *
@@ -31,8 +30,8 @@ import javax.faces.event.ActionEvent;
 public class PublicInfoBB extends BackingBeanUtils implements Serializable {
 
     private List<PublicInfoBundle> publicInfoBundleList;
-    private PublicInfoBundle selectedBundle;
     private int submittedPACC;
+    private boolean refreshingBundles; //To surpress actions that submitPACC does when getting bundles the first time. When true only do refresh things
     private String publicMessage;
 
     //cePaccView.xhtml fields
@@ -53,45 +52,50 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable {
     public void initBean() {
 
         publicInfoBundleList = getSessionBean().getInfoBundleList();
-        
+
         if (publicInfoBundleList != null) {
-            
-            //Lists are only initialized if we need them
-            
-            for (PublicInfoBundle bundle : publicInfoBundleList) {
-                if (bundle instanceof PublicInfoBundleCEActionRequest) {
-                    if(bundledRequests == null){
-                        bundledRequests = new ArrayList<>();
-                    }
-                    bundledRequests.add((PublicInfoBundleCEActionRequest) bundle);
-                    continue;
-                }
 
-                if (bundle instanceof PublicInfoBundleCECase) {
-                    if(bundledCases == null){
-                        bundledCases = new ArrayList<>();
-                    }
-                    bundledCases.add((PublicInfoBundleCECase) bundle);
-                    continue;
-                }
+            sortBundles();
 
-                if (bundle instanceof PublicInfoBundleOccInspection) {
-                    if(bundledInspections == null){
-                        bundledInspections = new ArrayList<>();
-                    }
-                    bundledInspections.add((PublicInfoBundleOccInspection) bundle);
-                    continue;
-                }
+        }
+    }
 
-                if (bundle instanceof PublicInfoBundleOccPermitApplication) {
-                    if(bundledApplications == null){
-                        bundledApplications = new ArrayList<>();
-                    }
-                    bundledApplications.add((PublicInfoBundleOccPermitApplication) bundle);
-                    continue;
+    private void sortBundles() {
+
+        //Lists are only initialized if we need them
+        for (PublicInfoBundle bundle : publicInfoBundleList) {
+            if (bundle instanceof PublicInfoBundleCEActionRequest) {
+                if (bundledRequests == null) {
+                    bundledRequests = new ArrayList<>();
                 }
+                bundledRequests.add((PublicInfoBundleCEActionRequest) bundle);
+                continue;
+            }
+
+            if (bundle instanceof PublicInfoBundleCECase) {
+                if (bundledCases == null) {
+                    bundledCases = new ArrayList<>();
+                }
+                bundledCases.add((PublicInfoBundleCECase) bundle);
+                continue;
+            }
+
+            if (bundle instanceof PublicInfoBundleOccInspection) {
+                if (bundledInspections == null) {
+                    bundledInspections = new ArrayList<>();
+                }
+                bundledInspections.add((PublicInfoBundleOccInspection) bundle);
+                continue;
+            }
+
+            if (bundle instanceof PublicInfoBundleOccPermitApplication) {
+                if (bundledApplications == null) {
+                    bundledApplications = new ArrayList<>();
+                }
+                bundledApplications.add((PublicInfoBundleOccPermitApplication) bundle);
             }
         }
+
     }
 
     public String submitPACC() {
@@ -99,27 +103,35 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable {
         try {
             publicInfoBundleList = pic.getPublicInfoBundles(submittedPACC);
             if (!publicInfoBundleList.isEmpty()) {
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Retrieved " + String.valueOf(publicInfoBundleList.size()) + " bundles!", ""));
 
                 getSessionBean().setInfoBundleList(publicInfoBundleList);
-                
-                //Now look through the bundles and see which interface we need to send the user to
-                for (PublicInfoBundle bundle : publicInfoBundleList) {
 
-                    if (bundle.getTypeName().equalsIgnoreCase("CECASE")
-                            || bundle.getTypeName().equalsIgnoreCase("CEAR")) {
-                        //Code enforcement it is!
-                        return "cePaccView";
-                    }
+                if (!refreshingBundles) {
 
-                    if (bundle.getTypeName().equalsIgnoreCase("OccPermitApplication")
-                            || bundle.getTypeName().equalsIgnoreCase("OccInspection")) {
-                        //Occupancy it is!
-                        return "occPaccView";
+                    //We're not refreshing the bundles
+                    //we need to tell them how many we retrieved
+                    //Then we need to redirect them
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                    "Retrieved " + String.valueOf(publicInfoBundleList.size()) + " bundles!", ""));
+
+                    //Now look through the bundles and see which interface we need to send the user to
+                    for (PublicInfoBundle bundle : publicInfoBundleList) {
+
+                        if (bundle.getTypeName().equalsIgnoreCase("CECASE")
+                                || bundle.getTypeName().equalsIgnoreCase("CEAR")) {
+                            //Code enforcement it is!
+                            return "cePaccView";
+                        }
+
+                        if (bundle.getTypeName().equalsIgnoreCase("OccPermitApplication")
+                                || bundle.getTypeName().equalsIgnoreCase("OccInspection")) {
+                            //Occupancy it is!
+                            return "occPaccView";
+                        }
                     }
                 }
+
             } else {
 
                 getFacesContext().addMessage(null,
@@ -141,6 +153,7 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable {
         }
 
         //something went wrong, try again
+        //Or we're refreshing bundles and don't need to redirect
         return "";
 
     }
@@ -155,7 +168,7 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable {
         return "";
     }
 
-    public void attachMessage(ActionEvent ev) {
+    public void attachMessage(PublicInfoBundle selectedBundle) {
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
         try {
             pic.attachMessageToBundle(selectedBundle, publicMessage);
@@ -171,7 +184,34 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable {
                             "This is a system error and has been logged for debugging."));
 
         }
+
         publicMessage = null;
+
+        submittedPACC = selectedBundle.getPacc();
+
+        //Clear the lists
+        if (bundledApplications != null) {
+            bundledApplications.clear();
+        }
+
+        if (bundledInspections != null) {
+            bundledInspections.clear();
+        }
+
+        if (bundledCases != null) {
+            bundledCases.clear();
+        }
+
+        if (bundledRequests != null) {
+            bundledRequests.clear();
+        }
+
+        //Refresh the bundles
+        refreshingBundles = true;
+
+        submitPACC();
+
+        sortBundles();
 
     }
 
@@ -201,21 +241,6 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable {
      */
     public void setSubmittedPACC(int submittedPACC) {
         this.submittedPACC = submittedPACC;
-    }
-
-    /**
-     * @return the selectedBundle
-     */
-    public PublicInfoBundle getSelectedBundle() {
-        return selectedBundle;
-    }
-
-    /**
-     * @param sb
-     */
-    public void setSelectedBundle(PublicInfoBundle sb) {
-        System.out.println("PublicInfoBB.setSelectedBundle | Bundle type: " + sb.getTypeName());
-        this.selectedBundle = sb;
     }
 
     /**

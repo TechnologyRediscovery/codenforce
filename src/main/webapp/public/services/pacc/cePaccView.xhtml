@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     <!-- MAIN CONTAINER -->
                     <div class="mainContainer">
 
-                        <p:growl id="paccSearchMessages" showDetail="false"/>
+                        <p:growl id="paccMessages" showDetail="false"/>
 
                         <!-- CONTENTS CONTAINER -->
                         <div class="public-main-contents-containner">
@@ -186,7 +186,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             <p:column width="4%">
                                                                 <i class="material-icons"><h:outputText value="#{e.bundledEvent.category.icon.materialIcon}"/></i>
                                                             </p:column>
-                                                            
+
                                                             <p:column width="12%" sortBy="#{e.bundledEvent.category.eventCategoryTitle}"
                                                                       filterBy="#{e.bundledEvent.category.eventCategoryTitle}"
                                                                       headerText="Category">
@@ -222,8 +222,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             <p:rowExpansion>
 
                                                                 <div class="outlinedBox">
-                                                                    <h2><h:outputText value="#{e.bundledEvent.category.eventType.label}:#{e.bundledEvent.category.eventCategoryTitle}"/>
-                                                                        ; Event ID: <h:outputText value="#{e.bundledEvent.eventID}"/> </h2>
+                                                                    <h3><h:outputText value="#{e.bundledEvent.category.eventType.label}:#{e.bundledEvent.category.eventCategoryTitle}"/>
+                                                                        ; Event ID: <h:outputText value="#{e.bundledEvent.eventID}"/> </h3>
                                                                     <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
                                                                                  columnClasses="gridTd, gridTd, gridTd, gridTd">
 
@@ -250,22 +250,214 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </p:tab>
                                                     <p:tab title="Violations">
 
+                                                        <p:dataTable
+                                                            id="violation-table"
+                                                            var="violation"
+                                                            rowKey="#{violation.bundledViolation.violationID}"
+                                                            value="#{case.violationList}"
+                                                            tableStyleClass="primeDataTable"
+                                                            resizableColumns="true"
+                                                            rowExpandMode="multiple"
+                                                            reflow="true">
+
+                                                            <p:column width="3%" exportable="false">
+                                                                <p:rowToggler/>
+                                                            </p:column>
+
+                                                            <p:column width="25%" styleClass="content-align-center"
+                                                                      sortBy="#{violation.bundledViolation.dateOfRecord}"
+                                                                      headerText="Date of record">
+                                                                <h:outputText value="#{violation.bundledViolation.dateOfRecordPretty}"/>
+                                                            </p:column>
+                                                            <p:column width="8%" styleClass="content-align-center"
+                                                                      headerText="ID">
+                                                                <h:outputText value="#{violation.bundledViolation.violationID}"/>
+                                                            </p:column>
+
+                                                            <p:column width="40%" styleClass="content-align-center"
+                                                                      sortBy="#{violation.bundledViolation.violatedEnfElement.codeElement.ordSubSecTitle}"
+                                                                      headerText="Ordinance">
+                                                                <h:outputText value="#{violation.bundledViolation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                                <p:spacer height="3px" />
+                                                                <h:outputText value="#{violation.bundledViolation.violatedEnfElement.codeElement.source.sourceName}"/>
+                                                                <h:outputText value=" (#{violation.bundledViolation.violatedEnfElement.codeElement.source.sourceYear})"/>
+                                                            </p:column>
+
+
+                                                            <p:column width="25%" styleClass="content-align-center"
+                                                                      headerText="Status">
+                                                                <h:outputText value="#{!(empty violation.bundledViolation.status) ? violation.bundledViolation.status.label : ''}" />
+                                                            </p:column>
+
+                                                            <p:rowExpansion>
+
+                                                                <div class="outlinedBox">
+                                                                    <h2><h:outputText value="#{violation.bundledViolation.violatedEnfElement.codeElement.source.sourceName}:
+                                                                                      #{violation.bundledViolation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                                        ; Violation ID: <h:outputText value="#{violation.bundledViolation.violationID}"/> </h2>
+                                                                    <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                                                 columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                                        <h:panelGroup>
+                                                                            <h:outputText styleClass="bold" value="Description" />
+                                                                            <div class="rowExpansion">
+                                                                                <h:outputText value="#{violation.bundledViolation.description}"/>
+                                                                            </div>
+                                                                        </h:panelGroup>
+
+                                                                        <h:panelGroup>
+                                                                            <h:outputText styleClass="bold" value="Penalty" />
+                                                                            <div class="rowExpansion">
+                                                                                <h:outputText value="$#{violation.bundledViolation.penalty}"/>
+                                                                            </div>
+                                                                        </h:panelGroup>
+
+                                                                        <h:panelGroup>
+                                                                            <h:outputText styleClass="bold" value="Compliance Deadline" />
+                                                                            <div class="rowExpansion">
+                                                                                <h:outputText value="#{violation.bundledViolation.stipulatedComplianceDatePretty}"/>
+                                                                            </div>
+                                                                        </h:panelGroup>
+
+                                                                        <h:panelGroup>
+                                                                            <h:outputText styleClass="bold" value="Compliance met?" />
+                                                                            <div class="rowExpansion">
+                                                                                <h:outputText value="#{not empty violation.bundledViolation.actualComplianceDate ? 'Yes' : 'No' }"/>
+                                                                            </div>
+                                                                        </h:panelGroup>
+
+                                                                        <h:panelGroup rendered="#{not empty violation.bundledViolation.actualComplianceDate}">
+                                                                            <h:outputText styleClass="bold" value="Compliance Met On" />
+                                                                            <div class="rowExpansion">
+                                                                                <h:outputText value="#{violation.bundledViolation.actualComplianceDatePretty}"/>
+                                                                            </div>
+                                                                        </h:panelGroup>
+
+                                                                    </h:panelGrid>
+                                                                </div>
+                                                            </p:rowExpansion>
+
+
+                                                        </p:dataTable>
+
                                                     </p:tab>
+                                                    <ui:remove>
+                                                        <p:tab title="Messages">
+
+                                                            <!--At this point in time there are no external notes for CE Cases-->
+                                                            
+                                                            <p:outputLabel>Type your message to the code enforcement staff in the box below. 
+                                                                Please note that all messages submitted through this portal become part of the permanent case record
+                                                                and may be included in documents prepare for town councils and magistrates. </p:outputLabel>
+                                                            <p:spacer height="15px"/>
+                                                            <p:outputLabel value="#{case.bundledCase.externalNotes}"/>
+                                                            <p:spacer height="10px"/>
+                                                            <p:inputTextarea id="message-ita" style="width: 100%; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
+                                                            <p:spacer height="10px"/>
+                                                            <p:commandButton ajax="true" actionListener="#{publicInfoBB.attachMessage(case)}"
+                                                                             value="Submit" icon="fa fa-link"
+                                                                             update="paccMessages"
+                                                                             />
+
+                                                        </p:tab>
+                                                    </ui:remove>
                                                 </p:tabView>
 
                                             </p:repeat>
 
                                             <!--BUNDLED CEARS LIST-->
-                                            <p:repeat rendered="#{not empty publicInfoBB.bundledRequests}" value="#{publicInfoBB.bundledRequests}" var="request">
+                                            <p:repeat rendered="#{not empty publicInfoBB.bundledRequests}" value="#{publicInfoBB.bundledRequests}" var="cear">
 
                                                 <p:tabView>
+                                                    <p:tab title="Code Enforcement Request Information">
+
+                                                        <p:panelGrid columns="4" 
+                                                                     layout="grid"
+                                                                     columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                                     >
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="PACC Status:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{cear.paccStatusMessage}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Request ID:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{cear.bundledRequest.requestID}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+                                                            
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Issue:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{cear.bundledRequest.issue.name}"/>
+                                                                    <p:spacer height="5px"/>
+                                                                    <p:outputLabel value="&#160;#{cear.bundledRequest.issue.description}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Request Description:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{cear.bundledRequest.requestDescription}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Status:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <p:outputLabel value="&#160;#{cear.bundledRequest.requestStatus.statusTitle}: #{cear.bundledRequest.requestStatus.description}"/>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Date of Submission:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{cear.bundledRequest.formattedSubmittedTimeStamp}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Active?"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{cear.bundledRequest.active ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                        </p:panelGrid>
+                                                        
+                                                    </p:tab>
                                                     <p:tab title="Messages">
 
-
-
-                                                    </p:tab>
-                                                    <p:tab title="Request Information">
-
+                                                        <p:outputLabel rendered="#{cear.showAddMessageButton}"> Type your message to the code enforcement staff in the box below. 
+                                                                Please note that all messages submitted through this portal become part of the permanent case record
+                                                                and may be included in documents prepare for town councils and magistrates. </p:outputLabel>
+                                                            <p:spacer height="15px"/>
+                                                            <p:outputLabel value="#{cear.bundledRequest.publicExternalNotes}" escape="false"/>
+                                                            <p:spacer height="10px"/>
+                                                            <p:inputTextarea id="message-ita" rendered="#{cear.showAddMessageButton}" style="width: 100%; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
+                                                            <p:spacer height="10px"/>
+                                                            <p:commandButton ajax="true" actionListener="#{publicInfoBB.attachMessage(cear)}"
+                                                                             value="Submit" icon="fa fa-link"
+                                                                             update="paccMessages viewPublicBundlesForm" 
+                                                                             rendered="#{cear.showAddMessageButton}"
+                                                                             />
+                                                        
                                                     </p:tab>
                                                 </p:tabView>
 
