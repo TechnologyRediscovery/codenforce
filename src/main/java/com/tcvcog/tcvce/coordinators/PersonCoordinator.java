@@ -291,7 +291,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @return the database identifier of the sent in Person's very own ghost
      * @throws IntegrationException 
      */
-    public int createChostPerson(Person p, User u) throws IntegrationException{
+    public int createChostPerson(Person p, User u) throws IntegrationException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();
         int newGhostID = pi.createGhost(p, u);
         return newGhostID;        

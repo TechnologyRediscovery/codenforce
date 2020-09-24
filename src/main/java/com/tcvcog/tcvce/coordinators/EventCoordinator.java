@@ -110,6 +110,12 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return evList;
     }
     
+    public List<EventCnFPropUnitCasePeriodHeavy> getEventHistoryList(UserAuthorized ua){
+        EventIntegrator ei = getEventIntegrator();
+        return assembleEventCnFPropUnitCasePeriodHeavyList();
+        
+    }
+    
     
     /**
      * Creates a data-rich subclass of our events that contains a Property object
@@ -547,7 +553,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
    
     /**
      * Logic container for choosing a sensible event view enum value
-     * @param ua
+     * @param ua not used
      * @return 
      */
    

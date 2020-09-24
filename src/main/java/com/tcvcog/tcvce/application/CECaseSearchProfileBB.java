@@ -17,11 +17,13 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.BOBSource;
@@ -439,11 +441,22 @@ public class CECaseSearchProfileBB
     }
     
     public String onEventViewButtonChange(EventCnF ev){
+        getSessionBean().setSessEvent(ev);
+        getSessionBean().setSessEventsPagePageModeRequest(PageModeEnum.VIEW);
+        getSessionBean().setSessEventsPageEventDomainRequest(null);
         return "events";
         
     }
     
     public String onEventAddButtonChange(){
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            getSessionBean().setSessEvent(ec.initEvent(currentCase, null));
+            getSessionBean().setSessEventsPagePageModeRequest(PageModeEnum.INSERT);
+            getSessionBean().setSessEventsPageEventDomainRequest(null);
+        } catch (BObStatusException | EventException ex) {
+            System.out.println(ex);
+        }
         return "events";
         
         

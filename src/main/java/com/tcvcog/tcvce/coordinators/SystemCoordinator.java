@@ -404,7 +404,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     private final NavigationSubItem CEViolations = getNavSubItem("Violations", "/restricted/cogstaff/ce/ceCaseViolations.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CENotices = getNavSubItem("Notices", "/restricted/cogstaff/ce/ceCaseNotices.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CECitations = getNavSubItem("Citations", "/restricted/cogstaff/ce/ceCaseCitations.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem CEEvents = getNavSubItem("Events", "/restricted/cogstaff/event/events.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CERequests = getNavSubItem("Requests", "/restricted/cogstaff/ce/ceActionRequests.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Code Enf
@@ -416,7 +415,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         navList.add(CEViolations);
         navList.add(CENotices);
         navList.add(CECitations);
-        navList.add(CEEvents);
         navList.add(CERequests);
         return navList;
     }
@@ -425,7 +423,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     private final NavigationSubItem occPeriodStatus = getNavSubItem("Period Status", "/restricted/cogstaff/occ/occPeriodWorkflow.xhtml", "fa fa-sign-in", true);
     private final NavigationSubItem occPermits = getNavSubItem("Permits", "/restricted/cogstaff/occ/occPeriodPermits.xhtml", "fa fa-sign-in", true);
     private final NavigationSubItem occPermitApplications = getNavSubItem("Permit Applications", "/restricted/cogstaff/occ/occPermitApplications.xhtml", "fa fa-sign-in", true);
-    private final NavigationSubItem occEvents = getNavSubItem("Events", "/restricted/cogstaff/event/events.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem occInspections = getNavSubItem("Inspections", "/restricted/cogstaff/occ/occPeriodInspections.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem occDocuments = getNavSubItem("Payments", "/restricted/cogstaff/occ/occPeriodPayments.xhtml", "fa fa-sign-in", false);
 
@@ -436,7 +433,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         navList.add(occPeriodStatus);
         navList.add(occPermits);
         navList.add(occPermitApplications);
-        navList.add(occEvents);
         navList.add(occInspections);
         navList.add(occDocuments);
         return navList;
@@ -572,7 +568,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     }
 
     //Sidebar Sub Nav Item: Reports
-    private final NavigationSubItem events = getNavSubItem("Event Search", "/restricted/cogstaff/event/eventSearch.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem events = getNavSubItem("Event Activity", "/restricted/cogstaff/event/events.xhtml", "fa fa-flag", false);
     private final NavigationSubItem eventConfig = getNavSubItem("Event Setup", "/restricted/cogstaff/event/eventConfiguration.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem eventRuleConfig = getNavSubItem("Event Rules", "/restricted/cogstaff/event/eventRuleConfiguration.xhtml", "fa fa-sign-in", false);
 

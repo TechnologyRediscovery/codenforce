@@ -160,7 +160,48 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         return ev;
     }
     
+
+    /**
+     * Extracts all records of event views by userid
+     * @param userID
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Integer> getEventHistory(int userID) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        List<Integer> al = new ArrayList<>();
+
+        try {
+            String s = "SELECT event_eventid, entrytimestamp FROM loginobjecthistory "
+                    + "WHERE login_userid = ? "
+                    + "AND event_eventid IS NOT NULL "
+                    + "ORDER BY entrytimestamp DESC;";
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, userID);
+
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                al.add(rs.getInt("event_eventid"));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.getPerson | Unable to retrieve person", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        System.out.println("PersonIntegrator Retrieved history of size: " + al.size());
+        return al;
+
+    }
+
    
+    
     
     /**
      * Builds a List of EventCnF objects given an ERG, which in June 2020 were
