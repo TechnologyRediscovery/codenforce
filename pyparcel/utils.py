@@ -2,17 +2,18 @@
 Miscellaneous code to be used in the creation of this package. Should not appear in production.
 """
 # Todo: Create git hook that fails if any function in utils.py appears in the other files.
+import json
 import pickle
 import sys
 from os import path
-from _constants import MEDIUM_DASHES, MORTGAGE
+from common import MEDIUM_DASHES, MORTGAGE
 import itertools
 
 
-from _constants import SPAN, PARCEL_ID_LoB, OWNER, TAXINFO
-import _scrape as scrape
-import _parse
-from _parse import TaxStatus
+from common import SPAN, PARCEL_ID_LoB, OWNER, TAXINFO
+import scrape as scrape
+import parse
+from common import TaxStatus
 from typing import Dict, NamedTuple, Any, Optional, Tuple, List
 import bs4  # Todo: Only imported BS4 for typing. Is that Pythonic?
 
@@ -23,11 +24,13 @@ THE_PICKLER_COUNT = 0
 
 
 # Todo: Discuss merits of permanent calls to the pickler left in source code with @click.option(--pickle/--nopickle)
-def pickler(obj, filename, path_to_file=MOCKS, incr=True):
+def pickler(obj, filename, path_to_file=MOCKS, incr=True, to_type=None):
     """
     A quick and dirty way to pickle objects. Useful for creating mocks.
 
-    Don't forget to delete your call to the pickler after you are done!
+    Args
+        to_tupe: Defaults to None. Leaving it as is pickles the object, otherwise it writes the file type.
+            Setting it to "json" uses json.dump
 
     How to use:
         Given the following source code, assuming we want to pickle foo
@@ -60,33 +63,49 @@ def pickler(obj, filename, path_to_file=MOCKS, incr=True):
             >>>     pickler(bar, "bar", incr=False)
             >>>     pickler(baz, "baz", incr=True)
 
+        Pickler also can return raw files!
+            >>> from utils import pickler
+            >>> foo = {"This is a dict": "Let's make it JSON"}
+            >>> pickler(foo, "foo", to_type="json")
         """
     global THE_PICKLER_COUNT
     initial_recursion = sys.getrecursionlimit()
     try:
         sys.setrecursionlimit(100000)
-        with open(
-            path.join(
-                path_to_file, str(THE_PICKLER_COUNT) + "_" + filename + ".pickle"
-            ),
-            "wb",
-        ) as f:
-            pickle.dump(obj, f)
+        if not to_type:
+            with open(
+                path.join(
+                    path_to_file, str(THE_PICKLER_COUNT) + "_" + filename + ".pickle"
+                ),
+                "wb",
+            ) as f:
+                pickle.dump(obj, f)
+
+        elif to_type == "json":
+            with open(
+                path.join(
+                    path_to_file, str(THE_PICKLER_COUNT) + "_" + filename + ".json"
+                ),
+                "w",
+            ) as f:
+                json.dump(obj, f)
+
+        else:
+            with open(
+                path.join(
+                    path_to_file,
+                    str(THE_PICKLER_COUNT) + "_" + filename + "." + to_type,
+                ),
+                "w",
+                newline="",
+            ) as f:
+                f.write(obj,)
+
         if incr:
             THE_PICKLER_COUNT += 1
+
     finally:
         sys.setrecursionlimit(initial_recursion)
-
-
-########################################################################################
-# from _utils import pickler
-# pickler(owner_name, "own", incr=False)
-# pickler(soup, "soup", incr=False)
-# pickler(imap, "prop_imap", incr=False)
-# pickler(cecase_map, "cecase_imap", incr=False)
-# pickler(owner_map, "owner_imap", incr=False)
-# pickler(propextern_map, "propext_imap", incr=True)
-########################################################################################
 
 
 def replace_parid(new_parid, soup, r) -> Tuple[bs4.BeautifulSoup, Dict]:
@@ -96,11 +115,11 @@ def replace_parid(new_parid, soup, r) -> Tuple[bs4.BeautifulSoup, Dict]:
         soup:
         r:
     """
-    hyphenless_parid = _parse.remove_hyphnes(new_parid)
+    hyphenless_parid = parse.remove_hyphnes(new_parid)
     r["PARID"] = hyphenless_parid
     # Replaces the Parcel ID (Lot and Block)
     # Does not add hyphens
-    new_soup = _parse.replace_html_content(new_parid, soup, PARCEL_ID_LoB)
+    new_soup = parse.replace_html_content(new_parid, soup, PARCEL_ID_LoB)
     # Note: Does not replace the url in <form> or Footer1$TtPID
     return new_soup, r
 
@@ -108,7 +127,7 @@ def replace_parid(new_parid, soup, r) -> Tuple[bs4.BeautifulSoup, Dict]:
 def replace_name(new_name, soup) -> bs4.BeautifulSoup:
     """
     """
-    new_soup = _parse.replace_html_content(new_name, soup, OWNER)
+    new_soup = parse.replace_html_content(new_name, soup, OWNER)
     # Todo: Replace mortage and footer
     # new_soup = _parse.replace_html_content(new_name, new_soup, MORTGAGE)
     return new_soup
@@ -193,7 +212,7 @@ def anonymize_html_and_record(
     """
     orig_parid = r["PARID"]
     html = scrape.county_property_assessment(orig_parid)
-    soup = _parse.soupify_html(html)
+    soup = parse.soupify_html(html)
     if new_parid:
         soup, r = replace_parid(new_parid, soup, r)
     if new_name:

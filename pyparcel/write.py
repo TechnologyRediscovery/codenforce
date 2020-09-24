@@ -104,8 +104,10 @@ def taxstatus(tax_status, cursor):
         )
         returning taxstatusid;
     """
-    cursor.execute(insert_sql, tax_status._asdict())    # Todo: For fun, learn speed of tuple -> dict
-    return cursor.fetchone()[0] # taxstatus_id
+    cursor.execute(
+        insert_sql, tax_status._asdict()
+    )  # Todo: For fun, learn speed of tuple -> dict
+    return cursor.fetchone()[0]  # taxstatus_id
 
 
 def propertyexternaldata(propextern_map, cursor):
