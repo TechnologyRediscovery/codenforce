@@ -1,8 +1,10 @@
 import re
-from collections import namedtuple
+from dataclasses import dataclass
+
 import bs4
-from _constants import OWNER, TAXINFO, SPAN
-from typing import List
+from common import OWNER, ADDRESS, MUNICIPALITY, TAXINFO, SPAN
+from common import TaxStatus
+from typing import List, Any, NamedTuple
 
 
 def soupify_html(raw_html):
@@ -46,22 +48,6 @@ def replace_html_content(new_str, soup, id):
     return soup
 
 
-TaxStatus = namedtuple(
-    "tax_status",
-    fields := [
-        "year",
-        "paidstatus",
-        "tax",
-        "penalty",
-        "interest",
-        "total",
-        "date_paid",
-        "blank",
-    ],
-    defaults=(None,) * len(fields),
-)
-
-
 def parse_tax_from_soup(soup: bs4.BeautifulSoup, clean=True) -> TaxStatus:
     """
     """
@@ -71,13 +57,27 @@ def parse_tax_from_soup(soup: bs4.BeautifulSoup, clean=True) -> TaxStatus:
     row = table[0].contents[1]  # The most recent year's data
     data = row.contents
 
-    # Todo: Document Intellej bug claiming TaxStatus recieved an unexpected argument.
+    # Todo: Document Intellej bug claiming TaxStatus received an unexpected argument.
     if clean:
         return TaxStatus(*[clean_text(x.text) for x in data])
     return TaxStatus(*[x.text for x in data])
 
 
-# Function currently unused
+def validate_county_municode_against_portal(html) -> List[str]:
+    """
+    Args:
+        html: Allegheny County Real Estate Portal html
+
+    Returns:
+        The municipality's municode and name if the html points to a real page.
+            Example: ['843\xa0North Braddock  ']
+        An invalid page returns an empty list
+    """
+    soup = soupify_html(html)
+    # Makes the assumption that a page without an owner is invalid.
+    return parse_municipality_from_soup(soup)
+
+
 def clean_text(text):
     text = strip_whitespace(text)
     text = strip_dollarsign(text)
@@ -107,14 +107,32 @@ def remove_hyphnes(text):
     return re.sub("-", "", text)
 
 
-def parse_owners_from_soup(
-    soup: bs4.BeautifulSoup,
-) -> List[
-    str,
-]:
+def parse_owners_from_soup(soup: bs4.BeautifulSoup,) -> List[str]:
     return _extract_elementlist_from_soup(
         soup, element_id=OWNER, element=SPAN, remove_tags=True
     )
+
+
+def parse_municipality_from_soup(soup: bs4.BeautifulSoup,) -> List[str]:
+    return _extract_elementlist_from_soup(
+        soup, element_id=MUNICIPALITY, element=SPAN, remove_tags=True
+    )
+
+
+class Municipality(NamedTuple):
+    municode: int
+    name: str
+
+    @classmethod
+    def from_raw(cls, raw_muni: List[str]):
+        """
+        Factory method for creating Municipalities from the raw text on Allegheny County Real Estate Portal's site.
+
+            >>> muni = Municipality.from_raw(['843\xa0North Braddock  '])
+            Municipality(municode='843', name='North Braddock')
+        """
+        # Makes the assumption that there will only ever be one muni
+        return Municipality(*clean_text(raw_muni[0]).split("\xa0"))
 
 
 class OwnerName:
@@ -130,8 +148,8 @@ class OwnerName:
         return f"{self.__class__.__name__}<{self.clean}>"
 
     @classmethod
-    def get_Owner_from_soup(cls, soup: bs4.BeautifulSoup):
-        """ Factory method for creating OwnerNames from parcel ids.
+    def from_soup(cls, soup: bs4.BeautifulSoup):
+        """ Factory method for creating OwnerNames from a soup.
         """
         o = OwnerName()
         o.raw = parse_owners_from_soup(soup)

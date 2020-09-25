@@ -442,8 +442,6 @@ public class CECaseSearchProfileBB
     
     public String onEventViewButtonChange(EventCnF ev){
         getSessionBean().setSessEvent(ev);
-        getSessionBean().setSessEventsPagePageModeRequest(PageModeEnum.VIEW);
-        getSessionBean().setSessEventsPageEventDomainRequest(null);
         return "events";
         
     }
@@ -452,18 +450,16 @@ public class CECaseSearchProfileBB
         EventCoordinator ec = getEventCoordinator();
         try {
             getSessionBean().setSessEvent(ec.initEvent(currentCase, null));
-            getSessionBean().setSessEventsPagePageModeRequest(PageModeEnum.INSERT);
-            getSessionBean().setSessEventsPageEventDomainRequest(null);
         } catch (BObStatusException | EventException ex) {
             System.out.println(ex);
-        }
+        } 
         return "events";
         
         
     }
     
     public String onCEARViewButtonChange(CEActionRequest cear){
-        
+        getSessionBean().setSessCEAR(cear);
         return "cEActionRequests";
         
     }
@@ -471,6 +467,7 @@ public class CECaseSearchProfileBB
     
     
     public String onViolationViewButtonChange(CodeViolation cv){
+        getSessionBean().setSessCodeViolation(cv);
         return "ceCaseViolations";
         
     }
@@ -483,6 +480,7 @@ public class CECaseSearchProfileBB
     }
     
     public String onNOVViewButtonChange(NoticeOfViolation nov){
+        getSessionBean().setSessNotice(nov);
         return "ceCaseNotices";
         
     }
@@ -499,6 +497,7 @@ public class CECaseSearchProfileBB
     }
     
     public String onCitationViewButtonChange(Citation cit){
+        getSessionBean().setSessCitation(cit);
         return "ceCaseCitations";
         
         
