@@ -154,12 +154,10 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         //TODO: Fix this, it does not retrieve cases
         //setPublicUser();
         //QueryCECase qc = sc.initQuery(QueryCECaseEnum.PACC, publicUser.getMyCredential());
-
         //List<CECase> caseList = qc.getBOBResultList();
-        
         //quick patch up
         List<CECase> caseList = caseInt.getCECasesByPACC(pacc);
-        
+
         System.out.println("PublicInfoCoordinator.getPublicInfoBundles | num CE cases found: " + caseList.size());;
 
         for (CECase c : caseList) {
@@ -198,7 +196,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         CaseCoordinator cc = getCaseCoordinator();
         setPublicUser();
         CECaseDataHeavy c = cc.cecase_assembleCECaseDataHeavy(cse, publicUser);
-        
+
         cse = new CECase(c);
         PublicInfoBundleCECase pib = new PublicInfoBundleCECase();
 
@@ -217,21 +215,23 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             ArrayList<PublicInfoBundleEventCnF> eventBundles = new ArrayList<>();
 
             for (EventCnF ev : c.getEventList()) {
-                //TODO: filter events by category or add "private event" flag on event.
-                eventBundles.add(extractPublicInfo(ev));
+                //Only add events that are visible to the public.
+                if (ev.getCategory().getUserRankMinimumToView() <= PUBLIC_VIEW_USER_RANK) {
+                    eventBundles.add(extractPublicInfo(ev));
+                }
             }
-            
+
             pib.setPublicEventList(eventBundles);
-            
+
             ArrayList<PublicInfoBundleCodeViolation> violationBundles = new ArrayList<>();
-            
+
             //We only need the unresolved ones.
-            for(CodeViolation vio : c.getViolationListUnresolved()){
+            for (CodeViolation vio : c.getViolationListUnresolved()) {
                 violationBundles.add(extractPublicInfo(vio));
             }
-            
+
             pib.setViolationList(violationBundles);
-            
+
             pib.setAddress(c.getProperty());
             pib.setShowAddMessageButton(false);
             pib.setPaccStatusMessage("Public access enabled");
@@ -251,9 +251,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
     }
 
-   /**
-     * Bundles a CodeViolation into a PublicInfoBundleCodeViolation by stripping out its
-     * private information.
+    /**
+     * Bundles a CodeViolation into a PublicInfoBundleCodeViolation by stripping
+     * out its private information.
      *
      * @param input
      * @return
@@ -938,7 +938,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         if (unbundled.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
 
             CECase ceLight = cc.cecase_getCECase(input.getCecaseID());
-            
+
             exportable.setCecase(cc.cecase_assembleCECasePropertyUnitHeavy(ceLight));
 
         } else if (unbundled.getDomain() == EventDomainEnum.OCCUPANCY) {
@@ -987,8 +987,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Converts a bundled PublicInfoBundleCodeViolation to an unbundled CodeViolation for
-     * internal use. Does not check for changes.
+     * Converts a bundled PublicInfoBundleCodeViolation to an unbundled
+     * CodeViolation for internal use. Does not check for changes.
      *
      * @param input
      * @return
@@ -1002,7 +1002,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         return exportable;
 
     }
-    
+
     /**
      * Converts a bundled PublicInfoBundleProperty to an unbundled Property for
      * internal use. Currently does check for changes.
@@ -1421,27 +1421,60 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      */
     public void attachMessageToBundle(PublicInfoBundle bundle, String message) throws IntegrationException {
         LocalDateTime current = LocalDateTime.now();
-        PublicInfoBundleCEActionRequest requestBundle;
 
-        System.out.println("PublicInfoCoordinator.attachmessagToBundle: In coordinator");
-
-        CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        if (bundle.getTypeName().equals("CEAR")) {
-            requestBundle = (PublicInfoBundleCEActionRequest) bundle;
-            StringBuilder sb = new StringBuilder();
-            sb.append(requestBundle.getBundledRequest().getPublicExternalNotes());
-            sb.append("<br /><br />");
-            sb.append("CASE NOTE ADDED AT ");
-            sb.append(current.toString());
-            sb.append("by public user: <br />");
-            sb.append(message);
-            sb.append("<br />");
-            sb.append("***********************");
-
-            System.out.println("PublicInfoCoordinator.attachmessagToBundle | message: " + sb.toString());
-            ceari.attachMessageToCEActionRequest(requestBundle, sb.toString());
-        } else if (bundle.getTypeName().equals("CECASE")) {
-
+        //You'll see brackets in the switch below for each case.
+        //These are so that each case has its own scope
+        //For code readability and optimization purposes
+        
+        StringBuilder sb = new StringBuilder();
+        switch (bundle.getTypeName()) {
+            case "CEAR":{
+                CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+                
+                PublicInfoBundleCEActionRequest requestBundle = (PublicInfoBundleCEActionRequest) bundle;
+                
+                
+                sb.append(requestBundle.getBundledRequest().getPublicExternalNotes());
+                sb.append("<br /><br />");
+                sb.append("CASE NOTE ADDED AT ");
+                sb.append(current.toString());
+                sb.append("by public user: <br />");
+                sb.append(message);
+                sb.append("<br />");
+                sb.append("***********************");
+                
+                System.out.println("PublicInfoCoordinator.attachMessageToBundle | message: " + sb.toString());
+                
+                ceari.attachMessageToCEActionRequest(requestBundle, sb.toString());
+                }
+                break;
+        //Nothing yet
+            case "CECASE":{
+                
+                }
+                break;
+            case "OccPermitApplication":{
+                
+                OccupancyIntegrator oi = getOccupancyIntegrator();
+                
+                PublicInfoBundleOccPermitApplication applicationBundle = (PublicInfoBundleOccPermitApplication) bundle;
+                
+                sb.append(applicationBundle.getBundledApplication().getExternalPublicNotes());
+                sb.append("<br /><br />");
+                sb.append("APPLICATION NOTE ADDED AT ");
+                sb.append(current.toString());
+                sb.append("by public user: <br />");
+                sb.append(message);
+                sb.append("<br />");
+                sb.append("***********************");
+                
+                System.out.println("PublicInfoCoordinator.attachMessageToBundle | message: " + sb.toString());
+                
+                oi.attachMessageToOccPermitApplication(applicationBundle, sb.toString());
+                }
+                break;
+            default:
+                break;
         }
     }
 } // close class

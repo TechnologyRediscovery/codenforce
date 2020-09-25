@@ -52,9 +52,13 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
     public CEActionRequestIntegrator() {
     }
     
-    
-    
-
+    /**
+     * Attaches a message to the CEActionRequest inside the PublicInfoBundle, 
+     * uses PACC to find request
+     * @param request
+     * @param message
+     * @throws IntegrationException 
+     */
     public void attachMessageToCEActionRequest(PublicInfoBundleCEActionRequest request, String message) throws IntegrationException {
         String q = "UPDATE public.ceactionrequest\n"
                 + "   SET publicexternalnotes = ? WHERE requestpubliccc = ?;";
@@ -83,6 +87,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
     }
+    
     public void updateActionRequestNotes(CEActionRequest request) throws IntegrationException {
         String q = "UPDATE public.ceactionrequest "
                 + "SET coginternalnotes = ?, "

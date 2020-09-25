@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccApplication;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.PublicInfoBundleOccPermitApplication;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -1317,6 +1318,38 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
+
+    }
+    
+    /**
+     * Attaches a message to the OccPermitApplication inside the PublicInfoBundle, 
+     * uses PACC to find application
+     * @param application
+     * @param message
+     * @throws IntegrationException 
+     */
+    public void attachMessageToOccPermitApplication(PublicInfoBundleOccPermitApplication application, String message) throws IntegrationException {
+        String query = "UPDATE public.occpermitapplication\n"
+                + "SET externalnotes=? WHERE occpermitapplication.applicationpubliccc = ?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, message);
+            stmt.setInt(2, application.getPacc());
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println("OccupancyIntegrator.attachMessageToOccPermitApplication() | ERROR: " + ex);
+            throw new IntegrationException("OccupancyInspectionIntegrator.attachMessageToOccPermitApplication"
+                    + " | IntegrationException: Unable to attach message to occupancy permit application ", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            
+        }
 
     }
     

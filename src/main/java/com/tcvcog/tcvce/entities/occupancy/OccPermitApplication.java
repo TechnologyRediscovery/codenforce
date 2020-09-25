@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccApplication;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -75,7 +76,15 @@ public class OccPermitApplication {
     public LocalDateTime getSubmissionDate() {
         return submissionDate;
     }
-
+    
+    /**
+     * @return the submissionDate
+     */
+    public String getSubmissionDatePretty() {
+       
+        return EntityUtils.getPrettyDate(submissionDate);
+    }
+    
     /**
      * @return the submissionNotes
      */

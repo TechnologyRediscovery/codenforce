@@ -118,10 +118,12 @@ public class        PersonOccApplication
         return applicationPersonType;
     }
 
+    @Override
     public PersonType getPersonType() {
         return personType;
     }
 
+    @Override
     public void setPersonType(PersonType personType) {
         this.personType = personType;
     }
