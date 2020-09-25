@@ -166,7 +166,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         
         EventCnF sessEv =  getSessionBean().getSessEvent();
         if(sessEv != null){
-            currentEventDomain = currentEvent.getDomain();
+            currentEventDomain =  sessEv.getDomain();
             
             try {
                 currentEvent = ec.assembleEventCnFPropUnitCasePeriodHeavy(sessEv);

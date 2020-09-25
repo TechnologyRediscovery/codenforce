@@ -17,11 +17,13 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.BOBSource;
@@ -439,18 +441,25 @@ public class CECaseSearchProfileBB
     }
     
     public String onEventViewButtonChange(EventCnF ev){
+        getSessionBean().setSessEvent(ev);
         return "events";
         
     }
     
     public String onEventAddButtonChange(){
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            getSessionBean().setSessEvent(ec.initEvent(currentCase, null));
+        } catch (BObStatusException | EventException ex) {
+            System.out.println(ex);
+        } 
         return "events";
         
         
     }
     
     public String onCEARViewButtonChange(CEActionRequest cear){
-        
+        getSessionBean().setSessCEAR(cear);
         return "cEActionRequests";
         
     }
@@ -458,6 +467,7 @@ public class CECaseSearchProfileBB
     
     
     public String onViolationViewButtonChange(CodeViolation cv){
+        getSessionBean().setSessCodeViolation(cv);
         return "ceCaseViolations";
         
     }
@@ -470,6 +480,7 @@ public class CECaseSearchProfileBB
     }
     
     public String onNOVViewButtonChange(NoticeOfViolation nov){
+        getSessionBean().setSessNotice(nov);
         return "ceCaseNotices";
         
     }
@@ -486,6 +497,7 @@ public class CECaseSearchProfileBB
     }
     
     public String onCitationViewButtonChange(Citation cit){
+        getSessionBean().setSessCitation(cit);
         return "ceCaseCitations";
         
         
