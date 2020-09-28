@@ -123,18 +123,15 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
     }
 
     public List<CEActionRequest> getCEActionRequestByControlCode(int controlCode) throws IntegrationException {
-        CEActionRequest newActionRequest = null;
-
         List<CEActionRequest> requestList = new ArrayList<>();
-        String q = "SELECT requestid, requestpubliccc, public.ceactionrequest.muni_municode AS muni_municode, \n"
+        String q = "SELECT requestid, requestpubliccc, muni_municode, \n"
                 + "	property_propertyid, issuetype_issuetypeid, actrequestor_requestorid, submittedtimestamp, \n"
-                + "	dateofrecord, addressofconcern, \n"
-                + "	notataddress, requestdescription, isurgent, anonymityRequested, \n"
+                + "	dateofrecord, addressofconcern, notataddress, \n"
+                + "	requestdescription, isurgent, anonymityRequested, \n"
                 + "	cecase_caseid, coginternalnotes, status_id, caseattachmenttimestamp, \n"
-                + "	muniinternalnotes, publicexternalnotes, paccenabled, caseattachment_userid, ceactionrequest.active, \n"
-                + "	ceactionrequestissuetype.typeName AS typename\n"
+                + "	muniinternalnotes, publicexternalnotes, paccenabled, caseattachment_userid, active, \n"
+                + "	usersubmitter_userid\n"
                 + "	FROM public.ceactionrequest \n"
-                + "		INNER JOIN ceactionrequestissuetype ON ceactionrequest.issuetype_issuetypeid = ceactionrequestissuetype.issuetypeid"
                 + " WHERE requestpubliccc= ?;";
 
         // for degugging

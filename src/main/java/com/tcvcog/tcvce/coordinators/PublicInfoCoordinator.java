@@ -177,6 +177,16 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         }
 
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+
+        List<OccInspection> inspectionList = oii.getOccInspectionListByPACC(pacc);
+
+        for (OccInspection ins : inspectionList) {
+
+            infoBundleList.add(extractPublicInfo(ins));
+
+        }
+
         return infoBundleList;
     }
 
@@ -293,6 +303,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         pib.setDateOfRecord(getPrettyDate(req.getDateOfRecord()));
 
+        pib.setTypeName("CEAR");
+
         if (req.isPaccEnabled()) {
 
             pib.setRequestor(extractPublicInfo(req.getRequestor()));
@@ -301,8 +313,6 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             pib.setBundledRequest(req);
             pib.setPaccStatusMessage("Public access enabled");
-
-            pib.setTypeName("CEAR");
 
             pib.setShowAddMessageButton(true);
             pib.setShowDetailsPageButton(false);
@@ -329,6 +339,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     public PublicInfoBundlePayment extractPublicInfo(Payment input) {
 
         PublicInfoBundlePayment pib = new PublicInfoBundlePayment();
+
+        pib.setTypeName("Payment");
         //the Paymentobject does not have a PACC Enabled field
         //if (!input.isPaccEnabled()) {
 
@@ -340,7 +352,6 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         pib.setBundledPayment(input);
 
-        pib.setTypeName("Payment");
         pib.setPaccStatusMessage("Public access enabled");
 
         pib.setShowAddMessageButton(false);
@@ -367,6 +378,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     public PublicInfoBundlePerson extractPublicInfo(Person input) {
 
         PublicInfoBundlePerson pib = new PublicInfoBundlePerson();
+
+        pib.setTypeName("Person");
         //the Person object does not have a PACC Enabled field, 
         //but I figure that a person under 18 should probably not be revealed to the public.
         if (!input.isUnder18()) {
@@ -377,7 +390,6 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             pib.setBundledPerson(input);
 
-            pib.setTypeName("Person");
             pib.setPaccStatusMessage("Public access enabled");
 
             pib.setShowAddMessageButton(false);
@@ -405,6 +417,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     public PublicInfoBundlePersonOccApplication extractPublicInfo(PersonOccApplication input) {
 
         PublicInfoBundlePersonOccApplication pib = new PublicInfoBundlePersonOccApplication();
+
+        pib.setTypeName("PersonOccApplication");
+
         //the Person object does not have a PACC Enabled field, 
         //but I figure that a person under 18 should probably not be revealed to the public.
         if (!input.isUnder18()) {
@@ -415,7 +430,6 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             pib.setBundledPerson(input);
 
-            pib.setTypeName("PersonOccApplication");
             pib.setPaccStatusMessage("Public access enabled");
 
             pib.setShowAddMessageButton(false);
@@ -448,6 +462,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     public PublicInfoBundleProperty extractPublicInfo(Property input) throws IntegrationException, EventException, AuthorizationException, BObStatusException, SearchException {
         PublicInfoBundleProperty pib = new PublicInfoBundleProperty();
 
+        pib.setTypeName("Property");
+
         //Again, no PACC enabled field. Perhaps this will be a good enough filter for now?
         if (input.isActive()) {
 
@@ -464,7 +480,6 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             pib.setUnitList(bundledUnits);
 
-            pib.setTypeName("Property");
             pib.setPaccStatusMessage("Public access enabled");
 
             pib.setShowAddMessageButton(false);
@@ -495,6 +510,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     public PublicInfoBundleOccPeriod extractPublicInfo(OccPeriod input) throws IntegrationException, BObStatusException, SearchException {
         PublicInfoBundleOccPeriod pib = new PublicInfoBundleOccPeriod();
 
+        pib.setTypeName("OccPeriod");
+
         //Again, no PACC enabled field. Perhaps this will be a good enough filter for now?
         if (input.isActive()) {
             OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -503,7 +520,6 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             pib.setBundledPeriod(input);
 
-            pib.setTypeName("OccPeriod");
             pib.setPaccStatusMessage("Public access enabled");
 
             ArrayList<PublicInfoBundlePerson> bundledPersons = new ArrayList<>();
@@ -586,6 +602,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             SearchException {
         PublicInfoBundleOccPermitApplication pib = new PublicInfoBundleOccPermitApplication();
 
+        pib.setTypeName("OccPermitApplication");
+
         if (input.isPaccEnabled()) {
 
             pib.setBundledApplication(input);
@@ -605,7 +623,6 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             pib.setAttachedPersons(attachedPersonBundles);
 
-            pib.setTypeName("OccPermitApplication");
             pib.setPaccStatusMessage("Public access enabled");
 
             pib.setShowAddMessageButton(false);
@@ -633,16 +650,18 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     public PublicInfoBundleOccInspection extractPublicInfo(OccInspection input) {
         PublicInfoBundleOccInspection pib = new PublicInfoBundleOccInspection();
 
+        pib.setTypeName("OccInspection");
+
         if (input.isEnablePacc()) {
 
             pib.setBundledInspection(input);
 
-            pib.setTypeName("OccInspection");
             pib.setPaccStatusMessage("Public access enabled");
 
             pib.setShowAddMessageButton(false);
             pib.setShowDetailsPageButton(true);
         } else {
+
             OccInspection skeleton = new OccInspection();
             skeleton.setInspectionID(input.getInspectionID());
             pib.setBundledInspection(skeleton);
@@ -733,6 +752,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     public PublicInfoBundleEventCnF extractPublicInfo(EventCnF input) throws IntegrationException, EventException, AuthorizationException, BObStatusException, SearchException {
         PublicInfoBundleEventCnF pib = new PublicInfoBundleEventCnF();
 
+        pib.setTypeName("EventCnF");
+        
         if (input.getCategory().getUserRankMinimumToView() <= PUBLIC_VIEW_USER_RANK) {
 
             if (input.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
@@ -761,7 +782,6 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             pib.setBundledEvent(input);
 
-            pib.setTypeName("EventCnF");
             pib.setPaccStatusMessage("Public access enabled");
 
             pib.setShowAddMessageButton(false);
@@ -1425,15 +1445,13 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         //You'll see brackets in the switch below for each case.
         //These are so that each case has its own scope
         //For code readability and optimization purposes
-        
         StringBuilder sb = new StringBuilder();
         switch (bundle.getTypeName()) {
-            case "CEAR":{
+            case "CEAR": {
                 CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-                
+
                 PublicInfoBundleCEActionRequest requestBundle = (PublicInfoBundleCEActionRequest) bundle;
-                
-                
+
                 sb.append(requestBundle.getBundledRequest().getPublicExternalNotes());
                 sb.append("<br /><br />");
                 sb.append("CASE NOTE ADDED AT ");
@@ -1442,23 +1460,23 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 sb.append(message);
                 sb.append("<br />");
                 sb.append("***********************");
-                
+
                 System.out.println("PublicInfoCoordinator.attachMessageToBundle | message: " + sb.toString());
-                
+
                 ceari.attachMessageToCEActionRequest(requestBundle, sb.toString());
-                }
-                break;
-        //Nothing yet
-            case "CECASE":{
-                
-                }
-                break;
-            case "OccPermitApplication":{
-                
+            }
+            break;
+            //Nothing yet
+            case "CECASE": {
+
+            }
+            break;
+            case "OccPermitApplication": {
+
                 OccupancyIntegrator oi = getOccupancyIntegrator();
-                
+
                 PublicInfoBundleOccPermitApplication applicationBundle = (PublicInfoBundleOccPermitApplication) bundle;
-                
+
                 sb.append(applicationBundle.getBundledApplication().getExternalPublicNotes());
                 sb.append("<br /><br />");
                 sb.append("APPLICATION NOTE ADDED AT ");
@@ -1467,12 +1485,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 sb.append(message);
                 sb.append("<br />");
                 sb.append("***********************");
-                
+
                 System.out.println("PublicInfoCoordinator.attachMessageToBundle | message: " + sb.toString());
-                
+
                 oi.attachMessageToOccPermitApplication(applicationBundle, sb.toString());
-                }
-                break;
+            }
+            break;
             default:
                 break;
         }
