@@ -350,7 +350,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 Please note that all messages submitted through this portal become part of the permanent case record
                                                                 and may be included in documents prepare for town councils and magistrates. </p:outputLabel>
                                                             <p:spacer height="15px"/>
-                                                            <p:outputLabel value="#{case.bundledCase.externalNotes}"/>
+                                                            <p:outputLabel value="#{case.bundledCase.externalNotes == '' or empty case.bundledCase.externalNotes ? 
+                                                                                'No messages found!' 
+                                                                                : case.bundledCase.externalNotes}"/>
                                                             <p:spacer height="10px"/>
                                                             <p:inputTextarea id="message-ita" style="width: 100%; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
                                                             <p:spacer height="10px"/>
@@ -448,7 +450,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 Please note that all messages submitted through this portal become part of the permanent case record
                                                                 and may be included in documents prepare for town councils and magistrates. </p:outputLabel>
                                                             <p:spacer height="15px"/>
-                                                            <p:outputLabel value="#{cear.bundledRequest.publicExternalNotes}" escape="false"/>
+                                                            <p:outputLabel value="#{cear.bundledRequest.publicExternalNotes == '' or empty cear.bundledRequest.publicExternalNotes ? 
+                                                                                'No messages found!' 
+                                                                                : cear.bundledRequest.publicExternalNotes}"escape="false"/>
                                                             <p:spacer height="10px"/>
                                                             <p:inputTextarea id="message-ita" rendered="#{cear.showAddMessageButton}" style="width: 100%; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
                                                             <p:spacer height="10px"/>

@@ -1075,6 +1075,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setString(10, application.getExternalPublicNotes());
             stmt.setString(11, OccApplicationStatusEnum.Waiting.name());
             stmt.setInt(12, application.getPublicControlCode());
+            
+            application.setPaccEnabled(true); //We want to make sure they default to visible
+            
             stmt.setBoolean(13, application.isPaccEnabled());
             stmt.setBoolean(14, application.isUplinkAccess());
                     

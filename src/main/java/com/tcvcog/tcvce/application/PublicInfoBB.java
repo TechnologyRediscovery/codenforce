@@ -176,7 +176,11 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Public case note added", ""));
 
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException 
+                | AuthorizationException 
+                | BObStatusException 
+                | EventException 
+                | ViolationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
