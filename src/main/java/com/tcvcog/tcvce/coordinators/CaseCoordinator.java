@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.entities.reports.ReportCEARList;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -30,6 +31,7 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
@@ -1181,6 +1183,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public void nov_LockAndQueue(CECaseDataHeavy c, NoticeOfViolation nov, UserAuthorized ua)
             throws BObStatusException, IntegrationException, EventException, ViolationException {
 
+        if(c == null || nov == null || ua == null){
+            throw new BObStatusException("Cannot lock notice with null case, nov, or user");
+        }
         CaseIntegrator ci = getCaseIntegrator();
         EventCoordinator evCoord = getEventCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
@@ -1303,6 +1308,18 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
     }
 
+    
+      public void nov_updateStyleHeaderImage(PrintStyle ps, Blob blob) throws BlobException, IntegrationException, BObStatusException {
+        CaseIntegrator ci = getCaseIntegrator();
+        if(ps == null || blob == null){
+            throw new BObStatusException("Cannot update header image with null style or blob");
+            
+        }
+        int newHeaderBlobID = getBlobIntegrator().storeBlob(blob);
+        ps.setHeader_img_id(newHeaderBlobID);
+        ci.novUpdateHeaderImage(ps, blob);
+        
+    }
     /**
      * Updates only the notes field on Notice of Violation
      *
@@ -1750,7 +1767,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     private CodeViolation violation_configureCodeViolation(CodeViolation cv) throws IntegrationException {
         SystemIntegrator si = getSystemIntegrator();
         CaseIntegrator ci = getCaseIntegrator();
-        ci.loadViolationPhotoList(cv);
+        
+        cv.setBlobList(ci.loadViolationPhotoList(cv));
         
         cv.setCitationIDList(ci.getCitations(cv.getViolationID()));
         cv.setNoticeIDList(ci.novGetNOVIDList(cv));
@@ -1898,6 +1916,26 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         ci.updateCodeViolationNotes(viol);
     }
+    
+    
+    public void violation_linkBlobToCodeViolation(CodeViolation cv, Blob blob) throws BObStatusException {
+        BlobIntegrator bi = getBlobIntegrator();
+        if(cv == null || blob == null){
+            throw new BObStatusException("Cannot link blob to violation with null blob or viol");
+        }
+                
+        try {
+            bi.linkBlobToCodeViolation(blob.getBlobID(), cv.getViolationID());
+            System.out.println("linkBlobBB.linkBlobToCodeViolation | link succesfull");  //TESTING
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR
+                            ,"Failed to link file to selected violation. Sorry! " , ""));
+        }
+        
+    }
+    
 
     /**
      * Attempts to deactivate a code violation, but will thow an Exception if

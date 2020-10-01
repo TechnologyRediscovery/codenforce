@@ -120,13 +120,14 @@ public class PersonInfoBB extends BackingBeanUtils{
     
     /**
      * Action listener for creation of new person objectgs
-     * @param ev 
+     * @return  
      */
-    public void personCreateCommit(ActionEvent ev){
+    public String personCreateCommit(){
         PersonCoordinator pc = getPersonCoordinator();
     
         try {
-            pc.personCreate(workingPerson, getSessionBean().getSessUser());
+            int freshID = pc.personCreate(workingPerson, getSessionBean().getSessUser());
+            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(pc.getPerson(freshID),getSessionBean().getSessUser().getKeyCard()));
                if(connectToActiveProperty){
                    
                    Property property = getSessionBean().getSessProperty();
@@ -135,7 +136,6 @@ public class PersonInfoBB extends BackingBeanUtils{
                         new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Successfully added " + workingPerson.getFirstName() + " to the Database!" 
                                 + " and connected to " + property.getAddress(), ""));
-
                } else {
 
                    getFacesContext().addMessage(null,
@@ -148,6 +148,7 @@ public class PersonInfoBB extends BackingBeanUtils{
                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                                "Unable to add new person to the database, my apologies!", ""));
            }
+        return "personInfo";
     }
     
     

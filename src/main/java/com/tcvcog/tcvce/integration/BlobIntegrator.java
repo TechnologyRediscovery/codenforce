@@ -38,15 +38,17 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         Blob blob = null;
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        String query = "SELECT photodocid, photodocdescription, photodocdate, photodoctype_typeid, photodocfilename, \n" +
-                        "       photodocblob, \n" +
-                        "       photodocuploadpersonid \n" +
-                        "  FROM public.photodoc WHERE photodocid = ?;";
+//        String query = "SELECT photodocid, photodocdescription, photodocdate, photodoctype_typeid, photodocfilename, \n" +
+//                        "       photodocblob, \n" +
+//                        "       photodocuploadpersonid \n" +
+//                        "  FROM public.photodoc WHERE photodocid = ?;";
+
+        String query =  "SELECT photodocid, photodocdescription, photodocdate, photodoctype_typeid, \n" +
+                        "       photodocblob, photodoccommitted\n" +
+                        "  FROM public.photodoc WHERE photodocid=?;";
         
         PreparedStatement stmt = null;
-        
         try {
-            
             stmt = con.prepareStatement(query);
             stmt.setInt(1, blobID);
             rs = stmt.executeQuery();
@@ -57,14 +59,13 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
                 blob.setDescription(rs.getString("photodocdescription"));
                 blob.setTimestamp(rs.getTimestamp("photodocdate").toLocalDateTime());
                 blob.setType(BlobType.blobTypeFromInt(rs.getInt("photodoctype_typeid")));
-                blob.setFilename(rs.getString("photodocfilename"));
-                
+//                blob.setFilename(rs.getString("photodocfilename"));
                 blob.setBytes(rs.getBytes("photodocblob"));
-                
-                blob.setUploadPersonID(rs.getInt("photodocuploadpersonid"));
+//                blob.setUploadPersonID(rs.getInt("photodocuploadpersonid"));
             }
             
         } catch (SQLException ex) {
+            System.out.println(ex);
             //System.out.println(ex);
             throw new IntegrationException("Error retrieving blob. ", ex);
         } finally{
@@ -105,11 +106,11 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
                 blob.setDescription(rs.getString("photodocdescription"));
                 blob.setTimestamp(rs.getTimestamp("photodocdate").toLocalDateTime());
                 blob.setType(BlobType.blobTypeFromInt(rs.getInt("photodoctype_typeid")));
-                blob.setFilename(rs.getString("photodocfilename"));
+//                blob.setFilename(rs.getString("photodocfilename"));
                 
                 blob.setBytes(rs.getBytes("photodocblob"));
                 
-                blob.setUploadPersonID(rs.getInt("photodocuploadpersonid"));
+//                blob.setUploadPersonID(rs.getInt("photodocuploadpersonid"));
                 blobList.add(blob);
             }
             
@@ -139,10 +140,9 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.photodoc(\n" +
-                        "            photodocid, photodocdescription, photodocdate, photodoctype_typeid, photodocuploadpersonid, photodocfilename, \n" +
+                        "            photodocid, photodocdescription, photodocdate, photodoctype_typeid, \n" +
                         "            photodocblob)\n" +
-                        "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
-                        "            ?, ?);";
+                        "    VALUES (DEFAULT, ?, ?, ?, ?);";
         
         PreparedStatement stmt = null;
         
@@ -156,10 +156,10 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setTimestamp(2, java.sql.Timestamp.from(blob.getTimestamp()
                     .atZone(ZoneId.systemDefault()).toInstant()));
             stmt.setInt(3, blob.getType().getTypeID());
-            stmt.setInt(4, blob.getUploadPersonID());
-            stmt.setString(5, blob.getFilename());
+//            stmt.setInt(4, blob.getUploadPersonID());
+//            stmt.setString(5, blob.getFilename());
             
-            stmt.setBytes(6, blob.getBytes());
+            stmt.setBytes(4, blob.getBytes());
             
             System.out.println("BlobIntegrator.storeBlob | Statement: " + stmt.toString());
             stmt.execute();
@@ -192,8 +192,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
         Connection con = getPostgresCon();
         String query =  " UPDATE public.photodoc\n" +
-                        " SET photodocdescription=?, photodocfilename=?\n" +
-                        " WHERE photodocid=?;";
+"   SET photodocdescription=? WHERE photodocid=?;";
         
         PreparedStatement stmt = null;
         
@@ -201,9 +200,8 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             
             stmt = con.prepareStatement(query);
             stmt.setString(1, blob.getDescription());
-            stmt.setString(2, blob.getFilename());
             
-            stmt.setInt(3, blob.getBlobID());
+            stmt.setInt(2, blob.getBlobID());
             
             System.out.println("BlobIntegrator.storeBlob | Statement: " + stmt.toString());
             stmt.execute();

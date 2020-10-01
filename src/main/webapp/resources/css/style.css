@@ -1351,6 +1351,10 @@ gridTd-bignum{
     clear:both;
 }
 
+.ui-datascroller{
+    border: none;
+}
+
 .occinsspace-metadata-container{
     display: block;
     width: 100%;
@@ -1526,6 +1530,9 @@ i.inspection-notinspected{
 .nov-chosen-recipeint{
     margin: 10px;
     font-family: Heebo;
+}
+.nov-viol-ds{
+    border: none;
 }
 
 

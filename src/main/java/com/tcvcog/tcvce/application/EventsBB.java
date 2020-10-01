@@ -98,6 +98,8 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     private List<EventCategory> eventCategoryCandidates;
     private EventCategory eventCategorySelected;
     
+    private int eventDurationFormField;
+    
     private List<Person> personCandidates;
     private int personIDForLookup;
     private Person personSelected;
@@ -585,14 +587,27 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
                 && currentEvent != null 
                 && updateNewEventFieldsWithCatChange){
             currentEvent.setTimeStart(LocalDateTime.now());
-            currentEvent.setTimeEnd(LocalDateTime.now().plusMinutes(eventCategorySelected.getDefaultdurationmins()));
+            eventDurationFormField = eventCategorySelected.getDefaultdurationmins();
+            currentEvent.setTimeEnd(currentEvent.getTimeStart().plusMinutes(eventCategorySelected.getDefaultdurationmins()));
             currentEvent.setDescription(eventCategorySelected.getHostEventDescriptionSuggestedText());
         }
     }
     
     public void onTimeStartChange(){
-        currentEvent.setTimeEnd(LocalDateTime.now().plusMinutes(eventCategorySelected.getDefaultdurationmins()));
+        if(currentEvent.getTimeStart() != null){
+            currentEvent.setTimeEnd(currentEvent.getTimeStart().plusMinutes(eventDurationFormField));
+            
+        }
     }
+    
+    public void onEventDurationChange(){
+        System.out.println("EventsBB.onEventDurtaionChange");
+        if(currentEvent.getTimeStart() != null){
+            currentEvent.setTimeEnd(currentEvent.getTimeStart().plusMinutes(eventDurationFormField));
+        }
+    }
+    
+   
     
     
     /**
@@ -807,7 +822,19 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     }
 
     public String onEventRemoveCommitButtonChange(){
-        // finish me
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            ec.removeEvent(currentEvent, getSessionBean().getSessUser());
+             getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Removed event ID " + currentEvent.getEventID(), ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                ex.getMessage(), ""));
+             return "";
+        }
         
         return "events";
         
@@ -919,6 +946,17 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
      * @return 
      */
     public String onEventUpdateCommitButtonChange(){
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            ec.updateEvent(currentEvent, getSessionBean().getSessUser());
+        } catch (IntegrationException | BObStatusException | EventException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(),
+                            ""));
+            return "";
+        } 
         
         return "events";
     }
@@ -1523,6 +1561,20 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
      */
     public void setCurrentERGBObTitle(String currentERGBObTitle) {
         this.currentERGBObTitle = currentERGBObTitle;
+    }
+
+    /**
+     * @return the eventDurationFormField
+     */
+    public int getEventDurationFormField() {
+        return eventDurationFormField;
+    }
+
+    /**
+     * @param eventDurationFormField the eventDurationFormField to set
+     */
+    public void setEventDurationFormField(int eventDurationFormField) {
+        this.eventDurationFormField = eventDurationFormField;
     }
 
 }

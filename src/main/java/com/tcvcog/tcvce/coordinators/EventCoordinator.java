@@ -110,9 +110,19 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return evList;
     }
     
-    public List<EventCnFPropUnitCasePeriodHeavy> getEventHistoryList(UserAuthorized ua){
+    public List<EventCnF> getEventList(List<Integer> evIDList) throws IntegrationException{
+        List<EventCnF> evList = new ArrayList<>();
+        if(evIDList != null && !evIDList.isEmpty()){
+            for(Integer i: evIDList){
+                evList.add(getEvent(i));
+            }
+        }
+        return evList;
+    }
+    
+    public List<EventCnFPropUnitCasePeriodHeavy> getEventHistoryList(UserAuthorized ua) throws IntegrationException, EventException, SearchException{
         EventIntegrator ei = getEventIntegrator();
-        return assembleEventCnFPropUnitCasePeriodHeavyList();
+        return assembleEventCnFPropUnitCasePeriodHeavyList(getEventList(ei.getEventHistory(ua.getUserID())));
         
     }
     
@@ -421,15 +431,21 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     public void updateEvent(EventCnF ev, UserAuthorized ua) throws IntegrationException, EventException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();
         EventIntegrator ei = getEventIntegrator();
+         if(ev == null || ua == null){
+            throw new BObStatusException("Event and User cannot be null");
+        }
+        if(ev.getCategory().getUserRankMinimumToUpdate() > ua.getRole().getRank()){
+            throw new BObStatusException("User's rank does not allow deactivation of given event");
+        }
         
         auditEvent(ev);
-        if(ua!= null){
-            ev.setLastUpdatedBy(ua);
-        }
+        ev.setLastUpdatedBy(ua);
         ev.setLastUpdatedTS(LocalDateTime.now());
         ei.updateEvent(ev);
-        pi.eventPersonClear(ev);
-        pi.eventPersonConnect(ev);
+        if(ev.getPersonList() != null && !ev.getPersonList().isEmpty()){
+            pi.eventPersonClear(ev);
+            pi.eventPersonConnect(ev);
+        }
         
     }
     
@@ -457,7 +473,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param ua
      * @throws IntegrationException 
      */
-    public void deactivateEvent(EventCnF ev, UserAuthorized ua) throws IntegrationException{
+    public void removeEvent(EventCnF ev, UserAuthorized ua) throws IntegrationException, BObStatusException{
+        if(ev == null || ua == null){
+            throw new BObStatusException("Event and User cannot be null");
+        }
+        if(ev.getCategory().getUserRankMinimumToUpdate() > ua.getRole().getRank()){
+            throw new BObStatusException("User's rank does not allow deactivation of given event");
+        }
         SystemCoordinator sc = getSystemCoordinator();
         EventIntegrator ei = getEventIntegrator();
         ev.setActive(false);

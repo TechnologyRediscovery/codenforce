@@ -1003,7 +1003,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             <f:selectItems id="violation-severity-update-selitems"
                                                                            value="#{violationBB.severityList}"
                                                                            var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
-
                                                         </h:selectOneMenu>
 
                                                     </div>
@@ -1037,10 +1036,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h2>Upload photos of this violation (3 max)</h2>
                                             <p:fileUpload fileUploadListener="#{violationBB.handlePhotoUpload}"
                                                           mode="advanced" 
-                                                          update=":violation-photos-form"
+                                                          update="violation-photos-form:photoTable"
                                                           multiple="true"
                                                           fileLimit="3"
-                                                          sizeLimit="900000000" 
+                                                          sizeLimit="999999999" 
                                                           allowTypes="/(\.|\/)(jpe?g|png)$/"/>    
                                         </h:form>
 
@@ -1051,17 +1050,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <p:dataTable
                                                 id="photoTable"
                                                 var="photo"
-                                                value="#{violationBB.currentViolation.photoList}"
-                                                rowKey="#{photo.photoID}"
+                                                value="#{violationBB.currentViolation.blobList}"
+                                                rowKey="#{photo.blobID}"
                                                 tableStyleClass="primeDataTable"
                                                 draggableRows="false" tabindex="6">
                                                 <p:column width="70%">
                                                     <f:facet name="header">
                                                         <h:outputText value="Photo"/>
                                                     </f:facet>
-                                                    <p:graphicImage width="100%" value="#{imageServices.image}">
-                                                        <f:param name="photoID" value="#{photo.photoID}"/>
+                                                    <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                                        <f:param name="blobID" value="#{photo.blobID}"/>
                                                     </p:graphicImage>
+                                                    
+                                                    <p:commandButton   id="photo-delete-button"
+                                                                       rendered="true"
+                                                                       value="Delete Photo"  
+                                                                       icon="fa fa-eraser"
+                                                                       ajax="true"
+                                                                       actionListener="#{violationBB.onPhotoRemoveButtonChange(photo.blobID)}"
+                                                                       />
+
                                                 </p:column>
                                                 <p:column>
                                                     <f:facet name="header">
@@ -1071,6 +1079,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                      style="width: 100%;" tabindex="5" required="true" styleClass="inputText">
                                                         <p:ajax />
                                                     </p:inputTextarea>
+                                                    <p:growl    id="photo-desc-growl"
+                                                                for="photo-updatedescr-button" />
+                                                    
+                                                    <p:commandButton   id="photo-updatedescr-button"
+                                                                       rendered="true"
+                                                                       value="Update Desc"  
+                                                                       icon="fa fa-edit"
+                                                                       ajax="true"
+                                                                       update="photo-desc-growl"
+                                                                       actionListener="#{violationBB.onPhotoUpdateDescription(photo)}"
+                                                                       />
+                                                    
                                                 </p:column>
 
                                             </p:dataTable>
@@ -1464,6 +1484,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h:outputText value="Description"/>
                                         </f:facet>
                                         <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                              
                                     </p:column>
                                 </p:dataTable>
                             </p:scrollPanel>

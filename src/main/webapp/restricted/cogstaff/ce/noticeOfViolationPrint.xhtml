@@ -16,17 +16,14 @@
         <f:view id="view-nov">
             <div class="nov-container">
                 <div class="header" style="margin-top:#{noticeOfViolationBB.currentNotice.style.nov_page_margin_top}px" >
-                    <p:graphicImage height="#{noticeOfViolationBB.currentNotice.style.header_height}" value="#{imageServices.image}"
-                                    class="nov-header-image">
-                        <f:param name="photoID" value="#{noticeOfViolationBB.currentNotice.style.header_img_id}"/>
+                    <p:graphicImage height="#{noticeOfViolationBB.currentNotice.style.header_height}" 
+                                    value="#{blobCoordinator.image}"
+                                    class="nov-header-image"
+                                    alt="Header image ID: #{noticeOfViolationBB.currentNotice.style.header_img_id}">
+                        <f:param name="blobID" value="#{noticeOfViolationBB.currentNotice.style.header_img_id}"/>
                     </p:graphicImage>
                 </div>
                 
-                <div class="barcode-nov">
-                    <p:barcode id="nov-barcode"
-                        type="code128"
-                        value="300#{noticeOfViolationBB.currentNotice.noticeID}"/>
-                </div>
 
                 <div class="addressee" style="left: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_left}px; top: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_top}px">
                     <f:subview id="subview-addressee-normaladdress"
@@ -70,6 +67,7 @@
                     </div>
 
                     <p:dataScroller id="violations-ds"
+                                    styleClass="nov-viol-ds"
                                     value="#{noticeOfViolationBB.currentNotice.violationList}"
                                     var="v">
                         <div class="violation">
@@ -90,7 +88,12 @@
 
                                     <p:spacer height="2px" />
 
-                                    <h:outputText    value="&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
+                                    <h:outputText    value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum} " />
+                                    <h:outputText    value="#{v.violatedEnfElement.codeElement.ordSecTitle}" />
+
+                                    <p:spacer height="2px" />
+
+                                    <h:outputText    value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
                                     <h:outputText    value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
 
                                     <p:spacer height="2px" />
@@ -148,6 +151,7 @@
                                     </h:panelGrid>
                                 </f:facet>
                             </h:panelGrid>
+                            <hr />
                         </div>
                     </p:dataScroller>
 
@@ -178,32 +182,40 @@
                         <p:dataScroller id="violations-photos-ds"
                                         value="#{noticeOfViolationBB.currentNotice.violationList}"
                                         var="v">
+                            <h4>Photos of code violation:
+                                
+                                    <h:outputText    value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
+                                    <h:outputText    value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
 
+                            </h4>
                             <p:dataTable
-                                id="violation-photo-table"
-                                var="photoid"
-                                value="#{v.photoIDList}"
-                                rowKey="#{photoid}"
-                                tableStyleClass="primeDataTable"
-                                rendered="#{photoIDListst.size()>0}"
-                                draggableRows="false" tabindex="6">
-                                <p:column width="100%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Photo"/>
-                                    </f:facet>
-                                    <p:graphicImage width="100%" value="#{imageServices.image}">
-                                        <f:param name="photoID" value="#{photoid}"/>
-                                    </p:graphicImage>
-                                    <div class="nov-image-caption">
-                                        <h:outputText escape="false" value="Photo Description: #{imageServices.getPhotograph(photoid).description}"/>
-                                        <br />
-                                        <h:outputText escape="false" value="Timestamp: #{imageServices.getPhotograph(photoid).timestampPretty}"/>
+                                    id="photoTable"
+                                    var="photo"
+                                    value="#{v.blobList}"
+                                    rowKey="#{photo.blobID}"
+                                    tableStyleClass="primeDataTable"
+                                    draggableRows="false" tabindex="6">
+                                    <p:column width="70%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Photo"/>
+                                        </f:facet>
+                                        <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                            <f:param name="blobID" value="#{photo.blobID}"/>
+                                        </p:graphicImage>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Description"/>
+                                        </f:facet>
+                                        <p:inputTextarea id="desc" value="#{photo.description}"
+                                                         style="width: 100%;" tabindex="5" required="true" styleClass="inputText">
+                                            <p:ajax />
+                                        </p:inputTextarea>
+                                    </p:column>
 
-                                    </div>
-                                </p:column>
-                            </p:dataTable>
-                            
-                          
+                                </p:dataTable>
+
+
                         </p:dataScroller>
                     </div>
                 </f:subview>

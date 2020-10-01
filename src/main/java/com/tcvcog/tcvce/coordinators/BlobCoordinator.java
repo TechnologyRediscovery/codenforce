@@ -6,11 +6,14 @@
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,6 +63,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         } else {
             BlobIntegrator bi = getBlobIntegrator();
             int blobID = Integer.parseInt(context.getExternalContext().getRequestParameterMap().get("blobID"));
+            System.out.println("BlobCoordinator.getImage: image ID " + blobID);
             try {
                 Blob blob = bi.getBlob(blobID);
                 if (null == blob.getType()) {
@@ -77,8 +81,10 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
                     }
                 }
             } catch (IntegrationException ex) {
+                System.out.println(ex);
                 System.out.println("BlobCoordinator.getImage | " + ex);
             } catch (FileNotFoundException ex) {
+                System.out.println(ex);
                 System.out.println("BlobCoordinator.getImage | could not find pdf-icon.png ");
             }
             return sc;
@@ -129,6 +135,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         return getBlobIntegrator().storeBlob(blob);
     }
 
+  
+
     public Blob getBlob(int blobID) throws IntegrationException {
         return getBlobIntegrator().getBlob(blobID);
     }
@@ -138,5 +146,12 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     public void deleteBlob(int blobID) throws IntegrationException {
         getBlobIntegrator().deleteBlob(blobID);
     }
-
+    
+    public void updateBlobDescription(Blob blob) throws IntegrationException{
+        
+        BlobIntegrator bi = getBlobIntegrator();
+        if(blob != null){
+            bi.updateBlobDescriptors(blob);
+        }
+    }
 }

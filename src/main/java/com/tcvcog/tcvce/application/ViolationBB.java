@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
@@ -455,9 +456,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
                             "Fatal error appending note; apologies!", ""));
             return "";
         }
-
         return "ceCaseViolations";
-
     }
 
     /**
@@ -477,9 +476,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      * @param ev
      */
     public void handlePhotoUpload(FileUploadEvent ev) {
-        if (this.currentViolation == null) {
-            this.currentViolation = getSessionBean().getSessCodeViolation();
-        }
+        CaseCoordinator cc = getCaseCoordinator();
         if (ev == null) {
             System.out.println("ViolationAddBB.handlePhotoUpload | event: null");
             return;
@@ -497,15 +494,20 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             blob = getBlobCoordinator().getNewBlob();
             blob.setBytes(ev.getFile().getContents());
             blob.setType(BlobType.PHOTO); // TODO: extract type from context somehow
-            this.currentViolation.getBlobIDList().add(blobi.storeBlob(blob));
+            int newBlobID = blobi.storeBlob(blob);
+            blob = blobi.getBlob(newBlobID);
+            
+            cc.violation_linkBlobToCodeViolation(currentViolation, blob);
+            currentViolation = cc.violation_getCodeViolation(currentViolation.getViolationID());
         } catch (IntegrationException ex) {
             System.out.println("ViolationAddBB.handlePhotoUpload | upload failed!\n" + ex);
-            return;
+            System.out.println(ex);
         } catch (BlobException ex) {
             System.out.println(ex);
-            return;
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
         }
-        this.getBlobList().add(blob);
+        
     }
 
     /**
@@ -563,13 +565,39 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      * @return
      */
     public String onPhotoRemoveButtonChange(int photoid) {
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Cannot remove photo yet: unsupported operation", ""));
+        BlobCoordinator bc = getBlobCoordinator();
+        try {
+            bc.deleteBlob(photoid);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Blob removed with ID " + photoid, ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Cannot remove photo yet: unsupported operation", ""));
+            
+        }
 
         // do something here
         return "ceCaseViolations";
 
+    }
+    
+    public void onPhotoUpdateDescription(Blob blob){
+        BlobCoordinator bc = getBlobCoordinator();
+        try {
+            bc.updateBlobDescription(blob);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully updated blob", ""));
+            
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Cannot update blob description", ""));
+            
+        }
+        
     }
 
     public String photosConfirm() {

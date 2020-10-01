@@ -15,7 +15,8 @@ public class Blob {
 
     private int blobID;
     private BlobType type;
-    private String description, filename;
+    private String description;
+    private String filename;
     private LocalDateTime timestamp;
     private int uploadPersonID;
     private byte[] bytes;

@@ -17,14 +17,18 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CodeViolationDisplayable;
@@ -46,6 +50,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
+import org.primefaces.event.FileUploadEvent;
 
 /**
  *
@@ -482,7 +487,48 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     public void deleteSelectedEvent() {
 
     }
+    
+    public void onBlockManageInitButtonChange(ActionEvent ev){
+        // nothing to do!
+        
+    }
+    
+    public void onHeaderUploadRequest(FileUploadEvent ev) {
+        CaseCoordinator cc = getCaseCoordinator();
+        if (ev == null) {
+            return;
+        }
 
+        // verify blob types here. Post a FacesMessage if file type is not an image
+        String fileType = ev.getFile().getContentType();
+        System.out.println("NoticeOfViolationBB.onHeaderUploadRequest.| File: " + ev.getFile().getFileName() + " Type: " + fileType);
+
+        if (!fileType.contains("jpg") && !fileType.contains("jpeg") && !fileType.contains("gif") && !fileType.contains("png")) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Incompatible file type. ",
+                            "Please upload image files only (jpg, gif, or png)."));
+        } else {
+
+            BlobCoordinator blobc = getBlobCoordinator();
+            Blob blob = null;
+            try {
+                blob = blobc.getNewBlob();  //init new blob
+                blob.setBytes(ev.getFile().getContents());  // set bytes  
+                blob.setType(BlobType.PHOTO);
+                blob.setFilename(ev.getFile().getFileName());
+                // Write to DB
+                blob.setBlobID(blobc.storeBlob(blob));
+                cc.nov_updateStyleHeaderImage(currentNotice.getStyle(), blob);
+                
+            } catch (BlobException | IntegrationException | BObStatusException ex) {
+                System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | " + ex);
+                System.out.println(ex);
+            }
+
+//            blobList.add(blob);
+        }
+    }
     /**
      * Listener for user requests to bring up the choose person dialog
      *

@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -38,6 +39,8 @@ import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
+import com.tcvcog.tcvce.entities.PrintStyle;
+import com.tcvcog.tcvce.entities.Blob;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -1220,8 +1223,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public CodeViolation loadViolationPhotoList(CodeViolation cv) throws IntegrationException{
-        ArrayList<Integer> photoList = new ArrayList<>();
+    public List<Blob> loadViolationPhotoList(CodeViolation cv) throws IntegrationException{
+        List<Blob> vBlobList = new ArrayList<>();
+        BlobCoordinator bc = getBlobCoordinator();
         
         String query = "SELECT photodoc_photodocid FROM public.codeviolationphotodoc WHERE codeviolation_violationid = ?";
         Connection con = getPostgresCon();
@@ -1234,7 +1238,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-//                blobList.add((Integer)rs.getInt(1));
+                vBlobList.add(bc.getBlob(rs.getInt("photodoc_photodocid")));
             }
             
 //            cv.setBlobIDList(blobList);
@@ -1249,7 +1253,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
-        return cv;
+        return vBlobList;
     }
        /**
      * Updates only the notes field on codeviolation table
@@ -1711,6 +1715,38 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
 
     }
     
+     public void novUpdateHeaderImage(PrintStyle ps, Blob blob) throws BObStatusException, IntegrationException{
+         if(ps == null || blob == null){
+             throw new BObStatusException("Cannot update header image with null print or blob");
+                     
+         }
+         
+
+        String query = "UPDATE public.printstyle\n" +
+                        "   SET headerimage_photodocid=?" +
+                        " WHERE styleid=?;";
+        // note that original time stamp is not altered on an update
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, blob.getBlobID());
+            stmt.setInt(2, ps.getStyleID());
+            
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("cannot clear nov of mailing data.", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+         
+         
+     }
+     
     /**
      * Primary getter for the NOV object
      * @param noticeID

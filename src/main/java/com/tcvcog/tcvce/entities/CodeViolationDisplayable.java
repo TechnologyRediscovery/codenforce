@@ -57,12 +57,15 @@ public class CodeViolationDisplayable extends CodeViolation {
         this.allowStipCompDateUpdate = cv.allowStipCompDateUpdate;
         this.complianceNote = cv.complianceNote;
         this.photoList = cv.photoList;
+        this.blobList = cv.blobList;
+        
+        includeViolationPhotos = true;
 
     }
 
     private boolean includeOrdinanceText;
     private boolean includeHumanFriendlyText;
-    private boolean includeViolationPhotos = true;
+    private boolean includeViolationPhotos;
 
     /**
      * @return the includeOrdinanceText

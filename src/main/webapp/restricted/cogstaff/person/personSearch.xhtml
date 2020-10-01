@@ -415,8 +415,11 @@
                                     <p:spacer height="3px"/>
                                     <p:selectOneMenu
                                         id="muniSM" tabindex="2"
-                                        value="#{personInfoBB.workingPerson.muniCode}">
-                                        <f:selectItems id="muniNameList" value="#{personsBB.muniNameIDMap}"/>
+                                        value="#{personInfoBB.workingPerson.muni}">
+                                         <f:converter converterId="muniConverter"/>
+                                        <f:selectItems id="propinfoedit-muninamelist"
+                                                       value="#{sessionBean.sessUser.authMuniList}"
+                                                       var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup>
 

@@ -185,33 +185,32 @@
                                                 value="#{eventsBB.eventList}"
                                                 tableStyleClass="primeDataTable"
                                                 resizableColumns="true"
-                                                rowExpandMode="multiple"
-                                                expandedRow="false"
                                                 widgetVar="events-table-var"
                                                 >
                                                 <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
-
-                                                <p:column width="3%" exportable="false">
-                                                    <p:rowToggler/>
-                                                </p:column>
 
                                                 <p:column width="4%">
                                                     <i class="material-icons"><h:outputText value="#{e.category.icon.materialIcon}"/></i>
                                                 </p:column>
 
-                                                    <p:column width="8%" sortBy="#{e.category.eventType.label}"
+                                                <p:column width="4%" sortBy="#{e.domain.abbrev}"
                                                               >
                                                         <f:facet name="header">
-                                                            <h:outputText value="Type" />
+                                                            <h:outputText value="Dom" />
                                                         </f:facet>
-                                                        <h:outputText value="#{e.category.eventType.label}"/>
-                                                    </p:column>
+                                                    <h:outputText value="#{e.domain.abbrev}"/>
+                                                </p:column>
 
-                                                <p:column width="4%" sortBy="#{e.eventID}">
+                                                <p:column width="12%" sortBy="#{e.category.eventType.label}"
+                                                         >
                                                     <f:facet name="header">
-                                                        <h:outputText value="ID" />
+                                                        <h:outputText value="Category" />
                                                     </f:facet>
-                                                    <h:outputText value="#{e.eventID}"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.category.eventType.label}"/>
+                                                        <p:spacer height="5px" />
+                                                        <h:outputText value="#{e.category.eventCategoryTitle}"/>
+                                                    </div>
                                                 </p:column>
 
                                                 <p:column width="9%" sortBy="#{e.timeStart}">
@@ -222,35 +221,17 @@
                                                         <h:outputText value="#{e.timeStartPretty}"/>
                                                     </div>
                                                 </p:column>
-                                                <p:column width="9%" sortBy="#{e.timeEnd}">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Date" />
-                                                    </f:facet>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{e.timeEndPretty}"/>
-                                                    </div>
-                                                </p:column>
 
-                                                <p:column width="12%" sortBy="#{e.category.eventCategoryTitle}"
-                                                         >
+                                                <p:column width="4%" sortBy="#{e.eventID}">
                                                     <f:facet name="header">
-                                                        <h:outputText value="Category" />
+                                                        <h:outputText value="ID" />
                                                     </f:facet>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{e.category.eventCategoryTitle}"/>
-                                                    </div>
+                                                    <h:outputText value="#{e.eventID}"/>
                                                 </p:column>
                                               
-                                                <p:column width="20%" style="word-wrap: normal;">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Description" />
-                                                    </f:facet>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{e.description}"/>
-                                                    </div>
-                                                </p:column>
+                                               
 
-                                                <p:column width="6%" exportable="false">
+                                                <p:column width="8%" exportable="false">
                                                     <f:facet name="header">
                                                         <h:outputText value="Action" />
                                                     </f:facet>
@@ -293,119 +274,6 @@
                                                 </p:column>
 
 
-
-                                                <p:rowExpansion>
-
-                                                    <div class="outlinedBox">
-                                                        <h2><h:outputText value="#{e.category.eventType.label}:#{e.category.eventCategoryTitle}"/>
-                                                            ; Event ID: <h:outputText value="#{e.eventID}"/> </h2>
-                                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
-                                                                     columnClasses="gridTd, gridTd, gridTd, gridTd">
-
-                                                            <h:panelGroup>
-                                                                <h:outputText styleClass="bold" value="Description" />
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{e.description}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup>
-                                                                <h:outputText styleClass="bold" value="Disclose to Municipality Staff?" />
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{e.discloseToMunicipality}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup>
-                                                                <h:outputText styleClass="bold" value="Disclose to Public?" />
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{e.discloseToPublic}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup>
-                                                                <h:outputText styleClass="bold" value="Creation time stamp"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{e.timestampPretty}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup>
-                                                                <h:outputText styleClass="bold" value="Active Event?"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{e.active}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup>
-                                                                <h:outputText styleClass="bold" value="Requests action?"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{e.requestsAction}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup>
-                                                                <h:outputText styleClass="bold" value="Requested event: "/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{e.requestedEventCat.eventType.label}: #{e.requestedEventCat.eventCategoryTitle}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup>
-                                                                <h:outputText styleClass="bold" value="Action requested by: "/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{e.actionRequestedBy.person.firstName} #{e.actionRequestedBy.person.lastName}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-
-
-                                                            <h:panelGroup>
-                                                                <h:outputText styleClass="bold" value="Intended user/action taker: "/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{e.responderIntended.person.firstName} #{e.responderIntended.person.lastName}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup>
-                                                                <h:outputText styleClass="bold" value="Action taken by: "/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{e.responderActual.person.firstName} #{e.responderActual.person.lastName}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup>
-                                                                <h:outputText styleClass="bold" value="Action timestamp: "/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{e.responseTimePrettyDate}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup>
-                                                                <h:outputText styleClass="bold" value="Request rejected? "/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{e.requestRejected}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup>
-                                                                <h:outputText styleClass="bold" value="Action response notes:"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{e.responderNotes}"/>
-                                                                </div>
-                                                            </h:panelGroup>
-
-                                                            <f:facet name="footer" class="leftalign">
-                                                                <h:outputLabel styleClass="bold" style="text-align: left" value="Notes"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion" style="text-align: left">
-                                                                    <h:outputText escape="false" value="#{e.notes}"/>
-                                                                </div>
-                                                            </f:facet>
-
-                                                        </h:panelGrid>
-                                                    </div>
-                                                </p:rowExpansion>
 
                                             </p:dataTable>
 
@@ -823,6 +691,8 @@
                                                                     event-add-time-start-cal
                                                                     event-add-time-end-cal
                                                                     event-add-descr-it
+                                                                    event-add-duration-in
+                                                                    event-add-time-end-cal
                                                                     " 
                                                                     listener="#{eventsBB.onEventCategoryMenuChange}"
                                                                     />
@@ -854,7 +724,7 @@
                                                     
                                                 </div>
 
-                                                <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field">
+                                                <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
 
                                                     <div class="restrict-main-contents-io-title" >
                                                         <h:outputLabel for="event-add-time-start-cal">
@@ -878,8 +748,27 @@
                                                         </p:calendar>
                                                     </div>
                                                 </div>
+                                                <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
 
-                                                <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field">
+                                                    <div class="restrict-main-contents-io-title" >
+                                                        <h:outputLabel for="event-add-time-start-cal">
+                                                            <h:outputText value="Duration"/>
+                                                        </h:outputLabel>
+                                                    </div>
+
+                                                    <div class="restrict-main-contents-io-content" >
+                                                        <p:inputNumber  id="event-add-duration-in"
+                                                                        value="#{eventsBB.eventDurationFormField}"
+                                                                        style="width: 50px;">
+                                                            <p:ajax listener="#{eventsBB.onEventDurationChange}"
+                                                                    update="event-add-time-end-cal" />
+                                                        </p:inputNumber>
+                                                                       
+                                                       
+                                                    </div>
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
                                                     <div class="restrict-main-contents-io-title" >
                                                         <h:outputLabel for="event-add-time-end-cal">
                                                             <h:outputText value="End time"/>
@@ -892,6 +781,7 @@
                                                                     id="event-add-time-end-cal"
                                                                     mode="popup"  
                                                                     showOn="button" 
+                                                                    disabled="true"
                                                                     pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                                     navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
                                                                     showButtonPanel="true" 
@@ -965,11 +855,10 @@
                                              >
 
                                         <h:form id="event-update-form">
+                                            <p style="font-style:  italic;">Note: Event type and category cannot be updated. Instead, remove incorrect event and make a new one.</p>
                                             <div class="ui-g data_container_nested_restrict">
 
-
-
-                                                <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field">
+                                                <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
 
                                                     <div class="restrict-main-contents-io-title" >
                                                         <h:outputLabel for="event-update-time-start-cal">
@@ -979,7 +868,7 @@
 
                                                     <div class="restrict-main-contents-io-content" >
                                                         <p:growl for="event-update-time-start-cal" />
-                                                        <p:calendar value="#{eventsBB.currentEvent.timeStart}" 
+                                                        <p:calendar value="#{eventsBB.currentEvent.timeStartUtilDate}" 
                                                                     id="event-update-time-start-cal"
                                                                     mode="popup"  
                                                                     showOn="button" 
@@ -987,11 +876,34 @@
                                                                     navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
                                                                     showButtonPanel="true" 
                                                                     showTodayButton="true"
-                                                                    required="true"/>
+                                                                    required="true">
+                                                            <p:ajax listener="#{eventsBB.onTimeStartChange()}"
+                                                                    update="event-update-time-end-cal" />
+                                                        </p:calendar>
+                                                    </div>
+                                                </div>
+                                                
+                                                 <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
+
+                                                    <div class="restrict-main-contents-io-title" >
+                                                        <h:outputLabel for="event-update-time-start-cal">
+                                                            <h:outputText value="Duration"/>
+                                                        </h:outputLabel>
+                                                    </div>
+
+                                                    <div class="restrict-main-contents-io-content" >
+                                                        <p:inputNumber  id="event-update-duration-in"
+                                                                        value="#{eventsBB.eventDurationFormField}"
+                                                                        style="width: 50px;">
+                                                            <p:ajax listener="#{eventsBB.onEventDurationChange}"
+                                                                    update="event-update-time-end-cal" />
+                                                        </p:inputNumber>
+                                                                       
+                                                       
                                                     </div>
                                                 </div>
 
-                                                <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field">
+                                                <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
                                                     <div class="restrict-main-contents-io-title" >
                                                         <h:outputLabel for="event-update-time-end-cal">
                                                             <h:outputText value="End time"/>
@@ -1000,9 +912,10 @@
 
                                                     <div class="restrict-main-contents-io-content" >
                                                         <p:growl for="event-update-time-end-cal" />
-                                                        <p:calendar value="#{eventsBB.currentEvent.timeEnd}" 
+                                                        <p:calendar value="#{eventsBB.currentEvent.timeEndUtilDate}" 
                                                                     id="event-update-time-end-cal"
                                                                     mode="popup"  
+                                                                    disabled="true"
                                                                     showOn="button" 
                                                                     pattern="EEE, dd MMM, yyyy HH:mm:ss"
                                                                     navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
@@ -1027,15 +940,15 @@
                                                     </div>
                                                 </div>
 
-                                            </div>
-                                            <div class="restrict-main-contents-io-button">
+                                                <div class="restrict-main-contents-io-button">
 
-                                                <p:commandButton    id="event-update-dialog-show-cb"
-                                                                    ajax="false" 
-                                                                    action="#{eventsBB.onEventUpdateCommitButtonChange}" 
-                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                                    value="Save edits"  
-                                                                    icon="fa fa-edit"/>
+                                                    <p:commandButton    id="event-update-dialog-show-cb"
+                                                                        ajax="false" 
+                                                                        action="#{eventsBB.onEventUpdateCommitButtonChange}" 
+                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                        value="Save edits"  
+                                                                        icon="fa fa-edit"/>
+                                                </div>
                                             </div>
 
                                         </h:form>
@@ -1068,7 +981,7 @@
 
                                                     <p:commandButton ajax="false" action="#{eventsBB.onEventRemoveCommitButtonChange}"
                                                                      value="Nuke event" icon="fa fa-bomb"
-                                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                     rendered="#{eventsBB.currentEvent.category.userRankMinimumToUpdate le systemServicesBB.bbSessionUser.role.rank}"
                                                                      />
                                                 </div>
                                             </div>

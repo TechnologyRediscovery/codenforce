@@ -73,6 +73,8 @@ public  class       CodeViolation
     protected List<Integer> blobIDList;
     protected List<Integer> photoIDList;
     
+    protected List<Blob> blobList;
+    
     protected int complianceTFExpiryPropID;
     protected Proposal complianceTFExpiryProp;
     
@@ -790,6 +792,20 @@ public  class       CodeViolation
      */
     public void setComplianceNote(String complianceNote) {
         this.complianceNote = complianceNote;
+    }
+
+    /**
+     * @return the blobList
+     */
+    public List<Blob> getBlobList() {
+        return blobList;
+    }
+
+    /**
+     * @param blobList the blobList to set
+     */
+    public void setBlobList(List<Blob> blobList) {
+        this.blobList = blobList;
     }
 
    
