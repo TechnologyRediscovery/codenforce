@@ -17,6 +17,8 @@ import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
 import com.tcvcog.tcvce.entities.PublicInfoBundleOccInspection;
 import com.tcvcog.tcvce.entities.PublicInfoBundleOccPermitApplication;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectionStatusEnum;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -158,6 +160,12 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * Probably not necessary anymore, since we now have PaccView pages
+     * @deprecated 
+     * @param pib
+     * @return 
+     */
     public String viewPACCRecordDetails(PublicInfoBundle pib) {
         if (pib instanceof PublicInfoBundleCECase) {
             PublicInfoBundleCECase pibCase = (PublicInfoBundleCECase) pib;
@@ -166,6 +174,38 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable {
 
         }
         return "";
+    }
+    
+    
+    /**
+     * Looks at an inspection and returns a string describing what stage the 
+     * inspection is currently in.
+     * @param inspection
+     * @return 
+     */
+    public String inspectionStatus(PublicInfoBundleOccInspection inspection){
+        
+        if(!inspection.isPaccEnabled()){
+            //not PACC enabled, the status is not available
+            
+            return "Status not available";
+        
+        } else if(!inspection.getBundledInspection().isReadyForPassedCertification()){
+            //Not passed, let's find out why
+            
+            for(OccInspectedSpace space : inspection.getBundledInspection().getInspectedSpaceList()){
+                if(space.getStatus().getStatusEnum() == OccInspectionStatusEnum.NOTINSPECTED){
+                    return "Inspection in progress";
+                }
+            }
+            //All spaces must have failed inspection.
+            return "Inspection failed";
+            
+        } else {
+            //Passed!
+            return "Inspection passed!";
+        }
+        
     }
 
     public void attachMessage(PublicInfoBundle selectedBundle) {

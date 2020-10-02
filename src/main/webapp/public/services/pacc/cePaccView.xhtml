@@ -346,15 +346,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                             <!--At this point in time there are no external notes for CE Cases-->
                                                             
-                                                            <p:outputLabel>Type your message to the code enforcement staff in the box below. 
-                                                                Please note that all messages submitted through this portal become part of the permanent case record
-                                                                and may be included in documents prepare for town councils and magistrates. </p:outputLabel>
+                                                            <p:outputLabel>Type your message to the code enforcement staff in the box below. </p:outputLabel>
                                                             <p:spacer height="15px"/>
                                                             <p:outputLabel value="#{case.bundledCase.externalNotes == '' or empty case.bundledCase.externalNotes ? 
                                                                                 'No messages found!' 
                                                                                 : case.bundledCase.externalNotes}"/>
                                                             <p:spacer height="10px"/>
                                                             <p:inputTextarea id="message-ita" style="width: 100%; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
+                                                            <p:spacer height="10px"/>
+                                                             <p:outputLabel rendered="#{cear.showAddMessageButton}"> 
+                                                                <i>Please note that all messages submitted through this portal become part of the permanent case record
+                                                                    and may be included in documents prepare for town councils and magistrates.</i> </p:outputLabel>
                                                             <p:spacer height="10px"/>
                                                             <p:commandButton ajax="true" actionListener="#{publicInfoBB.attachMessage(case)}"
                                                                              value="Submit" icon="fa fa-link"
@@ -446,15 +448,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </p:tab>
                                                     <p:tab title="Messages">
 
-                                                        <p:outputLabel rendered="#{cear.showAddMessageButton}"> Type your message to the code enforcement staff in the box below. 
-                                                                Please note that all messages submitted through this portal become part of the permanent case record
-                                                                and may be included in documents prepare for town councils and magistrates. </p:outputLabel>
+                                                        <p:outputLabel rendered="#{cear.showAddMessageButton}"> Type your message to the code enforcement staff in the box below. </p:outputLabel>
                                                             <p:spacer height="15px"/>
                                                             <p:outputLabel value="#{cear.bundledRequest.publicExternalNotes == '' or empty cear.bundledRequest.publicExternalNotes ? 
                                                                                 'No messages found!' 
-                                                                                : cear.bundledRequest.publicExternalNotes}"escape="false"/>
+                                                                                : cear.bundledRequest.publicExternalNotes}" escape="false"/>
                                                             <p:spacer height="10px"/>
                                                             <p:inputTextarea id="message-ita" rendered="#{cear.showAddMessageButton}" style="width: 100%; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
+                                                            <p:spacer height="10px"/>
+                                                            <p:outputLabel rendered="#{cear.showAddMessageButton}"> 
+                                                                <i>Please note that all messages submitted through this portal become part of the permanent case record
+                                                                    and may be included in documents prepare for town councils and magistrates.</i> </p:outputLabel>
                                                             <p:spacer height="10px"/>
                                                             <p:commandButton ajax="true" actionListener="#{publicInfoBB.attachMessage(cear)}"
                                                                              value="Submit" icon="fa fa-link"
