@@ -10,6 +10,7 @@ import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobType;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -34,8 +35,8 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      * @return the blob pulled from the db
      * @throws IntegrationException thrown instead of SCLException
      */
-    public Blob getBlob(int blobID) throws IntegrationException{
-        Blob blob = null;
+    public BlobLight getBlobLight(int blobID) throws IntegrationException{
+        BlobLight blob = null;
         Connection con = getPostgresCon();
         ResultSet rs = null;
         String query = "SELECT photodocid, photodocdescription, photodocdate, photodoctype_typeid, photodocfilename, \n" +
@@ -59,7 +60,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
                 blob.setType(BlobType.blobTypeFromInt(rs.getInt("photodoctype_typeid")));
                 blob.setFilename(rs.getString("photodocfilename"));
                 
-                blob.setBytes(rs.getBytes("photodocblob"));
+                //blob.setBytes(rs.getBytes("photodocblob"));
                 
                 blob.setUploadPersonID(rs.getInt("photodocuploadpersonid"));
             }
@@ -74,6 +75,49 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
         
         return blob;
+        
+    }
+    
+    public BlobLight generateBlobLight(ResultSet rs){
+        //TODO
+    }
+    
+    /**
+     * Gets the bytes 
+     * @param blobID
+     * @return
+     * @throws IntegrationException 
+     */
+    public byte[] getBlobBytes(int blobID) throws IntegrationException{
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT photodocblob FROM public.photodoc WHERE photodocid = ?;";
+        
+        PreparedStatement stmt = null;
+        
+        byte[] blobBytes = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, blobID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                blobBytes = rs.getBytes("photodocblob");
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving blob bytes. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return blobBytes;
+        
         
     }
     

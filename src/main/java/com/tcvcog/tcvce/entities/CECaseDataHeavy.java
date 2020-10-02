@@ -9,10 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
-import java.util.Iterator;
 
 /**
  *  Listified CECase object 
@@ -39,7 +37,7 @@ public class CECaseDataHeavy
     private List<MoneyCECaseFeeAssigned> feeList;
     private List<MoneyCECaseFeePayment> paymentList;
     
-    private List<Blob> blobList;
+    private List<Integer> blobIDList;
     
    
     public CECaseDataHeavy(CECase cse){
@@ -357,17 +355,17 @@ public class CECaseDataHeavy
     }
 
     /**
-     * @return the blobList
+     * @return the blobIDList
      */
-    public List<Blob> getBlobList() {
-        return blobList;
+    public List<Integer> getBlobIDList() {
+        return blobIDList;
     }
 
     /**
-     * @param blobList the blobList to set
+     * @param blobIDList the blobIDList to set
      */
-    public void setBlobList(List<Blob> blobList) {
-        this.blobList = blobList;
+    public void setBlobIDList(List<Integer> blobIDList) {
+        this.blobIDList = blobIDList;
     }
 
     @Override

@@ -19,13 +19,10 @@ package com.tcvcog.tcvce.entities;
 import java.util.List;
 
 /**
- *
+ * Interface for any object that has attached blob IDs
  * @author Nathan Dietz
  */
 public interface IFace_BlobHolder {
-    public void setBlobList(List<Blob> blobList);
     public void setBlobIDList(List<Integer> blobIDList);
-    
-    public List<Blob> getBlobList();
     public List<Integer> getBlobIDList();
 }

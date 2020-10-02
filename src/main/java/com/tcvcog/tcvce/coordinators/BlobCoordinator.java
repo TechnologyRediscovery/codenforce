@@ -61,7 +61,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             BlobIntegrator bi = getBlobIntegrator();
             int blobID = Integer.parseInt(context.getExternalContext().getRequestParameterMap().get("blobID"));
             try {
-                Blob blob = bi.getBlob(blobID);
+                Blob blob = bi.getBlobLight(blobID);
                 if (null == blob.getType()) {
                     throw new BlobTypeException("BlobType is null. ");
                 } else {
@@ -99,7 +99,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
         BlobIntegrator bi = getBlobIntegrator();
         try {
-            Blob blob = bi.getBlob(blobID);
+            BlobLight blob = bi.getBlobLight(blobID);
 
             if (blob == null) {
                 throw new BlobTypeException("Blob is null, probably due to an invalid ID");
@@ -130,7 +130,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
 
     public Blob getBlob(int blobID) throws IntegrationException {
-        return getBlobIntegrator().getBlob(blobID);
+        return getBlobIntegrator().getBlobLight(blobID);
     }
 
     // TODO: MAYBE seperate into PDF and Photo deletes, verify types appropriately,
