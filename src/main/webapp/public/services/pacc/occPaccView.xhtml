@@ -101,26 +101,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 <p:spacer height="10px"/>
                                                             </h:panelGroup>
 
-                                                                <h:panelGroup>
-                                                                    <p:outputLabel value="Inspector:"/>
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Inspector:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160; Name: #{inspection.bundledInspection.inspector.person.firstName} #{inspection.bundledInspection.inspector.person.lastName}"/>
                                                                     <p:spacer height="5px"/>
-                                                                    <div>
-                                                                        <p:outputLabel value="&#160; Name: #{inspection.bundledInspection.inspector.person.firstName} #{inspection.bundledInspection.inspector.person.lastName}"/>
-                                                                        <p:spacer height="5px"/>
-                                                                        <p:outputLabel value="&#160; Email: #{inspection.bundledInspection.inspector.person.email}"/>
-                                                                        <p:spacer height="5px"/>
-                                                                        <p:outputLabel value="&#160; Phone: #{inspection.bundledInspection.inspector.person.phoneWork}"/>
-                                                                    </div>
-                                                                    <p:spacer height="10px"/>
-                                                                </h:panelGroup>
+                                                                    <p:outputLabel value="&#160; Email: #{inspection.bundledInspection.inspector.person.email}"/>
+                                                                    <p:spacer height="5px"/>
+                                                                    <p:outputLabel value="&#160; Phone: #{inspection.bundledInspection.inspector.person.phoneWork}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
 
 
-                                                                <h:panelGroup>
-                                                                    <p:outputLabel value="Status:"/>
-                                                                    <p:spacer height="5px"/>
-                                                                    <p:outputLabel value="#{publicInfoBB.inspectionStatus(inspection)}"/>
-                                                                    <p:spacer height="10px"/>
-                                                                </h:panelGroup>
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Status:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <p:outputLabel value="#{publicInfoBB.inspectionStatus(inspection)}"/>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
 
                                                             <h:panelGroup rendered="#{inspection.bundledInspection.readyForPassedCertification}">
                                                                 <p:outputLabel value="Inspection Passed Timestamp:"/>
@@ -140,7 +140,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 </div>
                                                                 <p:spacer height="10px"/>
                                                             </h:panelGroup>
-                                                            
+
                                                             <h:panelGroup>
                                                                 <p:outputLabel value="Capacity Data:"/>
                                                                 <p:spacer height="5px"/>
@@ -151,7 +151,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 <p:outputLabel value="&#160;Number of bathrooms: #{inspection.bundledInspection.numBathrooms}"/>
                                                                 <p:spacer height="10px"/>
                                                             </h:panelGroup>
-                                                            
+
                                                             <h:panelGroup>
                                                                 <p:outputLabel value="Active?"/>
                                                                 <p:spacer height="5px"/>
@@ -174,7 +174,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                     </p:tab>
                                                     <p:tab title="Spaces">
-                                                        
+
                                                         <p:dataTable
                                                             id="inspectedSpaceTable"
                                                             var="space"
@@ -188,37 +188,63 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             widgetVar="inspectedSpaceTableVar"
                                                             >
 
+                                                            <p:column width="3%" exportable="false">
+                                                                <p:rowToggler/>
+                                                            </p:column>
+                                                            
                                                             <p:column width="12%" headerText="ID:">
-                                                                    <h:outputText value="#{space.inspectedSpaceID}"/>
+                                                                <h:outputText value="#{space.inspectedSpaceID}"/>
                                                             </p:column>
-                                                            
+
                                                             <p:column width="12%" headerText="Type:">
-                                                                    <h:outputText value="#{space.type.spaceTypeTitle}"/>
+                                                                <h:outputText value="#{space.type.spaceTypeTitle}"/>
                                                             </p:column>
-                                                            
+
                                                             <p:column width="12%" headerText="Location:">
-                                                                    <h:outputText value="#{space.location}"/>
+                                                                <h:outputText value="#{space.location.locationDescription}, Floor #{space.location.buildingFloorNo}"/>
                                                             </p:column>
-                                                            
+
                                                             <p:column width="12%" headerText="Status:">
-                                                                    <h:outputText value="#{space.status.statusEnum.label}"/>
+                                                                <h:outputText value="#{space.status.statusEnum.label}"/>
                                                             </p:column>
-                                                            
-                                                            <!--Making row expansion a panelGrid that p:repeats a panelGroup for each OccInspectedSpaceElement-->
+
+                                                            <p:rowExpansion>
+
+                                                                <div class="outlinedBox">
+                                                                    <h2>Elements in Space ID: <h:outputText value="#{space.inspectedSpaceID}"/> </h2>
+                                                                    <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                                                 columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                                        <p:repeat value="#{space.inspectedElementList}" var="element">
+
+                                                                            <h:panelGroup>
+                                                                                <h:outputText styleClass="bold" value="Element ID ##{element.inspectedSpaceElementID}" />
+                                                                                <div class="rowExpansion">
+                                                                                    <h:outputText value="Type: #{element.type.spaceTypeTitle}"/>
+                                                                                    <h:outputText value="Location: #{space.location.locationDescription}, Floor #{space.location.buildingFloorNo}"/>
+                                                                                    <h:outputText value="Status: #{element.status.statusEnum.label}"/>
+                                                                                </div>
+                                                                            </h:panelGroup>
+
+                                                                        </p:repeat>
+
+                                                                    </h:panelGrid>
+                                                                </div>
+                                                            </p:rowExpansion>
 
                                                         </p:dataTable>
-                                                        
+
                                                     </p:tab>
                                                     <ui:remove>
                                                         <p:tab title="Messages">
 
-                                                            <!--At the time of writing this code, there were no external notes attached -->
+                                                            <!--At the time of writing this code, there were no external notes attached to occ inspections-->
 
                                                             <p:outputLabel>Type your message to the code enforcement staff in the box below.</p:outputLabel>
                                                             <p:spacer height="15px"/>
                                                             <p:outputLabel value="#{inspection.bundledInspection.externalNotes == '' or empty inspection.bundledInspection.externalNotes ? 
-                                                                                'No messages found!' 
-                                                                                : inspection.bundledInspection.externalNotes}"/>
+                                                                                    'No messages found!' 
+                                                                                    : inspection.bundledInspection.externalNotes}"/>
                                                             <p:spacer height="10px"/>
                                                             <p:inputTextarea id="message-ita" style="width: 100%; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
                                                             <p:spacer height="10px"/>
@@ -309,7 +335,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 </div>
                                                                 <p:spacer height="10px"/>
                                                             </h:panelGroup>
-                                                            
+
                                                             <h:panelGroup>
                                                                 <p:outputLabel value="Applicant:"/>
                                                                 <p:spacer height="5px"/>
@@ -318,7 +344,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 </div>
                                                                 <p:spacer height="10px"/>
                                                             </h:panelGroup>
-                                                            
+
                                                             <h:panelGroup>
                                                                 <p:outputLabel value="Preferred Contact:"/>
                                                                 <p:spacer height="5px"/>
@@ -345,15 +371,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             >
 
                                                             <p:column width="12%" headerText="First Name">
-                                                                    <h:outputText value="#{p.bundledPerson.firstName}"/>
+                                                                <h:outputText value="#{p.bundledPerson.firstName}"/>
                                                             </p:column>
-                                                            
+
                                                             <p:column width="12%" headerText="Last Name">
-                                                                    <h:outputText value="#{p.bundledPerson.lastName}"/>
+                                                                <h:outputText value="#{p.bundledPerson.lastName}"/>
                                                             </p:column>
-                                                            
+
                                                             <p:column width="12%" headerText="Role">
-                                                                    <h:outputText value="#{p.bundledPerson.applicationPersonType.label}"/>
+                                                                <h:outputText value="#{p.bundledPerson.applicationPersonType.label}"/>
                                                             </p:column>
 
                                                         </p:dataTable>
@@ -370,7 +396,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:inputTextarea id="message-ita" rendered="#{app.showAddMessageButton}" style="width: 100%; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
                                                         <p:spacer height="10px"/>
                                                         <p:outputLabel rendered="#{app.showAddMessageButton}"> 
-                                                                <i>Please note that all messages submitted through this portal become part of permanent occupancy record.</i> </p:outputLabel>
+                                                            <i>Please note that all messages submitted through this portal become part of permanent occupancy record.</i> </p:outputLabel>
                                                         <p:spacer height="10px"/>
                                                         <p:commandButton ajax="true" actionListener="#{publicInfoBB.attachMessage(app)}"
                                                                          value="Submit" icon="fa fa-link"

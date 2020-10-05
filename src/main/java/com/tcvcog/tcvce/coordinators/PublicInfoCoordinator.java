@@ -155,6 +155,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         //setPublicUser();
         //QueryCECase qc = sc.initQuery(QueryCECaseEnum.PACC, publicUser.getMyCredential());
         //List<CECase> caseList = qc.getBOBResultList();
+        
         //quick patch up
         List<CECase> caseList = caseInt.getCECasesByPACC(pacc);
 
@@ -218,6 +219,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         pib.setTypeName("CECASE");
         pib.setMuni(c.getProperty().getMuni());
         pib.setPacc(cse.getPublicControlCode());
+        pib.setPaccEnabled(c.isPaccEnabled());
 
         if (c.isPaccEnabled()) {
             pib.setBundledCase(cse);
@@ -286,6 +288,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         pib.setTypeName("CodeViolation");
         pib.setPaccStatusMessage("Public access enabled");
+        pib.setPaccEnabled(true);
 
         pib.setShowAddMessageButton(false);
         pib.setShowDetailsPageButton(true);
@@ -319,6 +322,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         pib.setTypeName("CEAR");
 
         pib.setPacc(req.getRequestPublicCC());
+        pib.setPaccEnabled(req.isPaccEnabled());
 
         if (req.isPaccEnabled()) {
 
@@ -370,6 +374,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         pib.setBundledPayment(input);
 
         pib.setPaccStatusMessage("Public access enabled");
+        pib.setPaccEnabled(true);
 
         pib.setShowDetailsPageButton(true);
         /*} else {
@@ -408,6 +413,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setBundledPerson(input);
 
             pib.setPaccStatusMessage("Public access enabled");
+            pib.setPaccEnabled(true);
 
             pib.setShowDetailsPageButton(true);
         } else {
@@ -448,6 +454,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setBundledPerson(input);
 
             pib.setPaccStatusMessage("Public access enabled");
+            pib.setPaccEnabled(true);
 
             pib.setShowDetailsPageButton(true);
         } else {
@@ -503,6 +510,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setUnitList(bundledUnits);
 
             pib.setPaccStatusMessage("Public access enabled");
+            pib.setPaccEnabled(true);
 
             pib.setShowDetailsPageButton(true);
         } else {
@@ -533,7 +541,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         pib.setTypeName("OccPeriod");
         pib.setShowAddMessageButton(false);
-
+        
         //Again, no PACC enabled field. Perhaps this will be a good enough filter for now?
         if (input.isActive()) {
             OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -543,7 +551,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setBundledPeriod(input);
 
             pib.setPaccStatusMessage("Public access enabled");
-
+            pib.setPaccEnabled(true);
+            
             ArrayList<PublicInfoBundlePerson> bundledPersons = new ArrayList<>();
 
             if (heavy.getPersonList() != null) {
@@ -626,6 +635,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         pib.setTypeName("OccPermitApplication");
 
         pib.setPacc(input.getPublicControlCode());
+        pib.setPaccEnabled(input.isPaccEnabled());
 
         if (input.isPaccEnabled()) {
 
@@ -676,6 +686,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         pib.setTypeName("OccInspection");
         pib.setPacc(input.getPacc());
+        pib.setPaccEnabled(input.isEnablePacc());
         pib.setShowAddMessageButton(false);
 
         if (input.isEnablePacc()) {
@@ -712,6 +723,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         pib.setTypeName("FeeAssigned");
         pib.setPaccStatusMessage("Public access enabled");
+        pib.setPaccEnabled(true);
 
         pib.setShowAddMessageButton(false);
         pib.setShowDetailsPageButton(true);
@@ -754,6 +766,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         pib.setTypeName("PropertyUnit");
         pib.setPaccStatusMessage("Public access enabled");
+        pib.setPaccEnabled(true);
 
         pib.setShowAddMessageButton(false);
         pib.setShowDetailsPageButton(true);
@@ -814,6 +827,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setBundledEvent(input);
 
             pib.setPaccStatusMessage("Public access enabled");
+            pib.setPaccEnabled(true);
 
             pib.setShowDetailsPageButton(true);
         } else {

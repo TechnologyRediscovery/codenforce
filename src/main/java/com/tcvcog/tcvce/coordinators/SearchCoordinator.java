@@ -42,6 +42,7 @@ import javax.annotation.PostConstruct;
 public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
     private static final RoleType MIN_ROLETYPEFORMULTIMUNI_QUERY = RoleType.SysAdmin;
+    private static final RoleType PUBLIC_SEARCH_ROLETYPE = RoleType.Public;
     private static final int RESULT_COUNT_LIMIT_DEFAULT = 100;
     private static final int FILTER_OFF_DEFVALUE_INT = 0;
     
@@ -481,7 +482,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     private void prepareQueryForRun(Query q) throws SearchException{
        List<SearchParams> plist = q.getParamsList();
        for(SearchParams params: plist){
-           params.setMuni_val(q.getCredential().getGoverningAuthPeriod().getMuni());
+            if (params.getMuni_val() == null) {
+                params.setMuni_val(q.getCredential().getGoverningAuthPeriod().getMuni());
+            }
 //           params.clearSQL();
 //           System.out.println("SearchCoordinator.prepareQueryForRun | SQL: " + params.extractRawSQL());
        }
@@ -541,7 +544,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         for(SearchParams sp: splst){
             // if user doesn't meet rank requirements, override all muni settings and allow only one search
-            if(q.getCredential().getGoverningAuthPeriod().getRole().getRank() < MIN_ROLETYPEFORMULTIMUNI_QUERY.getRank()){
+            //unless they are public, because then we don't know what muni they're from
+            if(q.getCredential().getGoverningAuthPeriod().getRole().getRank() < MIN_ROLETYPEFORMULTIMUNI_QUERY.getRank() &&
+                    q.getCredential().getGoverningAuthPeriod().getRole().getRank() != PUBLIC_SEARCH_ROLETYPE.getRank()){
                 sp.setMuni_ctl(true);
                 sp.setMuni_val(q.getCredential().getGoverningAuthPeriod().getMuni());
             }
