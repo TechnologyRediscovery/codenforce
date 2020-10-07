@@ -61,7 +61,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             BlobIntegrator bi = getBlobIntegrator();
             int blobID = Integer.parseInt(context.getExternalContext().getRequestParameterMap().get("blobID"));
             try {
-                Blob blob = bi.getBlobLight(blobID);
+                Blob blob = bi.getPhotoBlobLight(blobID);
                 if (null == blob.getType()) {
                     throw new BlobTypeException("BlobType is null. ");
                 } else {
@@ -99,7 +99,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
         BlobIntegrator bi = getBlobIntegrator();
         try {
-            BlobLight blob = bi.getBlobLight(blobID);
+            BlobLight blob = bi.getPhotoBlobLight(blobID);
 
             if (blob == null) {
                 throw new BlobTypeException("Blob is null, probably due to an invalid ID");
@@ -126,17 +126,23 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
 
     public int storeBlob(Blob blob) throws BlobException, IntegrationException {
-        return getBlobIntegrator().storeBlob(blob);
+        return getBlobIntegrator().storePhotoBlob(blob);
     }
 
-    public Blob getBlob(int blobID) throws IntegrationException {
-        return getBlobIntegrator().getBlobLight(blobID);
+    public Blob getPhotoBlob(int blobID) throws IntegrationException {
+        BlobIntegrator bi = getBlobIntegrator();
+        
+        Blob blob = new Blob(bi.getPhotoBlobLight(blobID));
+        
+        blob.setBytes(bi.getBlobBytes(blobID));
+        
+        return blob;
     }
 
     // TODO: MAYBE seperate into PDF and Photo deletes, verify types appropriately,
     // then delete with integrator.
     public void deleteBlob(int blobID) throws IntegrationException {
-        getBlobIntegrator().deleteBlob(blobID);
+        getBlobIntegrator().deletePhotoBlob(blobID);
     }
 
 }

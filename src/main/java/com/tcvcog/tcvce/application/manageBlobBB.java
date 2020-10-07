@@ -49,7 +49,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void intiBean(){
         try {
-            this.blobList = getBlobIntegrator().getRecentBlobs();
+            this.blobList = getBlobIntegrator().getRecentPhotoBlobs();
         } catch (IntegrationException ex) {
             System.out.println("manageBlobBB.initBean | " + ex + "\n" + ex.getException().getLocalizedMessage());
         }

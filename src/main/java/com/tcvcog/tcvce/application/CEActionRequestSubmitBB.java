@@ -184,7 +184,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         if (currentRequest.getBlobIDList().size() > 0) {
             for (Integer idNum : currentRequest.getBlobIDList()) {
                 try {
-                    blobList.add(bc.getBlob(idNum));
+                    blobList.add(bc.getPhotoBlob(idNum));
                 } catch (IntegrationException ex) {
                     System.out.println("Error occured while fetching request blob list: " + ex);
                 }
@@ -351,7 +351,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
             //Also, save the description to the database.
             try {
-                bi.updateBlobDescriptors(b);
+                bi.updatePhotoBlobDescriptors(b);
             } catch (IntegrationException ex) {
                 System.out.println("CEActionRequestSubmitBB.savePhotosAndContinue() | ERROR: " + ex);
             }
@@ -479,7 +479,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
             for (Integer blobID : currentRequest.getBlobIDList()) {
                 try {
-                    blobI.linkBlobToActionRequest(blobID, sb.getSessCEAR().getRequestID());
+                    blobI.linkPhotoBlobToActionRequest(blobID, sb.getSessCEAR().getRequestID());
                 } catch (IntegrationException ex) {
                     System.out.println(ex);
                 }

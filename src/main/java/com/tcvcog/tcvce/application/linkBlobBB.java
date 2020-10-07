@@ -52,7 +52,7 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         }
         
         try {
-            bi.linkBlobToCodeViolation(selectedBlobID, codeViolationID);
+            bi.linkPhotoBlobToCodeViolation(selectedBlobID, codeViolationID);
             System.out.println("linkBlobBB.linkBlobToCodeViolation | link succesfull");  //TESTING
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
@@ -76,7 +76,7 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         }
         
         try {
-            bi.linkBlobToProperty(selectedBlobID, propertyID);
+            bi.linkPhotoBlobToProperty(selectedBlobID, propertyID);
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR
@@ -99,7 +99,7 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         }
         
         try {
-            bi.linkBlobToPerson(selectedBlobID, getPersonID());
+            bi.linkPhotoBlobToPerson(selectedBlobID, getPersonID());
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR

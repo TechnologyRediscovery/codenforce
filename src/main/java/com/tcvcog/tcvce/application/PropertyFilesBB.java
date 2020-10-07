@@ -54,7 +54,7 @@ public class PropertyFilesBB
      */
     public void deletePhoto(int blobID){
         try {
-            Blob blob = getBlobCoordinator().getBlob(blobID);
+            Blob blob = getBlobCoordinator().getPhotoBlob(blobID);
             if(blob.getType() == BlobType.PHOTO){
                 getBlobCoordinator().deleteBlob(blobID);
             }

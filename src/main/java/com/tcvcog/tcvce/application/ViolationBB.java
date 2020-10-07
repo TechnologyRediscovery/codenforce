@@ -497,7 +497,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             blob = getBlobCoordinator().getNewBlob();
             blob.setBytes(ev.getFile().getContents());
             blob.setType(BlobType.PHOTO); // TODO: extract type from context somehow
-            this.currentViolation.getBlobIDList().add(blobi.storeBlob(blob));
+            this.currentViolation.getBlobIDList().add(blobi.storePhotoBlob(blob));
         } catch (IntegrationException ex) {
             System.out.println("ViolationAddBB.handlePhotoUpload | upload failed!\n" + ex);
             return;

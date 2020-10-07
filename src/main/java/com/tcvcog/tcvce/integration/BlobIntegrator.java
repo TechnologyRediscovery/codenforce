@@ -35,7 +35,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      * @return the blob pulled from the db
      * @throws IntegrationException thrown instead of SCLException
      */
-    public BlobLight getBlobLight(int blobID) throws IntegrationException{
+    public BlobLight getPhotoBlobLight(int blobID) throws IntegrationException{
         BlobLight blob = null;
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -52,17 +52,8 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setInt(1, blobID);
             rs = stmt.executeQuery();
             while(rs.next()){
-                blob = new Blob();
                 System.out.println("BlobIntegrator.getBlob: | retrieving blobID "  + blobID);
-                blob.setBlobID(rs.getInt("photodocid"));
-                blob.setDescription(rs.getString("photodocdescription"));
-                blob.setTimestamp(rs.getTimestamp("photodocdate").toLocalDateTime());
-                blob.setType(BlobType.blobTypeFromInt(rs.getInt("photodoctype_typeid")));
-                blob.setFilename(rs.getString("photodocfilename"));
-                
-                //blob.setBytes(rs.getBytes("photodocblob"));
-                
-                blob.setUploadPersonID(rs.getInt("photodocuploadpersonid"));
+                blob = generatePhotoBlobLight(rs);
             }
             
         } catch (SQLException ex) {
@@ -78,8 +69,17 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public BlobLight generateBlobLight(ResultSet rs){
-        //TODO
+    public BlobLight generatePhotoBlobLight(ResultSet rs) throws SQLException{
+        BlobLight blob = new BlobLight();
+        blob.setBlobID(rs.getInt("photodocid"));
+        blob.setDescription(rs.getString("photodocdescription"));
+        blob.setTimestamp(rs.getTimestamp("photodocdate").toLocalDateTime());
+        blob.setType(BlobType.blobTypeFromInt(rs.getInt("photodoctype_typeid")));
+        blob.setFilename(rs.getString("photodocfilename"));
+
+        //blob.setBytes(rs.getBytes("photodocblob"));
+        blob.setUploadPersonID(rs.getInt("photodocuploadpersonid"));
+        return blob;
     }
     
     /**
@@ -123,17 +123,14 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     
     /**
      * 
-     * @return list of blobs uploaded in the past month
+     * @return list of Blob IDs for all photos uploaded in the past month
      * @throws IntegrationException 
      */
-    public List<Blob> getRecentBlobs() throws IntegrationException{
-        ArrayList<Blob> blobList = new ArrayList();
+    public List<Integer> getRecentPhotoBlobs() throws IntegrationException{
+        ArrayList<Integer> blobIDList = new ArrayList();
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        String query = "SELECT photodocid, photodocdescription, photodocdate, photodoctype_typeid, photodocfilename, \n" +
-                        "       photodocblob, \n" +
-                        "       photodocuploadpersonid \n" +
-                        "  FROM public.photodoc WHERE photodocdate > ?;";
+        String query = "SELECT photodocid FROM public.photodoc WHERE photodocdate > ?;";
         
         PreparedStatement stmt = null;
         
@@ -144,17 +141,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
                     .atZone(ZoneId.systemDefault()).toInstant()));
             rs = stmt.executeQuery();
             while(rs.next()){
-                Blob blob = new Blob();
-                blob.setBlobID(rs.getInt("photodocid"));
-                blob.setDescription(rs.getString("photodocdescription"));
-                blob.setTimestamp(rs.getTimestamp("photodocdate").toLocalDateTime());
-                blob.setType(BlobType.blobTypeFromInt(rs.getInt("photodoctype_typeid")));
-                blob.setFilename(rs.getString("photodocfilename"));
-                
-                blob.setBytes(rs.getBytes("photodocblob"));
-                
-                blob.setUploadPersonID(rs.getInt("photodocuploadpersonid"));
-                blobList.add(blob);
+                blobIDList.add(rs.getInt("photodocid"));
             }
             
         } catch (SQLException ex) {
@@ -166,18 +153,18 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
-        return blobList;
+        return blobIDList;
         
     }
     
     /**
-     * stores this blob in the db
+     * stores this photo blob in the db
      * @param blob the blob to be stored
      * @return the blobID of the newly stored blob
      * @throws com.tcvcog.tcvce.domain.BlobException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public int storeBlob(Blob blob) throws BlobException, IntegrationException{
+    public int storePhotoBlob(Blob blob) throws BlobException, IntegrationException{
         if(blob.getType() == null) throw new BlobTypeException("Attempted to store a blob with null type. ");
         // TODO: validate BLOB's and throw exception if corrupted
         
@@ -232,7 +219,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      * @param blob the blob to be updated
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public void updateBlobDescriptors(Blob blob) throws  IntegrationException{
+    public void updatePhotoBlobDescriptors(BlobLight blob) throws  IntegrationException{
         
         Connection con = getPostgresCon();
         String query =  " UPDATE public.photodoc\n" +
@@ -266,7 +253,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      * @param blobID the blobID of the blob to be removed
      * @throws IntegrationException thrown instead of a SQLException
      */
-    public void deleteBlob(int blobID) throws IntegrationException{
+    public void deletePhotoBlob(int blobID) throws IntegrationException{
         // TODO: delete from linker tables as they are added
         
         //actionrequest linker table
@@ -339,7 +326,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setInt(1, blobID);
             stmt.executeUpdate();
         } catch (SQLException ex) {
-            System.out.println("BlobIntegrator.deleteBlob() | ERROR: "+ ex);
+            System.out.println("BlobIntegrator.deletePhotoBlob() | ERROR: "+ ex);
             throw new IntegrationException("Error deleting link. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {ignored} }
@@ -366,7 +353,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
     }
     
-    public void linkBlobToActionRequest(int blobID, int requestID) throws IntegrationException{
+    public void linkPhotoBlobToActionRequest(int blobID, int requestID) throws IntegrationException{
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.ceactionrequestphotodoc(\n" +
                         "            photodoc_photodocid, ceactionrequest_requestid)\n" +
@@ -392,7 +379,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
     }
     
-    public void linkBlobToCodeViolation(int blobID, int cvID) throws IntegrationException{
+    public void linkPhotoBlobToCodeViolation(int blobID, int cvID) throws IntegrationException{
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.codeviolationphotodoc(\n" +
                         "            photodoc_photodocid, codeviolation_violationid)\n" +
@@ -416,7 +403,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
     }
     
-    public void linkBlobToProperty(int blobID, int propertyID) throws IntegrationException{
+    public void linkPhotoBlobToProperty(int blobID, int propertyID) throws IntegrationException{
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.propertyphotodoc(\n" +
                         "            photodoc_photodocid, property_propertyid)\n" +
@@ -440,7 +427,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
     }
     
-    public void linkBlobToPerson(int blobID, int personID) throws IntegrationException{
+    public void linkPhotoBlobToPerson(int blobID, int personID) throws IntegrationException{
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.personphotodoc(\n" +
                         "            photodoc_photodocid, person_personid)\n" +
