@@ -54,7 +54,7 @@ public class CECasePublicBB
         CaseIntegrator ci = getCaseIntegrator();
 
         try {
-            freshPACC = generateControlCodeFromTime();
+            freshPACC = generateControlCodeFromTime(currentCase.getProperty().getMuni().getMuniCode());
 
             currentCase.setPublicControlCode(freshPACC);
             ci.updateCECaseMetadata(currentCase);

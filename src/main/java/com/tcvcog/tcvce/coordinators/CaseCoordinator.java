@@ -603,7 +603,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         UserCoordinator uc = getUserCoordinator();
         CECase newCase = new CECase();
 
-        int casePCC = generateControlCodeFromTime();
+        int casePCC = generateControlCodeFromTime(p.getMuni().getMuniCode());
         // caseID set by postgres sequence
         // timestamp set by postgres
         // no closing date, by design of case flow

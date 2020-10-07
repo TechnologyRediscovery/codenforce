@@ -694,7 +694,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                 inspec.setChecklistTemplate(tem);
             }
             inspec.setInspector(user);
-            inspec.setPacc(generateControlCodeFromTime());
+            inspec.setPacc(generateControlCodeFromTime(user.getHomeMuniID()));
 //            if(muni.isEnablePublicOccInspectionTODOs()){
 //                inspec.setEnablePacc(true);
 //            } else {
@@ -804,12 +804,13 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     
     /**
      * Factory method for creating new OccPermitApplications
+     * @param muniCode
      * @return
      * @throws IntegrationException If an error occurs while generating a control code
      */
-    public OccPermitApplication initOccPermitApplication() throws IntegrationException {
+    public OccPermitApplication initOccPermitApplication(int muniCode) throws IntegrationException {
         OccPermitApplication occpermitapp = new OccPermitApplication();
-        occpermitapp.setPublicControlCode(generateControlCodeFromTime());
+        occpermitapp.setPublicControlCode(generateControlCodeFromTime(muniCode));
         occpermitapp.setSubmissionDate(LocalDateTime.now());
         return occpermitapp;
     }

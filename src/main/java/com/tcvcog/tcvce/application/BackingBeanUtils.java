@@ -225,10 +225,12 @@ public class        BackingBeanUtils
     /**
      * Chops up the current time to get seven random digits
      *
+     * @param muniCode The muni code of the municipality that governs the object
+     *                 this PACC will be attached to.
      * @return
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public int generateControlCodeFromTime() throws IntegrationException {
+    public int generateControlCodeFromTime(int muniCode) throws IntegrationException {
 
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
         List<PublicInfoBundle> bundles = new ArrayList<>();
@@ -239,6 +241,8 @@ public class        BackingBeanUtils
             long dateInMs = new Date().getTime();
             String numAsString = String.valueOf(dateInMs);
             String reducedNum = numAsString.substring(7);
+            //attach Municode to this number
+            reducedNum = reducedNum + muniCode;
             controlCode = Integer.parseInt(reducedNum);
 
             //Let's make sure this PACC doesn't already exist in the database!

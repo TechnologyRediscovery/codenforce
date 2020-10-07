@@ -229,7 +229,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         getSessionBean().setSessMuniQueued(selectedMuni);
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try{
-        OccPermitApplication occpermitapp = oc.initOccPermitApplication();
+        OccPermitApplication occpermitapp = oc.initOccPermitApplication(selectedMuni.getMuniCode());
          getSessionBean().setSessOccPermitApplication(occpermitapp);
         getSessionBean().getNavStack().pushCurrentPage();
         return "chooseProperty";
