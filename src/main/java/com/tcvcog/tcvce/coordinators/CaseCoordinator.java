@@ -653,7 +653,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.EventException
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public void cecase_insertNewCECase(CECase freshCase, UserAuthorized ua, CEActionRequest cear) throws IntegrationException, BObStatusException, ViolationException, EventException, SearchException {
+    public int cecase_insertNewCECase(CECase freshCase, UserAuthorized ua, CEActionRequest cear) throws IntegrationException, BObStatusException, ViolationException, EventException, SearchException {
 
         CaseIntegrator ci = getCaseIntegrator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
@@ -685,6 +685,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             originationEvent = ec.initEvent(cedh, originationCategory);
             StringBuilder sb = new StringBuilder();
             originationEvent.setNotes(sb.toString());
+        } else if(freshCase.isPropertyInfoCase()){
+            // This is a property info case, it originated to store info
+            originationCategory = ec.initEventCategory(
+                    Integer.parseInt(getResourceBundle(
+                            Constants.EVENT_CATEGORY_BUNDLE).getString("originiationByObservation")));
+            originationEvent = ec.initEvent(cedh, originationCategory);
+            StringBuilder sb = new StringBuilder();
+            sb.append("This case was created to contain information pertaining to a property");
         } else {
             // since there's no action request, the assumed method is called "observation"
             originationCategory = ec.initEventCategory(
@@ -701,6 +709,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         cedh.setCaseID(freshID);
 
         ec.addEvent(originationEvent, cedh, ua);
+        
+        return freshID;
     }
 
     private String cecase_generateCaseInitNoteFromCEAR(CEActionRequest cear) {

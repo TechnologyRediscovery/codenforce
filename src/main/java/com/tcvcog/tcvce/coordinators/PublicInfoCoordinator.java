@@ -37,6 +37,7 @@ import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccApplication;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
@@ -65,9 +66,11 @@ import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -1486,20 +1489,26 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      * @throws com.tcvcog.tcvce.domain.AuthorizationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      * @throws com.tcvcog.tcvce.domain.ViolationException
+     * @throws com.tcvcog.tcvce.domain.SearchException
      */
     public void attachMessageToBundle(PublicInfoBundle bundle, String message) 
             throws IntegrationException, 
             EventException, 
             AuthorizationException, 
             BObStatusException, 
-            ViolationException {
+            ViolationException,
+            SearchException {
+        
         LocalDateTime current = LocalDateTime.now();
-
+        StringBuilder sb = new StringBuilder();
+        Property currentProp = null; //We will store the associated property ID so we can attach an event to it 
+        
         //You'll see brackets in the switch below for each case.
         //These are so that each case has its own scope
         //For code readability and optimization purposes
-        StringBuilder sb = new StringBuilder();
+        
         switch (bundle.getTypeName()) {
+            
             case "CEAR": {
                 CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
 
@@ -1524,6 +1533,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 System.out.println("PublicInfoCoordinator.attachMessageToBundle | message: " + sb.toString());
 
                 ceari.attachMessageToCEActionRequest(requestBundle, sb.toString());
+                
+                currentProp = dbRequest.getRequestProperty();
+                
             }
             break;
             //Nothing yet
@@ -1556,11 +1568,43 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 System.out.println("PublicInfoCoordinator.attachMessageToBundle | message: " + sb.toString());
 
                 oi.attachMessageToOccPermitApplication(applicationBundle, sb.toString());
+                
+                PropertyIntegrator pi = getPropertyIntegrator();
+                
+                currentProp = pi.getProperty(dbApplication.getApplicationPropertyUnit().getPropertyID());
+                
             }
             break;
             
             default:
                 break;
         }
+        
+        if(currentProp != null){
+            PropertyCoordinator pc = getPropertyCoordinator();
+            CaseCoordinator cc = getCaseCoordinator();
+            EventCoordinator ec = getEventCoordinator();
+            setPublicUser();
+            PropertyDataHeavy heavyProp = pc.assemblePropertyDataHeavy(currentProp, publicUser);
+            
+            //determine the governing property info case and then assemble a CECaseDataHeavy with it
+            CECaseDataHeavy propertyInfoCase = cc.cecase_assembleCECaseDataHeavy(pc.determineGoverningPropertyInfoCase(heavyProp, publicUser), publicUser);
+            
+            EventCnF ev = ec.initEvent(propertyInfoCase,
+                    ec.getEventCategory(Integer.parseInt(
+                            getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                                    .getString("propertyinfoeventcatid"))));
+            
+            ec.addEvent(ev, propertyInfoCase, publicUser);
+            
+        } else {
+            System.out.println("PublicInfoCoordinator.attachMessageToBundle() | ERROR: The system tried to attach a message to a bundle "
+                    + "that did not have a property attached to it. Look in this method for a comment explaining more.");
+            //A property is needed to send an event to code officers so they know the public added
+            //a message to the object. Please get the property for the associated object so we can create an event.
+            throw new BObStatusException("PublicInfoCoordinator.attachMessageToBundle() | ERROR: The system tried to attach a message to a bundle "
+                    + "that did not have a property attached to it. Look in this method for a comment explaining more.");
+        }
+        
     }
 } // close class

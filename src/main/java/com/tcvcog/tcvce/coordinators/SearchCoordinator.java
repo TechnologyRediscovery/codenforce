@@ -481,12 +481,33 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      */
     private void prepareQueryForRun(Query q) throws SearchException{
        List<SearchParams> plist = q.getParamsList();
-       for(SearchParams params: plist){
+       
+       for(int index = 0; index < plist.size(); index++){
+           //We use an indexed for loop so that our changes to each param will be kept
+           SearchParams params = plist.get(index);
+           
             if (params.getMuni_val() == null) {
                 params.setMuni_val(q.getCredential().getGoverningAuthPeriod().getMuni());
             }
+            //This caused issues at some point by removing good SQL we built 
+            //for the search. If it's needed, uncomment it, 
+            //but make sure it doesn't remove SQL that we need.
 //           params.clearSQL();
 //           System.out.println("SearchCoordinator.prepareQueryForRun | SQL: " + params.extractRawSQL());
+
+            //If our params are searching for a property, then let's make sure 
+            //to replace all spaces in the address with wildcards.
+            if(params instanceof SearchParamsProperty){
+                SearchParamsProperty temp = (SearchParamsProperty) params;
+                temp.setAddress_val(temp.getAddress_val().replaceAll(" ", "%"));
+                params = temp;
+                
+            }
+            
+            //update the list with the edited params
+            
+            plist.set(index, params);
+
        }
         q.clearResultList();
         

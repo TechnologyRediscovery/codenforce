@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventCnF;
@@ -116,14 +117,28 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
                 // We'll just grab all the events on the session and load up
                 // the muni property info
                 eventList.addAll(sb.getSessEventList());
+                try{
                 // ask the Prop Coor to figure out a sensible ERG when we're viewing
                 // an arbitrary event list
-                currentERGBOb = (IFace_EventRuleGoverned) pc.determineGoverningPropertyInfoCase(sb.getSessMuni().getMuniPropertyDH());
+                currentERGBOb = (IFace_EventRuleGoverned) pc.determineGoverningPropertyInfoCase(sb.getSessMuni().getMuniPropertyDH(), sb.getSessUser());
+                } catch (IntegrationException | SearchException ex){
+                    getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to get events while we were loading the page!", ex.getMessage()));
+                    System.out.println("EventsBB.initBean() | ERROR: " + ex);
+                }
                 break;
             // "Shouldn't happen"
             default:
                 eventList.addAll(sb.getSessEventList());
-                currentERGBOb = (IFace_EventRuleGoverned) pc.determineGoverningPropertyInfoCase(sb.getSessMuni().getMuniPropertyDH());
+                try{
+                currentERGBOb = (IFace_EventRuleGoverned) pc.determineGoverningPropertyInfoCase(sb.getSessMuni().getMuniPropertyDH(), sb.getSessUser());
+                } catch (IntegrationException | SearchException ex){
+                    getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to get events while we were loading the page!", ex.getMessage()));
+                    System.out.println("EventsBB.initBean() | ERROR: " + ex);
+                }
         }
         
         personCandidates = new ArrayList<>();

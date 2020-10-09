@@ -540,10 +540,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             if (qp != null && !qp.getParamsList().isEmpty()) {
                 SearchParamsProperty spp = qp.getPrimaryParams();
                 spp.setAddress_ctl(true);
-                String addressVal = houseNum + " " + streetName;
-                //then replace all spaces with wildcards
-                addressVal = addressVal.replaceAll(" ", "%");
-                spp.setAddress_val(addressVal);
+                spp.setAddress_val(houseNum + " " + streetName);
                 spp.setMuni_ctl(true);
                 spp.setMuni_val(currentRequest.getMuni());
                 spp.setLimitResultCount_ctl(true);

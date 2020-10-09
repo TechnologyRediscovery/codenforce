@@ -220,7 +220,8 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable {
                 | AuthorizationException 
                 | BObStatusException 
                 | EventException 
-                | ViolationException ex) {
+                | ViolationException 
+                | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
