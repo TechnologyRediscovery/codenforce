@@ -370,6 +370,28 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
     }
     
+      public void removeLinkBlobToCodeViolation(int cvid, int blobid) throws IntegrationException{
+        Connection con = getPostgresCon();
+        String query =  " DELTE FROM public.codeviolationphotodoc WHERE photodoc_photodocid=? AND codeviolation_violationid=?;" ;
+        
+        PreparedStatement stmt = null;
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, blobid);
+            stmt.setInt(2, cvid);
+            stmt.execute();
+            System.out.println("BlobIntegrator.linkBlobToCodeViolation | UNlink successfull. ");
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error unlinking Blob to CodeViolation", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
     public void linkBlobToProperty(int blobID, int propertyID) throws IntegrationException{
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.propertyphotodoc(\n" +

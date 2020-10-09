@@ -14,7 +14,7 @@
             <ui:define name="content">
                 <f:view id="occperiod-search-view">
                     <div class="mainContainer">
-                        <h1>Occupancy period search</h1>
+                        <h1>Occupancy period search and workflow</h1>
 
                         <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
                                      columnClasses="gridTd, gridTd"> 
@@ -351,7 +351,7 @@
                                                                          disabled="#{!occPeriodSearchBB.searchParamsSelected.property_ctl}">
 
                                                             <f:selectItem itemLabel="select a propery..." noSelectionOption="true" />
-                                                            <f:selectItems value="#{occPeriodSearchBB.propListForSearch}"  var="p" itemValue="#{p}" 
+                                                            <f:selectItems value="#{occPeriodSearchBB.search_propList}"  var="p" itemValue="#{p}" 
                                                                            itemLabel="#{p.address} (#{p.muni.muniName})"/>
                                                             <f:converter converterId="propertyConverter"/>
 
@@ -375,7 +375,7 @@
                                                                          disabled="#{!occPeriodSearchBB.searchParamsSelected.periodType_ctl}">
 
                                                             <f:selectItem itemLabel="select a period type..." noSelectionOption="true" />
-                                                            <f:selectItems value="#{occPeriodSearchBB.occPeriodTypeList}"  var="t" itemValue="#{t}" 
+                                                            <f:selectItems value="#{occPeriodSearchBB.search_occPeriodTypeList}"  var="t" itemValue="#{t}" 
                                                                            itemLabel="#{t.title}"/>
                                                             <f:converter converterId="occPeriodTypeConverter"/>
 
@@ -399,7 +399,7 @@
                                                                          disabled="#{!occPeriodSearchBB.searchParamsSelected.person_ctl}">
 
                                                             <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
-                                                            <f:selectItems value="#{occPeriodSearchBB.personListForSearch}"  var="p" itemValue="#{p}" 
+                                                            <f:selectItems value="#{occPeriodSearchBB.search_personList}"  var="p" itemValue="#{p}" 
                                                                            itemLabel="#{p.firstName} #{p.lastName} (ID:#{p.personID})"/>
                                                             <f:converter converterId="personConverter"/>
 

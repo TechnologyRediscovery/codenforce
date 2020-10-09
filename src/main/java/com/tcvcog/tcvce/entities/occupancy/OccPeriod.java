@@ -38,6 +38,7 @@ public  class       OccPeriod
      
     protected User periodTypeCertifiedBy;
     protected LocalDateTime periodTypeCertifiedTS;
+    protected List<EventCnF> eventList;
     
     protected BOBSource source;
     protected User createdBy;
@@ -61,7 +62,6 @@ public  class       OccPeriod
     protected String notes;
     
     protected boolean active;
-    protected List<EventCnF> eventList;
     
     
     

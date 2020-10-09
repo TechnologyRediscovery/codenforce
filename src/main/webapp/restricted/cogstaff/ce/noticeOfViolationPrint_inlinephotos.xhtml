@@ -23,7 +23,7 @@
                         <f:param name="blobID" value="#{noticeOfViolationBB.currentNotice.style.header_img_id}"/>
                     </p:graphicImage>
                 </div>
-                
+
 
                 <div class="addressee" style="left: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_left}px; top: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_top}px">
                     <f:subview id="subview-addressee-normaladdress"
@@ -90,12 +90,12 @@
                                     <h:outputLabel  value="#{v.violatedEnfElement.codeElement.source.sourceName} 
                                                     (#{v.violatedEnfElement.codeElement.source.sourceYear}) " />
                                     <p:spacer height="2px" />
-                                    
+
                                     <h:outputText    value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
                                     <h:outputText    value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
-                                    
+
                                     <h:outputText value=" | " />
-                                    
+
                                     <h:outputText    value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum} " />
                                     <h:outputText    value="#{v.violatedEnfElement.codeElement.ordSecTitle}" />
 
@@ -131,8 +131,30 @@
                                                   rendered="#{v.includeViolationPhotos}"/>
                                 </f:facet>
                             </h:panelGrid>
-                            <hr />
+
                         </div>
+                        <h4>Photos</h4>
+                        <div class="ui-g data_container_nested_restrict">
+
+
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field" >
+                                    
+                                <p:dataScroller   id="photos-ds"
+                                                  value="#{v.blobList}"
+                                                  var="photo"
+                                                  styleClass="scroller-half">
+                                     <div class="restrict-main-contents-io-content" >
+
+                                        <p:graphicImage width="400" value="#{blobCoordinator.image}">
+                                            <f:param name="blobID" value="#{photo.blobID}"/>
+                                        </p:graphicImage>
+                                    
+                                    </div>
+                                </p:dataScroller>
+                            </div>
+                        </div>
+
+                        <hr />
                     </p:dataScroller>
 
                     <div class="text-insert">
@@ -155,49 +177,7 @@
 
                 </div>
 
-                <f:subview id="subview-violation-photos"
-                           rendered="true">
-                    <div class="violation-photo-attachments">
-                        <h2>Attachments: photographs of code violations</h2>
-                        <p:dataScroller id="violations-photos-ds"
-                                        value="#{noticeOfViolationBB.currentNotice.violationList}"
-                                        var="v">
-                            <h4>Photos of code violation:
-                                
-                                    <h:outputText    value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
-                                    <h:outputText    value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
 
-                            </h4>
-                            <p:dataTable
-                                    id="photoTable"
-                                    var="photo"
-                                    value="#{v.blobList}"
-                                    rowKey="#{photo.blobID}"
-                                    tableStyleClass="primeDataTable"
-                                    draggableRows="false" tabindex="6">
-                                    <p:column width="70%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Photo"/>
-                                        </f:facet>
-                                        <p:graphicImage width="100%" value="#{blobCoordinator.image}">
-                                            <f:param name="blobID" value="#{photo.blobID}"/>
-                                        </p:graphicImage>
-                                    </p:column>
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Description"/>
-                                        </f:facet>
-                                        <p:inputTextarea id="desc" value="#{photo.description}"
-                                                         style="width: 100%;" tabindex="5" required="true" styleClass="inputText">
-                                            <p:ajax />
-                                        </p:inputTextarea>
-                                    </p:column>
-
-                                </p:dataTable>
-
-                        </p:dataScroller>
-                    </div>
-                </f:subview>
             </div>
         </f:view>
     </h:body>

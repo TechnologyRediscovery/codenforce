@@ -61,7 +61,7 @@
 
                         <p:dataScroller
                             id="caselist-report-datascroller"
-                            value="#{caseProfileBB.caseList}"
+                            value="#{ceCaseSearchProfileBB.caseList}"
                             var="cse">
 
                             <h1 class="printing-page-break-before">
@@ -86,18 +86,14 @@
                             <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
                                          columnClasses="gridTd, gridTd">
                                 <h:panelGroup>
-                                    <h:outputLabel styleClass="bold" value="Case Status: #{caseProfileBB.currentCase.casePhase.caseOpen ? 'Open' : 'Closed'}" />
+                                    <h:outputLabel styleClass="bold" value="Case Status: #{ceCaseSearchProfileBB.currentCase.casePhase.caseOpen ? 'Open' : 'Closed'}" />
                                     <div class="status-display-container">
-                                        <div class="status-display-icon-container #{caseProfileBB.styleClassStatusIcon}">
+                                        <div class="status-display-icon-container #{ceCaseSearchProfileBB.styleClassStatusIcon}">
                                             <i class="material-icons status-display-icon-i"><h:outputText id="status-display-icon-ot" value="#{cse.casePhaseIcon.materialIcon}"/></i>
                                         </div>
                                         <div class="status-display-status-list-container">
                                             <ul class="status-list">
 
-                                                <li><h:outputText value="Stage 1: Investigation" styleClass="#{caseProfileBB.styleClassInvestigation}"/></li>
-                                                <li><h:outputText value="Stage 2: Enforcement" styleClass="#{caseProfileBB.styleClassEnforcement}"/></li>
-                                                <li><h:outputText value="Stage 3: Citation" styleClass="#{caseProfileBB.sytleClassCitation}"/></li>
-                                                <li><h:outputText value="Closed" styleClass="#{caseProfileBB.sytleClassClosed}"/></li>
                                             </ul>
                                         </div>
 
@@ -137,13 +133,13 @@
                             <h2 id="violations">Code violations  </h2>
 
                             <h:outputLabel styleClass="bold" value="Unresolved code violations: 
-                                           #{caseProfileBB.currentCase.violationListUnresolved.size()} 
-                                           / #{caseProfileBB.currentCase.violationList.size()}"/> 
+                                           #{ceCaseSearchProfileBB.currentCase.violationListUnresolved.size()} 
+                                           / #{ceCaseSearchProfileBB.currentCase.violationList.size()}"/> 
                             <p:spacer height="5px"/>
 
                             <h:outputLabel styleClass="bold" value="Violations with compliance achieved: 
-                                           #{caseProfileBB.currentCase.violationListResolved.size()} 
-                                           / #{caseProfileBB.currentCase.violationList.size()}"/> 
+                                           #{ceCaseSearchProfileBB.currentCase.violationListResolved.size()} 
+                                           / #{ceCaseSearchProfileBB.currentCase.violationList.size()}"/> 
                             <p:spacer height="5px"/>
 
                             <p:dataTable

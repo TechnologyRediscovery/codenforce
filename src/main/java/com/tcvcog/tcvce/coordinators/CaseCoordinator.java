@@ -309,6 +309,45 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         return cspudhList;
     }
+    /**
+     * Utility method for converting a List of simple CECase objects into the a
+     * case that contains information about its Property and any associated
+     * Units
+     *
+     * @param cseList
+     * @return
+     */
+    public List<CECasePropertyUnitHeavy> cecase_refreshCECasePropertyUnitHeavyList(List<CECasePropertyUnitHeavy> cseList) {
+
+        List<CECasePropertyUnitHeavy> cspudhList = new ArrayList<>();
+
+        if (cseList != null && !cseList.isEmpty()) {
+            if (getSessionBean().getSessUser() != null) {
+
+                for (CECase cse : cseList) {
+                    try {
+                        cspudhList.add(cecase_assembleCECasePropertyUnitHeavy(cse));
+                    } catch (IntegrationException | SearchException ex) {
+                        System.out.println(ex);
+
+                    }
+                }
+            } else {
+                //This session must be public
+                UserCoordinator uc = getUserCoordinator();
+                for (CECase cse : cseList) {
+                    try {
+                        cspudhList.add(cecase_assembleCECasePropertyUnitHeavy(cse));
+                    } catch (IntegrationException | SearchException ex) {
+                        System.out.println(ex);
+                    }
+                }
+            }
+
+        }
+
+        return cspudhList;
+    }
 
     /**
      * Asks the Integrator for an icon based on case phase
@@ -1936,6 +1975,25 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
     }
     
+    
+    public void violation_removeLinkBlobToCodeViolation(CodeViolation cv, int blobID) throws BObStatusException {
+        BlobIntegrator bi = getBlobIntegrator();
+        if(cv == null || blobID == 0){
+            throw new BObStatusException("Cannot link blob to violation with null blob or viol");
+        }
+                
+        try {
+            bi.removeLinkBlobToCodeViolation(cv.getViolationID(), blobID);
+            System.out.println("linkBlobBB.linkBlobToCodeViolation | link succesfull");  //TESTING
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR
+                            ,"Failed to link file to selected violation. Sorry! " , ""));
+        }
+        
+    }
+    
 
     /**
      * Attempts to deactivate a code violation, but will thow an Exception if
@@ -1983,7 +2041,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             throw new BObStatusException("I, the mighty CaseCoordinator, shall not extend the compliance window by 0 days");
         }
         
-        if(cv.isAllowStipCompDateUpdate()){
+//        if(cv.isAllowStipCompDateUpdate()){
             LocalDateTime oldStipDate = cv.getStipulatedComplianceDate();
             cv.setStipulatedComplianceDate(LocalDateTime.now().plusDays(daysToExtend));
             violation_updateCodeViolation(cse, cv, ua);
@@ -1996,18 +2054,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             StringBuilder sb = new StringBuilder();
             sb.append("Previous stipulated compliance date of ");
             sb.append(getPrettyDate(oldStipDate));
-            sb.append(" has been extended by ");
-            sb.append(daysToExtend);
-            sb.append(" days to ");
+            sb.append(" has been changed to ");
             sb.append(getPrettyDate(cv.getStipulatedComplianceDate()));
             sb.append(".");
             
             mbp.setNewMessageContent(sb.toString());
             violation_updateNotes(mbp, cv);
-            
-        } else {
-            throw new BObStatusException("Code violation status does not permit updates to compliance date");
-        }
+//            
+//        } else {
+//            throw new BObStatusException("Code violation status does not permit updates to compliance date");
+//        }
     }
     
     /**

@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -47,6 +48,8 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -98,6 +101,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     @PostConstruct
     public void initBean() {
         CaseCoordinator cc = getCaseCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        PersonCoordinator persC = getPersonCoordinator();
         currentNotice = getSessionBean().getSessNotice();
         try {
             currentCase = cc.cecase_assembleCECaseDataHeavy(getSessionBean().getSessCECase(), getSessionBean().getSessUser());
@@ -107,7 +112,12 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
         blockListBeforeViolations = new ArrayList<>();
         blockListAfterViolations = new ArrayList<>();
-        PropertyDataHeavy pdh = getSessionBean().getSessProperty();
+        PropertyDataHeavy pdh = null;
+        try {
+            pdh = pc.assemblePropertyDataHeavy(currentCase.getProperty(), getSessionBean().getSessUser());
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
+            System.out.println(ex);
+        } 
         if(pdh != null){
             personCandidateList = pdh.getPersonList();
         }

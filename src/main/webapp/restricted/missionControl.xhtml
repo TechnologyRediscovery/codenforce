@@ -152,11 +152,14 @@
                                                     <f:facet name="header">
                                                         <h:outputText value="view" />
                                                     </f:facet>
+                                                    <ui:remove>
+                                                        
                                                     <p:commandButton    id="cecases-viewcase-cb"
                                                                         icon="fa fa-archive" 
                                                                         action="#{missionControlBB.onViewCECaseButtonChange(c)}"
                                                                         ajax="false"
                                                                         />
+                                                    </ui:remove>
                                                 </p:column>
                                             </p:dataTable>
 

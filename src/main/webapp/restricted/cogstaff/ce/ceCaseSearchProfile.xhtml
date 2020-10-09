@@ -346,7 +346,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                     value="view property profile" />
 
                                                 <p:commandButton    id="refresh-case-cb" 
-                                                                    ajax="true" actionListener="#{ceCaseWorkflowBB.refreshCurrentCase}"
+                                                                    ajax="true" actionListener="#{ceCaseSearchProfile.refreshCurrentCase}"
                                                                     icon="fa fa-refresh" styleClass="noFill"
                                                                     value="reload current case data" 
                                                                     update="@all"
@@ -358,7 +358,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                     value="case settings" />
 
                                                 <p:commandButton   id="print-case-cb" 
-                                                                   ajax="true" actionListener="#{ceCaseWorkflowBB.prepareReportCECase}"
+                                                                   ajax="true" actionListener="#{ceCaseSearchProfileBB.prepareReportCECase}"
                                                                    icon="fa fa-print" styleClass="noFill"
                                                                    oncomplete="PF('report-case-profile-diaglog-var').show()"
                                                                    value="print case profile" 
@@ -376,7 +376,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                  widgetVar="caseprofile-panel-todos-var"
                                                  collapsed="false"
                                                  rendered="false"
-                                                 header="TODOs (#{ceCaseWorkflowBB.currentCase.proposalList.size()})">
+                                                 header="TODOs (#{ceCaseSearchProfileBB.currentCase.proposalList.size()})">
 
                                        
                                             
@@ -417,7 +417,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <p:dataScroller id="proposals-proposalscroller"
                                                                 var="proposal"
                                                                 widgetVar="proposals-proposalscroller-var"
-                                                                value="#{ceCaseWorkflowBB.currentCase.assembleProposalList(workflowBB.selectedProposalsViewOption)}"
+                                                                value="#{ceCaseSearchProfileBB.currentCase.assembleProposalList(workflowBB.selectedProposalsViewOption)}"
                                                                 rowIndexVar="#{proposal.proposalID}">
                                                     <div class="outlinedBox">
                                                         <div class="proposal-metadata-container">
@@ -2086,7 +2086,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                     <p:dialog   id="cecase-report-dialog"
-                                widgetVar="cecase-report-dialog-var"
+                                widgetVar="report-case-profile-diaglog-var"
                                 closable="true" 
                                 responsive="true"
                                 >
@@ -2104,19 +2104,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                     <p:spacer height="5px"/>
 
-                                    <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{ceCaseWorkflowBB.reportCECase.title}"/>
+                                    <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{ceCaseSearchProfileBB.reportCECase.title}"/>
                                     <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
 
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include case name" for="report-case-profile-casename-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-casename-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeCaseName}" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-casename-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeCaseName}" />
 
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
                                     <p:spacer height="5px"/>
-                                    <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{ceCaseWorkflowBB.reportCECase.notes}"/>
+                                    <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{ceCaseSearchProfileBB.reportCECase.notes}"/>
                                     <p:spacer height="5px"/>
                                 </f:facet>
 
@@ -2124,37 +2124,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <h3>Case event history report options</h3>
 
                                     <h:outputLabel class="bold" value="Include hidden events: " for="report-case-profile-hidden-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-hidden-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeHiddenEvents}" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-hidden-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeHiddenEvents}" />
 
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include inactive events: " for="report-case-profile-inactive-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-inactive-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeInactiveEvents}" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-inactive-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeInactiveEvents}" />
 
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include event notes: " for="report-case-profile-eventnotes-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-eventnotes-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeEventNotes}" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-eventnotes-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeEventNotes}" />
 
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include requested action fields: " for="report-case-profile-eventrequests-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-eventrequests-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeRequestedActionFields}" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-eventrequests-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeRequestedActionFields}" />
 
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include non-public, muni-only events " for="report-case-profile-events-muni-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-events-muni-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeMunicipalityDiclosedEvents}" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-events-muni-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeMunicipalityDiclosedEvents}" />
 
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include code officer only events " for="report-case-profile-events-ceo-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-events-ceo-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeOfficerOnlyEvents}" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-events-ceo-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeOfficerOnlyEvents}" />
 
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include event access and metadata" for="report-case-profile-events-meta-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-events-meta-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeEventMetadata}" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-events-meta-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeEventMetadata}" />
 
                                 </h:panelGroup>
                                 <h:panelGroup>
@@ -2162,22 +2162,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <h3>Other options</h3>
 
                                     <h:outputLabel class="bold" value="Include full letter text of notices of violation: " for="report-case-profile-noticetext-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-noticetext-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeNoticeFullText}" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-noticetext-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeNoticeFullText}" />
 
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include returned notices of violation: " for="report-case-profile-allnotices-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-allnotices-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeAllNotices}" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-allnotices-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeAllNotices}" />
 
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include full text of violated ordinances: " for="report-case-profile-ordtext-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-ordtext-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeFullOrdinanceText}" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-ordtext-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeFullOrdinanceText}" />
 
                                     <p:spacer height="5px"/>
 
                                     <h:outputLabel class="bold" value="Include photos of violations" for="report-case-profile-photo-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-photo-chkbox" value="#{ceCaseWorkflowBB.reportCECase.includeViolationPhotos}" />
+                                    <p:selectBooleanCheckbox id="report-case-profile-photo-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeViolationPhotos}" />
 
                                 </h:panelGroup>
                             </h:panelGrid>
@@ -2186,7 +2186,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                              value="Cancel" icon="fa fa-stop" 
                                              onclick="PF('report-case-profile-diaglog-var').hide()"/>
 
-                            <p:commandButton ajax="true" action="#{ceCaseWorkflowBB.generateReportCECase}"
+                            <p:commandButton ajax="true" action="#{ceCaseSearchProfileBB.generateReportCECase}"
                                              value="Generate" icon="fa fa-print" 
                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                              />

@@ -152,7 +152,6 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         selectedEventView = ec.determineDefaultEventView(sb.getSessUser());
         personCandidates = new ArrayList<>();
         
-        
         updateNewEventFieldsWithCatChange = true;
         pageModes = new ArrayList<>();
 

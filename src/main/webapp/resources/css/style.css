@@ -802,6 +802,10 @@ i.status-display-icon-i{
     font-weight: bold;
 }
 
+.underline{
+    text-decoration: underline;
+}
+
 .note{
     font-style: italic;
     font-size: 0.8em;
@@ -915,8 +919,8 @@ div.headerLinks{
     font-family: Heebo;
     white-space: normal;
     overflow-wrap: normal;
-    padding: 20px;
-    line-height: 105%;
+    padding: 5px;
+    line-height: 100%;
 
 }
 

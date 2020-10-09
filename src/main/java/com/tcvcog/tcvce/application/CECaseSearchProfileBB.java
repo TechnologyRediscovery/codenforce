@@ -121,7 +121,7 @@ public class CECaseSearchProfileBB
         configureParameters();
 
         caseList = new ArrayList<>();
-        caseList.addAll(sb.getSessCECaseList());
+        caseList.addAll(cc.cecase_refreshCECasePropertyUnitHeavyList(sb.getSessCECaseList()));
         CECase cseTemp = getSessionBean().getSessCECase();
         try {
             if(cseTemp == null){
@@ -550,6 +550,7 @@ public class CECaseSearchProfileBB
      * @return 
      */
     public String generateReportCECase() {
+        System.out.println("CECaseSearchProfileBB.generateReportCECase");
         CaseCoordinator cc = getCaseCoordinator();
 
         getReportCECase().setCse(currentCase);
@@ -583,7 +584,7 @@ public class CECaseSearchProfileBB
      */
     public void prepareReportCECase(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
-        setReportCECase(cc.report_getDefaultReportConfigCECase(currentCase));
+        reportCECase = cc.report_getDefaultReportConfigCECase(currentCase);
         System.out.println("CaseProfileBB.prepareReportCECase | reportConfigOb: " + getReportCECase());
 
     }
@@ -705,8 +706,8 @@ public class CECaseSearchProfileBB
     public void prepareReportCECaseList(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
 
-        if (getReportCECaseList() == null) {
-            setReportCECaseList(cc.report_getDefaultReportConfigCECaseList());
+        if (reportCECaseList == null) {
+            reportCECaseList = cc.report_getDefaultReportConfigCECaseList();
         }
         System.out.println("CaseProfileBB.prepareCaseListReport");
 
@@ -717,9 +718,9 @@ public class CECaseSearchProfileBB
         getReportCECaseList().setMuni(getSessionBean().getSessMuni());
         getReportCECaseList().setGenerationTimestamp(LocalDateTime.now());
 
-        getSessionBean().setReportConfigCECaseList(getReportCECaseList());
+        getSessionBean().setReportConfigCECaseList(reportCECaseList);
         getSessionBean().setReportConfigCECase(null);
-        getSessionBean().setSessReport(getReportCECaseList());
+        getSessionBean().setSessReport(reportCECaseList);
 
         return "reportCECaseList";
 

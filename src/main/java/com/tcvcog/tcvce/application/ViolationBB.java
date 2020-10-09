@@ -321,6 +321,9 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.toString(), ""));
         } 
+        getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                    "Stipulated compliance dates is now: " + getPrettyDate(currentViolation.getStipulatedComplianceDate()), ""));
         return "ceCaseViolations";
 
     }
@@ -565,18 +568,19 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      * @return
      */
     public String onPhotoRemoveButtonChange(int photoid) {
-        BlobCoordinator bc = getBlobCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
         try {
-            bc.deleteBlob(photoid);
+            cc.violation_removeLinkBlobToCodeViolation(currentViolation, photoid);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Blob removed with ID " + photoid, ""));
-        } catch (IntegrationException ex) {
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Cannot remove photo yet: unsupported operation", ""));
             
-        }
+        } 
 
         // do something here
         return "ceCaseViolations";
@@ -589,12 +593,12 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             bc.updateBlobDescription(blob);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully updated blob", ""));
+                            "Successfully updated photo description", ""));
             
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Cannot update blob description", ""));
+                            "Cannot update photo description", ""));
             
         }
         

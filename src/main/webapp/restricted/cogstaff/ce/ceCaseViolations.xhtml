@@ -681,12 +681,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:panel id="violation-update-stipdate-panel"
                                              toggleable="true"
                                              collapsed="false"
-                                             header="Extend stipulated compliance date for Violation ID: #{violationBB.currentViolation.violationID}"
-                                             rendered="#{violationBB.activeUpdateMode and (empty violationBB.currentViolation.stipulatedComplianceDate) and violationBB.currentViolation.allowStipCompDateUpdate }"
+                                             header="Chnage stipulated compliance date for Violation ID: #{violationBB.currentViolation.violationID}"
+                                             rendered="#{violationBB.activeUpdateMode}"
                                              >
 
 
                                         <h:form id="violation-update-stipdate-form">
+                                            <h4>Current Compliance date</h4>
+                                            <p>
+                                                <h:outputText value="#{violationBB.getPrettyDate(violationBB.currentViolation.stipulatedComplianceDate)} "/>
+                                            </p>
 
                                             <div class="ui-g data_container_nested_restrict">
 
@@ -702,7 +706,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
                                                     <div class="restrict-main-contents-io-content" >
 
-                                                        <p:selectBooleanButton id="prop-pers-personlink-chooselinkmethod-sbb"
+                                                        <p:selectBooleanButton id="violation-update-stipdate-sbb"
                                                                                onLabel="Pick a date" 
                                                                                offLabel="Enter a number of days from today"
                                                                                styleClass="selectButton" 
@@ -727,7 +731,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                                         <p:calendar id="update-stipdate-cal"
-                                                                    value="#{violationBB.currentViolation.stipulatedComplianceDateUtilDate}" 
+                                                                    value="#{violationBB.extendedStipCompDate}" 
                                                                     disabled="#{!violationBB.extendStipCompUsingDate}"
                                                                     mode="popup"  
                                                                     showOn="button" 
@@ -771,10 +775,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             </div>
 
                                             <p:commandButton 
+                                                id="update-stipdate-sbb"
                                                 icon="fa fa-trash"
                                                 ajax="false"
                                                 action="#{violationBB.onViolationExtendStipCompDateCommitButtonChange}"
-                                                value="Extend Stipulated Complaince Date"
+                                                value="Change Stipulated Complaince Date"
+                                                disabled="#{!(empty violationBB.currentViolation.actualComplianceDate)}"
+                                                update="form-messages-growl"
                                                 />
 
                                         </h:form>
@@ -1067,6 +1074,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                        value="Delete Photo"  
                                                                        icon="fa fa-eraser"
                                                                        ajax="true"
+                                                                       update="form-messages-global"
                                                                        actionListener="#{violationBB.onPhotoRemoveButtonChange(photo.blobID)}"
                                                                        />
 
@@ -1087,7 +1095,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                        value="Update Desc"  
                                                                        icon="fa fa-edit"
                                                                        ajax="true"
-                                                                       update="photo-desc-growl"
+                                                                       update="form-messages-global"
                                                                        actionListener="#{violationBB.onPhotoUpdateDescription(photo)}"
                                                                        />
                                                     
@@ -1174,11 +1182,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                     <p:dialog   id="violation-choose-dialog"
-                                height="800" width="1000"
+                                height="800" width="1600"
                                 widgetVar="violation-choose-dialog-var"
                                 responsive="true"
                                 resizable="trie"
                                 closable="true"
+                                closeOnEscape="true"
                                 header="Choose Violation"
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                 > 
@@ -1216,7 +1225,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <h:outputText value="#{cse.codeElement.source.sourceName}(#{cse.codeElement.source.sourceYear})"/>
                                 </p:column>
 
-                                <p:column width="5%" sortBy="#{cse.codeElement.ordchapterNo}">
+                                <p:column width="5%" 
+                                          sortBy="#{cse.codeElement.ordchapterNo}">
                                     <f:facet name="header">
                                         <h:outputText value="Chap#"/>
                                     </f:facet>
