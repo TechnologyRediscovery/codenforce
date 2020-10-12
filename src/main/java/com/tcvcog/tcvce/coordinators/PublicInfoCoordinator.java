@@ -1501,7 +1501,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         
         LocalDateTime current = LocalDateTime.now();
         StringBuilder sb = new StringBuilder();
-        Property currentProp = null; //We will store the associated property ID so we can attach an event to it 
+        Property currentProp = null; //We will store the associated property so we can attach an event to it 
+        
+        //Stores the ID and class of the bundled object
+        //so that we can attach them to the event description.
+        int objectID = 0;
+        String objectKind = "";
         
         //You'll see brackets in the switch below for each case.
         //These are so that each case has its own scope
@@ -1514,8 +1519,10 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
                 PublicInfoBundleCEActionRequest requestBundle = (PublicInfoBundleCEActionRequest) bundle;
 
+                objectID = requestBundle.getBundledRequest().getRequestID();
+                
                 //Get the external notes currently in the database
-                CEActionRequest dbRequest = ceari.getActionRequestByRequestID(requestBundle.getBundledRequest().getRequestID());
+                CEActionRequest dbRequest = ceari.getActionRequestByRequestID(objectID);
                 
                 String currentNotes = dbRequest.getPublicExternalNotes();
                 
@@ -1523,8 +1530,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                     sb.append(currentNotes);
                     sb.append("<br /><br />");
                 }
-                sb.append("CASE NOTE ADDED AT ");
-                sb.append(current.toString());
+                sb.append("CODE ENFORCEMENT REQUEST NOTE ADDED AT ");
+                sb.append(getPrettyDate(current));
                 sb.append("by public user: <br />");
                 sb.append(message);
                 sb.append("<br />");
@@ -1536,9 +1543,11 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 
                 currentProp = dbRequest.getRequestProperty();
                 
+                objectKind = "Code Enforcement Action Request";
+                
             }
             break;
-            //Nothing yet
+            //Nothing yet. Remember to set objectID and objectKind!
             case "CECASE": {
 
             }
@@ -1549,8 +1558,10 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
                 PublicInfoBundleOccPermitApplication applicationBundle = (PublicInfoBundleOccPermitApplication) bundle;
 
+                objectID = applicationBundle.getBundledApplication().getId();
+                
                 //Get the external notes currently in the database
-                OccPermitApplication dbApplication = oi.getOccPermitApplication(applicationBundle.getBundledApplication().getId());
+                OccPermitApplication dbApplication = oi.getOccPermitApplication(objectID);
                 
                 String currentNotes = dbApplication.getExternalPublicNotes();
                 
@@ -1559,7 +1570,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                     sb.append("<br /><br />");
                 }
                 sb.append("APPLICATION NOTE ADDED AT ");
-                sb.append(current.toString());
+                sb.append(getPrettyDate(current));
                 sb.append("by public user: <br />");
                 sb.append(message);
                 sb.append("<br />");
@@ -1572,6 +1583,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 PropertyIntegrator pi = getPropertyIntegrator();
                 
                 currentProp = pi.getProperty(dbApplication.getApplicationPropertyUnit().getPropertyID());
+                
+                objectKind = "Occupancy Permit Application";
                 
             }
             break;
@@ -1593,7 +1606,17 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             EventCnF ev = ec.initEvent(propertyInfoCase,
                     ec.getEventCategory(Integer.parseInt(
                             getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                                    .getString("propertyinfoeventcatid"))));
+                                    .getString("publicnoteeventcatid"))));
+            
+            sb = new StringBuilder();
+            sb.append(getResourceBundle(Constants.MESSAGE_TEXT)
+                .getString("publicNoteEventDescription"));
+            sb.append(" " + objectKind+ " ");
+            sb.append(" ID#: (");
+            sb.append(objectID);
+            sb.append(")");
+            
+            ev.setDescription(sb.toString());
             
             ec.addEvent(ev, propertyInfoCase, publicUser);
             
