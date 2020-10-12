@@ -1,7 +1,19 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2018 Turtle Creek Valley
+Council of Governments, PA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.tcvcog.tcvce.coordinators;
 
@@ -10,6 +22,7 @@ import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -61,13 +74,13 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             BlobIntegrator bi = getBlobIntegrator();
             int blobID = Integer.parseInt(context.getExternalContext().getRequestParameterMap().get("blobID"));
             try {
-                Blob blob = bi.getPhotoBlobLight(blobID);
+                BlobLight blob = bi.getPhotoBlobLight(blobID);
                 if (null == blob.getType()) {
                     throw new BlobTypeException("BlobType is null. ");
                 } else {
                     switch (blob.getType()) {
                         case PHOTO:
-                            sc = new DefaultStreamedContent(new ByteArrayInputStream(blob.getBytes()));
+                            sc = new DefaultStreamedContent(new ByteArrayInputStream(bi.getBlobBytes(blobID)));
                             break;
                         case PDF:
                             sc = new DefaultStreamedContent(new FileInputStream(new File("/home/noah/Documents/COG Project/codeconnect/src/main/webapp/images/pdf-icon.png")));
@@ -94,7 +107,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @throws BlobTypeException
      */
     public StreamedContent getImageFromID(int blobID) throws BlobTypeException {
-        FacesContext context = FacesContext.getCurrentInstance();
+        //FacesContext context = FacesContext.getCurrentInstance();
         DefaultStreamedContent sc = null;
 
         BlobIntegrator bi = getBlobIntegrator();
@@ -108,7 +121,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             } else {
                 switch (blob.getType()) {
                     case PHOTO:
-                        sc = new DefaultStreamedContent(new ByteArrayInputStream(blob.getBytes()));
+                        sc = new DefaultStreamedContent(new ByteArrayInputStream(bi.getBlobBytes(blob.getBlobID())));
                         break;
                     case PDF:
                         sc = new DefaultStreamedContent(new FileInputStream(new File("/home/noah/Documents/COG Project/codeconnect/src/main/webapp/images/pdf-icon.png")));
