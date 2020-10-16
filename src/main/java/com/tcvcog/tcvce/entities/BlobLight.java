@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 public class BlobLight {
 
     protected int blobID;
+    protected int bytesID;
     protected BlobType type;
     protected String description, filename;
     protected LocalDateTime timestamp;
@@ -113,6 +114,14 @@ public class BlobLight {
      */
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+
+    public int getBytesID() {
+        return bytesID;
+    }
+
+    public void setBytesID(int bytesID) {
+        this.bytesID = bytesID;
     }
     
 }

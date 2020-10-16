@@ -29,6 +29,7 @@ public class Blob  extends BlobLight {
     
     public Blob(BlobLight input){
         blobID = input.getBlobID();
+        bytesID = input.getBytesID();
         type = input.getType();
         description = input.getDescription();
         filename = input.getFilename();

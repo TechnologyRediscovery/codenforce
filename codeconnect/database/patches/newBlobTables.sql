@@ -22,7 +22,7 @@ CREATE TABLE public.blobbytes
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.photodoc
+ALTER TABLE public.blobbytes
   OWNER TO sylvia;
 
 --This statement should copy some of photodoc's columns into blob
@@ -66,3 +66,33 @@ DROP COLUMN photodoctype_typeid,
 DROP COLUMN photodocblob,
 DROP COLUMN photodocuploadpersonid,
 DROP COLUMN photodocfilename;
+
+--Let's make the metadata table
+
+CREATE SEQUENCE IF NOT EXISTS blobmetadata_seq
+INCREMENT 1
+START 10;
+
+CREATE TABLE public.blobmetadata
+(
+  metadataid integer NOT NULL DEFAULT nextval('blobmetadata_seq'::regclass),
+  blobtype_typeid integer NOT NULL,
+  metadatamap bytea,
+  CONSTRAINT blobmetadata_pk PRIMARY KEY (metadataid),
+  CONSTRAINT blobmetadata_blobtype_fk FOREIGN KEY (blobtype_typeid)
+      REFERENCES public.blobtype (typeid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.blobbytes
+  OWNER TO sylvia;
+
+--link blobbytes to the metadata
+
+ALTER TABLE blobbytes ADD COLUMN blobmetadata_metadataid integer;
+
+ALTER TABLE blobbytes ADD CONSTRAINT blobbytes_blobmetadata_fk FOREIGN KEY (blobmetadata_metadataid)
+      REFERENCES public.blobmetadata (metadataid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;
