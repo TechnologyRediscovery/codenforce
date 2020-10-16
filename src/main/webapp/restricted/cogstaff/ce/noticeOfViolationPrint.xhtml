@@ -49,7 +49,7 @@
 
 
                     <div class="date-of-record">
-                        <h:outputText id="date-of-record-ot" value="#{noticeOfViolationBB.currentNotice.dateOfRecordPretty}" />
+                        <h:outputText id="date-of-record-ot" value="#{noticeOfViolationBB.getPrettyDateNoTime(noticeOfViolationBB.currentNotice.dateOfRecord)}" />
                     </div> 
 
                     <div class="property-of-concern">
