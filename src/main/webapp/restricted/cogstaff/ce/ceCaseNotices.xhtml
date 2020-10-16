@@ -1,203 +1,1816 @@
 <?xml version='1.0' encoding='UTF-8' ?>
+<!--
+Copyright (C) 2020 Turtle Creek Valley
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
+
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>CE cases notices of violation</title>
+        <title>Notices of Violation</title>
     </h:head>
-    <h:body>
+
+    <h:body id="novs-body">
+
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view id="cecases-notices-view">
+                <f:view id="novs-view">
 
-                    <div class="mainContainer">
+                    <p:outputPanel id="body-panel">
+                        <h:form id="form-messages-global">
+                            <p:growl id="novs-messages-growl"
+                                     />
+                        </h:form>
 
-                            <h:form id="notices-messages-form">
+                        <h1>Notices of Violation</h1>
 
-                                <h:messages id="notices-messages-global"
-                                            globalOnly="true" showDetail="true" showSummary="true"
-                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                </h:messages>
-                            </h:form>
+                        <div class="mainContainer">
+                            <div class="ui-g data-container">
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 list-data-container">
+                                    <h:form id="mode-form">
+                                        <div class="restrict-main-list-mode-button">
 
-                        <h:form id="cecases-notices-form">
-                            
+                                            <p:selectOneButton style="  width: 100%;
+                                                               margin-top: 10px ;
+                                                               height: 20px;"
+                                                               value="#{noticeOfViolationBB.currentMode}"
+                                                               unselectable="false"
+                                                               >
+                                                <f:selectItems value="#{noticeOfViolationBB.pageModes}"
+                                                               var="pmo"
+                                                               itemDisabled="#{pmo.objectSelectRequiredToEnable and empty noticeOfViolationBB.currentNotice}"
+                                                               itemLabel="#{pmo.title}"/>
+                                                <f:ajax render="@all"/>
+                                            </p:selectOneButton>
+                                        </div>
+                                    </h:form>
 
-                            <h2 id="notices">Notices of violation</h2>
+                                    <p:panel    id="nov-list-panel"
+                                                toggleable="true"
+                                                style="width: 100%;"
+                                                widgetVar="nov-list-panel-var"
+                                                collapsed="false"
+                                                rendered="#{noticeOfViolationBB.activeLookupMode}"
+                                                header="Notice list" >
+
+                                        <h:form id="nov-list-form">
+                                            <h2>
+                                                <h:outputText value="Case: #{noticeOfViolationBB.currentCase.caseName}, ID:#{noticeOfViolationBB.currentCase.caseID}" />
+                                                <p:spacer height="3px" />
+                                                <h:outputText value="Property: #{noticeOfViolationBB.currentCase.property.address} (#{noticeOfViolationBB.currentCase.property.muni.muniName})" />
+                                            </h2>
+
+                                            <p:selectOneMenu    id="nov-viewoptions-som"
+                                                                value="#{noticeOfViolationBB.selectedViewOption}"
+                                                                tabindex="10">
+
+                                                <f:selectItems  id="nov-viewoptions-selitems"
+                                                                value="#{noticeOfViolationBB.viewOptionList}"
+                                                                var="vo"
+                                                                itemValue="#{vo}"
+                                                                itemLabel="#{vo.label}"/>
+                                                <p:ajax update="nov-scroller"
+                                                        immediate="true"/>
+                                            </p:selectOneMenu>
+                                            <p:spacer height="5px" />
 
 
-                            <h:form id="notices-form">
-                                <p:commandButton ajax="false" icon="fa fa-paper-plane"
-                                                 action="#{ceCaseNoticesBB.createNewNotice}"
-                                                 value="Create new notice of violation letter"
-                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                 disabled="false"
-                                                 />
-                                <p:spacer height="5px"/>
 
-                                <ui:remove>
-                                    disabled="#{!(empty ceCaseNoticesBB.currentCase.closingDate)}"
-                                </ui:remove>
-                                
-                                <p:dataScroller
-                                    id="notices-ds"
-                                    value="#{ceCaseNoticesBB.currentCase.noticeList}"
-                                    var="notice"
-                                    rendered="true">
+                                            <p:dataTable
+                                                id="nov-scroller"
+                                                var="notice"
+                                                rowKey="#{notice.noticeID}"
+                                                value="#{noticeOfViolationBB.currentCase.assembleNoticeList(noticeOfViolationBB.selectedViewOption)}"
+                                                tableStyleClass="primeDataTable"
+                                                resizableColumns="true"
+                                                reflow="true">
 
-                                    <div class="action-request-header">
-                                        <h:outputText styleClass="bold"   value="Notice dated: " />
-                                        <h:outputText value="#{notice.dateOfRecordPretty}"/>
-                                    </div>
+                                                <p:column width="25%"
+                                                          styleClass="content-align-center"
+                                                          sortBy="#{notice.dateOfRecord}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Date of record" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{notice.dateOfRecordPretty}"/>
+                                                </p:column>
 
-                                    <h:panelGrid columns="2" rendered="true"
-                                                 columnClasses="gridTd-solid-back, gridTd-solid-back"
-                                                 footerClass="no-border">
+                                                <p:column width="15%"
+                                                          styleClass="content-align-center">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Queued?" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{!(empty notice.lockedAndqueuedTS) ? 'Yes' : 'No'}"/>
+                                                </p:column>
 
-                                        <h:panelGroup>
-                                            <h:outputText styleClass="bold" value="Notice ID:" />
-                                            <h:outputText value="#{notice.noticeID}"/>
+                                                <p:column width="15%"
+                                                          styleClass="content-align-center">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Sent?" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{!(empty notice.sentTS) ? 'Yes' : 'No'}"/>
+                                                </p:column>
 
-                                            <p:spacer height="5px"/>
+                                                <p:column width="15%"
+                                                          styleClass="content-align-center">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Returned?" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{!(empty notice.returnedTS) ? 'Yes' : 'No'}"/>
+                                                </p:column>
 
-                                            <h:outputText styleClass="bold"   value="Queued for Mailing: " />
-                                            <h:outputText id="nov-queued-ot" value="#{notice.lockedAndQueuedTSPretty}"/>
-                                            <p:spacer height="5px"/>
+                                                <p:column width="15%"
+                                                          styleClass="content-align-center">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="View" />
+                                                    </f:facet>
+                                                    <p:commandButton ajax="true" 
+                                                                     actionListener="#{noticeOfViolationBB.onObjectViewButtonChange(notice)}"
+                                                                     icon="#{notice.noticeID == noticeOfViolationBB.currentNotice.noticeID ? 'fa fa-hand-o-right':'fa fa-send-o'}"
+                                                                     style="#{notice.noticeID == noticeOfViolationBB.currentNotice.noticeID ? 'background-color: #dee461; color:black; border:none;':''}"
+                                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                     update="@form
+                                                                     nov-profile-panel
+                                                                     nov-add-panel
+                                                                     nov-update-panel
+                                                                     nov-remove-panel
+                                                                     nov-notes-panel"
+                                                                     />
+                                                </p:column>
+                                            </p:dataTable>
+                                        </h:form>
+                                    </p:panel>
+                                </div>
 
-                                            <h:outputText styleClass="bold"  value="Sent Date: " />
-                                            <h:outputText id="nov-sent-date" value="#{notice.sentTSPretty}"/>
+                                <div class="ui-g-12 ui-md-8 ui-lg-8 object-data-container">
 
-                                            <p:spacer height="5px"/>
-                                            <h:outputText styleClass="bold"  value="Returned? " />
-                                            <h:outputText id="nov-returned-date" value="#{notice.returnedTSPretty}"/>
-                                        </h:panelGroup>
+                                    <p:panel    id="nov-profile-panel"
+                                                toggleable="true"
+                                                widgetVar="nov-profile-panel-var"
+                                                collapsed="false"
+                                                rendered="true"
+                                                header="Notice of Violation #{noticeOfViolationBB.currentNotice.dateOfRecordPretty} | ID:#{noticeOfViolationBB.currentNotice.noticeID} | Created by #{!(empty noticeOfViolationBB.currentNotice.creationBy) ? noticeOfViolationBB.currentNotice.creationBy.person.lastName : ''} #{noticeOfViolationBB.getPrettyDateNoTime(noticeOfViolationBB.currentNotice.creationTS)}">
 
-                                        <h:panelGroup rendered="#{!notice.recipient.useSeparateMailingAddress}">
-                                            <h:outputLabel styleClass="bold" value="Recipient:"/>
-                                            <p:spacer height="5px"/>
-                                            <h:outputLabel styleClass="bold" rendered="#{! (empty notice.recipient.ghostCreatedDate)}" value="[ghost of user ID: #{notice.recipient.ghostOf}"/>
-                                            <h:outputText value="#{notice.recipient.firstName} #{notice.recipient.lastName}"/>
-                                            <p:spacer height="5px"/>
-                                            <h:outputText escape="false" value="#{notice.recipient.addressStreet}"/>
-                                            <p:spacer height="5px"/>
-                                            <h:outputText value="#{notice.recipient.addressCity}, #{notice.recipient.addressState} #{notice.recipient.addressZip}"/>
-                                        </h:panelGroup>
+                                        <h:form id="nov-profile-form">
 
-                                        <h:panelGroup rendered="#{notice.recipient.useSeparateMailingAddress}">
-                                            <h:outputLabel styleClass="bold" value="Recipient (using separate mailing address):"/>
-                                            <h:outputLabel styleClass="bold" rendered="#{! (empty notice.recipient.ghostCreatedDate)}" value="[ghost of user ID: #{notice.recipient.ghostOf}"/>
-                                            <h:outputText value="#{notice.recipient.firstName} #{notice.recipient.lastName}"/>
-                                            <p:spacer height="5px"/>
-                                            <h:outputText escape="false" value="#{notice.recipient.mailingAddressStreet}"/>
-                                            <p:spacer height="5px"/>
-                                            <h:outputText value="#{notice.recipient.mailingAddressCity}, #{notice.recipient.mailingAddressState} #{notice.recipient.mailingAddressZip}"/>
-                                        </h:panelGroup>
+                                            <!-- Violation status; single line-->
+                                            <div class="ui-g data_container_nested_restrict">
 
-                                    </h:panelGrid>
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
 
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="nov-addressee">
+                                                            <h:outputText value="Adressee"/>
+                                                        </p:outputLabel>
+                                                    </div>
+
+                                                    <div class="restrict-data-field-value-inline" >
+                                                        <h:outputText   id="nov-addressee"
+                                                                        value="#{notice.recipient.firstName} #{notice.recipient.lastName}"/>
+                                                        <p:spacer height="3px" />
+                                                        <h:outputText escape="false" value="#{notice.recipient.addressStreet}"/>
+                                                        <p:spacer height="3px" />
+                                                        <h:outputText value="#{notice.recipient.addressCity}, #{notice.recipient.addressState} #{notice.recipient.addressZip}"/>
+                                                        <p:spacer height="3px" />
+                                                        <h:outputLabel styleClass="bold" rendered="#{! (empty notice.recipient.ghostCreatedDate)}" value="[ghost of user ID: #{notice.recipient.ghostOf}"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Recipient (using separate mailing address):"/>
+                                                        <p:spacer height="3px" />
+                                                        <h:outputText value="#{notice.recipient.firstName} #{notice.recipient.lastName}"/>
+                                                        <h:outputText escape="false" value="#{notice.recipient.mailingAddressStreet}"/>
+                                                        <p:spacer height="3px" />
+                                                        <h:outputText value="#{notice.recipient.mailingAddressCity}, #{notice.recipient.mailingAddressState} #{notice.recipient.mailingAddressZip}"/>
+                                                        <p:spacer height="3px" />
+                                                        <h:outputLabel styleClass="bold" rendered="#{! (empty notice.recipient.ghostCreatedDate)}" value="[ghost of user ID: #{notice.recipient.ghostOf}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- DOR, qued date, sent date, returned date table-->
+                                            <div class="ui-g data_container_nested_restrict">
+
+                                                <!--NESTED DATA FIELD VERTICAL-->
+                                                <div class="ui-g-3 ui-md-6 ui-lg-2 restrict-data-field-vertical">
+                                                    <!--NESTED DATA LABEL VERTICAL -->
+                                                    <div class="restrict-data-field-label-vertical" >
+                                                        <h:outputLabel value=" "/>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" style="font-weight: 700;">
+                                                        Date:
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" style="font-weight: 700;">
+                                                        Details:
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" style="font-weight: 700;">
+                                                        Action:
+                                                    </div>
+
+                                                </div>
+
+                                                <!--NESTED DATA FIELD VERTICAL-->
+                                                <div class="ui-g-3 ui-md-6 ui-lg-2 restrict-data-field-vertical">
+                                                    <!--NESTED DATA LABEL VERTICAL -->
+                                                    <div class="restrict-data-field-label-vertical" >
+                                                        <h:outputLabel value="Date of Record"/>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText id="nov-dor-ot"
+                                                                      value="#{noticeOfViolationBB.currentNotice.dateOfRecordPretty}" />
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText   id="nov-creator-ot0"
+                                                                        value="#{!(empty noticeOfViolationBB.currentNotice.creationBy) ? 'By ' : ''}"/>
+                                                        <h:outputText   id="nov-creator-ot1"
+                                                                        value="#{!(empty noticeOfViolationBB.currentNotice.creationBy) ? noticeOfViolationBB.currentNotice.creationBy.person.firstName : ''}"/>
+                                                        <h:outputText   id="nov-creator-ot2"
+                                                                        value=" "/>
+                                                        <h:outputText   id="nov-creator-ot3"
+                                                                        value="#{!(empty noticeOfViolationBB.currentNotice.creationBy) ? noticeOfViolationBB.currentNotice.creationBy.person.lastName : ''}"/>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText id="nov-dor-placeholder-ot"
+                                                                      value=" " />
+                                                    </div>
+
+                                                </div>
+
+                                                <!--NESTED DATA FIELD VERTICAL-->
+                                                <div class="ui-g-3 ui-md-6 ui-lg-2 restrict-data-field-vertical">
+                                                    <!--NESTED DATA LABEL VERTICAL -->
+                                                    <div class="restrict-data-field-label-vertical" >
+                                                        <h:outputLabel value="Queued for Mailing"/>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText   id="nov-queued-ot"
+                                                                        value="#{noticeOfViolationBB.currentNotice.lockedAndQueuedTSPretty}"/>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText   id="nov-queuedby-ot0"
+                                                                        value="#{!(empty noticeOfViolationBB.currentNotice.lockedAndQueuedBy) ? 'By ' : ''}"/>
+                                                        <h:outputText   id="nov-queuedby-ot1"
+                                                                        value="#{!(empty noticeOfViolationBB.currentNotice.lockedAndQueuedBy) ? noticeOfViolationBB.currentNotice.lockedAndQueuedBy.person.firstName : ''}"/>
+                                                        <h:outputText   id="nov-queuedby-ot2"
+                                                                        value=" "/>
+                                                        <h:outputText   id="nov-queuedby-ot3"
+                                                                        value="#{!(empty noticeOfViolationBB.currentNotice.lockedAndQueuedBy) ? noticeOfViolationBB.currentNotice.lockedAndQueuedBy.person.lastName : ''}"/>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-vertical" >
+
+                                                        <p:commandButton id="nov-queuenotice-cb"
+                                                                         ajax="false" 
+                                                                         action="#{noticeOfViolationBB.lockNoticeAndQueueForMailing}"
+                                                                         value="Lock notice: ready to print and mail" 
+                                                                         styleClass="noFill"
+                                                                         icon="fa fa-edit" 
+                                                                         disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
+                                                                         />
+
+                                                    </div>
+                                                </div>
+
+
+
+                                                <!--NESTED DATA FIELD VERTICAL-->
+                                                <div class="ui-g-3 ui-md-3 ui-lg-3 restrict-data-field-vertical">
+                                                    <!--NESTED DATA LABEL VERTICAL -->
+                                                    <div class="restrict-data-field-label-vertical" >
+                                                        <h:outputLabel value="Sent"/>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText   id="nov-sent-ot"
+                                                                        value="#{noticeOfViolationBB.currentNotice.sentTSPretty}"/>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText   id="nov-sentby-ot0"
+                                                                        value="#{!(empty noticeOfViolationBB.currentNotice.sentBy) ? 'By ' : ''}"/>
+                                                        <h:outputText   id="nov-sentby-ot1"
+                                                                        value="#{!(empty noticeOfViolationBB.currentNotice.sentBy) ? noticeOfViolationBB.currentNotice.sentBy.person.firstName : ''}"/>
+                                                        <h:outputText   id="nov-sentby-ot2"
+                                                                        value=" "/>
+                                                        <h:outputText   id="nov-sentby-ot3"
+                                                                        value="#{!(empty noticeOfViolationBB.currentNotice.sentBy) ? noticeOfViolationBB.currentNotice.sentBy.person.lastName : ''}"/>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-vertical" >
+
+
+
+                                                        <p:commandButton    id="nov-print-cb"
+                                                                            ajax="false" 
+                                                                            action="#{noticeOfViolationBB.printNotice}"
+                                                                            value="Print/View" 
+                                                                            styleClass="noFill button-size-small"
+                                                                            icon="fa fa-print" 
+                                                                            disabled="#{(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}" />
+                                                        <p:spacer height="3px" />
+
+                                                        <p:commandButton id="nov-sent-cb"
+                                                                         ajax="false" 
+                                                                         action="#{noticeOfViolationBB.markNoticeOfViolationAsSent}"
+                                                                         value="Mark notice as mailed!" 
+                                                                         styleClass="noFill"
+                                                                         icon="fa fa-paper-plane" 
+                                                                         disabled="#{(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS) || (!(empty noticeOfViolationBB.currentNotice.sentTS) and !(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS))}"
+                                                                         />
+
+                                                    </div>
+
+                                                </div>
+                                                <!--NESTED DATA FIELD VERTICAL-->
+                                                <div class="ui-g-3 ui-md-3 ui-lg-3 restrict-data-field-vertical">
+                                                    <!--NESTED DATA LABEL VERTICAL -->
+                                                    <div class="restrict-data-field-label-vertical" >
+                                                        <h:outputLabel value="Returned"/>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText   id="nov-returned-ot"
+                                                                        value="#{noticeOfViolationBB.currentNotice.returnedTSPretty}"/>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText   id="nov-returnedby-ot0"
+                                                                        value="#{!(empty noticeOfViolationBB.currentNotice.returnedBy) ? 'By ' : ''}"/>
+                                                        <h:outputText   id="nov-returnedby-ot1"
+                                                                        value="#{!(empty noticeOfViolationBB.currentNotice.returnedBy) ? noticeOfViolationBB.currentNotice.returnedBy.person.firstName : ''}"/>
+                                                        <h:outputText   id="nov-returnedby-ot2"
+                                                                        value=" "/>
+                                                        <h:outputText   id="nov-returnedby-ot3"
+                                                                        value="#{!(empty noticeOfViolationBB.currentNotice.returnedBy) ? noticeOfViolationBB.currentNotice.returnedBy.person.lastName : ''}"/>
+                                                    </div>
+
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <p:commandButton id="nov-returned-cb"
+                                                                         ajax="false" 
+                                                                         action="#{noticeOfViolationBB.markNoticeOfViolationAsReturned()}"
+                                                                         value="Mark notice as returned" 
+                                                                         styleClass="noFill"
+                                                                         icon="fa fa-mail-reply" 
+                                                                         disabled="#{(empty noticeOfViolationBB.currentNotice.sentTS) || !(empty noticeOfViolationBB.currentNotice.returnedTS)}"
+                                                                         />
+                                                    </div>
+
+                                                </div>
+
+                                                <!--NESTED DATA FIELD VERTICAL-->
+                                                <div class="ui-g-3 ui-md-6 ui-lg-2 restrict-data-field-vertical">
+                                                    <!--NESTED DATA LABEL VERTICAL -->
+                                                    <div class="restrict-data-field-label-vertical" >
+                                                        <h:outputLabel value=" "/>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText   id="nov-placeholder-ot"
+                                                                        value=" "/>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText   id="nov-placeholder2-ot"
+                                                                        value=" "/>
+                                                    </div>
+                                                    <div class="restrict-data-field-value-vertical" >
+
+                                                        <h:outputText   id="nov-placeholder3-ot"
+                                                                        value=" "/>
+
+                                                    </div>
+
+                                                </div>
+
+
+
+                                            </div>
+
+
+
+
+                                            <h2>Notice Text</h2>
+                                            <h:outputText id="nov-text-view-before"
+                                                          value="#{noticeOfViolationBB.currentNotice.noticeTextBeforeViolations}"
+                                                          escape="false" />
+
+                                            <h:outputText id="nov-text-view-after"
+                                                          value="#{noticeOfViolationBB.currentNotice.noticeTextBeforeViolations}"
+                                                          escape="false" />
+
+
+                                        </h:form>
+                                    </p:panel>
+
+                                    <p:panel    id="nov-add-panel"
+                                                toggleable="true"
+                                                widgetVar="nov-add-panel-var"
+                                                collapsed="false"
+                                                rendered="#{noticeOfViolationBB.activeInsertMode}"
+                                                header="Create a new notice for #{noticeOfViolationBB.currentCase.property.address}">
+
+
+
+
+                                            <p:growl for="chosen-recipient-form" />
+
+
+                                            <h2>Step 1: Select Recipient</h2>
+
+
+                                            <h:form id="chosen-recipient-form">
+
+                                                <p:commandButton   id="nov-add-chooseperson-init-button"
+                                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                   value="Choose addressee"  
+                                                                   icon="fa fa-search"
+                                                                   ajax="true"
+                                                                   actionListener="#{violationBB.onViolationSelectElementInitButtonChange}"
+                                                                   oncomplete="PF('nov-personchoose-dialog-var').show()"
+                                                                   update="nov-chooseperson-lookup-form
+                                                                   nov-chooseperson-list-form"/>
+
+
+                                                <h3>Chosen notice recipient:</h3>
+
+                                                <div class="nov-chosen-recipeint">
+                                                    <h:outputText   id="nov-chosen-recipient-name-ot"
+                                                                    value="#{noticeOfViolationBB.currentNotice.recipient.firstName} 
+                                                                    #{noticeOfViolationBB.currentNotice.recipient.lastName}"/>
+                                                    <h:outputText   id="nov-chosen-recipient-addressstreet-ot"
+                                                                    escape="false" value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
+                                                                                            ? noticeOfViolationBB.currentNotice.recipient.mailingAddressStreet 
+                                                                                            : noticeOfViolationBB.currentNotice.recipient.addressStreet }"/>
+
+                                                    <p:spacer height="5px"/>
+                                                    <h:outputText   id="nov-chosen-recipient-city-ot"
+                                                                    value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
+                                                                             ? noticeOfViolationBB.currentNotice.recipient.mailingAddressCity 
+                                                                             : noticeOfViolationBB.currentNotice.recipient.addressCity }"/>
+                                                    <h:outputText value=", " />
+                                                    <h:outputText   id="nov-chosen-recipient-state-ot"
+                                                                    value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
+                                                                             ? noticeOfViolationBB.currentNotice.recipient.mailingAddressState
+                                                                             : noticeOfViolationBB.currentNotice.recipient.addressState}"/>
+
+                                                    <h:outputText   id="nov-chosen-recipient-zip-ot"
+                                                                    value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
+                                                                             ? noticeOfViolationBB.currentNotice.recipient.mailingAddressZip
+                                                                             : noticeOfViolationBB.currentNotice.recipient.addressZip}"/>
+                                                    <p:spacer height="5px"/>
+                                                </div>
+
+
+                                            </h:form>
+
+
+                                            <h:form id="nov-violation-configuration-form">
+
+                                                <h2>Step 2: Configure code violations</h2>
+
+                                                <p:dataTable
+                                                    id="violation-table"
+                                                    var="v"
+                                                    rowKey="#{v.violationID}"
+                                                    value="#{noticeOfViolationBB.currentNotice.violationList}"
+                                                    tableStyleClass="primeDataTable"
+                                                    expandedRow="false"
+                                                    rowExpandMode="multiple"
+                                                    draggableColumns="true"
+                                                    reflow="true"
+                                                    rowStyleClass="spacier-rows"
+                                                    editMode="cell"
+                                                    editable="true">
+
+
+                                                    <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                                    <p:column width="4%">
+                                                        <p:rowToggler />
+                                                    </p:column>
+
+                                                    <p:column width="6%">
+                                                        <p:commandButton ajax="true" 
+                                                                         action="#{noticeOfViolationBB.removeViolationFromList(v)}"
+                                                                         value="remove" 
+                                                                         update="violation-table form-messages-global"
+                                                                         icon="fa fa-stop" />
+                                                    </p:column>
+                                                    <p:column width="15%">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Ordinance" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{v.violatedEnfElement.codeElement.ordSecTitle}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                    </p:column>
+
+                                                    <p:column width="15%">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Stip Comp Date" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
+                                                    </p:column>
+
+                                                    <p:column width="5%">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Days left" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
+                                                    </p:column>
+
+                                                    <p:column width="10%">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Include ord text?" />
+                                                        </f:facet>
+                                                        <p:cellEditor>
+                                                            <f:facet name="output">
+                                                                <h:outputText value="#{v.includeOrdinanceText}"/>
+                                                            </f:facet>
+                                                            <f:facet name="input">
+                                                                <p:selectBooleanCheckbox value="#{v.includeOrdinanceText}" />
+                                                            </f:facet>
+                                                        </p:cellEditor>
+                                                    </p:column>
+                                                    <p:column width="10%">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Human friendly text?" />
+                                                        </f:facet>
+                                                        <p:cellEditor>
+                                                            <f:facet name="output">
+                                                                <h:outputText value="#{v.includeHumanFriendlyText}"/>
+                                                            </f:facet>
+                                                            <f:facet name="input">
+                                                                <p:selectBooleanCheckbox value="#{v.includeHumanFriendlyText}"/>
+                                                            </f:facet>
+                                                        </p:cellEditor>
+                                                    </p:column>
+                                                    <p:column width="10%">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Photos?" />
+                                                        </f:facet>
+                                                        <p:cellEditor>
+                                                            <f:facet name="output">
+                                                                <h:outputText value="#{v.includeViolationPhotos}"/>
+                                                            </f:facet>
+                                                            <f:facet name="input">
+                                                                <p:selectBooleanCheckbox value="#{v.includeViolationPhotos}"/>
+                                                            </f:facet>
+                                                        </p:cellEditor>
+                                                    </p:column>
+
+
+                                                    <p:rowExpansion>
+                                                        <div class="outlinedBox">
+                                                            <h3>Violation details</h3>
+
+                                                            <h:outputText value="ID: " />
+                                                            <h:outputText value="#{v.violationID}"/>
+
+                                                            <h:outputText value="Citations: " />
+                                                            <h:outputText value="#{v.citationListAsString}"/>
+
+                                                            <h:outputText value="re-link" />
+                                                            <p:commandButton icon="fa fa-link"
+                                                                             actionListener="#{caseProfileBB.setSelectedViolation(v)}" 
+                                                                             ajax="true" oncomplete="PF('linkDialog').show()"/>
+
+                                                            <h:outputLabel styleClass="bold" value="Violated Element Details: "/>
+                                                            <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
+                                                                           #{v.violatedEnfElement.codeElement.ordSecNum} 
+                                                                           #{v.violatedEnfElement.codeElement.ordSecTitle}:
+                                                                           #{v.violatedEnfElement.codeElement.ordSubSecNum} 
+                                                                           #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                            <p:spacer height="5px"/>
+
+                                                            <h:outputText styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+
+                                                            <p:spacer height="5px"/>
+
+                                                            <h:outputLabel styleClass="bold" value="Penalty:"/>
+                                                            <h:outputText value="#{v.penalty}"/>
+                                                            <p:spacer height="5px"/>
+
+                                                            <h:outputLabel styleClass="bold" value="Description: "/>
+                                                            <h:outputText value="#{v.description}"/>
+
+                                                            <p:spacer height="5px"/>
+
+                                                            <h:outputLabel styleClass="bold" value="Violation Notes: "/>
+                                                            <h:outputText value="#{v.notes}" escape="false"/>
+                                                        </div>
+                                                    </p:rowExpansion>
+
+                                                </p:dataTable> 
+
+                                                <script type="text/javascript">
+
+                                                    $(function () {
+                                                        $.extend(PF("datatable"), {
+                                                            onKeyDown: function (e) {
+                                                                var key = e.which,
+                                                                        keyCode = $.ui.keyCode;
+
+                                                                if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                                    e.preventDefault();
+                                                                }
+                                                            },
+
+                                                            onKeyUp: function (e, rowIndex) {
+                                                                var key = e.which,
+                                                                        keyCode = $.ui.keyCode;
+                                                                //.ui-row-editor-check .ui-icon-check .ui-c
+                                                                if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                                    this.tbody
+                                                                            .find('.ui-row-editor .ui-icon-check')
+                                                                            .eq(rowIndex)
+                                                                            .click();
+                                                                }
+
+                                                                if (key === keyCode.ESCAPE) {
+                                                                    this.tbody
+                                                                            .find('.ui-row-editor .ui-icon-close')
+                                                                            .eq(rowIndex)
+                                                                            .click();
+                                                                }
+                                                            }
+                                                        });
+                                                    });
+
+                                                </script>
+
+
+                                            </h:form>
+
+
+
+                                            <h:form id="noticeBuilderForm">
+
+                                                <h2>Step 2: Assemble notice of violation letter</h2>
+
+                                                <p:commandLink id="textblock-manager-commandlink"
+                                                               type="button"
+                                                               oncomplete="PF('nov-blockmanage-dialog-var').show()" />
+                                                               
+                                                <p:spacer height="5px" />
+                                                
+
+                                                <h:outputLabel for="nov-builder-blocks-showallmunis-cb" 
+                                                               value="load text blocks from all municipalities " />
+                                                <p:selectBooleanCheckbox id="nov-builder-blocks-showallmunis-cb" 
+                                                                         value="#{noticeOfViolationBB.showTextBlocksAllMuni}">
+                                                    <p:ajax listener="#{noticeOfViolationBB.loadBlocksAllMunis}" 
+                                                            update="paragraph-scroller" />
+                                                </p:selectBooleanCheckbox>
+
+
+
+                                                <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                                             columnClasses="nov-builder-halfwidth, nov-builder-halfwidth">
+                                                    <h:panelGroup >
+
+                                                        <p:dataScroller
+                                                            id="paragraph-scroller"
+                                                            value="#{noticeOfViolationBB.blockList}"
+                                                            var="block" 
+                                                            widgetVar="noticebuilder-ds-var">
+                                                            <div class="outlinedBox event-ds-box">
+                                                                <h2><h:outputText  value="#{block.textBlockName}"/></h2>
+                                                                <p:commandButton 
+                                                                    ajax="true"
+                                                                    immediate="true"
+                                                                    id="add-block-before-cb"
+                                                                    value="Add before violations"
+                                                                    actionListener="#{noticeOfViolationBB.addBlockBeforeViolations(block)}"
+                                                                    update="noticeBuilderForm:before-violations-scroller
+                                                                    noticeBuilderForm:paragraph-scroller"
+                                                                    />
+                                                                <p:commandButton 
+                                                                    ajax="true"
+                                                                    immediate="true"
+                                                                    id="add-block-after-cb"
+                                                                    value="Add afterviolations"
+                                                                    actionListener="#{noticeOfViolationBB.addBlockAfterViolations(block)}"
+                                                                    update="noticeBuilderForm:after-violations-scroller
+                                                                    noticeBuilderForm:paragraph-scroller"
+                                                                    />
+                                                                <p:spacer height="5px"/>
+                                                                <p><h:outputText escape="false" value="#{block.textBlockText}"/> </p>
+
+                                                            </div>
+                                                        </p:dataScroller>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup> 
+                                                        <h1>Letter preview:</h1>
+
+                                                        <h2>text blocks to come before violations</h2>
+
+                                                        <p:dataScroller
+                                                            id="before-violations-scroller"
+                                                            value="#{noticeOfViolationBB.blockListBeforeViolations}"
+                                                            var="block" 
+                                                            widgetVar="blocksbefore-ds-var">
+
+                                                            <p><h:outputText escape="false" value="#{block.textBlockText}"/> </p>
+
+                                                            <p:commandButton 
+                                                                ajax="true"
+                                                                immediate="true"
+                                                                id="remove-block-before-cb"
+                                                                value="remove block from letter"
+                                                                styleClass="button-size-small noFill"
+                                                                actionListener="#{noticeOfViolationBB.removeBlockBeforeViolations(block)}"
+                                                                update="noticeBuilderForm:before-violations-scroller
+                                                                noticeBuilderForm:paragraph-scroller"
+                                                                />
+                                                        </p:dataScroller>
+
+                                                        <h2>Code violations</h2>
+
+                                                        <p:dataScroller id="violations-ds"
+                                                                        value="#{noticeOfViolationBB.currentNotice.violationList}"
+                                                                        var="v">
+                                                            <div class="violation">
+
+                                                                <h:panelGrid columns="2" rendered="true"
+                                                                             columnClasses="gridTd, gridTd"
+                                                                             headerClass="no-border"
+                                                                             footerClass="no-border">
+
+                                                                    <h:panelGroup>
+
+                                                                        <h:outputLabel styleClass="bold" value="Ordinance: "  />
+
+                                                                        <br />
+
+                                                                        <h:outputText    value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
+                                                                        <h:outputText    value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
+
+                                                                        <p:spacer height="2px" />
+
+                                                                        <h:outputText    value="&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
+                                                                        <h:outputText    value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+
+                                                                        <p:spacer height="2px" />
+
+                                                                        <h:outputLabel  value="#{v.violatedEnfElement.codeElement.source.sourceName} 
+                                                                                        (#{v.violatedEnfElement.codeElement.source.sourceYear}) " />
+
+                                                                        <p:spacer height="5px"/>
+
+                                                                        <h:outputText styleClass="bold" value="Compliance due by: " />
+                                                                        <br />
+                                                                        <h:outputText   id="stipcompdate-ot" styleClass="compliance-date"
+                                                                                        value="#{v.stipulatedComplianceDatePretty}"/>
+
+                                                                        <p:spacer height="5px"/>
+
+                                                                    </h:panelGroup>
+                                                                    <h:panelGroup>
+                                                                        <h:outputLabel styleClass="bold" value="Description of violation recorded on #{v.dateOfRecordPretty} 
+                                                                                       by code officer #{v.createdBy.person.firstName} #{v.createdBy.person.lastName}:"/>
+
+                                                                        <p:spacer height="2px"/>
+
+                                                                        <h:outputText value="#{v.description}"/>
+
+                                                                        <p:spacer height="2px" />
+
+                                                                        <h:outputText style="bold" value="Number of photographs enclosed in attachments: " 
+                                                                                      rendered="#{v.includeViolationPhotos}"/>
+                                                                        <h:outputText value="#{empty v.photoIDList ? '0' : v.photoIDList.size()}"
+                                                                                      rendered="#{v.includeViolationPhotos}"/>
+                                                                    </h:panelGroup>
+
+                                                                    <f:facet name="footer">
+                                                                        <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTd" 
+                                                                                        rendered="#{v.includeOrdinanceText}">
+                                                                            <h:panelGroup>
+                                                                                <h:outputLabel styleClass="bold" value="Ordinance text: "/>
+                                                                                <div class="ord-text">
+                                                                                    <h:outputText escape="false" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                                                                </div>
+                                                                            </h:panelGroup>
+
+                                                                        </h:panelGrid>
+
+                                                                        <h:panelGrid    id="violation-ord-humanfriendly-pg" columns="1" columnClasses="gridTd" 
+                                                                                        rendered="#{v.includeHumanFriendlyText}">
+                                                                            <h:panelGroup>
+                                                                                <h:outputLabel styleClass="bold" value="Ordinance text: "/>
+                                                                                <div class="ord-text">
+                                                                                    <h:outputText   escape="false"
+                                                                                                    value="#{v.violatedEnfElement.codeElement.ordHumanFriendlyText}"/>
+                                                                                </div>
+                                                                            </h:panelGroup>
+                                                                        </h:panelGrid>
+                                                                    </f:facet>
+                                                                </h:panelGrid>
+                                                                <p:commandButton   ajax="true" 
+                                                                                   action="#{noticeOfViolationBB.removeViolationFromList(v)}"
+                                                                                   value="remove violation from notice" 
+                                                                                   update="form-messages-global
+                                                                                   violations-ds"
+                                                                                   icon="fa fa-stop" 
+                                                                                   styleClass="noFill"/>
+                                                                <hr />
+                                                            </div>
+                                                        </p:dataScroller>
+
+                                                        <h2>text blocks to come after violations:</h2>
+
+                                                        <p:dataScroller
+                                                            id="after-violations-scroller"
+                                                            value="#{noticeOfViolationBB.blockListAfterViolations}"
+                                                            var="block" 
+                                                            widgetVar="blocksafter-ds-var">
+
+
+
+                                                            <p><h:outputText escape="false" value="#{block.textBlockText}"/> </p>
+                                                            <p:commandButton 
+                                                                ajax="true"
+                                                                immediate="true"
+                                                                id="remove-block-after-cb"
+                                                                value="remove block from letter"
+                                                                styleClass="button-size-small noFill"
+                                                                actionListener="#{noticeOfViolationBB.removeBlockAfterViolations(block)}"
+                                                                update="noticeBuilderForm:after-violations-scroller
+                                                                noticeBuilderForm:paragraph-scroller"
+                                                                />
+
+                                                        </p:dataScroller>
+
+                                                        <h2>signature</h2>
+
+                                                        <p>
+                                                            <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.firstName}" />
+                                                            <h:outputText value=" " />
+                                                            <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.lastName}" />
+                                                            <p:spacer height="3px" />
+                                                            <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.jobTitle}" />
+                                                            <p:spacer height="3px" />
+                                                            <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.phoneWork}" />
+                                                            <h:outputText value=" | " />
+                                                            <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.email}" />
+                                                        </p>
+
+                                                    </h:panelGroup>
+                                                </h:panelGrid>
+                                            </h:form>
+
+                                            <h:form id="nov-date-form">
+                                                <h2>Step 4: Verify date of record</h2>
+                                                <p>This date will automatically be included at the top of the notice.</p>
+                                                <h:outputLabel for="noticeDateOfRecord">
+                                                    <h:outputText value="Letter's Date of Record"/>
+                                                </h:outputLabel>
+                                                <p:calendar value="#{noticeOfViolationBB.currentNotice.dateOfRecordUtilDate}" 
+                                                            mode="popup" tabindex="13"
+                                                            id="noticeDateOfRecord"
+                                                            showOn="button"
+                                                            pattern="EEE, dd MMM, yyyy"
+                                                            navigator="true"
+                                                            showButtonPanel="true"
+                                                            showTodayButton="true"
+                                                            required="true"/>
+
+                                                <h:message for="noticeDateOfRecord" showDetail="true" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            </h:form>
+
+                                            <p:spacer height="15px" />
+
+                                            <h:form id="nov-submission-form">
+
+                                                <p:commandButton ajax="false" value="Assemble and edit draft notice" 
+                                                                 action="#{noticeOfViolationBB.assembleNotice}"
+                                                                 icon="fa fa-tasks"/>
+                                                <p:commandButton action="ceCases" icon="fa fa-arrow-left"
+                                                                 value="cancel"/>
+
+                                            </h:form>
+                                    </p:panel>
+
+
+
+
+
+                                    <!--Remove Panel-->
+                                    <p:panel id="nov-update-panel"
+                                             toggleable="true"
+                                             collapsed="false"
+                                             header="Update Notice of Violation"
+                                             rendered="#{noticeOfViolationBB.activeUpdateMode}"
+                                             >
+
+                                        <h:form id="nov-update-form">
+
+                                            <div class="ui-g data_container_nested_restrict">
+
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <h:outputLabel  for="nov-reset-button">
+                                                            <h:outputText value="Reset notice mailing dates" />
+                                                        </h:outputLabel>
+                                                    </div>
+                                                </div>
+                                                <div class="restrict-main-contents-io-button red_button">
+
+
+                                                    <p:commandButton id="nov-reset-cb"
+                                                                     ajax="false" 
+                                                                     action="#{noticeOfViolationBB.resetNotice()}"
+                                                                     value="Reset mailing status" 
+                                                                     styleClass="noFill"
+                                                                     icon="fa fa-window-close-o" 
+                                                                     disabled="false"
+                                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                     />
+
+
+                                                </div>
+                                            </div>
+
+                                        </h:form>
+
+
+                                        <h:form id="nov-edit-form">
+
+                                            <h2>Notice of Violation editor</h2>
+
+                                            <p>Current Notice ID (0 for new notice): <h:outputText value="#{noticeOfViolationBB.currentNotice.noticeID}"/> </p>
+                                            
+                                            <h3>Addressee</h3>
+                                            
+                                             <div class="nov-chosen-recipeint">
+                                                    <h:outputText   id="nov-update-chosen-recipient-name-ot"
+                                                                    value="#{noticeOfViolationBB.currentNotice.recipient.firstName} 
+                                                                    #{noticeOfViolationBB.currentNotice.recipient.lastName}"/>
+                                                    <h:outputText   id="nov-update-chosen-recipient-addressstreet-ot"
+                                                                    escape="false" value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
+                                                                                            ? noticeOfViolationBB.currentNotice.recipient.mailingAddressStreet 
+                                                                                            : noticeOfViolationBB.currentNotice.recipient.addressStreet }"/>
+
+                                                    <p:spacer height="5px"/>
+                                                    <h:outputText   id="nov-update-chosen-recipient-city-ot"
+                                                                    value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
+                                                                             ? noticeOfViolationBB.currentNotice.recipient.mailingAddressCity 
+                                                                             : noticeOfViolationBB.currentNotice.recipient.addressCity }"/>
+                                                    <h:outputText value=", " />
+                                                    <h:outputText   id="nov-update-chosen-recipient-state-ot"
+                                                                    value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
+                                                                             ? noticeOfViolationBB.currentNotice.recipient.mailingAddressState
+                                                                             : noticeOfViolationBB.currentNotice.recipient.addressState}"/>
+
+                                                    <h:outputText   id="nov-update-chosen-recipient-zip-ot"
+                                                                    value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
+                                                                             ? noticeOfViolationBB.currentNotice.recipient.mailingAddressZip
+                                                                             : noticeOfViolationBB.currentNotice.recipient.addressZip}"/>
+                                                    <p:spacer height="5px"/>
+                                                </div>
+                                            
+                                            <p:commandButton   id="nov-update-chooseperson-button"
+                                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                               disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
+                                                                   value="Change addressee"  
+                                                                   icon="fa fa-search"
+                                                                   ajax="true"
+                                                                   actionListener="#{violationBB.onViolationSelectElementInitButtonChange}"
+                                                                   oncomplete="PF('nov-personchoose-dialog-var').show()"
+                                                                   update="nov-chooseperson-lookup-form
+                                                                   nov-chooseperson-list-form"/>
+                                            
+                                            <h3>Date of Record</h3>
+                                            
+                                            <h:outputText class="bold" value="date of record:" />
+                                            <div class="date-of-record">
+                                                <h:outputText id="date-of-record-ot" value="#{noticeOfViolationBB.currentNotice.dateOfRecordPretty}" />
+                                            </div> 
+                                            
+                                                <p:calendar value="#{noticeOfViolationBB.currentNotice.dateOfRecordUtilDate}" 
+                                                            mode="popup" tabindex="13"
+                                                            disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
+                                                            id="nov-update-dor"
+                                                            showOn="button"
+                                                            pattern="EEE, dd MMM, yyyy"
+                                                            navigator="true"
+                                                            showButtonPanel="true"
+                                                            showTodayButton="true"
+                                                            required="true"/>
+
+                                                <h:message for="noticeDateOfRecord" showDetail="true" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+
+
+                                            <p:spacer height="5px" />
+
+                                            <h3>letter text (upper half):</h3>
+
+                                            <p:editor value="#{noticeOfViolationBB.currentNotice.noticeTextBeforeViolations}"
+                                                      controls="bold italic underline strikethrough font size style color 
+                                                      bullets numbering center undo redo rule link removeformat outdent 
+                                                      indent link unlink copy cut paste rule alignleft center alignright"
+                                                      width="1000"
+                                                      height="400"
+                                                      disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
+                                                      />
+
+                                            <div class="preview-violations-box">
+
+
+                                                <h2>Code violations</h2>
+
+                                                <p:dataScroller id="violations-ds"
+                                                                value="#{noticeOfViolationBB.currentNotice.violationList}"
+                                                                var="v">
+                                                    <div class="violation">
+
+                                                        <h:panelGrid columns="2" rendered="true"
+                                                                     columnClasses="gridTd, gridTd"
+                                                                     headerClass="no-border"
+                                                                     footerClass="no-border">
+
+                                                            <h:panelGroup>
+
+                                                                <h:outputLabel styleClass="bold" value="Ordinance: "  />
+
+                                                                <br />
+
+                                                                <h:outputText    value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
+                                                                <h:outputText    value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
+
+                                                                <p:spacer height="2px" />
+
+                                                                <h:outputText    value="&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
+                                                                <h:outputText    value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+
+                                                                <p:spacer height="2px" />
+
+                                                                <h:outputLabel  value="#{v.violatedEnfElement.codeElement.source.sourceName} 
+                                                                                (#{v.violatedEnfElement.codeElement.source.sourceYear}) " />
+
+                                                                <p:spacer height="5px"/>
+
+                                                                <h:outputText styleClass="bold" value="Compliance due by: " />
+                                                                <br />
+                                                                <h:outputText   id="stipcompdate-ot" styleClass="compliance-date"
+                                                                                value="#{v.stipulatedComplianceDatePretty}"/>
+
+                                                                <p:spacer height="5px"/>
+
+                                                            </h:panelGroup>
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Description of violation recorded on #{v.dateOfRecordPretty} 
+                                                                               by code officer #{v.createdBy.person.firstName} #{v.createdBy.person.lastName}:"/>
+
+                                                                <p:spacer height="2px"/>
+
+                                                                <h:outputText value="#{v.description}"/>
+
+                                                                <p:spacer height="2px" />
+
+                                                                <h:outputText style="bold" value="Number of photographs enclosed in attachments: " 
+                                                                              rendered="#{v.includeViolationPhotos}"/>
+                                                                <h:outputText value="#{empty v.blobIDList ? '0' : v.blobIDList.size()}"
+                                                                              rendered="#{v.includeViolationPhotos}"/>
+                                                            </h:panelGroup>
+
+                                                            <f:facet name="footer">
+                                                                <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTd" 
+                                                                                rendered="#{v.includeOrdinanceText}">
+                                                                    <h:panelGroup>
+                                                                        <h:outputLabel styleClass="bold" value="Ordinance text: "/>
+                                                                        <div class="ord-text">
+                                                                            <h:outputText escape="false" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                                                        </div>
+                                                                    </h:panelGroup>
+
+                                                                </h:panelGrid>
+
+                                                                <h:panelGrid    id="violation-ord-humanfriendly-pg" columns="1" columnClasses="gridTd" 
+                                                                                rendered="#{v.includeHumanFriendlyText}">
+                                                                    <h:panelGroup>
+                                                                        <h:outputLabel styleClass="bold" value="Ordinance text: "/>
+                                                                        <div class="ord-text">
+                                                                            <h:outputText   escape="false"
+                                                                                            value="#{v.violatedEnfElement.codeElement.ordHumanFriendlyText}"/>
+                                                                        </div>
+                                                                    </h:panelGroup>
+                                                                </h:panelGrid>
+                                                            </f:facet>
+                                                        </h:panelGrid>
+                                                        <hr />
+                                                    </div>
+                                                </p:dataScroller>
+                                            </div>
+
+                                            <h3>letter text (bottom half)</h3>
+
+                                            <p:editor value="#{noticeOfViolationBB.currentNotice.noticeTextAfterViolations}"
+                                                      controls="bold italic underline strikethrough font size style color 
+                                                      bullets numbering center undo redo rule link removeformat outdent 
+                                                      indent link unlink copy cut paste rule alignleft center alignright"
+                                                      width="1000"
+                                                      disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
+                                                      height="400"/>
+
+                                            <div class="signature">
+                                                <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.firstName}" />
+                                                <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.lastName}" />
+                                                <br />
+                                                <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.jobTitle}" />
+                                                <br />
+                                                <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.phoneWork}" />
+                                                <h:outputText value=" | " />
+                                                <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.email}" />
+                                            </div>
+
+
+                                            <p:commandButton icon="fa fa-arrow-left"
+                                                             process="@none"
+                                                             immediate="true"
+                                                             ajax="true"
+                                                             disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
+                                                             actionListener="#{noticeOfViolationBB.onAbortOperationButtonChange}"
+                                                             value="Abort update"/>
+
+                                            <p:commandButton ajax="false" 
+                                                             action="#{noticeOfViolationBB.saveNoticeDraft}"
+                                                             icon="fa fa-save" 
+                                                             disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
+                                                             value="Save Changes"/>
+                                        </h:form>
+
+
+                                    </p:panel>
+
+
+
+                                    <!--Remove Panel-->
+                                    <p:panel id="nov-remove-panel"
+                                             toggleable="true"
+                                             collapsed="false"
+                                             header="Remove notice of violation"
+                                             rendered="#{noticeOfViolationBB.activeRemoveMode}"
+                                             >
+
+                                        <h:form id="nov-remove-form">
+
+                                            <div class="ui-g data_container_nested_restrict">
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <h:outputLabel  for="nov-remove-button">
+                                                            <h:outputText value="Notices cannot be removed if they have been mailed." />
+                                                        </h:outputLabel>
+                                                    </div>
+                                                </div>
+                                                <div class="restrict-main-contents-io-button red_button">
+
+
+                                                    <p:commandButton 
+                                                        id="nov-remove-button"
+                                                        icon="fa fa-trash"
+                                                        ajax="false"
+                                                        action="#{noticeOfViolationBB.deleteNoticeOfViolation}"
+                                                        value="Remove notice of violation ID:#{noticeOfViolationBB.currentNotice.noticeID}"
+                                                        />
+                                                </div>
+                                            </div>
+
+                                        </h:form>
+
+                                    </p:panel>
+
+
+                                    <!--Remove Panel-->
+                                    <p:panel id="nov-notes-panel"
+                                             toggleable="true"
+                                             collapsed="false"
+                                             header="Notes"
+                                             rendered="#{noticeOfViolationBB.activeViewMode}"
+                                             >
+
+                                        <h:form id="nov-notes-form">
+
+                                            <p:commandButton   id="nov-notes-add-button"
+                                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                               value="Add New Note"  
+                                                               icon="fa fa-sticky-note-o"
+                                                               actionListener="#{noticeOfViolationBB.onNoteInitButtonChange}"
+                                                               oncomplete="PF('nov-note-dialog-var').show()"
+                                                               update="nov-note-form"/>
+
+                                            <h:outputText id="nov-note-ot"
+                                                          value="#{noticeOfViolationBB.currentNotice.notes}"
+                                                          escape="false" />
+
+                                        </h:form>
+
+                                    </p:panel>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </p:outputPanel>
+
+
+
+                    <p:dialog   id="nov-note-dialog"
+                                height="300" width="750"
+                                widgetVar="nov-note-dialog-var"
+                                closable="true"
+                                header="Note Builder"
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                >
+
+                        <h:form id="nov-note-form">
+
+
+                            <h:panelGrid columns="1"
+                                         columnClasses="gridTd, gridTd">
+
+                                <h:panelGroup>
+                                    <h:outputText styleClass="ui-label" value="Note text: "/>
+                                    <p:editor   id="nov-notes-editor"
+                                                value="#{noticeOfViolationBB.formNoteText}"
+                                                controls="bold italic underline strikethrough font size style color
+                                                bullets numbering center undo redo rule link removeformat"
+                                                width="400" required="false"
+                                                height="200"/>
+
+
+                                    <p:spacer height="5px" />
+                                    <p:commandButton    id="nov-note-button-cancel"
+                                                        ajax="true" 
+                                                        tabindex="27"
+                                                        value="Cancel"
+                                                        icon="fa fa-stop"
+                                                        immediate="true"
+                                                        onclick="PF('nov-note-dialog-var').hide()"
+                                                        />
+
+                                    <p:commandButton   id="nov-dialog-notes-button-addnote"
+                                                       ajax="false" 
+                                                       actionListener="#{noticeOfViolationBB.onNoteCommitButtonChange}"
+                                                       oncomplete="PF('nov-note-dialog-var').hide()"
+                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
+                                                       value="Attach Note"  
+                                                       styleClass="inline-button"
+                                                       icon="fa fa-sticky-note-o"
+                                                       update="nov-notes-form"/>
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+
+
+                    <p:dialog   id="nov-personchoose-dialog"
+                                height="300" width="750"
+                                widgetVar="nov-personchoose-dialog-var"
+                                closable="true"
+                                header="Choose Addressee"
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                >
+
+                        <div    id="person-add-container-div"
+                                class="ui-g data-container">
+
+                            <div    id="prop-pers-personlink-chooselinkmethod-div"
+                                    class="ui-g-12 ui-md-12 ui-lg-8 data_field">
+
+                                <h:form id="nov-chooseperson-list-form">
+
+                                    <h2>Property-connected persons</h2>
+
+                                    <p>Table contains all Persons currently connected to this case's property: 
+                                        <h:outputText value="#{noticeOfViolationBB.currentCase.property.address}" />
+                                        If your intended addressee is not in this table, navigate to the Persons manager and create a new 
+                                        Person on this property or connect an existing person to the property.</p>
+
+                                    <p:dataTable
+                                        id="newRecipientPersonTD"
+                                        var="person"
+                                        rowKey="#{person.personID}"
+                                        value="#{noticeOfViolationBB.personCandidateList}"
+                                        tableStyleClass="primeDataTable"
+                                        expandedRow="false"
+                                        rowExpandMode="single"
+                                        rowIndexVar="rowIndex">
+
+
+                                        <p:column width="5%">
+                                            <p:rowToggler />
+                                        </p:column>
+                                        <p:column width="50%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Last" />
+                                            </f:facet>
+                                            <h:outputText value="#{person.firstName}"/>
+                                            <h:outputText value=" "/>
+                                            <h:outputText value="#{person.lastName}"/>
+                                            <h:outputText value="(ID: #{person.personID})"/>
+                                            <p:spacer height="2px" />
+                                            <h:outputText value="#{person.addressStreet}"/>
+                                            <p:spacer height="2px" />
+                                            <h:outputText value="#{person.addressCity}"/>
+                                            <h:outputText value=" "/>
+                                            <h:outputText value="#{person.addressState}"/>
+                                            <h:outputText value=", "/>
+                                            <h:outputText value="#{person.addressZip}"/>
+                                        </p:column>
+                                        <p:column width="8%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Person Type" />
+                                            </f:facet>
+                                            <h:outputText value="#{person.personType.label}"/>
+                                        </p:column>
+                                        <p:column width="15%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Municipality" />
+                                            </f:facet>
+                                            <h:outputText value="#{person.muniName}"/>
+                                        </p:column>
+                                        <p:column width="8%">
+                                            <p:commandButton id="use-person-from-table-cb1"
+                                                             rendered="#{noticeOfViolationBB.currentNotice.noticeID!=0}"
+                                                             ajax="true"
+                                                             value="Replace"
+                                                             actionListener="#{noticeOfViolationBB.storeRecipient(person)}" 
+                                                             oncomplete="PF('nov-personchoose-dialog-var').hide()."
+                                                             update="nov-edit-form
+                                                             form-messages-global:novs-messages-growl"
+                                                             />
+                                            <p:commandButton id="use-person-from-table-cb2"
+                                                             rendered="#{noticeOfViolationBB.currentNotice.noticeID==0}"
+                                                             ajax="true"
+                                                             value="Select"
+                                                             actionListener="#{noticeOfViolationBB.storeRecipient(person)}" 
+                                                             oncomplete="PF('nov-personchoose-dialog-var').hide()."
+                                                             update="chosen-recipient-form
+                                                             form-messages-global:novs-messages-growl"
+                                                             />
+                                        </p:column>
+
+                                        <p:rowExpansion>
+                                            <div class="outlinedBox">
+                                                <h2><h:outputText value="#{person.firstName} #{person.lastName}"/>, Person ID:<h:outputText value="#{person.personID}"/> </h2>
+                                                <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd">
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Person Type: "/>
+                                                        <h:outputText value="#{person.personType.label}"/>
+
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Job Title: "/>
+                                                        <h:outputText value="#{person.jobTitle}"/>
+
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Email: "/>
+                                                        <h:outputText value="#{person.email}"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Last Updated: "/>
+                                                        <h:outputText value="#{person.lastUpdatedPretty}"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Address: "/>
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputText escape="false" value="#{person.addressStreet}"/>
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputText value="#{person.addressCity}, #{person.addressState} #{person.addressZip}"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Use separate mailing address?"/>
+                                                        <h:outputText value="#{person.useSeparateMailingAddress ? 'Yes':'No'}"/>
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputText escape="false" value="#{person.mailingAddressStreet}"/>
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputText value="#{person.mailingAddressCity}, #{person.mailingAddressState} #{person.mailingAddressZip}"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Under 18? "/>
+                                                        <h:outputText value="#{person.under18 ? 'Yes':'No'}"/>
+
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Active? "/>
+                                                        <h:outputText value="#{person.active ? 'Yes':'No'}"/>
+
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Composite last name? "/>
+                                                        <h:outputText value="#{person.compositeLastName? 'Yes':'No'}"/>
+                                                    </h:panelGroup>
+
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Allowed to expire? "/>
+                                                        <h:outputText value="#{person.canExpire ? 'Yes':'No'}"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Expires: "/>
+                                                        <h:outputText value="#{person.expireString}"/>
+
+                                                        <p:spacer height="5px"/>
+                                                        <h:outputLabel styleClass="bold" value="Expiry Notes: "/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{person.expiryNotes}"/>
+                                                        </div>
+
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Phone(h): "/>
+                                                        <h:outputText value="#{person.phoneHome}"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Phone(w): "/>
+                                                        <h:outputText value="#{person.phoneWork}"/>
+                                                        <p:spacer height="5px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Phone(m): "/>
+                                                        <h:outputText value="#{person.phoneCell}"/>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup>
+                                                        <h:outputLabel styleClass="bold" value="Linked to user? "/>
+                                                        <h:outputText value="#{person.linkedUserID == 0 ? 'No':'Yes'}"/>
+                                                        <p:spacer height="5px"/>
+
+                                                    </h:panelGroup>
+                                                </h:panelGrid>
+                                            </div>
+                                        </p:rowExpansion>
+                                    </p:dataTable>
+
+
+                                    <h:message for="nov-person-som-userpersons" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:form>
+
+                            </div>
+
+
+                            <div    id="prop-pers-personlink-byid-div"
+                                    class="ui-g-12 ui-md-12 ui-lg-4 data_field">
+
+                                <h:form id="nov-chooseperson-lookup-form">
+
+                                    <h2>Option 2: Manual person lookup</h2>
+
+                                    <p>If you wish to send the letter to a person not on the list above, 
+                                        enter the Person's ID number in the box below and click "Look Up Person". 
+                                        You can open the Persons's search page by "right-clicking" the link to "Persons" 
+                                        on the left side bar and opening that page in its own browser tab.</p>
+
+                                    <h:commandLink  class="bold" target="_blank" action="persons" value="Open person search in new tab ---> "/>
                                     <p:spacer height="5px"/>
 
-                                    <h:panelGrid    id="notice-rowexpand-pg" 
-                                                    columns="4" 
-                                                    columnClasses="gridTd-solid-back, gridTd-solid-back, gridTd-solid-back, gridTd-solid-back" >
+                                    <h:outputLabel for="personIDIT" value="Person ID Number: "/>
 
-                                        <h:panelGroup>
-                                            <p:commandButton    id="nov-print-cb"
-                                                                ajax="false" action="#{ceCaseNoticesBB.printNotice(notice)}"
-                                                                value="Print/View" styleClass="noFill button-size-small"
-                                                                icon="fa fa-print" disabled="#{(empty notice.lockedAndqueuedTS)}" />
-                                        </h:panelGroup>
+                                    <p:inputText id="personIDIT" value="#{noticeOfViolationBB.recipientPersonID}"/>
 
-                                        <h:panelGroup>
-                                            <p:commandButton id="nov-edit-cb"
-                                                             ajax="false" action="#{ceCaseNoticesBB.editNoticeOfViolation(notice)}"
-                                                             value="Edit notice" styleClass="noFill"
-                                                             icon="fa fa-edit " 
-                                                             disabled="#{!(empty notice.lockedAndqueuedTS)}" />
-                                        </h:panelGroup>
+                                    <p:spacer height="10px"/>
 
-                                        <h:panelGroup>
-                                            <p:commandButton id="nov-delete-cb"
-                                                             ajax="true" actionListener="#{ceCaseNoticesBB.deleteNoticeOfViolation(notice)}"
-                                                             value="Nuke notice" styleClass="noFill"
-                                                             icon="fa fa-bomb" 
-                                                             disabled="#{!(empty notice.lockedAndqueuedTS)}"
-                                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                             update="notices-messages-form:notices-messages-global
-                                                             notices-ds"/>
-                                        </h:panelGroup>
-                                        <h:panelGroup></h:panelGroup>
 
-                                        <h:panelGroup>
-                                            <p:commandButton id="nov-queuenotice-cb"
-                                                             ajax="true" action="#{ceCaseNoticesBB.lockNoticeAndQueueForMailing(notice)}"
-                                                             value="Lock notice: ready to print and mail" styleClass="noFill"
-                                                             icon="fa fa-edit" 
-                                                             disabled="#{!(empty notice.lockedAndqueuedTS)}"
-                                                             update="notices-messages-form:notices-messages-global
-                                                             nov-queuenotice-cb
-                                                             nov-queued-ot
-                                                             nov-edit-cb
-                                                             nov-delete-cb
-                                                             nov-sent-cb
-                                                             nov-print-cb"/>
-                                        </h:panelGroup>
+                                    <p:commandButton id="nov-add-lookupperson-button" 
+                                                     value="Look up person" 
+                                                     actionListener="#{noticeOfViolationBB.checkNOVRecipient}" 
+                                                     ajax="true" 
+                                                     update="form-messages-global
+                                                     person-scroller"/>
+                                    <p:spacer height="5px"/>
 
-                                        <h:panelGroup>
-                                            <p:commandButton id="nov-sent-cb"
-                                                             ajax="true" actionListener="#{ceCaseNoticesBB.markNoticeOfViolationAsSent(notice)}"
-                                                             value="Mark notice as mailed!" styleClass="noFill"
-                                                             icon="fa fa-paper-plane" 
-                                                             disabled="#{(empty notice.lockedAndqueuedTS) || (!(empty notice.sentTS) and !(empty notice.lockedAndqueuedTS))}"
-                                                             update="notices-messages-form:notices-messages-global
-                                                             nov-sent-date
-                                                             nov-returned-cb
-                                                             nov-sent-cb
-                                                             "/>
-                                        </h:panelGroup>
 
-                                        <h:panelGroup>
-                                            <p:commandButton id="nov-returned-cb"
-                                                             ajax="true" actionListener="#{ceCaseNoticesBB.markNoticeOfViolationAsReturned(notice)}"
-                                                             value="Mark notice as returned" styleClass="noFill"
-                                                             icon="fa fa-mail-reply" 
-                                                             disabled="#{(empty notice.sentTS) || !(empty notice.returnedTS)}"
-                                                             update="notices-messages-form:notices-messages-global
-                                                             nov-returned-date
-                                                             nov-returned-cb"/>
-                                        </h:panelGroup>
+                                    <p:dataScroller
+                                        id="person-scroller"
+                                        value="#{noticeOfViolationBB.manualRetrievedPersonList}"
+                                        var="per" 
+                                        widgetVar="noticebuilder-pers-ds-var">
 
-                                        <h:panelGroup>
-                                            <p:commandButton id="nov-reset-cb"
-                                                             ajax="true" actionListener="#{ceCaseNoticesBB.resetNotice(notice)}"
-                                                             value="Reset mailing status" styleClass="noFill"
-                                                             icon="fa fa-window-close-o" 
-                                                             disabled="false"
-                                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
-                                                             update="notices-messages-form:notices-messages-global
-                                                             nov-returned-date
-                                                             nov-returned-cb
-                                                             nov-sent-cb
-                                                             nov-queuenotice-cb
-                                                             nov-delete-cb
-                                                             nov-edit-cb
-                                                             nov-queued-ot
-                                                             nov-sent-date
-                                                             nov-returned-date"/>
-                                        </h:panelGroup>
-                                    </h:panelGrid>
-                                    <hr />
-                                </p:dataScroller>
-                            </h:form>
-                    <!--close main container-->
-                    </div>
+                                        <h:outputText value="#{per.firstName} #{per.lastName}"/>
+                                        <p:spacer height="5px"/>
+                                       <p:commandButton id="use-person-from-lookup-cb1"
+                                                             rendered="#{noticeOfViolationBB.currentNotice.noticeID!=0}"
+                                                             ajax="true"
+                                                             value="Replace"
+                                                             actionListener="#{noticeOfViolationBB.storeRecipient(per)}" 
+                                                             oncomplete="PF('nov-personchoose-dialog-var').hide()."
+                                                             update="nov-edit-form
+                                                             form-messages-global:novs-messages-growl"
+                                                             />
+                                            <p:commandButton id="use-person-from-lookup-cb2"
+                                                             rendered="#{noticeOfViolationBB.currentNotice.noticeID==0}"
+                                                             ajax="true"
+                                                             value="Select"
+                                                             actionListener="#{noticeOfViolationBB.storeRecipient(per)}" 
+                                                             oncomplete="PF('nov-personchoose-dialog-var').hide()."
+                                                             update="chosen-recipient-form
+                                                             form-messages-global:novs-messages-growl"
+                                                             />
+                                    </p:dataScroller>
+                                </h:form>
+
+                            </div>
+                        </div>
+
+                        <p:spacer height="5px" />
+
+                        <h:form id="nov-chooseperson-abort-form">
+                            <p:commandButton    id="nov-person-connect-abort"
+                                                ajax="true" 
+                                                tabindex="2"
+                                                oncomplete="PF('nov-personchoose-dialog-var').hide()"
+                                                value="Cancel" 
+                                                icon="fa fa-stop" 
+                                                />
+                        </h:form>
+
+                    </p:dialog>
+
+                    <p:dialog   id="nov-blockmanage-dialog"
+                                height="800" width="1000"
+                                widgetVar="nov-blockmanage-dialog-var"
+                                closable="true"
+                                responsive="true"
+                                resizable="true"
+                                header="Text block manager"
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                >
+                        <h:form id="textBlockTableForm">
+
+                            <h2>Existing text blocks</h2>
+
+                            <p><span style="font-style: italic">A text block is a
+                                    paragraph or so of formatted text that can be inserted into
+                                    a notice of violation. This feature allows for the storage of
+                                    stock text in the database, sharable by all users--obviating 
+                                    the need for tedious copying and pasting from a local document.</span></p>
+
+                            <p:spacer height="15px"/>
+
+                            <p:dataTable
+                                id="textBlockTable"
+                                var="block"
+                                value="#{textBlockBB.blockList}"
+                                selectionMode="single"
+                                selection="#{textBlockBB.selectedBlock}"
+                                rowKey="#{block.blockID}"
+                                tableStyleClass="primeDataTable"
+                                scrollable="true"
+                                scrollHeight="150"
+                                resizableColumns="true"
+                                rowExpandMode="multiple"
+                                expandedRow="false"
+                                filteredValue="#{textBlockBB.filteredBlockList}"
+                                widgetVar="textBlockTableWidgetVar"
+                                tabindex="1">
+
+                                <p:ajax event="rowSelect" immediate="true" 
+                                        update=":updateTextBlockForm:selectedBlockOT
+                                        :updateTextBlockForm:tbcat
+                                        :updateTextBlockForm:blockNameIT
+                                        :updateTextBlockForm:updateTextBlockTextEditor"/>
+
+                                <p:column width="3%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Exp"/>
+                                    </f:facet>
+                                    <p:rowToggler/>
+                                </p:column>
+
+                                <p:column width="3%">
+                                    <f:facet name="header">
+                                        <h:outputText value="ID#" />
+                                    </f:facet>
+                                    <h:outputText value="#{block.blockID}"/>
+                                </p:column>
+
+                                <p:column width="20%" sortBy="#{block.muni.muniName}"
+                                          filterBy="#{block.muni.muniName}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Municipality" />
+                                    </f:facet>
+                                    <h:outputText value="#{block.muni.muniName}"/>
+                                </p:column>
+
+                                <p:column width="20%" sortBy="#{block.textBlockCategoryTitle}"
+                                          filterBy="#{block.textBlockCategoryTitle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{block.textBlockCategoryTitle}"/>
+                                </p:column>
+
+                                <p:column sortBy="#{block.textBlockName}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Block Name"/>
+                                    </f:facet>
+                                    <h:outputText value="#{block.textBlockName}"/>
+                                </p:column>
+                                <p:rowExpansion>
+                                    <div class="outlinedBox">
+
+                                        <h:outputLabel styleClass="bold" value="Block text"/>
+                                        <p:spacer height="15px"/>
+                                        <h:outputText escape="false" value="#{block.textBlockText}"/>
+                                    </div>
+                                </p:rowExpansion>
+                            </p:dataTable>
+
+
+                            <p:commandButton 
+                                id="nukeTextBlockButton" ajax="false" icon="fa fa-bomb"
+                                value="Nuke selected text block" tabindex="3"
+                                action="#{textBlockBB.nukeTextBlock}"/>
+                        </h:form>
+
+                        <p:spacer height="10"/>
+                        <hr/>
+                        <p:spacer height="10"/>
+
+                        <h2>Update Text Block</h2>
+                        <h:form id="updateTextBlockForm">
+
+                            <h:panelGrid columns="4" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
+                                         footerClass="gridFooter">
+
+
+                                <h:outputText value="Code set ID: #{textBlockBB.selectedBlock.blockID}" id="selectedBlockOT" />
+
+                                <p:outputLabel for="tbcat">
+                                    <h:outputText value="Text block category"/>
+                                </p:outputLabel>
+                                <h:panelGroup>
+                                    <p:selectOneMenu 
+                                        id="tbcat" tabindex="7"
+                                        value="#{textBlockBB.selectedBlock.textBlockCategoryID}"
+                                        style="display: block; clear: right;">
+                                        <f:selectItems value="#{textBlockBB.categoryList}"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+
+                                <p:outputLabel for="muniSelectMenuUpdate">
+                                    <h:outputText value="Municipality"/>
+                                </p:outputLabel>
+                                <h:panelGroup>
+                                    <p:selectOneMenu id="muniSelectMenuUpdate" tabindex="5" value="#{textBlockBB.selectedBlock.muni}">
+                                        <f:converter converterId="muniConverter"/>
+                                        <f:selectItems id="muniNameList" value="#{systemServicesBB.bbSessionUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                    </p:selectOneMenu>
+                                    <h:message for="muniSelectMenuUpdate" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                                <p:outputLabel for="blockNameIT">
+                                    <h:outputText value="Block name"/>
+                                </p:outputLabel>
+
+                                <h:panelGroup>
+
+                                    <p:inputText id="blockNameIT" value="#{textBlockBB.selectedBlock.textBlockName}" 
+                                                 style="width: 20%;" tabindex="4" required="true" styleClass="inputText"/>
+                                    <h:message for="blockNameIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                                <f:facet name="footer">
+                                    <p:outputLabel for="updateTextBlockTextEditor">
+                                        <h:outputText value="Text of text block"/>
+                                    </p:outputLabel>
+                                    <p:editor  id="updateTextBlockTextEditor"  value="#{textBlockBB.selectedBlock.textBlockText}" 
+                                               controls="bold italic underline strikethrough font size style color 
+                                               bullets numbering center undo redo rule link removeformat outdent 
+                                               indent link unlink copy cut paste rule alignleft center alignright"
+                                               width="1000" 
+                                               height="200"/>
+                                    <h:message for="updateTextBlockTextEditor" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </f:facet>   
+
+                            </h:panelGrid>
+
+                            <p:spacer height="15"/>
+
+                            <p:commandButton 
+                                id="updatSetButton" 
+                                value="Commit updates to code set" 
+                                ajax="false" icon="fa fa-check"
+                                styleClass="buttonOwnLine" tabindex="6"
+                                actionListener="#{textBlockBB.updateTextBlock}"/>
+
+                        </h:form>
+
+                        <p:spacer height="10"/>
+                        <hr/>
+                        <p:spacer height="10"/>
+                        <h2>Add a new text block</h2>
+                        <h:form id="addNewBlockForm">
+                            <h:panelGrid columns="4" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
+                                         footerClass="gridFooter">
+
+
+                                <p:outputLabel for="tbcatadd">
+                                    <h:outputText value="Text block category"/>
+                                </p:outputLabel>
+                                <h:panelGroup>
+                                    <p:selectOneMenu 
+                                        id="tbcatadd" tabindex="7"
+                                        value="#{textBlockBB.formCategoryID}"
+                                        style="display: block; clear: right;">
+                                        <f:selectItems value="#{textBlockBB.categoryList}"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+
+                                <p:outputLabel for="muniSelectMenuadd">
+                                    <h:outputText value="Municipality"/>
+                                </p:outputLabel>
+                                <h:panelGroup>
+                                    <p:selectOneMenu id="muniSelectMenuadd" tabindex="5" value="#{textBlockBB.formMuni}">
+                                        <f:converter converterId="muniConverter"/>
+                                        <f:selectItems id="muniNameList" value="#{systemServicesBB.bbSessionUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                    </p:selectOneMenu>
+                                    <h:message for="muniSelectMenuadd" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                                <p:outputLabel for="blockNameITadd">
+                                    <h:outputText value="Block name"/>
+                                </p:outputLabel>
+
+                                <h:panelGroup>
+
+                                    <p:inputText id="blockNameITadd" value="#{textBlockBB.formBlockName}" 
+                                                 style="width: 20%;" tabindex="4" required="true" styleClass="inputText"/>
+                                    <h:message for="blockNameIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                                <f:facet name="footer">
+                                    <p:outputLabel for="updateTextBlockTextEditoradd">
+                                        <h:outputText value="Text of text block"/>
+                                    </p:outputLabel>
+                                    <p:editor  id="updateTextBlockTextEditoradd"  value="#{textBlockBB.formBlockText}" 
+                                               controls="bold italic underline strikethrough font size style color 
+                                               bullets numbering center undo redo rule link removeformat outdent 
+                                               indent link unlink copy cut paste rule alignleft center alignright"
+                                               width="1000" 
+                                               height="200"/>
+                                    <h:message for="updateTextBlockTextEditoradd" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </f:facet>   
+
+                            </h:panelGrid>
+                            <p:commandButton
+                                id="newCodeSet" icon="fa fa-plus" tabindex="10"
+                                value="Add new text block" ajax="false"
+                                styleClass="buttonOwnLine" 
+                                action="#{textBlockBB.addNewTextBlock}"/>
+                        </h:form>
+                    </p:dialog>
+
                 </f:view>
             </ui:define>
         </ui:composition>
     </h:body>
 </html>
+
+
+
 

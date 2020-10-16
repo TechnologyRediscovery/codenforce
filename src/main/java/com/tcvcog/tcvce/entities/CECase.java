@@ -9,6 +9,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -160,6 +161,99 @@ public class        CECase
             } // close for   
         } // close null check
         return visEventList;
+    }
+    
+    /**
+     * Builds our violation list based on inputted view options
+     * @param viewOption
+     * @return 
+     */
+    public List<CodeViolation> assembleViolationList(ViewOptionsActiveListsEnum viewOption){
+        List<CodeViolation> displayedViolations = new ArrayList<>();
+        if(violationList != null){
+            for(CodeViolation cv: violationList){
+                switch(viewOption){
+                    case VIEW_ACTIVE:
+                        if(cv.isActive()){
+                            displayedViolations.add(cv);
+                        }
+                        break;
+                    case VIEW_ALL:
+                            displayedViolations.add(cv);
+                        break;
+                    case VIEW_INACTIVE:
+                        if(!cv.isActive()){
+                            displayedViolations.add(cv);
+                        }
+                        break;
+                    default: 
+                        
+                }
+            }
+        }
+        return displayedViolations;
+    }
+    
+    /**
+     * Builds our violation list based on inputted view options
+     * @param viewOption
+     * @return 
+     */
+    public List<NoticeOfViolation> assembleNoticeList(ViewOptionsActiveListsEnum viewOption){
+        List<NoticeOfViolation> displayedNOVs = new ArrayList<>();
+        if(noticeList != null){
+            for(NoticeOfViolation nov: noticeList){
+                switch(viewOption){
+                    case VIEW_ACTIVE:
+                        if(nov.isActive()){
+                            displayedNOVs.add(nov);
+                        }
+                        break;
+                    case VIEW_ALL:
+                            displayedNOVs.add(nov);
+                        break;
+                    case VIEW_INACTIVE:
+                        if(!nov.isActive()){
+                            displayedNOVs.add(nov);
+                        }
+                        break;
+                    default: 
+                        
+                }
+            }
+        }
+        return displayedNOVs;
+    }
+    
+    /**
+     * Builds our citation list based on inputted view options
+     * @param viewOption
+     * @return 
+     */
+    public List<Citation> assembleCitationList(ViewOptionsActiveListsEnum viewOption){
+        List<Citation> dispCits = new ArrayList<>();
+        if(citationList != null){
+            for(Citation cit: citationList){
+                switch(viewOption){
+                    case VIEW_ACTIVE:
+                        if(cit.isIsActive()){
+                            dispCits.add(cit);
+                        }
+                        break;
+                    case VIEW_ALL:
+                            dispCits.add(cit);
+                        break;
+                    case VIEW_INACTIVE:
+                        if(!cit.isIsActive()){
+                            dispCits.add(cit);
+                        }
+                        break;
+                    default: 
+                        
+                }
+            }
+        }
+        return dispCits;
     }
 
    

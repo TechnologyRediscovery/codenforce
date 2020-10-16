@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.EventCnF;
@@ -530,20 +531,63 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     /**
      * Convenience method for iterating over a List<Person> and calling
-     * eventPersonConect for each one
+     * eventPersonConnect for each one
      * 
      * @param ev
-     * @param personList
+     
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public void eventPersonConnect(EventCnF ev, List<Person> personList) throws IntegrationException {
-        ListIterator li = personList.listIterator();
-        while (li.hasNext()) {
-            PersonIntegrator.this.eventPersonConnect(ev, (Person) li.next());
+    public void eventPersonConnect(EventCnF ev) throws IntegrationException, BObStatusException {
+        if(ev != null && !ev.getPersonList().isEmpty()){
+            
+            for(Person p: ev.getPersonList())
+                if(!checkForExistingEventPersonConnections(ev, p)){
+                    eventPersonConnect(ev, p);
+                }
         }
     }
+    
+    /**
+     * Organ for avoiding duplicate connections in eventperson
+     * @param ev the event against which to check the Person argument for links
+     * @param p the Person to check
+     * @return true if there IS an existing connection
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public boolean checkForExistingEventPersonConnections(EventCnF ev, Person p) throws BObStatusException, IntegrationException{
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        List<Person> list = new ArrayList<>();
+        if(ev == null || p == null){
+            throw new BObStatusException("cannot check for links with null person or event");
+        }
+        
+        try {
+            String s = "SELECT ceevent_eventid, person_personid FROM public.eventperson WHERE person_personid=?;";
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, p.getPersonID());
 
-    public void eventPersonConnect(EventCnF ev, Person p) throws IntegrationException {
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                return true;
+            }
+            return false;
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.getPerson | Unable to retrieve person", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+    }
+
+    private void eventPersonConnect(EventCnF ev, Person p) throws IntegrationException {
 
         String query = "INSERT INTO public.eventperson(\n"
                 + " ceevent_eventid, person_personid)\n"
@@ -911,7 +955,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return the database identifier of the sent in Person's very own ghost
      * @throws IntegrationException 
      */
-    public int createGhost(Person p, User u) throws IntegrationException {
+    public int createGhost(Person p, User u) throws IntegrationException, BObStatusException {
+        if(p == null || u == null){
+            throw new BObStatusException("Cannot make ghost with null peson or U");
+            
+        }
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;

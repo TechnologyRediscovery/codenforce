@@ -34,14 +34,19 @@ import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,7 +61,6 @@ import org.primefaces.event.FileUploadEvent;
  */
 public class ViolationBB extends BackingBeanUtils implements Serializable {
 
-    
     private PageModeEnum currentMode;
     private List<PageModeEnum> pageModes;
 
@@ -64,9 +68,18 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
     private CECaseDataHeavy currentCase;
     private List<Blob> blobList;
     
+    private List<ViewOptionsActiveListsEnum> viewOptionList;
+    private ViewOptionsActiveListsEnum selectedViewOption;
+    
+    private List<IntensityClass> severityList;
+    
     private String formNoteText;
-    private ArrayList<EnforcableCodeElement> filteredElementList;
+    private List<EnforcableCodeElement> filteredElementList;
     private CodeSet currentCodeSet;
+
+    private boolean extendStipCompUsingDate;
+    private java.util.Date extendedStipCompDate;
+    private int extendedStipCompDaysFromToday;
 
     /**
      * Creates a new instance of ViolationAdd
@@ -77,16 +90,31 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
 
     @PostConstruct
     public void initBean() {
-        
-        currentCase = getSessionBean().getSessCECase();
-        
-        currentViolation = getSessionBean().getSessCodeViolation();
-        if(currentViolation == null){
-            if(currentCase != null && !currentCase.getViolationList().isEmpty()){
-                currentViolation = currentCase.getViolationList().get(0);
+        CaseCoordinator cc = getCaseCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        try {
+            currentCase = cc.cecase_assembleCECaseDataHeavy(getSessionBean().getSessCECase(), getSessionBean().getSessUser());
+
+            currentViolation = getSessionBean().getSessCodeViolation();
+            if (currentViolation == null) {
+                if (currentCase != null && !currentCase.getViolationList().isEmpty()) {
+                    currentViolation = currentCase.getViolationList().get(0);
+                }
             }
+
+            severityList = sc.getIntensitySchemaWithClasses(
+                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("intensityschema_violationseverity"))
+                    .getClassList();
+        } catch (BObStatusException | IntegrationException | SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+
         }
-        
+
+        filteredElementList = null;
+        extendStipCompUsingDate = true;
         currentCodeSet = getSessionBean().getSessCodeSet();
 
         pageModes = new ArrayList<>();
@@ -99,10 +127,13 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         } else {
             setCurrentMode(PageModeEnum.LOOKUP);
         }
+        viewOptionList = Arrays.asList(ViewOptionsActiveListsEnum.values());
+        selectedViewOption = ViewOptionsActiveListsEnum.VIEW_ACTIVE;
+        
         System.out.println("ViolationBB.initBean()");
     }
 
-     /**
+    /**
      * Responds to the user clicking one of the page modes: LOOKUP, ADD, UPDATE,
      * REMOVE
      *
@@ -168,7 +199,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
     public boolean getActiveRemoveMode() {
         return PageModeEnum.REMOVE.equals(currentMode);
     }
-    
+
     /**
      * Primary listener method which copies a reference to the selected user
      * from the list and sets it on the selected user perch
@@ -176,23 +207,21 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      * @param viol
      */
     public void onObjetViewButtonChange(CodeViolation viol) {
-  
 
         if (viol != null) {
             getSessionBean().setSessCodeViolation(viol);
             currentViolation = viol;
         }
         System.out.println("ViolationBB.onObjectViewButtonChange: currentViolation is now " + currentViolation.getViolationID());
-        
+
     }
 
-    
-       /**
+    /**
      * Internal logic container for changes to page mode: Lookup
      */
     private void onModeLookupInit() {
     }
-    
+
     /**
      * Internal logic container for beginning the user creation change process
      * Delegated from the mode button router
@@ -200,19 +229,19 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
     public void onModeInsertInit() {
         CaseCoordinator cc = getCaseCoordinator();
         System.out.println("violationBB.OnModeInsertInit");
-        
+
         try {
             currentViolation = cc.violation_getCodeViolationSkeleton(currentCase);
         } catch (BObStatusException ex) {
             System.out.println(ex);
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                           ex.getMessage(), ""));
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
         }
-        
+
     }
-    
-      /**
+
+    /**
      * Listener for beginning of update process
      */
     public void onModeUpdateInit() {
@@ -226,122 +255,168 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
 
     }
 
-
     /**
-     * Listener for user selection of a violation from the code set violation table
+     * Listener for user selection of a violation from the code set violation
+     * table
+     *
      * @param ece
      */
-    public void onViolationSelectElementButtonChange(EnforcableCodeElement ece){
-        if(currentViolation != null){
-            currentViolation.setCodeViolated(ece);
-        } else {
+    public void onViolationSelectElementButtonChange(EnforcableCodeElement ece) {
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            currentViolation = cc.violation_injectOrdinance(currentCase, currentViolation, ece, null);
+        } catch (BObStatusException ex) {
             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_WARN, 
-                        "Cannot add null ordinance","" ));
-
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
         }
-        
-        
     }
-    
+
     /**
      * Listener for the start of the violation choosing process
-     * @param ev 
+     *
+     * @param ev
      */
-    public void onViolationChooseButtonChange(ActionEvent ev){
+    public void onViolationSelectElementInitButtonChange(ActionEvent ev) {
         // do nothing yet
-        
-        
-        
     }
- 
+
+    /**
+     * Listener for commencement of extending stip comp date
+     *
+     * @param ev
+     */
+    public void onViolationExtendStipCompDateInitButtonChange(ActionEvent ev) {
+        extendedStipCompDaysFromToday = CaseCoordinator.DEFAULT_EXTENSIONDAYS;
+    }
+
+    /**
+     * Listener for requests to commit extension of stip comp date
+     *
+     * @return
+     */
+    public String onViolationExtendStipCompDateCommitButtonChange() {
+        CaseCoordinator cc = getCaseCoordinator();
+        long secBetween;
+        try {
+            if (extendStipCompUsingDate && extendedStipCompDate != null) {
+                LocalDateTime freshDate = extendedStipCompDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                if (freshDate.isBefore(LocalDateTime.now())) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Stipulated compliance dates must be in the future!", ""));
+                } else {
+                    secBetween = freshDate.toEpochSecond(ZoneOffset.of("-4")) - LocalDateTime.now().toEpochSecond(ZoneOffset.of("-4"));
+                    // divide by num seconds in a day
+                    long daysBetween = secBetween / (24 * 60 * 60);
+                    cc.violation_extendStipulatedComplianceDate(currentViolation, daysBetween, currentCase, getSessionBean().getSessUser());
+                }
+            } else {
+                cc.violation_extendStipulatedComplianceDate(currentViolation, extendedStipCompDaysFromToday, currentCase, getSessionBean().getSessUser());
+            }
+        } catch (BObStatusException | IntegrationException | ViolationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.toString(), ""));
+        } 
+        return "ceCaseViolations";
+
+    }
+
     /**
      * Listener for user reqeusts to commit updates to a codeViolation
+     *
      * @return
      * @throws IntegrationException
-     * @throws BObStatusException 
+     * @throws BObStatusException
      */
-    public String onViolationUpdateCommitButtonChange() throws IntegrationException, BObStatusException{
-       CaseCoordinator cc = getCaseCoordinator();
-       EventCoordinator eventCoordinator = getEventCoordinator();     
-       SystemCoordinator sc = getSystemCoordinator();
-       
-       EventCategory ec = eventCoordinator.initEventCategory(
-               Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
-       
-        try {
-            
+    public String onViolationUpdateCommitButtonChange() throws IntegrationException, BObStatusException {
+        CaseCoordinator cc = getCaseCoordinator();
+        EventCoordinator eventCoordinator = getEventCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
 
-            
-             cc.violation_updateCodeViolation(currentCase, currentViolation, getSessionBean().getSessUser());
-             
-             // if update succeeds without throwing an error, then generate an
+        EventCategory ec = eventCoordinator.initEventCategory(
+                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
+
+        try {
+
+            cc.violation_updateCodeViolation(currentCase, currentViolation, getSessionBean().getSessUser());
+
+            // if update succeeds without throwing an error, then generate an
             // update violation event
             // TODO: Rewire this to work with new event processing cycle
-            
 //             eventCoordinator.generateAndInsertCodeViolationUpdateEvent(getCurrentCase(), currentViolation, event);
-             
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Success! Violation updated and notice event generated", ""));
         } catch (IntegrationException ex) {
             System.out.println(ex);
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Unable to edit violation in the database", 
-                                "This is a system-level error that msut be corrected by an administrator, Sorry!"));
-            
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to edit violation in the database",
+                            "This is a system-level error that msut be corrected by an administrator, Sorry!"));
+
         } catch (ViolationException ex) {
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN, 
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
                             ex.getMessage(), "Please revise the stipulated compliance date"));
-             
-        } catch (EventException ex) {
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            ex.getMessage(), "Unable to generate automated event to log violation update"));
+
         }
-        
-            return "ceCaseViolations";
+
+        return "ceCaseViolations";
     }
 
-    
-/**
- * Listener for user requests to commit a violation compliance event
- * @param cv 
- */
-    public void onViolationRecordComplianceCommitButtonChange(CodeViolation cv) {
+    /**
+     * Listener for user requests to commit a violation compliance event
+     *
+     * @return 
+     */
+    public String onViolationRecordComplianceCommitButtonChange() {
         EventCoordinator ec = getEventCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
-        if(cv != null){
-            currentViolation = cv;
+        
             // build event details package
             EventCnF e = null;
             try {
-                currentViolation.setComplianceUser(getSessionBean().getSessUser());
+                
+                cc.violation_recordCompliance(currentViolation, getSessionBean().getSessUser());
+                   getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Compliance recorded", ""));
+                
+                // ************ TODO: Finish me with events ******************//
+                // ************ TODO: Finish me with events ******************//
                 e = ec.generateViolationComplianceEvent(currentViolation);
                 e.setUserCreator(getSessionBean().getSessUser());
                 e.setTimeStart(LocalDateTime.now());
-                cv.setActualComplianceDate(LocalDateTime.now());
-                cc.violation_recordCompliance(cv, getSessionBean().getSessUser());
+                
+                // ************ TODO: Finish me with events ******************//
+                // ************ TODO: Finish me with events ******************//
+                
+                   getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Compliance event attached to case", ""));
             } catch (IntegrationException ex) {
                 System.out.println(ex);
+                   getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.toString(), ""));
+                   return "";
             }
+
+        return "ceCaseViolations";
+        
+
             
-        }
-        
-        
         // the user is then shown the add event dialog, and when the
         // event is added to the case, the CaseCoordinator will
         // set the date of record on the violation to match that chosen
         // for the event
 //        selectedEvent = e;
-
     }
-    
 
-    
-       /**
+    /**
      * Listener for commencement of note writing process
      *
      * @param ev
@@ -384,8 +459,10 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         return "ceCaseViolations";
 
     }
+
     /**
      * Listener for user requests to abort their insert/update operation
+     *
      * @return
      */
     public String onInsertUpdateAbortButtonChange() {
@@ -393,10 +470,11 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         return "ceCaseViolations";
 
     }
-    
+
     /**
-     * Listener 
-     * @param ev 
+     * Listener
+     *
+     * @param ev
      */
     public void handlePhotoUpload(FileUploadEvent ev) {
         if (this.currentViolation == null) {
@@ -432,16 +510,17 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
 
     /**
      * Responds to user reqeusts to commit a new code violation to the CECase
-     * @return 
+     *
+     * @return
      */
     public String onViolationAddCommitButtonChange() {
 
         CaseCoordinator cc = getCaseCoordinator();
 
         try {
-             cc.violation_attachViolationToCase(currentViolation, currentCase, getSessionBean().getSessUser());
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+            cc.violation_attachViolationToCase(currentViolation, currentCase, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Success! Violation attached to case.", ""));
             getSessionBean().getSessionBean().setSessCodeViolation(currentViolation);
             System.out.println("ViolationBB.onViolationAddCommmitButtonChange | completed violation process");
@@ -451,16 +530,17 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), ""));
             return "";
-        } 
+        }
         return "ceCaseViolations";
 
     }
-    
+
     /**
      * Listener for user requests to remove a violation from a case
-     * @return 
+     *
+     * @return
      */
-    public String onViolationRemoveCommitButtonChange(){
+    public String onViolationRemoveCommitButtonChange() {
         CaseCoordinator cc = getCaseCoordinator();
         try {
             cc.violation_deactivateCodeViolation(currentViolation, getSessionBean().getSessUser());
@@ -470,65 +550,26 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), null));
             return "";
-            
+
         }
         return "ceCaseViolations";
-        
-    }
-
-    /**
-     * Unknown 
-     * @return 
-     */
-    public String addViolationWithPhotos() {
-        CaseIntegrator ci = getCaseIntegrator();
-        CaseCoordinator cc = getCaseCoordinator();
-
-        try {
-             currentViolation.setViolationID(cc.violation_attachViolationToCase(currentViolation, currentCase, getSessionBean().getSessUser()));
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            "Success! Violation added.", ""));
-            return "violationPhotos";
-        } catch (IntegrationException | SearchException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to edit violation.",
-                            "This is a system-level error that must be corrected by an administrator, Sorry!"));
-
-        } catch (ViolationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN,
-                            ex.getMessage(), "Stipulated compliance date must be in the future; please revise the stipulated compliance date."));
-        } catch (BObStatusException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), "To preserve data integrity, this "
-                            + "case's phase restrictions forbid attaching new code violations."));
-        } catch (EventException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), "Violation event exception"));
-        }
-        return "";
 
     }
-    
+
     /**
      * Listener for user request to remove photo on violation
+     *
      * @param photoid
-     * @return 
+     * @return
      */
-    public String onPhotoRemoveButtonChange(int photoid){
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Cannot remove photo yet: unsupported operation", ""));
-        
+    public String onPhotoRemoveButtonChange(int photoid) {
+        getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Cannot remove photo yet: unsupported operation", ""));
+
         // do something here
         return "ceCaseViolations";
-        
+
     }
 
     public String photosConfirm() {
@@ -617,7 +658,6 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         return currentMode;
     }
 
-   
     /**
      * @return the pageModes
      */
@@ -649,14 +689,14 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the filteredElementList
      */
-    public ArrayList<EnforcableCodeElement> getFilteredElementList() {
+    public List<EnforcableCodeElement> getFilteredElementList() {
         return filteredElementList;
     }
 
     /**
      * @param filteredElementList the filteredElementList to set
      */
-    public void setFilteredElementList(ArrayList<EnforcableCodeElement> filteredElementList) {
+    public void setFilteredElementList(List<EnforcableCodeElement> filteredElementList) {
         this.filteredElementList = filteredElementList;
     }
 
@@ -672,6 +712,93 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      */
     public void setCurrentCodeSet(CodeSet currentCodeSet) {
         this.currentCodeSet = currentCodeSet;
+    }
+
+    /**
+     * @return the extendedStipCompDaysFromToday
+     */
+    public int getExtendedStipCompDaysFromToday() {
+        return extendedStipCompDaysFromToday;
+    }
+
+    /**
+     * @param extendedStipCompDaysFromToday the extendedStipCompDaysFromToday to
+     * set
+     */
+    public void setExtendedStipCompDaysFromToday(int extendedStipCompDaysFromToday) {
+        this.extendedStipCompDaysFromToday = extendedStipCompDaysFromToday;
+    }
+
+    /**
+     * @return the extendedStipCompDate
+     */
+    public java.util.Date getExtendedStipCompDate() {
+        return extendedStipCompDate;
+    }
+
+    /**
+     * @param extendedStipCompDate the extendedStipCompDate to set
+     */
+    public void setExtendedStipCompDate(java.util.Date extendedStipCompDate) {
+        this.extendedStipCompDate = extendedStipCompDate;
+    }
+
+    /**
+     * @return the extendStipCompUsingDate
+     */
+    public boolean isExtendStipCompUsingDate() {
+        return extendStipCompUsingDate;
+    }
+
+    /**
+     * @param extendStipCompUsingDate the extendStipCompUsingDate to set
+     */
+    public void setExtendStipCompUsingDate(boolean extendStipCompUsingDate) {
+        this.extendStipCompUsingDate = extendStipCompUsingDate;
+    }
+
+  
+
+    /**
+     * @return the severityList
+     */
+    public List<IntensityClass> getSeverityList() {
+        return severityList;
+    }
+
+    /**
+     * @param severityList the severityList to set
+     */
+    public void setSeverityList(List<IntensityClass> severityList) {
+        this.severityList = severityList;
+    }
+
+    /**
+     * @return the selectedViewOption
+     */
+    public ViewOptionsActiveListsEnum getSelectedViewOption() {
+        return selectedViewOption;
+    }
+
+    /**
+     * @param selectedViewOption the selectedViewOption to set
+     */
+    public void setSelectedViewOption(ViewOptionsActiveListsEnum selectedViewOption) {
+        this.selectedViewOption = selectedViewOption;
+    }
+
+    /**
+     * @return the viewOptionList
+     */
+    public List<ViewOptionsActiveListsEnum> getViewOptionList() {
+        return viewOptionList;
+    }
+
+    /**
+     * @param viewOptionList the viewOptionList to set
+     */
+    public void setViewOptionList(List<ViewOptionsActiveListsEnum> viewOptionList) {
+        this.viewOptionList = viewOptionList;
     }
 
 }

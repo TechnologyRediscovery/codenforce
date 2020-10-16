@@ -404,7 +404,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     private final NavigationSubItem CEViolations = getNavSubItem("Violations", "/restricted/cogstaff/ce/ceCaseViolations.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CENotices = getNavSubItem("Notices", "/restricted/cogstaff/ce/ceCaseNotices.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CECitations = getNavSubItem("Citations", "/restricted/cogstaff/ce/ceCaseCitations.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem CEEvents = getNavSubItem("Events", "/restricted/cogstaff/ce/ceCaseEvents.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CEEvents = getNavSubItem("Events", "/restricted/cogstaff/event/events.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CERequests = getNavSubItem("Requests", "/restricted/cogstaff/ce/ceActionRequests.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Code Enf
@@ -425,7 +425,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     private final NavigationSubItem occPeriodStatus = getNavSubItem("Period Status", "/restricted/cogstaff/occ/occPeriodWorkflow.xhtml", "fa fa-sign-in", true);
     private final NavigationSubItem occPermits = getNavSubItem("Permits", "/restricted/cogstaff/occ/occPeriodPermits.xhtml", "fa fa-sign-in", true);
     private final NavigationSubItem occPermitApplications = getNavSubItem("Permit Applications", "/restricted/cogstaff/occ/occPermitApplications.xhtml", "fa fa-sign-in", true);
-    private final NavigationSubItem occEvents = getNavSubItem("Events", "/restricted/cogstaff/occ/occPeriodEvents.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem occEvents = getNavSubItem("Events", "/restricted/cogstaff/event/events.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem occInspections = getNavSubItem("Inspections", "/restricted/cogstaff/occ/occPeriodInspections.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem occDocuments = getNavSubItem("Payments", "/restricted/cogstaff/occ/occPeriodPayments.xhtml", "fa fa-sign-in", false);
 
@@ -446,7 +446,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     // listed in file order
     private final NavigationSubItem personCECases = getNavSubItem("CE Cases", "/restricted/cogstaff/person/personCECases.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem personChanges = getNavSubItem("Changes", "/restricted/cogstaff/person/personChanges.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem personEvents = getNavSubItem("Events", "/restricted/cogstaff/person/personEvents.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem personInfo = getNavSubItem("Info", "/restricted/cogstaff/person/personInfo.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem personOccPeriods = getNavSubItem("Occ periods", "/restricted/cogstaff/person/personOccPeriods.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem personProperties = getNavSubItem("Properties", "/restricted/cogstaff/person/personProperties.xhtml", "fa fa-sign-in", false);
@@ -461,7 +460,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         navList.add(personSearch);
         navList.add(personInfo);
         navList.add(personProperties);
-        navList.add(personEvents);
         navList.add(personOccPeriods);
         navList.add(personCECases);
         navList.add(personPublic);

@@ -43,7 +43,6 @@ public  class       CodeViolation
     protected double penalty;
     protected String description;
     protected String notes;
-    
  
     protected LocalDateTime dateOfRecord;
     protected java.util.Date dateOfRecordUtilDate;
@@ -53,20 +52,26 @@ public  class       CodeViolation
     protected String creationTSPretty;
     protected User createdBy;
     
+    protected boolean allowHostCaseUpdate;
+    protected boolean allowOrdinanceUpdates;
+    protected boolean allowDORUpdate;
+    protected boolean allowStipCompDateUpdate;
+    
     protected LocalDateTime dateOfCitation;
     protected List<Integer> citationIDList;
     protected List<Integer> noticeIDList;
     
+    // compliance fields
     protected LocalDateTime stipulatedComplianceDate;
     protected LocalDateTime actualComplianceDate;
-    
-    protected boolean leagacyImport;
-    private List<Photograph> photoList;
-    protected List<Integer> blobIDList;
-    protected List<Integer> photoIDList;
-    
     protected LocalDateTime complianceTimeStamp;
     protected User complianceUser;
+    protected String complianceNote;
+    
+    protected boolean leagacyImport;
+    protected List<Photograph> photoList;
+    protected List<Integer> blobIDList;
+    protected List<Integer> photoIDList;
     
     protected int complianceTFExpiryPropID;
     protected Proposal complianceTFExpiryProp;
@@ -715,6 +720,76 @@ public  class       CodeViolation
      */
     public void setPhotoList(List<Photograph> photoList) {
         this.photoList = photoList;
+    }
+
+    /**
+     * @return the allowHostCaseUpdate
+     */
+    public boolean isAllowHostCaseUpdate() {
+        return allowHostCaseUpdate;
+    }
+
+    /**
+     * @return the allowOrdinanceUpdates
+     */
+    public boolean isAllowOrdinanceUpdates() {
+        return allowOrdinanceUpdates;
+    }
+
+    /**
+     * @return the allowDORUpdate
+     */
+    public boolean isAllowDORUpdate() {
+        return allowDORUpdate;
+    }
+
+    /**
+     * @return the allowStipCompDateUpdate
+     */
+    public boolean isAllowStipCompDateUpdate() {
+        return allowStipCompDateUpdate;
+    }
+
+    /**
+     * @param allowHostCaseUpdate the allowHostCaseUpdate to set
+     */
+    public void setAllowHostCaseUpdate(boolean allowHostCaseUpdate) {
+        this.allowHostCaseUpdate = allowHostCaseUpdate;
+    }
+
+    /**
+     * @param allowOrdinanceUpdates the allowOrdinanceUpdates to set
+     */
+    public void setAllowOrdinanceUpdates(boolean allowOrdinanceUpdates) {
+        this.allowOrdinanceUpdates = allowOrdinanceUpdates;
+    }
+
+    /**
+     * @param allowDORUpdate the allowDORUpdate to set
+     */
+    public void setAllowDORUpdate(boolean allowDORUpdate) {
+        this.allowDORUpdate = allowDORUpdate;
+    }
+
+    /**
+     * @param allowStipCompDateUpdate the allowStipCompDateUpdate to set
+     */
+    public void setAllowStipCompDateUpdate(boolean allowStipCompDateUpdate) {
+        this.allowStipCompDateUpdate = allowStipCompDateUpdate;
+    }
+
+    /**
+     * @return the complianceNote
+     */
+    public String getComplianceNote() {
+        return complianceNote;
+    }
+
+    /**
+     * @param complianceNote the complianceNote to set
+     */
+    public void setComplianceNote(String complianceNote) {
+        this.complianceNote = complianceNote;
     }
 
    

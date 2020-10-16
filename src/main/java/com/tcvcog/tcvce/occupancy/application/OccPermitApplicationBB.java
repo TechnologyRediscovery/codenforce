@@ -186,9 +186,12 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             return getSessionBean().getNavStack().popLastPage();
         } catch (NavigationException ex) {
             System.out.println("OccPermitApplication.goBack() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
+            //We must do things a little bit different here to make sure messages are kept after the redirect.
+            FacesContext context = getFacesContext();
+                    context.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Something went wrong when we tried to direct you back a page!", ""));
+                    context.getExternalContext().getFlash().setKeepMessages(true);
             return "occPermitApplicationFlow";
         }
     }

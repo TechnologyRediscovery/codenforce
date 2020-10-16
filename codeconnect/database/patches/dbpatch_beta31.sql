@@ -1,6 +1,6 @@
 -- ****************************************************************************
--- PATCH 30
--- "MID August 2020" launch changes
+-- PATCH 31
+-- "MID SEP 2020" launch changes
 
 -- ****************************************************************************
 
@@ -43,8 +43,30 @@ ALTER TABLE codeviolation ADD COLUMN compliancenote TEXT;
 
 ALTER TABLE noticeofviolation ADD COLUMN active BOOLEAN DEFAULT TRUE;
 
+-- FROM SNAPPER's file called ParcelNotInWprdcData.sql
+
+INSERT INTO public.eventcategory(
+     categoryid, categorytype,
+     title,
+     description,
+     notifymonitors, hidable, icon_iconid, relativeorderwithintype, relativeorderglobal,
+     hosteventdescriptionsuggtext, directive_directiveid, defaultdurationmins,
+     active, userrankminimumtoenact, userrankminimumtoview, userrankminimumtoupdate)
+ VALUES
+    (308, 'PropertyInfoCase'::eventtype,
+        'DifferentMunicode',
+        'Documents a change in a Parcel''s municode (compared to the Allegheny County Real Estate Portal)',
+        TRUE, TRUE, NULL, 0, 0,
+        NULL, NULL, 1,
+        TRUE, 7, 3, 7),
+    (309, 'PropertyInfoCase'::eventtype,
+        'NotInRealEstatePortal',
+        'Documents when a parcel is in the CodeNForce database but the Allegheny County Real Estate Portal''s corresponding page is blank',
+        TRUE, TRUE, NULL, 0, 0,
+        NULL, NULL, 1,
+        TRUE, 7, 3, 7);
 
 
 --IF datepublished IS NULL the patch is still open and receiving changes
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (30, 'database/patches/dbpatch_beta30.sql', '08-25-2020' 'ecd', 'mid august 2020 changes');
+    VALUES (31, 'database/patches/dbpatch_beta31.sql', '09-24-2020' 'ecd', 'mid sep 2020 changes');

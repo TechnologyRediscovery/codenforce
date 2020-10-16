@@ -1290,7 +1290,6 @@
                                                              rowKey="#{cse.caseID}"
                                                              >
 
-
                                                     <p:column headerText="Date Opened"
                                                               styleClass="centeredColumnContent"
                                                               sortBy="#{cse.originationDate}">
@@ -1302,7 +1301,7 @@
                                                     <p:column headerText="Status"
                                                               styleClass="centeredColumnContent">
 
-                                                        <h:outputText value="#{cse.open ? 'Open' : 'Closed'}"/>
+                                                        <h:outputText value="#{cse.statusBundle.phase.caseOpen ? 'Open' : 'Closed'}"/>
 
                                                     </p:column>
 

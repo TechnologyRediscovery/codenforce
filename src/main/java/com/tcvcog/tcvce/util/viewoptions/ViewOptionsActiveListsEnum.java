@@ -22,9 +22,9 @@ package com.tcvcog.tcvce.util.viewoptions;
  */
 public enum ViewOptionsActiveListsEnum {
     
-    VIEW_ALL("all Objects"),
-    VIEW_ACTIVE("active (default)"),
-    VIEW_INACTIVE("inactive (aka deleted)");
+    VIEW_ALL("Show all items"),
+    VIEW_ACTIVE("Show only active items"),
+    VIEW_INACTIVE("Show inactive (aka deleted) items");
     
     private final String label;
      

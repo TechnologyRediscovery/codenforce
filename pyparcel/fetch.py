@@ -2,13 +2,14 @@ import requests
 import json
 import os
 from typing import List
-from collections import namedtuple
 
-import _create
-import _write
-from _constants import PARCEL_ID_LISTS, DEFAULT_PROP_UNIT
-
-Municipality = namedtuple("Municipalicty", ["municode", "name"])
+# TODO: Refactor these imports somewhere else
+#   These files should not read from each other.
+#   If not refactored, this file should somehow be designated a higher level than the others
+import create
+import write
+import parse
+from common import PARCEL_ID_LISTS, DEFAULT_PROP_UNIT
 
 
 def munis(cursor):
@@ -24,7 +25,7 @@ def muniname_from_municode(municode, cursor):
     cursor.execute(select_sql, [municode])
     row = cursor.fetchone()
     try:
-        return Municipality(*row)
+        return parse.Municipality(*row)
     except TypeError as e:
         if row is None:
             raise TypeError(
@@ -34,16 +35,16 @@ def muniname_from_municode(municode, cursor):
             raise e
 
 
-def muni_data_and_write_to_file(Municipality):
+def muni_data_and_write_to_file(muni: parse.Municipality):
     # Note: The WPRDC limits 50,000 parcels
     script_dir = os.path.dirname(__file__)
-    rel_path = os.path.join(PARCEL_ID_LISTS, Municipality.name + "_parcelids.json")
+    rel_path = os.path.join(PARCEL_ID_LISTS, muni.name + "_parcelids.json")
     abs_path = os.path.join(script_dir, rel_path)
 
     with open(abs_path, "w") as f:
         wprdc_url = """https://data.wprdc.org/api/3/action/datastore_search_sql?sql=
         SELECT * FROM "518b583f-7cc8-4f60-94d0-174cc98310dc" WHERE "MUNICODE" = '{}'""".format(
-            Municipality.municode
+            muni.municode
         )
         req = requests.get(wprdc_url)
         try:
@@ -73,8 +74,8 @@ def unit_id(prop_id, cursor):
     try:
         return cursor.fetchone()[0]  # unit id
     except TypeError:
-        # TODO: ERROR: Property exists without property unit
-        _unit_id = _write.unit(
+        # TODO: Raise Warning: Property exists without property unit
+        _unit_id = write.unit(
             {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id}, cursor,
         )
         return _unit_id
@@ -95,15 +96,17 @@ def cecase_id(
     except TypeError:  # 'NoneType' object is not subscriptable:
         # TODO: ERROR: Property exists without cecase
         _unit_id = unit_id(prop_id, cursor)  # Function _fetch.unit_id
-        cecase_map = _create.cecase_imap(prop_id, _unit_id)
-        case_id = _write.cecase(cecase_map, cursor)
+        cecase_map = create.cecase_imap(prop_id, _unit_id)
+        case_id = write.cecase(cecase_map, cursor)
         return case_id
 
 
 def all_parids_in_muni(municdode, cursor) -> List[str]:
     select_sql = "SELECT parid FROM property WHERE municipality_municode = %s;"
     cursor.execute(select_sql, [municdode])
-    return cursor.fetchall()
+    all_parcels = cursor.fetchall()
+    # Each parcel returned in all_parcels is a tuple rather than the string we want, so we unpack it.
+    return [p[0] for p in all_parcels]
 
 
 def valid_json(file_name):
@@ -111,8 +114,11 @@ def valid_json(file_name):
         f = json.load(file)
         if not (f["success"] and len(f["result"]["records"]) > 0):
             # Check and see if it's a test municipality
-            if file.name.startswith(os.path.join(PARCEL_ID_LISTS, "COG Land")):
+            _, tail = os.path.split(file_name)
+            if tail.startswith("COG Land"):
                 return False
-            os.rename(file_name, file_name + "_corrupt")
-            raise ValueError("{} not valid".format(file.name))
+            else:
+                os.rename(file_name, file_name + "_corrupt")
+                # Note: This doesn't actually work, since we get a WinError 32
+                raise ValueError("{} not valid".format(file.name))
         return True

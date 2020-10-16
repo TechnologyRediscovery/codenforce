@@ -374,14 +374,12 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             con = getPostgresCon();
             stmt = con.prepareStatement(sb.toString());
             stmt.setInt(1, requestID);
-            System.out.println("CEActionRequestorIntegrator.getActionRequest | statement: " + stmt.toString());
             // Retrieve action data from postgres
             rs = stmt.executeQuery();
 
             // loop through the result set and reat an action request from each
             while (rs.next()) {
                 newActionRequest = generateActionRequestFromRS(rs);
-                System.out.println("CEActionRequestorIntegrator.getActionRequest | Retrieved Request: " + newActionRequest.getRequestID());
 
             }
         } catch (SQLException ex) {

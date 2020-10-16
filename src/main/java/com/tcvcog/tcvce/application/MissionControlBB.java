@@ -29,6 +29,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
@@ -154,8 +155,9 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      * @param cse
      * @return 
      */
-    public String onViewCECaseButtonChange(CECaseDataHeavy cse){
+    public String onViewCECaseButtonChange(CECase cse){
         if(cse != null){
+            System.out.println("view case " + cse.getCaseID());
             getSessionBean().setSessCECase(cse);
         }
         return "ceCaseSearchProfile";

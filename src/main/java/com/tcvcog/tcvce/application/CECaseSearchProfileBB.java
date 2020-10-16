@@ -122,12 +122,13 @@ public class CECaseSearchProfileBB
         caseList.addAll(sb.getSessCECaseList());
         CECase cseTemp = getSessionBean().getSessCECase();
         try {
-            if(cseTemp == null && !caseList.isEmpty()){
-                cseTemp = caseList.get(0);
-            } else {
-                cseTemp = cc.cecase_selectDefaultCECase(sb.getSessUser());
+            if(cseTemp == null){
+                if(caseList != null && !caseList.isEmpty()){
+                    cseTemp = caseList.get(0);
+                } else {
+                    cseTemp = cc.cecase_selectDefaultCECase(sb.getSessUser());
+                }
             }
-            
             currentCase = cc.cecase_assembleCECaseDataHeavy(cseTemp, getSessionBean().getSessUser());
             System.out.println("CECaseSearchProfile.initBean(): current case ID: " + currentCase.getCaseID());
             

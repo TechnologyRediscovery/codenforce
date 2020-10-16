@@ -2738,3 +2738,15 @@ input{
     padding-top: 15px;
     display: block;
 }
+
+/** RULES MADE FOR EDITABLE TABLES
+
+    These rules are made for tables with editable rows. The rows used to turn blue, and that was hard to read. Now they turn not blue. Please put this rule wherever it should be.
+**/
+
+body .ui-datatable.editTable .ui-datatable-data>tr.ui-state-highlight {
+ border:1px solid #c8c8c8;
+ background-color:#cde162;
+ color:#262626;
+ cursor:default
+}

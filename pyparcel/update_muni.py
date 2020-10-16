@@ -3,20 +3,32 @@
 #
 #   Otherwise, treat the name as the module name.
 #   Example: _parse.strip_whitespace strips whitespace, _parse.OwnerName is a class
-import copy
-import json
-import _create as create
-import _fetch as fetch
-from _fetch import valid_json
-import _write as write
-import _scrape as scrape
-import _events
-import _parse
-from _constants import Tally
-from _constants import DEFAULT_PROP_UNIT
-from _constants import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
 
-# from _events import ParcelNotInRecentRecords
+import json
+import create as create
+import fetch as fetch
+from fetch import valid_json
+import write as write
+import scrape as scrape
+import events
+import parse
+from common import Tally
+from common import DEFAULT_PROP_UNIT
+from common import DASHES, MEDIUM_DASHES, SHORT_DASHES, SPACE
+
+
+def download_and_read_records_from_Wprdc(muni):
+    print("Updating {} ({})".format(muni.name, muni.municode))
+    print(MEDIUM_DASHES)
+    filename = fetch.muni_data_and_write_to_file(muni)
+    if not valid_json(filename):
+        print(DASHES)
+        return
+
+    with open(filename, "r") as f:
+        file = json.load(f)
+        records = file["result"]["records"]
+    return records
 
 
 def parcel_not_in_db(parid, cursor):
@@ -40,35 +52,33 @@ def compare(WPRDC_data, AlleghenyCountyData):
 
 
 # Todo: Validate more data
-def validate_data(r, tax):  #   Example data as applicable to explain transformations
-    #   WPRDC               Allegheny County
-    compare(r["TAXYEAR"], int(tax.year))  #   2020.0              2020
+def validate_data(r, tax):
+    #                                       #   WPRDC               Allegheny County
+    compare(r["TAXYEAR"], int(tax.year))  # #   2020.0              2020
 
 
-def insert_and_update_database(record, conn, cursor, commit):
+def update_database(record, conn, cursor, commit):
     """
     """
     parid = record["PARID"]
     html = scrape.county_property_assessment(parid)
-    soup = _parse.soupify_html(html)
-    owner_name = _parse.OwnerName.get_Owner_from_soup(soup)
-    tax_status = _parse.parse_tax_from_soup(soup)
+    soup = parse.soupify_html(html)
+    owner_name = parse.OwnerName.from_soup(soup)
+    tax_status = parse.parse_tax_from_soup(soup)
 
     if parcel_not_in_db(parid, cursor):
         new_parcel = True
         imap = create.property_insertmap(record)
         prop_id = write.property(imap, cursor)
+        #
         if record["PROPERTYUNIT"] == " ":
-            unit_id = write.unit(
-                {"unitnumber": DEFAULT_PROP_UNIT, "property_propertyid": prop_id},
-                cursor,
-            )
+            unit_num = DEFAULT_PROP_UNIT
         else:
-            print(record["PROPERTYUNIT"])
-            unit_id = write.unit(
-                {"unitnumber": record["PROPERTYUNIT"], "property_propertyid": prop_id,},
-                cursor,
-            )
+            unit_num = record["PROPERTYUNIT"]
+        unit_id = write.unit(
+            {"unitnumber": unit_num, "property_propertyid": prop_id}, cursor
+        )
+        #
         cecase_map = create.cecase_imap(prop_id, unit_id)
         cecase_id = write.cecase(cecase_map, cursor)
         #
@@ -92,7 +102,7 @@ def insert_and_update_database(record, conn, cursor, commit):
     # Property external data is a misnomer. It's just a log of the data from every time stuff
     write.propertyexternaldata(propextern_map, cursor)
 
-    if _events.query_propertyexternaldata_for_changes_and_write_events(
+    if events.query_propertyexternaldata_for_changes_and_write_events(
         parid, prop_id, cecase_id, new_parcel, cursor
     ):
         Tally.updated += 1
@@ -106,8 +116,9 @@ def insert_and_update_database(record, conn, cursor, commit):
             for attr in [parid, new_parcel, prop_id, unit_id, cecase_id]
         ]
 
-    # from _utils import pickler
-    # pickler(html, "html", incr=False)
+    # from utils import pickler
+    # pickler(record, "record", to_type="json", incr=False)
+    # pickler(html, "html", to_type="html", incr=True)
     # pickler(owner_name, "own", incr=False)
     # pickler(soup, "soup", incr=False)
     # pickler(imap, "prop_imap", incr=False)
@@ -123,53 +134,26 @@ def insert_and_update_database(record, conn, cursor, commit):
 
 
 def create_events_for_parcels_in_db_but_not_in_records(
-    record, municdode, db_conn, cursor, commit
+    records, municdode, db_conn, cursor, commit
 ):
     """
     Writes an event to the database for every parcel in a municipality that appears in the database but was not in the WPRDC's data.
     If a property doesn't have an associated unit and cecase, one is created.
     """
     # Get parcels in the database but not in the WPRDC record
-    all_parcels = fetch.all_parids_in_muni(municdode, cursor)
-    remaining_parcels = copy.copy(all_parcels)
-    for i, parcel in enumerate(all_parcels):
-        for r in record:
-            if parcel == r["PARID"]:
-                remaining_parcels.pop(i)
-                continue
-    # At this point, `parcels` contains a list of muni's parcels that appeared in the database but not in the most recent record from the WPRDC.
-    # Now, write each event to the database.
-    for parcel_id in remaining_parcels:
+    db_parcels = fetch.all_parids_in_muni(municdode, cursor)
+    wprdc_parcels = [r["PARID"] for r in records]
+    extra_parcels = set(db_parcels) - set(wprdc_parcels)
+    for parcel_id in extra_parcels:
         prop_id = fetch.prop_id(parcel_id, cursor)
         cecase_id = fetch.cecase_id(prop_id, cursor)
-        details = _events.EventDetails(parcel_id, prop_id, cecase_id, cursor)
-
-        _events.ParcelNotInRecentRecords(details).write_to_db()
+        details = events.EventDetails(parcel_id, prop_id, cecase_id, cursor)
+        details.old = municdode
+        # Creates DifferentMunicode or NotInRealEstatePortal
+        # If DifferentMunicode, supplies the new muni
+        event = events.parcel_not_in_wprdc_data(details)
+        event.write_to_db()
+        Tally.diff_count += 1
     if commit:
-        db_conn.execute()
-
-
-def update_muni(muni, db_conn, commit=True):
-    """
-    The core functionality of the script.
-    """
-    print("Updating {} ({})".format(muni.name, muni.municode))
-    print(MEDIUM_DASHES)
-    filename = fetch.muni_data_and_write_to_file(muni)
-    if not valid_json(filename):
-        print(DASHES)
-        return
-
-    with open(filename, "r") as f:
-        file = json.load(f)
-        records = file["result"]["records"]
-
-    with db_conn.cursor() as cursor:
-        for record in records:
-            insert_and_update_database(record, db_conn, cursor, commit)
-        print(DASHES)
-
-        # create_events_for_parcels_in_db_but_not_in_records(
-        #     records, muni.municode, db_conn, cursor, commit
-        # )
-        # print(DASHES)
+        # db_conn.execute()
+        db_conn.commit()
