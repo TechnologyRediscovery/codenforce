@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
@@ -310,6 +311,10 @@ public class OccInspection  implements Comparable<OccInspection> {
     public LocalDateTime getPassedInspectionTS() {
         return passedInspectionTS;
     }
+    
+    public String getPassedInspectionTSPretty(){
+        return EntityUtils.getPrettyDate(passedInspectionTS);
+    }
 
     /**
      * @param passedInspectionTS the passedInspectionTS to set
@@ -323,6 +328,10 @@ public class OccInspection  implements Comparable<OccInspection> {
      */
     public LocalDateTime getEffectiveDateOfRecord() {
         return effectiveDateOfRecord;
+    }
+    
+    public String getEffectiveDateOfRecordPretty(){
+        return EntityUtils.getPrettyDate(effectiveDateOfRecord);
     }
 
     /**

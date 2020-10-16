@@ -1158,6 +1158,12 @@
             <redirect />
         </navigation-case>
         
+        <navigation-case>
+            <from-outcome>occAppSuccess</from-outcome>
+            <to-view-id>/public/services/occPermitAppConf.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
     </navigation-rule>
          
     
@@ -1901,7 +1907,25 @@
         <from-view-id>*</from-view-id>    
         <navigation-case>
             <from-outcome>paccSearch</from-outcome>
-            <to-view-id>/public/services/paccSearch.xhtml</to-view-id>
+            <to-view-id>/public/services/pacc/paccSearch.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>*</from-view-id>    
+        <navigation-case>
+            <from-outcome>cePaccView</from-outcome>
+            <to-view-id>/public/services/pacc/cePaccView.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>*</from-view-id>    
+        <navigation-case>
+            <from-outcome>occPaccView</from-outcome>
+            <to-view-id>/public/services/pacc/occPaccView.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>

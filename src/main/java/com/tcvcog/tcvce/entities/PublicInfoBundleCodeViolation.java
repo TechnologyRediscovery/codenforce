@@ -16,41 +16,49 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 /**
  *
  * @author Nathan Dietz
  */
-public class PublicInfoBundleOccInspection extends PublicInfoBundle {
-    
-    private OccInspection bundledInspection;
+public class PublicInfoBundleCodeViolation extends PublicInfoBundle {
+ 
+    private CodeViolation bundledViolation;
     
     @Override
     public String toString(){
         
-        return this.getClass().getName() + bundledInspection.getInspectionID();
+        return this.getClass().getName() + bundledViolation.getViolationID();
         
     }
 
-    public OccInspection getBundledInspection() {
-        return bundledInspection;
+    public CodeViolation getBundledViolation() {
+        return bundledViolation;
     }
-    
-    public void setBundledInspection(OccInspection input) {
-        
-        setPacc(input.getPacc());
-        
-        input.setCreationTS(LocalDateTime.MIN);
-        
-        input.setThirdPartyInspector(new Person());
-        
-        input.setThirdPartyApprovalBy(new User());
+
+    public void setBundledViolation(CodeViolation input) {
         
         input.setNotes("*****");
+        input.setCreatedBy(new User());
         
-        bundledInspection = input;
+        input.setCitationIDList(new ArrayList<Integer>());
+        input.setNoticeIDList(new ArrayList<Integer>());
+        
+        input.setLeagacyImport(false);
+        
+        input.setComplianceUser(new User());
+        
+        input.setComplianceTFExpiryPropID(0);
+        input.setComplianceTFExpiryProp(new Proposal());
+        
+        input.setSeverityIntensity(new IntensityClass());
+        
+        input.setLastUpdatedTS(LocalDateTime.MIN);
+        input.setLastUpdatedUser(new User());
+        
+        bundledViolation = input;
     }
     
 }

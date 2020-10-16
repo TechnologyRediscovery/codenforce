@@ -29,7 +29,7 @@ import java.util.Objects;
  */
 public  class       CodeViolation  
         implements  Serializable,
-                    Comparable<CodeViolation>{
+                    Comparable<CodeViolation> {
     
     protected int violationID;
     protected EnforcableCodeElement violatedEnfElement;

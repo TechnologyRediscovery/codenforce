@@ -70,7 +70,7 @@ import java.util.List;
 import java.util.ListIterator;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.PersonOccPeriod;
+import com.tcvcog.tcvce.entities.PersonOccApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccApplicationStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
@@ -697,7 +697,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                 inspec.setChecklistTemplate(tem);
             }
             inspec.setInspector(user);
-            inspec.setPacc(generateControlCodeFromTime());
+            inspec.setPacc(generateControlCodeFromTime(user.getHomeMuniID()));
 //            if(muni.isEnablePublicOccInspectionTODOs()){
 //                inspec.setEnablePacc(true);
 //            } else {
@@ -805,8 +805,15 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
     }
     
-    public OccPermitApplication getNewOccPermitApplication() {
+    /**
+     * Factory method for creating new OccPermitApplications
+     * @param muniCode
+     * @return
+     * @throws IntegrationException If an error occurs while generating a control code
+     */
+    public OccPermitApplication initOccPermitApplication(int muniCode) throws IntegrationException {
         OccPermitApplication occpermitapp = new OccPermitApplication();
+        occpermitapp.setPublicControlCode(generateControlCodeFromTime(muniCode));
         occpermitapp.setSubmissionDate(LocalDateTime.now());
         return occpermitapp;
     }
@@ -878,7 +885,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         }
         
         List<PersonType> applicationPersonTypes = new ArrayList<>();
-        for (PersonOccPeriod applicationPerson : opa.getAttachedPersons()) {
+        for (PersonOccApplication applicationPerson : opa.getAttachedPersons()) {
             if (applicationPerson.getFirstName() == null || applicationPerson.getFirstName().contentEquals("")){
                 throw new BObStatusException("The first name field is not optional. "
                         + "If you are filling in the name of a business, "
@@ -1026,8 +1033,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
         OccupancyIntegrator oi = getOccupancyIntegrator();
         
-        List<PersonOccPeriod> applicationPersons = application.getAttachedPersons();
-        for (PersonOccPeriod person : applicationPersons) {
+        List<PersonOccApplication> applicationPersons = application.getAttachedPersons();
+        for (PersonOccApplication person : applicationPersons) {
 
             //see javadoc
             if (person.getPersonID() == 0){
@@ -1054,11 +1061,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         OccupancyIntegrator oi = getOccupancyIntegrator();
         PropertyIntegrator pri = getPropertyIntegrator();
 
-        List<PersonOccPeriod> existingList = pi.getPersonOccApplicationListWithInactive(opa);
+        List<PersonOccApplication> existingList = pi.getPersonOccApplicationListWithInactive(opa);
 
-        PersonOccPeriod applicationPerson = new PersonOccPeriod();
+        PersonOccApplication applicationPerson = new PersonOccApplication();
 
-        for (PersonOccPeriod existingPerson : existingList) {
+        for (PersonOccApplication existingPerson : existingList) {
 
             boolean removed = true;
 
@@ -1066,7 +1073,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
             while (itr.hasNext()) {
 
-                applicationPerson = (PersonOccPeriod) itr.next();
+                applicationPerson = (PersonOccApplication) itr.next();
 
                 /* If the person  is the applicantPerson on the 
                     OccPermitApplication, set applicant to true*/

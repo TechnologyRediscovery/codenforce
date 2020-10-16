@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!--
+Copyright (C) 2020 Technology Rediscovery LLC.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Public Data Access Portal</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="sysHomeView">
+
+                    <!-- MAIN CONTAINER -->
+                    <div class="mainContainer">
+
+                        <p:growl id="paccSearchMessages" showDetail="false"/>
+
+                        <!-- TITLE COMPONENT -->
+                        <div class="public-title">
+                            <div class="public-title-main">
+                                View/Edit Existing Concern
+                            </div>
+                            <div class="public-title-sub">
+                                Check the status of an existing request, or add information to an existing request
+                            </div>
+                        </div>
+
+                        <!-- CONTENTS CONTAINER -->
+                        <div class="public-main-contents-containner">
+
+                            <!--CONTENT MAIN COMPONENT -->
+                            <div class="public-main-contents">
+
+                                <!-- GUIDANCE COMPONENT -->
+                                <div class="public-guide">
+
+                                </div>
+
+                                <h:form id="checkRequestStatusForm">
+
+                                    <!-- CONTENT IO COMPONENT -->
+                                    <div class="public-main-contents-io">
+
+                                        <!-- CONTENT IO COMPONENT: CONTENT -->
+                                        <div class="public-main-contents-io-content" >
+                                            <p>
+                                                Please enter the Public Access Control Code(PACC) provided to you.
+                                            </p>
+
+                                            <div class="ui-g data-container">
+                                                <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                                    <p:inputText id="controlCode" 
+                                                                 value="#{publicInfoBB.submittedPACC}" 
+                                                                 tabindex="1" 
+                                                                 required="true"
+                                                                 />
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-1 ui-lg-1">
+
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-1 ui-lg-1">
+                                                    <div class="gray_button">
+                                                        <p:commandButton  id="submitCheckRequest"  
+                                                                          tabindex="2"
+                                                                          value="Search" 
+                                                                          action="#{publicInfoBB.submitPACC()}"
+                                                                          update="paccSearchMessages"
+                                                                          immediate="false"
+                                                                          style="width: 100%"
+                                                                          icon="fa fa-search"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            
+                                            </div>
+                                                
+                                        </div>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </f:view>
+
+                <script>
+                    var y = document.getElementById('public-reviewcase-arrow-id');
+                    y.className += " public-menu-active";
+                </script> 
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

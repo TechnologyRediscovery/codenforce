@@ -686,7 +686,11 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         params.appendSQL("SELECT DISTINCT propertyid ");
         params.appendSQL("FROM property LEFT OUTER JOIN propertyexternaldata ON (property.propertyid = propertyexternaldata.property_propertyid) \n");
-        params.appendSQL("LEFT OUTER JOIN propertyperson ON (property.propertyid = propertyperson.property_propertyid) \n");
+        
+        if(params.isPerson_ctl()){
+            params.appendSQL("LEFT OUTER JOIN propertyperson ON (property.propertyid = propertyperson.property_propertyid) \n");
+        }
+        
         params.appendSQL("WHERE propertyid IS NOT NULL ");
         
         // **********************************
