@@ -24,6 +24,11 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobType;
+import com.tcvcog.tcvce.entities.Metadata;
+import com.tcvcog.tcvce.entities.MetadataKey;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,6 +38,7 @@ import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 
 /**
@@ -43,17 +49,20 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     
     /**
      * 
-     * @param blobID the blobID of the blob to be retrieved from db
-     * @return the blob pulled from the db
+     * @param blobID the blobID of the meta to be retrieved from db
+     * @return the meta pulled from the db
      * @throws IntegrationException thrown instead of SCLException
+     * @throws java.io.IOException
+     * @throws java.lang.ClassNotFoundException
      */
-    public BlobLight getPhotoBlobLight(int blobID) throws IntegrationException{
+    public BlobLight getPhotoBlobLight(int blobID) throws IntegrationException, IOException, ClassNotFoundException{
         BlobLight blob = null;
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        String query = "SELECT photodocid, photodocdescription, photodocdate, photodoctype_typeid, photodocfilename, \n" +
-                        "       photodocblob, photodocuploadpersonid, blobbytes_bytesid \n" +
-                        "  FROM public.photodoc WHERE photodocid = ?;";
+        String query = "SELECT photodocid, photodocdescription, photodoccommitted, blobbytes_bytesid, \n"
+                + "uploaddate, blobtype_typeid, uploadpersonid, filename, metadatamap\n"
+                + "FROM public.photodoc LEFT JOIN blobbytes on blobbytes_bytesid = bytesid\n"
+                + "WHERE photodocid = ?;";
         
         PreparedStatement stmt = null;
         
@@ -80,16 +89,17 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public BlobLight generatePhotoBlobLight(ResultSet rs) throws SQLException{
+    public BlobLight generatePhotoBlobLight(ResultSet rs) throws SQLException, IOException, ClassNotFoundException{
         BlobLight blob = new BlobLight();
         blob.setBlobID(rs.getInt("photodocid"));
         blob.setBytesID(rs.getInt("blobbytes_bytesid"));
         blob.setDescription(rs.getString("photodocdescription"));
-        blob.setTimestamp(rs.getTimestamp("photodocdate").toLocalDateTime());
-        blob.setType(BlobType.blobTypeFromInt(rs.getInt("photodoctype_typeid")));
-        blob.setFilename(rs.getString("photodocfilename"));
-
-        blob.setUploadPersonID(rs.getInt("photodocuploadpersonid"));
+        blob.setTimestamp(rs.getTimestamp("uploaddate").toLocalDateTime());
+        blob.setType(BlobType.blobTypeFromInt(rs.getInt("blobtype_typeid")));
+        blob.setFilename(rs.getString("filename"));
+        blob.setUploadPersonID(rs.getInt("uploadpersonid"));
+        
+        blob.setBlobMetadata(generateBlobMetadata(rs));
         return blob;
     }
     
@@ -129,11 +139,25 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
         return blobBytes;
         
+    } 
+    
+    public Metadata generateBlobMetadata(ResultSet rs) throws SQLException, IOException, ClassNotFoundException{
+        Metadata meta = new Metadata();
+        meta.setBytesID(rs.getInt("blobbytes_bytesid"));
+        meta.setType(BlobType.blobTypeFromInt(rs.getInt("blobtype_typeid")));
         
+        // We must now convert the byte array to an object
+        
+        byte[] mapBytes = rs.getBytes("metadatamap");
+        
+        ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(mapBytes));
+        
+        meta.replaceDataMap((EnumMap<MetadataKey, String>) in.readObject());
+        
+        return meta;
     }
     
     /**
-     * TODO: Fix, uploaddate is now on blobbytes, we need to put it on 
      * @return list of Blob IDs for all photos uploaded in the past month
      * @throws IntegrationException 
      */
@@ -141,7 +165,9 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         ArrayList<Integer> blobIDList = new ArrayList();
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        String query = "SELECT photodocid FROM public.photodoc WHERE photodocdate > ?;";
+        String query = "SELECT photodocid\n"
+                + "FROM public.photodoc LEFT JOIN blobbytes on blobbytes_bytesid = bytesid\n"
+                + "WHERE uploaddate > ?;";
         
         PreparedStatement stmt = null;
         
@@ -169,14 +195,14 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * stores this photo blob in the db
-     * TODO: So like, where does the column "photodoccomitted" come in?
-     * @param blob the blob to be stored
-     * @return the blobID of the newly stored blob
+     * stores this photo meta in the db
+     * @param blob the meta to be stored
+     * @return the blobID of the newly stored meta
      * @throws com.tcvcog.tcvce.domain.BlobException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws java.io.IOException
      */
-    public int storePhotoBlob(Blob blob) throws BlobException, IntegrationException{
+    public int storePhotoBlob(Blob blob) throws BlobException, IntegrationException, IOException{
         
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.photodoc(photodocid, photodocdescription, blobbytes_bytesid)\n" +
@@ -219,75 +245,115 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * stores the bytes of a blob in the db
-     * @param blob the blob to be stored
-     * @return the blobID of the newly stored blob
+     * stores the bytes of a meta in the db
+     * @param blob the meta to be stored
+     * @return the blobID of the newly stored meta
      * @throws com.tcvcog.tcvce.domain.BlobException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws java.io.IOException
      */
-    public int storeBlobBytes(Blob blob) throws BlobException, IntegrationException{
+    public int storeBlobBytes(Blob blob) throws BlobException, IntegrationException, IOException{
         if(blob.getType() == null) throw new BlobTypeException("Attempted to store a blob with null type. ");
-        
-        // TODO: validate BLOB's and throw exception if corrupted
         
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.blobbytes(\n" +
                         "            bytesid, uploaddate, blobtype_typeid, \n" +
-                        "            blob, uploadpersonid, filename)\n" +
-                        "    VALUES (DEFAULT, ?, ?, ?, ?, ?);";
+                        "            blob, uploadpersonid, filename, metadatamap)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, ?, ?, ?);";
+        
+        PreparedStatement stmt = null;
+
+        List<Integer> existingBlobs = checkBytes(blob.getBytes());
+        
+        if(!existingBlobs.isEmpty()){
+            //The file is already in our database, link it to the existing file.
+            return existingBlobs.get(existingBlobs.size() - 1);
+        } else {
+            try {
+
+                stmt = con.prepareStatement(query);
+                stmt.setTimestamp(1, java.sql.Timestamp.from(blob.getTimestamp()
+                        .atZone(ZoneId.systemDefault()).toInstant()));
+                stmt.setInt(2, blob.getType().getTypeID());
+                stmt.setBytes(3, blob.getBytes());
+                stmt.setInt(4, blob.getUploadPersonID());
+                stmt.setString(5, blob.getFilename());
+                stmt.setBytes(6, blob.getBlobMetadata().getMapBytes());
+
+                System.out.println("BlobIntegrator.storeBlobBytes | Statement: " + stmt.toString());
+                stmt.execute();
+
+                String idNumQuery = "SELECT currval('photodoc_photodocid_seq');";
+                Statement s = con.createStatement();
+                ResultSet rs;
+                rs = s.executeQuery(idNumQuery);
+                rs.next();
+                blob.setBlobID(rs.getInt(1));
+                
+                return blob.getBlobID();
+
+            } catch (SQLException ex) {
+                System.out.println(ex);
+                throw new IntegrationException("Error saving blob bytes. ", ex);
+            } finally{
+                 if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+                 if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            } // close finally
+        }
+    }
+    
+    /**
+     * This method checks to see if a set of bytes already exists in our database,
+     * and returns the ID of the bytes if they do indeed exist.
+     * It is meant to prevent duplicates from flooding our database.
+     * @param proposedBytes
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Integer> checkBytes(byte[] proposedBytes) throws IntegrationException{
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT bytesid FROM public.blobbytes WHERE blob = ?;";
         
         PreparedStatement stmt = null;
         
-        int lastID = 0;
-
+        List<Integer> idList = new ArrayList<>();
         
         try {
             
             stmt = con.prepareStatement(query);
-            stmt.setTimestamp(1, java.sql.Timestamp.from(blob.getTimestamp()
-                    .atZone(ZoneId.systemDefault()).toInstant()));
-            stmt.setInt(2, blob.getType().getTypeID());
-            stmt.setBytes(3, blob.getBytes());
-            stmt.setInt(4, blob.getUploadPersonID());
-            stmt.setString(5, blob.getFilename());
-            
-            System.out.println("BlobIntegrator.storeBlobBytes | Statement: " + stmt.toString());
-            stmt.execute();
-            
-            String idNumQuery = "SELECT currval('photodoc_photodocid_seq');";
-            Statement s = con.createStatement();
-            ResultSet rs;
-            rs = s.executeQuery(idNumQuery);
-            rs.next();
-            lastID = rs.getInt(1);
-            blob.setBlobID(lastID);
+            stmt.setBytes(1, proposedBytes);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                 idList.add(rs.getInt("bytesid"));
+            }
             
         } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error saving blob bytes. ", ex);
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving blob bytes. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
-        return lastID;
-    }
+        
+        return idList;
+        
+    } 
     
     /**
-     * Since many values in the Blob sphere shouldn't be changed after uploaded,
-     * this method only updates the filename and description values.
-     * @param blob the blob to be updated
+     * Since many values in the Blob sphere shouldn't be changed after uploading,
+     * this method only updates the blob description
+     * @param blob the meta to be updated
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public void updatePhotoBlobDescriptors(BlobLight blob) throws  IntegrationException{
+    public void updatePhotoBlobDescription(BlobLight blob) throws  IntegrationException{
         
         Connection con = getPostgresCon();
         String query = " UPDATE public.photodoc\n"
                 + " SET photodocdescription=?,\n"
-                + " WHERE photodocid=?;\n\n"
-                
-                + "UPDATE public.blobbytes\n"
-                + " SET filename=?\n"
-                + " WHERE bytesid=?;";
+                + " WHERE photodocid=?;\n\n";
         
         PreparedStatement stmt = null;
         
@@ -296,11 +362,6 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt = con.prepareStatement(query);
             stmt.setString(1, blob.getDescription());            
             stmt.setInt(2, blob.getBlobID());
-            
-            //setting the parameters for the second statement
-            
-            stmt.setString(3, blob.getFilename());
-            stmt.setInt(4, blob.getBytesID());
             
             System.out.println("BlobIntegrator.storeBlob | Statement: " + stmt.toString());
             stmt.execute();
@@ -315,9 +376,43 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * removes this blob from the db, as well as any rows associated with this blob in linker tables.
+     * Updates the metadata and filename of a blobbytes entry.
+     * @param blob the meta to be updated
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws java.io.IOException
+     */
+    public void updateBlobMetadata(BlobLight blob) throws  IntegrationException, IOException{
+        
+        Connection con = getPostgresCon();
+        String query = "UPDATE public.blobbytes\n"
+                + " SET filename=?, metadatamap=?\n"
+                + " WHERE bytesid=?;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, blob.getFilename());
+            stmt.setBytes(2, blob.getBlobMetadata().getMapBytes());
+            stmt.setInt(3, blob.getBytesID());
+            
+            System.out.println("BlobIntegrator.storeBlob | Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error updating blob. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
+     * removes this meta from the db, as well as any rows associated with this meta in linker tables.
      * TODO: Add functionality to delete bytes too?
-     * @param blobID the blobID of the blob to be removed
+     * @param blobID the blobID of the meta to be removed
      * @throws IntegrationException thrown instead of a SQLException
      */
     public void deletePhotoBlob(int blobID) throws IntegrationException{

@@ -28,15 +28,25 @@ import java.util.EnumMap;
  */
 public class Metadata implements Serializable{
     
-    private int metadataID;
+    private int bytesID;
 
     private BlobType type;
     private EnumMap<MetadataKey, String> properties;
     
+    /**
+     * Automatically creates an empty metadata map to prevent null pointers.
+     */
+    public Metadata(){
+        properties = new EnumMap<>(MetadataKey.class);
+    }
     
     //We're going to encapsulate the properties field because we want to make sure 
     //it's easy to grab values
     
+    /**
+     * Replaces the current dataMap with a clone of the supplied dataMap
+     * @param dataMap 
+     */
     public void replaceDataMap(EnumMap<MetadataKey, String> dataMap) {
         properties = new EnumMap<>(dataMap);
     }
@@ -59,36 +69,62 @@ public class Metadata implements Serializable{
         return output;
     }
     
+    /**
+     * Checks if the metadata collection contains a specific property
+     * @param key
+     * @return 
+     */
     public boolean hasProperty(MetadataKey key){
         return properties.containsKey(key);
     }
     
+    /**
+     * Checks if the metadata collection is empty
+     * @return 
+     */
     public boolean isEmpty(){
         return properties.isEmpty();
     }
     
+    /**
+     * Get a specific property from the metadata collection
+     * @param key
+     * @return the property or null if the property does not exist
+     */
     public String getProperty(MetadataKey key){
         return properties.get(key);
     }
     
+    /**
+     * Set a specific property in the metadata collection
+     * @param key The property you would like to set
+     * @param value The value of the property
+     */
     public void setProperty(MetadataKey key, String value){
         properties.put(key, value);
     }
     
+    /**
+     * Removes a specific property from the metadata collection
+     * @param key 
+     */
     public void removeProperty(MetadataKey key){
         properties.remove(key);
     }
     
+    /**
+     * Clears all properties from the collection, rendering it empty.
+     */
     public void clearProperties(){
         properties.clear();
     }
     
-    public int getMetadataID() {
-        return metadataID;
+    public int getBytesID() {
+        return bytesID;
     }
 
-    public void setMetadataID(int metadataID) {
-        this.metadataID = metadataID;
+    public void setBytesID(int bytesID) {
+        this.bytesID = bytesID;
     }
 
     public BlobType getType() {

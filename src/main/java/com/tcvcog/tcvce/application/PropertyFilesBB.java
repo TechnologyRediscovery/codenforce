@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
+import java.io.IOException;
 import javax.annotation.PostConstruct;
 import org.primefaces.event.FileUploadEvent;
 
@@ -59,7 +60,7 @@ public class PropertyFilesBB
                 getBlobCoordinator().deleteBlob(blobID);
             }
             }
-        catch (IntegrationException ex) {
+        catch (IntegrationException | ClassNotFoundException | IOException ex) {
             System.out.println(ex);
         }
     }

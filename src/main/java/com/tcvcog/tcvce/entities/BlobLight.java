@@ -32,6 +32,8 @@ public class BlobLight {
     protected LocalDateTime timestamp;
     protected int uploadPersonID;
     
+    protected Metadata blobMetadata;
+    
     /**
      * @return the blobID
      */
@@ -122,6 +124,14 @@ public class BlobLight {
 
     public void setBytesID(int bytesID) {
         this.bytesID = bytesID;
+    }
+
+    public Metadata getBlobMetadata() {
+        return blobMetadata;
+    }
+
+    public void setBlobMetadata(Metadata blobMetadata) {
+        this.blobMetadata = blobMetadata;
     }
     
 }

@@ -12,13 +12,10 @@ import com.tcvcog.tcvce.integration.BlobIntegrator;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -49,7 +46,13 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void intiBean(){
         try {
-            this.blobList = getBlobIntegrator().getRecentPhotoBlobs();
+            BlobIntegrator bi = getBlobIntegrator();
+            blobList = new ArrayList<>();
+            List<Integer> blobIDs = bi.getRecentPhotoBlobs();
+            for (int idnum : blobIDs) {
+                //blobList.add(bi.get)
+            }
+            
         } catch (IntegrationException ex) {
             System.out.println("manageBlobBB.initBean | " + ex + "\n" + ex.getException().getLocalizedMessage());
         }

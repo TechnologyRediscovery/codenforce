@@ -46,6 +46,7 @@ import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -185,7 +186,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             for (Integer idNum : currentRequest.getBlobIDList()) {
                 try {
                     blobList.add(bc.getPhotoBlob(idNum));
-                } catch (IntegrationException ex) {
+                } catch (IntegrationException | ClassNotFoundException | IOException ex) {
                     System.out.println("Error occured while fetching request blob list: " + ex);
                 }
             }
@@ -351,7 +352,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
             //Also, save the description to the database.
             try {
-                bi.updatePhotoBlobDescriptors(b);
+                bi.updatePhotoBlobDescription(b);
             } catch (IntegrationException ex) {
                 System.out.println("CEActionRequestSubmitBB.savePhotosAndContinue() | ERROR: " + ex);
             }
@@ -387,31 +388,30 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             return;
         }
 
-        // verify blob types here. Post a FacesMessage if file type is not an image
-        String fileType = ev.getFile().getContentType();
-        System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | File: " + ev.getFile().getFileName() + " Type: " + fileType);
-
-        if (!fileType.contains("jpg") && !fileType.contains("jpeg") && !fileType.contains("gif") && !fileType.contains("png")) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Incompatible file type. ",
-                            "Please upload image files only (jpg, gif, or png)."));
-        } else {
+        System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | File: " + ev.getFile().getFileName() + " Type: " + ev.getFile().getContentType());
 
             BlobCoordinator blobc = getBlobCoordinator();
             Blob blob = null;
             try {
                 blob = blobc.getNewBlob();  //init new blob
-                blob.setBytes(ev.getFile().getContents());  // set bytes  
-                blob.setType(BlobType.PHOTO);
+                blob.setBytes(ev.getFile().getContents());  // set bytes
                 blob.setFilename(ev.getFile().getFileName());
                 blob.setBlobID(blobc.storeBlob(blob));
-            } catch (BlobException | IntegrationException ex) {
+            } catch (IntegrationException | IOException ex) {
                 System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Something went wrong while trying to upload your photo,please try again.",
+                            "If this problem persists, please call your municipal office."));
+            } catch(BlobException ex){
+                System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(),
+                            ""));
             }
 
             blobList.add(blob);
-        }
     }
 
     /**

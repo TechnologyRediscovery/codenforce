@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
@@ -37,10 +38,10 @@ import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -48,8 +49,6 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -490,22 +489,23 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         if (this.blobList == null) {
             this.blobList = new ArrayList<>();
         }
-
-        BlobIntegrator blobi = getBlobIntegrator();
-        Blob blob = null;
+        
         try {
-            blob = getBlobCoordinator().getNewBlob();
+            BlobCoordinator blobc = getBlobCoordinator();
+            
+            Blob blob = blobc.getNewBlob();
             blob.setBytes(ev.getFile().getContents());
-            blob.setType(BlobType.PHOTO); // TODO: extract type from context somehow
-            this.currentViolation.getBlobIDList().add(blobi.storePhotoBlob(blob));
-        } catch (IntegrationException ex) {
-            System.out.println("ViolationAddBB.handlePhotoUpload | upload failed!\n" + ex);
-            return;
+            blob.setFilename(ev.getFile().getFileName());
+            this.currentViolation.getBlobIDList().add(blobc.storeBlob(blob));
+            this.getBlobList().add(blob);
+        } catch (IntegrationException | IOException ex) {
+            System.out.println("ViolationAddBB.handlePhotoUpload | upload failed! " + ex);
         } catch (BlobException ex) {
-            System.out.println(ex);
-            return;
+            System.out.println("ViolationAddBB.handlePhotoUpload | upload failed! " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
         }
-        this.getBlobList().add(blob);
     }
 
     /**

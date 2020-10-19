@@ -23,11 +23,14 @@ import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
+import com.tcvcog.tcvce.entities.BlobType;
+import com.tcvcog.tcvce.entities.Metadata;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import javax.faces.context.FacesContext;
@@ -42,9 +45,11 @@ import org.primefaces.model.StreamedContent;
 public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
     private final StreamedContent image = new DefaultStreamedContent();
+    private final int GIGABYTE = 1000000000;
 
     public Blob getNewBlob() throws IntegrationException {
         Blob blob = new Blob();
+        blob.setBlobMetadata(new Metadata());
         blob.setDescription("No description.");
         blob.setTimestamp(LocalDateTime.now());
         if (getSessionBean().getSessUser() != null) {
@@ -62,8 +67,10 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      *
      * @return
      * @throws BlobTypeException
+     * @throws java.io.IOException
+     * @throws java.lang.ClassNotFoundException
      */
-    public StreamedContent getImage() throws BlobTypeException {
+    public StreamedContent getImage() throws BlobTypeException, IOException, ClassNotFoundException {
         // should use EL to verify blob type,  but this will check it anyway
         FacesContext context = FacesContext.getCurrentInstance();
         DefaultStreamedContent sc = null;
@@ -105,8 +112,10 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @param blobID
      * @return
      * @throws BlobTypeException
+     * @throws java.io.IOException
+     * @throws java.lang.ClassNotFoundException
      */
-    public StreamedContent getImageFromID(int blobID) throws BlobTypeException {
+    public StreamedContent getImageFromID(int blobID) throws BlobTypeException, IOException, ClassNotFoundException {
         //FacesContext context = FacesContext.getCurrentInstance();
         DefaultStreamedContent sc = null;
 
@@ -138,11 +147,50 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         return sc;
     }
 
-    public int storeBlob(Blob blob) throws BlobException, IntegrationException {
-        return getBlobIntegrator().storePhotoBlob(blob);
+    public int storeBlob(Blob blob) throws BlobException, IntegrationException, IOException {
+        //Test to see if the byte array is larger than a GIGABYTE
+        if(blob.getBytes().length > GIGABYTE) {
+            throw new BlobException("You cannot upload a file larger than 1 gigabyte.");
+        }  
+        
+        // TODO: validate BLOB's and throw exception if corrupted
+        
+        //First, let's find out what type of file this is.
+        
+        //split on every dot
+        String[] fileNameTokens = blob.getFilename().split(".");
+        
+        //the last token will contain our file type extension
+        String fileExtension = fileNameTokens[fileNameTokens.length - 1];
+        
+        if(fileExtension.contains("jpg") 
+                || fileExtension.contains("jpeg") 
+                || fileExtension.contains("gif") 
+                || fileExtension.contains("png")){
+            blob.setType(BlobType.PHOTO);
+        } else if (fileExtension.contains("pdf")){
+            blob.setType(BlobType.PDF);
+        } else {
+            //Incorrect file type
+            throw new BlobException("Incompatible file type, please upload a JPG, JPEG, GIF, PNG, or PDF.");
+        }
+        
+        switch(blob.getType()){
+            case PHOTO:
+                //TODO: Strip metadata from original file and save it in the Metadata dictionary
+                
+                return getBlobIntegrator().storePhotoBlob(blob);
+            case PDF:
+                //No PDF methods yet!
+                //TODO: Strip metadata from original file and save it in the Metadata dictionary
+                return 0;
+            default:
+                return 0;
+        }
+        
     }
 
-    public Blob getPhotoBlob(int blobID) throws IntegrationException {
+    public Blob getPhotoBlob(int blobID) throws IntegrationException, IOException, ClassNotFoundException {
         BlobIntegrator bi = getBlobIntegrator();
         
         Blob blob = new Blob(bi.getPhotoBlobLight(blobID));
