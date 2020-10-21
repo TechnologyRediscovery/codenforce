@@ -20,7 +20,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Stores the metadata of a blob using an EnumMap
@@ -31,13 +32,13 @@ public class Metadata implements Serializable{
     private int bytesID;
 
     private BlobType type;
-    private EnumMap<MetadataKey, String> properties;
+    private Map<MetadataKey, String> properties;
     
     /**
      * Automatically creates an empty metadata map to prevent null pointers.
      */
     public Metadata(){
-        properties = new EnumMap<>(MetadataKey.class);
+        properties = new HashMap<>();
     }
     
     //We're going to encapsulate the properties field because we want to make sure 
@@ -47,8 +48,8 @@ public class Metadata implements Serializable{
      * Replaces the current dataMap with a clone of the supplied dataMap
      * @param dataMap 
      */
-    public void replaceDataMap(EnumMap<MetadataKey, String> dataMap) {
-        properties = new EnumMap<>(dataMap);
+    public void replaceDataMap(Map<MetadataKey, String> dataMap) {
+        properties = new HashMap<>(dataMap);
     }
     
     /**

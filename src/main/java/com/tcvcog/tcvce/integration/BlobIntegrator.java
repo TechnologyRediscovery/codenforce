@@ -38,8 +38,8 @@ import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -152,7 +152,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
         ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(mapBytes));
         
-        meta.replaceDataMap((EnumMap<MetadataKey, String>) in.readObject());
+        meta.replaceDataMap((Map<MetadataKey, String>) in.readObject());
         
         return meta;
     }

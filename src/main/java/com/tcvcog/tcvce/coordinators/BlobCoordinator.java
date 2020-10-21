@@ -25,18 +25,29 @@ import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.Metadata;
+import com.tcvcog.tcvce.entities.MetadataKey;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.stream.ImageInputStream;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -46,6 +57,10 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
     private final StreamedContent image = new DefaultStreamedContent();
     private final int GIGABYTE = 1000000000;
+
+    public BlobCoordinator() {
+
+    }
 
     public Blob getNewBlob() throws IntegrationException {
         Blob blob = new Blob();
@@ -149,36 +164,29 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
     public int storeBlob(Blob blob) throws BlobException, IntegrationException, IOException {
         //Test to see if the byte array is larger than a GIGABYTE
-        if(blob.getBytes().length > GIGABYTE) {
+        if (blob.getBytes().length > GIGABYTE) {
             throw new BlobException("You cannot upload a file larger than 1 gigabyte.");
-        }  
-        
+        }
+
         // TODO: validate BLOB's and throw exception if corrupted
-        
         //First, let's find out what type of file this is.
-        
-        //split on every dot
-        String[] fileNameTokens = blob.getFilename().split(".");
-        
-        //the last token will contain our file type extension
-        String fileExtension = fileNameTokens[fileNameTokens.length - 1];
-        
-        if(fileExtension.contains("jpg") 
-                || fileExtension.contains("jpeg") 
-                || fileExtension.contains("gif") 
-                || fileExtension.contains("png")){
+        String fileExtension = getFileExtension(blob.getFilename());
+
+        if (fileExtension.contains("jpg")
+                || fileExtension.contains("jpeg")
+                || fileExtension.contains("gif")
+                || fileExtension.contains("png")) {
             blob.setType(BlobType.PHOTO);
-        } else if (fileExtension.contains("pdf")){
+        } else if (fileExtension.contains("pdf")) {
             blob.setType(BlobType.PDF);
         } else {
             //Incorrect file type
             throw new BlobException("Incompatible file type, please upload a JPG, JPEG, GIF, PNG, or PDF.");
         }
-        
-        switch(blob.getType()){
+
+        switch (blob.getType()) {
             case PHOTO:
-                //TODO: Strip metadata from original file and save it in the Metadata dictionary
-                
+                blob = stripImageMetadata(blob);
                 return getBlobIntegrator().storePhotoBlob(blob);
             case PDF:
                 //No PDF methods yet!
@@ -187,16 +195,16 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             default:
                 return 0;
         }
-        
+
     }
 
     public Blob getPhotoBlob(int blobID) throws IntegrationException, IOException, ClassNotFoundException {
         BlobIntegrator bi = getBlobIntegrator();
-        
+
         Blob blob = new Blob(bi.getPhotoBlobLight(blobID));
-        
+
         blob.setBytes(bi.getBlobBytes(blobID));
-        
+
         return blob;
     }
 
@@ -204,6 +212,118 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     // then delete with integrator.
     public void deleteBlob(int blobID) throws IntegrationException {
         getBlobIntegrator().deletePhotoBlob(blobID);
+    }
+
+    /**
+     * A method that removes all metadata from an image blob's bytes and puts
+     * them into its Metadata field. Should always be called before saving an
+     * image file to the database.
+     *
+     * @param input
+     * @return The blob that was put into it, stripped of metadata
+     * @throws java.io.IOException
+     */
+    public Blob stripImageMetadata(Blob input) throws IOException, NoSuchElementException {
+
+        //First, let's find out what type of file this is.
+        String fileExtension = getFileExtension(input.getFilename());
+        
+        ByteArrayInputStream bis = new ByteArrayInputStream(input.getBytes());
+        
+        ImageInputStream iis = ImageIO.createImageInputStream(bis);
+
+        //Extract metadata and place it in the blob
+        
+        //First we need to get an image reader.
+        //The file extension is required because the default getImageReaders()
+        //method guesses what file type the bytes are, and sometimes it guesses wrong.
+        //Using the getImageReadersByFormatName() ensures we get the right one.
+        Iterator<ImageReader> inReaders = ImageIO.getImageReadersByFormatName(fileExtension);
+        
+        ImageReader reader = inReaders.next();
+        
+        reader.setInput(iis, true, false);
+        
+        IIOMetadata imgMeta = reader.getImageMetadata(0);
+        
+        String[] names = imgMeta.getMetadataFormatNames();
+        
+        Metadata blobMeta = new Metadata();
+        
+        //Go through each different metadata format and put it into the blobMeta map
+        for(int i = 0; i < names.length; i++){
+            Node node = imgMeta.getAsTree(names[i]);
+            blobMeta = extractMetadataFromNode(node, blobMeta);
+        }
+        
+        input.setBlobMetadata(blobMeta);
+        
+        //Strip the metadata by reading out only the image data and writing it back
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        BufferedImage temp = ImageIO.read(bis);
+        
+        //TODO: error here
+        ImageIO.write(temp, fileExtension, baos);
+        
+        //These bytes should only be the image file itself, without the metadata. But that in the bytes field.
+        
+        input.setBytes(baos.toByteArray());
+        
+        return input;
+    }
+    
+    /**
+     * Takes a Node of image metadata and extracts its values and keys into the Metadata
+     * object. Once it's done extracting all the information it needs, it tosses
+     * the Metadata object back.
+     * @param node The node to extract from
+     * @param meta The Metadata object to fill with data.
+     * @return 
+     */
+    private Metadata extractMetadataFromNode(Node node, Metadata meta){
+        //Check for attributes on the parent node.
+        
+        NamedNodeMap map = node.getAttributes();
+        if(map != null){
+            for(int index = 0; index < map.getLength(); index++){
+                //extract the value of each attribute.
+                Node attr = map.item(index);
+                MetadataKey key = new MetadataKey(attr.getNodeName());
+                meta.setProperty(key, attr.getNodeValue());
+            }
+        } /* else {
+            //If we ever get to the point where we would want to keep track of metadata categories
+            //keep in mind that categories are attributeless but have children. 
+            //So, grab the node name from attributeless nodes.
+        }
+        */
+        
+        //Extract metadata from each child, if one exists.
+        Node child = node.getFirstChild();
+        
+        while(child != null){
+            meta = extractMetadataFromNode(child, meta);
+            child = child.getNextSibling();
+        }
+        
+        return meta;
+    }
+    
+    /**
+     * Accepts a filename and returns only the file extension
+     * E.g. "image.jpg" -> "jpg"
+     * @param filename
+     * @return 
+     */
+    public String getFileExtension(String filename) {
+        //split on every dot
+        String[] fileNameTokens = filename.split("\\.");
+
+        //the last token will contain our file type extension
+        return fileNameTokens[fileNameTokens.length - 1];
+        
     }
 
 }

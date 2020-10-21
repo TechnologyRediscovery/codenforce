@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 ellen bascomb of apt 31y
+ * Copyright (C) 2020 Turtle Creek Valley
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,20 +18,27 @@ package com.tcvcog.tcvce.entities;
 
 /**
  *
- * @author ellen bascomb of apt 31y
+ * @author Nathan Dietz
  */
-public enum MetadataKey{
-    Title("Title"),
-    Comments("Comments");
+public class MetadataKey{
+
+    private String label;
+    private String key;
     
-    private final String label;
     
-    private MetadataKey(String label){
-        this.label = label;
+    public MetadataKey(String nodeName){
+        key = nodeName;
+        //Place a space between all capital letters and the letters infront of them
+        //i.e. OriginalText -> Original Text
+        label = nodeName.replaceAll("(.)([A-Z])", "$1 $2");
     }
     
     public String getLabel(){
         return label;
+    }
+
+    public String getKey() {
+        return key;
     }
     
 }
