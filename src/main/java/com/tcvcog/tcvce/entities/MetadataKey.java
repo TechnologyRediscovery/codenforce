@@ -16,11 +16,13 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Nathan Dietz
  */
-public class MetadataKey{
+public class MetadataKey implements Serializable {
 
     private String label;
     private String key;

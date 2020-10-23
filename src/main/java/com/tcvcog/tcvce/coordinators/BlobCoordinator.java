@@ -94,6 +94,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             return image;
         } else {
             BlobIntegrator bi = getBlobIntegrator();
+            
+            //Get the blob ID from the Faces context
             int blobID = Integer.parseInt(context.getExternalContext().getRequestParameterMap().get("blobID"));
             try {
                 BlobLight blob = bi.getPhotoBlobLight(blobID);
@@ -102,7 +104,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
                 } else {
                     switch (blob.getType()) {
                         case PHOTO:
-                            sc = new DefaultStreamedContent(new ByteArrayInputStream(bi.getBlobBytes(blobID)));
+                            sc = new DefaultStreamedContent(new ByteArrayInputStream(bi.getBlobBytes(blob.getBytesID())));
                             break;
                         case PDF:
                             sc = new DefaultStreamedContent(new FileInputStream(new File("/home/noah/Documents/COG Project/codeconnect/src/main/webapp/images/pdf-icon.png")));
@@ -118,48 +120,6 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             }
             return sc;
         }
-    }
-
-    /**
-     * Gets an image manually using the given blobID, should be used if
-     * getImage() doesn't work.
-     *
-     * @param blobID
-     * @return
-     * @throws BlobTypeException
-     * @throws java.io.IOException
-     * @throws java.lang.ClassNotFoundException
-     */
-    public StreamedContent getImageFromID(int blobID) throws BlobTypeException, IOException, ClassNotFoundException {
-        //FacesContext context = FacesContext.getCurrentInstance();
-        DefaultStreamedContent sc = null;
-
-        BlobIntegrator bi = getBlobIntegrator();
-        try {
-            BlobLight blob = bi.getPhotoBlobLight(blobID);
-
-            if (blob == null) {
-                throw new BlobTypeException("Blob is null, probably due to an invalid ID");
-            } else if (null == blob.getType()) {
-                throw new BlobTypeException("BlobType is null. ");
-            } else {
-                switch (blob.getType()) {
-                    case PHOTO:
-                        sc = new DefaultStreamedContent(new ByteArrayInputStream(bi.getBlobBytes(blob.getBlobID())));
-                        break;
-                    case PDF:
-                        sc = new DefaultStreamedContent(new FileInputStream(new File("/home/noah/Documents/COG Project/codeconnect/src/main/webapp/images/pdf-icon.png")));
-                        break;
-                    default:
-                        throw new BlobTypeException("Attempted to display incompatible BLOB type. ");
-                }
-            }
-        } catch (IntegrationException ex) {
-            System.out.println("BlobCoordinator.getImage | " + ex);
-        } catch (FileNotFoundException ex) {
-            System.out.println("BlobCoordinator.getImage | could not find pdf-icon.png ");
-        }
-        return sc;
     }
 
     public int storeBlob(Blob blob) throws BlobException, IntegrationException, IOException {
@@ -229,8 +189,6 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         String fileExtension = getFileExtension(input.getFilename());
         
         ByteArrayInputStream bis = new ByteArrayInputStream(input.getBytes());
-        
-        ImageInputStream iis = ImageIO.createImageInputStream(bis);
 
         //Extract metadata and place it in the blob
         
@@ -240,9 +198,11 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         //Using the getImageReadersByFormatName() ensures we get the right one.
         Iterator<ImageReader> inReaders = ImageIO.getImageReadersByFormatName(fileExtension);
         
+        ImageInputStream iis = ImageIO.createImageInputStream(bis);
+        
         ImageReader reader = inReaders.next();
         
-        reader.setInput(iis, true, false);
+        reader.setInput(iis, false, false);
         
         IIOMetadata imgMeta = reader.getImageMetadata(0);
         
@@ -262,9 +222,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
-        BufferedImage temp = ImageIO.read(bis);
+        BufferedImage temp = reader.read(0);
         
-        //TODO: error here
         ImageIO.write(temp, fileExtension, baos);
         
         //These bytes should only be the image file itself, without the metadata. But that in the bytes field.

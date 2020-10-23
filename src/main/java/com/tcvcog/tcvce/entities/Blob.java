@@ -39,7 +39,6 @@ public class Blob  extends BlobLight {
     }
     
     private byte[] bytes;
-    //private StreamedContent image;
     
     /**
      * @return the bytes

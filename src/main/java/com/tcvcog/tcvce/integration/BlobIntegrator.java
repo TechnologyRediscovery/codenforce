@@ -217,11 +217,10 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             
             stmt = con.prepareStatement(query);
             stmt.setString(1, blob.getDescription());
-            stmt.setInt(2, blob.getUploadPersonID());
             
             int bytesID = storeBlobBytes(blob);
             
-            stmt.setInt(3, bytesID);
+            stmt.setInt(2, bytesID);
             
             System.out.println("BlobIntegrator.storePhotoBlob | Statement: " + stmt.toString());
             stmt.execute();
