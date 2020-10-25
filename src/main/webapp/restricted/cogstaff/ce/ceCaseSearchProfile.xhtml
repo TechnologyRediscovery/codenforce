@@ -519,6 +519,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                         <!--Update Table-->
+                                        <p:panel id="cecase-forceslose-panel"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Force close case"
+                                                 rendered="#{ceCaseSearchProfileBB.activeUpdateMode}"
+                                                 >
+                                            <h:form id="cecase-forceclose-form">
+
+                                                <h:selectOneMenu id="cecase-forceclose-evcat-som"
+                                                                 value="#{ceCaseSearchProfileBB.closingEventCategorySelected}"
+                                                                 styleClass="data_field_value"
+                                                                 disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
+                                                    
+                                                    <f:converter converterId="eventCategoryConverter"/>
+                                                    <f:selectItem itemLabel="select a closing event category" 
+                                                                  noSelectionOption="true" />
+                                                    <f:selectItems id="cecase-forceclose-evcat-selitems"
+                                                                   value="#{ceCaseSearchProfileBB.closingEventList}"
+                                                                   var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
+                                                </h:selectOneMenu>
+                                                
+                                                <p:spacer height="5px" />
+                                                <p:commandButton    id="cecase-forceclose-button"
+                                                                    ajax="false" 
+                                                                    value="Force close case prior to full compliance" 
+                                                                    action="#{ceCaseSearchProfileBB.onCaseForceCloseCommitButtonChnage}"  
+                                                                    icon="fa fa-stop"/>
+                                                
+                                                
+                                                
+                                                
+                                            </h:form>
+                                        </p:panel>
+
+                                        <!--Update Table-->
                                         <p:panel id="cecase-update-panel"
                                                  toggleable="true"
                                                  collapsed="false"
@@ -549,9 +584,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <div    id="cecase-property-div"
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
+                                                        <ui:remove>
                                                         <p:outputLabel  value="Property"
                                                                         for="cecase-property-som"/>
 
+                                                            
                                                         <h:selectOneMenu id="cecase-property-som"
                                                                          value="#{ceCaseSearchProfileBB.currentCase.property}"
                                                                          styleClass="data_field_value"
@@ -562,6 +599,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                            value="#{systemServicesBB.bbSessionPropertyList}"
                                                                            var="prop" itemValue="#{prop}" itemLabel="#{prop.address} (#{prop.muni.muniName})"/>
                                                         </h:selectOneMenu>
+                                                        </ui:remove>
                                                     </div>
 
 
@@ -605,7 +643,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                           noSelectionOption="true" 
                                                                           itemDisabled="true"/>
                                                             <f:selectItems id="cecase-search-user-field-val-items" 
-                                                                           value="#{ceCaseSearchProfileBB.userManagerOptionList}" 
+                                                                           value="#{systemServicesBB.userListForSearch}" 
                                                                            var="usr" itemValue="#{usr}" itemLabel="#{usr.person.firstName} #{usr.person.lastName}; username #{usr.username}" />
                                                             <f:converter converterId="userConverter" />
                                                         </p:selectOneMenu>
@@ -616,20 +654,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                     <div    id="cecase-source-div"
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+                                                        <ui:remove>
 
                                                         <p:outputLabel  value="Case Source"
                                                                         for="cecase-source-som"/>
 
-                                                        <h:selectOneMenu id="cecase-source-som"
-                                                                         value="#{ceCaseSearchProfileBB.currentCase.source}"
-                                                                         styleClass="data_field_value">
-                                                            <f:converter converterId="bobSourceConverter"/>
-                                                            <f:selectItem itemLabel="select a source..." noSelectionOption="true" />
-                                                            <f:selectItems id="cecase-source-selitem"
-                                                                           value="#{ceCaseSearchProfileBB.bobSourceOptionList}"
-                                                                           var="bs" itemValue="#{bs}" itemLabel="#{bs.title}"/>
+                                                            <h:selectOneMenu id="cecase-source-som"
+                                                                             value="#{ceCaseSearchProfileBB.currentCase.source}"
+                                                                             styleClass="data_field_value">
+                                                                <f:converter converterId="bobSourceConverter"/>
+                                                                <f:selectItem itemLabel="select a source..." noSelectionOption="true" />
+                                                                <f:selectItems id="cecase-source-selitem"
+                                                                               value="#{ceCaseSearchProfileBB.bobSourceOptionList}"
+                                                                               var="bs" itemValue="#{bs}" itemLabel="#{bs.title}"/>
 
-                                                        </h:selectOneMenu>
+                                                            </h:selectOneMenu>
+                                                        </ui:remove>
                                                     </div>
 
 
@@ -828,7 +868,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <f:facet name="header">
                                                             <h:outputText value="Status" />
                                                         </f:facet>
-                                                        <h:outputText id="violation-status-ot" value="#{v.status.label}"/>
+                                                        <h:outputText value="#{(!(empty v.status)) and (empty v.nullifiedTS) ? v.status.label : ''}" />
+                                                        <h:outputText value="#{!(empty v.nullifiedTS) ? 'NULLIFIED': ''}" />
                                                     </p:column>
                                                     <p:column width="10%">
                                                         <f:facet name="header">
@@ -893,20 +934,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <f:facet name="header">
                                                             <h:outputText value="Date of record" />
                                                         </f:facet>
-                                                        <h:outputText value="#{nov.dateOfRecordPretty}"/>
+                                                        <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDate(nov.dateOfRecord)}"/>
+                                                    </p:column>
+                                                    <p:column width="5%">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="ID" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{nov.noticeID}"/>
                                                     </p:column>
                                                     <p:column width="10%">
                                                         <f:facet name="header">
                                                             <h:outputText value="Sent?" />
                                                         </f:facet>
-                                                        <h:outputText value="#{nov.sentTSPretty}"/>
+                                                        <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDate(nov.sentTSPretty)}"/>
                                                     </p:column>
 
                                                     <p:column width="10%">
                                                         <f:facet name="header">
                                                             <h:outputText value="Returned?" />
                                                         </f:facet>
-                                                        <h:outputText value="#{nov.returnedTSPretty}"/>
+                                                        <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDate(nov.returnedTSPretty)}"/>
                                                     </p:column>
                                                     <p:column width="10%">
                                                         <f:facet name="edit">
@@ -1054,6 +1101,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <div class="#{event.category.icon.styleClass}">
                                                             <i class="material-icons status-display-icon-i"><h:outputText value="#{event.category.icon.materialIcon}"/></i>
                                                         </div>
+                                                        <h:outputText value="#{event.category.eventType.label}:" />
+                                                        <p:spacer height="1px" />
                                                         <h:outputText value="#{event.category.eventCategoryTitle}" />
 
 

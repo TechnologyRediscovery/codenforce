@@ -207,6 +207,45 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         return heavyList;
 
     }
+    
+    /**
+     * Manages the closing of a case prior to full violation compliance.
+     * Will nullify any existing violations on the CECase
+     * and attach a close case event based on the inputted value
+     * 
+     * @param cse the case to force close
+     * @param closeEventCat the EventCategory associated with the closure reason
+     * @param ua the user doing the force closing
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void cecase_forceclose(CECaseDataHeavy cse, EventCategory closeEventCat, UserAuthorized ua) throws BObStatusException, IntegrationException, EventException{
+        CaseIntegrator ci = getCaseIntegrator();
+        EventCoordinator ec = getEventCoordinator();
+        
+        if(cse.getClosingDate() != null){
+            throw new BObStatusException("Cannot force close an already closed case");
+        }
+        if(closeEventCat == null){
+            throw new BObStatusException("Cannot close case with null closing event");
+        }
+        
+        if(closeEventCat.getEventType() != EventType.Closing){
+            throw new BObStatusException("Cannot close case with an event that's not of type: Closing");
+        }
+        
+        // Nullify violations on case
+        if(cse.getViolationList() != null && !cse.getViolationList().isEmpty()){
+            for(CodeViolation cv: cse.getViolationList()){
+                violation_NullifyCodeViolation(cv, ua);
+            }
+        }
+        
+        cse.setClosingDate(LocalDateTime.now());
+        ci.updateCECaseMetadata(cse);
+        events_processClosingEvent(cse, ec.initEvent(cse, closeEventCat));
+        
+    }
 
     /**
      * Primary pathway for retrieving the data-light superclass CECase.
@@ -1106,8 +1145,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         CasePhaseEnum closedPhase = CasePhaseEnum.Closed;
 //        c.setCasePhase(closedPhase);
 
-        c.setClosingDate(LocalDateTime.now());
-        cecase_updateCECaseMetadata(c);
+        if(c.getClosingDate() == null){
+            c.setClosingDate(LocalDateTime.now());
+            cecase_updateCECaseMetadata(c);
+        }
         // now load up the closing event before inserting it
         // we'll probably want to get this text from a resource file instead of
         // hardcoding it down here in the Java
@@ -1185,6 +1226,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
         nov.setViolationList(new ArrayList<CodeViolationDisplayable>());
         nov.setDateOfRecord(LocalDateTime.now());
+        nov.setBlocksBeforeViolations(new ArrayList<TextBlock>());
+        nov.setBlocksAfterViolations(new ArrayList<TextBlock>());
 
         try {
             nov.setStyle(si.getPrintStyle(mdh.getDefaultNOVStyleID()));
@@ -1359,6 +1402,40 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         ci.novUpdateHeaderImage(ps, blob);
         
     }
+      
+    /**
+     * Logic container for creating a NOV from a given template/category ID
+     * 
+     * @param nov
+     * @param categoryID 
+     * @return  with text blocks
+     * loaded up into before and after based on default sort order
+     * @throws com.tcvcog.tcvce.domain.IntegrationException  
+     */
+    public NoticeOfViolation nov_assembleNOVFromTemplate(NoticeOfViolation nov, int categoryID) throws IntegrationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        List<TextBlock> blockList = new ArrayList<>();
+        
+        
+        if(categoryID != 0){
+            blockList.addAll(ci.getTextBlocksByCategory(categoryID));
+        }
+        
+        if(!blockList.isEmpty()){
+            for(TextBlock tb: blockList){
+                if(tb.getPlacementOrder() < 0){
+                    nov.getBlocksBeforeViolations().add(tb);
+                    Collections.sort(nov.getBlocksBeforeViolations());
+                } else if (tb.getPlacementOrder() > 0){
+                    nov.getBlocksAfterViolations().add(tb);
+                    Collections.sort(nov.getBlocksAfterViolations());
+                }
+            }
+            
+        }
+        return nov;
+    }
+      
     /**
      * Updates only the notes field on Notice of Violation
      *
@@ -2017,6 +2094,32 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         cv.setActive(false);
         ci.updateCodeViolation(cv);
+
+    }
+    /**
+     * Attempts to deactivate a code violation, but will thow an Exception if
+     * the CodeViolation has been used in a notice or in a citation
+     *
+     * @param cv
+     * @param ua
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void violation_NullifyCodeViolation(CodeViolation cv, UserAuthorized ua) throws BObStatusException, IntegrationException {
+        CaseIntegrator ci = getCaseIntegrator();
+//
+//        if (cv.getCitationIDList() != null && !cv.getCitationIDList().isEmpty()) {
+//            throw new BObStatusException("Cannot deactivate a violation that has been used in a citation");
+//        }
+        // inject appropriate values into CV before updating
+        if(cv != null && ua != null){
+            // cannot nullify a violation for which compliance has been achieved
+            if(cv.getActualComplianceDate() != null){
+                cv.setNullifiedTS(LocalDateTime.now());
+                cv.setNullifiedUser(ua);
+                ci.updateCodeViolation(cv);
+            }
+        }
 
     }
 

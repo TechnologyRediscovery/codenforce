@@ -51,6 +51,9 @@ public class CodeViolationDisplayable extends CodeViolation {
         this.lastUpdatedTS = cv.lastUpdatedTS;
         this.lastUpdatedUser = cv.lastUpdatedUser;
         
+        this.nullifiedTS = cv.nullifiedTS;
+        this.nullifiedUser = cv.nullifiedUser;
+        
         this.allowDORUpdate = cv.allowDORUpdate;
         this.allowHostCaseUpdate = cv.allowHostCaseUpdate;
         this.allowOrdinanceUpdates = cv.allowOrdinanceUpdates;

@@ -397,11 +397,6 @@ public class        CECase
     public void setAllowForwardLinkedPublicAccess(boolean allowForwardLinkedPublicAccess) {
         this.allowForwardLinkedPublicAccess = allowForwardLinkedPublicAccess;
     }
-
-   
-
-  
-    
     
     @Override
     public int compareTo(CECase cse) {
@@ -413,9 +408,7 @@ public class        CECase
              c = this.creationTimestamp.compareTo(cse.creationTimestamp);
         } 
         return c;
-        
     }
-
 
     @Override
     public int hashCode() {

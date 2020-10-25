@@ -48,6 +48,7 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -74,13 +75,15 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
     private String formNoteText;
 
+    private boolean useManualTextBlockMode;
+    
     private List<TextBlock> blockList;
+    private List<String> templateList;
+    private Map<String, Integer> blockCatIDMap;
+    private String selectedBlockTemplate;
 
     private List<Person> personCandidateList;
     private List<Person> manualRetrievedPersonList;
-
-    private List<TextBlock> blockListBeforeViolations;
-    private List<TextBlock> blockListAfterViolations;
 
     private boolean personLookupUseID;
     private Person retrievedManualLookupPerson;
@@ -102,7 +105,9 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     public void initBean() {
         CaseCoordinator cc = getCaseCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
+        CaseIntegrator ci = getCaseIntegrator();
         PersonCoordinator persC = getPersonCoordinator();
+        
         currentNotice = getSessionBean().getSessNotice();
         try {
             currentCase = cc.cecase_assembleCECaseDataHeavy(getSessionBean().getSessCECase(), getSessionBean().getSessUser());
@@ -110,8 +115,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             System.out.println(ex);
         }
 
-        blockListBeforeViolations = new ArrayList<>();
-        blockListAfterViolations = new ArrayList<>();
         PropertyDataHeavy pdh = null;
         try {
             pdh = pc.assemblePropertyDataHeavy(currentCase.getProperty(), getSessionBean().getSessUser());
@@ -128,6 +131,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
         manualRetrievedPersonList = new ArrayList<>();
         showTextBlocksAllMuni = false;
+        useManualTextBlockMode = false;
 
         setPageModes(new ArrayList<PageModeEnum>());
         getPageModes().add(PageModeEnum.LOOKUP);
@@ -142,7 +146,28 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
         viewOptionList = Arrays.asList(ViewOptionsActiveListsEnum.values());
         selectedViewOption = ViewOptionsActiveListsEnum.VIEW_ACTIVE;
-
+        Municipality m = getSessionBean().getSessMuni();
+        try {
+            if (blockList == null) {
+                if (showTextBlocksAllMuni) {
+                    blockList = ci.getAllTextBlocks();
+                } else {
+                    blockList = ci.getTextBlocks(m);
+                }
+            }
+            blockCatIDMap = ci.getTextBlockCategoryMap();
+            if(blockCatIDMap != null && !blockCatIDMap.isEmpty()){
+                templateList = new ArrayList<>(blockCatIDMap.keySet());
+                if(templateList != null && !templateList.isEmpty()){
+                    selectedBlockTemplate = templateList.get(0);
+                }
+            }
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+        
+        
     } // close initbean
 
     /**
@@ -289,6 +314,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 //        }
     }
 
+
+    
     public void onNOVEditTextInitButtonChange(ActionEvent ev) {
 
     }
@@ -306,6 +333,22 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     public void onModeRemoveInit() {
 
     }
+    
+    public void onBuildNOVUsingTemplate(){
+        CaseCoordinator cc = getCaseCoordinator();
+        if(currentNotice != null && selectedBlockTemplate != null){
+            try {
+                currentNotice = cc.nov_assembleNOVFromTemplate(currentNotice, blockCatIDMap.get(selectedBlockTemplate));
+            } catch (IntegrationException ex) {
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to build based on template", ""));
+            }
+            getFacesContext().addMessage(null,
+               new FacesMessage(FacesMessage.SEVERITY_INFO,
+                       "Assembled block using template", ""));
+        }
+    }
 
     public void loadBlocksAllMunis() {
         blockList = null;
@@ -314,25 +357,34 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     }
 
     public void addBlockBeforeViolations(TextBlock tb) {
+        if(currentNotice != null && tb != null){
+            currentNotice.getBlocksBeforeViolations().add(tb);
+        }
         blockList.remove(tb);
-        blockListBeforeViolations.add(tb);
     }
 
     public void removeBlockBeforeViolations(TextBlock tb) {
-        blockListBeforeViolations.remove(tb);
+        if(currentNotice != null && tb != null){
+            currentNotice.getBlocksBeforeViolations().remove(tb);
+        }
         blockList.add(tb);
 
     }
 
     public void removeBlockAfterViolations(TextBlock tb) {
-        blockListAfterViolations.remove(tb);
+        if(currentNotice != null && tb != null){
+            currentNotice.getBlocksAfterViolations().remove(tb);
+        }
         blockList.add(tb);
 
     }
 
     public void addBlockAfterViolations(TextBlock tb) {
+        if(currentNotice != null && tb != null){
+            currentNotice.getBlocksAfterViolations().add(tb);
+        }
         blockList.remove(tb);
-        blockListAfterViolations.add(tb);
+        
     }
 
     public void removeViolationFromList(CodeViolationDisplayable viol) {
@@ -390,14 +442,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             int newNoticeId = 0;
 
             StringBuilder sb = new StringBuilder();
-            Iterator<TextBlock> it = blockListBeforeViolations.iterator();
+            Iterator<TextBlock> it = currentNotice.getBlocksBeforeViolations().iterator();
             while (it.hasNext()) {
                 appendTextBlockAsPara(it.next(), sb);
             }
             currentNotice.setNoticeTextBeforeViolations(sb.toString());
 
             sb = new StringBuilder();
-            it = blockListAfterViolations.iterator();
+            it = currentNotice.getBlocksAfterViolations().iterator();
             while (it.hasNext()) {
                 appendTextBlockAsPara(it.next(), sb);
             }
@@ -691,19 +743,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      * @return the textBlockListByMuni
      */
     public List<TextBlock> getBlockList() {
-        CaseIntegrator ci = getCaseIntegrator();
-        Municipality m = getSessionBean().getSessMuni();
-        if (blockList == null) {
-            try {
-                if (showTextBlocksAllMuni) {
-                    blockList = ci.getAllTextBlocks();
-                } else {
-                    blockList = ci.getTextBlocks(m);
-                }
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-            }
-        }
+        
         return blockList;
     }
 
@@ -745,34 +785,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         this.personCandidateList = personCandidateAL;
     }
 
-    /**
-     * @return the blockListBeforeViolations
-     */
-    public List<TextBlock> getBlockListBeforeViolations() {
-        return blockListBeforeViolations;
-    }
-
-    /**
-     * @param blockListBeforeViolations the blockListBeforeViolations to set
-     */
-    public void setBlockListBeforeViolations(List<TextBlock> blockListBeforeViolations) {
-        this.blockListBeforeViolations = blockListBeforeViolations;
-    }
-
-    /**
-     * @return the blockListAfterViolations
-     */
-    public List<TextBlock> getBlockListAfterViolations() {
-        return blockListAfterViolations;
-    }
-
-    /**
-     * @param blockListAfterViolations the blockListAfterViolations to set
-     */
-    public void setBlockListAfterViolations(List<TextBlock> blockListAfterViolations) {
-        this.blockListAfterViolations = blockListAfterViolations;
-    }
-
+   
     /**
      * @return the currentCase
      */
@@ -946,6 +959,62 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setPersonLookupUseID(boolean personLookupUseID) {
         this.personLookupUseID = personLookupUseID;
+    }
+
+    /**
+     * @return the blockCatIDMap
+     */
+    public Map<String, Integer> getBlockCatIDMap() {
+        return blockCatIDMap;
+    }
+
+    /**
+     * @param blockCatIDMap the blockCatIDMap to set
+     */
+    public void setBlockCatIDMap(Map<String, Integer> blockCatIDMap) {
+        this.blockCatIDMap = blockCatIDMap;
+    }
+
+    /**
+     * @return the selectedBlockTemplate
+     */
+    public String getSelectedBlockTemplate() {
+        return selectedBlockTemplate;
+    }
+
+    /**
+     * @param selectedBlockTemplate the selectedBlockTemplate to set
+     */
+    public void setSelectedBlockTemplate(String selectedBlockTemplate) {
+        this.selectedBlockTemplate = selectedBlockTemplate;
+    }
+
+    /**
+     * @return the templateList
+     */
+    public List<String> getTemplateList() {
+        return templateList;
+    }
+
+    /**
+     * @param templateList the templateList to set
+     */
+    public void setTemplateList(List<String> templateList) {
+        this.templateList = templateList;
+    }
+
+    /**
+     * @return the useManualTextBlockMode
+     */
+    public boolean isUseManualTextBlockMode() {
+        return useManualTextBlockMode;
+    }
+
+    /**
+     * @param useManualTextBlockMode the useManualTextBlockMode to set
+     */
+    public void setUseManualTextBlockMode(boolean useManualTextBlockMode) {
+        this.useManualTextBlockMode = useManualTextBlockMode;
     }
 
 }

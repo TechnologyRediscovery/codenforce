@@ -45,6 +45,7 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
     private String formBlockName;
     private String formBlockText;
     private int formCategoryID;
+    private int formBlockOrder;
     
     
     /**
@@ -84,6 +85,8 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
         newBlock.setTextBlockCategoryID(formCategoryID);
         newBlock.setTextBlockName(formBlockName);
         newBlock.setTextBlockText(formBlockText);
+        newBlock.setPlacementOrder(formBlockOrder);
+        
         try {
             ci.insertTextBlock(newBlock);
             getFacesContext().addMessage(null,
@@ -252,6 +255,20 @@ public class TextBlockBB extends BackingBeanUtils implements Serializable{
      */
     public void setFormMuni(Municipality formMuni) {
         this.formMuni = formMuni;
+    }
+
+    /**
+     * @return the formBlockOrder
+     */
+    public int getFormBlockOrder() {
+        return formBlockOrder;
+    }
+
+    /**
+     * @param formBlockOrder the formBlockOrder to set
+     */
+    public void setFormBlockOrder(int formBlockOrder) {
+        this.formBlockOrder = formBlockOrder;
     }
 
  

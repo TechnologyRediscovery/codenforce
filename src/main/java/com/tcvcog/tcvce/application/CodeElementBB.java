@@ -155,10 +155,5 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
                             "Unable to add code elment to code source",
                             "This must be corrected by the System Administrator"));
         }
-        
-        
-        
     }
-
-    
 }

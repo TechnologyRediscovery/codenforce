@@ -79,6 +79,11 @@ public  enum QueryCECaseEnum
     CUSTOM(                 "Custom case query", 
                             "Customized search parameters", 
                             RoleType.MuniReader, 
+                            true),
+    
+    MUNI_ALL(               "All active cases in current muni",
+                            "Including closed cases",
+                            RoleType.MuniStaff,
                             true);
     
     private final String title;

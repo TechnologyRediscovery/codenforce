@@ -110,6 +110,22 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return evList;
     }
     
+    /**
+     * Retrieves event Categories by Type
+     * @param et
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<EventCategory> getEventCategeryList(EventType et) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        List<EventCategory> evCatList = new ArrayList<>();
+        if(et != null){
+            evCatList.addAll(ei.getEventCategoryList(et));
+        }
+        return evCatList;
+        
+    }
+    
     public List<EventCnF> getEventList(List<Integer> evIDList) throws IntegrationException{
         List<EventCnF> evList = new ArrayList<>();
         if(evIDList != null && !evIDList.isEmpty()){
@@ -631,7 +647,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
        Map<EventType, List<EventCategory>> typeCatMap = new HashMap<>();
        List<EventType> typeList = new ArrayList();
        typeList.addAll(Arrays.asList(EventType.values()));
-       if(typeList != null && !typeList.isEmpty()){
+       if(!typeList.isEmpty()){
            for(EventType typ: typeList){
                try {
                    typeCatMap.put(typ, determinePermittedEventCategories_toView(typ, ua));

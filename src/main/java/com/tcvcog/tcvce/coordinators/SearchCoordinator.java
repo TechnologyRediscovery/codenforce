@@ -781,7 +781,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case OPENED_30DAYS:
                 break;
             case CLOSED_30DAYS:
-                paramsList.add(getSearchParams_CECase_closedPast30Days(params, cred));
+                paramsList.add(genParams_cecase_closedPast30Days(params, cred));
                 break;
             case UNRESOLVED_CITATIONS:
                 break;
@@ -802,6 +802,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 paramsList.add(genParams_cecase_pacc(params, cred));
             case CUSTOM:
                 break;
+            case MUNI_ALL:
+                paramsList.add(genParams_ceCase_muniAllActive(params, cred));
             default:
          }
          
@@ -1584,7 +1586,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @return a SearchParams subclass with mem vars ready to send
      * into the Integrator for case list retrieval
      */
-    public SearchParamsCECase getSearchParams_CECase_closedPast30Days(SearchParamsCECase params, Credential cred){
+    public SearchParamsCECase genParams_cecase_closedPast30Days(SearchParamsCECase params, Credential cred){
         params.setFilterName("CECases closed in past month");
 
         params.setDate_startEnd_ctl(true);
@@ -1592,6 +1594,20 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setDate_field(SearchParamsCECaseDateFieldsEnum.CLOSE);
         params.setDate_relativeDates_start_val(PASTPERIOD_YEAR);
         params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
+        
+        return params;
+    }
+    
+    public SearchParamsCECase genParams_ceCase_muniAllActive(SearchParamsCECase params, Credential cred){
+        params.setFilterName("All active in muni");
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+        params.setPersonInfoCase_ctl(true);
+        params.setPersonInfoCase_val(false);
+        
+        params.setPropInfoCase_ctl(true);
+        params.setPropInfoCase_val(false);
         
         return params;
     }

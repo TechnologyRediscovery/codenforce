@@ -560,6 +560,22 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         return "ceCaseViolations";
 
     }
+    
+    public String onViolationNullifyCommitButtonChange(){
+        CaseCoordinator cc = getCaseCoordinator();
+         try {
+            cc.violation_deactivateCodeViolation(currentViolation, getSessionBean().getSessUser());
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), null));
+            return "";
+
+        }
+        return "ceCaseViolations";
+        
+    }
 
     /**
      * Listener for user request to remove photo on violation

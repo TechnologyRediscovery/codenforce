@@ -156,8 +156,59 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             </p:dataTable>
                                         </h:form>
                                     </p:panel>
-                                </div>
+                                
+                                
+                                    <p:panel    id="nov-tools-panel"
+                                                toggleable="true"
+                                                style="width: 100%;"
+                                                widgetVar="nov-tools-panel-var"
+                                                collapsed="false"
+                                                rendered="true"
+                                                header="Notice Tools" >
 
+                                        <h:form id="nov-tools-form">
+                                            
+                                                
+                                                <p:commandButton   id="nov-manageblocks-init-button"
+                                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                   value="Manage text blocks"  
+                                                                   icon="fa fa-paragraph"
+                                                                   ajax="true"
+                                                                   actionListener="#{noticeOfViolationBB.onBlockManageInitButtonChange}"
+                                                                   oncomplete="PF('nov-blockmanage-dialog-var').show()"
+                                                                   />
+                                                
+                                                <p:commandButton   id="nov-newblock-init-button"
+                                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                   value="Add new text block"  
+                                                                   icon="fa fa-plus"
+                                                                   ajax="true"
+                                                                   actionListener="#{noticeOfViolationBB.onBlockManageInitButtonChange}"
+                                                                   oncomplete="PF('nov-nbewblock-dialog-var').show()"
+                                                                   />
+                                                
+                                                
+                                            
+                                        </h:form>
+                                        
+                                              
+                                        <h:form id="nov-header-fileupload" 
+                                                enctype="multipart/form-data">
+                                            <h4>Upload new header image for this NOV style</h4>
+
+                                            <p:fileUpload fileUploadListener="#{noticeOfViolationBB.onHeaderUploadRequest}"
+                                                          mode="advanced" 
+                                                          multiple="true"
+                                                          fileLimit="3" 
+                                                          sizeLimit="900000000" 
+                                                          allowTypes="/(\.|\/)(jpe?g|png)$/"
+                                                          />    
+                                        </h:form>
+
+                                        
+                                    </p:panel>
+
+                                </div>
                                 <div class="ui-g-12 ui-md-8 ui-lg-8 object-data-container">
 
                                     <p:panel    id="nov-profile-panel"
@@ -412,9 +463,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h:outputText id="nov-text-view-before"
                                                           value="#{noticeOfViolationBB.currentNotice.noticeTextBeforeViolations}"
                                                           escape="false" />
+                                            
+                                            <h:outputText value="[CODE VIOLATIONS WILL BE INSERTED HERE]" class="bold" />
 
                                             <h:outputText id="nov-text-view-after"
-                                                          value="#{noticeOfViolationBB.currentNotice.noticeTextBeforeViolations}"
+                                                          value="#{noticeOfViolationBB.currentNotice.noticeTextAfterViolations}"
                                                           escape="false" />
 
 
@@ -428,52 +481,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 rendered="#{noticeOfViolationBB.activeInsertMode}"
                                                 header="Create a new notice for #{noticeOfViolationBB.currentCase.property.address}">
 
-
-
-
                                             <p:growl for="chosen-recipient-form" />
-                                            <h:form id="nov-block-editor-button-form">
-                                                
-                                                <p:commandButton   id="nov-manageblocks-init-button"
-                                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                                   value="Manage text blocks"  
-                                                                   icon="fa fa-paragraph"
-                                                                   ajax="true"
-                                                                   actionListener="#{noticeOfViolationBB.onBlockManageInitButtonChange}"
-                                                                   oncomplete="PF('nov-blockmanage-dialog-var').show()"
-                                                                   />
-                                                
-                                                <p:commandButton   id="nov-newblock-init-button"
-                                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                                   value="Add new text block"  
-                                                                   icon="fa fa-plus"
-                                                                   ajax="true"
-                                                                   actionListener="#{noticeOfViolationBB.onBlockManageInitButtonChange}"
-                                                                   oncomplete="PF('nov-nbewblock-dialog-var').show()"
-                                                                   />
-                                                
-                                                
-                                                
-                                            </h:form>
+                                          
                                             <p:spacer height="5px" />
-                                            
-                                            
-                                        <h:form id="nov-header-fileupload" 
-                                                enctype="multipart/form-data">
-                                            <h4>Upload new header image for this NOV style</h4>
-
-                                            <p:fileUpload fileUploadListener="#{noticeOfViolationBB.onHeaderUploadRequest}"
-                                                          mode="advanced" 
-                                                          multiple="true"
-                                                          fileLimit="3" 
-                                                          sizeLimit="900000000" 
-                                                          allowTypes="/(\.|\/)(jpe?g|png)$/"
-                                                          />    
-                                        </h:form>
-
 
                                             <h2>Step 1: Select Recipient</h2>
-
 
                                             <h:form id="chosen-recipient-form">
 
@@ -494,6 +506,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <h:outputText   id="nov-chosen-recipient-name-ot"
                                                                     value="#{noticeOfViolationBB.currentNotice.recipient.firstName} 
                                                                     #{noticeOfViolationBB.currentNotice.recipient.lastName}"/>
+                                                    <p:spacer height="5px"/>
                                                     <h:outputText   id="nov-chosen-recipient-addressstreet-ot"
                                                                     escape="false" value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
                                                                                             ? noticeOfViolationBB.currentNotice.recipient.mailingAddressStreet 
@@ -694,25 +707,58 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                 </script>
 
-
                                             </h:form>
-
-
 
                                             <h:form id="noticeBuilderForm">
 
-                                                <h2>Step 2: Assemble notice of violation letter</h2>
+                                                <h2>Step 3: Assemble notice of violation letter</h2>
 
-                                                <p:commandLink id="textblock-manager-commandlink"
-                                                               type="button"
-                                                               oncomplete="PF('nov-blockmanage-dialog-var').show()" />
-                                                               
-                                                <p:spacer height="5px" />
+                                              
+                                    <p:outputLabel for="template-som">
+                                        <h:outputText value="Choose a template"/>
+                                    </p:outputLabel>
+                                        <p:selectOneMenu 
+                                            id="template-som" 
+                                            tabindex="7"
+                                            value="#{noticeOfViolationBB.selectedBlockTemplate}"
+                                            style="display: block; clear: right;">
+                                            <f:selectItems value="#{noticeOfViolationBB.templateList}"/>
+                                            <p:ajax />
+                                        </p:selectOneMenu>
                                                 
+                                                  <p:commandButton 
+                                                                    ajax="true"
+                                                                    immediate="true"
+                                                                    id="build-using-template"
+                                                                    value="Build notice with template"
+                                                                    actionListener="#{noticeOfViolationBB.onBuildNOVUsingTemplate}"
+                                                                    update="noticeBuilderForm:before-violations-scroller
+                                                                    noticeBuilderForm:after-violations-scroller
+                                                                    noticeBuilderForm:paragraph-scroller"
+                                                                    />
+                                                
+                                                <p:spacer height="5px" />
 
-                                                <h:outputLabel for="nov-builder-blocks-showallmunis-cb" 
-                                                               value="load text blocks from all municipalities " />
+                                                <h:outputLabel for="nov-builder-blocks-manualentry-cb" 
+                                                               value="Use manual text block mode" />
+                                                
+                                                <p:selectBooleanCheckbox id="nov-builder-blocks-manualentry-cb" 
+                                                                         value="#{noticeOfViolationBB.useManualTextBlockMode}">
+                                                    <p:ajax update="paragraph-scroller
+                                                            nov-builder-blocks-showallmunis-cb
+                                                            nov-builder-blocks-showallmunis-ol" />
+                                                </p:selectBooleanCheckbox>
+                                                
+                                                <p:spacer height="5px" />
+
+                                                <h:outputLabel  id="nov-builder-blocks-showallmunis-ol"
+                                                                for="nov-builder-blocks-showallmunis-cb" 
+                                                               value="load text blocks from all municipalities " 
+                                                               rendered="#{noticeOfViolationBB.useManualTextBlockMode}"/>
+                                                
+                                                
                                                 <p:selectBooleanCheckbox id="nov-builder-blocks-showallmunis-cb" 
+                                                                         rendered="#{noticeOfViolationBB.useManualTextBlockMode}"
                                                                          value="#{noticeOfViolationBB.showTextBlocksAllMuni}">
                                                     <p:ajax listener="#{noticeOfViolationBB.loadBlocksAllMunis}" 
                                                             update="paragraph-scroller" />
@@ -727,6 +773,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:dataScroller
                                                             id="paragraph-scroller"
                                                             value="#{noticeOfViolationBB.blockList}"
+                                                            rendered="#{noticeOfViolationBB.useManualTextBlockMode}"
                                                             var="block" 
                                                             widgetVar="noticebuilder-ds-var">
                                                             <div class="outlinedBox event-ds-box">
@@ -763,7 +810,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                         <p:dataScroller
                                                             id="before-violations-scroller"
-                                                            value="#{noticeOfViolationBB.blockListBeforeViolations}"
+                                                            value="#{noticeOfViolationBB.currentNotice.blocksBeforeViolations}"
                                                             var="block" 
                                                             widgetVar="blocksbefore-ds-var">
 
@@ -877,7 +924,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                         <p:dataScroller
                                                             id="after-violations-scroller"
-                                                            value="#{noticeOfViolationBB.blockListAfterViolations}"
+                                                            value="#{noticeOfViolationBB.currentNotice.blocksAfterViolations}"
                                                             var="block" 
                                                             widgetVar="blocksafter-ds-var">
 
@@ -1637,10 +1684,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     tabindex="1">
 
                                     <p:ajax event="rowSelect" immediate="true" 
-                                            update=":updateTextBlockForm:selectedBlockOT
-                                            :updateTextBlockForm:tbcat
-                                            :updateTextBlockForm:blockNameIT
-                                            :updateTextBlockForm:updateTextBlockTextEditor"/>
+                                            update=":updateTextBlockForm"/>
 
                                     <p:column width="3%">
                                         <f:facet name="header">
@@ -1700,17 +1744,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             <p:spacer height="10"/>
 
                             <h2>Update Text Block</h2>
+                            
                             <h:form id="updateTextBlockForm">
+                                
+                                <p:commandButton 
+                                    id="updatSetButton0" 
+                                    value="Commit updates" 
+                                    ajax="false" icon="fa fa-check"
+                                    styleClass="buttonOwnLine" tabindex="6"
+                                    actionListener="#{textBlockBB.updateTextBlock}"/>
 
                                 <h:panelGrid columns="4" border="0" 
                                              cellpadding="5" columnClasses="gridTd, gridTd, gridTd, gridTd,"
                                              footerClass="gridFooter">
 
 
-                                    <h:outputText value="Code set ID: #{textBlockBB.selectedBlock.blockID}" id="selectedBlockOT" />
-
                                     <p:outputLabel for="tbcat">
-                                        <h:outputText value="Text block category"/>
+                                        <h:outputText value="Text block template"/>
                                     </p:outputLabel>
                                     <h:panelGroup>
                                         <p:selectOneMenu 
@@ -1724,6 +1774,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:outputLabel for="muniSelectMenuUpdate">
                                         <h:outputText value="Municipality"/>
                                     </p:outputLabel>
+                                    
                                     <h:panelGroup>
                                         <p:selectOneMenu id="muniSelectMenuUpdate" tabindex="5" value="#{textBlockBB.selectedBlock.muni}">
                                             <f:converter converterId="muniConverter"/>
@@ -1746,6 +1797,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
 
+                                    <p:outputLabel for="tb-add-templateorder-in">
+                                        <h:outputText value="Default order"/>
+                                    </p:outputLabel>
+
+                                    <h:panelGroup>
+                                        <p:inputNumber  id="tb-add-templateorder-in"
+                                                        minValue="-20" maxValue="20" value="#{textBlockBB.selectedBlock.placementOrder}" />
+                                        <p:spacer height="3px" />
+                                        <p>Note: negative values are placed in ascending order before violations; <br />positive values in ascending order after violations.</p>
+                                    </h:panelGroup>
 
                                     <f:facet name="footer">
                                         <p:outputLabel for="updateTextBlockTextEditor">
@@ -1794,7 +1855,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                     <p:outputLabel for="tbcatadd">
-                                        <h:outputText value="Text block category"/>
+                                        <h:outputText value="Text block template"/>
                                     </p:outputLabel>
                                     <h:panelGroup>
                                         <p:selectOneMenu 
@@ -1829,6 +1890,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:message for="blockNameIT" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
+                                    
+                                    
+                                    <p:outputLabel for="tb-edit-templateorder-in">
+                                        <h:outputText value="Default order"/>
+                                    </p:outputLabel>
+
+                                    <h:panelGroup>
+                                        <p:inputNumber  id="tb-edit-templateorder-in"
+                                                        minValue="-20" maxValue="20" value="#{textBlockBB.formBlockOrder}" />
+                                        <p:spacer height="3px" />
+                                        <p>Note: negative values are placed in ascending order before violations; <br />positive values in ascending order after violations.</p>
+                                    </h:panelGroup>
+
+
 
 
                                     <f:facet name="footer">

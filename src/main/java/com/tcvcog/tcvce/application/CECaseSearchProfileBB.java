@@ -35,7 +35,9 @@ import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.CaseStageEnum;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Property;
@@ -81,6 +83,9 @@ public class CECaseSearchProfileBB
     private QueryCECase querySelected;
     private boolean appendResultsToList;
     
+    private List<EventCategory> closingEventCategoryList;
+    private EventCategory closingEventCategorySelected;
+    
     private ViewOptionsActiveHiddenListsEnum eventViewOptionSelected;
     private List<ViewOptionsActiveHiddenListsEnum> eventViewOptions;
     
@@ -112,6 +117,7 @@ public class CECaseSearchProfileBB
         SearchCoordinator sc = getSearchCoordinator();
         UserCoordinator uc = getUserCoordinator();
         SystemCoordinator sysCor = getSystemCoordinator();
+        EventCoordinator ec = getEventCoordinator();
         
 
         SessionBean sb = getSessionBean();
@@ -133,6 +139,7 @@ public class CECaseSearchProfileBB
             }
             currentCase = cc.cecase_assembleCECaseDataHeavy(cseTemp, getSessionBean().getSessUser());
             System.out.println("CECaseSearchProfile.initBean(): current case ID: " + currentCase.getCaseID());
+            closingEventCategoryList = ec.getEventCategeryList(EventType.Closing);
             
         } catch (IntegrationException | SearchException | BObStatusException ex) {
             System.out.println(ex);
@@ -155,6 +162,7 @@ public class CECaseSearchProfileBB
         } else {
             reportCECaseList = cc.report_getDefaultReportConfigCECaseList();
         }
+        
         
         ReportConfigCECase rpt = getSessionBean().getReportConfigCECase();
         
@@ -373,6 +381,26 @@ public class CECaseSearchProfileBB
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                 "Case marked as inactive.", ""));
         } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                ex.getMessage(), ""));
+            
+        }
+        return "ceCaseSearchProfile";
+        
+    }
+    
+    /**
+     * Listener for user requests to deactivate a cecase
+     * @return 
+     */
+    public String onCaseForceCloseCommitButtonChnage(){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            cc.cecase_forceclose(currentCase, closingEventCategorySelected, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                "Case closed and violations nullified.", ""));
+        } catch (IntegrationException | BObStatusException | EventException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                 ex.getMessage(), ""));
@@ -985,6 +1013,34 @@ public class CECaseSearchProfileBB
      */
     public void setFormNoteText(String formNoteText) {
         this.formNoteText = formNoteText;
+    }
+
+    /**
+     * @return the closingEventList
+     */
+    public List<EventCategory> getClosingEventList() {
+        return closingEventCategoryList;
+    }
+
+    /**
+     * @param closingEventList the closingEventList to set
+     */
+    public void setClosingEventList(List<EventCategory> closingEventList) {
+        this.closingEventCategoryList = closingEventList;
+    }
+
+    /**
+     * @return the closingEventCategorySelected
+     */
+    public EventCategory getClosingEventCategorySelected() {
+        return closingEventCategorySelected;
+    }
+
+    /**
+     * @param closingEventCategorySelected the closingEventCategorySelected to set
+     */
+    public void setClosingEventCategorySelected(EventCategory closingEventCategorySelected) {
+        this.closingEventCategorySelected = closingEventCategorySelected;
     }
 
 }
