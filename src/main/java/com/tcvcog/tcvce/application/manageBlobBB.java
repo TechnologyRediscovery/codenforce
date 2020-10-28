@@ -27,7 +27,9 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -49,6 +51,13 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     private List<BlobLight> blobList;
     private Blob selectedBlob;
     private boolean currentBlobSelected;
+    
+    //search parameters.
+    //Should eventually be replaced with an implementation of the Query object
+    private String searchFilename;
+    private String searchDescription;
+    private LocalDateTime searchBefore;
+    private LocalDateTime searchAfter;
     
     /**
      * load all blobs uploaded in the past month into memory
@@ -193,6 +202,54 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
 
     public void setCurrentBlobSelected(boolean currentBlobSelected) {
         this.currentBlobSelected = currentBlobSelected;
+    }
+
+    public String getSearchFilename() {
+        return searchFilename;
+    }
+
+    public void setSearchFilename(String searchFilename) {
+        this.searchFilename = searchFilename;
+    }
+
+    public String getSearchDescription() {
+        return searchDescription;
+    }
+
+    public void setSearchDescription(String searchDescription) {
+        this.searchDescription = searchDescription;
+    }
+
+    public LocalDateTime getSearchBefore() {
+        return searchBefore;
+    }
+
+    public void setSearchBefore(LocalDateTime searchBefore) {
+        this.searchBefore = searchBefore;
+    }
+
+    public LocalDateTime getSearchAfter() {
+        return searchAfter;
+    }
+
+    public void setSearchAfter(LocalDateTime searchAfter) {
+        this.searchAfter = searchAfter;
+    }
+    
+    public java.util.Date getSearchBeforeUtil() {
+        return convertDate(searchBefore);
+    }
+
+    public void setSearchBeforeUtil(java.util.Date searchBefore) {
+        this.searchBefore = convertDate(searchBefore);
+    }
+
+    public java.util.Date getSearchAfterUtil() {
+        return convertDate(searchAfter);
+    }
+
+    public void setSearchAfterUtil(java.util.Date searchAfter) {
+        this.searchAfter = convertDate(searchAfter);
     }
     
 }

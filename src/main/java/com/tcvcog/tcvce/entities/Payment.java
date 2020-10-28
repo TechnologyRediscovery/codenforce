@@ -18,13 +18,12 @@
 package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 /**
  *
  * @author Adam Gutonski & Nathan Dietz
  */
-public class Payment {
+public class Payment extends BOb {
     
     protected int paymentID;
     protected PaymentType paymentType;
@@ -127,48 +126,28 @@ public class Payment {
      * @return the dateDeposited
      */
     public Date getDateDepositedUtilDate() {
-        Date dateDepositedUtilDate = null;
-        if(dateDeposited != null){
-            
-            dateDepositedUtilDate = Date.from(dateDeposited.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return dateDepositedUtilDate;
+        return convertUtilDate(dateDeposited);
     }
 
     /**
      * @param dateDeposited the dateDeposited to set
      */
     public void setDateDepositedUtilDate(Date dateDeposited) {
-        
-        if(dateDeposited != null){
-            
-            this.dateDeposited = dateDeposited.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            
-        }
-        
+        this.dateDeposited = convertUtilDate(dateDeposited);
     }
 
     /**
      * @return the dateReceived
      */
     public Date getDateReceivedUtilDate() {
-        Date dateReceivedUtilDate = null;
-        if(dateReceived != null){
-            
-            dateReceivedUtilDate = Date.from(dateReceived.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return dateReceivedUtilDate;
+        return convertUtilDate(dateReceived);
     }
 
     /**
      * @param dateReceived the dateReceived to set
      */
     public void setDateReceivedUtilDate(Date dateReceived) {
-        if(dateReceived != null){
-            
-            this.dateReceived = dateReceived.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            
-        }
+        this.dateReceived = convertUtilDate(dateReceived);
     }
     
     /**

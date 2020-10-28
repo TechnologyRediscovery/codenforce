@@ -17,11 +17,11 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccPeriod;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author ellen bascomb of apt 31y
  */
-public class OccPermitApplication {
+public class OccPermitApplication extends BOb {
     private int id;
     private OccPermitApplicationReason reason;
     private OccApplicationStatusEnum status;
@@ -124,13 +124,13 @@ public class OccPermitApplication {
     }
 
     public Date getSubmissionDateUtilDate() {
-        submissionDateUtilDate = java.util.Date.from(submissionDate.atZone(ZoneId.systemDefault()).toInstant());
+        submissionDateUtilDate = convertUtilDate(submissionDate);
         return submissionDateUtilDate;
     }
 
     public void setSubmissionDateUtilDate(Date submissionDateUtilDate) {
         this.submissionDateUtilDate = submissionDateUtilDate;
-        submissionDate = submissionDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        submissionDate = convertUtilDate(submissionDateUtilDate);
     }
 
     public PropertyUnit getApplicationPropertyUnit() {

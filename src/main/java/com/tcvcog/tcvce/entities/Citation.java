@@ -19,7 +19,6 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,7 +26,9 @@ import java.util.Objects;
  *
  * @author ellen bascomb of apt 31y
  */
-public class Citation implements Serializable {
+public class Citation 
+        extends BOb
+        implements Serializable {
     private int citationID;
     private String citationNo;
     private CitationStatus status;
@@ -279,9 +280,7 @@ public class Citation implements Serializable {
      * @return the dateOfRecordUtilDate
      */
     public java.util.Date getDateOfRecordUtilDate() {
-        if(dateOfRecord != null){
-            dateOfRecordUtilDate = java.util.Date.from(dateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
-        }
+        dateOfRecordUtilDate = convertUtilDate(dateOfRecord);
         return dateOfRecordUtilDate;
     }
 
@@ -290,9 +289,7 @@ public class Citation implements Serializable {
      */
     public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
         this.dateOfRecordUtilDate = dateOfRecordUtilDate;
-        if(dateOfRecordUtilDate != null){
-            dateOfRecord = dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
+        this.dateOfRecord = convertUtilDate(dateOfRecordUtilDate);
     }
 
     /**

@@ -7,7 +7,9 @@ package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,6 +33,35 @@ public class EntityUtils {
         return formattedDateTime;
     }
    
+    /**
+     * Converts a date from LocalDateTime to java.util.Date, returns null if
+     * input is null.
+     *
+     * @param input
+     * @return
+     */
+    public static java.util.Date convertUtilDate(LocalDateTime input) {
+        Date utilDate = null;
+        if (input != null) {
+            utilDate = Date.from(input.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return utilDate;
+    }
+
+    /**
+     * Converts a date from java.util.Date to LocalDateTime, returns null if
+     * input is null.
+     *
+     * @param input
+     * @return
+     */
+    public static LocalDateTime convertUtilDate(java.util.Date input) {
+        LocalDateTime dateTime = null;
+        if (input != null) {
+            dateTime = input.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+        return dateTime;
+    }
     
     /**
      * Counts days between two LocalDateTimes and returns the primitive

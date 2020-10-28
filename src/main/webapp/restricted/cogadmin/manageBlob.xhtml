@@ -77,7 +77,7 @@
                                                     <div class="restrict-main-contents-io-content">
                                                         <h:outputLabel value="Filename contains..."/>
                                                         <p:inputText id="blob-search-filter-filename"
-                                                                     value="#{}"
+                                                                     value="#{manageBlobBB.searchFilename}"
                                                                      style="width: 100%;"
                                                                      tabindex="2"
                                                                      styleClass="data_field_value"
@@ -89,7 +89,7 @@
                                                     <div class="restrict-main-contents-io-content">
                                                         <h:outputLabel value="Description contains..."/>
                                                         <p:inputText id="blob-search-filter-desc"
-                                                                     value="#{}"
+                                                                     value="#{manageBlobBB.searchDescription}"
                                                                      style="width: 100%;"
                                                                      tabindex="2"
                                                                      styleClass="data_field_value"
@@ -100,13 +100,12 @@
                                                     
                                                     <div class="restrict-main-contents-io-content">
                                                         <h:outputLabel value="Uploaded before..."/>
-                                                        <p:calendar value="#{}" 
+                                                        <p:calendar value="#{manageBlobBB.searchBeforeUtil}" 
                                                                             mode="popup" 
                                                                             tabindex="3"
                                                                             id="blob-search-filter-upload-before"
                                                                             showOn="button"
                                                                             pattern="EEE, dd MMM, yyyy HH:mm"
-                                                                            maxdate="#{}"
                                                                             navigator="true"
                                                                             showButtonPanel="true"
                                                                             showTodayButton="true"
@@ -117,13 +116,12 @@
                                                     
                                                     <div class="restrict-main-contents-io-content">
                                                         <h:outputLabel value="Uploaded after..."/>
-                                                        <p:calendar value="#{}" 
+                                                        <p:calendar value="#{manageBlobBB.searchAfterUtil}" 
                                                                             mode="popup" 
                                                                             tabindex="3"
                                                                             id="blob-search-filter-upload-after"
                                                                             showOn="button"
                                                                             pattern="EEE, dd MMM, yyyy HH:mm"
-                                                                            maxdate="#{}"
                                                                             navigator="true"
                                                                             showButtonPanel="true"
                                                                             showTodayButton="true"

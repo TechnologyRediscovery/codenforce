@@ -17,14 +17,13 @@
 package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 
 /**
  *
  * @author Nathan Dietz
  */
-public class Fee {
+public class Fee extends BOb {
     private int occupancyInspectionFeeID;
     private Municipality muni;
 
@@ -104,48 +103,28 @@ public class Fee {
      * @return the effective date
      */
     public Date getEffectiveUtilDate() {
-        Date effectiveUtilDate = null;
-        if(effectiveDate != null){
-            
-           effectiveUtilDate = Date.from(effectiveDate.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return effectiveUtilDate;
+        return convertUtilDate(effectiveDate);
     }
 
     /**
      * @param effectiveUtilDate the date to set
      */
     public void setEffectiveUtilDate(Date effectiveUtilDate) {
-        
-        if(effectiveUtilDate != null){
-            
-            this.effectiveDate = effectiveUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            
-        }
-        
+        effectiveDate = convertUtilDate(effectiveUtilDate);
     }
 
     /**
      * @return the expiry date
      */
     public Date getExpiryUtilDate() {
-        Date expiryUtilDate = null;
-        if(expiryDate != null){
-            
-            expiryUtilDate = Date.from(expiryDate.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return expiryUtilDate;
+        return convertUtilDate(expiryDate);
     }
 
     /**
      * @param expiryUtilDate the date to set
      */
     public void setExpiryUtilDate(Date expiryUtilDate) {
-        if(expiryUtilDate != null){
-            
-            this.expiryDate = expiryUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            
-        }
+        expiryDate = convertUtilDate(expiryUtilDate);
     }
     
     public String getNotes() {

@@ -45,7 +45,6 @@ import com.tcvcog.tcvce.util.MessageBuilderParams;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -1011,18 +1010,11 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     }
 
     public Date getQueryBegin_Util() {
-
-        Date utilDate = null;
-        if (queryBegin != null) {
-            utilDate = Date.from(queryBegin.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return utilDate;
+        return convertDate(queryEnd);
     }
 
     public void setQueryBegin_Util(Date queryBeginUtil) {
-        if (queryBeginUtil != null) {
-            queryBegin = queryBeginUtil.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
+        queryBegin = convertDate(queryBeginUtil);
     }
 
     public LocalDateTime getQueryEnd() {
@@ -1034,17 +1026,11 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     }
 
     public Date getQueryEnd_Util() {
-        Date utilDate = null;
-        if (queryEnd != null) {
-            utilDate = Date.from(queryEnd.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return utilDate;
+        return convertDate(queryEnd);
     }
 
     public void setQueryEnd_Util(Date queryEndUtil) {
-        if (queryEndUtil != null) {
-            queryEnd = queryEndUtil.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
+        queryEnd = convertDate(queryEndUtil);
     }
 
     public List<OccApplicationStatusEnum> getStatusList() {
