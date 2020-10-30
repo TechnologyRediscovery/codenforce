@@ -36,7 +36,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
@@ -282,6 +285,54 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
         //the last token will contain our file type extension
         return fileNameTokens[fileNameTokens.length - 1];
+        
+    }
+    
+    /**
+     * TEMPORARY SEARCH METHOD FOR BLOBS.
+     * Should search all blob tables, add their entries to one list, and return it.
+     * @param filename
+     * @param description
+     * @param before
+     * @param after
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @throws java.io.IOException 
+     * @throws java.lang.ClassNotFoundException 
+     */
+    public List<BlobLight> searchBlobs(String filename, String description, LocalDateTime before, LocalDateTime after) 
+            throws IntegrationException, 
+            IOException, 
+            ClassNotFoundException {
+        
+        BlobIntegrator bi = getBlobIntegrator();
+        
+        //For GIGO and optimization purposes, throw out the filename and description
+        //if they don't contain non-whitespace
+        if(!filename.matches("\\S")){
+            filename = null;
+        }
+        
+        if(!description.matches("\\S")){
+            description = null;
+        }
+        
+        List<Integer> idList = new ArrayList<>();
+        
+        idList.addAll(bi.searchPhotoBlobs(filename, description, before, after));
+        
+        //No PDF Search yet!
+        //idList.addAll(bi.searchPDFBlobs(filename, description, before, after));
+        
+        List<BlobLight> blobList = new ArrayList<>();
+        
+        for(Integer id : idList){
+            blobList.add(bi.getPhotoBlobLight(id));
+        }
+        
+        //No "getPDFBlob()" method!
+        
+        return blobList;
         
     }
 

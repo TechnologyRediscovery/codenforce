@@ -612,4 +612,161 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
     }
     
+    /**
+     * TEMPORARY SEARCH METHOD FOR BLOBS.
+     * @param filename
+     * @param description
+     * @param before
+     * @param after
+     * @deprecated as I don't encourage using this method, it's temporary
+     * @return list of Blob IDs for all photos that meet our search parameters
+     * @throws IntegrationException 
+     */
+    public List<Integer> searchPhotoBlobs(String filename,
+                                          String description,
+                                          LocalDateTime before,
+                                          LocalDateTime after)
+                                          throws IntegrationException {
+        ArrayList<Integer> blobIDList = new ArrayList();
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+
+        //Store search terms, more information in a large comment below
+        String[] filenameTokens = null;
+
+        String[] descTokens = null;
+        
+        StringBuilder query = new StringBuilder();
+
+        query.append("SELECT DISTINCT photodocid\n"
+                + "FROM public.photodoc LEFT JOIN blobbytes on blobbytes_bytesid = bytesid");
+
+        PreparedStatement stmt = null;
+        
+        //First check if any parameters have been set at all
+        if (filename != null
+                || description != null
+                || before != null
+                || after != null) {
+
+            //They have been, let's add a WHERE keyword
+            query.append("\nWHERE (");
+            
+            //We will store each things we would like to test for in this 
+            ArrayList<String> clauses = new ArrayList<>();
+
+            //Dates first
+            if (before != null) {
+                clauses.add("uploaddate < ?");
+            }
+            
+            if (after != null) {
+                clauses.add("uploaddate > ?");
+            }
+
+            //we are going to split apart the filename and description search terms 
+            //on spaces and search for each token.
+            //If a person searches for "house photo", we want "photo of house" to show up
+
+            if (filename != null) {
+
+                ArrayList<String> statements = new ArrayList<>();
+
+                //Split on whitespaces
+                filenameTokens = filename.split("\\s");
+
+                //Add as many ILIKE statements as we have terms
+                for (int i = 0; i < filenameTokens.length; i++) {
+                    statements.add("filename ILIKE ?");
+                }
+
+                //Join them togeth with an OR in between
+                //Then throw the completed clause into the clauses array
+                String finished = String.join(" OR\n", statements);
+
+                clauses.add(finished);
+
+            }
+
+            if (description != null) {
+                ArrayList<String> statements = new ArrayList<>();
+
+                //Split on whitespaces
+                descTokens = description.split("\\s");
+
+                //Add as many ILIKE statements as we have terms
+                for (int i = 0; i < descTokens.length; i++) {
+                    statements.add("description ILIKE ?");
+                }
+
+                //Join them togeth with an OR in between
+                //Then throw the completed clause into the clauses array
+                String finished = String.join(" OR\n", statements);
+
+                clauses.add(finished);
+            }
+            
+            //We want to make sure all clauses are satisfied, so put an AND between them
+            //And use parantheses to make sure that each is a self-contained logical expression
+            String allClauses = String.join(") AND\n(", clauses);
+            
+            query.append(allClauses + ")\n");
+
+        }
+
+        //add limit 
+        query.append("LIMIT 150;");
+        
+        try {
+            
+            stmt = con.prepareStatement(query.toString());
+            
+            int index = 0;
+            
+            if (before != null) {
+                java.sql.Timestamp stamp = java.sql.Timestamp.valueOf(before);
+                index++;
+                stmt.setTimestamp(index, stamp);
+            }
+            
+            if (after != null) {
+                java.sql.Timestamp stamp = java.sql.Timestamp.valueOf(after);
+                index++;
+                stmt.setTimestamp(index, stamp);
+            }
+            
+            if(filename != null){
+                for(String token : filenameTokens){
+                    index++;
+                    //Also add the wildcards
+                    stmt.setString(index, "%" + token + "%");
+                }
+            }
+            
+            if(description != null){
+                for(String token : descTokens){
+                    index++;
+                    //Also add the wildcards
+                    stmt.setString(index, "%" + token + "%");
+                }
+            }
+            
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                blobIDList.add(rs.getInt("photodocid"));
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving list of recent blobs. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return blobIDList;
+        
+    }
+    
 }

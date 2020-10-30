@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
@@ -131,6 +132,38 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         facesContext.responseComplete();
     }
 
+    public void executeQuery(){
+        BlobCoordinator bc = getBlobCoordinator();
+        
+        try{
+            blobList = bc.searchBlobs(searchFilename, searchDescription, searchBefore, searchAfter);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Found " + blobList.size() + " files matching your criteria!", ""));
+        } catch(ClassNotFoundException | IOException | IntegrationException ex){
+            System.out.println("manageBlobBB.executeQuery() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to search for files!", ""));
+        }
+    }
+    
+    public void selectBlob(BlobLight blob){
+        BlobCoordinator bc = getBlobCoordinator();
+        
+        try{
+        selectedBlob = bc.getPhotoBlob(blob.getBlobID());
+        currentBlobSelected = true;
+        } catch(ClassNotFoundException | IOException | IntegrationException ex){
+            System.out.println("manageBlobBB.selectBlob() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to load selected file!", ""));
+            selectedBlob = new Blob();
+        }
+        
+    }
+    
     /**
      * @return the selectedBlob
      */
