@@ -34,9 +34,11 @@ public class NoticeOfViolation  implements Serializable, Comparable<NoticeOfViol
     
     private String noticeTextBeforeViolations;
     private List<TextBlock> blocksBeforeViolations;
+    private String textBeforeViolations;
     private List<CodeViolationDisplayable> violationList;
     private String noticeTextAfterViolations;
     private List<TextBlock> blocksAfterViolations;
+    private String textAfterViolations;
     
     private LocalDateTime dateOfRecord;
     private java.util.Date dateOfRecordUtilDate;
@@ -47,6 +49,8 @@ public class NoticeOfViolation  implements Serializable, Comparable<NoticeOfViol
     private User creationBy;
     
     private int headerImageID;
+    
+    private boolean injectViolations;
    
     private LocalDateTime lockedAndqueuedTS;
     private String lockedAndQueuedTSPretty;
@@ -500,6 +504,48 @@ public class NoticeOfViolation  implements Serializable, Comparable<NoticeOfViol
      */
     public void setBlocksAfterViolations(List<TextBlock> blocksAfterViolations) {
         this.blocksAfterViolations = blocksAfterViolations;
+    }
+
+    /**
+     * @return the injectViolations
+     */
+    public boolean isInjectViolations() {
+        return injectViolations;
+    }
+
+    /**
+     * @param injectViolations the injectViolations to set
+     */
+    public void setInjectViolations(boolean injectViolations) {
+        this.injectViolations = injectViolations;
+    }
+
+    /**
+     * @return the textBeforeViolations
+     */
+    public String getTextBeforeViolations() {
+        return textBeforeViolations;
+    }
+
+    /**
+     * @return the textAfterViolations
+     */
+    public String getTextAfterViolations() {
+        return textAfterViolations;
+    }
+
+    /**
+     * @param textBeforeViolations the textBeforeViolations to set
+     */
+    public void setTextBeforeViolations(String textBeforeViolations) {
+        this.textBeforeViolations = textBeforeViolations;
+    }
+
+    /**
+     * @param textAfterViolations the textAfterViolations to set
+     */
+    public void setTextAfterViolations(String textAfterViolations) {
+        this.textAfterViolations = textAfterViolations;
     }
     
 }

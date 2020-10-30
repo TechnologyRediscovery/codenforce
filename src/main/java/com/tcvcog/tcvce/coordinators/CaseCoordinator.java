@@ -1296,6 +1296,24 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         noticeEvent.setPersonList(persList);
         evCoord.addEvent(noticeEvent, c, ua);
     }
+    
+    
+    /**
+     * Create a new text block skeleton with injectrable set to true
+     * @param muni
+     * @return 
+     */
+    public TextBlock nov_getTemplateBlockSekeleton(Municipality muni){
+        TextBlock tb = new TextBlock();
+        tb.setMuni(muni);
+        tb.setInjectableTemplate(true);
+        tb.setTextBlockCategoryID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString("nov_textblocktemplate_categoryid")));
+        tb.setTextBlockText("inject violations with: ***VIOLATIONS***");
+        
+        return tb;
+                
+    }
 
     /**
      * Called when the NOV is ready to get written to the DB --but before
@@ -1318,6 +1336,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      *
      * @param nov
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public void nov_update(NoticeOfViolation nov) throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
@@ -1346,7 +1365,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         CaseIntegrator ci = getCaseIntegrator();
         nov.setSentTS(LocalDateTime.now());
         nov.setSentBy(user);
-        ci.novUpdateNotice(nov);
+        ci.novRecordMailing(nov);
     }
 
     /**
@@ -1362,7 +1381,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         CaseIntegrator ci = getCaseIntegrator();
         nov.setReturnedTS(LocalDateTime.now());
         nov.setReturnedBy(user);
-        ci.novUpdateNotice(nov);
+        ci.novRecordReturnedNotice(nov);
     }
 
     /**
@@ -1412,7 +1431,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * loaded up into before and after based on default sort order
      * @throws com.tcvcog.tcvce.domain.IntegrationException  
      */
-    public NoticeOfViolation nov_assembleNOVFromTemplate(NoticeOfViolation nov, int categoryID) throws IntegrationException{
+    public NoticeOfViolation nov_assembleNOVFromBlocks(NoticeOfViolation nov, int categoryID) throws IntegrationException{
         CaseIntegrator ci = getCaseIntegrator();
         List<TextBlock> blockList = new ArrayList<>();
         
@@ -1433,6 +1452,28 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             }
             
         }
+        return nov;
+    }
+    
+    public NoticeOfViolation nov_assembleNOVFromTemplate(NoticeOfViolation nov, TextBlock temp, CECase cse) throws BObStatusException{
+        
+        CaseIntegrator ci = getCaseIntegrator();
+        if(nov == null || temp == null || cse ==null){
+            throw new BObStatusException("Cannot build a notice with null NOV, template or case");
+        }
+        
+        String template = "I am a bunch of text before the VIOLATION injection point ***VIOLATIONS*** and I'm after the violation injection point";
+        int startOfInjectionPoint = template.indexOf(Constants.NOV_VIOLATIONS_INJECTION_POINT);
+        System.out.println("CaseCoor.nov_assembleNOVFromTemplate: Injection point found starts at: " + startOfInjectionPoint);
+        // If the injection point is not found, put the entire template block as text before Violations
+        if(startOfInjectionPoint != -1){
+            nov.setTextBeforeViolations(template.substring(0, startOfInjectionPoint));
+            nov.setTextAfterViolations(template.substring(startOfInjectionPoint + Constants.NOV_VIOLATIONS_INJECTION_POINT.length()));
+        } else {
+            nov.setTextBeforeViolations(template);
+        }
+        
+        
         return nov;
     }
       

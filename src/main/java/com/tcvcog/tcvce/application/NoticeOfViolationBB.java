@@ -47,6 +47,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -78,7 +79,12 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private boolean useManualTextBlockMode;
     
     private List<TextBlock> blockList;
-    private List<String> templateList;
+    private List<String> blockCatList;
+    
+    private List<TextBlock> injectableBlockList;
+    private TextBlock currentTemplateBlock;
+    private String formTemplateBlockText;
+    
     private Map<String, Integer> blockCatIDMap;
     private String selectedBlockTemplate;
 
@@ -93,6 +99,22 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
     private List<ViewOptionsActiveListsEnum> viewOptionList;
     private ViewOptionsActiveListsEnum selectedViewOption;
+    
+    // MIGRATED FROM TEXT BLOCK BB
+    
+    
+    private List<TextBlock> filteredBlockList;
+    
+    private TextBlock selectedBlock;
+    
+    private HashMap<String, Integer> categoryList;
+    
+    private Municipality formMuni;
+    
+    private String formBlockName;
+    private String formBlockText;
+    private int formCategoryID;
+    private int formBlockOrder;
 
     /**
      * Creates a new instance of NoticeOfViolationBB
@@ -147,7 +169,17 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         viewOptionList = Arrays.asList(ViewOptionsActiveListsEnum.values());
         selectedViewOption = ViewOptionsActiveListsEnum.VIEW_ACTIVE;
         Municipality m = getSessionBean().getSessMuni();
+        
         try {
+            injectableBlockList = ci.getTextBlockTemplates(getSessionBean().getSessMuni());
+            formTemplateBlockText = "";
+            if(currentTemplateBlock == null){
+                if(injectableBlockList != null && !injectableBlockList.isEmpty()){
+                    currentTemplateBlock = injectableBlockList.get(0);
+                } else {
+                    currentTemplateBlock = cc.nov_getTemplateBlockSekeleton(getSessionBean().getSessMuni());
+                }
+            } 
             if (blockList == null) {
                 if (showTextBlocksAllMuni) {
                     blockList = ci.getAllTextBlocks();
@@ -157,9 +189,9 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             }
             blockCatIDMap = ci.getTextBlockCategoryMap();
             if(blockCatIDMap != null && !blockCatIDMap.isEmpty()){
-                templateList = new ArrayList<>(blockCatIDMap.keySet());
-                if(templateList != null && !templateList.isEmpty()){
-                    selectedBlockTemplate = templateList.get(0);
+                blockCatList = new ArrayList<>(blockCatIDMap.keySet());
+                if(blockCatList != null && !blockCatList.isEmpty()){
+                    selectedBlockTemplate = blockCatList.get(0);
                 }
             }
         } catch (IntegrationException ex) {
@@ -169,6 +201,123 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         
         
     } // close initbean
+    
+    
+    // MIGRATED FROM TEXT BLOCK BB
+      public String updateTextBlock(){
+        CaseIntegrator ci = getCaseIntegrator();
+        if(selectedBlock != null){
+            try {
+                ci.updateTextBlock(selectedBlock);
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,  
+                            "Success! Updated text block id " + selectedBlock.getBlockID(), ""));
+            } catch (IntegrationException ex) {
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,  
+                            "Please select a text block and try again", ""));
+            }
+        } else {
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, 
+                            "Please select a text block and try again", ""));
+            
+        }
+        // clear block list so the page reload forces a DB SELECT 
+        blockList = null;
+        return "";
+    }
+    
+    public String addNewTextBlock(){
+        CaseIntegrator ci = getCaseIntegrator();
+        TextBlock newBlock = new TextBlock();
+        newBlock.setMuni(getFormMuni());
+        newBlock.setTextBlockCategoryID(getFormCategoryID());
+        newBlock.setTextBlockName(getFormBlockName());
+        newBlock.setTextBlockText(getFormBlockText());
+        newBlock.setPlacementOrder(getFormBlockOrder());
+        
+        try {
+            ci.insertTextBlock(newBlock);
+            getFacesContext().addMessage(null,
+               new FacesMessage(FacesMessage.SEVERITY_INFO,  
+                       "Success! Added a new text block named " + getFormBlockName() + "to the db!", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+               new FacesMessage(FacesMessage.SEVERITY_ERROR,  
+                       ex.getMessage(), ""));
+            
+        }
+        blockList = null;
+        return "";
+    }
+    
+    public String nukeTextBlock(){
+        CaseIntegrator ci = getCaseIntegrator();
+        if(selectedBlock != null){
+            try {
+                ci.deleteTextBlock(selectedBlock);
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,  
+                            "Success! Nuked block id " + selectedBlock.getBlockID(), ""));
+            } catch (IntegrationException ex) {
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,  ex.getMessage(), ""));
+            }
+        } else {
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, 
+                            "Please select a text block and try again", ""));
+        }
+        blockList = null;
+        return "";
+    }
+
+    /**
+     * @return the blockList
+     */
+    public List<TextBlock> getBlockList() {
+        CaseIntegrator ci = getCaseIntegrator();
+        if(blockList == null){
+            try {
+                blockList = ci.getAllTextBlocks();
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
+        }
+        return blockList;
+    }
+
+    /**
+     * @return the filteredBlockList
+     */
+    public List<TextBlock> getFilteredBlockList() {
+        return filteredBlockList;
+    }
+
+    /**
+     * @return the selectedBlock
+     */
+    public TextBlock getSelectedBlock() {
+        if(selectedBlock == null){
+            setSelectedBlock(new TextBlock());
+        }
+        return selectedBlock;
+    }
+
+    /**
+     * @return the categoryList
+     */
+    public HashMap<String, Integer> getCategoryList() {
+        CaseIntegrator ci = getCaseIntegrator();
+        try {
+            setCategoryList(ci.getTextBlockCategoryMap());
+            System.out.println("TextBlockBB.getCategoryMap | isempty: " + categoryList.isEmpty());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        return categoryList;
+    }
 
     /**
      * Responds to the user clicking one of the page modes: LOOKUP, ADD, UPDATE,
@@ -334,11 +483,11 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
     }
     
-    public void onBuildNOVUsingTemplate(){
+    public void onBuildNOVUsingBlocks(){
         CaseCoordinator cc = getCaseCoordinator();
         if(currentNotice != null && selectedBlockTemplate != null){
             try {
-                currentNotice = cc.nov_assembleNOVFromTemplate(currentNotice, blockCatIDMap.get(selectedBlockTemplate));
+                currentNotice = cc.nov_assembleNOVFromBlocks(currentNotice, blockCatIDMap.get(selectedBlockTemplate));
             } catch (IntegrationException ex) {
                  getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -348,6 +497,18 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                new FacesMessage(FacesMessage.SEVERITY_INFO,
                        "Assembled block using template", ""));
         }
+    }
+    
+    public void onBuildNOVUsingTemplateBlock(){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            currentNotice = cc.nov_assembleNOVFromTemplate(currentNotice, currentTemplateBlock, currentCase);
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+        }
+        
+        
+        
     }
 
     public void loadBlocksAllMunis() {
@@ -554,6 +715,95 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         // nothing to do!
         
     }
+
+    /**
+     * Listener for changes to text block template list selected items
+     */
+    public void onTemplateBlockViewChange(){
+        System.out.println("NoticeOfViolationBB.onTemplateBlockViewChange");
+        formTemplateBlockText = currentTemplateBlock.getTextBlockText();
+    }
+    
+    /**
+     * Listener for user reuqests to manage templates
+     * @param ev 
+     */
+    public void onTemplateManageInitButtonChange(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        // only load the a block automatically if not selected
+        
+        formTemplateBlockText = currentTemplateBlock.getTextBlockText();
+    }
+    
+    /**
+     * Listener for user requests to make a new template block
+     * @param ev 
+     */
+    public void onTemplateCreateButton(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        CaseIntegrator ci = getCaseIntegrator();
+        currentTemplateBlock = cc.nov_getTemplateBlockSekeleton(getSessionBean().getSessMuni());
+        formTemplateBlockText = currentTemplateBlock.getTextBlockText();
+      
+        getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "New Template block created", ""));
+    }
+    
+    
+    
+    /**
+     * Listener for user requests to add a new template block
+     * @param ev 
+     */
+    public void onTemplateInsertButtonChange(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        CaseIntegrator ci = getCaseIntegrator();
+        try {
+            if(currentTemplateBlock != null){
+                currentTemplateBlock.setTextBlockText(formTemplateBlockText);
+                ci.insertTextBlock(currentTemplateBlock);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Inserted template !", ""));
+            } else {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "No block to insert!", ""));
+            }
+            formTemplateBlockText = currentTemplateBlock.getTextBlockText();
+            injectableBlockList = ci.getTextBlockTemplates(getSessionBean().getSessMuni());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not insert new text block", ""));
+        }
+
+        
+    }
+    
+    /**
+     * Listener for user requests to update a template block
+     * @param ev 
+     */
+    public void onTemplateUpdateButtonChange(ActionEvent ev){
+        CaseIntegrator ci = getCaseIntegrator();
+        try {
+            currentTemplateBlock.setTextBlockText(formTemplateBlockText);
+            ci.updateTextBlock(currentTemplateBlock);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully updated template", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not insert new text block", ""));
+        }
+
+        
+    }
     
     public void onHeaderUploadRequest(FileUploadEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
@@ -739,13 +989,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         this.currentNotice = currentNotice;
     }
 
-    /**
-     * @return the textBlockListByMuni
-     */
-    public List<TextBlock> getBlockList() {
-        
-        return blockList;
-    }
+  
 
     /**
      * @param textBlockListByMuni the textBlockListByMuni to set
@@ -990,17 +1234,17 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     }
 
     /**
-     * @return the templateList
+     * @return the blockCatList
      */
-    public List<String> getTemplateList() {
-        return templateList;
+    public List<String> getBlockCatList() {
+        return blockCatList;
     }
 
     /**
-     * @param templateList the templateList to set
+     * @param blockCatList the blockCatList to set
      */
-    public void setTemplateList(List<String> templateList) {
-        this.templateList = templateList;
+    public void setBlockCatList(List<String> blockCatList) {
+        this.blockCatList = blockCatList;
     }
 
     /**
@@ -1015,6 +1259,139 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setUseManualTextBlockMode(boolean useManualTextBlockMode) {
         this.useManualTextBlockMode = useManualTextBlockMode;
+    }
+
+    /**
+     * @return the injectableBlockList
+     */
+    public List<TextBlock> getInjectableBlockList() {
+        return injectableBlockList;
+    }
+
+    /**
+     * @param injectableBlockList the injectableBlockList to set
+     */
+    public void setInjectableBlockList(List<TextBlock> injectableBlockList) {
+        this.injectableBlockList = injectableBlockList;
+    }
+
+    /**
+     * @return the currentTemplateBlock
+     */
+    public TextBlock getCurrentTemplateBlock() {
+        return currentTemplateBlock;
+    }
+
+    /**
+     * @param currentTemplateBlock the currentTemplateBlock to set
+     */
+    public void setCurrentTemplateBlock(TextBlock currentTemplateBlock) {
+        this.currentTemplateBlock = currentTemplateBlock;
+    }
+
+    /**
+     * @return the formMuni
+     */
+    public Municipality getFormMuni() {
+        return formMuni;
+    }
+
+    /**
+     * @return the formBlockName
+     */
+    public String getFormBlockName() {
+        return formBlockName;
+    }
+
+    /**
+     * @return the formBlockText
+     */
+    public String getFormBlockText() {
+        return formBlockText;
+    }
+
+    /**
+     * @return the formCategoryID
+     */
+    public int getFormCategoryID() {
+        return formCategoryID;
+    }
+
+    /**
+     * @return the formBlockOrder
+     */
+    public int getFormBlockOrder() {
+        return formBlockOrder;
+    }
+
+    /**
+     * @param filteredBlockList the filteredBlockList to set
+     */
+    public void setFilteredBlockList(List<TextBlock> filteredBlockList) {
+        this.filteredBlockList = filteredBlockList;
+    }
+
+    /**
+     * @param selectedBlock the selectedBlock to set
+     */
+    public void setSelectedBlock(TextBlock selectedBlock) {
+        this.selectedBlock = selectedBlock;
+    }
+
+    /**
+     * @param categoryList the categoryList to set
+     */
+    public void setCategoryList(HashMap<String, Integer> categoryList) {
+        this.categoryList = categoryList;
+    }
+
+    /**
+     * @param formMuni the formMuni to set
+     */
+    public void setFormMuni(Municipality formMuni) {
+        this.formMuni = formMuni;
+    }
+
+    /**
+     * @param formBlockName the formBlockName to set
+     */
+    public void setFormBlockName(String formBlockName) {
+        this.formBlockName = formBlockName;
+    }
+
+    /**
+     * @param formBlockText the formBlockText to set
+     */
+    public void setFormBlockText(String formBlockText) {
+        this.formBlockText = formBlockText;
+    }
+
+    /**
+     * @param formCategoryID the formCategoryID to set
+     */
+    public void setFormCategoryID(int formCategoryID) {
+        this.formCategoryID = formCategoryID;
+    }
+
+    /**
+     * @param formBlockOrder the formBlockOrder to set
+     */
+    public void setFormBlockOrder(int formBlockOrder) {
+        this.formBlockOrder = formBlockOrder;
+    }
+
+    /**
+     * @return the formTemplateBlockText
+     */
+    public String getFormTemplateBlockText() {
+        return formTemplateBlockText;
+    }
+
+    /**
+     * @param formTemplateBlockText the formTemplateBlockText to set
+     */
+    public void setFormTemplateBlockText(String formTemplateBlockText) {
+        this.formTemplateBlockText = formTemplateBlockText;
     }
 
 }

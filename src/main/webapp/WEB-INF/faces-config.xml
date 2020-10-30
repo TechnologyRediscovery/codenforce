@@ -996,11 +996,7 @@
     <!--*********************************************************************-->
     <!--**                       VI. OCCPERIOD                             **-->
     <!--*********************************************************************-->
-    <managed-bean>
-        <managed-bean-name>occPeriodWorkflowBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodWorkflowBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+  
     
     <managed-bean>
         <managed-bean-name>occupancyCoordinator</managed-bean-name>
@@ -1210,11 +1206,6 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
-    <managed-bean>
-        <managed-bean-name>textBlockBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.TextBlockBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
 
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules code enforcement ~~~~~~~~~~~~~~~~ --> 

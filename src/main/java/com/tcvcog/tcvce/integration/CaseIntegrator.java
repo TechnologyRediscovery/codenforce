@@ -2033,7 +2033,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         tb.setTextBlockName(rs.getString("blockname"));
         tb.setTextBlockText(rs.getString("blocktext"));
         tb.setPlacementOrder(rs.getInt("placementorderdefault"));
-
+        tb.setInjectableTemplate(rs.getBoolean("injectabletemplate"));
+        
         return tb;
     }
     
@@ -2045,7 +2046,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      */
      public TextBlock getTextBlock(int blockID) throws IntegrationException{
          
-        String query =  "SELECT blockid, blockcategory_catid, textblock.muni_municode, blockname, blocktext, categoryid, categorytitle, placementorderdefault\n" +
+        String query =  "SELECT blockid, blockcategory_catid, textblock.muni_municode,"
+                + " blockname, blocktext, categoryid, categorytitle, placementorderdefault,"
+                + " injectabletemplate \n" +
                         "  FROM public.textblock INNER JOIN public.textblockcategory " + 
                         "  ON textblockcategory.categoryid=textblock.blockcategory_catid\n" +
                         "  WHERE blockid=?;";
@@ -2155,13 +2158,50 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
          return ll;
      }
      
+       /**
+      * Extracts all text blocks associated with a given Muni
+      * @param m
+      * @return
+      * @throws IntegrationException 
+      */
+     public ArrayList<TextBlock> getTextBlockTemplates(Municipality m) throws IntegrationException{
+        String query =    "  SELECT blockid " +
+                            "  FROM public.textblock INNER JOIN public.textblockcategory ON textblockcategory.categoryid=textblock.blockcategory_catid\n" +
+                            "  WHERE textblock.muni_municode=? AND textblock.injectabletemplate IS TRUE;";
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        Connection con = null;
+        ArrayList<TextBlock> ll = new ArrayList();
+        TextBlock tb = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, m.getMuniCode());
+            
+            rs = stmt.executeQuery(); 
+            
+            while(rs.next()){
+                tb = getTextBlock(rs.getInt("blockid"));
+                ll.add(tb);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Code Violation Integrator: cannot retrive text blocks by municipality", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+         return ll;
+     }
+     
      /**
       * Extracts a master list of all text blocks regardless of Muni
       * @return
       * @throws IntegrationException 
       */
      public List<TextBlock> getAllTextBlocks() throws IntegrationException{
-        String query =    "  SELECT blockid, blockcategory_catid, textblock.muni_municode, blockname, blocktext, categoryid, categorytitle, placementorderdefault\n" +
+        String query =    "  SELECT blockid \n" +
                           "  FROM public.textblock INNER JOIN public.textblockcategory "
                         + "  ON textblockcategory.categoryid=textblock.blockcategory_catid;";
         PreparedStatement stmt = null;
@@ -2176,7 +2216,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery(); 
             
             while(rs.next()){
-                ll.add(generateTextBlock(rs));
+                ll.add(getTextBlock(rs.getInt("blockid")));
             }
             
         } catch (SQLException ex) {
@@ -2200,8 +2240,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
       */
      public void insertTextBlock(TextBlock tb) throws IntegrationException{
         String query =  "INSERT INTO public.textblock(\n" +
-                        " blockid, blockcategory_catid, muni_municode, blockname, blocktext, placementorderdefault)\n" +
-                        " VALUES (DEFAULT, ?, ?, ?, ?, ?);";
+                        " blockid, blockcategory_catid, muni_municode, blockname, "
+                        + "blocktext, placementorderdefault, injectabletemplate)\n" +
+                        " VALUES (DEFAULT, ?, ?, ?, ?, ?, ?);";
         PreparedStatement stmt = null;
         Connection con = null;
         
@@ -2213,6 +2254,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setString(3, tb.getTextBlockName());
             stmt.setString(4, tb.getTextBlockText());
             stmt.setInt(5, tb.getPlacementOrder());
+            stmt.setBoolean(6, tb.isInjectableTemplate());
+            
             
             stmt.execute(); 
             
@@ -2237,7 +2280,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      public void updateTextBlock(TextBlock tb) throws IntegrationException{
         String query = "UPDATE public.textblock\n" +
                         "   SET blockcategory_catid=?, muni_municode=?, blockname=?, \n" +
-                        "       blocktext=?,placementorderdefault=? \n" +
+                        "       blocktext=?,placementorderdefault=?, injectabletemplate=? \n" +
                         " WHERE blockid=?;";
         PreparedStatement stmt = null;
         Connection con = null;
@@ -2250,7 +2293,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setString(3, tb.getTextBlockName());
             stmt.setString(4, tb.getTextBlockText());
             stmt.setInt(5, tb.getPlacementOrder());
-            stmt.setInt(6, tb.getBlockID());  
+            stmt.setBoolean(6, tb.isInjectableTemplate());
+            stmt.setInt(7, tb.getBlockID());  
             
             stmt.execute(); 
             

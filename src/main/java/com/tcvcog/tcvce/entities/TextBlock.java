@@ -33,6 +33,7 @@ public class TextBlock implements Serializable, Comparable<TextBlock>{
     private String textBlockName;
     private String textBlockText;
     private int placementOrder;
+    private boolean injectableTemplate;
     
 
     @Override
@@ -189,6 +190,20 @@ public class TextBlock implements Serializable, Comparable<TextBlock>{
             return -1;
         }
         return 0;
+    }
+
+    /**
+     * @return the injectableTemplate
+     */
+    public boolean isInjectableTemplate() {
+        return injectableTemplate;
+    }
+
+    /**
+     * @param injectableTemplate the injectableTemplate to set
+     */
+    public void setInjectableTemplate(boolean injectableTemplate) {
+        this.injectableTemplate = injectableTemplate;
     }
 
     

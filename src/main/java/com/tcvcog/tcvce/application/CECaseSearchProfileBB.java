@@ -546,10 +546,6 @@ public class CECaseSearchProfileBB
         return "blobs";
     }
     
-    
-    
-    
-    
 
     /**
      * Listener for requests to go view the property profile of a property associated
