@@ -17,11 +17,11 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobType;
-import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -44,13 +43,12 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class manageBlobBB extends BackingBeanUtils implements Serializable{
     
-     private static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
+    private static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
      
-    private PageModeEnum currentMode;
-    private List<PageModeEnum> pageModes;
+    private String currentMode;
      
     private List<BlobLight> blobList;
-    private Blob selectedBlob;
+    private BlobLight selectedBlob;
     private boolean currentBlobSelected;
     
     //search parameters.
@@ -66,13 +64,8 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
      */
     @PostConstruct
     public void initBean(){
-        pageModes = new ArrayList<>();
-        pageModes.add(PageModeEnum.LOOKUP);
-        pageModes.add(PageModeEnum.INSERT);
-        pageModes.add(PageModeEnum.UPDATE);
-        pageModes.add(PageModeEnum.REMOVE);
         
-        setCurrentMode(PageModeEnum.LOOKUP);
+        setCurrentMode("Info");
         
         try {
             BlobIntegrator bi = getBlobIntegrator();
@@ -87,7 +80,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         }
     }
     
-    public void downloadBlob(Blob blob){
+    public void downloadSelectedBlob(){
 
         // Prepare.
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -97,18 +90,40 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         BufferedInputStream input = null;
         BufferedOutputStream output = null;
 
+        BlobCoordinator bc = getBlobCoordinator();
+        
+        Blob blob = null;
+        
         try {
-            // Open file.
-            input = new BufferedInputStream(new ByteArrayInputStream(blob.getBytes()));
-
+            
             // Init servlet response.
             response.reset();
-            if(blob.getType() == BlobType.PDF)
+            
+            switch(selectedBlob.getType()){
+            case PDF:
                 response.setHeader("Content-Type", "application/pdf");
-            else
-                response.setHeader("Content-Type", "image/png");
+                //PDF downloads not yet supported
+                //blob = bc.getPDFBlob(selectedBlob.getBlobID())
+                break;
+                
+            case PHOTO:
+                response.setHeader("Content-Type", "image/" + bc.getFileExtension(selectedBlob.getFilename()));
+                blob = bc.getPhotoBlob(selectedBlob.getBlobID());
+                break;
+                
+            default:
+                //do nothing
+                break;
+            }
+            
+            if(blob != null){
+            // Open file.
+            input = new BufferedInputStream(new ByteArrayInputStream(blob.getBytes()));
+                
             response.setHeader("Content-Length", String.valueOf(blob.getBytes().length));
+            
             response.setHeader("Content-Disposition", "inline; filename=\"" + blob.getFilename() + "\"");
+            
             output = new BufferedOutputStream(response.getOutputStream(), DEFAULT_BUFFER_SIZE);
 
             // Write file contents to response.
@@ -120,8 +135,14 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
 
             // Finalize task.
             output.flush();
-        } catch (IOException ex) {
-            System.out.println("manageBlobBB.downloadPDF | " + ex);
+            } else {
+                throw new BlobException("BlobType not yet supported for download or blob failed to load.");
+            }
+        } catch (IOException | ClassNotFoundException | IntegrationException | BlobException ex) {
+            System.out.println("manageBlobBB.downloadSelectedBlob | " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to prepare your download!", ""));
         } finally {
             // close streams.
             if (output != null){  try { output.close(); } catch (IOException ex) { /* Ignore */ } }
@@ -151,74 +172,63 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     public void selectBlob(BlobLight blob){
         BlobCoordinator bc = getBlobCoordinator();
         
-        try{
-        selectedBlob = bc.getPhotoBlob(blob.getBlobID());
+        selectedBlob = blob;
+        
         currentBlobSelected = true;
-        } catch(ClassNotFoundException | IOException | IntegrationException ex){
-            System.out.println("manageBlobBB.selectBlob() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occured while trying to load selected file!", ""));
-            selectedBlob = new Blob();
-        }
         
     }
     
     /**
      * @return the selectedBlob
      */
-    public Blob getSelectedBlob() {
+    public BlobLight getSelectedBlob() {
         return selectedBlob;
     }
 
     /**
      * @param selectedBlob the selectedBlob to set
      */
-    public void setSelectedBlob(Blob selectedBlob) {
+    public void setSelectedBlob(BlobLight selectedBlob) {
         this.selectedBlob = selectedBlob;
     }
 
-    //check if current mode == Lookup
-    public boolean getActiveLookupMode() {
-        // hard-wired on since there's always a property loaded
-        return PageModeEnum.LOOKUP.equals(currentMode);
+    /**
+     * Determines whether or not a user should currently be able to select a
+     * blob or deselect a blob.
+     *
+     * @return
+     */
+    public boolean getSelectedButtonActive() {
+        return getActiveInfoMode() || getActiveViewMode();
     }
 
-    //check if current mode == Lookup
+    public boolean getActiveInfoMode() {
+        return "Info".equals(currentMode);
+    }
+
     public boolean getActiveViewMode() {
-        return PageModeEnum.VIEW.equals(currentMode) || PageModeEnum.LOOKUP.equals(currentMode);
-
+        return "View".equals(currentMode);
     }
 
-    //check if current mode == Insert
-    public boolean getActiveInsertUpdateMode() {
-        return PageModeEnum.INSERT.equals(currentMode) || PageModeEnum.UPDATE.equals(currentMode);
+    public boolean getActiveObjectsMode() {
+        return "Objects".equals(currentMode);
     }
 
-    //check if current mode == Remove
-    public boolean getActiveRemoveMode() {
-        return PageModeEnum.REMOVE.equals(currentMode);
+    public boolean getActiveUpdateMode() {
+        return "Update".equals(currentMode);
     }
-    
-    public PageModeEnum getCurrentMode() {
+
+    public String getCurrentMode() {
         return currentMode;
     }
-
-    public void setCurrentMode(PageModeEnum input) {
+    
+    public void setCurrentMode(String input) {
         if(input != null){
         currentMode = input;
         getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            this.currentMode.getTitle() + " Mode Selected", ""));
+                            this.currentMode + " Mode Selected", ""));
         }
-    }
-
-    public List<PageModeEnum> getPageModes() {
-        return pageModes;
-    }
-
-    public void setPageModes(List<PageModeEnum> pageModes) {
-        this.pageModes = pageModes;
     }
 
     public List<BlobLight> getBlobList() {

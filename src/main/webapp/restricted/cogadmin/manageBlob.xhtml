@@ -36,23 +36,24 @@
                                                                 tabindex="1"
                                                                 style="width: 100%"
                                                                 >
-                                                <f:selectItems value="#{manageBlobBB.pageModes}"
-                                                               var="pmo"
-                                                               itemLabel="#{pmo.title}"
-                                                               itemDisabled="#{!manageBlobBB.currentBlobSelected and pmo.objectSelectRequiredToEnable}"/>
+
+                                                <f:selectItem itemLabel="INFO" itemValue="Info"  />
+                                                <f:selectItem itemLabel="VIEW" itemValue="View"  />
+                                                <f:selectItem itemLabel="CONNECTIONS" itemValue="Objects" itemDisabled="#{!manageBlobBB.currentBlobSelected}"/>
+                                                <f:selectItem itemLabel="UPDATE" itemValue="Update"  itemDisabled="#{!manageBlobBB.currentBlobSelected}"/>
+
                                                 <f:ajax render="@all"/>
                                             </p:selectOneButton>
                                         </div>
                                     </h:form>
 
-                                    <!-- PANEL CONTAINER -->
+                                    <!--QUERY PANEL-->
                                     <p:panel id="blob-search-query-panel"
                                              toggleable="true"
                                              widgetVar="blob-search-query-panel-var"
                                              collapsed="false"
                                              style="width:100%;"
-                                             header="File Search"
-                                             rendered="#{manageBlobBB.activeLookupMode}">
+                                             header="File Search">
 
                                         <!--MESSAGES -->
                                         <h:form id="blob-search-messages-form">
@@ -160,14 +161,13 @@
                                         </h:form>
                                     </p:panel>
 
-                                    <!-- PANEL CONTAINER -->
+                                    <!-- SEARCH RESULTS PANEL -->
                                     <p:panel id="blob-search-results-panel"
                                              toggleable="true"
-                                             widgetVar="prop-search-query-panel-var"
+                                             widgetVar="blob-search-query-panel-var"
                                              collapsed="false"
                                              style="width:100%;"
-                                             header="Search Results"
-                                             rendered="#{manageBlobBB.activeLookupMode}">
+                                             header="Search Results">
 
 
                                         <h:form id="blob-search-results-form">
@@ -196,16 +196,14 @@
 
                                                 <p:column width="20%" style="text-align: center" headerText="View">
                                                     <div class="gray_button">
-                                                        <p:commandButton id="prop-search-loadprop-button"
+                                                        <p:commandButton id="blob-search-loadblob-button"
                                                                          icon="fa fa-folder-open-o"
                                                                          value="Load"
                                                                          action="#{manageBlobBB.selectBlob(blob)}"
                                                                          ajax="true"
                                                                          update="
                                                                          form-messages-global
-                                                                         blobinfo-panel-info
-                                                                         blobinfo-panel-addupdate
-                                                                         blob-remove-panel"
+                                                                         blob-lists-outpanel"
                                                                          />
                                                     </div>
                                                 </p:column>
@@ -221,578 +219,294 @@
                                     <!-- OBJECT DATA TITLE --> 
                                     <div class="restrict-main-object-title">
 
-                                        <h:form id="prop-info-header-form">
-                                            <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.address}" />
+                                        <h:form id="blob-info-header-form">
+                                            <h:outputText id="header-ot" styleClass="dataText" value="#{manageBlobBB.selectedBlob.filename}" />
                                             <h:outputText value=" (" />
-                                            <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}" />
+                                            <h:outputText value="#{manageBlobBB.selectedBlob.blobID}" />
                                             <h:outputText value=") " />
                                         </h:form>
 
                                     </div>
 
-                                    <p:outputPanel id = "prop-lists-outpanel" >
+                                    <!-- Panel of the various Blob panels-->
 
-                                        <!-- OBJECT DATA PANEL--> 
-                                        <p:panel id="propinfo-panel-info"
+                                    <p:outputPanel id = "blob-lists-outpanel" >
+
+                                        <!--Info Panel-->
+                                        <p:panel id="blobManage-panel-Info"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="Property Record ID:#{propertyProfileBB.currentProperty.propertyID} (Created: #{propertyProfileBB.getPrettyDate(propertyProfileBB.currentProperty.creationTS)} | Last udpated:#{propertyProfileBB.getPrettyDate(propertyProfileBB.currentProperty.lastUpdatedTS)})"
-                                                 rendered="#{propertyProfileBB.getActiveViewMode() }"
+                                                 header="Info Panel"
+                                                 rendered="#{manageBlobBB.activeInfoMode}"
                                                  >
 
                                             <p:spacer height="10px"/>
 
-                                            <h:form id="evruleconfig-panel-info-form">
+                                            <h:form id="blobManage-form-actions">
 
-                                                <!-- NESTED DATA CONTAINER -->
-                                                <div class="ui-g data_container_nested_restrict">
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
 
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <p:outputLabel value="&#160;#{manageBlobBB.selectedBlob.blobID}"/>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Address"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Type:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <i class="material-icons status-display-icon-i"><h:outputText value="#{manageBlobBB.selectedBlob.type.typeIcon}"/></i>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.address}" />
-                                                            <br/>
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.address_city}" />
-                                                            <h:outputText value=", " />
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.address_state}" />
-                                                            <h:outputText value=" " />
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.address_zip}" />
-                                                        </div>
-                                                    </div>
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Description:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <p:outputLabel value="&#160;#{manageBlobBB.selectedBlob.description}"/>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="County"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.countyCode}" />
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Upload Timestamp:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <p:outputLabel value="&#160;#{manageBlobBB.selectedBlob.timestamp}"/>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                                                        </div>
-                                                    </div>
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Bytes ID:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <p:outputLabel> The system does not duplicate files when they are attached to multiple objects.
+                                                            This number is the ID number of the file itself in our system.
+                                                            If this number is the same as another file in this list, then the two
+                                                            files are really the same file, they are just attached to two different things. </p:outputLabel>
+                                                        <p:spacer height="5px"/>
+                                                        <p:outputLabel value="&#160;#{manageBlobBB.selectedBlob.bytesID}"/>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="User Group"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.useGroup}" />
+                                                    <p:dataTable id="blob-search-results-table"
+                                                                 var="property"
+                                                                 value="#{manageBlobBB.selectedBlob.blobMetadata.propertiesList}"
+                                                                 rowKey="#{property.key}"
+                                                                 tableStyleClass="primeDataTable"
+                                                                 draggableRows="false" draggableColumns="true"
+                                                                 tabindex="6"
+                                                                 >
 
-                                                        </div>
-                                                    </div>
+                                                        <p:column headerText="Metadata Property">
+                                                            <h:outputText value="#{property.label}"/>
+                                                        </p:column>
 
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Land Bank Prospect"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{!(empty propertyProfileBB.currentProperty.landBankProspect)
-                                                                                   ? propertyProfileBB.currentProperty.landBankProspect.title : ' '}" />
+                                                        <p:column headerText="Value">
+                                                            <h:outputText value="#{manageBlobBB.selectedBlob.blobMetadata.getProperty(property)}"/>
+                                                        </p:column>
 
-                                                        </div>
-                                                    </div>
+                                                    </p:dataTable>
 
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Municipality"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}
-                                                                          (ID:#{propertyProfileBB.currentProperty.muni.muniCode})" />
+                                                </p:panelGrid>
 
-                                                        </div>
-                                                    </div>
+                                                <p:spacer height="10px" />
 
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Construction Type"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.constructionType}" />
 
-                                                        </div>
-                                                    </div>
-
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Land Bank Held"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.landBankHeld}" />
-
-                                                        </div>
-                                                    </div>
-
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Parcel ID"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.parID}" />
-
-                                                        </div>
-                                                    </div>
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Condition Class"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{!(empty propertyProfileBB.currentProperty.condition)
-                                                                                   ? propertyProfileBB.currentProperty.condition.title
-                                                                                   : ''}" />
-
-                                                        </div>
-                                                    </div>
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Nonaddressable"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.nonAddressable}" />
-
-                                                        </div>
-                                                    </div>
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Lot-Block"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.lotAndBlock}"  />
-
-                                                        </div>
-                                                    </div>
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Source"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{!(empty propertyProfileBB.currentProperty.bobSource)
-                                                                                   ? propertyProfileBB.currentProperty.bobSource.title : ''}"  />
-
-                                                        </div>
-                                                    </div>
-                                                    <!--NESTED DATA FIELD -->
-                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                                        <!--NESTED DATA LABEL INLINE -->
-                                                        <div class="restrict-data-field-label-inline" >
-                                                            <h:outputLabel value="Active"/>
-                                                        </div>
-                                                        <!--NESTED DATA VALUE INLINE -->
-                                                        <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.active}" />
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             </h:form>
 
                                         </p:panel>
 
-                                        <!--Insert/update Table-->
-                                        <p:panel id="propinfo-panel-addupdate"
+                                        <!--View Panel-->
+                                        <p:panel id="blobManage-panel-view"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="#{propertyProfileBB.currentProperty.propertyID == 0 ? 'New property record':'Update property record'}"
-                                                 rendered="#{propertyProfileBB.getActiveInsertUpdateMode() }"
+                                                 header="View Panel"
+                                                 rendered="#{manageBlobBB.activeViewMode}"
                                                  >
 
-                                            <h:form id="prop-add-form">
+                                            <p:spacer height="10px"/>
 
+                                            <h:form id="blobManage-form-view">
 
-                                                <p:commandButton    id="prop-add-addnew-commit-button-1"
-                                                                    icon="fa fa-thmubs-o-up"
-                                                                    ajax="false"
-                                                                    action="#{propertyProfileBB.onInsertButtonChange()}"
-                                                                    value="Commit record"
-                                                                    rendered="#{propertyProfileBB.currentProperty.propertyID == 0}"
-                                                                    />
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
 
-                                                <p:commandButton    id="prop-add-update-commit-button-1"
-                                                                    icon="fa fa-edit"
-                                                                    ajax="false"
-                                                                    action="#{propertyProfileBB.onUpdateButtonChange()}"
-                                                                    value="Commit updates"
-                                                                    rendered="#{propertyProfileBB.currentProperty.propertyID != 0}"
-                                                                    />
+                                                    <p:outputLabel value="View Image:"/>
+                                                    <p:spacer height="10px"/>
 
-                                                <p:commandButton    id="prop-add-discard-button-1"
-                                                                    icon="fa fa-trash-o"
-                                                                    ajax="false"
-                                                                    action="#{propertyProfileBB.onDiscardNewPropertyDataButtonChange}"
-                                                                    value="Discard new record"
-                                                                    rendered="#{propertyProfileBB.currentProperty.propertyID == 0}"
-                                                                    />
+                                                    <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                                        <f:param name="blobID" value="#{manageBlobBB.selectedBlob.blobID}"/>
+                                                    </p:graphicImage>
 
-                                                <div    id="prop-add-container-div"
-                                                        class="ui-g data-container">
+                                                    <p:spacer height="10px"/>
+                                                    <p:commandLink value="#{blob.filename}" action="#{manageBlobBB.downloadSelectedBlob()}"/>
+                                                    <p:spacer height="10px"/>
 
-                                                    <div    id="prop-add-muni-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+                                                </p:panelGrid>
 
-                                                        <p:outputLabel  value="Municipality"
-                                                                        for="prop-add-muni-som"/>
+                                                <p:spacer height="10px" />
 
-                                                        <h:selectOneMenu id="prop-add-muni-som"
-                                                                         value="#{propertyProfileBB.currentProperty.muni}" style="width:175px;height:25px">
-                                                            <f:converter converterId="muniConverter"/>
-                                                            <f:selectItems id="propinfoedit-muninamelist"
-                                                                           value="#{sessionBean.sessUser.authMuniList}"
-                                                                           var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
-
-                                                        </h:selectOneMenu>
-                                                    </div>
-                                                    <div    id="prop-add-address-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-                                                        <p:outputLabel value="Street Address"/>
-                                                        <p:spacer width="3px"/>
-                                                        <p:inputText    id="prop-add-address-it"
-                                                                        value="#{propertyProfileBB.currentProperty.address}"
-                                                                        />
-                                                    </div>
-
-                                                    <div    id="prop-add-cit-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-                                                        <p:outputLabel      id="prop-add-cit-ol"
-                                                                            value="City"
-                                                                            for="prop-add-cit-it"
-                                                                            styleClass="data_field_label"/>
-
-                                                        <p:inputText    id="prop-add-cit-it"
-                                                                        value="#{propertyProfileBB.currentProperty.address_city}"
-                                                                        />
-
-                                                    </div>
-
-                                                    <div    id="prop-add-state-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="State"
-                                                                       for="prop-add-state-it"
-                                                                       />
-
-                                                        <p:inputText    id="prop-add-state-it"
-                                                                        value="#{propertyProfileBB.currentProperty.address_state}"
-                                                                        />
-
-                                                    </div>
-
-                                                    <div    id="prop-add-zip-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Zip Code"
-                                                                       for="prop-add-zip-it"
-                                                                       />
-
-                                                        <p:inputText    id="prop-add-zip-it"
-                                                                        value="#{propertyProfileBB.currentProperty.address_zip}"
-                                                                        />
-                                                    </div>
-
-
-                                                    <div    id="prop-add-lab-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel  value="Lot and Block"
-                                                                        for="prop-add-lab-it"/>
-
-                                                        <p:inputText    id="prop-add-lab-it"
-                                                                        value="#{propertyProfileBB.currentProperty.lotAndBlock}"
-                                                                        />
-
-                                                    </div>
-
-                                                    <div    id="prop-add-parid-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="ParcelID"
-                                                                       for="prop-add-parid-it"/>
-
-                                                        <p:inputText    id="prop-add-parid-it"
-                                                                        value="#{propertyProfileBB.currentProperty.parID}"/>
-                                                    </div>
-
-                                                    <div    id="prop-add-usegroup-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Use Group"
-                                                                       for="prop-add-usegroup-it"/>
-
-                                                        <p:inputText    id="prop-add-usegroup-it"
-                                                                        value="#{propertyProfileBB.currentProperty.useGroup}"/>
-                                                    </div>
-
-
-                                                    <div    id="prop-add-const-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Construction type"
-                                                                       for="prop-add-const-it"/>
-
-                                                        <p:inputText    id="prop-add-const-it"
-                                                                        value="#{propertyProfileBB.currentProperty.constructionType}"/>
-                                                    </div>
-
-
-
-                                                    <div    id="prop-add-cond-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel  value="Condition"
-                                                                        for="prop-add-condition-som"/>
-
-                                                        <h:selectOneMenu id="prop-add-condition-som"
-                                                                         value="#{propertyProfileBB.currentProperty.condition}" style="width:175px;height:25px">
-                                                            <f:converter converterId="intensityClassConverter"/>
-                                                            <f:selectItem itemLabel="select a muni..." noSelectionOption="true" />
-                                                            <f:selectItems id="propinfoedit-condition-selitems"
-                                                                           value="#{propertyProfileBB.conditionIntensityList}"
-                                                                           var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
-
-                                                        </h:selectOneMenu>
-                                                    </div>
-
-                                                    <div    id="prop-add-landprospect-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel  value="Land Bank Prospect"
-                                                                        for="prop-add-landprospect-som"/>
-
-                                                        <h:selectOneMenu id="prop-add-landprospect-som"
-                                                                         value="#{propertyProfileBB.currentProperty.landBankProspect}" style="width:175px;height:25px">
-                                                            <f:converter converterId="intensityClassConverter"/>
-                                                            <f:selectItem itemLabel="select a muni..." noSelectionOption="true" />
-                                                            <f:selectItems id="propinfoedit-landprospect-selitems"
-                                                                           value="#{propertyProfileBB.landBankProspectIntensityList}"
-                                                                           var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
-
-                                                        </h:selectOneMenu>
-                                                    </div>
-
-                                                    <div    id="prop-add-source-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel  value="Object Source"
-                                                                        for="prop-add-source-som"/>
-
-                                                        <h:selectOneMenu id="prop-add-source-som"
-                                                                         value="#{propertyProfileBB.currentProperty.bobSource}" style="width:175px;height:25px">
-                                                            <f:converter converterId="bobSourceConverter"/>
-                                                            <f:selectItem itemLabel="select a source..." noSelectionOption="true" />
-                                                            <f:selectItems id="propinfoedit-sourcess-elitems"
-                                                                           value="#{propertyProfileBB.sourceList}"
-                                                                           var="bs" itemValue="#{bs}" itemLabel="#{bs.title}"/>
-
-                                                        </h:selectOneMenu>
-                                                    </div>
-
-
-                                                    <div    id="prop-add-unfit-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Unfit Start Date"
-                                                                       for="prop-add-unfit-start-cal"/>
-
-                                                        <p:calendar id="prop-add-unfit-start-cal"
-                                                                    value="#{propertyProfileBB.currentProperty.unfitDateUtilStart}"
-                                                                    mode="popup"
-                                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                    navigator="true"
-                                                                    tabindex="16"
-                                                                    timeInput="true"
-                                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                                    showButtonPanel="true"
-                                                                    showTodayButton="true"
-                                                                    maxdate="#{propertyProfileBB.currentProperty.unfitDateUtilStop}">
-                                                        </p:calendar>
-                                                    </div>
-
-                                                    <div    id="prop-add-unfit-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Unfit End Date"
-                                                                       for="prop-add-unfit-end-cal"/>
-                                                        <p:spacer height="3px"/>
-                                                        <p:calendar id="prop-add-unfit-end-cal"
-                                                                    value="#{propertyProfileBB.currentProperty.unfitDateUtilStop}"
-                                                                    mode="popup"
-                                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                    navigator="true"
-                                                                    tabindex="16"
-                                                                    timeInput="true"
-                                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                                    showButtonPanel="true"
-                                                                    showTodayButton="true"
-                                                                    mindate="#{propertyProfileBB.currentProperty.unfitDateUtilStart}">
-                                                        </p:calendar>
-
-                                                    </div>
-
-                                                    <div    id="prop-add-vacant-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel  value="Vacant Start Date"
-                                                                        for="prop-add-vacant-start-cal"/>
-
-                                                        <p:calendar id="prop-add-vacant-start-cal"
-                                                                    value="#{propertyProfileBB.currentProperty.vacantDateUtilStart}"
-                                                                    mode="popup"
-                                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                    navigator="true"
-                                                                    tabindex="16"
-                                                                    timeInput="true"
-                                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                                    showButtonPanel="true"
-                                                                    showTodayButton="true"
-                                                                    maxdate="#{propertyProfileBB.currentProperty.vacantDateUtilStop}">
-                                                        </p:calendar>
-                                                    </div>
-
-                                                    <div    id="prop-add-vacant-stop-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Vacant Stop Date"
-                                                                       for="prop-add-vacant-stop-cal"/>
-
-                                                        <p:calendar id="prop-add-vacant-stop-cal"
-                                                                    value="#{propertyProfileBB.currentProperty.vacantDateUtilStop}"
-                                                                    mode="popup"
-                                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                    navigator="true"
-                                                                    tabindex="16"
-                                                                    timeInput="true"
-                                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                                    showButtonPanel="true"
-                                                                    showTodayButton="true"
-                                                                    mindate="#{propertyProfileBB.currentProperty.vacantDateUtilStart}">
-                                                        </p:calendar>
-                                                    </div>
-
-                                                    <div    id="prop-add-abandoned-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Abandoned Start Date"
-                                                                       for="prop-add-abandoned-start-cal"/>
-
-                                                        <p:calendar id="prop-add-abandoned-start-cal"
-                                                                    value="#{propertyProfileBB.currentProperty.abandonedDateUtilStart}"
-                                                                    mode="popup"
-                                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                    navigator="true"
-                                                                    tabindex="16"
-                                                                    timeInput="true"
-                                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                                    showButtonPanel="true"
-                                                                    showTodayButton="true"
-                                                                    maxdate="#{propertyProfileBB.currentProperty.abandonedDateUtilStop}">
-                                                        </p:calendar>
-                                                    </div>
-
-                                                    <div    id="prop-add-abandoned-stop-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Abandoned Stop Date"
-                                                                       for="prop-add-abandoned-stop-cal"/>
-
-                                                        <p:calendar id="prop-add-abandoned-stop-cal"
-                                                                    value="#{propertyProfileBB.currentProperty.abandonedDateUtilStop}"
-                                                                    mode="popup"
-                                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                    navigator="true"
-                                                                    tabindex="16"
-                                                                    timeInput="true"
-                                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                                    showButtonPanel="true"
-                                                                    showTodayButton="true"
-                                                                    mindate="#{propertyProfileBB.currentProperty.abandonedDateUtilStart}">
-                                                        </p:calendar>
-                                                    </div>
-
-
-
-
-                                                    <p:commandButton    id="prop-add-addnew-commit-button-2"
-                                                                        icon="fa fa-thmubs-o-up"
-                                                                        ajax="false"
-                                                                        action="#{propertyProfileBB.onInsertButtonChange()}"
-                                                                        value="Commit record"
-                                                                        rendered="#{propertyProfileBB.currentProperty.propertyID == 0}"
-                                                                        />
-
-                                                    <p:commandButton    id="prop-add-update-commit-button-2"
-                                                                        icon="fa fa-edit"
-                                                                        ajax="false"
-                                                                        action="#{propertyProfileBB.onUpdateButtonChange()}"
-                                                                        value="Commit updates"
-                                                                        rendered="#{propertyProfileBB.currentProperty.propertyID != 0}"
-                                                                        />
-
-                                                    <p:commandButton    id="prop-add-discard-button-2"
-                                                                        icon="fa fa-trash-o"
-                                                                        ajax="true"
-                                                                        action="#{propertyProfileBB.onDiscardNewPropertyDataButtonChange}"
-                                                                        value="Discard new record"
-                                                                        rendered="#{propertyProfileBB.currentProperty.propertyID == 0}"
-                                                                        />
-                                                </div>
                                             </h:form>
+
                                         </p:panel>
 
-                                        <!--remove panel-->
-                                        <p:panel id="prop-remove-panel"
+                                        <!--Connections Panel-->
+                                        <p:panel id="cearManage-panel-objects"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="Remove property"
-                                                 rendered="#{propertyProfileBB.getActiveRemoveMode() }"
+                                                 header="Connections Panel"
+                                                 rendered="#{cEActionRequestsBB.getActiveObjectsMode()}"
                                                  >
 
+                                            <p:spacer height="10px"/>
 
-                                            <h:form id="propinfo-remove-form">
+                                            <h:form id="cearManage-form-objects">
 
-                                                <p>Caution: This action is like 'delete'; we have to dig the record back out by
-                                                    hand if you goof.</p>
-                                                <p:commandButton icon="fa fa-stop"
-                                                                 ajax="false"
-                                                                 action="#{propertyProfileBB.onRemoveButtonChange()}"
-                                                                 value="Permanently remove property ID:#{propertyProfileBB.currentProperty.propertyID}"
-                                                                 />
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Property:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearObjectsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/>
+                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName}"/>
+                                                        </div>
+                                                        <p:spacer height="5px"/>
+                                                        <p:commandButton    id="change-property-cb" 
+                                                                            onclick="PF('change-property-dialog').show()" 
+                                                                            value="change request property" 
+                                                                            styleClass="noFill button-size-small"
+                                                                            disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
+                                                                            icon="fa fa-home"
+                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Requestor:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearObjectsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;Requestor ID:#{cEActionRequestsBB.selectedRequest.requestor.personID} 
+                                                                           (#{cEActionRequestsBB.selectedRequest.requestor.personType.label}): "/>
+                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestor.firstName}"/>
+                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestor.lastName}"/>
+                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestor.addressStreet}"/>
+                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestor.addressCity}, "/>
+                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestor.addressState}"/>
+                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestor.addressZip}"/>
+                                                        </div>
+                                                        <p:spacer height="5px"/>
+                                                        <p:commandButton    id="change-person-cb"
+                                                                            onclick="PF('change-person-dialog').show()" 
+                                                                            value="change requestor Person" 
+                                                                            styleClass="noFill button-size-small" 
+                                                                            icon="fa fa-child"
+                                                                            disabled="#{empty cEActionRequestsBB.selectedRequest}"
+                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}" />
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
+
+                                                </p:panelGrid>
+
+                                                <h3>Attached photos:</h3>
+
+                                                <p:dataTable
+                                                    id="photoTable"
+                                                    var="photoid"
+                                                    value="#{cEActionRequestsBB.selectedRequest.blobIDList}"
+                                                    rowKey="#{photoid.intValue()}"
+                                                    tableStyleClass="primeDataTable"
+                                                    draggableRows="false" tabindex="6">
+                                                    <p:column width="10%" headerText="Manage">
+                                                        <p:commandButton ajax="true" 
+                                                                         actionListener="#{cEActionRequestsBB.deletePhoto(photoid)}"
+                                                                         value="Delete" 
+                                                                         icon="fa fa-bomb"
+                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                                                         update="photoTable"/>
+                                                    </p:column>
+                                                    <p:column headerText="Photo">
+                                                        <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                                            <f:param name="blobID" value="#{photoid.intValue()}"/>
+                                                        </p:graphicImage>
+                                                    </p:column>
+                                                    <p:column width="20%" headerText="Description">
+                                                        <h:outputText escape="false" value="#{blobCoordinator.getBlob(photoid).description}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+
+                                            </h:form>
+
+                                        </p:panel>
+
+                                        <!--Notes Panel-->
+                                        <p:panel id="cearManage-panel-notes"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Notes Panel"
+                                                 rendered="#{cEActionRequestsBB.getActiveNotesMode()}"
+                                                 >
+
+                                            <p:spacer height="10px"/>
+
+                                            <h:form id="cearManage-form-notes">
+
+                                                <p:panelGrid columns="4" 
+                                                             layout="grid"
+                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                             >
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Officer-only notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearNotesTableOutputLabel">
+                                                            <p:outputLabel escape="false" value="&#160;#{cEActionRequestsBB.selectedRequest.cogInternalNotes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                        <p:commandButton onclick="PF('internal-message-dialog').show()" 
+                                                                         icon="fa fa-pencil-square-o"
+                                                                         value="new note" 
+                                                                         styleClass="noFill button-size-small" 
+                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}" />
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="System internal only notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearNotesTableOutputLabel">
+                                                            <p:outputLabel escape="false" value="&#160;#{cEActionRequestsBB.selectedRequest.muniNotes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                        <p:commandButton onclick="PF('muni-message-dialog').show()" 
+                                                                         value="new note"
+                                                                         icon="fa fa-pencil-square-o"
+                                                                         styleClass="noFill button-size-small" 
+                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}" />
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Public notes:"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearNotesTableOutputLabel">
+                                                            <p:outputLabel escape="false" value="&#160;#{cEActionRequestsBB.selectedRequest.publicExternalNotes}"/>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                        <p:commandButton onclick="PF('public-message-dialog').show()" 
+                                                                         value="new note" 
+                                                                         icon="fa fa-pencil-square-o"
+                                                                         styleClass="noFill button-size-small" 
+                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}" />
+                                                    </h:panelGroup>
+
+                                                </p:panelGrid>
+
+                                                <p:spacer height="10px" />
 
                                             </h:form>
 

@@ -20,7 +20,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -85,6 +87,15 @@ public class Metadata implements Serializable{
      */
     public boolean isEmpty(){
         return properties.isEmpty();
+    }
+    
+    /**
+     * Returns a list of all metadata keys in the map.
+     * @return 
+     */
+    public List<MetadataKey> getPropertiesList(){
+        
+        return new ArrayList<>(properties.keySet());
     }
     
     /**

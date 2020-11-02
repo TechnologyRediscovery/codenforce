@@ -103,7 +103,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             try {
                 BlobLight blob = bi.getPhotoBlobLight(blobID);
                 if (null == blob.getType()) {
-                    throw new BlobTypeException("BlobType is null. ");
+                    throw new BlobTypeException("BlobType is null.");
                 } else {
                     switch (blob.getType()) {
                         case PHOTO:
