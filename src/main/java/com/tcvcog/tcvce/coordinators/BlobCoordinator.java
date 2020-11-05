@@ -18,15 +18,26 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.Metadata;
 import com.tcvcog.tcvce.entities.MetadataKey;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
+import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.integration.CodeIntegrator;
+import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,6 +46,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -285,6 +297,81 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
         //the last token will contain our file type extension
         return fileNameTokens[fileNameTokens.length - 1];
+        
+    }
+    
+    /**
+     * Returns a list of all the objects associated with the given blob
+     * @param blob
+     * @return
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.EventException 
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException 
+     * @throws com.tcvcog.tcvce.domain.ViolationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public List<BOb> getAttachedObjects(BlobLight blob) 
+        throws IntegrationException,
+            EventException, 
+            AuthorizationException, 
+            ViolationException, 
+            BObStatusException {
+
+        BlobIntegrator bi = getBlobIntegrator();
+
+        List<BOb> objectList = new ArrayList<>();
+
+        int blobID = blob.getBlobID();
+        
+        if (blob.getType() == BlobType.PHOTO) {
+
+            CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
+            
+            for (Integer id : bi.requestsAttachedToPhoto(blobID)) {
+
+                objectList.add(ceari.getActionRequestByRequestID(id));
+                
+            }
+            
+            CaseIntegrator ci = getCaseIntegrator();
+            
+            for (Integer id : bi.violationsAttachedToPhoto(blobID)) {
+
+                objectList.add(ci.getCodeViolation(id));
+                
+            }
+            
+            MunicipalityIntegrator mi = getMunicipalityIntegrator();
+            
+            for(Integer id : bi.munisAttachedToPhoto(blobID)){
+                
+                objectList.add(mi.getMuni(id));
+                
+            }
+            
+            OccInspectionIntegrator occi = getOccInspectionIntegrator();
+            
+            for(Integer id : bi.elementsAttachedToPhoto(blobID)){
+                
+                objectList.add(occi.getInspectedSpaceElement(id));
+                
+            }
+            
+            OccupancyIntegrator oi = getOccupancyIntegrator();
+            
+            for(Integer id : bi.occPeriodsAttachedToPhoto(blobID)){
+                
+                objectList.add(oi.getOccPeriod(id));
+                
+            }
+            
+        } else if (blob.getType() == BlobType.PDF){
+            
+            //No PDF Connections yet
+            
+        }
+
+        return objectList;
         
     }
     

@@ -354,16 +354,16 @@
                                         </p:panel>
 
                                         <!--Connections Panel-->
-                                        <p:panel id="cearManage-panel-objects"
+                                        <p:panel id="blobManage-panel-objects"
                                                  toggleable="true"
                                                  collapsed="false"
                                                  header="Connections Panel"
-                                                 rendered="#{cEActionRequestsBB.getActiveObjectsMode()}"
+                                                 rendered="#{manageBlobBB.activeObjectsMode}"
                                                  >
 
                                             <p:spacer height="10px"/>
 
-                                            <h:form id="cearManage-form-objects">
+                                            <h:form id="blobManage-form-objects">
 
                                                 <p:panelGrid columns="4" 
                                                              layout="grid"
@@ -373,7 +373,7 @@
                                                     <h:panelGroup>
                                                         <p:outputLabel value="Property:"/>
                                                         <p:spacer height="5px"/>
-                                                        <div class="cearObjectsTableOutputLabel">
+                                                        <div class="blobObjectsTableOutputLabel">
                                                             <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/>
                                                             <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName}"/>
                                                         </div>
@@ -445,7 +445,7 @@
 
                                         </p:panel>
 
-                                        <!--Notes Panel-->
+                                        <!--Update Panel-->
                                         <p:panel id="cearManage-panel-notes"
                                                  toggleable="true"
                                                  collapsed="false"

@@ -17,11 +17,21 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
-import com.tcvcog.tcvce.entities.BlobType;
+import com.tcvcog.tcvce.entities.CEActionRequest;
+import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -57,6 +67,15 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     private String searchDescription;
     private LocalDateTime searchBefore;
     private LocalDateTime searchAfter;
+    
+    //Lists of connected objects
+    
+    private List<CEActionRequest> connectedRequests;
+    private List<CodeViolation> connectedViolations;
+    private List<Municipality> connectedMunis;
+    private List<OccInspectedSpaceElement> connectedElements;
+    private List<OccPeriod> connectedPeriods;
+    private List<Property> connectedProperties;
     
     /**
      * load all blobs uploaded in the past month into memory
@@ -168,14 +187,61 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
                             "An error occured while trying to search for files!", ""));
         }
     }
-    
-    public void selectBlob(BlobLight blob){
+
+    public void selectBlob(BlobLight blob) {
         BlobCoordinator bc = getBlobCoordinator();
-        
+
         selectedBlob = blob;
-        
+
         currentBlobSelected = true;
+
+        connectedRequests = new ArrayList<>();
+        connectedViolations = new ArrayList<>();
+        connectedMunis = new ArrayList<>();
+        connectedElements = new ArrayList<>();
+        connectedPeriods = new ArrayList<>();
         
+        try {
+            for (BOb object : bc.getAttachedObjects(blob)) {
+
+                //Check to see what class the object is
+                
+                String className = object.getClass().getSimpleName();
+                
+                switch(className){
+                    case "CEActionRequest":
+                        connectedRequests.add((CEActionRequest) object);
+                        break;
+                    
+                    case "CodeViolation":
+                        connectedViolations.add((CodeViolation) object);
+                        break;
+                        
+                    case "Municipality":
+                        connectedMunis.add((Municipality) object);
+                        break;
+                        
+                    case "OccInspectedSpaceElement":
+                        connectedElements.add((OccInspectedSpaceElement) object);
+                        break;
+                        
+                    case "OccPeriod":
+                        connectedPeriods.add((OccPeriod) object);
+                        break;
+                }
+                
+            }
+        } catch (AuthorizationException 
+                | BObStatusException 
+                | EventException 
+                | ViolationException 
+                | IntegrationException ex) {
+            System.out.println("manageBlobBB.selectBlob() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to search for files!", ""));
+        }
+
     }
     
     /**
@@ -294,5 +360,53 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     public void setSearchAfterUtil(java.util.Date searchAfter) {
         this.searchAfter = convertDate(searchAfter);
     }
-    
+
+    public List<CEActionRequest> getConnectedRequests() {
+        return connectedRequests;
+    }
+
+    public void setConnectedRequests(List<CEActionRequest> connectedRequests) {
+        this.connectedRequests = connectedRequests;
+    }
+
+    public List<CodeViolation> getConnectedViolations() {
+        return connectedViolations;
+    }
+
+    public void setConnectedViolations(List<CodeViolation> connectedViolations) {
+        this.connectedViolations = connectedViolations;
+    }
+
+    public List<Municipality> getConnectedMunis() {
+        return connectedMunis;
+    }
+
+    public void setConnectedMunis(List<Municipality> connectedMunis) {
+        this.connectedMunis = connectedMunis;
+    }
+
+    public List<OccInspectedSpaceElement> getConnectedElements() {
+        return connectedElements;
+    }
+
+    public void setConnectedElements(List<OccInspectedSpaceElement> connectedElements) {
+        this.connectedElements = connectedElements;
+    }
+
+    public List<OccPeriod> getConnectedPeriods() {
+        return connectedPeriods;
+    }
+
+    public void setConnectedPeriods(List<OccPeriod> connectedPeriods) {
+        this.connectedPeriods = connectedPeriods;
+    }
+
+    public List<Property> getConnectedProperties() {
+        return connectedProperties;
+    }
+
+    public void setConnectedProperties(List<Property> connectedProperties) {
+        this.connectedProperties = connectedProperties;
+    }
+
 }

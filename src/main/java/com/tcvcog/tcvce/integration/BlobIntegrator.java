@@ -769,4 +769,232 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
     }
     
+    /**
+     * Get the IDs of requests attached to a given photodoc
+     * @param photodocID
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Integer> requestsAttachedToPhoto(int photodocID) throws IntegrationException{
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT ceactionrequest_requestid FROM public.ceactionrequestphotodoc WHERE photodoc_photodocid = ?;";
+        
+        PreparedStatement stmt = null;
+        
+        List<Integer> idList = new ArrayList<>();
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, photodocID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                 idList.add(rs.getInt("ceactionrequest_requestid"));
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving attachment IDs. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return idList;
+        
+    }
+    
+    /**
+     * Get the IDs of violations attached to a given photodoc
+     * @param photodocID
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Integer> violationsAttachedToPhoto(int photodocID) throws IntegrationException{
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT codeviolation_violationid FROM public.codeviolationphotodoc WHERE photodoc_photodocid = ?;";
+        
+        PreparedStatement stmt = null;
+        
+        List<Integer> idList = new ArrayList<>();
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, photodocID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                 idList.add(rs.getInt("codeviolation_violationid"));
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving attachment IDs. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return idList;
+        
+    }
+    
+    /**
+     * Get the IDs of municipalities attached to a given photodoc
+     * @param photodocID
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Integer> munisAttachedToPhoto(int photodocID) throws IntegrationException{
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT muni_municode FROM public.muniphotodoc WHERE photodoc_photodocid = ?;";
+        
+        PreparedStatement stmt = null;
+        
+        List<Integer> idList = new ArrayList<>();
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, photodocID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                 idList.add(rs.getInt("muni_municode"));
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving attachment IDs. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return idList;
+        
+    }
+    
+    /**
+     * Get the IDs of OccInspectedSpaceElements attached to a given photodoc
+     * @param photodocID
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Integer> elementsAttachedToPhoto(int photodocID) throws IntegrationException{
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT inspectedspaceelement_elementid FROM public.occinspectedspaceelementphotodoc WHERE photodoc_photodocid = ?;";
+        
+        PreparedStatement stmt = null;
+        
+        List<Integer> idList = new ArrayList<>();
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, photodocID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                 idList.add(rs.getInt("inspectedspaceelement_elementid"));
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving attachment IDs. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return idList;
+        
+    }
+    
+    /**
+     * Get the IDs of OccPeriods attached to a given photodoc
+     * @param photodocID
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Integer> occPeriodsAttachedToPhoto(int photodocID) throws IntegrationException{
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT occperiod_periodid FROM public.occperiodphotodoc WHERE photodoc_photodocid = ?;";
+        
+        PreparedStatement stmt = null;
+        
+        List<Integer> idList = new ArrayList<>();
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, photodocID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                 idList.add(rs.getInt("occperiod_periodid"));
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving attachment IDs. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return idList;
+        
+    }
+    
+    /**
+     * Get the IDs of Properties attached to a given photodoc
+     * @param photodocID
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Integer> propertiesAttachedToPhoto(int photodocID) throws IntegrationException{
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT property_propertyid FROM public.propertyphotodoc WHERE photodoc_photodocid = ?;";
+        
+        PreparedStatement stmt = null;
+        
+        List<Integer> idList = new ArrayList<>();
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, photodocID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                 idList.add(rs.getInt("property_propertyid"));
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving attachment IDs. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return idList;
+        
+    }
+    
 }
