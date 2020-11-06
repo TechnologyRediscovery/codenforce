@@ -33,6 +33,7 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
+import com.tcvcog.tcvce.occupancy.entities.InspectedSpace;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -252,12 +253,154 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     }
 
     /**
-     * @param selectedBlob the selectedBlob to set
+     * Set the selected property on the session bean and go to propertySearchProfile.xhtml
+     * @param input
+     * @return 
      */
-    public void setSelectedBlob(BlobLight selectedBlob) {
-        this.selectedBlob = selectedBlob;
+    public String goToProperty(Property input){
+        
+        getSessionBean().setSessProperty(input);
+        
+        return "propertyInfo";
     }
-
+    
+    /**
+     * Set the selected violation on the session bean and go to ceCaseViolations.xhtml
+     * @param input
+     * @return 
+     */
+    public String goToCodeViolation(CodeViolation input){
+        
+        getSessionBean().setSessCodeViolation(input);
+        
+        return "ceCaseViolations";
+    }
+    
+    /**
+     * Set the selected OccInspectedSpaceElement on the session bean and go to ...
+     * @param input
+     * @return 
+     */
+    public void goToInspectedSpaceElement(OccInspectedSpaceElement input){
+  
+        //No idea how to rediect to this object... huh
+        //return "";
+    }
+    
+    /**
+     * Set the selected OccPeriod on the session bean and go to occPeriodWorkflow.xhtml
+     * @param input
+     * @return 
+     */
+    public String goToOccPeriod(OccPeriod input){
+        
+        getSessionBean().setSessOccPeriod(input);
+        
+        return "occPeriodWorkflow";
+    }
+    
+    public void removePropPhotoLink(Property prop){
+        
+        try {
+            BlobIntegrator bi = getBlobIntegrator();
+            bi.removePhotoPropertyLink(selectedBlob.getBlobID(), prop.getPropertyID());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully removed link between photo and property", ""));
+        } catch (IntegrationException ex) {
+            System.out.println("manageBlobBB.removePropPhotoLink | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to remove the link!", ""));
+        }
+        
+    }
+    
+    public void removeCEARPhotoLink(CEActionRequest request){
+        
+        try {
+            BlobIntegrator bi = getBlobIntegrator();
+            bi.removePhotoCEARLink(selectedBlob.getBlobID(), request.getRequestID());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully removed link between photo and Code Enforcement Action Request", ""));
+        } catch (IntegrationException ex) {
+            System.out.println("manageBlobBB.removeCEARPhotoLink | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to remove the link!", ""));
+        }
+        
+    }
+    
+    public void removeViolationPhotoLink(CodeViolation violation){
+        
+        try {
+            BlobIntegrator bi = getBlobIntegrator();
+            bi.removePhotoViolationsLink(selectedBlob.getBlobID(), violation.getViolationID());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully removed link between photo and Code Violation", ""));
+        } catch (IntegrationException ex) {
+            System.out.println("manageBlobBB.removeViolationPhotoLink | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to remove the link!", ""));
+        }
+        
+    }
+    
+    public void removeMuniPhotoLink(Municipality muni){
+        
+        try {
+            BlobIntegrator bi = getBlobIntegrator();
+            bi.removePhotoMuniLink(selectedBlob.getBlobID(), muni.getMuniCode());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully removed link between photo and Municipality", ""));
+        } catch (IntegrationException ex) {
+            System.out.println("manageBlobBB.removeMuniPhotoLink | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to remove the link!", ""));
+        }
+        
+    }
+    
+    public void removeInspectedSpaceElementPhotoLink(OccInspectedSpaceElement element){
+        
+        try {
+            BlobIntegrator bi = getBlobIntegrator();
+            bi.removePhotoInspectedSpaceElementLink(selectedBlob.getBlobID(), element.getElementID());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully removed link between photo and Inspected Space Element", ""));
+        } catch (IntegrationException ex) {
+            System.out.println("manageBlobBB.removeInspectedSpaceElementPhotoLink | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to remove the link!", ""));
+        }
+        
+    }
+    
+    public void removeOccPeriodPhotoLink(OccPeriod period){
+        
+        try {
+            BlobIntegrator bi = getBlobIntegrator();
+            bi.removePhotoMuniLink(selectedBlob.getBlobID(), period.getPeriodID());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully removed link between photo and Occ Period", ""));
+        } catch (IntegrationException ex) {
+            System.out.println("manageBlobBB.removeOccPeriodPhotoLink | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to remove the link!", ""));
+        }
+        
+    }
+    
     /**
      * Determines whether or not a user should currently be able to select a
      * blob or deselect a blob.

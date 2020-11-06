@@ -514,6 +514,150 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
     }
     
+    public void removePhotoPropertyLink(int blobID, int propertyID) throws IntegrationException {
+
+        //property linker table
+        String query = "DELETE"
+                + "  FROM public.propertyphotodoc WHERE photodoc_photodocid = ? AND property_propertyid = ?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, blobID);
+            stmt.setInt(2, propertyID);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("BlobIntegrator.removePhotoPropertyLink() | ERROR: "+ ex);
+            throw new IntegrationException("Error deleting link. Photo-Property", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    public void removePhotoCEARLink(int blobID, int requestID) throws IntegrationException {
+
+        //property linker table
+        String query = "DELETE"
+                + "  FROM public.ceactionrequestphotodoc WHERE photodoc_photodocid = ? AND ceactionrequest_requestid = ?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, blobID);
+            stmt.setInt(2, requestID);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("BlobIntegrator.removePhotoCEARLink() | ERROR: "+ ex);
+            throw new IntegrationException("Error deleting link. Photo-CEAR", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    public void removePhotoViolationsLink(int blobID, int violationID) throws IntegrationException {
+
+        //property linker table
+        String query = "DELETE"
+                + "  FROM public.codeviolationphotodoc WHERE photodoc_photodocid = ? AND codeviolation_violationid = ?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, blobID);
+            stmt.setInt(2, violationID);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("BlobIntegrator.removePhotoViolationsLink() | ERROR: "+ ex);
+            throw new IntegrationException("Error deleting link. Photo-Violation", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    public void removePhotoMuniLink(int blobID, int muniCode) throws IntegrationException {
+
+        //property linker table
+        String query = "DELETE"
+                + "  FROM public.muniphotodoc WHERE photodoc_photodocid = ? AND muni_municode = ?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, blobID);
+            stmt.setInt(2, muniCode);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("BlobIntegrator.removePhotoMuniLink() | ERROR: "+ ex);
+            throw new IntegrationException("Error deleting link. Photo-Muni", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    public void removePhotoInspectedSpaceElementLink(int blobID, int elementID) throws IntegrationException {
+
+        //property linker table
+        String query = "DELETE"
+                + "  FROM public.occinspectedspaceelementphotodoc WHERE photodoc_photodocid = ? AND inspectedspaceelement_elementid = ?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, blobID);
+            stmt.setInt(2, elementID);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("BlobIntegrator.removePhotoInspectedSpaceElementLink() | ERROR: "+ ex);
+            throw new IntegrationException("Error deleting link. Photo-Muni", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    public void removePhotoOccPeriodLink(int blobID, int periodID) throws IntegrationException {
+
+        //property linker table
+        String query = "DELETE"
+                + "  FROM public.occperiodphotodoc WHERE photodoc_photodocid = ? AND occperiod_periodid = ?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, blobID);
+            stmt.setInt(2, periodID);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("BlobIntegrator.removePhotoOccPeriodLink() | ERROR: "+ ex);
+            throw new IntegrationException("Error deleting link. Photo-Muni", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
     public void linkPhotoBlobToActionRequest(int blobID, int requestID) throws IntegrationException{
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.ceactionrequestphotodoc(\n" +

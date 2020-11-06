@@ -9,6 +9,9 @@
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
         <title>Manage uploaded photographs and documents</title>
     </h:head>
+    
+    <!--TODO: NOT TAB-INDEXED-->
+    
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
@@ -181,6 +184,10 @@
                                                          tabindex="6"
                                                          >
 
+                                                <p:column headerText="ID:">
+                                                    <h:outputText value="#{blob.blobID}"/>
+                                                </p:column>
+                                                
                                                 <p:column headerText="File Type">
                                                     <h:outputText value="#{blob.type.typeID}"/>
                                                     <i class="material-icons status-display-icon-i"><h:outputText value="#{blob.type.typeIcon}"/></i>
@@ -370,8 +377,45 @@
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
+                                                    <p:outputLabel value="Property:" rendered="#{manageBlobBB.connectedProperties.size() != 0}"/>
+
+                                                    <p:dataTable id="connected-property-table"
+                                                                 var="prop"
+                                                                 value="#{manageBlobBB.connectedProperties}"
+                                                                 rowKey="#{prop.propertyID}"
+                                                                 tableStyleClass="primeDataTable"
+                                                                 draggableRows="false" draggableColumns="true"
+                                                                 rendered="#{manageBlobBB.connectedProperties.size() != 0}"
+                                                                 >
+
+                                                        <p:column headerText="ID:">
+                                                            <h:outputText value="#{prop.propertyID}"/>
+                                                        </p:column>
+
+                                                        <p:column headerText="Address">
+                                                            <h:outputText value="#{prop.address}"/>
+                                                        </p:column>
+
+                                                        <p:column>
+                                                            <p:commandButton value="View" icon="fa fa-folder" 
+                                                                             action="#{manageBlobBB.goToProperty(prop)}"
+                                                                             disabled="#{!manageBlobBB.currentBlobSelected}"/>
+                                                        </p:column>
+
+                                                        <p:column>
+                                                            <p:commandButton value="Remove Link" 
+                                                                             action="#{manageBlobBB.removePropPhotoLink(prop)}"
+                                                                             ajax="true"
+                                                                             disabled="#{!manageBlobBB.currentBlobSelected}"
+                                                                             update="
+                                                                             form-messages-global
+                                                                             blob-lists-outpanel"/>
+                                                        </p:column>
+                                                        
+                                                    </p:dataTable>
+
                                                     <h:panelGroup>
-                                                        <p:outputLabel value="Property:"/>
+
                                                         <p:spacer height="5px"/>
                                                         <div class="blobObjectsTableOutputLabel">
                                                             <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/>
