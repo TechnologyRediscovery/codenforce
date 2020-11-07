@@ -216,12 +216,7 @@ public class CECaseDataHeavy
         this.eventRuleList = eventRuleList;
     }
 
-    /**
-     * @return the ceActionRequestList
-     */
-    public List<CEActionRequest> getCeActionRequestList() {
-        return ceActionRequestList;
-    }
+   
 
     /**
      * @param ceActionRequestList the ceActionRequestList to set
@@ -377,6 +372,13 @@ public class CECaseDataHeavy
         } 
         return true;
         
+    }
+
+    /**
+     * @return the ceActionRequestList
+     */
+    public List<CEActionRequest> getCeActionRequestList() {
+        return ceActionRequestList;
     }
 
 }

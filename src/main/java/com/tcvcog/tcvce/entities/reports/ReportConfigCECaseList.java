@@ -5,9 +5,13 @@
  */
 package com.tcvcog.tcvce.entities.reports;
 
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryBacked;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  *
@@ -25,6 +29,12 @@ public class ReportConfigCECaseList
     private boolean includeEventSummaryByCase;
     
     private boolean includeExtendedPropertyDetails;
+    
+    private List<CECaseDataHeavy> caseListOpened;
+    private List<CECaseDataHeavy> caseListCurrent;
+    private List<CECaseDataHeavy> caseListClosed;
+    
+    private List<EventCnFPropUnitCasePeriodHeavy> eventList;
 
     /**
      * @return the includeListSummaryFigures
@@ -118,6 +128,62 @@ public class ReportConfigCECaseList
     @Override
     public void setBOBQuery(Query q) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    /**
+     * @return the caseListOpened
+     */
+    public List<CECaseDataHeavy> getCaseListOpened() {
+        return caseListOpened;
+    }
+
+    /**
+     * @return the caseListCurrent
+     */
+    public List<CECaseDataHeavy> getCaseListCurrent() {
+        return caseListCurrent;
+    }
+
+    /**
+     * @return the caseListClosed
+     */
+    public List<CECaseDataHeavy> getCaseListClosed() {
+        return caseListClosed;
+    }
+
+    /**
+     * @param caseListOpened the caseListOpened to set
+     */
+    public void setCaseListOpened(List<CECaseDataHeavy> caseListOpened) {
+        this.caseListOpened = caseListOpened;
+    }
+
+    /**
+     * @param caseListCurrent the caseListCurrent to set
+     */
+    public void setCaseListCurrent(List<CECaseDataHeavy> caseListCurrent) {
+        this.caseListCurrent = caseListCurrent;
+    }
+
+    /**
+     * @param caseListClosed the caseListClosed to set
+     */
+    public void setCaseListClosed(List<CECaseDataHeavy> caseListClosed) {
+        this.caseListClosed = caseListClosed;
+    }
+
+    /**
+     * @return the eventList
+     */
+    public List<EventCnFPropUnitCasePeriodHeavy> getEventList() {
+        return eventList;
+    }
+
+    /**
+     * @param eventList the eventList to set
+     */
+    public void setEventList(List<EventCnFPropUnitCasePeriodHeavy> eventList) {
+        this.eventList = eventList;
     }
     
     

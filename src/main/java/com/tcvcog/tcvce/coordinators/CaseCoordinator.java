@@ -31,6 +31,12 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
+import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
+import com.tcvcog.tcvce.entities.search.QueryEvent;
+import com.tcvcog.tcvce.entities.search.QueryEventEnum;
+import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
+import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
@@ -49,6 +55,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
@@ -925,6 +933,51 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         listRpt.setIncludeEventSummaryByCase(false);
         return listRpt;
 
+    }
+    
+    /**
+     * Prepares a report of municipal case activity for a given time period
+     * @param rpt the report config object with dates set for searching
+     * @param ua the user requesting the report
+     * @return the configured report
+     * @throws SearchException 
+     */
+    public ReportConfigCECaseList report_buildCECaseListReport(ReportConfigCECaseList rpt, UserAuthorized ua) throws SearchException{
+        SearchCoordinator sc = getSearchCoordinator();
+        if(rpt == null || ua == null){
+            return null;
+        }
+        
+        QueryCECase query_opened = sc.initQuery(QueryCECaseEnum.OPENED_30DAYS, ua.getKeyCard());
+        SearchParamsCECase spcse = query_opened.getPrimaryParams();
+        spcse.setDate_startEnd_ctl(true);
+        spcse.setDate_start_val(rpt.getDate_start_val());
+        spcse.setDate_end_val(rpt.getDate_end_val());
+        rpt.setCaseListOpened(sc.runQuery(query_opened).getBOBResultList());
+        
+        QueryCECase query_active = sc.initQuery(QueryCECaseEnum.OPENCASES, ua.getKeyCard());
+        spcse = query_active.getPrimaryParams();
+        spcse.setDate_startEnd_ctl(true);
+        spcse.setDate_start_val(rpt.getDate_start_val());
+        spcse.setDate_end_val(rpt.getDate_end_val());
+        rpt.setCaseListCurrent(sc.runQuery(query_active).getBOBResultList());
+        
+        QueryCECase query_closed = sc.initQuery(QueryCECaseEnum.CLOSED_30DAYS, ua.getKeyCard());
+        spcse = query_closed.getPrimaryParams();
+        spcse.setDate_startEnd_ctl(true);
+        spcse.setDate_start_val(rpt.getDate_start_val());
+        spcse.setDate_end_val(rpt.getDate_end_val());
+        rpt.setCaseListClosed(sc.runQuery(query_closed).getBOBResultList());
+        
+        QueryEvent query_ev = sc.initQuery(QueryEventEnum.MUNI_MONTHYACTIVITY, ua.getKeyCard());
+        SearchParamsEvent spev = query_ev.getPrimaryParams();
+        spev.setDate_startEnd_ctl(true);
+        spev.setDate_start_val(rpt.getDate_start_val());
+        spev.setDate_end_val(rpt.getDate_end_val());
+        rpt.setEventList(sc.runQuery(query_ev).getBOBResultList());
+        
+        return rpt;
+        
     }
 
     /**

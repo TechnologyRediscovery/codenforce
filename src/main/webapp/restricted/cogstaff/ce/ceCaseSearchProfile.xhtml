@@ -162,6 +162,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                value="load case history" 
                                                                update="cecase-messages-growl
                                                                cecase-search-results-form"/>
+                                            
+                                         
+                                            <p:commandButton   id="print-case-list-cb" 
+                                                               ajax="true" 
+                                                               actionListener="#{ceCaseSearchProfileBB.prepareReportCECaseList}"
+                                                               icon="fa fa-print" 
+                                                               styleClass="button"
+                                                               oncomplete="PF('cecase-list-report-dialog-var').show()"
+                                                               value="Prepare Case List Report" 
+                                                               update="cecase-list-report-form"/>
+
 
                                             <p:spacer height="5px" />
 
@@ -179,7 +190,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 value="#{ceCaseSearchProfileBB.caseList}"
                                                 tableStyleClass="primeDataTable">
 
-                                                <p:column width="15%" sortBy="#{c.originationDate}">
+                                                <p:column width="15%" sortBy="#{c.originjationDate}">
                                                     <f:facet name="header">
                                                         <h:outputText value="Opened" />
                                                     </f:facet>
@@ -222,15 +233,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                             <p:spacer height="10px"/>
-
-                                            <p:commandButton   id="print-case-list-cb" 
-                                                               ajax="true" 
-                                                               actionListener="#{ceCaseSearchProfileBB.prepareReportCECaseList}"
-                                                               icon="fa fa-print" 
-                                                               styleClass="button"
-                                                               oncomplete="PF('cecase-list-report-dialog-var').show()"
-                                                               value="Prepare Case List Report" 
-                                                               update="cecase-list-report-form"/>
 
                                         </h:form>
 
@@ -922,6 +924,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                     />
 
                                                 <p:spacer height="5px" />
+                                                <ui:remove>
+                                                    
                                                 <p:dataTable
                                                     id="cecase-notices-table"
                                                     var="nov"
@@ -946,7 +950,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <f:facet name="header">
                                                             <h:outputText value="Sent?" />
                                                         </f:facet>
-                                                        <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDate(nov.sentTSPretty)}"/>
+                                                        <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDate(nov.sentTS)}"/>
                                                     </p:column>
 
                                                     <p:column width="10%">
@@ -968,6 +972,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                                 </p:dataTable>
+                                                                                                    </ui:remove>
+
 
                                             </h:form>
 
@@ -2263,6 +2269,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:spacer height="5px"/>
 
                                     <p:inputText id="report-caselist-title-it" style="width: 300px;" value="#{ceCaseSearchProfileBB.reportCECaseList.title}"/>
+                                    <p:spacer height="5px"/>
                                     <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
 
                                     <p:spacer height="5px"/>
@@ -2271,6 +2278,58 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeCaseNames}" />
 
                                     <p:spacer height="5px"/>
+                                    
+                                     <h:panelGrid    columns="1" 
+                                                            cellpadding="10" 
+                                                            columnClasses="gridTd">
+                                                <h:panelGroup>
+
+                                                    <p:outputLabel for="cecase-list-report-date-start-cal" 
+                                                                   value="start date"/>
+
+                                                    <p:spacer height="1px" />
+
+                                                    <p:calendar id="cecase-list-report-date-start-cal" 
+                                                                value="#{ceCaseSearchProfileBB.reportCECaseList.startDate_val_utilDate}" 
+                                                                disabled="false"
+                                                                mode="popup" 
+                                                                showOn="button" 
+                                                                pattern="EEE, dd MMM, yyyy"
+                                                                navigator="true" 
+                                                                tabindex="16" 
+                                                                timeInput="true" 
+                                                                showHour="false" showMinute="false" showSecond="false" showMillisec="false"
+                                                                showButtonPanel="true" 
+                                                                showTodayButton="true"
+                                                                required="true"/>
+                                                    
+
+                                                </h:panelGroup>
+
+                                                <h:panelGroup>
+
+                                                    <p:outputLabel for="cecase-list-report-date-end-cal" 
+                                                                   value="end date"/>
+
+                                                    <p:spacer height="1px" />
+
+                                                    <p:calendar id="cecase-list-report-date-end-cal" 
+                                                                value="#{ceCaseSearchProfileBB.reportCECaseList.endDate_val_utilDate}" 
+                                                                disabled="false"
+                                                                mode="popup" 
+                                                                showOn="button" 
+                                                                pattern="EEE, dd MMM, yyyy"
+                                                                navigator="true" 
+                                                                tabindex="16" 
+                                                                timeInput="true" 
+                                                                showHour="false" showMinute="false" showSecond="false" showMillisec="false"
+                                                                showButtonPanel="true" 
+                                                                showTodayButton="true"
+                                                                required="true"/>
+                                                    
+
+                                                </h:panelGroup>
+                                            </h:panelGrid>
 
                                     <h:outputLabel for="report-caselist-notes-ita" value="Notes"/>
                                     <p:spacer height="5px"/>
@@ -2304,14 +2363,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                             </h:panelGrid>
 
+                            <p:commandLink  ajax="false" 
+                                             action="#{ceCaseSearchProfileBB.generateReportCECaseList}"
+                                             value="Click to generate report in new tab" 
+                                             target="_blank"
+                                             styleClass="font-size:2em;"
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                             />
+                            <p:spacer height="5px" />
                             <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" immediate="true"
                                              onclick="PF('report-caselist-profile-diaglog-var').hide()"/>
-
-                            <p:commandButton ajax="true" action="#{ceCaseSearchProfileBB.generateReportCECaseList}"
-                                             value="Generate" icon="fa fa-print" 
-                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                             />
 
                         </h:form>
                     </p:dialog>

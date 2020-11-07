@@ -86,13 +86,19 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         DashboardColumn column2 = new DefaultDashboardColumn();
         DashboardColumn column3 = new DefaultDashboardColumn();
         column1.addWidget("dashpanel-ce-cears");
+        column1.addWidget("dashpanel-properties");
+        column1.addWidget("dashpanel-property-profile");
 //        column1.addWidget("dashpanel-ce-todo");
         
-        column2.addWidget("dashpanel-ce-cecases");
+        column2.addWidget("dashpanel-cecase");
+        column2.addWidget("dashpanel-cecases");
+        
+        column2.addWidget("dashpanel-events-recent");
+        column2.addWidget("dashpanel-events-upcoming");
+        column2.addWidget("dashpanel-todo");
 //        column2.addWidget("dashpanel-occ-periods");
 //        column2.addWidget("dashpanel-occ-inspections");
 //        column2.addWidget("dashpanel-persons");
-//        column2.addWidget("dashpanel-properties");
         
 //        column3.addWidget("dashpanel-sys-events");
         column3.addWidget("dashpanel-sys-switchmuni");

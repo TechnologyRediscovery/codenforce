@@ -576,8 +576,10 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
      * @return
      */
     public String onViewPersonProfileButtonChange(Person p) {
+        PersonCoordinator pc = getPersonCoordinator();
         if (p != null) {
             getSessionBean().getSessPersonList().add(0, p);
+            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(p, getSessionBean().getSessUser().getKeyCard()));
             return "personInfo";
 
         }

@@ -726,22 +726,40 @@ public class CECaseSearchProfileBB
         }
         configureParameters();
     }
-
+    
+    /**
+     * 
+     * @param ev 
+     */
     public void prepareReportCECaseList(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
 
         if (reportCECaseList == null) {
             reportCECaseList = cc.report_getDefaultReportConfigCECaseList();
         }
+        reportCECaseList.setTitle("Code Enforcement Activity Report");
+        reportCECaseList.setDate_start_val(LocalDateTime.now().minusDays(30));
+        reportCECaseList.setDate_end_val(LocalDateTime.now());
         System.out.println("CaseProfileBB.prepareCaseListReport");
 
     }
 
+    /**
+     * 
+     * @return 
+     */
     public String generateReportCECaseList() {
-        getReportCECaseList().setCreator(getSessionBean().getSessUser());
-        getReportCECaseList().setMuni(getSessionBean().getSessMuni());
-        getReportCECaseList().setGenerationTimestamp(LocalDateTime.now());
+        CaseCoordinator cc = getCaseCoordinator();
+        reportCECaseList.setCreator(getSessionBean().getSessUser());
+        reportCECaseList.setMuni(getSessionBean().getSessMuni());
+        reportCECaseList.setGenerationTimestamp(LocalDateTime.now());
 
+        try {
+            reportCECaseList = cc.report_buildCECaseListReport(reportCECaseList, getSessionBean().getSessUser());
+        } catch (SearchException ex) {
+            System.out.println(ex);
+            
+        }
         getSessionBean().setReportConfigCECaseList(reportCECaseList);
         getSessionBean().setReportConfigCECase(null);
         getSessionBean().setSessReport(reportCECaseList);

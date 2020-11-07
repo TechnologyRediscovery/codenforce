@@ -51,7 +51,7 @@ import java.util.List;
  */
 public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
-    final String ACTIVE_FIELD = "event.activeevent";
+    final String ACTIVE_FIELD = "event.active";
     /**
      * Creates a new instance of EventIntegrator
      */
@@ -521,7 +521,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         // we need an EventDomain for the BOBID, too, so set it arbitrarily if it's null
         if(params.getEventDomain_val() == null){
-            params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
+            params.setEventDomain_val(EventDomainEnum.UNIVERSAL);
             params.appendToParamLog("DOMAIN CONTROL: no object specified - Code Enforcement chosen as default; | ");
         }
         
