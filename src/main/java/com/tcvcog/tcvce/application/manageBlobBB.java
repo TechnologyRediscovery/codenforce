@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
+import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -245,6 +246,42 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
 
     }
     
+    public void deleteSelectedBlob() {
+
+        BlobCoordinator bc = getBlobCoordinator();
+        
+        if (selectedBlob.getType() == BlobType.PHOTO) {
+            try {
+
+                bc.deletePhotoBlob(selectedBlob);
+
+                //Reload the blob list
+                initBean();
+                
+            } catch (IntegrationException 
+                    | EventException 
+                    | AuthorizationException 
+                    | BObStatusException 
+                    | ViolationException ex) {
+                System.out.println("manageBlobBB.deleteSelectedBlob | ERROR: " + ex);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Something went wrong when trying to delete the selected file!", ""));
+            } catch (BlobException ex){
+                System.out.println("manageBlobBB.deleteSelectedBlob | ERROR: " + ex);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Something went wrong when trying to delete the selected file! "
+                                    + "Make sure that the file is not connected to any "
+                                    + "other objects in the system before trying to delete it", ""));
+            }
+        } else if (selectedBlob.getType() == BlobType.PDF) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Deleting PDFs is not yet supported", ""));
+        }
+    }
+    
     /**
      * @return the selectedBlob
      */
@@ -440,6 +477,20 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         }
     }
 
+    /**
+     * Checks to see if all connection lists are empty.
+     * Controls if the "Delete blob" is enabled.
+     * @return 
+     */
+    public boolean allConnectionsEmpty() {
+        return  connectedElements.isEmpty() 
+                && connectedMunis.isEmpty() 
+                && connectedPeriods.isEmpty() 
+                && connectedProperties.isEmpty()
+                && connectedRequests.isEmpty()
+                && connectedViolations.isEmpty();
+    }
+    
     public List<BlobLight> getBlobList() {
         return blobList;
     }

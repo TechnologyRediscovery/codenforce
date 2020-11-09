@@ -183,10 +183,34 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         return blob;
     }
 
-    // TODO: MAYBE seperate into PDF and Photo deletes, verify types appropriately,
-    // then delete with integrator.
-    public void deleteBlob(int blobID) throws IntegrationException {
-        getBlobIntegrator().deletePhotoBlob(blobID);
+    public void deletePhotoBlob(BlobLight blob) 
+            throws IntegrationException, 
+            EventException, 
+            AuthorizationException, 
+            ViolationException, 
+            BObStatusException, 
+            BlobException {
+        
+        BlobIntegrator bi = getBlobIntegrator();
+        
+        //First we have to make sure that no objects are attached to this blob
+        List<BOb> connectedObjects = getAttachedObjects(blob);
+        
+        if(!connectedObjects.isEmpty()){
+            throw new BlobException("The coordinator attempted to remove a blob that is currently connected to other objects.");
+        }
+        
+        //The blob isn't attached to anything, let's delete the blob from the photodoc table
+        bi.deletePhotoBlob(blob.getBlobID());
+        
+        //Let's see if this blob is still attached to other photodoc rows
+        List<Integer> connectedPhotoDocs = bi.getPhotoBlobsFromBytesID(blob.getBytesID());
+        
+        if(connectedPhotoDocs.isEmpty()){
+            //No rows are referencing this file, let's delete the bytes too
+            bi.deleteBytes(blob.getBytesID());
+        }
+        
     }
 
     /**

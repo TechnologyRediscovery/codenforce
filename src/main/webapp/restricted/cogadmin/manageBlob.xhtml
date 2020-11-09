@@ -4,14 +4,15 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
         <title>Manage uploaded photographs and documents</title>
     </h:head>
-    
+
     <!--TODO: NOT TAB-INDEXED-->
-    
+
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
@@ -152,6 +153,7 @@
                                                                          style="width: 100%"
                                                                          update=" 
                                                                          @form
+                                                                         form-messages-global
                                                                          blob-search-messages-form
                                                                          blob-search-log-form
                                                                          blob-search-results-panel
@@ -187,7 +189,11 @@
                                                 <p:column headerText="ID:">
                                                     <h:outputText value="#{blob.blobID}"/>
                                                 </p:column>
-                                                
+
+                                                <p:column headerText="Upload timestamp:">
+                                                    <h:outputText value="#{blob.timestamp}"/>
+                                                </p:column>
+
                                                 <p:column headerText="File Type">
                                                     <h:outputText value="#{blob.type.typeID}"/>
                                                     <i class="material-icons status-display-icon-i"><h:outputText value="#{blob.type.typeIcon}"/></i>
@@ -288,9 +294,9 @@
                                                         <p:outputLabel value="Bytes ID:"/>
                                                         <p:spacer height="5px"/>
                                                         <p:outputLabel> The system does not duplicate files when they are attached to multiple objects.
-                                                            This number is the ID number of the file itself in our system.
+                                                            This number is the ID number of the data that makes up the file in our system.
                                                             If this number is the same as another file in this list, then the two
-                                                            files are really the same file, they are just attached to two different things. </p:outputLabel>
+                                                            files use the same data and are just attached to two different things. </p:outputLabel>
                                                         <p:spacer height="5px"/>
                                                         <p:outputLabel value="&#160;#{manageBlobBB.selectedBlob.bytesID}"/>
                                                         <p:spacer height="10px"/>
@@ -377,7 +383,9 @@
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
-                                                    <p:outputLabel value="Property:" rendered="#{manageBlobBB.connectedProperties.size() != 0}"/>
+                                                    <!--Connected properties -->
+
+                                                    <p:outputLabel value="Properties:" rendered="#{manageBlobBB.connectedProperties.size() != 0}"/>
 
                                                     <p:dataTable id="connected-property-table"
                                                                  var="prop"
@@ -409,81 +417,292 @@
                                                                              disabled="#{!manageBlobBB.currentBlobSelected}"
                                                                              update="
                                                                              form-messages-global
-                                                                             blob-lists-outpanel"/>
+                                                                             blob-lists-outpanel">
+                                                                <p:confirm header="Confirm" 
+                                                                           message="Are you sure that you would like to remove 
+                                                                           the link between Blob ID##{manageBlobBB.selectedBlob.blobID} and property ID##{prop.propertyID}?
+                                                                           This file will no longer appear when they view the property!" 
+                                                                           icon="pi pi-exclamation-triangle"/>
+                                                            </p:commandButton>
                                                         </p:column>
-                                                        
+
                                                     </p:dataTable>
 
-                                                    <h:panelGroup>
+                                                    <!--Connected requests-->
+
+                                                    <p:outputLabel value="Code Enforcement Action Requests:" rendered="#{manageBlobBB.connectedRequests.size() != 0}"/>
+
+                                                    <p:dataTable id="connected-requests-table"
+                                                                 var="cear"
+                                                                 value="#{manageBlobBB.connectedRequests}"
+                                                                 rowKey="#{cear.requestID}"
+                                                                 tableStyleClass="primeDataTable"
+                                                                 draggableRows="false" draggableColumns="true"
+                                                                 rendered="#{manageBlobBB.connectedRequests.size() != 0}"
+                                                                 >
+
+                                                        <p:column headerText="ID:">
+                                                            <h:outputText value="#{cear.requestID}"/>
+                                                        </p:column>
+
+                                                        <p:column headerText="Date of record:">
+                                                            <h:outputText value="#{cear.dateOfRecord}"/>
+                                                        </p:column>
+
+                                                        <p:column headerText="Address">
+                                                            <h:outputText value="#{cear.addressOfConcern}"/>
+                                                        </p:column>
+
+                                                        <ui:remove>
+
+                                                            <!-- no CEAR redirection yet-->
+
+                                                            <p:column>
+                                                                <p:commandButton value="View" icon="fa fa-folder" 
+                                                                                 action="#{manageBlobBB}"
+                                                                                 disabled="#{!manageBlobBB.currentBlobSelected}"/>
+                                                            </p:column>
+
+                                                        </ui:remove>
+
+                                                        <p:column>
+                                                            <p:commandButton value="Remove Link" 
+                                                                             action="#{manageBlobBB.removeCEARPhotoLink(request)}"
+                                                                             ajax="true"
+                                                                             disabled="#{!manageBlobBB.currentBlobSelected}"
+                                                                             update="
+                                                                             form-messages-global
+                                                                             blob-lists-outpanel">
+                                                                <p:confirm header="Confirm" 
+                                                                           message="Are you sure that you would like to remove 
+                                                                           the link between Blob ID##{manageBlobBB.selectedBlob.blobID} and action request ID##{cear.requestID}?
+                                                                           This file will no longer appear when they view the request!" 
+                                                                           icon="pi pi-exclamation-triangle"/>
+                                                            </p:commandButton>
+                                                        </p:column>
+
+                                                    </p:dataTable>
+
+                                                    <!--Connected violations -->
+
+                                                    <p:outputLabel value="Violations:" rendered="#{manageBlobBB.connectedViolations.size() != 0}"/>
+
+                                                    <p:dataTable id="connected-violations-table"
+                                                                 var="violation"
+                                                                 value="#{manageBlobBB.connectedViolations}"
+                                                                 rowKey="#{violation.violationID}"
+                                                                 tableStyleClass="primeDataTable"
+                                                                 draggableRows="false" draggableColumns="true"
+                                                                 rendered="#{manageBlobBB.connectedViolations.size() != 0}"
+                                                                 >
+
+                                                        <p:column headerText="ID:">
+                                                            <h:outputText value="#{violation.violationID}"/>
+                                                        </p:column>
+
+                                                        <p:column headerText="Date of record:">
+                                                            <h:outputText value="#{violation.dateOfRecordPretty}"/>
+                                                        </p:column>
+
+                                                        <p:column headerText="Code Violated:">
+                                                            <h:outputText value="#{violation.codeViolated.ordSubSecTitle}"/>
+                                                        </p:column>
+
+                                                        <p:column>
+                                                            <p:commandButton value="View" icon="fa fa-folder" 
+                                                                             action="#{manageBlobBB.goToCodeViolation(violation)}"
+                                                                             disabled="#{!manageBlobBB.currentBlobSelected}"/>
+                                                        </p:column>
+
+                                                        <p:column>
+                                                            <p:commandButton value="Remove Link" 
+                                                                             action="#{manageBlobBB.removeViolationPhotoLink(violation)}"
+                                                                             ajax="true"
+                                                                             disabled="#{!manageBlobBB.currentBlobSelected}"
+                                                                             update="
+                                                                             form-messages-global
+                                                                             blob-lists-outpanel">
+                                                                <p:confirm header="Confirm" 
+                                                                           message="Are you sure that you would like to remove 
+                                                                           the link between Blob ID##{manageBlobBB.selectedBlob.blobID} and violation ID##{violation.violationID}?
+                                                                           This file will no longer appear when they view the violation!" 
+                                                                           icon="pi pi-exclamation-triangle"/>
+                                                            </p:commandButton>
+                                                        </p:column>
+
+                                                    </p:dataTable>
+
+                                                    <!--Connected munis -->
+
+                                                    <p:outputLabel value="Municipalities" rendered="#{manageBlobBB.connectedMunis.size() != 0}"/>
+
+                                                    <p:dataTable id="connected-muni-table"
+                                                                 var="muni"
+                                                                 value="#{manageBlobBB.connectedMunis}"
+                                                                 rowKey="#{muni.muniCode}"
+                                                                 tableStyleClass="primeDataTable"
+                                                                 draggableRows="false" draggableColumns="true"
+                                                                 rendered="#{manageBlobBB.connectedMunis.size() != 0}"
+                                                                 >
+
+                                                        <p:column headerText="Code:">
+                                                            <h:outputText value="#{muni.muniCode}"/>
+                                                        </p:column>
+
+                                                        <p:column headerText="Name:">
+                                                            <h:outputText value="#{muni.muniName}"/>
+                                                        </p:column>
+
+                                                        <p:column>
+                                                            <p:commandButton value="Remove Link" 
+                                                                             action="#{manageBlobBB.removeMuniPhotoLink(muni)}"
+                                                                             ajax="true"
+                                                                             disabled="#{!manageBlobBB.currentBlobSelected}"
+                                                                             update="
+                                                                             form-messages-global
+                                                                             blob-lists-outpanel">
+                                                                <p:confirm header="Confirm" 
+                                                                           message="Are you sure that you would like to remove 
+                                                                           the link between Blob ID##{manageBlobBB.selectedBlob.blobID} and #{muni.muniName}?
+                                                                           This file will no longer appear when they view the municipality!" 
+                                                                           icon="pi pi-exclamation-triangle"/>
+                                                            </p:commandButton>
+                                                        </p:column>
+
+                                                    </p:dataTable>
+
+                                                    <!--Connected OccInspectedSpaceElements -->
+
+                                                    <p:outputLabel value="Inspected Space Elements:" rendered="#{manageBlobBB.connectedElements.size() != 0}"/>
+
+                                                    <p:dataTable id="connected-space-elements-table"
+                                                                 var="element"
+                                                                 value="#{manageBlobBB.connectedElements}"
+                                                                 rowKey="#{element.inspectedSpaceElementID}"
+                                                                 tableStyleClass="primeDataTable"
+                                                                 draggableRows="false" draggableColumns="true"
+                                                                 rendered="#{manageBlobBB.connectedElements.size() != 0}"
+                                                                 >
+
+                                                        <p:column headerText="ID:">
+                                                            <h:outputText value="#{element.inspectedSpaceElementID}"/>
+                                                        </p:column>
+
+                                                        <p:column headerText="Last inspected on:">
+                                                            <h:outputText value="#{element.lastInspectedTS}"/>
+                                                        </p:column>
+
+                                                        <p:column headerText="Location:">
+                                                            <h:outputText value="#{element.location.locationDescription}, floor #{element.location.buildingFloorNo}"/>
+                                                        </p:column>
+
+                                                        <ui:remove>
+                                                            <p:column>
+                                                                <p:commandButton value="View" icon="fa fa-folder" 
+                                                                                 action="#{manageBlobBB}"
+                                                                                 disabled="#{!manageBlobBB.currentBlobSelected}"/>
+                                                            </p:column>
+
+                                                        </ui:remove>
+
+                                                        <p:column>
+                                                            <p:commandButton value="Remove Link" 
+                                                                             action="#{manageBlobBB.removeInspectedSpaceElementPhotoLink(element)}"
+                                                                             ajax="true"
+                                                                             disabled="#{!manageBlobBB.currentBlobSelected}"
+                                                                             update="
+                                                                             form-messages-global
+                                                                             blob-lists-outpanel">
+                                                                <p:confirm header="Confirm" 
+                                                                           message="Are you sure that you would like to remove 
+                                                                           the link between Blob ID##{manageBlobBB.selectedBlob.blobID} and inspected space element ID##{element.inspectedSpaceElementID}?
+                                                                           This file will no longer appear when they view the element!" 
+                                                                           icon="pi pi-exclamation-triangle"/>
+                                                            </p:commandButton>
+                                                        </p:column>
+
+                                                    </p:dataTable>
+
+                                                    <!--Connected periods -->
+
+                                                    <p:outputLabel value="Occupancy Periods" rendered="#{manageBlobBB.connectedPeriods.size() != 0}"/>
+
+                                                    <p:dataTable id="connected-periods-table"
+                                                                 var="period"
+                                                                 value="#{manageBlobBB.connectedPeriods}"
+                                                                 rowKey="#{period.periodID}"
+                                                                 tableStyleClass="primeDataTable"
+                                                                 draggableRows="false" draggableColumns="true"
+                                                                 rendered="#{manageBlobBB.connectedPeriods.size() != 0}"
+                                                                 >
+
+                                                        <p:column headerText="ID:">
+                                                            <h:outputText value="#{period.periodID}"/>
+                                                        </p:column>
+
+                                                        <p:column headerText="Start date:">
+                                                            <h:outputText value="#{period.startDate}"/>
+                                                        </p:column>
+
+                                                        <p:column headerText="Type:">
+                                                            <h:outputText value="#{period.type.title}"/>
+                                                        </p:column>
+
+                                                        <p:column>
+                                                            <p:commandButton value="View" icon="fa fa-folder" 
+                                                                             action="#{manageBlobBB.goToOccPeriod(period)}"
+                                                                             disabled="#{!manageBlobBB.currentBlobSelected}"/>
+                                                        </p:column>
+
+                                                        <p:column>
+                                                            <p:commandButton value="Remove Link" 
+                                                                             action="#{manageBlobBB.removeOccPeriodPhotoLink(period)}"
+                                                                             ajax="true"
+                                                                             disabled="#{!manageBlobBB.currentBlobSelected}"
+                                                                             update="
+                                                                             form-messages-global
+                                                                             blob-lists-outpanel">
+                                                                <p:confirm header="Confirm" 
+                                                                           message="Are you sure that you would like to remove 
+                                                                           the link between Blob ID##{manageBlobBB.selectedBlob.blobID} and occupancy period ID##{period.periodID}?
+                                                                           This file will no longer appear when they view the period!" 
+                                                                           icon="pi pi-exclamation-triangle"/>
+                                                            </p:commandButton>
+                                                        </p:column>
+
+                                                    </p:dataTable>
+
+                                                    <!-- DELETE FILE CONTROLS! -->
+
+                                                    <h:panelGroup rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
 
                                                         <p:spacer height="5px"/>
                                                         <div class="blobObjectsTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/>
-                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName}"/>
+                                                            <p:outputLabel value="Delete Blob"/>
                                                         </div>
+                                                        <p:spacer height="10px"/>
+                                                        <p:outputLabel>
+                                                            A file may only be deleted if all links to other objects have been removed.
+                                                            If you deletes all files pointing to the same data in our database, the data will be destroyed as well.
+                                                        </p:outputLabel>
                                                         <p:spacer height="5px"/>
                                                         <p:commandButton    id="change-property-cb" 
-                                                                            onclick="PF('change-property-dialog').show()" 
-                                                                            value="change request property" 
+                                                                            actionListener="#{manageBlobBB.deleteSelectedBlob()}"
+                                                                            value="Delete Blob" 
                                                                             styleClass="noFill button-size-small"
-                                                                            disabled="#{cEActionRequestsBB.isDisabledDueToRoutingNotAllowed}"
+                                                                            disabled="#{!manageBlobBB.allConnectionsEmpty and !manageBlobBB.currentBlobSelected}"
                                                                             icon="fa fa-home"
-                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
+                                                                            update="form-messages-global
+                                                                            blob-search-messages-form
+                                                                            blob-search-log-form
+                                                                            blob-search-results-panel
+                                                                            blob-search-clear-cb-0">
+                                                            <p:confirm header="Confirm" 
+                                                                       message="Are you sure that you would like to delete #{manageBlobBB.selectedBlob.filename}? 
+                                                                       If you will need it later, you should download it first."/>
+                                                        </p:commandButton>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <p:outputLabel value="Requestor:"/>
-                                                        <p:spacer height="5px"/>
-                                                        <div class="cearObjectsTableOutputLabel">
-                                                            <p:outputLabel value="&#160;Requestor ID:#{cEActionRequestsBB.selectedRequest.requestor.personID} 
-                                                                           (#{cEActionRequestsBB.selectedRequest.requestor.personType.label}): "/>
-                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestor.firstName}"/>
-                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestor.lastName}"/>
-                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestor.addressStreet}"/>
-                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestor.addressCity}, "/>
-                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestor.addressState}"/>
-                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestor.addressZip}"/>
-                                                        </div>
-                                                        <p:spacer height="5px"/>
-                                                        <p:commandButton    id="change-person-cb"
-                                                                            onclick="PF('change-person-dialog').show()" 
-                                                                            value="change requestor Person" 
-                                                                            styleClass="noFill button-size-small" 
-                                                                            icon="fa fa-child"
-                                                                            disabled="#{empty cEActionRequestsBB.selectedRequest}"
-                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}" />
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                </p:panelGrid>
-
-                                                <h3>Attached photos:</h3>
-
-                                                <p:dataTable
-                                                    id="photoTable"
-                                                    var="photoid"
-                                                    value="#{cEActionRequestsBB.selectedRequest.blobIDList}"
-                                                    rowKey="#{photoid.intValue()}"
-                                                    tableStyleClass="primeDataTable"
-                                                    draggableRows="false" tabindex="6">
-                                                    <p:column width="10%" headerText="Manage">
-                                                        <p:commandButton ajax="true" 
-                                                                         actionListener="#{cEActionRequestsBB.deletePhoto(photoid)}"
-                                                                         value="Delete" 
-                                                                         icon="fa fa-bomb"
-                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
-                                                                         update="photoTable"/>
-                                                    </p:column>
-                                                    <p:column headerText="Photo">
-                                                        <p:graphicImage width="100%" value="#{blobCoordinator.image}">
-                                                            <f:param name="blobID" value="#{photoid.intValue()}"/>
-                                                        </p:graphicImage>
-                                                    </p:column>
-                                                    <p:column width="20%" headerText="Description">
-                                                        <h:outputText escape="false" value="#{blobCoordinator.getBlob(photoid).description}"/>
-                                                    </p:column>
-                                                </p:dataTable>
 
                                             </h:form>
 
@@ -616,6 +835,14 @@
                             </h:panelGrid>
                         </h:form>
                     </p:dialog>
+
+                    <h:form>
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                            <p:commandButton value="Yes" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
+                            <p:commandButton value="No" styleClass="ui-confirmdialog-no" icon="pi pi-times"/>
+                        </p:confirmDialog>
+
+                    </h:form>
 
                 </f:view>
 

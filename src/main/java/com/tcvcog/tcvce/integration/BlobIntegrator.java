@@ -409,78 +409,21 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * removes this meta from the db, as well as any rows associated with this meta in linker tables.
-     * TODO: Add functionality to delete bytes too?
-     * @param blobID the blobID of the meta to be removed
+     * Removes the photodoc row from the photodoc table.
+     * No longer removes any connections to the photodoc
+     * Users must erase each connection manually via the interface.
+     * This method should only be used by the coordinator.
+     * Use the method on the coordinator, it is safer - checks for connections first.
+     * @param blobID the blob to be removed
      * @throws IntegrationException thrown instead of a SQLException
      */
     public void deletePhotoBlob(int blobID) throws IntegrationException{
-        // TODO: delete from linker tables as they are added
         
-        //actionrequest linker table
-        Connection con = getPostgresCon();
-        String query = "DELETE" +
-                        "  FROM public.ceactionrequestphotodoc WHERE photodoc_photodocid = ?;";
+        //delete the main photodoc entry
+        String query = "DELETE FROM public.photodoc WHERE photodocid = ?;";
         
         PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            System.out.println("BlobIntegrator.deleteBlob() | ERROR: "+ ex);
-            throw new IntegrationException("Error deleting link. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        
-        //violation linker table
-        query = "DELETE FROM public.codeviolationphotodoc WHERE photodoc_photodocid = ?";
-        stmt = null;
-        con = getPostgresCon();
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            System.out.println("BlobIntegrator.deleteBlob() | ERROR: "+ ex);
-            throw new IntegrationException("Error deleting link. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        
-        //property linker table
-        query = "DELETE" +
-                        "  FROM public.propertyphotodoc WHERE photodoc_photodocid = ?;";
-        
-        stmt = null;
-        con = getPostgresCon();
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            System.out.println("BlobIntegrator.deleteBlob() | ERROR: "+ ex);
-            throw new IntegrationException("Error deleting link. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        //person linker table - which doesn't exist at the moment, so this code is commented out.
-        /*
-        query = "DELETE" +
-                        "  FROM public.personphotodoc WHERE photodoc_photodocid = ?;";
-        
-        stmt = null;
-        con = getPostgresCon();
+        Connection con = getPostgresCon();
         
         try {
             stmt = con.prepareStatement(query);
@@ -488,30 +431,76 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println("BlobIntegrator.deletePhotoBlob() | ERROR: "+ ex);
-            throw new IntegrationException("Error deleting link. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {ignored} }
-             if (con != null) { try { con.close(); } catch (SQLException e) { ignored } }
-        } // close finally
-        */
-        
-        //delete the main photodoc entry
-        query = "DELETE FROM public.photodoc WHERE photodocid = ?;";
-        
-        stmt = null;
-        con = getPostgresCon();
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            System.out.println("BlobIntegrator.deleteBlob() | ERROR: "+ ex);
             throw new IntegrationException("Error deleting blob. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
+    }
+    
+    /**
+     * Removes the bytes with the given ID.
+     * This method should only be used by the coordinator.
+     * Use the Blob removal methods on the coordinator, 
+     * they check to make sure no blob is using the bytes before removal.
+     * @param bytesID
+     * @throws IntegrationException thrown instead of a SQLException
+     */
+    public void deleteBytes(int bytesID) throws IntegrationException{
+        
+        //delete the main photodoc entry
+        String query = "DELETE FROM public.blobbytes WHERE bytesid = ?;";
+        
+        PreparedStatement stmt = null;
+        Connection con = getPostgresCon();
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, bytesID);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("BlobIntegrator.deleteBytes() | ERROR: "+ ex);
+            throw new IntegrationException("Error deleting blob. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
+     * Returns the IDs of all photo blobs connected to the given bytesID
+     * @param bytesID
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public List<Integer> getPhotoBlobsFromBytesID(int bytesID) throws IntegrationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT photodocid FROM public.photodoc WHERE blobbytes_bytesid = ?;";
+        
+        PreparedStatement stmt = null;
+        
+        List<Integer> idList = new ArrayList<>();
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, bytesID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                 idList.add(rs.getInt("photodocid"));
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving attached blob IDs. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return idList;
     }
     
     public void removePhotoPropertyLink(int blobID, int propertyID) throws IntegrationException {
