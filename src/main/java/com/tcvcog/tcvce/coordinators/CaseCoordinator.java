@@ -1508,6 +1508,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         return nov;
     }
     
+    /**
+     * Tool for building an NOV from a template block
+     * @param nov
+     * @param temp
+     * @param cse
+     * @return
+     * @throws BObStatusException 
+     */
     public NoticeOfViolation nov_assembleNOVFromTemplate(NoticeOfViolation nov, TextBlock temp, CECase cse) throws BObStatusException{
         
         CaseIntegrator ci = getCaseIntegrator();
@@ -1515,15 +1523,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             throw new BObStatusException("Cannot build a notice with null NOV, template or case");
         }
         
-        String template = "I am a bunch of text before the VIOLATION injection point ***VIOLATIONS*** and I'm after the violation injection point";
+        String template = temp.getTextBlockText();
         int startOfInjectionPoint = template.indexOf(Constants.NOV_VIOLATIONS_INJECTION_POINT);
         System.out.println("CaseCoor.nov_assembleNOVFromTemplate: Injection point found starts at: " + startOfInjectionPoint);
         // If the injection point is not found, put the entire template block as text before Violations
         if(startOfInjectionPoint != -1){
-            nov.setTextBeforeViolations(template.substring(0, startOfInjectionPoint));
-            nov.setTextAfterViolations(template.substring(startOfInjectionPoint + Constants.NOV_VIOLATIONS_INJECTION_POINT.length()));
+            nov.setNoticeTextBeforeViolations(template.substring(0, startOfInjectionPoint));
+            nov.setNoticeTextAfterViolations(template.substring(startOfInjectionPoint + Constants.NOV_VIOLATIONS_INJECTION_POINT.length()));
         } else {
-            nov.setTextBeforeViolations(template);
+            nov.setNoticeTextBeforeViolations(template);
         }
         
         

@@ -17,213 +17,341 @@
             <ui:define name="content">
                 <f:view id="missionControlView">
                     <div class="mainContainer">
-                        
+
                         <h:form id="growl-form">
                             <p:growl showSummary="true" 
                                      showDetail="false"/>
                         </h:form>
-                        
+
                         <h:form id="missionControlForm">
                             <h1><h:outputText value="codeNforce Dashboard: #{systemServicesBB.bbSessionMuni.muniName}"/> </h1>
 
-                            <p:dashboard model="#{missionControlBB.mainDash}">
 
-                                <p:panel id="dashpanel-ce-cears"
-                                         collapsed="false"
-                                         closable="true"
-                                         toggleable="true"
-                                         header="#{sessionBean.sessCEARList.size()} CE Action Requests Awaitng Review"
-                                         rendered="true"
-                                         footer=""
-                                         toggleableHeader="true"
-                                         menuTitle="">
-                                    <p:scrollPanel style="height: 550px;"
-                                                   >
+                                <!--NESTED DATA FIELD VERTICAL-->
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field-vertical">
 
-                                        <h:form id="dash-cears-form">
-
-                                            <p:dataTable id="requestTable"
-                                                         var="r"
-                                                         rowKey="#{r.requestID}"
-                                                         value="#{sessionBean.sessCEARList}"
-                                                         tableStyleClass="primeDataTable"
-                                                         >
-
-                                                <p:column headerText="Date Submitted000"
-                                                          styleClass="centeredColumnContent">
-
-                                                    <h:outputText value="#{missionControlBB.getPrettyDateNoTime(r.submittedTimeStamp)}"/>
-
-                                                </p:column>
-
-                                                <p:column headerText="Address"
-                                                          styleClass="centeredColumnContent">
-
-                                                    <h:outputText value="#{r.requestProperty.address}"/>
-
-                                                </p:column>
+                                    <p:panel id="testpanel1"
+                                             header="Property search">
 
 
-                                                <p:column headerText="Issue Type"
-                                                          styleClass="centeredColumnContent">
+                                    </p:panel>
 
-                                                    <h:outputText value="#{r.issue.name}"/>
-
-                                                </p:column>
+                                    <p:panel id="testpanel2"
+                                             header="Property Profile">
 
 
+                                    </p:panel>
 
-                                                <p:column headerText="View"
-                                                          styleClass="centeredColumnContent"
-                                                          >
+                                    <p:panel id="testpanel3"
+                                             header="Code Enforcement Cases">
 
-                                                    <p:commandButton    
-                                                        id="dash-switchuser-button-switch"
-                                                        value="View"
-                                                        styleClass="button" 
-                                                        ajax="false"
-                                                        action="#{missionControlBB.onViewCEARButtonChange(r)}" 
-                                                        icon="fa fa-cogs" />
+                                        <p:dataScroller id="caselist-report-datascroller"
+                                                        value="#{sessionBean.sessCECaseList}"
+                                                        var="cse">
+
+                                            <h:outputText id="header-addr-ot" value="#{cse.property.address} "/>  
+                                            <h:outputText id="header-sep-ot" value=" | "/>  
+                                            <h:outputText id="header-muni-ot" value="#{cse.caseName}"/>  
+                                            <p:spacer height="3px" />
+                                            <div class="restrict-data-field-label-inline" >
+                                                <h:outputLabel value="Status: "/>
+                                            </div>
+                                            <!--NESTED DATA VALUE INLINE -->
+                                            <div class="restrict-data-field-value-inline" >
+                                                <h:outputText id="selcase-status-it" 
+                                                              value="#{cse.statusBundle.phase.label}"/>
+                                            </div>
+
+                                            <div class="restrict-data-field-label-inline" >
+                                                <h:outputLabel value="Opened: "/>
+                                            </div>
+
+                                            <div class="restrict-data-field-value-inline" >
+                                                <h:outputText id="selcase-odate-it" 
+                                                              value="#{cse.originiationDatePretty}"/>
+                                            </div>
+
+                                            <div class="restrict-data-field-label-inline" >
+                                                <h:outputLabel value="ID: "/>
+                                            </div>
+
+                                            <div class="restrict-data-field-value-inline" >
+                                                <h:outputText id="header-id-ot" value="#{cse.caseID}"/>
+
+                                            </div>
 
 
-                                                </p:column>
 
-                                            </p:dataTable>
+                                            <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-report" >
 
-                                            <p:spacer height="15px"/>
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Violations: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <p:dataScroller id="violations-ds"
+                                                                    styleClass="nov-viol-ds"
+                                                                    value="#{cse.violationList}"
+                                                                    var="v">
 
-                                            <p:chart type="donut" 
-                                                     model="#{cEActionRequestsBB.requestReasonDonut}" 
-                                                     style="width:600px; height: 600px;"/>
 
-                                            <p:spacer height="10px"/>
+                                                        <h:outputLabel  value="#{v.violatedEnfElement.codeElement.source.sourceName} 
+                                                                        (#{v.violatedEnfElement.codeElement.source.sourceYear}) " />
+                                                        <p:spacer height="2px" />
 
-                                        </h:form>
+                                                        <h:outputText    value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
+                                                        <h:outputText    value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
 
-                                    </p:scrollPanel>
+                                                        <h:outputText value=" | " />
+
+                                                        <h:outputText    value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum} " />
+                                                        <h:outputText    value="#{v.violatedEnfElement.codeElement.ordSecTitle}" />
+
+                                                        <h:outputText value=" | " />
+
+                                                        <h:outputText    value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
+                                                        <h:outputText    value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+
+                                                        <hr />
+                                                    </p:dataScroller>
+                                                </div>
+                                            </div>
+
+
+                                            <!--NESTED DATA LABEL INLINE -->
+                                            <div class="restrict-data-field-label-inline" >
+                                                <h:outputLabel value="Notices: "/>
+                                            </div>
+                                            <!--NESTED DATA VALUE INLINE -->
+                                            <div class="restrict-data-field-value-inline" >
+                                                <h:outputText value="#{cse.noticeList.size()}" />
+                                            </div>
+
+                                            <!--NESTED DATA LABEL INLINE -->
+                                            <div class="restrict-data-field-label-inline" >
+                                                <h:outputLabel value="Citations: "/>
+                                            </div>
+                                            <!--NESTED DATA VALUE INLINE -->
+                                            <div class="restrict-data-field-value-inline" >
+                                                <h:outputText value="#{cse.citationList.size()}" />
+                                            </div>
+
+                                            <!--NESTED DATA LABEL INLINE -->
+                                            <div class="restrict-data-field-label-inline" >
+                                                <h:outputLabel value="Events total: "/>
+                                            </div>
+                                            <!--NESTED DATA VALUE INLINE -->
+                                            <div class="restrict-data-field-value-inline" >
+                                                <h:outputText value="#{cse.eventList.size()}" />
+                                            </div>
+
+                                            <p:spacer height="10px" />
+                                        </p:dataScroller>
+                                
+
+
                                 </p:panel>
+                                </div>
 
-                                <p:panel id="dashpanel-ce-cecases"
-                                         collapsed="false"
-                                         closable="true"
-                                         toggleable="true"
-                                         header="#{sessionBean.sessCECaseList.size()} Open Code Enforcement Cases"
-                                         rendered="true"
-                                         footer=""
-                                         toggleableHeader="true"
-                                         menuTitle="">
-                                    <p:scrollPanel style="height: 550px;"
-                                                   >
+                                <p:dashboard model="#{missionControlBB.mainDash}">
 
-                                        <h:form id="dash-cecases-form">
-                                            <p:dataTable
-                                                id="cecase-table"
-                                                var="c"
-                                                rowKey="#{c.caseID}"
-                                                widgetVar="cecase-table-var"
-                                                value="#{sessionBean.sessCECaseList}"
-                                                tableStyleClass="primeDataTable">
+                                    <p:panel id="dashpanel-ce-cears"
+                                             collapsed="false"
+                                             closable="true"
+                                             toggleable="true"
+                                             header="#{sessionBean.sessCEARList.size()} CE Action Requests Awaitng Review"
+                                             rendered="true"
+                                             footer=""
+                                             toggleableHeader="true"
+                                             menuTitle="">
+                                        <p:scrollPanel style="height: 550px;"
+                                                       >
 
-                                                <p:column width="5%" sortBy="#{c.originationDate}">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Date Opened" />
-                                                    </f:facet>
-                                                    <h:outputText value="#{missionControlBB.getPrettyDateNoTime(c.originationDate)}"/>
-                                                </p:column>
-                                              
-                                                <p:column width="15%" sortBy="#{c.property.address}">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Property" />
-                                                    </f:facet>
-                                                    <h:outputText value="#{c.property.address} (#{c.property.muni.muniName})"/>
-                                                </p:column>
-                                                
-                                                <p:column width="15%">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Name" />
-                                                    </f:facet>
-                                                    <h:outputText value="#{c.caseName}"/>
-                                                </p:column>
-                                               
-                                                <p:column width="5%">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="view" />
-                                                    </f:facet>
-                                                    <ui:remove>
-                                                        
-                                                    <p:commandButton    id="cecases-viewcase-cb"
-                                                                        icon="fa fa-archive" 
-                                                                        action="#{missionControlBB.onViewCECaseButtonChange(c)}"
-                                                                        ajax="false"
-                                                                        />
-                                                    </ui:remove>
-                                                </p:column>
-                                            </p:dataTable>
+                                            <h:form id="dash-cears-form">
+
+                                                <p:dataTable id="requestTable"
+                                                             var="r"
+                                                             rowKey="#{r.requestID}"
+                                                             value="#{sessionBean.sessCEARList}"
+                                                             tableStyleClass="primeDataTable"
+                                                             >
+
+                                                    <p:column headerText="Date Submitted000"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{missionControlBB.getPrettyDateNoTime(r.submittedTimeStamp)}"/>
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Address"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{r.requestProperty.address}"/>
+
+                                                    </p:column>
 
 
-                                            <p:spacer height="15px"/>
+                                                    <p:column headerText="Issue Type"
+                                                              styleClass="centeredColumnContent">
 
-                                            <p:chart type="donut" 
-                                                     model="#{cEActionRequestsBB.requestReasonDonut}" 
-                                                     style="width:600px; height: 600px;"/>
+                                                        <h:outputText value="#{r.issue.name}"/>
 
-                                            <p:spacer height="10px"/>
-
-                                        </h:form>
-
-                                    </p:scrollPanel>
-                                </p:panel>
+                                                    </p:column>
 
 
 
-                               
+                                                    <p:column headerText="View"
+                                                              styleClass="centeredColumnContent"
+                                                              >
 
-                                <p:panel id="dashpanel-sys-switchmuni"
-                                         collapsed="false"
-                                         closable="true"
-                                         toggleable="true"
-                                         header="Switch session municipality"
-                                         rendered="true"
-                                         footer=""
-                                         toggleableHeader="true"
-                                         menuTitle="">
-                                    <p:commandButton    id="dash-switchmuni-button-switch"
-                                                        disabled="false"
-                                                        value="Change session credential" 
-                                                        styleClass="button" 
-                                                        action="#{missionControlBB.reauthenticate}" 
-                                                        icon="fa fa-exchange" />
-                                </p:panel>
+                                                        <p:commandButton    
+                                                            id="dash-switchuser-button-switch"
+                                                            value="View"
+                                                            styleClass="button" 
+                                                            ajax="false"
+                                                            action="#{missionControlBB.onViewCEARButtonChange(r)}" 
+                                                            icon="fa fa-cogs" />
 
-                                <p:panel id="dashpanel-sys-switchuser"
-                                         collapsed="false"
-                                         closable="true"
-                                         toggleable="true"
-                                         header="Switch user"
-                                         rendered="true"
-                                         footer=""
-                                         toggleableHeader="true"
-                                         menuTitle="">
 
-                                    <p:selectOneMenu id="dash-switchuser-solb-chooseuser" tabindex="12" value="#{missionControlBB.selectedUser}">
-                                        <f:converter converterId="userConverter"/>
-                                        <f:selectItem itemLabel="select a user..." noSelectionOption="true" itemDisabled="true"/>
-                                        <f:selectItems id="dash-switchuser-si-username" 
-                                                       value="#{missionControlBB.userList}"
-                                                       var="u" itemValue="#{u}" itemLabel="#{u.username} (#{u.userID})" />
-                                        <p:ajax update="dash-switchuser-button-switch" />
-                                    </p:selectOneMenu>
-                                    <h:message for="dash-switchuser-solb-chooseuser" showDetail="true" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    <p:commandButton    id="dash-switchuser-button-switch"
-                                                        disabled="#{empty missionControlBB.selectedUser}"
-                                                        value="Switch to #{missionControlBB.selectedUser.username}" 
-                                                        styleClass="button" 
-                                                        action="#{missionControlBB.switchToUser}" 
-                                                        icon="fa fa-universal-access" />
-                                </p:panel>
+                                                    </p:column>
 
-                            </p:dashboard>
+                                                </p:dataTable>
+
+                                                <p:spacer height="15px"/>
+
+                                                <p:chart type="donut" 
+                                                         model="#{cEActionRequestsBB.requestReasonDonut}" 
+                                                         style="width:600px; height: 600px;"/>
+
+                                                <p:spacer height="10px"/>
+
+                                            </h:form>
+
+                                        </p:scrollPanel>
+                                    </p:panel>
+
+                                    <p:panel id="dashpanel-ce-cecases"
+                                             collapsed="false"
+                                             closable="true"
+                                             toggleable="true"
+                                             header="#{sessionBean.sessCECaseList.size()} Open Code Enforcement Cases"
+                                             rendered="true"
+                                             footer=""
+                                             toggleableHeader="true"
+                                             menuTitle="">
+                                        <p:scrollPanel style="height: 550px;"
+                                                       >
+
+                                            <h:form id="dash-cecases-form">
+                                                <p:dataTable
+                                                    id="cecase-table"
+                                                    var="c"
+                                                    rowKey="#{c.caseID}"
+                                                    widgetVar="cecase-table-var"
+                                                    value="#{sessionBean.sessCECaseList}"
+                                                    tableStyleClass="primeDataTable">
+
+                                                    <p:column width="5%" sortBy="#{c.originationDate}">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Date Opened" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{missionControlBB.getPrettyDateNoTime(c.originationDate)}"/>
+                                                    </p:column>
+
+                                                    <p:column width="15%" sortBy="#{c.property.address}">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Property" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{c.property.address} (#{c.property.muni.muniName})"/>
+                                                    </p:column>
+
+                                                    <p:column width="15%">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Name" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{c.caseName}"/>
+                                                    </p:column>
+
+                                                    <p:column width="5%">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="view" />
+                                                        </f:facet>
+                                                        <ui:remove>
+
+                                                            <p:commandButton    id="cecases-viewcase-cb"
+                                                                                icon="fa fa-archive" 
+                                                                                action="#{missionControlBB.onViewCECaseButtonChange(c)}"
+                                                                                ajax="false"
+                                                                                />
+                                                        </ui:remove>
+                                                    </p:column>
+                                                </p:dataTable>
+
+
+                                                <p:spacer height="15px"/>
+
+                                                <p:chart type="donut" 
+                                                         model="#{cEActionRequestsBB.requestReasonDonut}" 
+                                                         style="width:600px; height: 600px;"/>
+
+                                                <p:spacer height="10px"/>
+
+                                            </h:form>
+
+                                        </p:scrollPanel>
+                                    </p:panel>
+
+
+
+
+
+                                    <p:panel id="dashpanel-sys-switchmuni"
+                                             collapsed="false"
+                                             closable="true"
+                                             toggleable="true"
+                                             header="Switch session municipality"
+                                             rendered="true"
+                                             footer=""
+                                             toggleableHeader="true"
+                                             menuTitle="">
+                                        <p:commandButton    id="dash-switchmuni-button-switch"
+                                                            disabled="false"
+                                                            value="Change session credential" 
+                                                            styleClass="button" 
+                                                            action="#{missionControlBB.reauthenticate}" 
+                                                            icon="fa fa-exchange" />
+                                    </p:panel>
+
+                                    <p:panel id="dashpanel-sys-switchuser"
+                                             collapsed="false"
+                                             closable="true"
+                                             toggleable="true"
+                                             header="Switch user"
+                                             rendered="true"
+                                             footer=""
+                                             toggleableHeader="true"
+                                             menuTitle="">
+
+                                        <p:selectOneMenu id="dash-switchuser-solb-chooseuser" tabindex="12" value="#{missionControlBB.selectedUser}">
+                                            <f:converter converterId="userConverter"/>
+                                            <f:selectItem itemLabel="select a user..." noSelectionOption="true" itemDisabled="true"/>
+                                            <f:selectItems id="dash-switchuser-si-username" 
+                                                           value="#{missionControlBB.userList}"
+                                                           var="u" itemValue="#{u}" itemLabel="#{u.username} (#{u.userID})" />
+                                            <p:ajax update="dash-switchuser-button-switch" />
+                                        </p:selectOneMenu>
+                                        <h:message for="dash-switchuser-solb-chooseuser" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        <p:commandButton    id="dash-switchuser-button-switch"
+                                                            disabled="#{empty missionControlBB.selectedUser}"
+                                                            value="Switch to #{missionControlBB.selectedUser.username}" 
+                                                            styleClass="button" 
+                                                            action="#{missionControlBB.switchToUser}" 
+                                                            icon="fa fa-universal-access" />
+                                    </p:panel>
+
+                                </p:dashboard>
 
 
                         </h:form>

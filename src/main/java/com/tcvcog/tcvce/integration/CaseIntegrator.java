@@ -1814,7 +1814,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      */
     public List<Integer> novGetList(CECase ceCase) throws IntegrationException {
-        String query = "SELECT noticeid FROM public.noticeofviolation WHERE caseid=?;";
+        String query = "SELECT noticeid FROM public.noticeofviolation WHERE caseid=? AND active=TRUE;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;

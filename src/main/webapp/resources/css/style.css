@@ -1284,6 +1284,18 @@ gridTd-bignum{
 }
 
 
+.link-button{
+    display: inline-block;
+    background-color:  #007ad9;
+    color: white;
+    padding: 5px;
+    
+}
+
+.link-button-container a{
+    color:white;
+}
+
 /* ****************** CLOSE BUTTON STYLES ********************/
 
 

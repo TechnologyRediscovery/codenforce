@@ -198,6 +198,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             System.out.println(ex);
         }
         
+      
+        
         
         
     } // close initbean
@@ -342,7 +344,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                 onModeLookupInit();
                 break;
             case INSERT:
-                onModeInsertInit();
+//                onModeInsertInit();
                 break;
             case UPDATE:
                 onModeUpdateInit();
@@ -394,6 +396,16 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         return PageModeEnum.REMOVE.equals(getCurrentMode());
     }
 
+    
+    /**
+     * Listener for user requests to go back to case
+     * @return 
+     */
+    public String onBackToCaseButtonChange(){
+        return "ceCaseSearchProfile";
+        
+    }
+    
     /**
      * Primary listener method which copies a reference to the selected user
      * from the list and sets it on the selected user perch
@@ -420,6 +432,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     /**
      * Internal logic container for beginning the user creation change process
      * Delegated from the mode button router
+     * @param ev
      */
     public void onModeInsertInit() {
         CaseCoordinator cc = getCaseCoordinator();
@@ -430,6 +443,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             nov.setCreationBy(getSessionBean().getSessUser());
             currentNotice = nov;
             getSessionBean().setSessNotice(currentNotice);
+            setCurrentMode(PageModeEnum.INSERT);
         } catch (AuthorizationException ex) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Database error", ""));
@@ -499,15 +513,51 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         }
     }
     
-    public void onBuildNOVUsingTemplateBlock(){
+    
+    public void onStartNewNoticeButtonChange(ActionEvent ev){
+        onModeInsertInit();
+        getFacesContext().addMessage(null,
+               new FacesMessage(FacesMessage.SEVERITY_INFO,
+                       "Building a new notice; Next: Apply template", ""));
+    }
+    
+    
+    /**
+     * Listener for user requests to update template
+     * @param tb 
+     */
+    public void onTemplateEditButtonChange(TextBlock tb){
+        currentTemplateBlock = tb;
+    }
+    /**
+     * Listener for user requests to build NOV with template
+     * @param temp 
+     */
+    public void onBuildNOVUsingTemplateBlock(TextBlock temp){
         CaseCoordinator cc = getCaseCoordinator();
+        currentTemplateBlock = temp;
         try {
             currentNotice = cc.nov_assembleNOVFromTemplate(currentNotice, currentTemplateBlock, currentCase);
+            getFacesContext().addMessage(null,
+               new FacesMessage(FacesMessage.SEVERITY_INFO,
+                       "Assembled block using template", ""));
         } catch (BObStatusException ex) {
+            getFacesContext().addMessage(null,
+               new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                       "Unable to build notice from template.", ""));
             System.out.println(ex);
         }
         
         
+        
+    }
+    
+    /**
+     * Listener for user requests to view template
+     * @param temp 
+     */
+    public void onTemplateViewButtonChange(TextBlock temp){
+        currentTemplateBlock = temp;
         
     }
 
@@ -596,6 +646,11 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         }
     }
 
+    /**
+     * Old NOV builder method using blocks
+     * @deprecated 
+     * @return 
+     */
     public String assembleNotice() {
 
         if (currentNotice != null && currentNotice.getRecipient() != null) {
@@ -655,7 +710,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         return "ceCaseNotices";
     } // close method
 
-    public String resetNotice() {
+    public void resetNotice(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         try {
             cc.nov_ResetMailing(currentNotice, getSessionBean().getSessUser());
@@ -667,12 +722,17 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-            return "";
         }
-        return "ceCaseNotices";
     }
 
     public String printNotice() {
+        getSessionBean().setSessNotice(currentNotice);
+//        positionCurrentCaseAtHeadOfQueue();
+        return "noticeOfViolationPrint";
+    }
+
+    public String printNotice(NoticeOfViolation nov) {
+        currentNotice = nov;
         getSessionBean().setSessNotice(currentNotice);
 //        positionCurrentCaseAtHeadOfQueue();
         return "noticeOfViolationPrint";
@@ -718,11 +778,57 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
     /**
      * Listener for changes to text block template list selected items
+     * @param tb
      */
-    public void onTemplateBlockViewChange(){
+    public void onTemplateBlockViewChange(TextBlock tb){
         System.out.println("NoticeOfViolationBB.onTemplateBlockViewChange");
+        currentTemplateBlock = tb;
         formTemplateBlockText = currentTemplateBlock.getTextBlockText();
     }
+    
+    /**
+     * Listener for user requests to delete text block
+     * @param tb 
+     */
+    public void onTemplateDeleteButtonChange(TextBlock tb){
+        System.out.println("NOVBB.deleteTemplate");
+        CaseIntegrator ci = getCaseIntegrator();
+        try {
+            ci.deleteTextBlock(tb);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Removed template!" + tb.getBlockID(), ""));
+             injectableBlockList = ci.getTextBlockTemplates(getSessionBean().getSessMuni());
+        } catch (IntegrationException ex) {
+            
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to delete template", ""));
+        }
+        
+    }
+    
+    /**
+     * Second gen listener for finalization of notices
+     * @return 
+     */
+    public String finalizeNoticeAndPrint(){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            cc.nov_InsertNotice(currentNotice, currentCase, getSessionBean().getSessUser());
+        } catch (IntegrationException ex) {
+            
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to save NOV and print", ""));
+            System.out.println("");
+            return "";
+        }
+        getSessionBean().setSessNotice(currentNotice);
+
+        return "noticeOfViolationPrint";
+    }
+    
     
     /**
      * Listener for user reuqests to manage templates
@@ -883,11 +989,11 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             return "";
 
         }
-        return "ceCaseNotices";
+        return "ceCaseSearchProfile";
 
     }
 
-    public String markNoticeOfViolationAsSent() {
+    public void markNoticeOfViolationAsSent(ActionEvent ev) {
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
             caseCoord.nov_markAsSent(currentCase, currentNotice, getSessionBean().getSessUser());
@@ -898,7 +1004,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-            return "";
         } catch (EventException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -906,13 +1011,11 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                             "Unable to generate case event to log phase change",
                             "Note that because this message is being displayed, the phase change"
                             + "has probably succeeded"));
-            return "";
         }
-        return "ceCaseNotices";
 
     }
 
-    public String markNoticeOfViolationAsReturned() {
+    public void markNoticeOfViolationAsReturned(ActionEvent ev) {
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
             caseCoord.nov_markAsReturned(currentCase, currentNotice, getSessionBean().getSessUser());
@@ -924,9 +1027,9 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-            return "";
+            
         }
-        return "ceCaseNotices";
+        
     }
 
     /**

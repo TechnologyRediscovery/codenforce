@@ -33,14 +33,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <ui:define name="content">
                 <f:view id="cecase-lookup-profile-view">
 
-                 
+
 
                     <p:outputPanel id="body-panel">
-                            
-                            <p:growl id="cecase-messages-growl"
-                             redisplay="false"
-                             />
-                        
+
+                        <p:growl id="cecase-messages-growl"
+                                 redisplay="false"
+                                 />
+
                         <h1>CECase Lookup and Profile</h1>
 
                         <div class="mainContainer">
@@ -162,8 +162,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                value="load case history" 
                                                                update="cecase-messages-growl
                                                                cecase-search-results-form"/>
-                                            
-                                         
+
+
                                             <p:commandButton   id="print-case-list-cb" 
                                                                ajax="true" 
                                                                actionListener="#{ceCaseSearchProfileBB.prepareReportCECaseList}"
@@ -297,33 +297,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                       #{ceCaseSearchProfileBB.currentCase.caseManager.person.lastName} 
                                                                       (#{ceCaseSearchProfileBB.currentCase.caseManager.username})"/>  
                                                         <p:spacer height="5px"/>
-                                                        
+
                                                         <h:outputLabel styleClass="bold" value="Case Phase: "/>
                                                         <div class="#{ceCaseSearchProfileBB.currentCase.statusBundle.phaseIcon.styleClass}">
                                                             <i class="material-icons status-display-icon-i"><h:outputText value="#{ceCaseSearchProfileBB.currentCase.statusBundle.phaseIcon.materialIcon}"/></i>
                                                         </div>
                                                         <h:outputText id="casephase-ot-profile" 
                                                                       value="#{ceCaseSearchProfileBB.currentCase.statusBundle.phase.label}"/>
-                                                        
+
                                                         <p:spacer height="5px"/>
-                                                        
+
                                                         <h:outputLabel styleClass="bold" value="Next Step: "/>
-                                                        
+
                                                         <h:outputText id="casephase-nextstep" 
                                                                       value="#{ceCaseSearchProfileBB.currentCase.statusBundle.phase.nextStep}"/>
                                                         <p:spacer height="5px"/>
-                                                        
+
                                                         <div class="gray_button">
 
                                                             <p:commandButton   id="howto-nextstep-button" 
-                                                                       ajax="true" 
-                                                                       actionListener="#{ceCaseSearchProfileBB.onHowToNextStepButtonChange}"
-                                                                       icon="fa fa-question-circle-o" 
-                                                                       styleClass="noFill"
-                                                                       oncomplete="PF('#{ceCaseSearchProfileBB.currentCase.statusBundle.phase.nextStepHelpPanelID}-panel-var').show()"
-                                                                       value="Help on next step" />
+                                                                               ajax="true" 
+                                                                               actionListener="#{ceCaseSearchProfileBB.onHowToNextStepButtonChange}"
+                                                                               icon="fa fa-question-circle-o" 
+                                                                               styleClass="noFill"
+                                                                               oncomplete="PF('#{ceCaseSearchProfileBB.currentCase.statusBundle.phase.nextStepHelpPanelID}-panel-var').show()"
+                                                                               value="Help on next step" />
                                                         </div>
-                                                        
+
                                                     </h:panelGroup>      
 
                                                     <f:facet name="footer" class="leftalign">
@@ -338,7 +338,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </f:facet>
                                                 </h:panelGrid>
 
-                                                
+
                                                 <p:commandButton    id="view-property-cb" 
                                                                     ajax="false" 
                                                                     action="#{ceCaseSearchProfileBB.exploreProperty}"
@@ -380,8 +380,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                  rendered="false"
                                                  header="TODOs (#{ceCaseSearchProfileBB.currentCase.proposalList.size()})">
 
-                                       
-                                            
+
+
                                             <h:form id="cecase-todos-form">
 
 
@@ -533,7 +533,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                  value="#{ceCaseSearchProfileBB.closingEventCategorySelected}"
                                                                  styleClass="data_field_value"
                                                                  disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
-                                                    
+
                                                     <f:converter converterId="eventCategoryConverter"/>
                                                     <f:selectItem itemLabel="select a closing event category" 
                                                                   noSelectionOption="true" />
@@ -541,17 +541,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                    value="#{ceCaseSearchProfileBB.closingEventList}"
                                                                    var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
                                                 </h:selectOneMenu>
-                                                
+
                                                 <p:spacer height="5px" />
                                                 <p:commandButton    id="cecase-forceclose-button"
                                                                     ajax="false" 
                                                                     value="Force close case prior to full compliance" 
                                                                     action="#{ceCaseSearchProfileBB.onCaseForceCloseCommitButtonChnage}"  
                                                                     icon="fa fa-stop"/>
-                                                
-                                                
-                                                
-                                                
+
+
+
+
                                             </h:form>
                                         </p:panel>
 
@@ -587,20 +587,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
                                                         <ui:remove>
-                                                        <p:outputLabel  value="Property"
-                                                                        for="cecase-property-som"/>
+                                                            <p:outputLabel  value="Property"
+                                                                            for="cecase-property-som"/>
 
-                                                            
-                                                        <h:selectOneMenu id="cecase-property-som"
-                                                                         value="#{ceCaseSearchProfileBB.currentCase.property}"
-                                                                         styleClass="data_field_value"
-                                                                         disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
-                                                            <f:converter converterId="propertyConverter"/>
-                                                            <f:selectItem itemLabel="select a property..." noSelectionOption="true" />
-                                                            <f:selectItems id="cecase-property-selitems"
-                                                                           value="#{systemServicesBB.bbSessionPropertyList}"
-                                                                           var="prop" itemValue="#{prop}" itemLabel="#{prop.address} (#{prop.muni.muniName})"/>
-                                                        </h:selectOneMenu>
+
+                                                            <h:selectOneMenu id="cecase-property-som"
+                                                                             value="#{ceCaseSearchProfileBB.currentCase.property}"
+                                                                             styleClass="data_field_value"
+                                                                             disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
+                                                                <f:converter converterId="propertyConverter"/>
+                                                                <f:selectItem itemLabel="select a property..." noSelectionOption="true" />
+                                                                <f:selectItems id="cecase-property-selitems"
+                                                                               value="#{systemServicesBB.bbSessionPropertyList}"
+                                                                               var="prop" itemValue="#{prop}" itemLabel="#{prop.address} (#{prop.muni.muniName})"/>
+                                                            </h:selectOneMenu>
                                                         </ui:remove>
                                                     </div>
 
@@ -658,8 +658,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field">
                                                         <ui:remove>
 
-                                                        <p:outputLabel  value="Case Source"
-                                                                        for="cecase-source-som"/>
+                                                            <p:outputLabel  value="Case Source"
+                                                                            for="cecase-source-som"/>
 
                                                             <h:selectOneMenu id="cecase-source-som"
                                                                              value="#{ceCaseSearchProfileBB.currentCase.source}"
@@ -816,8 +816,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             </h:form>
 
                                         </p:panel>
-                                        
-                                        
+
+
                                         <p:panel id="cecase-violations-panel"
                                                  toggleable="true"
                                                  collapsed="false"
@@ -924,8 +924,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                     />
 
                                                 <p:spacer height="5px" />
-                                                <ui:remove>
-                                                    
+
+
                                                 <p:dataTable
                                                     id="cecase-notices-table"
                                                     var="nov"
@@ -955,25 +955,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                     <p:column width="10%">
                                                         <f:facet name="header">
-                                                            <h:outputText value="Returned?" />
+                                                            <h:outputText value="Actions" />
                                                         </f:facet>
-                                                        <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDate(nov.returnedTSPretty)}"/>
-                                                    </p:column>
-                                                    <p:column width="10%">
-                                                        <f:facet name="edit">
-                                                            <h:outputText value="View" />
-                                                        </f:facet>
-                                                        <p:commandButton    id="cecase-notices-view-button"
-                                                                            ajax="false" 
-                                                                            action="#{ceCaseSearchProfileBB.onNOVViewButtonChange(nov)}"
-                                                                            icon="fa fa-send"
-                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"/>
-                                                    </p:column>
+                                                        <div class="link-button-container">
 
+                                                            <p:commandLink  ajax="false" value="Print" 
+                                                                            action="#{noticeOfViolationBB.printNotice(nov)}"
+                                                                            target="_blank"
+                                                                            styleClass="link-button"/>
+                                                        </div>
+                                                        <p:commandButton    id="cecase-notices-view-button"
+                                                                            ajax="true" 
+                                                                            value="Details"
+                                                                            actionListener="#{noticeOfViolationBB.onObjectViewButtonChange(nov)}"
+                                                                            icon="fa fa-search"
+                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                            update="novstatus-dialog"
+                                                                            oncomplete="PF('novstatus-dialog-var').show()"/>
+
+                                                        <p:commandButton    id="cecase-notices-edit-button"
+                                                                            ajax="false" 
+                                                                            value="Edit"
+                                                                            action="#{ceCaseSearchProfileBB.onNOVViewButtonChange(nov)}"
+                                                                            icon="fa fa-edit"
+                                                                            rendered="true"
+                                                                            disabled="#{!(empty nov.lockedAndqueuedTS)}"
+                                                                            update="novstatus-dialog"
+                                                                            oncomplete="PF('novstatus-dialog-var').show()"/>
+                                                    </p:column>
 
                                                 </p:dataTable>
-                                                                                                    </ui:remove>
-
 
                                             </h:form>
 
@@ -1203,7 +1214,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                  toggleable="true"
                                                  collapsed="false"
                                                  header="Files and Photos"
-                                                 rendered="#{ceCaseSearchProfileBB.activeLookupMode}"
+                                                 rendered="false"
                                                  >
 
                                             <h:form id="cecase-blobs-form">
@@ -1649,6 +1660,287 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     </p:outputPanel>
 
 
+                    <p:dialog   id="novstatus-dialog"
+                                height="650" width="900"
+                                widgetVar="novstatus-dialog-var"
+                                closable="true" 
+                                rendered="true"
+                                >
+
+                        <h:form id="nov-profile-form">
+
+                            <!-- Violation status; single line-->
+                            <div class="ui-g data_container_nested_restrict">
+
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
+
+                                    <div class="restrict-data-field-label-inline" >
+                                        <p:outputLabel for="nov-addressee">
+                                            <h:outputText value="Adressee"/>
+                                        </p:outputLabel>
+                                    </div>
+
+                                    <div class="restrict-data-field-value-inline" >
+                                        <h:outputText   id="nov-addressee"
+                                                        value="#{noticeOfViolationBB.currentNotice.recipient.firstName} #{noticeOfViolationBB.currentNotice.recipient.lastName}"/>
+                                        <p:spacer height="3px" />
+                                        <h:outputText escape="false" value="#{noticeOfViolationBB.currentNotice.recipient.addressStreet}"/>
+                                        <p:spacer height="3px" />
+                                        <h:outputText value="#{noticeOfViolationBB.currentNotice.recipient.addressCity}, #{noticeOfViolationBB.currentNotice.recipient.addressState} #{noticeOfViolationBB.currentNotice.recipient.addressZip}"/>
+                                        <p:spacer height="3px" />
+                                        <h:outputLabel styleClass="bold" rendered="#{! (empty noticeOfViolationBB.currentNotice.recipient.ghostCreatedDate)}" value="[ghost of user ID: #{noticeOfViolationBB.currentNotice.recipient.ghostOf}"/>
+
+                                        <h:outputLabel styleClass="bold" value="Recipient (using separate mailing address):"/>
+                                        <p:spacer height="3px" />
+                                        <h:outputText value="#{noticeOfViolationBB.currentNotice.recipient.firstName} #{noticeOfViolationBB.currentNotice.recipient.lastName}"/>
+                                        <h:outputText escape="false" value="#{noticeOfViolationBB.currentNotice.recipient.mailingAddressStreet}"/>
+                                        <p:spacer height="3px" />
+                                        <h:outputText value="#{noticeOfViolationBB.currentNotice.recipient.mailingAddressCity}, #{noticeOfViolationBB.currentNotice.recipient.mailingAddressState} #{noticeOfViolationBB.currentNotice.recipient.mailingAddressZip}"/>
+                                        <p:spacer height="3px" />
+                                        <h:outputLabel styleClass="bold" rendered="#{! (empty noticeOfViolationBB.currentNotice.recipient.ghostCreatedDate)}" value="[ghost of user ID: #{noticeOfViolationBB.currentNotice.recipient.ghostOf}"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- DOR, qued date, sent date, returned date table-->
+                            <div class="ui-g data_container_nested_restrict">
+
+                                <!--NESTED DATA FIELD VERTICAL-->
+                                <div class="ui-g-3 ui-md-6 ui-lg-2 restrict-data-field-vertical">
+                                    <!--NESTED DATA LABEL VERTICAL -->
+                                    <div class="restrict-data-field-label-vertical" >
+                                        <h:outputLabel value=" "/>
+                                    </div>
+                                    <!--NESTED DATA VALUE VERTICAL -->
+                                    <div class="restrict-data-field-value-vertical" style="font-weight: 700;">
+                                        Date:
+                                    </div>
+                                    <!--NESTED DATA VALUE VERTICAL -->
+                                    <div class="restrict-data-field-value-vertical" style="font-weight: 700;">
+                                        Details:
+                                    </div>
+                                    <!--NESTED DATA VALUE VERTICAL -->
+                                    <div class="restrict-data-field-value-vertical" style="font-weight: 700;">
+                                        Action:
+                                    </div>
+
+                                </div>
+
+                                <!--NESTED DATA FIELD VERTICAL-->
+                                <div class="ui-g-3 ui-md-6 ui-lg-2 restrict-data-field-vertical">
+                                    <!--NESTED DATA LABEL VERTICAL -->
+                                    <div class="restrict-data-field-label-vertical" >
+                                        <h:outputLabel value="Date of Record"/>
+                                    </div>
+                                    <!--NESTED DATA VALUE VERTICAL -->
+                                    <div class="restrict-data-field-value-vertical" >
+                                        <h:outputText id="nov-dor-ot"
+                                                      value="#{noticeOfViolationBB.currentNotice.dateOfRecordPretty}" />
+                                    </div>
+                                    <!--NESTED DATA VALUE VERTICAL -->
+                                    <div class="restrict-data-field-value-vertical" >
+                                        <h:outputText   id="nov-creator-ot0"
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.creationBy) ? 'By ' : ''}"/>
+                                        <h:outputText   id="nov-creator-ot1"
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.creationBy) ? noticeOfViolationBB.currentNotice.creationBy.person.firstName : ''}"/>
+                                        <h:outputText   id="nov-creator-ot2"
+                                                        value=" "/>
+                                        <h:outputText   id="nov-creator-ot3"
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.creationBy) ? noticeOfViolationBB.currentNotice.creationBy.person.lastName : ''}"/>
+                                    </div>
+                                    <div class="restrict-data-field-value-vertical" >
+                                        <h:outputText id="nov-dor-placeholder-ot"
+                                                      value=" " />
+                                    </div>
+
+                                </div>
+
+                                <!--NESTED DATA FIELD VERTICAL-->
+                                <div class="ui-g-3 ui-md-6 ui-lg-2 restrict-data-field-vertical">
+                                    <!--NESTED DATA LABEL VERTICAL -->
+                                    <div class="restrict-data-field-label-vertical" >
+                                        <h:outputLabel value="Queued for Mailing"/>
+                                    </div>
+                                    <!--NESTED DATA VALUE VERTICAL -->
+                                    <div class="restrict-data-field-value-vertical" >
+                                        <h:outputText   id="nov-queued-ot"
+                                                        value="#{noticeOfViolationBB.currentNotice.lockedAndQueuedTSPretty}"/>
+                                    </div>
+                                    <!--NESTED DATA VALUE VERTICAL -->
+                                    <div class="restrict-data-field-value-vertical" >
+                                        <h:outputText   id="nov-queuedby-ot0"
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.lockedAndQueuedBy) ? 'By ' : ''}"/>
+                                        <h:outputText   id="nov-queuedby-ot1"
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.lockedAndQueuedBy) ? noticeOfViolationBB.currentNotice.lockedAndQueuedBy.person.firstName : ''}"/>
+                                        <h:outputText   id="nov-queuedby-ot2"
+                                                        value=" "/>
+                                        <h:outputText   id="nov-queuedby-ot3"
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.lockedAndQueuedBy) ? noticeOfViolationBB.currentNotice.lockedAndQueuedBy.person.lastName : ''}"/>
+                                    </div>
+                                    <div class="restrict-data-field-value-vertical" >
+
+                                        <p:commandButton id="nov-queuenotice-cb"
+                                                         ajax="true" 
+                                                         actionListener="#{noticeOfViolationBB.lockNoticeAndQueueForMailing}"
+                                                         value="Lock notice: ready to print and mail" 
+                                                         styleClass="noFill"
+                                                         icon="fa fa-edit" 
+                                                         disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
+                                                         />
+
+                                    </div>
+                                </div>
+
+
+
+                                <!--NESTED DATA FIELD VERTICAL-->
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 restrict-data-field-vertical">
+                                    <!--NESTED DATA LABEL VERTICAL -->
+                                    <div class="restrict-data-field-label-vertical" >
+                                        <h:outputLabel value="Sent"/>
+                                    </div>
+                                    <!--NESTED DATA VALUE VERTICAL -->
+                                    <div class="restrict-data-field-value-vertical" >
+                                        <h:outputText   id="nov-sent-ot"
+                                                        value="#{noticeOfViolationBB.currentNotice.sentTSPretty}"/>
+                                    </div>
+                                    <!--NESTED DATA VALUE VERTICAL -->
+                                    <div class="restrict-data-field-value-vertical" >
+                                        <h:outputText   id="nov-sentby-ot0"
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.sentBy) ? 'By ' : ''}"/>
+                                        <h:outputText   id="nov-sentby-ot1"
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.sentBy) ? noticeOfViolationBB.currentNotice.sentBy.person.firstName : ''}"/>
+                                        <h:outputText   id="nov-sentby-ot2"
+                                                        value=" "/>
+                                        <h:outputText   id="nov-sentby-ot3"
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.sentBy) ? noticeOfViolationBB.currentNotice.sentBy.person.lastName : ''}"/>
+                                    </div>
+                                    <div class="restrict-data-field-value-vertical" >
+
+
+
+                                    </div>
+
+                                </div>
+                                <!--NESTED DATA FIELD VERTICAL-->
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 restrict-data-field-vertical">
+                                    <!--NESTED DATA LABEL VERTICAL -->
+                                    <div class="restrict-data-field-label-vertical" >
+                                        <h:outputLabel value="Returned"/>
+                                    </div>
+                                    <!--NESTED DATA VALUE VERTICAL -->
+                                    <div class="restrict-data-field-value-vertical" >
+                                        <h:outputText   id="nov-returned-ot"
+                                                        value="#{noticeOfViolationBB.currentNotice.returnedTSPretty}"/>
+                                    </div>
+                                    <!--NESTED DATA VALUE VERTICAL -->
+                                    <div class="restrict-data-field-value-vertical" >
+                                        <h:outputText   id="nov-returnedby-ot0"
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.returnedBy) ? 'By ' : ''}"/>
+                                        <h:outputText   id="nov-returnedby-ot1"
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.returnedBy) ? noticeOfViolationBB.currentNotice.returnedBy.person.firstName : ''}"/>
+                                        <h:outputText   id="nov-returnedby-ot2"
+                                                        value=" "/>
+                                        <h:outputText   id="nov-returnedby-ot3"
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.returnedBy) ? noticeOfViolationBB.currentNotice.returnedBy.person.lastName : ''}"/>
+                                    </div>
+
+                                    <div class="restrict-data-field-value-vertical" >
+                                        <p:commandButton id="nov-returned-cb"
+                                                         ajax="true" 
+                                                         actionListener="#{noticeOfViolationBB.markNoticeOfViolationAsReturned()}"
+                                                         value="Mark notice as returned" 
+                                                         styleClass="noFill"
+                                                         icon="fa fa-mail-reply" 
+                                                         update="nov-status-dialog"
+                                                         disabled="#{(empty noticeOfViolationBB.currentNotice.sentTS) || !(empty noticeOfViolationBB.currentNotice.returnedTS)}"
+                                                         />
+                                    </div>
+
+                                </div>
+
+                                <!--NESTED DATA FIELD VERTICAL-->
+                                <div class="ui-g-3 ui-md-6 ui-lg-2 restrict-data-field-vertical">
+                                    <!--NESTED DATA LABEL VERTICAL -->
+                                    <div class="restrict-data-field-label-vertical" >
+                                        <h:outputLabel value=" "/>
+                                    </div>
+                                    <!--NESTED DATA VALUE VERTICAL -->
+                                    <div class="restrict-data-field-value-vertical" >
+                                        <h:outputText   id="nov-placeholder-ot"
+                                                        value=" "/>
+                                    </div>
+                                    <!--NESTED DATA VALUE VERTICAL -->
+                                    <div class="restrict-data-field-value-vertical" >
+                                        <h:outputText   id="nov-placeholder2-ot"
+                                                        value=" "/>
+                                    </div>
+                                    <div class="restrict-data-field-value-vertical" >
+
+                                        <h:outputText   id="nov-placeholder3-ot"
+                                                        value=" "/>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h2>Reset Notice</h2>
+
+                            <div class="ui-g data_container_nested_restrict">
+
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+                                    <div class="restrict-data-field-label-inline" >
+
+                                        <h:outputLabel  for="nov-reset-button">
+                                            <h:outputText value="Reset notice mailing dates" />
+                                        </h:outputLabel>
+                                    </div>
+                                    <div class="restrict-main-contents-io-button red_button">
+
+
+                                        <p:commandButton id="nov-reset-cb"
+                                                         ajax="true" 
+                                                         actionListener="#{noticeOfViolationBB.resetNotice}"
+                                                         value="Reset mailing status" 
+                                                         styleClass="noFill"
+                                                         icon="fa fa-window-close-o" 
+                                                         disabled="false"
+                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                         />
+                                    </div>
+
+
+                                    <div class="restrict-main-contents-io-button red_button">
+
+
+                                        <p:commandButton 
+                                            id="nov-remove-button"
+                                            icon="fa fa-trash"
+                                            ajax="false"
+                                            action="#{noticeOfViolationBB.deleteNoticeOfViolation}"
+                                            value="Remove notice of violation ID:#{noticeOfViolationBB.currentNotice.noticeID}"
+                                            />
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <h2>Notice Text</h2>
+                            <h:outputText id="nov-text-view-before"
+                                          value="#{noticeOfViolationBB.currentNotice.noticeTextBeforeViolations}"
+                                          escape="false" />
+
+                            <h:outputText value="[CODE VIOLATIONS WILL BE INSERTED HERE]" class="bold" />
+
+                            <h:outputText id="nov-text-view-after"
+                                          value="#{noticeOfViolationBB.currentNotice.noticeTextAfterViolations}"
+                                          escape="false" />
+
+
+                        </h:form>
+                    </p:dialog>
+
                     <p:dialog   id="cecase-rejectproposal-dialog"
                                 height="650" width="900"
                                 widgetVar="cecase-rejectproposal-dialog-var"
@@ -1657,7 +1949,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 >
 
                         <h:form id="cecase-rejectproposal-form">
-                    
+
 
                             <h:outputText styleClass="ui-label" value="reason for rejecting proposal" />
 
@@ -1688,7 +1980,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                   height="700">
 
 
-                        
+
 
                         <h:form id="cecase-search-advanced-form">
 
@@ -2278,58 +2570,58 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeCaseNames}" />
 
                                     <p:spacer height="5px"/>
-                                    
-                                     <h:panelGrid    columns="1" 
-                                                            cellpadding="10" 
-                                                            columnClasses="gridTd">
-                                                <h:panelGroup>
 
-                                                    <p:outputLabel for="cecase-list-report-date-start-cal" 
-                                                                   value="start date"/>
+                                    <h:panelGrid    columns="1" 
+                                                    cellpadding="10" 
+                                                    columnClasses="gridTd">
+                                        <h:panelGroup>
 
-                                                    <p:spacer height="1px" />
+                                            <p:outputLabel for="cecase-list-report-date-start-cal" 
+                                                           value="start date"/>
 
-                                                    <p:calendar id="cecase-list-report-date-start-cal" 
-                                                                value="#{ceCaseSearchProfileBB.reportCECaseList.startDate_val_utilDate}" 
-                                                                disabled="false"
-                                                                mode="popup" 
-                                                                showOn="button" 
-                                                                pattern="EEE, dd MMM, yyyy"
-                                                                navigator="true" 
-                                                                tabindex="16" 
-                                                                timeInput="true" 
-                                                                showHour="false" showMinute="false" showSecond="false" showMillisec="false"
-                                                                showButtonPanel="true" 
-                                                                showTodayButton="true"
-                                                                required="true"/>
-                                                    
+                                            <p:spacer height="1px" />
 
-                                                </h:panelGroup>
+                                            <p:calendar id="cecase-list-report-date-start-cal" 
+                                                        value="#{ceCaseSearchProfileBB.reportCECaseList.startDate_val_utilDate}" 
+                                                        disabled="false"
+                                                        mode="popup" 
+                                                        showOn="button" 
+                                                        pattern="EEE, dd MMM, yyyy"
+                                                        navigator="true" 
+                                                        tabindex="16" 
+                                                        timeInput="true" 
+                                                        showHour="false" showMinute="false" showSecond="false" showMillisec="false"
+                                                        showButtonPanel="true" 
+                                                        showTodayButton="true"
+                                                        required="true"/>
 
-                                                <h:panelGroup>
 
-                                                    <p:outputLabel for="cecase-list-report-date-end-cal" 
-                                                                   value="end date"/>
+                                        </h:panelGroup>
 
-                                                    <p:spacer height="1px" />
+                                        <h:panelGroup>
 
-                                                    <p:calendar id="cecase-list-report-date-end-cal" 
-                                                                value="#{ceCaseSearchProfileBB.reportCECaseList.endDate_val_utilDate}" 
-                                                                disabled="false"
-                                                                mode="popup" 
-                                                                showOn="button" 
-                                                                pattern="EEE, dd MMM, yyyy"
-                                                                navigator="true" 
-                                                                tabindex="16" 
-                                                                timeInput="true" 
-                                                                showHour="false" showMinute="false" showSecond="false" showMillisec="false"
-                                                                showButtonPanel="true" 
-                                                                showTodayButton="true"
-                                                                required="true"/>
-                                                    
+                                            <p:outputLabel for="cecase-list-report-date-end-cal" 
+                                                           value="end date"/>
 
-                                                </h:panelGroup>
-                                            </h:panelGrid>
+                                            <p:spacer height="1px" />
+
+                                            <p:calendar id="cecase-list-report-date-end-cal" 
+                                                        value="#{ceCaseSearchProfileBB.reportCECaseList.endDate_val_utilDate}" 
+                                                        disabled="false"
+                                                        mode="popup" 
+                                                        showOn="button" 
+                                                        pattern="EEE, dd MMM, yyyy"
+                                                        navigator="true" 
+                                                        tabindex="16" 
+                                                        timeInput="true" 
+                                                        showHour="false" showMinute="false" showSecond="false" showMillisec="false"
+                                                        showButtonPanel="true" 
+                                                        showTodayButton="true"
+                                                        required="true"/>
+
+
+                                        </h:panelGroup>
+                                    </h:panelGrid>
 
                                     <h:outputLabel for="report-caselist-notes-ita" value="Notes"/>
                                     <p:spacer height="5px"/>
@@ -2364,12 +2656,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             </h:panelGrid>
 
                             <p:commandLink  ajax="false" 
-                                             action="#{ceCaseSearchProfileBB.generateReportCECaseList}"
-                                             value="Click to generate report in new tab" 
-                                             target="_blank"
-                                             styleClass="font-size:2em;"
-                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                             />
+                                            action="#{ceCaseSearchProfileBB.generateReportCECaseList}"
+                                            value="Click to generate report in new tab" 
+                                            target="_blank"
+                                            styleClass="font-size:2em;"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                            />
                             <p:spacer height="5px" />
                             <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" immediate="true"
@@ -2377,7 +2669,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                         </h:form>
                     </p:dialog>
-                    
+
                     <p:confirmDialog id= "howto-violation-add-panel"
                                      widgetVar="howto-violation-add-panel-var"
                                      closable="true"
@@ -2386,9 +2678,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                      header="Adding a code violation to a case"
                                      >
                         <p>Bullets, screen shots, etc.</p>
-                        
+
                     </p:confirmDialog>
-                    
+
                     <p:confirmDialog id="howto-notices-panel"
                                      widgetVar="howto-notices-panel-var"
                                      closable="true"
@@ -2396,12 +2688,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                      responsive="true"
                                      header="Generating a notice of violation"
                                      >
-                        
+
                         <p>Click "Build new notice" in the section "Notices of Violation"</p>
-                        
+
                     </p:confirmDialog>
-                    
-                    
+
+
                     <p:confirmDialog id="howto-insidetimeframe-panel"
                                      widgetVar="howto-insidetimeframe-panel-var"
                                      closable="true"
@@ -2409,12 +2701,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                      responsive="true"
                                      header="Monitoring a case during compliance timeframe"
                                      >
-                        
+
                         <p>Violation compliance timeframe is still open. Passively monitor the property for changes that might impact case management.</p>
-                        
+
                     </p:confirmDialog>
-                    
-                    
+
+
                     <p:confirmDialog id="howto-expiredtimeframe-panel"
                                      widgetVar="howto-expiredtimeframe-panel-var"
                                      closable="true"
@@ -2422,7 +2714,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                      responsive="true"
                                      header="Pathways after compliance window expiery"
                                      >
-                        
+
                         <ol>
                             <li>Visit the property and re-inspect the code violations attached to the case</li>
                             <li>If compliance has been achieved, mark the violations as such</li>
@@ -2430,10 +2722,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             <li>Extend compliance window</li>
                             <li>Issue a citation</li>
                         </ol>
-                        
+
                     </p:confirmDialog>
-                    
-                    
+
+
                     <p:confirmDialog id="howto-recordhearingdate-panel"
                                      widgetVar="howto-recordhearingdate-panel-var"
                                      closable="true"
@@ -2441,12 +2733,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                      responsive="true"
                                      header="Recording a scheduled hearing"
                                      >
-                        
+
                         <p>Click: Log new event</p>
-                        
+
                     </p:confirmDialog>
-                    
-                    
+
+
                     <p:confirmDialog id="howto-hearingprep-panel"
                                      widgetVar="howto-hearingprep-panel-var"
                                      closable="true"
@@ -2454,13 +2746,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                      responsive="true"
                                      header="Preparing for a hearing"
                                      >
-                        
+
                         <p>Attach and annotate photographs</p>
                         <p>Generate a case profile report</p>
-                        
+
                     </p:confirmDialog>
-                    
-                    
+
+
                     <p:confirmDialog id="howto-insidecourttimeframe-panel"
                                      widgetVar="howto-insidecourttimeframe-panel-var"
                                      closable="true"
@@ -2468,12 +2760,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                      responsive="true"
                                      header="Monitoring a case during court-ordered compliance timeframe"
                                      >
-                        
+
                         <p>The court has extended the complianec timeframe, so mark violations with the new date</p>
-                        
+
                     </p:confirmDialog>
-                    
-                    
+
+
                     <p:confirmDialog id="howto-expiredcourttimeframe-panel"
                                      widgetVar="howto-expiredcourttimeframe-panel-var"
                                      closable="true"
@@ -2481,7 +2773,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                      responsive="true"
                                      header="Options following court-ordered compliance timeframe expiery"
                                      >
-                        
+
                         <ol>
                             <li>Visit the property and re-inspect the code violations attached to the case</li>
                             <li>If compliance has been achieved, mark the violations as such</li>
@@ -2489,10 +2781,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             <li>Extend compliance window</li>
                             <li>Request a new court hearing</li>
                         </ol>
-                        
+
                     </p:confirmDialog>
-                    
-                    
+
+
                     <p:confirmDialog id="howto-inactive-panel"
                                      widgetVar="howto-inactive-panel-var"
                                      closable="true"
@@ -2500,15 +2792,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                      responsive="true"
                                      header="Stalled case options"
                                      >
-                        
+
                         <ol>
                             <li>Open a new case with the same violation and start the managment cycle again</li>
                         </ol>
-                        
+
                     </p:confirmDialog>
-                    
-                    
-                    
+
+
+
                     <p:confirmDialog id="howto-closed-panel"
                                      widgetVar="howto-closed-panel-var"
                                      closable="true"
@@ -2516,16 +2808,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                      responsive="true"
                                      header="About closed cases"
                                      >
-                        
+
                         <ul>
                             <li>You may add events noting follow-up, but no new violations can be added</li>
                             <li>If new code violations have been found, open a new case</li>
                         </ul>
-                        
+
                     </p:confirmDialog>
-                    
-                    
-                    
+
+
+
                     <p:confirmDialog id="howto-container-panel"
                                      widgetVar="howto-container-panel-var"
                                      closable="true"
@@ -2533,16 +2825,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                      responsive="true"
                                      header="About container cases"
                                      >
-                        
+
                         <ul>
                             <li>These are data storage containers that simply use the case infrastructure</li>
                             <li>They cannot have new violations attached to them, nor any actions associated with violation mitigation</li>
                         </ul>
-                        
+
                     </p:confirmDialog>
-                    
-                    
- 
+
+
+
                 </f:view>
             </ui:define>
         </ui:composition>
