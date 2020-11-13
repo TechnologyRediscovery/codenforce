@@ -147,10 +147,10 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         //First, let's find out what type of file this is.
         String fileExtension = getFileExtension(blob.getFilename());
 
-        if (fileExtension.contains("jpg")
-                || fileExtension.contains("jpeg")
-                || fileExtension.contains("gif")
-                || fileExtension.contains("png")) {
+        if (fileExtension.equals("jpg")
+                || fileExtension.equals("jpeg")
+                || fileExtension.equals("gif")
+                || fileExtension.equals("png")) {
             blob.setType(BlobType.PHOTO);
         } else if (fileExtension.contains("pdf")) {
             blob.setType(BlobType.PDF);
@@ -171,6 +171,42 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
                 return 0;
         }
 
+    }
+    
+    /**
+     * Updates a blob's filename.
+     * Safe for BB use, as this checks the file extension and throws an error
+     * if the file extension is wrong.
+     * @param blob
+     * @throws IntegrationException
+     * @throws IOException
+     * @throws ClassNotFoundException
+     * @throws BlobTypeException if the supplied file extension is different than what we have in the DB
+     */
+    public void updateBlobFilename(BlobLight blob) 
+            throws IntegrationException, 
+            IOException, 
+            ClassNotFoundException, 
+            BlobTypeException{
+        
+        //we must make sure that the file extension has not been changed, as
+        //Changing it could break the file.
+        
+        BlobIntegrator bi = getBlobIntegrator();
+        
+        BlobLight originalBlob = bi.getPhotoBlobLight(blob.getBlobID());
+        
+        String newExtension = getFileExtension(blob.getFilename());
+        
+        String originalExtension = getFileExtension(originalBlob.getFilename());
+        
+        if(!newExtension.equals(originalExtension)){
+            throw new BlobTypeException("File extension of new filename is not equal to original extension.");
+        }
+        
+        //If we reach here, the file extensions are equal, we may update the filename.
+        bi.updatePhotoBlobFilename(blob);
+        
     }
 
     public Blob getPhotoBlob(int blobID) throws IntegrationException, IOException, ClassNotFoundException {

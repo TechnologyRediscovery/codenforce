@@ -44,11 +44,12 @@ WHERE photodoc.photodocblob = blobbytes.blob
 	AND photodoc.photodocfilename = blobbytes.filename;
 
 
---This ALTER TABLE should be implemented at some point, 
+--This commented out ALTER TABLE should be implemented at some point, 
 --but on my machine certain rows couldn't be linked with their bytes.
 --It seems as if rows without filenames are the only ones having the problem.
 --I'm leaving this note here and the statement because I think my DB
 --didn't get all the files when I downloaded the brain into it.
+
 --ALTER TABLE public.photodoc ALTER COLUMN blobbytes_bytesid SET NOT NULL;
 
 ALTER TABLE public.photodoc
@@ -71,3 +72,74 @@ DROP COLUMN photodocfilename;
 ALTER TABLE public.blobbytes ADD COLUMN metadatamap bytea;
 
 
+
+--We need to be able to filter blobs by muni
+
+ALTER TABLE public.photodoc ADD COLUMN muni_municode integer;
+
+ALTER TABLE public.photodoc
+  ADD CONSTRAINT photodoc_municode_fk FOREIGN KEY (muni_municode)
+      REFERENCES public.municipality (municode) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+--We will now get the muni code by linking tables together until we find one.
+
+--action request.muni
+
+UPDATE photodoc
+SET muni_municode = ceactionrequest.muni_municode
+FROM ceactionrequestphotodoc, ceactionrequest
+WHERE photodoc.photodocid = ceactionrequestphotodoc.photodoc_photodocid 
+	AND ceactionrequestphotodoc.ceactionrequest_requestid = ceactionrequest.requestid;
+
+--codeviolation -> cecase -> property.muni
+
+UPDATE photodoc
+SET muni_municode = property.municipality_municode
+FROM codeviolationphotodoc, codeviolation, cecase, property
+WHERE photodoc.photodocid = codeviolationphotodoc.photodoc_photodocid 
+	AND codeviolationphotodoc.codeviolation_violationid = codeviolation.violationid
+	AND codeviolation.cecase_caseid = cecase.caseid
+	AND cecase.property_propertyid = property.propertyid
+	AND property.municipality_municode IS NOT NULL;
+
+--Municipality.muni
+
+UPDATE photodoc
+SET muni_municode = muniphotodoc.muni_municode
+FROM muniphotodoc
+WHERE photodoc.photodocid = muniphotodoc.photodoc_photodocid;
+
+--occinspectedspaceelement -> occinspectedspace -> occinspection -> occperiod -> propertyunit -> property.muni
+
+UPDATE photodoc
+SET muni_municode = property.municipality_municode
+FROM occinspectedspaceelementphotodoc, occinspectedspaceelement, occinspectedspace, occinspection, occperiod, propertyunit, property
+WHERE photodoc.photodocid = occinspectedspaceelementphotodoc.photodoc_photodocid 
+	AND occinspectedspaceelementphotodoc.inspectedspaceelement_elementid = occinspectedspaceelement.inspectedspaceelementid
+	AND occinspectedspaceelement.inspectedspace_inspectedspaceid = occinspectedspace.inspectedspaceid
+	AND occinspectedspace.occinspection_inspectionid = occinspection.inspectionid
+	AND occinspection.occperiod_periodid = occperiod.periodid
+	AND occperiod.propertyunit_unitid = propertyunit.unitid
+	AND propertyunit.property_propertyid = property.propertyid
+	AND property.municipality_municode IS NOT NULL;
+
+--occperiod -> propertyunit -> property.muni
+
+UPDATE photodoc
+SET muni_municode = property.municipality_municode
+FROM occperiodphotodoc, occperiod, propertyunit, property
+WHERE photodoc.photodocid = occperiodphotodoc.photodoc_photodocid 
+	AND occperiodphotodoc.occperiod_periodid = occperiod.periodid
+	AND occperiod.propertyunit_unitid = propertyunit.unitid
+	AND propertyunit.property_propertyid = property.propertyid
+	AND property.municipality_municode IS NOT NULL;
+
+--property.muni
+
+UPDATE photodoc
+SET muni_municode = property.municipality_municode
+FROM propertyphotodoc, property
+WHERE photodoc.photodocid = propertyphotodoc.photodoc_photodocid 
+	AND propertyphotodoc.property_propertyid = property.propertyid
+	AND property.municipality_municode IS NOT NULL;

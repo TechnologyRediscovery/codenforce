@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
+import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
@@ -34,7 +35,6 @@ import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
-import com.tcvcog.tcvce.occupancy.entities.InspectedSpace;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -78,6 +78,10 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     private List<OccInspectedSpaceElement> connectedElements;
     private List<OccPeriod> connectedPeriods;
     private List<Property> connectedProperties;
+    
+    //Files for updating blobs.
+    private String newFilename;
+    private String newDescription;
     
     /**
      * load all blobs uploaded in the past month into memory
@@ -193,6 +197,10 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     public void selectBlob(BlobLight blob) {
         BlobCoordinator bc = getBlobCoordinator();
 
+        newFilename = "";
+        
+        newDescription = "";
+        
         selectedBlob = blob;
 
         currentBlobSelected = true;
@@ -280,6 +288,60 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Deleting PDFs is not yet supported", ""));
         }
+    }
+    
+    public void updateBlobFilename(){
+        
+        BlobCoordinator bc = getBlobCoordinator();
+        
+        String originalName = selectedBlob.getFilename();
+        
+        try{
+            selectedBlob.setFilename(newFilename);
+            
+            bc.updateBlobFilename(selectedBlob);
+            
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully updated filename!", ""));
+        } catch(ClassNotFoundException | IOException | IntegrationException ex){
+            //Rollback the filename
+            selectedBlob.setFilename(originalName);
+            System.out.println("manageBlobBB.updateBlobFilename() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to update the filename!", ""));
+        } catch(BlobTypeException ex){
+            //Rollback the filename
+            selectedBlob.setFilename(originalName);
+            System.out.println("manageBlobBB.updateBlobFilename() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please make sure the filename extension (e.g. .jpg, .png, .pdf) is the same as the current filename extension. "
+                                    + "Changing a file's extension could break the file!", ""));
+        }
+        
+    }
+    
+    public void updateBlobDescription(){
+        
+        BlobIntegrator bi = getBlobIntegrator();
+        
+        try{
+            selectedBlob.setDescription(newDescription);
+            
+            bi.updatePhotoBlobDescription(selectedBlob);
+            
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully updated description!", ""));
+        } catch(IntegrationException ex){
+            System.out.println("manageBlobBB.updateBlobDescription() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to update the description!", ""));
+        }
+        
     }
     
     /**
@@ -601,6 +663,22 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
 
     public void setConnectedProperties(List<Property> connectedProperties) {
         this.connectedProperties = connectedProperties;
+    }
+
+    public String getNewFilename() {
+        return newFilename;
+    }
+
+    public void setNewFilename(String newFilename) {
+        this.newFilename = newFilename;
+    }
+
+    public String getNewDescription() {
+        return newDescription;
+    }
+
+    public void setNewDescription(String newDescription) {
+        this.newDescription = newDescription;
     }
 
 }

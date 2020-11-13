@@ -207,18 +207,18 @@
                                                     <h:outputText id="desc" value="#{blob.description}"/>
                                                 </p:column>
 
-                                                <p:column width="20%" style="text-align: center" headerText="View">
-                                                    <div class="gray_button">
-                                                        <p:commandButton id="blob-search-loadblob-button"
-                                                                         icon="fa fa-folder-open-o"
-                                                                         value="Load"
-                                                                         action="#{manageBlobBB.selectBlob(blob)}"
-                                                                         ajax="true"
-                                                                         update="
-                                                                         form-messages-global
-                                                                         blob-lists-outpanel"
-                                                                         />
-                                                    </div>
+                                                <p:column headerText="View"
+                                                          styleClass="centeredColumnContent"
+                                                          style="width: 80px">
+                                                    <p:commandButton id="blob-search-loadblob-button"
+                                                                     icon="fa fa-folder-open-o"
+                                                                     value="Load"
+                                                                     action="#{manageBlobBB.selectBlob(blob)}"
+                                                                     ajax="true"
+                                                                     update="
+                                                                     form-messages-global
+                                                                     blob-lists-outpanel"
+                                                                     />
                                                 </p:column>
                                             </p:dataTable>
                                         </h:form>
@@ -709,16 +709,16 @@
                                         </p:panel>
 
                                         <!--Update Panel-->
-                                        <p:panel id="cearManage-panel-notes"
+                                        <p:panel id="blobManage-panel-update"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="Notes Panel"
-                                                 rendered="#{cEActionRequestsBB.getActiveNotesMode()}"
+                                                 header="Update Panel"
+                                                 rendered="#{manageBlobBB.activeUpdateMode}"
                                                  >
 
                                             <p:spacer height="10px"/>
 
-                                            <h:form id="cearManage-form-notes">
+                                            <h:form id="blobManage-form-update">
 
                                                 <p:panelGrid columns="4" 
                                                              layout="grid"
@@ -726,45 +726,57 @@
                                                              >
 
                                                     <h:panelGroup>
-                                                        <p:outputLabel value="Officer-only notes:"/>
+                                                        <p:outputLabel value="Filename:"/>
+                                                        <p:spacer height="10px"/>
+                                                        <div>
+                                                            <p:outputLabel escape="false" value="&#160;Current Filename: #{manageBlobBB.selectedBlob.filename}"/>
+                                                        </div>
                                                         <p:spacer height="5px"/>
-                                                        <div class="cearNotesTableOutputLabel">
-                                                            <p:outputLabel escape="false" value="&#160;#{cEActionRequestsBB.selectedRequest.cogInternalNotes}"/>
+                                                        <div>
+                                                            <p:outputLabel escape="false" 
+                                                                           rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
+                                                                           value="&#160;New Filename:"/>
+                                                            <p:inputText rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
+                                                                         value="#{manageBlobBB.newFilename}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
-                                                        <p:commandButton onclick="PF('internal-message-dialog').show()" 
+                                                        <p:commandButton actionListener="#{manageBlobBB.updateBlobFilename()}" 
                                                                          icon="fa fa-pencil-square-o"
-                                                                         value="new note" 
+                                                                         value="Update Filename" 
                                                                          styleClass="noFill button-size-small" 
-                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}" />
+                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
+                                                                         update="form-messages-global
+                                                                         blob-search-messages-form
+                                                                         blob-search-log-form
+                                                                         blob-search-results-panel
+                                                                         blob-search-clear-cb-0"/>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
-                                                        <p:outputLabel value="System internal only notes:"/>
+                                                        <p:outputLabel value="Description:"/>
+                                                        <p:spacer height="10px"/>
+                                                        <div>
+                                                            <p:outputLabel escape="false" value="&#160;Current Description: #{manageBlobBB.selectedBlob.description}"/>
+                                                        </div>
                                                         <p:spacer height="5px"/>
-                                                        <div class="cearNotesTableOutputLabel">
-                                                            <p:outputLabel escape="false" value="&#160;#{cEActionRequestsBB.selectedRequest.muniNotes}"/>
+                                                        <div>
+                                                            <p:outputLabel escape="false" 
+                                                                           rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
+                                                                           value="&#160;New Description:"/>
+                                                            <p:inputText rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
+                                                                         value="#{manageBlobBB.newDescription}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
-                                                        <p:commandButton onclick="PF('muni-message-dialog').show()" 
-                                                                         value="new note"
+                                                        <p:commandButton actionListener="#{manageBlobBB.updateBlobDescription()}" 
                                                                          icon="fa fa-pencil-square-o"
+                                                                         value="Update Description" 
                                                                          styleClass="noFill button-size-small" 
-                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}" />
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <p:outputLabel value="Public notes:"/>
-                                                        <p:spacer height="5px"/>
-                                                        <div class="cearNotesTableOutputLabel">
-                                                            <p:outputLabel escape="false" value="&#160;#{cEActionRequestsBB.selectedRequest.publicExternalNotes}"/>
-                                                        </div>
-                                                        <p:spacer height="10px"/>
-                                                        <p:commandButton onclick="PF('public-message-dialog').show()" 
-                                                                         value="new note" 
-                                                                         icon="fa fa-pencil-square-o"
-                                                                         styleClass="noFill button-size-small" 
-                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}" />
+                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
+                                                                         update="form-messages-global
+                                                                         blob-search-messages-form
+                                                                         blob-search-log-form
+                                                                         blob-search-results-panel
+                                                                         blob-search-clear-cb-0"/>
                                                     </h:panelGroup>
 
                                                 </p:panelGrid>
@@ -784,58 +796,6 @@
 
                     </p:outputPanel>
 
-
-                    <p:dialog   id="propinfo-notes-dialog"
-                                height="300" width="750"
-                                widgetVar="propinfo-notes-dialog-var"
-                                closable="true"
-                                header="Note Builder"
-                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                >
-
-                        <h:form id="propinfo-note-create-form">
-
-                            <h:messages id="propinfo-dialog-note-messages"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-
-                            <h:panelGrid columns="1"
-                                         columnClasses="gridTd, gridTd">
-
-                                <h:panelGroup>
-                                    <h:outputText styleClass="ui-label" value="Note text: "/>
-                                    <p:editor   id="propinfo-notes-editor"
-                                                value="#{propertyProfileBB.formNoteText}"
-                                                controls="bold italic underline strikethrough font size style color
-                                                bullets numbering center undo redo rule link removeformat"
-                                                width="400" required="false"
-                                                height="200"/>
-
-
-                                    <p:spacer height="5px" />
-                                    <p:commandButton    id="propinfo-updatemetadata-button-cancel"
-                                                        ajax="true"  tabindex="27"
-                                                        value="Cancel"
-                                                        icon="fa fa-stop"
-                                                        immediate="true"
-                                                        onclick="PF('propinfo-notes-dialog-var').hide()"
-                                                        />
-
-                                    <p:commandButton   id="propinfo-dialog-notes-button-addnote"
-                                                       ajax="true" 
-                                                       actionListener="#{propertyProfileBB.onNoteCommitButtonChange}"
-                                                       oncomplete="PF('propinfo-notes-dialog-var').hide()"
-                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
-                                                       value="Attach Note"  
-                                                       styleClass="inline-button"
-                                                       icon="fa fa-sticky-note-o"
-                                                       update="propinfo-notes-form"/>
-                                </h:panelGroup>
-                            </h:panelGrid>
-                        </h:form>
-                    </p:dialog>
-
                     <h:form>
                         <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
                             <p:commandButton value="Yes" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
@@ -846,36 +806,6 @@
 
                 </f:view>
 
-                <script type="text/javascript">
-                    $(function () {
-                        $.extend(PF("datatable"), {
-                            onKeyDown: function (e) {
-                                var key = e.which,
-                                        keyCode = $.ui.keyCode;
-                                if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
-                                    e.preventDefault();
-                                }
-                            },
-                            onKeyUp: function (e, rowIndex) {
-                                var key = e.which,
-                                        keyCode = $.ui.keyCode;
-                                //.ui-row-editor-check .ui-icon-check .ui-c
-                                if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
-                                    this.tbody
-                                            .find('.ui-row-editor .ui-icon-check')
-                                            .eq(rowIndex)
-                                            .click();
-                                }
-                                if (key === keyCode.ESCAPE) {
-                                    this.tbody
-                                            .find('.ui-row-editor .ui-icon-close')
-                                            .eq(rowIndex)
-                                            .click();
-                                }
-                            }
-                        });
-                    });
-                </script>
             </ui:define>
         </ui:composition>
     </h:body>

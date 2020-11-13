@@ -375,6 +375,40 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * This method updates a blob's filename.
+     * NOT SAFE. Use the Coordinator method, it makes sure that the correct 
+     * file extension is at the end of the filename.
+     * @param blob the meta to be updated
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void updatePhotoBlobFilename(BlobLight blob) throws  IntegrationException{
+        
+        Connection con = getPostgresCon();
+        String query = " UPDATE public.blobbytes\n"
+                + " SET filename=?,\n"
+                + " WHERE bytesid=?;\n\n";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, blob.getFilename());            
+            stmt.setInt(2, blob.getBytesID());
+            
+            System.out.println("BlobIntegrator.storeBlob | Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error updating blob. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
      * Updates the metadata and filename of a blobbytes entry.
      * @param blob the meta to be updated
      * @throws com.tcvcog.tcvce.domain.IntegrationException
