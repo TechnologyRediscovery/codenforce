@@ -54,6 +54,10 @@ public class OccInspectedSpace
     
     private OccInspectableStatus status;
     
+    //This field exists just to make it easier to find the inspection associated
+    //with an inspected space.
+    private int inspectionID;
+    
     
     public OccInspectedSpace(OccSpace spc){
         this.spaceID = spc.getSpaceID();
@@ -313,6 +317,12 @@ public class OccInspectedSpace
         return this.addedToChecklistTS.compareTo(o.addedToChecklistTS);
     }
 
-   
+    public int getInspectionID() {
+        return inspectionID;
+    }
+
+    public void setInspectionID(int inspectionID) {
+        this.inspectionID = inspectionID;
+    }
     
 }

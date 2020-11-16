@@ -53,6 +53,8 @@ public class UploadBlobBB extends BackingBeanUtils implements Serializable {
             // set filename
             blob.setFilename(ev.getFile().getFileName());
 
+            blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
+            
             blob.setBlobID(blobc.storeBlob(blob));
         } catch (IntegrationException | IOException ex) {
             System.out.println("BlobUploadBB.handleBlobUpload | " + ex);

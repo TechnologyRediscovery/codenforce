@@ -453,18 +453,12 @@
                                                             <h:outputText value="#{cear.addressOfConcern}"/>
                                                         </p:column>
 
-                                                        <ui:remove>
-
-                                                            <!-- no CEAR redirection yet-->
-
-                                                            <p:column>
-                                                                <p:commandButton value="View" icon="fa fa-folder" 
-                                                                                 action="#{manageBlobBB}"
-                                                                                 disabled="#{!manageBlobBB.currentBlobSelected}"/>
-                                                            </p:column>
-
-                                                        </ui:remove>
-
+                                                        <p:column>
+                                                            <p:commandButton value="View" icon="fa fa-folder" 
+                                                                             action="#{manageBlobBB.goToRequest(cear)}"
+                                                                             disabled="#{!manageBlobBB.currentBlobSelected}"/>
+                                                        </p:column>
+                                                        
                                                         <p:column>
                                                             <p:commandButton value="Remove Link" 
                                                                              action="#{manageBlobBB.removeCEARPhotoLink(request)}"
@@ -704,6 +698,7 @@
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
+                                                </p:panelGrid>
                                             </h:form>
 
                                         </p:panel>

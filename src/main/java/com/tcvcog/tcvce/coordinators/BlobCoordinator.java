@@ -442,12 +442,13 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @param description
      * @param before
      * @param after
+     * @param municode
      * @return 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      * @throws java.io.IOException 
      * @throws java.lang.ClassNotFoundException 
      */
-    public List<BlobLight> searchBlobs(String filename, String description, LocalDateTime before, LocalDateTime after) 
+    public List<BlobLight> searchBlobs(String filename, String description, LocalDateTime before, LocalDateTime after, int municode) 
             throws IntegrationException, 
             IOException, 
             ClassNotFoundException {
@@ -466,7 +467,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         List<Integer> idList = new ArrayList<>();
         
-        idList.addAll(bi.searchPhotoBlobs(filename, description, before, after));
+        idList.addAll(bi.searchPhotoBlobs(filename, description, before, after, municode));
         
         //No PDF Search yet!
         //idList.addAll(bi.searchPDFBlobs(filename, description, before, after));

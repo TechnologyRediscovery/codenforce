@@ -843,7 +843,8 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         inSpace.setLocation(getLocationDescriptor(rs.getInt("occlocationdescription_descid")));
         inSpace.setSpaceType(getSpaceType(inSpace.getOccSpaceTypeID()));
         inSpace.setAddedToChecklistBy(ui.getUser(rs.getInt("addedtochecklistby_userid")));
-
+        inSpace.setInspectionID(rs.getInt("occinspection_inspectionid"));
+        
         if (rs.getTimestamp("addedtochecklistts") != null) {
             inSpace.setAddedToChecklistTS(rs.getTimestamp("addedtochecklistts").toLocalDateTime());
         }

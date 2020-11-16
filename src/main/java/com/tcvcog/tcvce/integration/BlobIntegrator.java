@@ -59,7 +59,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         BlobLight blob = null;
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        String query = "SELECT photodocid, photodocdescription, photodoccommitted, blobbytes_bytesid, \n"
+        String query = "SELECT photodocid, photodocdescription, photodoccommitted, blobbytes_bytesid, muni_municode, \n"
                 + "uploaddate, blobtype_typeid, uploadpersonid, filename, metadatamap\n"
                 + "FROM public.photodoc LEFT JOIN blobbytes on blobbytes_bytesid = bytesid\n"
                 + "WHERE photodocid = ?;";
@@ -98,6 +98,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         blob.setType(BlobType.blobTypeFromInt(rs.getInt("blobtype_typeid")));
         blob.setFilename(rs.getString("filename"));
         blob.setUploadPersonID(rs.getInt("uploadpersonid"));
+        blob.setMunicode(rs.getInt("muni_municode"));
         
         blob.setBlobMetadata(generateBlobMetadata(rs));
         return blob;
@@ -205,8 +206,8 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     public int storePhotoBlob(Blob blob) throws BlobException, IntegrationException, IOException{
         
         Connection con = getPostgresCon();
-        String query =  " INSERT INTO public.photodoc(photodocid, photodocdescription, blobbytes_bytesid)\n" +
-                        "    VALUES (DEFAULT, ?, ?);";
+        String query =  " INSERT INTO public.photodoc(photodocid, photodocdescription, blobbytes_bytesid, muni_municode)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?);";
         
         PreparedStatement stmt = null;
         
@@ -221,6 +222,8 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             int bytesID = storeBlobBytes(blob);
             
             stmt.setInt(2, bytesID);
+            
+            stmt.setInt(3, blob.getMunicode());
             
             System.out.println("BlobIntegrator.storePhotoBlob | Statement: " + stmt.toString());
             stmt.execute();
@@ -785,6 +788,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      * @param description
      * @param before
      * @param after
+     * @param municode
      * @deprecated as I don't encourage using this method, it's temporary
      * @return list of Blob IDs for all photos that meet our search parameters
      * @throws IntegrationException 
@@ -792,7 +796,8 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     public List<Integer> searchPhotoBlobs(String filename,
                                           String description,
                                           LocalDateTime before,
-                                          LocalDateTime after)
+                                          LocalDateTime after,
+                                          int municode)
                                           throws IntegrationException {
         ArrayList<Integer> blobIDList = new ArrayList();
         Connection con = getPostgresCon();
@@ -873,6 +878,10 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
                 clauses.add(finished);
             }
             
+            //We must always include the muni_code in the search.
+            
+            clauses.add("muni_municode = ?");
+            
             //We want to make sure all clauses are satisfied, so put an AND between them
             //And use parantheses to make sure that each is a self-contained logical expression
             String allClauses = String.join(") AND\n(", clauses);
@@ -889,6 +898,8 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt = con.prepareStatement(query.toString());
             
             int index = 0;
+            
+            //Remember to iterate the index first, then use it.
             
             if (before != null) {
                 java.sql.Timestamp stamp = java.sql.Timestamp.valueOf(before);
@@ -917,6 +928,10 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
                     stmt.setString(index, "%" + token + "%");
                 }
             }
+            
+            //Finally, set municode
+            index++;
+            stmt.setInt(index, municode);
             
             rs = stmt.executeQuery();
             while(rs.next()){

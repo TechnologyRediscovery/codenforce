@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
+import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
@@ -32,9 +33,12 @@ import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
+import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
+import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -167,7 +171,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             System.out.println("manageBlobBB.downloadSelectedBlob | " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occured while trying to prepare your download!", ""));
+                            "An error occurred while trying to prepare your download!", ""));
         } finally {
             // close streams.
             if (output != null){  try { output.close(); } catch (IOException ex) { /* Ignore */ } }
@@ -181,8 +185,10 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     public void executeQuery(){
         BlobCoordinator bc = getBlobCoordinator();
         
+        int municode = getSessionBean().getSessMuni().getMuniCode();
+        
         try{
-            blobList = bc.searchBlobs(searchFilename, searchDescription, searchBefore, searchAfter);
+            blobList = bc.searchBlobs(searchFilename, searchDescription, searchBefore, searchAfter, municode);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Found " + blobList.size() + " files matching your criteria!", ""));
@@ -190,7 +196,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             System.out.println("manageBlobBB.executeQuery() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occured while trying to search for files!", ""));
+                            "An error occurred while trying to search for files!", ""));
         }
     }
 
@@ -249,7 +255,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             System.out.println("manageBlobBB.selectBlob() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occured while trying to search for files!", ""));
+                            "An error occurred while trying to search for files!", ""));
         }
 
     }
@@ -310,7 +316,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             System.out.println("manageBlobBB.updateBlobFilename() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occured while trying to update the filename!", ""));
+                            "An error occurred while trying to update the filename!", ""));
         } catch(BlobTypeException ex){
             //Rollback the filename
             selectedBlob.setFilename(originalName);
@@ -339,7 +345,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             System.out.println("manageBlobBB.updateBlobDescription() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occured while trying to update the description!", ""));
+                            "An error occurred while trying to update the description!", ""));
         }
         
     }
@@ -364,6 +370,18 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * Set the selected CEAR on the session bean and go to ceActionRequests.xhtml
+     * @param input
+     * @return 
+     */
+    public String goToRequest(CEActionRequest input){
+        
+        getSessionBean().setSessCEAR(input);
+        
+        return "cEActionRequests";
+    }
+    
+    /**
      * Set the selected violation on the session bean and go to ceCaseViolations.xhtml
      * @param input
      * @return 
@@ -376,14 +394,29 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * Set the selected OccInspectedSpaceElement on the session bean and go to ...
+     * Set the OccPeriod associated with the selected OccInspectedSpaceElement on the session bean and go to 
      * @param input
      * @return 
      */
-    public void goToInspectedSpaceElement(OccInspectedSpaceElement input){
-  
-        //No idea how to rediect to this object... huh
-        //return "";
+    public String goToInspectedSpaceElement(OccInspectedSpaceElement input) {
+
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+
+        try {
+            OccInspectedSpace space = oii.getInspectedSpace(input.getInspectedSpaceID());
+
+            OccInspection ins = oii.getOccInspection(space.getInspectionID());
+
+            getSessionBean().setSessOccPeriod(oc.getOccPeriod(ins.getOccPeriodID()));
+            return "occInspectionAdd";
+        } catch (IntegrationException ex) {
+            System.out.println("manageBlobBB.goToInspectedSpaceElement() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while redirecting you to the relevant occupancy inspection!", ""));
+            return "";
+        }
     }
     
     /**
@@ -410,7 +443,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             System.out.println("manageBlobBB.removePropPhotoLink | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occured while trying to remove the link!", ""));
+                            "An error occurred while trying to remove the link!", ""));
         }
         
     }
@@ -427,7 +460,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             System.out.println("manageBlobBB.removeCEARPhotoLink | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occured while trying to remove the link!", ""));
+                            "An error occurred while trying to remove the link!", ""));
         }
         
     }
@@ -444,7 +477,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             System.out.println("manageBlobBB.removeViolationPhotoLink | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occured while trying to remove the link!", ""));
+                            "An error occurred while trying to remove the link!", ""));
         }
         
     }
@@ -461,7 +494,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             System.out.println("manageBlobBB.removeMuniPhotoLink | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occured while trying to remove the link!", ""));
+                            "An error occurred while trying to remove the link!", ""));
         }
         
     }
@@ -478,7 +511,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             System.out.println("manageBlobBB.removeInspectedSpaceElementPhotoLink | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occured while trying to remove the link!", ""));
+                            "An error occurred while trying to remove the link!", ""));
         }
         
     }
@@ -495,7 +528,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             System.out.println("manageBlobBB.removeOccPeriodPhotoLink | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occured while trying to remove the link!", ""));
+                            "An error occurred while trying to remove the link!", ""));
         }
         
     }

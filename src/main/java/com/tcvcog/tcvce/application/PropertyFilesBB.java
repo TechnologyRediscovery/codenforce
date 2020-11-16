@@ -50,14 +50,14 @@ public class PropertyFilesBB
     }
     
     /**
-     * delete blob if the blob is a photo
+     * Removes the link between the current property and the select blob.
      * @param blobID
      */
-    public void deletePhoto(int blobID){
+    public void removePhoto(int blobID){
         try {
             Blob blob = getBlobCoordinator().getPhotoBlob(blobID);
             if(blob.getType() == BlobType.PHOTO){
-                getBlobCoordinator().deleteBlob(blobID);
+                getBlobIntegrator().removePhotoPropertyLink(blobID, currProp.getPropertyID());
             }
             }
         catch (IntegrationException | ClassNotFoundException | IOException ex) {

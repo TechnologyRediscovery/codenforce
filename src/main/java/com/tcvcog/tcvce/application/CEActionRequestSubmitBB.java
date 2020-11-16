@@ -22,9 +22,13 @@ import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
 import java.util.Date;
@@ -323,8 +327,13 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
             for (Blob b : blobList) {
                 try {
-                    blobc.deleteBlob(b.getBlobID());
-                } catch (IntegrationException ex) {
+                    blobc.deletePhotoBlob(b);
+                } catch (IntegrationException 
+                        | AuthorizationException 
+                        | BObStatusException 
+                        | BlobException 
+                        | EventException 
+                        | ViolationException ex) {
                     System.out.println(ex);
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -396,6 +405,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                 blob = blobc.getNewBlob();  //init new blob
                 blob.setBytes(ev.getFile().getContents());  // set bytes
                 blob.setFilename(ev.getFile().getFileName());
+                blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
+                
                 blob.setBlobID(blobc.storeBlob(blob));
             } catch (IntegrationException | IOException ex) {
                 System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
@@ -511,8 +522,13 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
             for (Blob b : blobList) {
                 try {
-                    bc.deleteBlob(b.getBlobID());
-                } catch (IntegrationException ex) {
+                    bc.deletePhotoBlob(b);
+                } catch (IntegrationException 
+                        | AuthorizationException
+                        | BObStatusException
+                        | BlobException 
+                        | EventException
+                        | ViolationException ex) {
                     System.out.println("CEActionRequestSubmitBB.restartRequest | ERROR: " + ex.toString());
                 }
             }

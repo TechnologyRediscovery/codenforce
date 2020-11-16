@@ -31,6 +31,7 @@ public class BlobLight {
     protected String description, filename;
     protected LocalDateTime timestamp;
     protected int uploadPersonID;
+    protected int municode;
     
     protected Metadata blobMetadata;
     
@@ -132,6 +133,14 @@ public class BlobLight {
 
     public void setBlobMetadata(Metadata blobMetadata) {
         this.blobMetadata = blobMetadata;
+    }
+
+    public int getMunicode() {
+        return municode;
+    }
+
+    public void setMunicode(int municode) {
+        this.municode = municode;
     }
     
 }

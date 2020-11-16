@@ -496,6 +496,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             Blob blob = blobc.getNewBlob();
             blob.setBytes(ev.getFile().getContents());
             blob.setFilename(ev.getFile().getFileName());
+            blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
             this.currentViolation.getBlobIDList().add(blobc.storeBlob(blob));
             this.getBlobList().add(blob);
         } catch (IntegrationException | IOException ex) {
