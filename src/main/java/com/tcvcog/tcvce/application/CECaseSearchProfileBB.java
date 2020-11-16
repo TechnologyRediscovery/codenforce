@@ -22,10 +22,12 @@ import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CEActionRequest;
@@ -75,6 +77,7 @@ public class CECaseSearchProfileBB
     private CECaseDataHeavy currentCase;
     private boolean currentCaseSelected;
 
+    private NoticeOfViolation currentNotice;
     private List<CECasePropertyUnitHeavy> caseList;
     private List<CECasePropertyUnitHeavy> filteredCaseList;
     
@@ -203,6 +206,10 @@ public class CECaseSearchProfileBB
      * @param ev 
      */
     public void refreshCurrentCase(ActionEvent ev){
+        reloadCase();
+    }
+    
+    public void reloadCase(){
         CaseCoordinator cc = getCaseCoordinator();
         try {
             currentCase = cc.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
@@ -506,6 +513,131 @@ public class CECaseSearchProfileBB
         
         
     }
+    
+    
+    public void markNoticeOfViolationAsSent(NoticeOfViolation nov) {
+        CaseCoordinator caseCoord = getCaseCoordinator();
+        
+        try {
+            caseCoord.nov_markAsSent(currentCase, nov, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Marked notice as sent and added event to case",
+                            ""));
+            reloadCase();
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        } catch (EventException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to generate case event to log phase change",
+                            "Note that because this message is being displayed, the phase change"
+                            + "has probably succeeded"));
+        }
+
+    }
+    
+    public void onNoticeDetailsButtonChange(NoticeOfViolation nov){
+        currentNotice = nov;
+        
+    }
+
+     public String resetNotice() {
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            cc.nov_ResetMailing(getCurrentNotice(), getSessionBean().getSessUser());
+//            refreshCurrentCase();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Notice mailing status has been reset", ""));
+            reloadCase();
+            return "ceCaseSearchProfile";
+            
+        } catch (IntegrationException | AuthorizationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        }
+        return "";
+    }
+    
+    public void markNoticeOfViolationAsReturned(ActionEvent ev) {
+        CaseCoordinator caseCoord = getCaseCoordinator();
+        try {
+            caseCoord.nov_markAsReturned(currentCase, currentNotice, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Notice no. " + getCurrentNotice().getNoticeID()
+                            + " has been marked as returned on today's date", ""));
+            reloadCase();
+        } catch (IntegrationException | BObStatusException  ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+            
+        }
+        
+    }
+    
+    public String deleteNoticeOfViolation() {
+        CaseCoordinator caseCoord = getCaseCoordinator();
+        try {
+            caseCoord.nov_delete(getCurrentNotice());
+            currentCase = caseCoord.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Notice no. " + getCurrentNotice().getNoticeID() + " has been nuked forever", ""));
+            reloadCase();
+            return "ceCaseSearchProfile";
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to delete this notice of violation, "
+                            + "probably because it has been sent already", ""));
+        } catch (IntegrationException | SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+
+        }
+        return "";
+        
+
+    }
+    
+    
+    
+    
+    public void lockNoticeAndQueueForMailing(NoticeOfViolation nov) {
+        CaseCoordinator caseCoord = getCaseCoordinator();
+
+        try {
+            caseCoord.nov_LockAndQueue(currentCase, nov, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Notice is locked and ready to be mailed!", ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        } catch (EventException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            "The automatic event generation associated with this action has thrown an error. "
+                            + "Please create an event manually which logs this letter being queued for mailing", ""));
+
+        } catch (ViolationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            "Unable to queue notice of violatio. "
+                            + "Please create an event manually which logs this letter being queued for mailing", ""));
+        }
+
+    }
+    
+    
     
     public String onNOVViewButtonChange(NoticeOfViolation nov){
         getSessionBean().setSessNotice(nov);
@@ -1055,6 +1187,20 @@ public class CECaseSearchProfileBB
      */
     public void setClosingEventCategorySelected(EventCategory closingEventCategorySelected) {
         this.closingEventCategorySelected = closingEventCategorySelected;
+    }
+
+    /**
+     * @return the currentNotice
+     */
+    public NoticeOfViolation getCurrentNotice() {
+        return currentNotice;
+    }
+
+    /**
+     * @param currentNotice the currentNotice to set
+     */
+    public void setCurrentNotice(NoticeOfViolation currentNotice) {
+        this.currentNotice = currentNotice;
     }
 
 }

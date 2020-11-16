@@ -67,6 +67,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private List<PageModeEnum> pageModes;
 
     private CECaseDataHeavy currentCase;
+    private boolean draftNoticeLoaded;
 
     private NoticeOfViolation currentNotice;
     private List<CodeViolation> activeVList;
@@ -528,6 +529,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void onTemplateEditButtonChange(TextBlock tb){
         currentTemplateBlock = tb;
+        formTemplateBlockText = currentTemplateBlock.getTextBlockText();
     }
     /**
      * Listener for user requests to build NOV with template
@@ -689,6 +691,27 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             return "";
         }
     }
+    
+      /**
+     * Second gen listener for finalization of notices
+     * @return 
+     */
+    public String finalizeNoticeAndPrint(){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            cc.nov_InsertNotice(getCurrentNotice(), currentCase, getSessionBean().getSessUser());
+        } catch (IntegrationException ex) {
+            
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to save NOV and print", ""));
+            System.out.println("");
+            return "";
+        }
+        getSessionBean().setSessNotice(getCurrentNotice());
+
+        return "noticeOfViolationPrint";
+    }
 
     private StringBuilder appendTextBlockAsPara(TextBlock tb, StringBuilder sb) {
         sb.append("<p>");
@@ -700,30 +723,30 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     public String saveNoticeDraft() {
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            cc.nov_update(currentNotice);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Notice udated", ""));
+            if(currentNotice != null && currentNotice.getNoticeID() == 0){
+                if(currentNotice.getRecipient() == null){
+                      getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please select a notice recipient to save draft", ""));
+                      return "";
+                } else {
+                    cc.nov_InsertNotice(currentNotice, currentCase, getSessionBean().getSessUser());
+                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Notice saved but not finalized", ""));
+                }
+            } else {
+                cc.nov_update(currentNotice);
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Notice udated", ""));
+            }
 
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+            return "";
         }
-        return "ceCaseNotices";
+        return "ceCaseSearchProfile";
     } // close method
 
-    public void resetNotice(ActionEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
-        try {
-            cc.nov_ResetMailing(currentNotice, getSessionBean().getSessUser());
-//            refreshCurrentCase();
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Notice mailing status has been reset", ""));
-        } catch (IntegrationException | AuthorizationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-        }
-    }
+   
 
     public String printNotice() {
         getSessionBean().setSessNotice(currentNotice);
@@ -738,34 +761,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         return "noticeOfViolationPrint";
     }
 
-    public String lockNoticeAndQueueForMailing() {
-        CaseCoordinator caseCoord = getCaseCoordinator();
-
-        try {
-            caseCoord.nov_LockAndQueue(currentCase, currentNotice, getSessionBean().getSessUser());
-        } catch (BObStatusException | IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-            return "";
-        } catch (EventException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN,
-                            "The automatic event generation associated with this action has thrown an error. "
-                            + "Please create an event manually which logs this letter being queued for mailing", ""));
-            return "";
-
-        } catch (ViolationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN,
-                            "Unable to queue notice of violatio. "
-                            + "Please create an event manually which logs this letter being queued for mailing", ""));
-            return "";
-        }
-        return "ceCaseNotices";
-
-    }
 
     public void deleteSelectedEvent() {
 
@@ -808,27 +803,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         
     }
     
-    /**
-     * Second gen listener for finalization of notices
-     * @return 
-     */
-    public String finalizeNoticeAndPrint(){
-        CaseCoordinator cc = getCaseCoordinator();
-        try {
-            cc.nov_InsertNotice(currentNotice, currentCase, getSessionBean().getSessUser());
-        } catch (IntegrationException ex) {
-            
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to save NOV and print", ""));
-            System.out.println("");
-            return "";
-        }
-        getSessionBean().setSessNotice(currentNotice);
-
-        return "noticeOfViolationPrint";
-    }
-    
+  
     
     /**
      * Listener for user reuqests to manage templates
@@ -968,69 +943,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         return "ceCaseNotices";
     }
 
-    public String deleteNoticeOfViolation() {
-        CaseCoordinator caseCoord = getCaseCoordinator();
-        try {
-            caseCoord.nov_delete(currentNotice);
-            currentCase = caseCoord.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Notice no. " + currentNotice.getNoticeID() + " has been nuked forever", ""));
-        } catch (BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to delete this notice of violation, "
-                            + "probably because it has been sent already", ""));
-            return "";
-        } catch (IntegrationException | SearchException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-            return "";
 
-        }
-        return "ceCaseSearchProfile";
-
-    }
-
-    public void markNoticeOfViolationAsSent(ActionEvent ev) {
-        CaseCoordinator caseCoord = getCaseCoordinator();
-        try {
-            caseCoord.nov_markAsSent(currentCase, currentNotice, getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Marked notice as sent and added event to case",
-                            ""));
-        } catch (BObStatusException | IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-        } catch (EventException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to generate case event to log phase change",
-                            "Note that because this message is being displayed, the phase change"
-                            + "has probably succeeded"));
-        }
-
-    }
-
-    public void markNoticeOfViolationAsReturned(ActionEvent ev) {
-        CaseCoordinator caseCoord = getCaseCoordinator();
-        try {
-            caseCoord.nov_markAsReturned(currentCase, currentNotice, getSessionBean().getSessUser());
-            currentCase = caseCoord.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Notice no. " + currentNotice.getNoticeID()
-                            + " has been marked as returned on today's date", ""));
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-            
-        }
-        
-    }
 
     /**
      * Listener for commencement of note writing process
@@ -1495,6 +1408,24 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setFormTemplateBlockText(String formTemplateBlockText) {
         this.formTemplateBlockText = formTemplateBlockText;
+    }
+
+    /**
+     * @return the draftNoticeLoaded
+     */
+    public boolean isDraftNoticeLoaded() {
+        boolean d = false;
+        if(currentNotice != null && currentNotice.getNoticeID() == 0){
+            d = true;
+        }
+        return d;
+    }
+
+    /**
+     * @param draftNoticeLoaded the draftNoticeLoaded to set
+     */
+    public void setDraftNoticeLoaded(boolean draftNoticeLoaded) {
+        this.draftNoticeLoaded = draftNoticeLoaded;
     }
 
 }

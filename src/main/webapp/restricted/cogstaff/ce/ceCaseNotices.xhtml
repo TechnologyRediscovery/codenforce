@@ -118,9 +118,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <h:outputText value="Actions"/>
                                                     </f:facet>
                                                     <p:commandButton id="choosetemplate-cb"
-                                                                     value="Apply"
+                                                                     value="Apply to draft"
                                                                      icon="fa fa-quote-left"
                                                                      ajax="true" 
+                                                                     disabled="false"
                                                                      actionListener="#{noticeOfViolationBB.onBuildNOVUsingTemplateBlock(template)}"
                                                                      update="nov-template-form
                                                                      nov-add-panel
@@ -299,12 +300,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </h:form>
                                         <h:form id="nov-preview-textbefore-form">
                                             <div class="link-button-container">
+                                                <p:growl id="noticesave-growl"
+                                                         for="nov-draft-save-cb" />
                                                 
                                                 <p:commandLink  ajax="false" value="Save and Print" 
                                                                  action="#{noticeOfViolationBB.finalizeNoticeAndPrint}"
                                                                  target="_blank"
                                                                  style="font-size: 1.5em;"
                                                                  styleClass="link-button"/>
+                                                <p:spacer height="3px" />
+                                                <p:commandButton    id="nov-draft-save-cb"
+                                                                    ajax="false" 
+                                                                   action="#{noticeOfViolationBB.saveNoticeDraft}"
+                                                                     value="Save draft and return to case profile" 
+                                                                     update="violation-table form-messages-global"
+                                                                     icon="fa fa-save" />
                                             </div>
                                             
                                             <p:spacer height="3px" />
@@ -516,12 +526,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             </p>
 
                                              <div class="link-button-container">
+                                                 
 
                                                 <p:commandLink  ajax="false" value="Save and Print notice" 
                                                                  action="#{noticeOfViolationBB.finalizeNoticeAndPrint}"
                                                                  target="_blank"
                                                                  style="font-size: 1.5em;"
                                                                  styleClass="link-button"/>
+                                                <p:spacer height="3px" />
+                                                
+                                                <p:commandButton ajax="false" 
+                                                                   action="#{noticeOfViolationBB.saveNoticeDraft}"
+                                                                     value="Save draft and return to case profile" 
+                                                                     update="violation-table form-messages-global"
+                                                                     icon="fa fa-save" />
                                              </div>
                                             
 

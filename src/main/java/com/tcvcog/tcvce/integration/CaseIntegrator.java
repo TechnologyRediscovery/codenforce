@@ -1575,7 +1575,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      */
     public void novRecordReturnedNotice(NoticeOfViolation nov) throws IntegrationException{
         String query =  "UPDATE public.noticeofviolation\n" +
-                        "   SET returneddate=? returnedby=? " +
+                        "   SET returneddate=?, returnedby=? " +
                         "  WHERE noticeid=?;";
         // note that original time stamp is not altered on an update
 
