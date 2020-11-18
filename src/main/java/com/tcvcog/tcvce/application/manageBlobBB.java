@@ -216,6 +216,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         connectedMunis = new ArrayList<>();
         connectedElements = new ArrayList<>();
         connectedPeriods = new ArrayList<>();
+        connectedProperties = new ArrayList<>();
         
         try {
             for (BOb object : bc.getAttachedObjects(blob)) {
@@ -577,7 +578,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
      * Controls if the "Delete blob" is enabled.
      * @return 
      */
-    public boolean allConnectionsEmpty() {
+    public boolean isAllConnectionsEmpty() {
         return  connectedElements.isEmpty() 
                 && connectedMunis.isEmpty() 
                 && connectedPeriods.isEmpty() 

@@ -55,7 +55,7 @@ public class UploadBlobBB extends BackingBeanUtils implements Serializable {
 
             blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
             
-            blob.setBlobID(blobc.storeBlob(blob));
+            blob = blobc.storeBlob(blob);
         } catch (IntegrationException | IOException ex) {
             System.out.println("BlobUploadBB.handleBlobUpload | " + ex);
         } catch (BlobException ex){

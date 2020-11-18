@@ -356,6 +356,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public String savePhotosAndContinue() {
 
         BlobIntegrator bi = getBlobIntegrator();
+        currentRequest.setBlobIDList(new ArrayList<Integer>());
         for (Blob b : blobList) {
             currentRequest.getBlobIDList().add(b.getBlobID());
 
@@ -374,6 +375,30 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         return "requestorDetails";
     }
 
+    /**
+     * Going back after uploading photos can cause photos to remain unlinked to 
+     * an object and slip through the cracks, so we'll save their connections.
+     * The user can always delete them later.
+     * @return 
+     */
+    public String goBackFromPhotos() {
+        try {
+            //Just use the uploading 
+            savePhotosAndContinue();
+            
+            return getSessionBean().getNavStack().popLastPage();
+        } catch (NavigationException ex) {
+            System.out.println("CEActionRequestSubmitBB.goBackFromPhotos() | ERROR: " + ex);
+            //We must do things a little bit different here to make sure messages are kept after the redirect.
+            FacesContext context = getFacesContext();
+            context.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Something went wrong when we tried to direct you back a page!", ""));
+            context.getExternalContext().getFlash().setKeepMessages(true);
+            return "requestCEActionFlow";
+        }
+    }
+    
     private void setupPersonEntry() {
         UserCoordinator uc = getUserCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
@@ -405,9 +430,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                 blob = blobc.getNewBlob();  //init new blob
                 blob.setBytes(ev.getFile().getContents());  // set bytes
                 blob.setFilename(ev.getFile().getFileName());
-                blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
+                blob.setMunicode(currentRequest.getMuni().getMuniCode());
                 
-                blob.setBlobID(blobc.storeBlob(blob));
+                blob = blobc.storeBlob(blob);
             } catch (IntegrationException | IOException ex) {
                 System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
                 getFacesContext().addMessage(null,

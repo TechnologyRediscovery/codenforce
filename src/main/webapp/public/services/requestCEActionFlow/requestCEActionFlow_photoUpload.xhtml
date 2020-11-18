@@ -68,11 +68,11 @@
 
                                             <p:fileUpload fileUploadListener="#{cEActionRequestSubmitBB.handlePhotoUpload}"
                                                           mode="advanced" 
-                                                          update="requestCEActionFlowFormDescribePhoto:photoTable"
+                                                          update="requestCEActionFlowFormDescribePhoto growl"
                                                           multiple="true"
                                                           fileLimit="3" 
                                                           sizeLimit="900000000" 
-                                                          allowTypes="/(\.|\/)(jpe?g|png)$/"
+                                                          allowTypes="/(\.|\/)(jpe?g|png|gif|JPG|JPE?G|PNG|GIF)$/"
                                                           />    
                                         </h:form>
 
@@ -136,7 +136,7 @@
                                             <p:commandButton id="goBack"
                                                              tabindex="4"
                                                              value="Go Back" styleClass="buttonOwnLine"
-                                                             action="#{cEActionRequestSubmitBB.goBack()}"
+                                                             action="#{cEActionRequestSubmitBB.goBackFromPhotos()}"
                                                              style="float: left">
                                                 <p:confirm header="Are you sure?" 
                                                            message="Going back could cause your changes to this page to be lost. Continue?" 
@@ -163,11 +163,15 @@
                                             <p:commandButton  ajax="false" 
                                                               tabindex="3"
                                                               styleClass="buttonOwnLine"
-                                                              value="Skip photo upload and continue to contact info" 
+                                                              value="Proceed without photos to contact info" 
                                                               id="ceactionrequestflow-nophotos-cb"
                                                               action="#{cEActionRequestSubmitBB.skipPhotoUpload}"
-                                                              style="width: 100%"
-                                                              />
+                                                              style="width: 100%">
+
+                                                <p:confirm header="Are you sure?" 
+                                                           message="If you select this option, any photos you have uploaded will be deleted. Continue?" 
+                                                           icon="pi pi-exclamation-triangle"/>
+                                            </p:commandButton>
                                         </div>
                                     </div>
 

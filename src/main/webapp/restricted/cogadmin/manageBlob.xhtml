@@ -155,9 +155,7 @@
                                                                          @form
                                                                          form-messages-global
                                                                          blob-search-messages-form
-                                                                         blob-search-log-form
-                                                                         blob-search-results-panel
-                                                                         blob-search-clear-cb-0"/>
+                                                                         blob-search-results-panel"/>
 
                                                     </div>
 
@@ -217,7 +215,8 @@
                                                                      ajax="true"
                                                                      update="
                                                                      form-messages-global
-                                                                     blob-lists-outpanel"
+                                                                     blob-lists-outpanel
+                                                                     mode-form"
                                                                      />
                                                 </p:column>
                                             </p:dataTable>
@@ -688,9 +687,7 @@
                                                                             icon="fa fa-home"
                                                                             update="form-messages-global
                                                                             blob-search-messages-form
-                                                                            blob-search-log-form
-                                                                            blob-search-results-panel
-                                                                            blob-search-clear-cb-0">
+                                                                            blob-search-results-panel">
                                                             <p:confirm header="Confirm" 
                                                                        message="Are you sure that you would like to delete #{manageBlobBB.selectedBlob.filename}? 
                                                                        If you will need it later, you should download it first."/>
@@ -742,9 +739,7 @@
                                                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
                                                                          update="form-messages-global
                                                                          blob-search-messages-form
-                                                                         blob-search-log-form
-                                                                         blob-search-results-panel
-                                                                         blob-search-clear-cb-0"/>
+                                                                         blob-search-results-panel"/>
                                                     </h:panelGroup>
 
                                                     <h:panelGroup>
@@ -769,9 +764,7 @@
                                                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
                                                                          update="form-messages-global
                                                                          blob-search-messages-form
-                                                                         blob-search-log-form
-                                                                         blob-search-results-panel
-                                                                         blob-search-clear-cb-0"/>
+                                                                         blob-search-results-panel"/>
                                                     </h:panelGroup>
 
                                                 </p:panelGrid>
@@ -788,6 +781,8 @@
                                 </div>
 
                             </div>
+                         
+                        </div>
 
                     </p:outputPanel>
 

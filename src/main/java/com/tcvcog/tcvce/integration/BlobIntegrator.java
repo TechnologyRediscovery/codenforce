@@ -203,7 +203,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws java.io.IOException
      */
-    public int storePhotoBlob(Blob blob) throws BlobException, IntegrationException, IOException{
+    public Blob storePhotoBlob(Blob blob) throws BlobException, IntegrationException, IOException{
         
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.photodoc(photodocid, photodocdescription, blobbytes_bytesid, muni_municode)\n" +
@@ -234,7 +234,10 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             rs = s.executeQuery(idNumQuery);
             rs.next();
             lastID = rs.getInt(1);
+            
+            //set the IDs so we can throw the blob back and they can access the blob and bytes
             blob.setBlobID(lastID);
+            blob.setBytesID(bytesID);
             
         } catch (SQLException ex) {
             System.out.println(ex);
@@ -243,7 +246,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
-        return lastID;
+        return blob;
     }
     
     /**
@@ -354,7 +357,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
         Connection con = getPostgresCon();
         String query = " UPDATE public.photodoc\n"
-                + " SET photodocdescription=?,\n"
+                + " SET photodocdescription=?\n"
                 + " WHERE photodocid=?;\n\n";
         
         PreparedStatement stmt = null;

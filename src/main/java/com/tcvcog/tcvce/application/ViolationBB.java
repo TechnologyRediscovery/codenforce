@@ -497,7 +497,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             blob.setBytes(ev.getFile().getContents());
             blob.setFilename(ev.getFile().getFileName());
             blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
-            this.currentViolation.getBlobIDList().add(blobc.storeBlob(blob));
+            this.currentViolation.getBlobIDList().add(blobc.storeBlob(blob).getBlobID());
             this.getBlobList().add(blob);
         } catch (IntegrationException | IOException ex) {
             System.out.println("ViolationAddBB.handlePhotoUpload | upload failed! " + ex);
