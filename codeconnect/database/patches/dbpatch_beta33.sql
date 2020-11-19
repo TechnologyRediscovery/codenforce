@@ -61,26 +61,141 @@ INSERT INTO public.textblockcategory(
 -- TODO: Deal with the WPRDC dump that stores the second
 -- part of an addrss range in field called PROPERTYFRACTION
 
-CREATE TABLE parcel;
-parcelid
+CREATE TABLE public.parcel(
+    parcelkey     INTEGER,
+    parcelidcnty    text,
+    parcellab       text,
+    lastupdatedts   TIMESTAMP WITH TIME ZONE,
+    lastupdatedby_userid    INTEGER CONSTRAINT parcel_lastupdated_fk REFERENCES,
+    deactivatedts   TIMESTAMP WITH TIME ZONE,
+    notes           text
+);
+
+
 -- code enf case is still based on a parcel
 
-CREATE TABLE parcelperson;
-FK parcel
-FK person
-TIMESTAMP
-role
+CREATE TABLE public.parcelperson
+    (
+        person_personid     INTEGER CONSTRAINT parcelperson_personid_fk REFERENCES person (personid),
+        parcel_parcelkey    INTEGER CONSTRAINT parcel_parcelkey_fk REFERENCES parcel (parcelkey),
+        role_roleid         INTEGER CONSTRAINT parcelperson_roleid_fk   REFERENCES parcelpersonrole (roleid)
+    );  
 
-CREATE TABLE person;
-name
-dob
-under18
-recordexpirydate
-deceaseddate
--- Clone defined; a person record with a non-null FK 
--- to a nother person record
-FK personclone
--- TODO: document cloning
+
+CREATE SEQUENCE IF NOT EXISTS parcelpersonrole_roleid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE public.parcelpersonrole
+    (
+        roleid              INTEGER PRIMARY KEY DEFAULT nextval('parcelpersonrole_roleid_seq'),
+        title               TEXT NOT NULL,
+        description         TEXT,
+        muni_municode       INTEGER CONSTRAINT parcelpersonrole_municode_fk REFERENCES municipality (municode),
+        deactivatedts       TIMESTAMP WITH TIME ZONE
+
+    ); 
+
+CREATE TABLE public.person
+    (
+        personid                INTEGER PRIMARY KEY DEFAULT nextval('person_personidseq'),
+        name                    TEXT,
+        dob                     DATE,
+        under18                 BOOLEAN,
+        activationstartdt       DATE,
+        activationstartnotes    TEXT,
+        activationstopdt        DATE,
+        activationstopnotes     TEXT,
+        deceaseddate            DATE,
+        deceasedby_userid       INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),
+        cloneof_personid        INTEGER CONSTRAINT person_clone_personid_fk REFERENCES person (personid),
+        createdts               TIMESTAMP WITH TIME ZONE,
+        createdby_userid        INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),     
+        lastupdatedts           TIMESTAMP WITH TIME ZONE,
+        lastupdatedby_userid    INTEGER CONSTRAINT person_lastupdatdby_userid_fk REFERENCES login (userid),
+        deactivatedts           TIMESTAMP WITH TIME ZONE,
+        deactivatedby_userid    INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),           
+        notes                   TEXT
+    );
+
+
+
+CREATE SEQUENCE IF NOT EXISTS contactphone_phoneid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+
+CREATE TABLE public.contactphone
+    (
+        phoneid             INTEGER PRIMARY KEY DEFAULT nextval('contactphone_phoneid_seq'),
+        phonenumber         TEXT NOT NULL,
+        phoneext            INTEGER,
+        createdts          TIMESTAMP WITH TIME ZONE,
+        created_userid     INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),
+        disconnectts        TIMESTAMP WITH TIME ZONE,
+        disconnect_userid       INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),    
+        deactivatedts           TIMESTAMP WITH TIME ZONE,
+        deactivatedby_userid    INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),     
+        notes               TEXT
+    );
+
+
+CREATE SEQUENCE IF NOT EXISTS contactphone_emailid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+
+CREATE TABLE public.contactphone
+    (
+        emailid                 INTEGER PRIMARY KEY DEFAULT nextval('contactphone_emailid_seq'),
+        emailaddress            TEXT NOT NULL,
+        bouncets                TIMESTAMP WITH TIME ZONE,
+
+        createdts               TIMESTAMP WITH TIME ZONE,
+        created_userid          INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),     
+        deactivatedts           TIMESTAMP WITH TIME ZONE,
+        deactivatedby_userid    INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),     
+        notes                   TEXT
+    );
+
+
+
+
+
+CREATE SEQUENCE IF NOT EXISTS mailingaddress_addressid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE mailingaddress
+    (
+        addressid               INTEGER PRIMARY KEY DEFAULT nextval('mailingaddress_addressid_seq'),
+        addressnum              TEXT,
+        street                  TEXT,
+        unitno                  TEXT,
+        city                    TEXT,
+        state                   TEXT,
+        zipcode                 TEXT,
+        lastupdatedts           TIMESTAMP WITH TIME ZONE,
+        lastupdatedby_userid    INTEGER CONSTRAINT mailingaddress_lastupdated_userid REFERENCES login (userid),
+        notes                   TEXT,
+        verifiedts              TIMESTAMP WITH TIME ZONE,
+        deactivatedts           TIMESTAMP WITH TIME ZONE,
+        deactivatedby_userid    INTEGER CONSTRAINT mailingaddress_lastupdated_userid REFERENCES login (userid),
+
+    );
+
 
 
 CREATE TABLE mailingaddressperson
@@ -93,31 +208,6 @@ CREATE TABLE mailingaddressparcel
 FK to parcel
 FK to mailingaddress
 creationts
-
-CREATE TABLE mailingaddress;
--- current
-address1
-address2
-city
-state
-zip
-
--- option 2
-housenum
-streetname
-unitno
-city
-state
-zip
-
--- four fields in the WPRDC API, map to "mailingaddress"
-changenoticeaddress1
-changenoticeaddress2
-changenoticeaddress3
-changenoticeaddress4
-
--- optionbrainstorm
-FK to street
 
 
 CREATE TABLE parcelunit;

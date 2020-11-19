@@ -1964,6 +1964,7 @@
             <redirect />
         </navigation-case>
     </navigation-rule>
+    
         
     <navigation-rule>
         <navigation-case>
@@ -2058,6 +2059,85 @@
     <!--*********************************************************************-->
     <!--**                       UNKNOWN                                   **-->
     <!--*********************************************************************-->
+    
+    <navigation-rule>
+        <navigation-case>
+            <from-view-id>*</from-view-id>
+            <from-outcome>rentalRegistrationFlow</from-outcome>
+            <to-view-id>/public/services/rental/rental0ChooseMuni.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+    
+    
+    <managed-bean>
+        <managed-bean-name>rentalRegistrationBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.rental.RentalRegistrationBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
+    
+    
+    <navigation-rule>
+        
+        
+        <navigation-case>
+            <from-view-id>/public/services/rental/rental0ChooseMuni.xhtml</from-view-id>
+            <from-outcome>chooseRole</from-outcome>
+            <to-view-id>/public/services/rental/rental1Role.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        
+        
+        <navigation-case>
+            <from-view-id>/public/services/rental/rental1Role.xhtml</from-view-id>
+            <from-outcome>chooseProperty</from-outcome>
+            <to-view-id>/public/services/rental/rental2ChooseProperty.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        
+        
+        <navigation-case>
+            <from-view-id>/public/services/rental/rental2ChoosProperty.xhtml</from-view-id>
+            <from-outcome>configureUnits</from-outcome>
+            <to-view-id>/public/services/rental/rental3AddPropertyUnit.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        
+        
+        <navigation-case>
+            <from-view-id>/public/services/rental/rental3AddPropertyUnit.xhtml</from-view-id>
+            <from-outcome>selectUnitForRegistration</from-outcome>
+            <to-view-id>/public/services/rental/rental4SelectForRegistration.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        
+        
+        <navigation-case>
+            <from-view-id>/public/services/rental/renta4SelectForRegistration.xhtml</from-view-id>
+            <from-outcome>personInfo</from-outcome>
+            <to-view-id>/public/services/rental/rental5personsRequirementManage.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        
+        
+        <navigation-case>
+            <from-view-id>/public/services/rental/rental5personsRequirementManage.xhtml</from-view-id>
+            <from-outcome>review</from-outcome>
+            <to-view-id>/public/services/rental/rental6ReviewAndSubmit.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        
+    </navigation-rule>
+    
+    
+    
     
     
     
