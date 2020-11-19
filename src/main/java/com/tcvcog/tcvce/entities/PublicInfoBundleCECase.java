@@ -23,6 +23,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle{
     private boolean paccEnabled;
 
     private List<PublicInfoBundleEventCnF> publicEventList;
+    private List<PublicInfoBundleCodeViolation> violationList;
 
     private LocalDateTime mostRecentLoggedEvent;
 
@@ -98,9 +99,6 @@ public class PublicInfoBundleCECase extends PublicInfoBundle{
         input.setSource(new BOBSource());
 
         setPacc(input.getPublicControlCode());
-
-        setCaseManager(input.getCaseManager());
-        input.setCaseManager(new User());
 
         if (input.getViolationList() != null) {
             countViolations = input.getViolationList().size();
@@ -207,6 +205,14 @@ public class PublicInfoBundleCECase extends PublicInfoBundle{
      */
     public void setPublicEventList(List<PublicInfoBundleEventCnF> publicEventList) {
         this.publicEventList = publicEventList;
+    }
+
+    public List<PublicInfoBundleCodeViolation> getViolationList() {
+        return violationList;
+    }
+
+    public void setViolationList(List<PublicInfoBundleCodeViolation> violationList) {
+        this.violationList = violationList;
     }
 
 }

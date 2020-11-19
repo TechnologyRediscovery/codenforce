@@ -21,7 +21,6 @@ import java.util.Objects;
  * @author sylvia
  */
 public class        CECase 
-        extends     CECasePublic
         implements  Cloneable,
                     IFace_Loggable,
                     IFace_EventHolder,
@@ -73,6 +72,34 @@ public class        CECase
     
     public CECase(){
         
+    }
+
+    public CECase(CECaseDataHeavy input){
+        caseID = input.getCaseID();
+        publicControlCode = input.getPublicControlCode();
+        paccEnabled = input.isPaccEnabled();
+        allowForwardLinkedPublicAccess = input.isAllowForwardLinkedPublicAccess();
+        propertyID = input.getPropertyID();
+        propertyUnitID = input.getPropertyUnitID();
+        caseManager = input.getCaseManager();
+        caseName = input.getCaseName();
+        statusBundle = input.getStatusBundle();
+        statusAssignmentLog = input.getStatusLog();
+        originationDate = input.getOriginationDate();
+        closingDate = input.getClosingDate();
+        creationTimestamp = input.getCreationTimestamp();
+        notes = input.getNotes();
+        source = input.getSource();
+        citationList = input.getCitationList();
+        noticeList = input.getNoticeList();
+        violationList = input.getViolationList();
+        active = input.isActive();
+        personInfoPersonID = input.getPersonInfoPersonID();
+        propertyInfoCase = input.isPropertyInfoCase();
+        lastUpdatedBy = input.getLastUpdatedBy();
+        lastUpdatedTS = input.getLastUpdatedTS();
+        eventList = input.getEventList();
+        eventListMaster = input.getEventList();
     }
     
     

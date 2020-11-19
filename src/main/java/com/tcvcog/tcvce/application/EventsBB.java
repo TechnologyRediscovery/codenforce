@@ -373,7 +373,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
                    if(sb.getSessEventList() != null && !sb.getSessEventList().isEmpty()){
                        eventList.addAll(sb.getSessEventList());
                    }
-                   setCurrentERGBOb((IFace_EventRuleGoverned) pc.determineGoverningPropertyInfoCase(sb.getSessMuni().getMuniPropertyDH()));
+//                   setCurrentERGBOb((IFace_EventRuleGoverned) pc.determineGoverningPropertyInfoCase(sb.getSessMuni().getMuniPropertyDH()));
            }
            if(eventList != null 
                    && !eventList.isEmpty() 
@@ -557,7 +557,6 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         return "";
     }
     
-  
     
     /**
      * Listener for user changes to the selected event type

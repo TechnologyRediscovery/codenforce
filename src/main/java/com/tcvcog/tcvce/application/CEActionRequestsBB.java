@@ -1133,7 +1133,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
     /**
-     * @return the disablePACCControl
+     * @return if the user should not be able to change public access on an object
      */
     public boolean isDisablePACCControl() {
         disablePACCControl = false;

@@ -102,7 +102,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             }
 
             if (pdh.getPropInfoCaseList().isEmpty()) {
-                createPropertyInfoCase(pdh, ua);
+                pdh.getPropInfoCaseList().add(createPropertyInfoCase(pdh, ua));
             }
 
             // UnitDataHeavy list
@@ -386,14 +386,20 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * Logic container for choosing a property info case
      *
      * @param pdh
+     * @param ua
      * @return
+     * @throws com.tcvcog.tcvce.domain.SearchException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public CECase determineGoverningPropertyInfoCase(PropertyDataHeavy pdh) {
+    public CECase determineGoverningPropertyInfoCase(PropertyDataHeavy pdh, UserAuthorized ua) throws SearchException, IntegrationException {
         CECaseDataHeavy chosenCECase = null;
         List<CECaseDataHeavy> cseList = pdh.getPropInfoCaseList();
         if (cseList != null && !cseList.isEmpty()) {
             Collections.sort(cseList);
             chosenCECase = cseList.get(0);
+        } else {
+            //There's no existing info case, let's make one.
+            chosenCECase = createPropertyInfoCase(pdh, ua);
         }
         return chosenCECase;
     }
@@ -406,25 +412,28 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param ua
      * @return
      * @throws com.tcvcog.tcvce.domain.SearchException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public PropertyDataHeavy createPropertyInfoCase(PropertyDataHeavy p, UserAuthorized ua) throws SearchException {
+    public CECaseDataHeavy createPropertyInfoCase(PropertyDataHeavy p, UserAuthorized ua) throws SearchException, IntegrationException {
         CaseCoordinator cc = getCaseCoordinator();
         UserCoordinator uc = getUserCoordinator();
         CECase cse = cc.cecase_initCECase(p, ua);
+        CECaseDataHeavy csehv = null;
         //review all case mems and set app ones for info case
 
-//        try {
-//            cse.setCaseManager(uc.getUser(ua.getMyCredential().getGoverningAuthPeriod().getUserID()));
-// TODO: Debug later
-//            cc.cecase_insertNewCECase(cse, ua, null);
-//        } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
-//            System.out.println(ex);
-//        }
-        if (p.getPropInfoCaseList() == null) {
-            p.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
+        try {
+            cse.setCaseManager(uc.user_getUser(ua.getMyCredential().getGoverningAuthPeriod().getUserID()));
+            cse.setPropertyInfoCase(true);
+            cse.setNotes("This is a Case object that contains information and events attached to " + p.getAddress() +". "
+                    + "This case does not represent an actual code enforcement case.");
+            cse.setCaseID(cc.cecase_insertNewCECase(cse, ua, null));
+            csehv = cc.cecase_assembleCECaseDataHeavy(cse, ua);
+            
+        } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
+            System.out.println(ex);
         }
 
-        return p;
+        return csehv;
     }
 
     /**
