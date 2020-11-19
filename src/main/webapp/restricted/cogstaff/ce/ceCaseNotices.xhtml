@@ -64,7 +64,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 header="Notice Templates" >
 
                                         <h:form id="noticeBuilderForm">
-                                            <h2>Create new notice</h2>
+                                            <h2>Step 1: Create new notice</h2>
 
                                                 <p:commandButton id="nov-init-cb"
                                                                  value="Start new notice"
@@ -77,7 +77,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                           
                                             <h2>
                                                 <p:outputLabel for="nov-templateblocks-add-table">
-                                                    <h:outputText value="NOV templates in #{systemServicesBB.bbSessionMuni.muniName}"/>
+                                                    <h:outputText value="Step 2: NOV templates in #{systemServicesBB.bbSessionMuni.muniName}"/>
                                                 </p:outputLabel>
                                             </h2>
 
@@ -323,7 +323,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                       controls="bold italic underline strikethrough font size style color 
                                                       bullets numbering center undo redo rule link removeformat outdent 
                                                       indent link unlink copy cut paste rule alignleft center alignright"
-                                                      width="600"
+                                                      width="800"
                                                       height="400"
                                                       disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
                                                       />
@@ -495,12 +495,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         
                                         <h:form id="nov-preview-textafter-form">
                                             <p:spacer height="10px" />
-                                            <h4>Letter text before violations</h4>
+                                            <h4>Letter text after violations</h4>
                                             <p:editor value="#{noticeOfViolationBB.currentNotice.noticeTextAfterViolations}"
                                                       controls="bold italic underline strikethrough font size style color 
                                                       bullets numbering center undo redo rule link removeformat outdent 
                                                       indent link unlink copy cut paste rule alignleft center alignright"
-                                                      width="600"
+                                                      width="800"
                                                       height="400"
                                                       disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
                                                       />
