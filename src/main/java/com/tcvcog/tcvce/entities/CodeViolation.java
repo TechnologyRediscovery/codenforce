@@ -68,6 +68,11 @@ public  class       CodeViolation
     protected User complianceUser;
     protected String complianceNote;
     
+    // nullification fields
+    
+    protected LocalDateTime nullifiedTS;
+    protected User nullifiedUser;
+    
     protected boolean leagacyImport;
     protected List<Photograph> photoList;
     protected List<Integer> blobIDList;
@@ -806,6 +811,34 @@ public  class       CodeViolation
      */
     public void setBlobList(List<Blob> blobList) {
         this.blobList = blobList;
+    }
+
+    /**
+     * @return the nullifiedTS
+     */
+    public LocalDateTime getNullifiedTS() {
+        return nullifiedTS;
+    }
+
+    /**
+     * @return the nullifiedUser
+     */
+    public User getNullifiedUser() {
+        return nullifiedUser;
+    }
+
+    /**
+     * @param nullifiedTS the nullifiedTS to set
+     */
+    public void setNullifiedTS(LocalDateTime nullifiedTS) {
+        this.nullifiedTS = nullifiedTS;
+    }
+
+    /**
+     * @param nullifiedUser the nullifiedUser to set
+     */
+    public void setNullifiedUser(User nullifiedUser) {
+        this.nullifiedUser = nullifiedUser;
     }
 
    

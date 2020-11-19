@@ -131,7 +131,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <h:outputText value="Status" />
                                                     </f:facet>
 
-                                                    <h:outputText value="#{!(empty violation.status) ? violation.status.label : ''}" />
+                                                    <h:outputText value="#{(!(empty violation.status)) and (empty violation.nullifiedTS) ? violation.status.label : ''}" />
+                                                    <h:outputText value="#{(!(empty violation.nullifiedTS)) ? 'NULLIFIED': ''}" />
                                                 </p:column>
 
 
@@ -197,7 +198,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <div class="ui-g data_container_nested_restrict">
 
                                                 <!--NESTED DATA FIELD VERTICAL-->
-                                                <div class="ui-g-3 ui-md-3 ui-lg-3 restrict-data-field-vertical">
+                                                <div class="ui-g-2 ui-md-2 ui-lg-2 restrict-data-field-vertical">
                                                     <!--NESTED DATA LABEL VERTICAL -->
                                                     <div class="restrict-data-field-label-vertical" >
                                                         <h:outputLabel value=" "/>
@@ -214,7 +215,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
 
                                                 <!--NESTED DATA FIELD VERTICAL-->
-                                                <div class="ui-g-3 ui-md-3 ui-lg-3 restrict-data-field-vertical">
+                                                <div class="ui-g-2 ui-md-2 ui-lg-2 restrict-data-field-vertical">
                                                     <!--NESTED DATA LABEL VERTICAL -->
                                                     <div class="restrict-data-field-label-vertical" >
                                                         <h:outputLabel value="Violation date of record"/>
@@ -239,7 +240,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
 
                                                 <!--NESTED DATA FIELD VERTICAL-->
-                                                <div class="ui-g-3 ui-md-3 ui-lg-3 restrict-data-field-vertical">
+                                                <div class="ui-g-2 ui-md-2 ui-lg-2 restrict-data-field-vertical">
                                                     <!--NESTED DATA LABEL VERTICAL -->
                                                     <div class="restrict-data-field-label-vertical" >
                                                         <h:outputLabel value="Stipulated compliance"/>
@@ -257,7 +258,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
 
                                                 <!--NESTED DATA FIELD VERTICAL-->
-                                                <div class="ui-g-3 ui-md-3 ui-lg-3 restrict-data-field-vertical">
+                                                <div class="ui-g-2 ui-md-2 ui-lg-2 restrict-data-field-vertical">
                                                     <!--NESTED DATA LABEL VERTICAL -->
                                                     <div class="restrict-data-field-label-vertical" >
                                                         <h:outputLabel      for="violation-compdate-ot"
@@ -284,6 +285,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                         value="#{!(empty violationBB.currentViolation.complianceNote) ? 'Note: ' : ''}"/>
                                                         <h:outputText   id="violation-comp-notes-ot1"
                                                                         value="#{violationBB.currentViolation.complianceNote}"/>
+                                                    </div>
+                                                </div>
+                                                <!--NESTED DATA FIELD VERTICAL-->
+                                                <div class="ui-g-2 ui-md-2 ui-lg-2 restrict-data-field-vertical">
+                                                    <!--NESTED DATA LABEL VERTICAL -->
+                                                    <div class="restrict-data-field-label-vertical" >
+                                                        <h:outputLabel      for="nullified-ts-ot"
+                                                                            value="Nullified"/>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText   id="nullified-ts-ot"
+                                                                        value="#{violationBB.getPrettyDate(violationBB.currentViolation.nullifiedTS)}"/>
+
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText   id="violation-nullifiedby-ot0"
+                                                                        value="#{!(empty violationBB.currentViolation.nullifiedUser) ? 'Nullified by user ' : ''}"/>
+                                                        <h:outputText   id="violation-nullifiedby-ot1"
+                                                                        value="#{!(empty violationBB.currentViolation.nullifiedUser) ? violationBB.currentViolation.nullifiedUser.person.firstName : ''}"/>
+                                                        <h:outputText   id="violation-nullifiedby-ot2"
+                                                                        value=" "/>
+                                                        <h:outputText   id="violation-nullifiedby-ot3"
+                                                                        value="#{!(empty violationBB.currentViolation.nullifiedUser) ? violationBB.currentViolation.nullifiedUser.person.lastName : ''}"/>
+                                                        
                                                     </div>
                                                 </div>
                                             </div>
@@ -1040,14 +1067,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                              >
 
                                         <h:form id="violationPhotosUploadForm" enctype="multipart/form-data">
-                                            <h2>Upload photos of this violation (3 max)</h2>
+                                            <h2>Photos of this violation (3 max)</h2>
+                                            <p>You must insert violation and re-enter this violation page, then select the violation and click "Update" mode to add photos.</p>
                                             <p:fileUpload fileUploadListener="#{violationBB.handlePhotoUpload}"
                                                           mode="advanced" 
                                                           update="violation-photos-form:photoTable"
                                                           multiple="true"
                                                           fileLimit="3"
-                                                          sizeLimit="999999999" 
-                                                          allowTypes="/(\.|\/)(jpe?g|png)$/"/>    
+                                                          sizeLimit="99999999999" 
+                                                          allowTypes="/(\.|\/)(jpe?g|png)$/"
+                                                          rendered="#{violationBB.activeUpdateMode}"/>    
                                         </h:form>
 
                                         <h:form id="violation-photos-form">
@@ -1135,6 +1164,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                     <p:commandButton 
                                                         id="violation-remove-button"
+                                                        icon="fa fa-trash"
+                                                        ajax="false"
+                                                        action="#{violationBB.onViolationRemoveCommitButtonChange}"
+                                                        value="Remove Violation ID:#{violationBB.currentViolation.violationID}"
+                                                        />
+                                                </div>
+                                            </div>
+
+                                        </h:form>
+
+                                    </p:panel>
+                                    
+                                       <p:panel id="violation-nullify-panel"
+                                             toggleable="true"
+                                             collapsed="false"
+                                             header="Nullify Code Violation"
+                                             rendered="#{violationBB.activeRemoveMode}"
+                                             >
+
+                                        <h:form id="violation-nullify-form">
+
+                                            <div class="ui-g data_container_nested_restrict">
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <h:outputLabel  for="violation-nullify-button">
+                                                            <h:outputText value="Nullify a code violation that was once legitimate but is no longer relevant for case closure." />
+                                                        </h:outputLabel>
+                                                    </div>
+                                                </div>
+                                                <div class="restrict-main-contents-io-button red_button">
+
+
+                                                    <p:commandButton 
+                                                        id="violation-nullify-button"
                                                         icon="fa fa-trash"
                                                         ajax="false"
                                                         action="#{violationBB.onViolationRemoveCommitButtonChange}"

@@ -698,7 +698,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 
          }
          
-         
          query = new QueryPerson(qName, paramsList, cred);
          query = (QueryPerson) initQueryFinalizeInit(query);
          
@@ -722,8 +721,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          
          
          switch(qName){
-             case MUNICODEOFFICER_ACTIVITY_PAST30DAYS:
-                 paramsList.add(genParams_event_cecase(params, cred));
+             case MUNI_MONTHYACTIVITY:
+                 paramsList.add(genParams_event_muniMonthly(params, cred));
                  break;
              case OCCPERIOD:
                  paramsList.add(genParams_event_occperid(params, cred));
@@ -753,10 +752,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @param cred of the requesting User
      * @return 
      */
-    public QueryOccPeriod initQuery(QueryOccPeriodEnum qName, Credential cred){
-         QueryOccPeriod  query;
-         List<SearchParamsOccPeriod> paramsList = new ArrayList<>();
-         SearchParamsOccPeriod params = genParams_occPeriod_initParams(cred);
+    public  QueryOccPeriod initQuery(QueryOccPeriodEnum qName, Credential cred){
+            QueryOccPeriod  query;
+            List<SearchParamsOccPeriod> paramsList = new ArrayList<>();
+            SearchParamsOccPeriod params = genParams_occPeriod_initParams(cred);
          
          switch(qName){
             
@@ -805,9 +804,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case CURRENT_TIMEFRAMES:
                 break;
             case OPENED_30DAYS:
+                paramsList.add(genParams_CECase_openedInDateRange(params, cred));
                 break;
             case CLOSED_30DAYS:
-                paramsList.add(getSearchParams_CECase_closedPast30Days(params, cred));
+                paramsList.add(genParams_CECase_closedInDateRange(params, cred));
                 break;
             case UNRESOLVED_CITATIONS:
                 break;
@@ -828,6 +828,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 paramsList.add(genParams_cecase_pacc(params, cred));
             case CUSTOM:
                 break;
+            case MUNI_ALL:
+                paramsList.add(genParams_ceCase_muniAllActive(params, cred));
             default:
          }
          
@@ -1387,6 +1389,22 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     
+    public SearchParamsEvent genParams_event_muniMonthly(SearchParamsEvent params, Credential cred ){
+        params.setDate_startEnd_ctl(true);
+        params.setDate_field(SearchParamsEventDateFieldsEnum.CREATED_TS);
+        params.setDate_end_val(LocalDateTime.now());
+        params.setDate_start_val(LocalDateTime.now().minusDays(30));
+        params.setLimitResultCount_ctl(false);
+        params.setEventDomain_ctl(true);
+        params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
+        
+        // all other event controls are off by default
+        
+        return params;
+        
+    }
+    
+    
     public SearchParamsEvent genParams_event_recentUserEvents(SearchParamsEvent params, Credential cred ){
         // event types are always bundled in an EventCategory
         // so in this case of this query, we don't care about the Category title,
@@ -1571,6 +1589,66 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         return params;
     }
+    /**
+     * Returns a SearchParams subclass for retrieving all open
+     * cases in a given municipality. Open cases are defined as a 
+     * case whose closing date is null.
+     * @param params
+     * @param cred
+     * @return a SearchParams subclass with mem vars ready to send
+     * into the Integrator for case list retrieval
+     */
+    public SearchParamsCECase genParams_CECase_openedInDateRange(SearchParamsCECase params, Credential cred){
+        params.setFilterName("Cases opened in date range");
+        params.setFilterDescription("Cases opened in date range");
+        
+        params.setDate_startEnd_ctl(true);
+        params.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATIONTS);
+        // subclass specific
+//        params.setCaseOpen_ctl(true);
+//        params.setCaseOpen_val(true);
+//        
+//        params.setDateToSearchCECases("Opening date of record");
+//        params.setUseCaseManager(false);
+//        
+//        params.setUseCasePhase(false);
+//        params.setUseCaseStage(false);
+//        params.setProperty_ctl(false);
+//        params.setPropInfoCase_ctl(false);
+//        params.setUseCaseManager(false);
+        
+        return params;
+    }
+    /**
+     * Returns a SearchParams subclass for retrieving all open
+     * cases in a given municipality. Open cases are defined as a 
+     * case whose closing date is null.
+     * @param params
+     * @param cred
+     * @return a SearchParams subclass with mem vars ready to send
+     * into the Integrator for case list retrieval
+     */
+    public SearchParamsCECase genParams_CECase_closedInDateRange(SearchParamsCECase params, Credential cred){
+        params.setFilterName("Cases closed in a date range");
+        params.setFilterDescription("Cases with a closed TS within a date range");
+        
+        params.setDate_startEnd_ctl(true);
+        params.setDate_field(SearchParamsCECaseDateFieldsEnum.CLOSE);
+        // subclass specific
+//        params.setCaseOpen_ctl(true);
+//        params.setCaseOpen_val(true);
+//        
+//        params.setDateToSearchCECases("Opening date of record");
+//        params.setUseCaseManager(false);
+//        
+//        params.setUseCasePhase(false);
+//        params.setUseCaseStage(false);
+//        params.setProperty_ctl(false);
+//        params.setPropInfoCase_ctl(false);
+//        params.setUseCaseManager(false);
+        
+        return params;
+    }
     
     public SearchParamsCECase genParams_cecase_pacc(SearchParamsCECase params, Credential cred){
         params.setFilterName("PACC only");
@@ -1610,7 +1688,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @return a SearchParams subclass with mem vars ready to send
      * into the Integrator for case list retrieval
      */
-    public SearchParamsCECase getSearchParams_CECase_closedPast30Days(SearchParamsCECase params, Credential cred){
+    public SearchParamsCECase genParams_cecase_closedPast30Days(SearchParamsCECase params, Credential cred){
         params.setFilterName("CECases closed in past month");
 
         params.setDate_startEnd_ctl(true);
@@ -1618,6 +1696,20 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setDate_field(SearchParamsCECaseDateFieldsEnum.CLOSE);
         params.setDate_relativeDates_start_val(PASTPERIOD_YEAR);
         params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
+        
+        return params;
+    }
+    
+    public SearchParamsCECase genParams_ceCase_muniAllActive(SearchParamsCECase params, Credential cred){
+        params.setFilterName("All active in muni");
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+        params.setPersonInfoCase_ctl(true);
+        params.setPersonInfoCase_val(false);
+        
+        params.setPropInfoCase_ctl(true);
+        params.setPropInfoCase_val(false);
         
         return params;
     }

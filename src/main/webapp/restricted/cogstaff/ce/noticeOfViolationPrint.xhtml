@@ -49,7 +49,7 @@
 
 
                     <div class="date-of-record">
-                        <h:outputText id="date-of-record-ot" value="#{noticeOfViolationBB.currentNotice.dateOfRecordPretty}" />
+                        <h:outputText id="date-of-record-ot" value="#{noticeOfViolationBB.getPrettyDateNoTime(noticeOfViolationBB.currentNotice.dateOfRecord)}" />
                     </div> 
 
                     <div class="property-of-concern">
@@ -63,6 +63,7 @@
                             <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.address_zip}" />
 
                             <h:outputText id="nov-prop-muni" value=" | Lot and block: #{noticeOfViolationBB.currentCase.property.lotAndBlock}" />
+                            <h:outputText id="nov-prop-muni" value=" | Case ID: #{noticeOfViolationBB.currentCase.caseID}" />
                         </div>
                     </div>
 
@@ -71,6 +72,8 @@
                                       escape="false"
                                       value="#{noticeOfViolationBB.currentNotice.noticeTextBeforeViolations}" />
                     </div>
+                    
+                    <h3>Violations</h3>
 
                     <p:dataScroller id="violations-ds"
                                     styleClass="nov-viol-ds"

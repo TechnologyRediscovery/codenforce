@@ -1284,6 +1284,18 @@ gridTd-bignum{
 }
 
 
+.link-button{
+    display: inline-block;
+    background-color:  #007ad9;
+    color: white;
+    padding: 5px;
+    
+}
+
+.link-button-container a{
+    color:white;
+}
+
 /* ****************** CLOSE BUTTON STYLES ********************/
 
 
@@ -2673,6 +2685,12 @@ input{
     margin-bottom: 20px;
 }
 
+.data_container_nested_restrict_report{
+    width: 100%;
+    padding-top: 5px;
+    margin-bottom: 5px;
+}
+
 .restrict-main-contents-io-title{
     font-weight: 700;
     padding-bottom: 10px;
@@ -2711,6 +2729,11 @@ input{
 .restrict-data-field{
     margin-top: 5px;
     margin-bottom: 10px;
+}
+
+.restrict-data-field_report{
+    margin-top: 3px;
+    margin-bottom: 3px;
 }
 
 .restrict-data-field-label-inline{

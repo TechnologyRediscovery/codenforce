@@ -484,8 +484,6 @@ public class        BackingBeanUtils
         return caseIntegrator;
         
         
-        
-        
     }
 
     /**

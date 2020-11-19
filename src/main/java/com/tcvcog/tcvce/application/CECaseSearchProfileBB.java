@@ -22,10 +22,12 @@ import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CEActionRequest;
@@ -35,7 +37,9 @@ import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.CaseStageEnum;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Property;
@@ -73,6 +77,7 @@ public class CECaseSearchProfileBB
     private CECaseDataHeavy currentCase;
     private boolean currentCaseSelected;
 
+    private NoticeOfViolation currentNotice;
     private List<CECasePropertyUnitHeavy> caseList;
     private List<CECasePropertyUnitHeavy> filteredCaseList;
     
@@ -80,6 +85,9 @@ public class CECaseSearchProfileBB
     private List<QueryCECase> queryList;
     private QueryCECase querySelected;
     private boolean appendResultsToList;
+    
+    private List<EventCategory> closingEventCategoryList;
+    private EventCategory closingEventCategorySelected;
     
     private ViewOptionsActiveHiddenListsEnum eventViewOptionSelected;
     private List<ViewOptionsActiveHiddenListsEnum> eventViewOptions;
@@ -112,6 +120,7 @@ public class CECaseSearchProfileBB
         SearchCoordinator sc = getSearchCoordinator();
         UserCoordinator uc = getUserCoordinator();
         SystemCoordinator sysCor = getSystemCoordinator();
+        EventCoordinator ec = getEventCoordinator();
         
 
         SessionBean sb = getSessionBean();
@@ -133,6 +142,7 @@ public class CECaseSearchProfileBB
             }
             currentCase = cc.cecase_assembleCECaseDataHeavy(cseTemp, getSessionBean().getSessUser());
             System.out.println("CECaseSearchProfile.initBean(): current case ID: " + currentCase.getCaseID());
+            closingEventCategoryList = ec.getEventCategeryList(EventType.Closing);
             
         } catch (IntegrationException | SearchException | BObStatusException ex) {
             System.out.println(ex);
@@ -155,6 +165,7 @@ public class CECaseSearchProfileBB
         } else {
             reportCECaseList = cc.report_getDefaultReportConfigCECaseList();
         }
+        
         
         ReportConfigCECase rpt = getSessionBean().getReportConfigCECase();
         
@@ -195,6 +206,10 @@ public class CECaseSearchProfileBB
      * @param ev 
      */
     public void refreshCurrentCase(ActionEvent ev){
+        reloadCase();
+    }
+    
+    public void reloadCase(){
         CaseCoordinator cc = getCaseCoordinator();
         try {
             currentCase = cc.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
@@ -382,6 +397,26 @@ public class CECaseSearchProfileBB
         
     }
     
+    /**
+     * Listener for user requests to deactivate a cecase
+     * @return 
+     */
+    public String onCaseForceCloseCommitButtonChnage(){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            cc.cecase_forceclose(currentCase, closingEventCategorySelected, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                "Case closed and violations nullified.", ""));
+        } catch (IntegrationException | BObStatusException | EventException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                ex.getMessage(), ""));
+            
+        }
+        return "ceCaseSearchProfile";
+        
+    }
+    
       /**
      * Listener for commencement of note writing process
      *
@@ -479,6 +514,131 @@ public class CECaseSearchProfileBB
         
     }
     
+    
+    public void markNoticeOfViolationAsSent(NoticeOfViolation nov) {
+        CaseCoordinator caseCoord = getCaseCoordinator();
+        
+        try {
+            caseCoord.nov_markAsSent(currentCase, nov, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Marked notice as sent and added event to case",
+                            ""));
+            reloadCase();
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        } catch (EventException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to generate case event to log phase change",
+                            "Note that because this message is being displayed, the phase change"
+                            + "has probably succeeded"));
+        }
+
+    }
+    
+    public void onNoticeDetailsButtonChange(NoticeOfViolation nov){
+        currentNotice = nov;
+        
+    }
+
+     public String resetNotice() {
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            cc.nov_ResetMailing(getCurrentNotice(), getSessionBean().getSessUser());
+//            refreshCurrentCase();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Notice mailing status has been reset", ""));
+            reloadCase();
+            return "ceCaseSearchProfile";
+            
+        } catch (IntegrationException | AuthorizationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        }
+        return "";
+    }
+    
+    public void markNoticeOfViolationAsReturned(ActionEvent ev) {
+        CaseCoordinator caseCoord = getCaseCoordinator();
+        try {
+            caseCoord.nov_markAsReturned(currentCase, currentNotice, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Notice no. " + getCurrentNotice().getNoticeID()
+                            + " has been marked as returned on today's date", ""));
+            reloadCase();
+        } catch (IntegrationException | BObStatusException  ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+            
+        }
+        
+    }
+    
+    public String deleteNoticeOfViolation() {
+        CaseCoordinator caseCoord = getCaseCoordinator();
+        try {
+            caseCoord.nov_delete(getCurrentNotice());
+            currentCase = caseCoord.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Notice no. " + getCurrentNotice().getNoticeID() + " has been nuked forever", ""));
+            reloadCase();
+            return "ceCaseSearchProfile";
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to delete this notice of violation, "
+                            + "probably because it has been sent already", ""));
+        } catch (IntegrationException | SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+
+        }
+        return "";
+        
+
+    }
+    
+    
+    
+    
+    public void lockNoticeAndQueueForMailing(NoticeOfViolation nov) {
+        CaseCoordinator caseCoord = getCaseCoordinator();
+
+        try {
+            caseCoord.nov_LockAndQueue(currentCase, nov, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Notice is locked and ready to be mailed!", ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        } catch (EventException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            "The automatic event generation associated with this action has thrown an error. "
+                            + "Please create an event manually which logs this letter being queued for mailing", ""));
+
+        } catch (ViolationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            "Unable to queue notice of violatio. "
+                            + "Please create an event manually which logs this letter being queued for mailing", ""));
+        }
+
+    }
+    
+    
+    
     public String onNOVViewButtonChange(NoticeOfViolation nov){
         getSessionBean().setSessNotice(nov);
         return "ceCaseNotices";
@@ -517,10 +677,6 @@ public class CECaseSearchProfileBB
         
         return "blobs";
     }
-    
-    
-    
-    
     
 
     /**
@@ -702,22 +858,40 @@ public class CECaseSearchProfileBB
         }
         configureParameters();
     }
-
+    
+    /**
+     * 
+     * @param ev 
+     */
     public void prepareReportCECaseList(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
 
         if (reportCECaseList == null) {
             reportCECaseList = cc.report_getDefaultReportConfigCECaseList();
         }
+        reportCECaseList.setTitle("Code Enforcement Activity Report");
+        reportCECaseList.setDate_start_val(LocalDateTime.now().minusDays(30));
+        reportCECaseList.setDate_end_val(LocalDateTime.now());
         System.out.println("CaseProfileBB.prepareCaseListReport");
 
     }
 
+    /**
+     * 
+     * @return 
+     */
     public String generateReportCECaseList() {
-        getReportCECaseList().setCreator(getSessionBean().getSessUser());
-        getReportCECaseList().setMuni(getSessionBean().getSessMuni());
-        getReportCECaseList().setGenerationTimestamp(LocalDateTime.now());
+        CaseCoordinator cc = getCaseCoordinator();
+        reportCECaseList.setCreator(getSessionBean().getSessUser());
+        reportCECaseList.setMuni(getSessionBean().getSessMuni());
+        reportCECaseList.setGenerationTimestamp(LocalDateTime.now());
 
+        try {
+            reportCECaseList = cc.report_buildCECaseListReport(reportCECaseList, getSessionBean().getSessUser());
+        } catch (SearchException ex) {
+            System.out.println(ex);
+            
+        }
         getSessionBean().setReportConfigCECaseList(reportCECaseList);
         getSessionBean().setReportConfigCECase(null);
         getSessionBean().setSessReport(reportCECaseList);
@@ -985,6 +1159,48 @@ public class CECaseSearchProfileBB
      */
     public void setFormNoteText(String formNoteText) {
         this.formNoteText = formNoteText;
+    }
+
+    /**
+     * @return the closingEventList
+     */
+    public List<EventCategory> getClosingEventList() {
+        return closingEventCategoryList;
+    }
+
+    /**
+     * @param closingEventList the closingEventList to set
+     */
+    public void setClosingEventList(List<EventCategory> closingEventList) {
+        this.closingEventCategoryList = closingEventList;
+    }
+
+    /**
+     * @return the closingEventCategorySelected
+     */
+    public EventCategory getClosingEventCategorySelected() {
+        return closingEventCategorySelected;
+    }
+
+    /**
+     * @param closingEventCategorySelected the closingEventCategorySelected to set
+     */
+    public void setClosingEventCategorySelected(EventCategory closingEventCategorySelected) {
+        this.closingEventCategorySelected = closingEventCategorySelected;
+    }
+
+    /**
+     * @return the currentNotice
+     */
+    public NoticeOfViolation getCurrentNotice() {
+        return currentNotice;
+    }
+
+    /**
+     * @param currentNotice the currentNotice to set
+     */
+    public void setCurrentNotice(NoticeOfViolation currentNotice) {
+        this.currentNotice = currentNotice;
     }
 
 }

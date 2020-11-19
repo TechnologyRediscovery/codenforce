@@ -1,0 +1,290 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="css/style.css"/>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+        <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" />
+        <title>Code Enforcement event report</title>
+    </h:head>
+    <h:body>
+        <f:view>
+        <ui:composition template="./../report_template.xhtml">
+            
+        
+        <ui:insert name="report-header">
+            <f:view id="report-header">
+                <div class="flexing-box-topbar">
+                    <div class="logoBox">
+                        <div class="logo-image-wrapper">
+                            <h:graphicImage value="/images/tcvcog_logo_inverted.jpg" height="50"/>
+                        </div>
+                        <div class="logo-title-wrapper">
+                            <div class="report-title">
+                                <h:outputText id="report-title-ot"  value="#{eventCECaseReportBB.reportConfig.title}"/> 
+                            </div>
+                            <div class="report-title-sub">
+                                <h:outputText id="report-subtitle-ot"  value="#{eventCECaseReportBB.reportConfig.muni.muniName}, #{eventCECaseReportBB.reportConfig.muni.address_state}"/> 
+                                <h:outputText value=" | " />
+                                <h:outputText id="creator-ot" value="Created by: #{eventCECaseReportBB.reportConfig.creator.person.firstName} #{eventCECaseReportBB.reportConfig.creator.person.lastName}" />
+                                <h:outputText value=" | " />
+                                <h:outputText id="creator-ot" value="Date: #{eventCECaseReportBB.reportConfig.generationTimestampPretty}" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </f:view>
+        </ui:insert>
+            <div class="flexing-box-pagecontent">
+                <ui:insert name="print-content">
+                    <div class="report-header-info">
+                        <h:panelGrid columns="2" rendered="true"
+                                     columnClasses="event-list-halfwidth, event-list-halfwidth"
+                                     footerClass="no-border">
+
+                            <h:panelGroup>
+                                <h:outputText styleClass="bold" value="Start date: " />
+                                <h:outputText value="#{eventCECaseReportBB.reportConfig.queryParams.startDatePretty}" />
+                                <br />
+                                <h:outputText styleClass="bold" value="End date:" />
+                                <h:outputText value="#{eventCECaseReportBB.reportConfig.queryParams.endDatePretty}" />
+                                
+                                <br />
+                                <h:outputLabel id="report-creator-cred-ol" for="report-creator-cred-ot" styleClass="bold" value="Creator credentials: " />
+                                <h:outputText id="report-creator-cred-ot"  value="User: #{eventCECaseReportBB.reportConfig.creator.username}, 
+                                              #{eventCECaseReportBB.reportConfig.creator.roleType.label} 
+                                              (ID: #{eventCECaseReportBB.reportConfig.creator.userID})"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                    <h:outputText styleClass="bold" value="Event count: " />
+                                    <h:outputText styleClass="bold" value="#{eventCECaseReportBB.reportConfig.BOBQuery.BOBResultList.size()}" />
+                                <br />
+                                    <h:outputLabel id="report-notes-ol" for="report-notes-ot" styleClass="bold" value="Report notes: "/>
+                                    <h:outputText id="report-notes-ot"  value="#{eventCECaseReportBB.reportConfig.notes}"/>
+                            </h:panelGroup>
+
+                        </h:panelGrid>
+
+                    </div>
+
+                    
+                    <f:subview id="report-ceevents-queryparams-subview"
+                               rendered="#{eventCECaseReportBB.reportConfig.includeCompleteQueryParamsDump}">
+                        <h:panelGrid   columns="2" 
+                                       cellpadding="5" 
+                                       footerClass="gridFooter" 
+                                       headerClass="gridHeader"
+                                       columnClasses="gridTd, gridTd">
+                            <h:panelGroup>
+
+                                <h:outputText styleClass="bold" value="Activated general filters: " />
+
+                                <br />
+                                <h:outputText   styleClass="bold"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByEventCategory}"
+                                                value="Event category filter: " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByEventCategory}"
+                                                value="#{eventCECaseReportBB.reportConfig.queryParams.eventCategory.eventCategoryTitle}" />
+
+                                <br />
+                                <h:outputText   styleClass="bold"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByEventType}"
+                                                value="Event type filter: " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByEventType}"
+                                                value="#{eventCECaseReportBB.reportConfig.queryParams.evtType.label}" />
+
+                                <br />
+                                <h:outputText   styleClass="bold"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByCaseID}"
+                                                value="Case ID filter: " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByCaseID}"
+                                                value="#{eventCECaseReportBB.reportConfig.queryParams.caseId}" />
+
+                                <br />
+                                <h:outputText   styleClass="bold"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByEventOwner}"
+                                                value="Event owner filter: " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByEventOwner}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.user.username} 
+                                                (ID: #{eventCECaseReportBB.reportConfig.queryParams.user.userID})" />
+
+                                <br />
+                                <h:outputText   styleClass="bold"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByPerson}"
+                                                value="Person filter: " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByPerson}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.person.firstName} 
+                                                #{eventCECaseReportBB.reportConfig.queryParams.person.lastName} 
+                                                (ID: #{eventCECaseReportBB.reportConfig.queryParams.person.personID})" />
+
+                                <br />
+                                <h:outputText   styleClass="bold"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.active_filterby}"
+                                                value="Active events: " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParamsactive_filterbye}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.isActive} " />
+
+                                <br />
+                                <h:outputText   styleClass="bold"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByHidden}"
+                                                value="Active events filter: " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByHidden}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.isHidden} " />
+
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <h:outputText styleClass="bold" value="Activated requested action filters: " />
+
+                                <br />
+                                <h:outputText   styleClass="bold"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByrequestsAction}"
+                                                value="Requests action filter: " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByrequestsAction}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.requestsAction} " />
+
+                                <br />
+                                <h:outputText   styleClass="bold"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.useRespondedAtDateRange}"
+                                                value="Apply date range to response timestamp : " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.useRespondedAtDateRange}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.useRespondedAtDateRange} " />
+
+                                <br />
+                                <h:outputText   styleClass="bold"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByHasResponseEvent}"
+                                                value="Reponse logged filter: " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByHasResponseEvent}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.hasResponseEvent} " />
+
+                                <br />
+                                <h:outputText   styleClass="bold"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByRequestedResponseEventCat}"
+                                                value="Apply event category to requested event: " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByRequestedResponseEventCat}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.filterByRequestedResponseEventCat} " />
+
+
+                                <br />
+                                <h:outputText   styleClass="bold"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByRequestor}"
+                                                value="Apply person filter to action requestor: " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByRequestor}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.filterByRequestor} " />
+
+                                <br />
+                                <h:outputText   styleClass="bold"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByResponderIntended}"
+                                                value="Apply person filter to intended responder: " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByResponderIntended}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.filterByResponderIntended} " />
+
+                                <br />
+                                <h:outputText   styleClass="bold"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByResponderActual}"
+                                                value="Apply person filter to actual responder: " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByResponderActual}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.filterByResponderActual} " />
+
+                                <br />
+                                <h:outputText   styleClass="bold"
+                                                rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByRejectedRequest}"
+                                                value="Apply person filter to actual responder: " />
+                                <h:outputText   rendered="#{eventCECaseReportBB.reportConfig.queryParams.filterByRejectedRequest}"
+                                                value=" #{eventCECaseReportBB.reportConfig.queryParams.rejectedRequest} " />
+
+
+                            </h:panelGroup>
+                        </h:panelGrid>
+                    </f:subview>
+
+
+                    <p:dataScroller
+                        id="events-datascroller"
+                        var="e"
+                        value="#{eventCECaseReportBB.reportConfig.BOBQuery.BOBResultList}"
+                        widgetVar="ceevent-ds-var">
+
+                        <div class="event-ds-box-report">
+
+                            <div class="status-display-container">
+                                <div class="action-request-icon">
+                                    <i class="material-icons"><h:outputText id="action-request-display-icon-ot" value="#{e.event.category.icon.materialIcon}"/></i>
+                                </div>
+                                <div class="status-display-status-list-container">
+                                    <div class="action-request-header">
+                                        <h:outputText value="#{e.event.category.eventType.label}: #{e.event.category.eventCategoryTitle} "/>
+                                    </div>
+                                    <div class="action-request-subheader">
+                                        <h:panelGrid    columns="2" 
+                                                        cellpadding="5" 
+                                                        footerClass="no-border"
+                                                        columnClasses="event-list-halfwidth, event-list-halfwidth">
+
+                                            <h:panelGroup>
+                                                <h:outputText value="Property: " styleClass="bold" />
+                                                <h:outputText value="#{e.eventCaseBare.property.address} " />
+                                                <h:outputText value=" (#{e.eventCaseBare.property.muni.muniName}) " />
+                                                <h:outputText value=" | " styleClass="bold" />
+                                                <h:outputText value="Prop ID: " styleClass="bold" />
+                                                <h:outputText value="#{e.eventCaseBare.property.propertyID} " />
+
+                                                <br />  
+
+                                                <h:outputText value="Date: " styleClass="bold" />
+                                                <h:outputText value="#{e.event.dateOfRecordPretty}"/>
+
+
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputText value="Case stage: " styleClass="bold" />
+                                                <h:outputText value="#{e.eventCaseBare.caseStage.label} " />
+                                                <h:outputText value=" | " styleClass="bold" />
+                                                <h:outputText value="Event ID: " styleClass="bold" />
+                                                <h:outputText value="#{e.event.eventID} " />
+                                                <h:outputText value=" | " styleClass="bold" />
+                                                <h:outputText value="Case ID: " styleClass="bold" />
+                                                <h:outputText value="#{e.eventCaseBare.caseID} " />
+
+                                                <br />  
+
+                                                <h:outputText value="Event Owner: " styleClass="bold" />
+                                                <h:outputText value="#{e.event.owner.person.firstName} #{e.event.owner.person.lastName}"/>
+                                                <h:outputText value="   (#{e.event.owner.username})" />
+                                            </h:panelGroup>
+
+                                            <f:facet name="footer">
+
+                                                <div class="rowExpansion">
+                                                    <h:outputText styleClass="bold" value="Description: " />
+                                                    <h:outputText styleClass="weight-normal" 
+                                                                  escape="false"
+                                                                  value="#{e.event.description}"/>
+                                                </div>
+                                                <div class="rowExpansion">
+                                                    <h:outputText styleClass="bold" value="Notes: " 
+                                                                  rendered="#{!(empty e.event.notes)}"/>
+                                                    <h:outputText styleClass="weight-normal" 
+                                                                  value="#{e.event.notes}"
+                                                                  escape="false"
+                                                                  rendered="#{!(empty e.event.notes)}"/>
+                                                </div>
+                                            </f:facet>
+                                        </h:panelGrid>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </p:dataScroller>
+                </ui:insert>
+                </ui:composition>
+            </div>
+        </f:view>
+    </h:body>
+</html>
+

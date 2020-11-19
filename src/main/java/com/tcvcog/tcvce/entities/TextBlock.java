@@ -24,7 +24,7 @@ import java.util.Objects;
  *
  * @author ellen bascomb of apt 31y
  */
-public class TextBlock implements Serializable{
+public class TextBlock implements Serializable, Comparable<TextBlock>{
     
     private int blockID;
     private int textBlockCategoryID;
@@ -32,6 +32,9 @@ public class TextBlock implements Serializable{
     private Municipality muni;
     private String textBlockName;
     private String textBlockText;
+    private int placementOrder;
+    private boolean injectableTemplate;
+    
 
     @Override
     public int hashCode() {
@@ -161,5 +164,47 @@ public class TextBlock implements Serializable{
     public void setTextBlockCategoryTitle(String textBlockCategoryTitle) {
         this.textBlockCategoryTitle = textBlockCategoryTitle;
     }
+
+    /**
+     * @return the placementOrder
+     */
+    public int getPlacementOrder() {
+        return placementOrder;
+    }
+
+    /**
+     * @param placementOrder the placementOrder to set
+     */
+    public void setPlacementOrder(int placementOrder) {
+        this.placementOrder = placementOrder;
+    }
+
+    @Override
+    public int compareTo(TextBlock o) {
+        if(o== null){
+            return 0;
+        }
+        if(o.placementOrder > this.placementOrder){
+            return 1;
+        } else if (o.placementOrder < this.placementOrder){
+            return -1;
+        }
+        return 0;
+    }
+
+    /**
+     * @return the injectableTemplate
+     */
+    public boolean isInjectableTemplate() {
+        return injectableTemplate;
+    }
+
+    /**
+     * @param injectableTemplate the injectableTemplate to set
+     */
+    public void setInjectableTemplate(boolean injectableTemplate) {
+        this.injectableTemplate = injectableTemplate;
+    }
+
     
 }

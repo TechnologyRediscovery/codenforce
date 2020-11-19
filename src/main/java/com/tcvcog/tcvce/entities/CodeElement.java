@@ -40,15 +40,21 @@ public  class       CodeElement
     
     protected String ordSubSecNum;
     protected String ordSubSecTitle;
+    
+    protected String ordSubSubSecNum;
+    
     protected String ordTechnicalText;
     
     protected String ordHumanFriendlyText;
     protected boolean isActive;
+    protected boolean useInjectedValues;
     
     protected String resourceURL;
     protected LocalDateTime dateCreated;
     
     protected String headerString;
+    
+    protected User creator;
 
     
     /**
@@ -291,6 +297,34 @@ public  class       CodeElement
      */
     public void setHeaderString(String headerString) {
         this.headerString = headerString;
+    }
+
+    /**
+     * @return the ordSubSubSecNum
+     */
+    public String getOrdSubSubSecNum() {
+        return ordSubSubSecNum;
+    }
+
+    /**
+     * @param ordSubSubSecNum the ordSubSubSecNum to set
+     */
+    public void setOrdSubSubSecNum(String ordSubSubSecNum) {
+        this.ordSubSubSecNum = ordSubSubSecNum;
+    }
+
+    /**
+     * @return the useInjectedValues
+     */
+    public boolean isUseInjectedValues() {
+        return useInjectedValues;
+    }
+
+    /**
+     * @param useInjectedValues the useInjectedValues to set
+     */
+    public void setUseInjectedValues(boolean useInjectedValues) {
+        this.useInjectedValues = useInjectedValues;
     }
 
 

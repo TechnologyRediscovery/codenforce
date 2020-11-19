@@ -47,7 +47,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -912,6 +911,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 stmt.setNull(15, java.sql.Types.NULL);
             }
             
+            
+            
             stmt.execute();
             
             String idNumQuery = "SELECT currval('codeviolation_violationid_seq');";
@@ -945,7 +946,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                         "       stipulatedcompliancedate=?, \n" + // 4-5
                         "       penalty=?, description=?, legacyimport=?, \n" + // 6-8
                         "       severity_classid=?, compliancetfexpiry_proposalid=?, \n" + // 9-12
-                        "       lastupdatedts=now(), lastupdated_userid=?, active=? \n" + // 13-14
+                        "       lastupdatedts=now(), lastupdated_userid=?, active=?,  nullifiedts=?, nullifiedby=? \n" + // 13-14
                         " WHERE violationid = ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -993,7 +994,19 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             }
             stmt.setBoolean(11, v.isActive());
             
-            stmt.setInt(12, v.getViolationID());
+            if(v.getNullifiedTS() != null){
+                stmt.setTimestamp(12, java.sql.Timestamp.valueOf(v.getNullifiedTS()));
+            } else {
+                stmt.setNull(12, java.sql.Types.NULL);
+            }
+            
+            if(v.getNullifiedUser() != null){
+                stmt.setInt(13, v.getNullifiedUser().getUserID());
+            } else {
+                stmt.setNull(13, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(14, v.getViolationID());
 
             stmt.executeUpdate();
 
@@ -1101,11 +1114,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 .atZone(ZoneId.systemDefault()).toLocalDateTime());
         }
                 
-                
         if (!(rs.getTimestamp("actualcompliancedate") == null)) {
             v.setActualComplianceDate(rs.getTimestamp("actualcompliancedate").toInstant()
                     .atZone(ZoneId.systemDefault()).toLocalDateTime());
-
         }
 
         v.setPenalty(rs.getDouble("penalty"));
@@ -1127,7 +1138,16 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
         v.setActive(rs.getBoolean("active"));
         
-     
+        if(rs.getTimestamp("nullifiedts") != null){
+            v.setNullifiedTS(rs.getTimestamp("nullifiedts").toLocalDateTime());
+        } else {
+            v.setNullifiedTS(null);
+        }
+
+        if(rs.getInt("nullifiedby") != 0){
+            v.setNullifiedUser(ui.getUser(rs.getInt("nullifiedby")));
+        } 
+        
         return v;
     }
 
@@ -1142,7 +1162,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                         "       entrytimestamp, stipulatedcompliancedate, actualcompliancedate, \n" +
                         "       penalty, description, notes, legacyimport, compliancetimestamp, \n" +
                         "       complianceuser, severity_classid, createdby, compliancetfexpiry_proposalid, \n" +
-                        "       lastupdatedts, lastupdated_userid, active, compliancenote \n" +
+                        "       lastupdatedts, lastupdated_userid, active, compliancenote, nullifiedts, nullifiedby \n" +
                         "  FROM public.codeviolation WHERE violationid = ?";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -1555,7 +1575,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      */
     public void novRecordReturnedNotice(NoticeOfViolation nov) throws IntegrationException{
         String query =  "UPDATE public.noticeofviolation\n" +
-                        "   SET returneddate=? returnedby=? " +
+                        "   SET returneddate=?, returnedby=? " +
                         "  WHERE noticeid=?;";
         // note that original time stamp is not altered on an update
 
@@ -1794,7 +1814,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      */
     public List<Integer> novGetList(CECase ceCase) throws IntegrationException {
-        String query = "SELECT noticeid FROM public.noticeofviolation WHERE caseid=?;";
+        String query = "SELECT noticeid FROM public.noticeofviolation WHERE caseid=? AND active=TRUE;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -2012,7 +2032,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         tb.setMuni(mi.getMuni(rs.getInt("muni_municode")));
         tb.setTextBlockName(rs.getString("blockname"));
         tb.setTextBlockText(rs.getString("blocktext"));
-
+        tb.setPlacementOrder(rs.getInt("placementorderdefault"));
+        tb.setInjectableTemplate(rs.getBoolean("injectabletemplate"));
+        
         return tb;
     }
     
@@ -2024,7 +2046,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      */
      public TextBlock getTextBlock(int blockID) throws IntegrationException{
          
-        String query =  "SELECT blockid, blockcategory_catid, muni_municode, blockname, blocktext, categoryid, categorytitle\n" +
+        String query =  "SELECT blockid, blockcategory_catid, textblock.muni_municode,"
+                + " blockname, blocktext, categoryid, categorytitle, placementorderdefault,"
+                + " injectabletemplate \n" +
                         "  FROM public.textblock INNER JOIN public.textblockcategory " + 
                         "  ON textblockcategory.categoryid=textblock.blockcategory_catid\n" +
                         "  WHERE blockid=?;";
@@ -2057,6 +2081,46 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
          return tb;
      }
      
+    /**
+     * Extracts all text blocks by a given category
+     * @param categoryID
+     * @return
+     * @throws IntegrationException 
+     */
+     public List<TextBlock> getTextBlocksByCategory(int catID) throws IntegrationException{
+         
+        String query =  "SELECT blockid " +
+                        "  FROM public.textblock WHERE blockcategory_catid=?;";
+        List<TextBlock> blockList = new ArrayList<>();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        Connection con = null;
+        TextBlock tb = null;
+        
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, catID);
+            
+            rs = stmt.executeQuery(); 
+            
+            while(rs.next()){
+                blockList.add(getTextBlock(rs.getInt("blockid")));
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Code Violation Integrator: cannot retrive text block by ID", ex);
+            
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+          
+         return blockList;
+     }
+     
      /**
       * Extracts all text blocks associated with a given Muni
       * @param m
@@ -2066,7 +2130,44 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      public ArrayList<TextBlock> getTextBlocks(Municipality m) throws IntegrationException{
         String query =    "  SELECT blockid " +
                             "  FROM public.textblock INNER JOIN public.textblockcategory ON textblockcategory.categoryid=textblock.blockcategory_catid\n" +
-                            "  WHERE muni_municode=?;";
+                            "  WHERE textblock.muni_municode=?;";
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        Connection con = null;
+        ArrayList<TextBlock> ll = new ArrayList();
+        TextBlock tb = null;
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, m.getMuniCode());
+            
+            rs = stmt.executeQuery(); 
+            
+            while(rs.next()){
+                tb = getTextBlock(rs.getInt("blockid"));
+                ll.add(tb);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Code Violation Integrator: cannot retrive text blocks by municipality", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+         return ll;
+     }
+     
+       /**
+      * Extracts all text blocks associated with a given Muni
+      * @param m
+      * @return
+      * @throws IntegrationException 
+      */
+     public ArrayList<TextBlock> getTextBlockTemplates(Municipality m) throws IntegrationException{
+        String query =    "  SELECT blockid " +
+                            "  FROM public.textblock INNER JOIN public.textblockcategory ON textblockcategory.categoryid=textblock.blockcategory_catid\n" +
+                            "  WHERE textblock.muni_municode=? AND textblock.injectabletemplate IS TRUE;";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         Connection con = null;
@@ -2100,7 +2201,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
       * @throws IntegrationException 
       */
      public List<TextBlock> getAllTextBlocks() throws IntegrationException{
-        String query =    "  SELECT blockid, blockcategory_catid, muni_municode, blockname, blocktext, categoryid, categorytitle\n" +
+        String query =    "  SELECT blockid \n" +
                           "  FROM public.textblock INNER JOIN public.textblockcategory "
                         + "  ON textblockcategory.categoryid=textblock.blockcategory_catid;";
         PreparedStatement stmt = null;
@@ -2115,7 +2216,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery(); 
             
             while(rs.next()){
-                ll.add(generateTextBlock(rs));
+                ll.add(getTextBlock(rs.getInt("blockid")));
             }
             
         } catch (SQLException ex) {
@@ -2139,8 +2240,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
       */
      public void insertTextBlock(TextBlock tb) throws IntegrationException{
         String query =  "INSERT INTO public.textblock(\n" +
-                        " blockid, blockcategory_catid, muni_municode, blockname, blocktext)\n" +
-                        " VALUES (DEFAULT, ?, ?, ?, ?);";
+                        " blockid, blockcategory_catid, muni_municode, blockname, "
+                        + "blocktext, placementorderdefault, injectabletemplate)\n" +
+                        " VALUES (DEFAULT, ?, ?, ?, ?, ?, ?);";
         PreparedStatement stmt = null;
         Connection con = null;
         
@@ -2151,6 +2253,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setInt(2, tb.getMuni().getMuniCode());
             stmt.setString(3, tb.getTextBlockName());
             stmt.setString(4, tb.getTextBlockText());
+            stmt.setInt(5, tb.getPlacementOrder());
+            stmt.setBoolean(6, tb.isInjectableTemplate());
             
             
             stmt.execute(); 
@@ -2176,7 +2280,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      public void updateTextBlock(TextBlock tb) throws IntegrationException{
         String query = "UPDATE public.textblock\n" +
                         "   SET blockcategory_catid=?, muni_municode=?, blockname=?, \n" +
-                        "       blocktext=?\n" +
+                        "       blocktext=?,placementorderdefault=?, injectabletemplate=? \n" +
                         " WHERE blockid=?;";
         PreparedStatement stmt = null;
         Connection con = null;
@@ -2188,7 +2292,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setInt(2, tb.getMuni().getMuniCode());
             stmt.setString(3, tb.getTextBlockName());
             stmt.setString(4, tb.getTextBlockText());
-            stmt.setInt(5, tb.getBlockID());  
+            stmt.setInt(5, tb.getPlacementOrder());
+            stmt.setBoolean(6, tb.isInjectableTemplate());
+            stmt.setInt(7, tb.getBlockID());  
             
             stmt.execute(); 
             

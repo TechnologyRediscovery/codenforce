@@ -11,35 +11,35 @@
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></link>
         
-        <title>Events</title>
+        <title>Ordinances</title>
     </h:head>
 
-    <h:body id="events-body">
+    <h:body id="ord-body">
 
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view id="events-view">
+                <f:view id="ord-view">
 
                     <p:outputPanel id="body-panel">
                         <h:form id="form-messages-global">
-                            <p:growl id="events-messages-growl"
+                            <p:growl id="ord-messages-growl"
                                      />
                         </h:form>
 
-                        <h1>Events</h1>
+                        <h1>Ordinances</h1>
 
                         <div class="mainContainer">
                             <div class="ui-g data-container">
                                 <div class="ui-g-12 ui-md-4 ui-lg-4 list-data-container">
                                     
-                                    <p:panel    id="event-settings-panel"
+                                    <p:panel    id="ord-settings-panel"
                                                 toggleable="true"
                                                 style="width: 100%;"
-                                                widgetVar="event-setttings-panel-var"
+                                                widgetVar="ord-setttings-panel-var"
                                                 collapsed="false"
                                                 rendered="true"
                                                 header="Settings" >
-                                        <h:form id="event-settings-form">
+                                        <h:form id="ord-settings-form">
 
 
                                             <div class="ui-g data_container_nested_restrict">
@@ -47,39 +47,39 @@
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
 
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <p:outputLabel for="events-domain-list-som">
+                                                        <p:outputLabel for="ord-domain-list-som">
                                                             <h:outputText value="Event Domains"/>
                                                         </p:outputLabel>
                                                     </div>
 
                                                     <div class="restrict-data-field-value-inline" >
 
-                                                        <p:selectOneMenu id="events-domain-list-som"
+                                                        <p:selectOneMenu id="ord-domain-list-som"
                                                                          value="#{eventsBB.eventDomianSelected}">
 
-                                                            <f:selectItems  id="event-domain-list-selitems"
+                                                            <f:selectItems  id="ord-domain-list-selitems"
                                                                             value="#{eventsBB.eventDomainList}"
                                                                             var="domain"
                                                                             itemValue="#{domain}"
                                                                             itemLabel="#{domain.title}"/>
-                                                            <p:ajax update="events-header-domain
+                                                            <p:ajax update="ord-header-domain
                                                                     mode-form
-                                                                    event-list-panel
-                                                                    event-settings-panel
-                                                                     event-search-panel
-                                                                     event-search-log-panel
-                                                                     event-profile-panel
-                                                                     event-add-panel
-                                                                     event-update-panel
-                                                                     event-remove-panel
-                                                                     event-notes-panel"
+                                                                    ord-list-panel
+                                                                    ord-settings-panel
+                                                                     ord-search-panel
+                                                                     ord-search-log-panel
+                                                                     ord-profile-panel
+                                                                     ord-add-panel
+                                                                     ord-update-panel
+                                                                     ord-remove-panel
+                                                                     ord-notes-panel"
                                                                     listener="#{eventsBB.onEventDomainListChange}" />
                                                            
                                                         </p:selectOneMenu>
 
                                                     </div>
                                                     <p:spacer height="5px" />
-                                                     <h:outputText id="events-header-domain"
+                                                     <h:outputText id="ord-header-domain"
                                                                    value="#{eventsBB.currentERGBObTitle}" />
                                                   
                                                     
@@ -112,15 +112,15 @@
 
 
 
-                                    <p:panel    id="event-list-panel"
+                                    <p:panel    id="ord-list-panel"
                                                 toggleable="true"
                                                 style="width: 100%;"
-                                                widgetVar="event-list-panel-var"
+                                                widgetVar="ord-list-panel-var"
                                                 collapsed="false"
                                                 rendered="#{eventsBB.activeLookupMode or eventsBB.activeViewMode}"
                                                 header="Event list" >
 
-                                        <h:form id="event-list-form">
+                                        <h:form id="ord-list-form">
 
 
 
@@ -128,22 +128,22 @@
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
 
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <h:outputLabel  for="event-viewoptions-som">
+                                                        <h:outputLabel  for="ord-viewoptions-som">
                                                             <h:outputText value="Filter" />
                                                         </h:outputLabel>
                                                     </div>
                                                     <div class="restrict-data-field-value-inline" >
 
-                                                        <p:selectOneMenu    id="event-viewoptions-som"
+                                                        <p:selectOneMenu    id="ord-viewoptions-som"
                                                                             value="#{eventsBB.selectedEventView}"
                                                                             tabindex="10">
 
-                                                            <f:selectItems  id="event-viewoptions-selitems"
+                                                            <f:selectItems  id="ord-viewoptions-selitems"
                                                                             value="#{eventsBB.eventsViewOptionsCandidates}"
                                                                             var="vo"
                                                                             itemValue="#{vo}"
                                                                             itemLabel="#{vo.label}"/>
-                                                            <p:ajax update="events-table"
+                                                            <p:ajax update="ord-table"
                                                                     immediate="true"/>
                                                         </p:selectOneMenu>
 
@@ -154,10 +154,10 @@
 
 
 
-                                                        <p:commandButton   id="print-event-list-report-cb" 
+                                                        <p:commandButton   id="print-ord-list-report-cb" 
                                                                            ajax="true" actionListener="#{eventsBB.prepareEventReport}"
                                                                            icon="fa fa-print" styleClass="button"
-                                                                           oncomplete="PF('report-event-diaglog-var').show()"
+                                                                           oncomplete="PF('report-ord-diaglog-var').show()"
                                                                            value="prepare event report" 
                                                                            update="report-eventlist-form
                                                                            form-messages-global"/>
@@ -166,26 +166,26 @@
                                                 
                                                     <div class="restrict-main-contents-io-button gray_button">
 
-                                                        <p:commandButton   id="event-search-clear-button" 
+                                                        <p:commandButton   id="ord-search-clear-button" 
                                                                            ajax="true" 
                                                                            actionListener="#{eventsBB.clearEventList}"
                                                                            icon="fa fa-eraser" 
                                                                            disabled="false"
                                                                            styleClass="button"
                                                                            value="clear results list" 
-                                                                           update="event-list-panel
+                                                                           update="ord-list-panel
                                                                            form-messages-global"/>
                                                     </div>
                                             </div>
 
                                             <p:dataTable
-                                                id="events-table"
+                                                id="ord-table"
                                                 var="e"
                                                 rowKey="#{e.eventID}"
                                                 value="#{eventsBB.eventList}"
                                                 tableStyleClass="primeDataTable"
                                                 resizableColumns="true"
-                                                widgetVar="events-table-var"
+                                                widgetVar="ord-table-var"
                                                 >
                                                 <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
@@ -241,15 +241,15 @@
                                                                      icon="#{e.eventID == eventsBB.currentEvent.eventID? 'fa fa-hand-o-right':'fa fa-tag'}"
                                                                      style="#{e.eventID == eventsBB.currentEvent.eventID ? 'background-color: #dee461; color:black; border:none;':''}"
                                                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                                     update="event-list-panel
-                                                                     event-settings-panel
-                                                                     event-search-panel
-                                                                     event-search-log-panel
-                                                                     event-profile-panel
-                                                                     event-add-panel
-                                                                     event-update-panel
-                                                                     event-remove-panel
-                                                                     event-notes-panel
+                                                                     update="ord-list-panel
+                                                                     ord-settings-panel
+                                                                     ord-search-panel
+                                                                     ord-search-log-panel
+                                                                     ord-profile-panel
+                                                                     ord-add-panel
+                                                                     ord-update-panel
+                                                                     ord-remove-panel
+                                                                     ord-notes-panel
                                                                      "
 
                                                                      />
@@ -259,7 +259,7 @@
                                                                      disabled="#{e.hidden}"
                                                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                                                      actionListener="#{eventsBB.hideEvent(e)}" 
-                                                                     update="event-list-panel
+                                                                     update="ord-list-panel
                                                                      form-messages-global"
                                                                      />
                                                     <p:commandButton icon="fa fa-eye"
@@ -267,7 +267,7 @@
                                                                      disabled="#{!e.hidden}"
                                                                      actionListener="#{eventsBB.unHideEvent(e)}" 
                                                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                     update="event-list-panel
+                                                                     update="ord-list-panel
                                                                      form-messages-global"
                                                                      />
 
@@ -284,15 +284,15 @@
 
                                     </p:panel>
 
-                                    <p:panel    id="event-search-panel"
+                                    <p:panel    id="ord-search-panel"
                                                 toggleable="true"
                                                 style="width: 100%;"
-                                                widgetVar="event-serach-panel-var"
+                                                widgetVar="ord-serach-panel-var"
                                                 collapsed="false"
-                                                rendered="true"
+                                                rendered="#{eventsBB.activeLookupMode}"
                                                 header="Search tools" >
                                         
-                                        <h:form id="event-search-form">
+                                        <h:form id="ord-search-form">
                                             <div class="ui-g data_container_nested_restrict">
                                                 
                                              <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
@@ -330,15 +330,15 @@
                                                                  value="Execute Search"
                                                                  disabled="false"
                                                                  actionListener="#{eventsBB.executeQuery}" 
-                                                                 update="event-list-panel
-                                                                 event-search-log-panel
+                                                                 update="ord-list-panel
+                                                                 ord-search-log-panel
                                                                  form-messages-global"
                                                                  />
 
                                                     </div>
 
                                                     <div class="restrict-main-contents-io-button gray_button">
-                                                        <p:commandButton   id="event-search-clear-cb" 
+                                                        <p:commandButton   id="ord-search-clear-cb" 
                                                                            ajax="true" 
                                                                            actionListener="#{eventsBB.resetQuery}"
                                                                            icon="fa fa-eraser" 
@@ -347,7 +347,7 @@
                                                                            disabled="#{!eventsBB.querySelected.queryExecuted}"
                                                                            update="form-messages-global
                                                                            @form
-                                                                           event-search-log-form"/>
+                                                                           ord-search-log-form"/>
 
                                                     </div>
 
@@ -356,8 +356,8 @@
                                                         <p:commandLink id="textblock-manager-commandlink"
                                                                        value="Advanced search"
                                                                        type="button"
-                                                                       update="event-search-advanced-dialog"
-                                                                       oncomplete="PF('event-search-advanced-dialog-var').show()" />
+                                                                       update="ord-search-advanced-dialog"
+                                                                       oncomplete="PF('ord-search-advanced-dialog-var').show()" />
                                                     </div>
                                                 </div>
 
@@ -365,13 +365,13 @@
 
                                                     <div class="restrict-data-field-label-inline" >
 
-                                                        <p:outputLabel for="event-search-appendresults-chkbox">
+                                                        <p:outputLabel for="ord-search-appendresults-chkbox">
                                                             <h:outputText value="Append results to list? "/>
                                                         </p:outputLabel>
 
                                                     </div>
                                                     <div class="restrict-data-field-value-inline" >
-                                                        <p:selectBooleanCheckbox   id="event-search-appendresults-chkbox" 
+                                                        <p:selectBooleanCheckbox   id="ord-search-appendresults-chkbox" 
                                                                                    value="#{eventsBB.appendResultsToList}" >
                                                             <p:ajax />
                                                         </p:selectBooleanCheckbox>
@@ -383,13 +383,13 @@
                                                   
 
                                                     <div class="restrict-main-contents-io-button gray_button">
-                                                        <p:commandButton   id="event-search-loadhistory-button" 
+                                                        <p:commandButton   id="ord-search-loadhistory-button" 
                                                                            ajax="true" 
                                                                            actionListener="#{eventsBB.loadEventHistory}"
                                                                            icon="fa fa-clock-o" 
                                                                            styleClass="button"
                                                                            value="load event history" 
-                                                                           update="event-list-panel
+                                                                           update="ord-list-panel
                                                                            form-messages-global"/>
                                                     </div>
                                                     <div class="restrict-main-contents-io-button gray_button">
@@ -405,16 +405,16 @@
 
                                     </p:panel>
 
-                                    <p:panel  id="event-search-log-panel"
+                                    <p:panel  id="ord-search-log-panel"
                                               toggleable="true"
-                                              widgetVar="event-search-log-panel-var"
+                                              widgetVar="ord-search-log-panel-var"
                                               collapsed="false"
                                               style="width:100%;"
                                               header="Query log">
 
-                                        <h:form id="event-search-log-form">
+                                        <h:form id="ord-search-log-form">
                                             <div class='search-query-desc'>
-                                                <h:outputText id="event-search-log-ot" 
+                                                <h:outputText id="ord-search-log-ot" 
                                                               value="#{eventsBB.querySelected.queryLog}"
                                                               escape="false"/>
                                             </div>
@@ -426,28 +426,28 @@
 
                                 <div class="ui-g-12 ui-md-8 ui-lg-8 object-data-container">
 
-                                    <p:panel    id="event-profile-panel"
+                                    <p:panel    id="ord-profile-panel"
                                                 toggleable="true"
-                                                widgetVar="event-profile-panel-var"
+                                                widgetVar="ord-profile-panel-var"
                                                 collapsed="false"
                                                 rendered="#{eventsBB.activeViewMode}"
                                                 header="Event Info (ID:#{eventsBB.currentEvent.eventID}) | Created by #{!(empty eventsBB.currentEvent.userCreator) ? eventsBB.currentEvent.userCreator.person.lastName : ''} | last updated on #{eventsBB.getPrettyDate(eventsBB.currentEvent.lastUpdatedTS)} by #{!(empty eventsBB.currentEvent.lastUpdatedBy) ? eventsBB.currentEvent.lastUpdatedBy.person.lastName: ''}">
 
-                                        <h:form id="event-profile-form">
+                                        <h:form id="ord-profile-form">
                                             <div class="ui-g data_container_nested_restrict">
 
                                                 <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
 
 
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <p:outputLabel for="event-domain-ot">
+                                                        <p:outputLabel for="ord-domain-ot">
                                                             <h:outputText value="Domain"/>
                                                         </p:outputLabel>
 
                                                     </div>
 
                                                     <div class="restrict-data-field-value-inline" >
-                                                        <h:outputText id="event-domain-ot" 
+                                                        <h:outputText id="ord-domain-ot" 
                                                                       value="#{eventsBB.currentEvent.domain.title} "/>
                                                     </div>
                                                 </div>
@@ -456,14 +456,14 @@
 
 
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <p:outputLabel for="event-et-ot">
+                                                        <p:outputLabel for="ord-et-ot">
                                                             <h:outputText value="Type"/>
                                                         </p:outputLabel>
 
                                                     </div>
 
                                                     <div class="restrict-data-field-value-inline" >
-                                                        <h:outputText id="event-et-ot" 
+                                                        <h:outputText id="ord-et-ot" 
                                                                       value="#{eventsBB.currentEvent.category.eventType.label} "/>
                                                     </div>
                                                 </div>
@@ -471,17 +471,17 @@
 
 
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <p:outputLabel for="event-ec-ot">
+                                                        <p:outputLabel for="ord-ec-ot">
                                                             <h:outputText value="Category"/>
                                                         </p:outputLabel>
 
                                                     </div>
 
                                                     <div class="restrict-data-field-value-inline" >
-                                                        <h:outputText id="event-ec-ot" 
+                                                        <h:outputText id="ord-ec-ot" 
                                                                       value="#{eventsBB.currentEvent.category.eventCategoryTitle}"/>
                                                     </div>
-                                                    <p:commandLink id="event-cat-details-cl" 
+                                                    <p:commandLink id="ord-cat-details-cl" 
                                                                    disabled="false"
                                                                    type="button"
                                                                    value="details" />
@@ -491,19 +491,19 @@
 
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <p:outputLabel for="event-descr-ot">
+                                                        <p:outputLabel for="ord-descr-ot">
                                                             <h:outputText value="Description:"/>
                                                         </p:outputLabel>
 
                                                     </div>
                                                     <div class="restrict-data-field-value-inline" >
-                                                        <h:outputText id="event-descr-ot" 
+                                                        <h:outputText id="ord-descr-ot" 
                                                                       value="#{eventsBB.currentEvent.description}" />
                                                     </div>
                                                 </div>
                                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <p:outputLabel for="event-st-ot">
+                                                        <p:outputLabel for="ord-st-ot">
                                                             <h:outputText value="Start time"/>
                                                         </p:outputLabel>
 
@@ -511,7 +511,7 @@
 
                                                     <div class="restrict-data-field-value-inline" >
 
-                                                        <h:outputText id="event-st-ot" 
+                                                        <h:outputText id="ord-st-ot" 
                                                                       value="#{eventsBB.getPrettyDate(eventsBB.currentEvent.timeStart)}" />
 
                                                     </div>
@@ -520,7 +520,7 @@
 
 
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <p:outputLabel for="event-time-end-ot">
+                                                        <p:outputLabel for="ord-time-end-ot">
                                                             <h:outputText value="End time"/>
                                                         </p:outputLabel>
 
@@ -528,7 +528,7 @@
 
 
                                                     <div class="restrict-data-field-value-inline" >
-                                                        <h:outputText id="event-time-end-ot" 
+                                                        <h:outputText id="ord-time-end-ot" 
                                                                       value="#{eventsBB.getPrettyDate(eventsBB.currentEvent.timeEnd)}" />
 
 
@@ -539,14 +539,14 @@
                                                 <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
 
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <p:outputLabel for="event-mintoview-ot">
+                                                        <p:outputLabel for="ord-mintoview-ot">
                                                             <h:outputText value="Rank req. to view"/>
                                                         </p:outputLabel>
 
                                                     </div>
 
                                                     <div class="restrict-data-field-value-inline" >
-                                                        <h:outputText id="event-mintoview-ot" 
+                                                        <h:outputText id="ord-mintoview-ot" 
                                                                       value="#{eventsBB.currentEvent.category.userRankMinimumToView}" />
                                                     </div>
                                                 </div>
@@ -554,14 +554,14 @@
                                                 <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
 
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <p:outputLabel for="event-mintoupdate-ot">
+                                                        <p:outputLabel for="ord-mintoupdate-ot">
                                                             <h:outputText value="Rank req. to update"/>
                                                         </p:outputLabel>
 
                                                     </div>
 
                                                     <div class="restrict-data-field-value-inline" >
-                                                        <h:outputText id="event-mintoupdate-ot" 
+                                                        <h:outputText id="ord-mintoupdate-ot" 
                                                                       value="#{eventsBB.currentEvent.category.userRankMinimumToUpdate}" />
                                                     </div>
                                                 </div>
@@ -569,14 +569,14 @@
                                                 <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
 
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <p:outputLabel for="event-active-ot">
+                                                        <p:outputLabel for="ord-active-ot">
                                                             <h:outputText value="Active"/>
                                                         </p:outputLabel>
 
                                                     </div>
 
                                                     <div class="restrict-data-field-value-inline" >
-                                                        <h:outputText id="event-active-ot" 
+                                                        <h:outputText id="ord-active-ot" 
                                                                       value="#{eventsBB.currentEvent.active ? 'Yes':'No'}" />
                                                     </div>
                                                 </div>
@@ -586,9 +586,9 @@
 
                                     </p:panel>
 
-                                    <p:overlayPanel id="event-cat-details-overlay"
-                                                    for="event-profile-form:event-cat-details-cl "
-                                                    widgetVar="event-cat-details-overlay-var" 
+                                    <p:overlayPanel id="ord-cat-details-overlay"
+                                                    for="ord-profile-form:ord-cat-details-cl "
+                                                    widgetVar="ord-cat-details-overlay-var" 
                                                     showEffect="fade" 
                                                     hideEffect="fade"
                                                     dismissable="true" 
@@ -598,42 +598,42 @@
 
                                         <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
                                             <div class="restrict-data-field-label-inline" >
-                                                <p:outputLabel for="event-cd-ot">
+                                                <p:outputLabel for="ord-cd-ot">
                                                     <h:outputText value="Cateogry description:"/>
                                                 </p:outputLabel>
 
                                             </div>
 
                                             <div class="restrict-data-field-value-inline" >
-                                                <h:outputText id="event-cd-ot" 
+                                                <h:outputText id="ord-cd-ot" 
                                                               value="#{eventsBB.currentEvent.category.eventCategoryDesc}" />
                                             </div>
                                         </div>
                                     </p:overlayPanel>
 
-                                    <p:panel    id="event-add-panel"
+                                    <p:panel    id="ord-add-panel"
                                                 toggleable="true"
-                                                widgetVar="event-add-panel-var"
+                                                widgetVar="ord-add-panel-var"
                                                 collapsed="false"
                                                 rendered="#{eventsBB.activeInsertMode}"
                                                 header="Create a new event">
 
 
-                                        <h:form id="event-add-form">
+                                        <h:form id="ord-add-form">
                                             
                                             <div class="ui-g data_container_nested_restrict">
 
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-                                                    <h:outputText id="event-add-header-domain"
+                                                    <h:outputText id="ord-add-header-domain"
                                                                   value="Attaching new event to #{!(empty eventsBB.eventDomainActive) ? eventsBB.eventDomainActive.title : ''} " />
-                                                    <h:outputText id="event-add-header-id"
+                                                    <h:outputText id="ord-add-header-id"
                                                                   value="Object ID #{!(empty eventsBB.currentERGBOb) ? eventsBB.currentERGBOb.BObID : ''} " />
                                                     <p:spacer height="5px" />
-                                                    <h2><h:outputText id="event-add-currtypecat-type-ot"
+                                                    <h2><h:outputText id="ord-add-currtypecat-type-ot"
                                                                       value="#{eventsBB.eventTypeSelected.label}"
                                                                       />
                                                         <h:outputText value=": " />
-                                                        <h:outputText id="event-add-currtypecat-cat-ot"
+                                                        <h:outputText id="ord-add-currtypecat-cat-ot"
                                                                        value="#{eventsBB.eventCategorySelected.eventCategoryTitle}" 
                                                                       />
                                                     </h2>
@@ -642,28 +642,28 @@
                                                                       value="#{eventsBB.eventCategorySelected.eventCategoryDesc}" 
                                                                       />
                                                      <p:spacer height="4px" />
-                                                            <p:commandLink id="event-add-cat-details-cl" 
+                                                            <p:commandLink id="ord-add-cat-details-cl" 
                                                                    disabled="#{empty eventsBB.eventCategorySelected}"
                                                                    type="button"
                                                                    value="details" />
                                                 </div>
                                                 <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field">
                                                     <div class="restrict-main-contents-io-title" >
-                                                        <h:outputLabel for="event-add-type-solb">
+                                                        <h:outputLabel for="ord-add-type-solb">
                                                             <h:outputText value="Type"/>
                                                         </h:outputLabel>
                                                     </div>
 
                                                     <div class="restrict-main-contents-io-content" >
-                                                        <p:growl for="event-add-type-solb" />
-                                                        <p:selectOneListbox id="event-add-type-solb" 
+                                                        <p:growl for="ord-add-type-solb" />
+                                                        <p:selectOneListbox id="ord-add-type-solb" 
                                                                             required="true" 
                                                                             value="#{eventsBB.eventTypeSelected}" 
                                                                             tabindex="10">
                                                             <p:ajax listener="#{eventsBB.onEventTypeMunuChange}"
                                                                     update="categoryList
-                                                                    event-add-dialog-show-cb
-                                                                    event-add-currtypecat-type-ot" /> 
+                                                                    ord-add-dialog-show-cb
+                                                                    ord-add-currtypecat-type-ot" /> 
                                                             <f:selectItems value="#{eventsBB.eventTypeCandidates}" var="et" itemLabel="#{et.label}" />
                                                         </p:selectOneListbox>
 
@@ -673,7 +673,7 @@
 
                                                 <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field">
                                                     <div class="restrict-main-contents-io-title" >
-                                                        <h:outputLabel for="event-add-cat-solb">
+                                                        <h:outputLabel for="ord-add-cat-solb">
                                                             <h:outputText value="Category"/>
                                                         </h:outputLabel>
                                                     </div>
@@ -685,14 +685,14 @@
                                                                             tabindex="11">
                                                             <p:ajax update="selectedEventCategoryDescription
                                                                     selectedEventCategoryDescription 
-                                                                    event-add-cat-details-cl
-                                                                    event-add-dialog-show-cb
-                                                                    event-add-currtypecat-cat-ot
-                                                                    event-add-time-start-cal
-                                                                    event-add-time-end-cal
-                                                                    event-add-descr-it
-                                                                    event-add-duration-in
-                                                                    event-add-time-end-cal
+                                                                    ord-add-cat-details-cl
+                                                                    ord-add-dialog-show-cb
+                                                                    ord-add-currtypecat-cat-ot
+                                                                    ord-add-time-start-cal
+                                                                    ord-add-time-end-cal
+                                                                    ord-add-descr-it
+                                                                    ord-add-duration-in
+                                                                    ord-add-time-end-cal
                                                                     " 
                                                                     listener="#{eventsBB.onEventCategoryMenuChange}"
                                                                     />
@@ -711,7 +711,7 @@
                                                     <div class="restrict-main-contents-io-content" >
                                                         
 
-                                                        <p:selectBooleanButton  id="event-add-updatefields-sbb" 
+                                                        <p:selectBooleanButton  id="ord-add-updatefields-sbb" 
                                                                             onLabel="Update event values"
                                                                             onIcon="fa fa-indent"
                                                                             offLabel="Custom event values"
@@ -727,15 +727,15 @@
                                                 <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
 
                                                     <div class="restrict-main-contents-io-title" >
-                                                        <h:outputLabel for="event-add-time-start-cal">
+                                                        <h:outputLabel for="ord-add-time-start-cal">
                                                             <h:outputText value="Start time"/>
                                                         </h:outputLabel>
                                                     </div>
 
                                                     <div class="restrict-main-contents-io-content" >
-                                                        <p:growl for="event-add-time-start-cal" />
+                                                        <p:growl for="ord-add-time-start-cal" />
                                                         <p:calendar value="#{eventsBB.currentEvent.timeStartUtilDate}" 
-                                                                    id="event-add-time-start-cal"
+                                                                    id="ord-add-time-start-cal"
                                                                     mode="popup"  
                                                                     showOn="button" 
                                                                     pattern="EEE, dd MMM, yyyy HH:mm:ss"
@@ -743,7 +743,7 @@
                                                                     showButtonPanel="true" 
                                                                     showTodayButton="true"
                                                                     required="true">
-                                                            <p:ajax update="event-add-time-end-cal" 
+                                                            <p:ajax update="ord-add-time-end-cal" 
                                                                     listener="#{eventsBB.onTimeStartChange}"/>
                                                         </p:calendar>
                                                     </div>
@@ -751,17 +751,17 @@
                                                 <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
 
                                                     <div class="restrict-main-contents-io-title" >
-                                                        <h:outputLabel for="event-add-time-start-cal">
+                                                        <h:outputLabel for="ord-add-time-start-cal">
                                                             <h:outputText value="Duration"/>
                                                         </h:outputLabel>
                                                     </div>
 
                                                     <div class="restrict-main-contents-io-content" >
-                                                        <p:inputNumber  id="event-add-duration-in"
+                                                        <p:inputNumber  id="ord-add-duration-in"
                                                                         value="#{eventsBB.eventDurationFormField}"
                                                                         style="width: 50px;">
                                                             <p:ajax listener="#{eventsBB.onEventDurationChange}"
-                                                                    update="event-add-time-end-cal" />
+                                                                    update="ord-add-time-end-cal" />
                                                         </p:inputNumber>
                                                                        
                                                        
@@ -770,15 +770,15 @@
 
                                                 <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
                                                     <div class="restrict-main-contents-io-title" >
-                                                        <h:outputLabel for="event-add-time-end-cal">
+                                                        <h:outputLabel for="ord-add-time-end-cal">
                                                             <h:outputText value="End time"/>
                                                         </h:outputLabel>
                                                     </div>
 
                                                     <div class="restrict-main-contents-io-content" >
-                                                        <p:growl for="event-add-time-end-cal" />
+                                                        <p:growl for="ord-add-time-end-cal" />
                                                         <p:calendar value="#{eventsBB.currentEvent.timeEndUtilDate}" 
-                                                                    id="event-add-time-end-cal"
+                                                                    id="ord-add-time-end-cal"
                                                                     mode="popup"  
                                                                     showOn="button" 
                                                                     disabled="true"
@@ -791,13 +791,13 @@
                                                 </div>
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                                                     <div class="restrict-main-contents-io-title" >
-                                                        <h:outputLabel for="event-add-descr-it">
+                                                        <h:outputLabel for="ord-add-descr-it">
                                                             <h:outputText value="Description"/>
                                                         </h:outputLabel>
                                                     </div>
 
                                                     <div class="restrict-main-contents-io-content" >
-                                                        <p:inputText  id="event-add-descr-it" 
+                                                        <p:inputText  id="ord-add-descr-it" 
                                                                       value="#{eventsBB.currentEvent.description}" 
                                                                       style="width: 100%;" 
                                                                       tabindex="3" 
@@ -806,20 +806,20 @@
                                                 </div>
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                                                     <div class="restrict-main-contents-io-title" >
-                                                        <h:outputLabel for="event-add-descr">
+                                                        <h:outputLabel for="ord-add-descr">
                                                             <h:outputText value="Person connections"/>
                                                         </h:outputLabel>
                                                     </div>
                                                     <div class="restrict-main-contents-io-button gray_button">
                                                         <p:commandButton  value="Manage person connections" 
-                                                                          onclick="PF('event-personchoose-dialog-var').show()" 
-                                                                          update="event-personchoose-dialog"
+                                                                          onclick="PF('ord-personchoose-dialog-var').show()" 
+                                                                          update="ord-personchoose-dialog"
                                                                           icon="fa fa-user"/>    
                                                     </div>
                                                     <div class="restrict-main-contents-io-content" >
 
                                                         <p:dataScroller
-                                                            id="event-add-personlist"
+                                                            id="ord-add-personlist"
                                                             value="#{eventsBB.currentEvent.personList}"
                                                             var="per" 
                                                             widgetVar="noticebuilder-pers-ds-var">
@@ -834,7 +834,7 @@
                                             <div class="restrict-main-contents-io-button">
 
 
-                                                <p:commandButton    id="event-add-dialog-show-cb"
+                                                <p:commandButton    id="ord-add-dialog-show-cb"
                                                                     ajax="false" 
                                                                     action="#{eventsBB.onEventAddCommitButtonChange}" 
                                                                     disabled="#{empty eventsBB.eventCategorySelected}"
@@ -847,29 +847,29 @@
                                     </p:panel>
 
 
-                                    <p:panel id="event-update-panel"
+                                    <p:panel id="ord-update-panel"
                                              toggleable="true"
                                              collapsed="false"
                                              header="Update event (ID:#{eventsBB.currentEvent.eventID}) | Created by #{!(empty eventsBB.currentEvent.userCreator) ? eventsBB.currentEvent.userCreator.person.lastName : ''} | last updated on #{eventsBB.getPrettyDate(eventsBB.currentEvent.lastUpdatedTS)} by #{!(empty eventsBB.currentEvent.lastUpdatedBy) ? eventsBB.currentEvent.lastUpdatedBy.person.lastName: ''}"
                                              rendered="#{eventsBB.activeUpdateMode}"
                                              >
 
-                                        <h:form id="event-update-form">
+                                        <h:form id="ord-update-form">
                                             <p style="font-style:  italic;">Note: Event type and category cannot be updated. Instead, remove incorrect event and make a new one.</p>
                                             <div class="ui-g data_container_nested_restrict">
 
                                                 <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
 
                                                     <div class="restrict-main-contents-io-title" >
-                                                        <h:outputLabel for="event-update-time-start-cal">
+                                                        <h:outputLabel for="ord-update-time-start-cal">
                                                             <h:outputText value="Start time"/>
                                                         </h:outputLabel>
                                                     </div>
 
                                                     <div class="restrict-main-contents-io-content" >
-                                                        <p:growl for="event-update-time-start-cal" />
+                                                        <p:growl for="ord-update-time-start-cal" />
                                                         <p:calendar value="#{eventsBB.currentEvent.timeStartUtilDate}" 
-                                                                    id="event-update-time-start-cal"
+                                                                    id="ord-update-time-start-cal"
                                                                     mode="popup"  
                                                                     showOn="button" 
                                                                     pattern="EEE, dd MMM, yyyy HH:mm:ss"
@@ -878,7 +878,7 @@
                                                                     showTodayButton="true"
                                                                     required="true">
                                                             <p:ajax listener="#{eventsBB.onTimeStartChange()}"
-                                                                    update="event-update-time-end-cal" />
+                                                                    update="ord-update-time-end-cal" />
                                                         </p:calendar>
                                                     </div>
                                                 </div>
@@ -886,17 +886,17 @@
                                                  <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
 
                                                     <div class="restrict-main-contents-io-title" >
-                                                        <h:outputLabel for="event-update-time-start-cal">
+                                                        <h:outputLabel for="ord-update-time-start-cal">
                                                             <h:outputText value="Duration"/>
                                                         </h:outputLabel>
                                                     </div>
 
                                                     <div class="restrict-main-contents-io-content" >
-                                                        <p:inputNumber  id="event-update-duration-in"
+                                                        <p:inputNumber  id="ord-update-duration-in"
                                                                         value="#{eventsBB.eventDurationFormField}"
                                                                         style="width: 50px;">
                                                             <p:ajax listener="#{eventsBB.onEventDurationChange}"
-                                                                    update="event-update-time-end-cal" />
+                                                                    update="ord-update-time-end-cal" />
                                                         </p:inputNumber>
                                                                        
                                                        
@@ -905,15 +905,15 @@
 
                                                 <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
                                                     <div class="restrict-main-contents-io-title" >
-                                                        <h:outputLabel for="event-update-time-end-cal">
+                                                        <h:outputLabel for="ord-update-time-end-cal">
                                                             <h:outputText value="End time"/>
                                                         </h:outputLabel>
                                                     </div>
 
                                                     <div class="restrict-main-contents-io-content" >
-                                                        <p:growl for="event-update-time-end-cal" />
+                                                        <p:growl for="ord-update-time-end-cal" />
                                                         <p:calendar value="#{eventsBB.currentEvent.timeEndUtilDate}" 
-                                                                    id="event-update-time-end-cal"
+                                                                    id="ord-update-time-end-cal"
                                                                     mode="popup"  
                                                                     disabled="true"
                                                                     showOn="button" 
@@ -926,7 +926,7 @@
                                                 </div>
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                                                     <div class="restrict-main-contents-io-title" >
-                                                        <h:outputLabel for="event-update-descr">
+                                                        <h:outputLabel for="ord-update-descr">
                                                             <h:outputText value="Description"/>
                                                         </h:outputLabel>
                                                     </div>
@@ -942,7 +942,7 @@
 
                                                 <div class="restrict-main-contents-io-button">
 
-                                                    <p:commandButton    id="event-update-dialog-show-cb"
+                                                    <p:commandButton    id="ord-update-dialog-show-cb"
                                                                         ajax="false" 
                                                                         action="#{eventsBB.onEventUpdateCommitButtonChange}" 
                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
@@ -959,19 +959,19 @@
 
 
                                     <!--Remove Panel-->
-                                    <p:panel id="event-remove-panel"
+                                    <p:panel id="ord-remove-panel"
                                              toggleable="true"
                                              collapsed="false"
                                              header="Remove Event"
                                              rendered="#{eventsBB.activeRemoveMode}"
                                              >
 
-                                        <h:form id="event-remove-form">
+                                        <h:form id="ord-remove-form">
 
                                             <div class="ui-g data_container_nested_restrict">
                                                 <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <h:outputLabel  for="event-remove-button">
+                                                        <h:outputLabel  for="ord-remove-button">
                                                             <h:outputText value="Removed events can only be rescued by sys admins." />
                                                         </h:outputLabel>
                                                     </div>
@@ -991,24 +991,24 @@
                                     </p:panel>
 
 
-                                    <p:panel id="event-notes-panel"
+                                    <p:panel id="ord-notes-panel"
                                              toggleable="true"
                                              collapsed="false"
                                              header="Notes"
                                              rendered="#{eventsBB.activeViewMode}"
                                              >
 
-                                        <h:form id="event-notes-form">
+                                        <h:form id="ord-notes-form">
 
-                                            <p:commandButton   id="event-notes-add-button"
+                                            <p:commandButton   id="ord-notes-add-button"
                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                                                value="Add New Note"  
                                                                icon="fa fa-sticky-note-o"
                                                                actionListener="#{eventsBB.onNoteInitButtonChange}"
-                                                               oncomplete="PF('event-note-dialog-var').show()"
-                                                               update="event-note-form"/>
+                                                               oncomplete="PF('ord-note-dialog-var').show()"
+                                                               update="ord-note-form"/>
 
-                                            <h:outputText id="event-note-ot"
+                                            <h:outputText id="ord-note-ot"
                                                           value="#{eventsBB.currentEvent.notes}"
                                                           escape="false" />
 
@@ -1024,17 +1024,17 @@
 
 
 
-                    <p:dialog   id="event-note-dialog"
+                    <p:dialog   id="ord-note-dialog"
                                 height="300" width="750"
-                                widgetVar="event-note-dialog-var"
+                                widgetVar="ord-note-dialog-var"
                                 closable="true"
                                 header="Note Builder"
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                 >
 
-                        <h:form id="event-note-form">
+                        <h:form id="ord-note-form">
                             <h:outputText styleClass="ui-label" value="Note text: "/>
-                            <p:editor   id="event-notes-editor"
+                            <p:editor   id="ord-notes-editor"
                                         value="#{eventsBB.formNoteText}"
                                         controls="bold italic underline strikethrough font size style color
                                         bullets numbering center undo redo rule link removeformat"
@@ -1042,38 +1042,38 @@
                                         height="200"/>
 
 
-                            <p:commandButton    id="event-note-button-cancel"
+                            <p:commandButton    id="ord-note-button-cancel"
                                                 ajax="true" 
                                                 tabindex="27"
                                                 value="Cancel"
                                                 icon="fa fa-stop"
                                                 immediate="true"
-                                                onclick="PF('event-note-dialog-var').hide()"
+                                                onclick="PF('ord-note-dialog-var').hide()"
                                                 />
 
-                            <p:commandButton   id="event-dialog-notes-button-addnote"
+                            <p:commandButton   id="ord-dialog-notes-button-addnote"
                                                ajax="false" 
                                                actionListener="#{eventsBB.onNoteCommitButtonChange}"
-                                               oncomplete="PF('event-note-dialog-var').hide()"
+                                               oncomplete="PF('ord-note-dialog-var').hide()"
                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
                                                value="Attach Note"  
                                                styleClass="inline-button"
                                                icon="fa fa-sticky-note-o"
-                                               update="event-notes-form"/>
+                                               update="ord-notes-form"/>
                         </h:form>
                     </p:dialog>
 
 
-                    <p:dialog   id="event-personchoose-dialog"
+                    <p:dialog   id="ord-personchoose-dialog"
                                 height="300" width="750"
-                                widgetVar="event-personchoose-dialog-var"
+                                widgetVar="ord-personchoose-dialog-var"
                                 closable="true"
                                 header="Choose persons to connect to this event"
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                 >
 
 
-                        <h:form id="event-person-form">
+                        <h:form id="ord-person-form">
 
                             <div class="ui-g data_container_nested_restrict">
 
@@ -1133,7 +1133,7 @@
 
                                         <p:inputText id="personIDIT" value="#{eventsBB.personIDForLookup}"/>
                                         <p:spacer height="5px" />
-                                        <p:commandButton id="event-add-lookupperson-button" 
+                                        <p:commandButton id="ord-add-lookupperson-button" 
                                                          value="Look up person" 
                                                          actionListener="#{eventsBB.onPersonLookupByIDButtonChange}" 
                                                          ajax="true" 
@@ -1157,8 +1157,8 @@
                                                          ajax="true"
                                                          value="Select"
                                                          actionListener="#{eventsBB.storeRecipient(per)}" 
-                                                         oncomplete="PF('event-personchoose-dialog-var').hide()."
-                                                         update="event-lookupperson-table
+                                                         oncomplete="PF('ord-personchoose-dialog-var').hide()."
+                                                         update="ord-lookupperson-table
                                                          "
                                                          />
                                     </p:dataScroller>
@@ -1171,7 +1171,7 @@
 
 
                                     <p:dataTable
-                                        id="event-lookupperson-table"
+                                        id="ord-lookupperson-table"
                                         var="person"
                                         rowKey="#{person.personID}"
                                         value="#{eventsBB.currentEvent.personList}"
@@ -1320,7 +1320,7 @@
 
                                         <p:commandButton ajax="true" 
                                                          value="Cancel" icon="fa fa-stop" 
-                                                         onclick="PF('event-personchoose-dialog-var').hide()"/>
+                                                         onclick="PF('ord-personchoose-dialog-var').hide()"/>
                                     </div>
                                     <div class="restrict-main-contents-io-button">   
 
@@ -1328,11 +1328,11 @@
                                                          ajax="true" 
                                                          value="Save person list" 
                                                          icon="fa fa-edit"
-                                                         oncomplete="PF('event-personchoose-dialog-var').hide()"
+                                                         oncomplete="PF('ord-personchoose-dialog-var').hide()"
                                                          disabled="#{!(eventsBB.currentEvent.eventID == 0)}"
                                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                         update="event-update-panel
-                                                         event-add-panel"/>
+                                                         update="ord-update-panel
+                                                         ord-add-panel"/>
 
                                     </div>
                                 </div>
@@ -1342,14 +1342,14 @@
                     </p:dialog>
 
 
-                    <p:dialog   id="event-search-advanced-dialog"
+                    <p:dialog   id="ord-search-advanced-dialog"
                                 height="300" width="750"
-                                widgetVar="event-search-advanced-dialog-var"
+                                widgetVar="ord-search-advanced-dialog-var"
                                 closable="true"
                                 header="Advanced search"
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                 >
-                        <h:form id="event-search-advanced-form">
+                        <h:form id="ord-search-advanced-form">
 
 
                             <div class="ui-g data_container_nested_restrict">
@@ -1359,7 +1359,7 @@
 
 
                                     <div class="restrict-main-contents-io-title" >
-                                        <p:outputLabel id="event-filter-muni-ol" 
+                                        <p:outputLabel id="ord-filter-muni-ol" 
                                                        for="seev-filter-muni-chkbx" 
                                                        value="filter by municipality "/>
 
@@ -1367,7 +1367,7 @@
 
                                     <div class="restrict-main-contents-io-content" >
                                         <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" value="#{eventsBB.searchParamsSelected.muni_ctl}" >
-                                            <p:ajax update="event-search-muni-som"/>
+                                            <p:ajax update="ord-search-muni-som"/>
                                         </p:selectBooleanCheckbox>
 
                                     </div>
@@ -1376,7 +1376,7 @@
                                 <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
 
                                     <div class="restrict-main-contents-io-content" >
-                                        <p:selectOneMenu id="event-search-muni-som" tabindex="1" value="#{eventsBB.searchParamsSelected.muni_val}"
+                                        <p:selectOneMenu id="ord-search-muni-som" tabindex="1" value="#{eventsBB.searchParamsSelected.muni_val}"
                                                          disabled="#{!eventsBB.searchParamsSelected.muni_ctl}">
                                             <f:converter converterId="muniConverter"/>
                                             <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
@@ -1389,19 +1389,19 @@
                                 <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
 
                                     <div class="restrict-main-contents-io-title" >
-                                        <p:outputLabel id="event-search-startend-chkbx-ol" 
-                                                       for="event-search-startend-chkbx" 
+                                        <p:outputLabel id="ord-search-startend-chkbx-ol" 
+                                                       for="ord-search-startend-chkbx" 
                                                        value="filter by date range "/>
 
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
-                                        <p:selectBooleanCheckbox id="event-search-startend-chkbx" 
+                                        <p:selectBooleanCheckbox id="ord-search-startend-chkbx" 
                                                                  value="#{eventsBB.searchParamsSelected.date_startEnd_ctl}" >
-                                            <p:ajax update="event-search-date-field-val
-                                                    event-search-date-start-val
-                                                    event-search-date-end-val
-                                                    event-search-date-relative-ctl" />
+                                            <p:ajax update="ord-search-date-field-val
+                                                    ord-search-date-start-val
+                                                    ord-search-date-end-val
+                                                    ord-search-date-relative-ctl" />
                                         </p:selectBooleanCheckbox>
 
                                     </div>
@@ -1410,14 +1410,14 @@
 
                                     <div class="restrict-main-contents-io-content" >
 
-                                        <p:selectOneMenu  id="event-search-date-field-val" 
+                                        <p:selectOneMenu  id="ord-search-date-field-val" 
                                                           tabindex="1" 
                                                           value="#{eventsBB.searchParamsSelected.date_field}"
                                                           disabled="#{!eventsBB.searchParamsSelected.date_startEnd_ctl}">
                                             <f:selectItem itemLabel="select a date field..." 
                                                           noSelectionOption="true" 
                                                           itemDisabled="true"/>
-                                            <f:selectItems id="event-search-date-field-val-items" 
+                                            <f:selectItems id="ord-search-date-field-val-items" 
                                                            value="#{eventsBB.searchParamsSelected.dateFieldList}" 
                                                            var="f" itemValue="#{f}" itemLabel="#{f.title}" />
                                         </p:selectOneMenu>
@@ -1429,14 +1429,14 @@
 
                                     <div class="restrict-main-contents-io-title" >
 
-                                        <p:outputLabel for="event-search-date-start-val" 
+                                        <p:outputLabel for="ord-search-date-start-val" 
                                                        value="start date"/>
 
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
 
-                                        <p:calendar id="event-search-date-start-val" 
+                                        <p:calendar id="ord-search-date-start-val" 
                                                     value="#{eventsBB.searchParamsSelected.startDate_val_utilDate}" 
                                                     disabled="#{(!eventsBB.searchParamsSelected.date_startEnd_ctl) or eventsBB.searchParamsSelected.date_relativeDates_ctl}"
                                                     mode="popup" 
@@ -1449,7 +1449,7 @@
                                                     showButtonPanel="true" 
                                                     showTodayButton="true"
                                                     required="false"/>
-                                        <h:message for="event-search-date-start-val" showDetail="false" showSummary="true" 
+                                        <h:message for="ord-search-date-start-val" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                     </div>
@@ -1459,7 +1459,7 @@
 
                                     <div class="restrict-main-contents-io-title" >
 
-                                        <p:outputLabel for="event-search-date-end-val" 
+                                        <p:outputLabel for="ord-search-date-end-val" 
                                                        value="end date"/>
 
                                     </div>
@@ -1467,7 +1467,7 @@
                                     <div class="restrict-main-contents-io-content" >
 
 
-                                        <p:calendar id="event-search-date-end-val" 
+                                        <p:calendar id="ord-search-date-end-val" 
                                                     value="#{eventsBB.searchParamsSelected.endDate_val_utilDate}" 
                                                     disabled="#{(!eventsBB.searchParamsSelected.date_startEnd_ctl) or eventsBB.searchParamsSelected.date_relativeDates_ctl}"
                                                     mode="popup" 
@@ -1480,7 +1480,7 @@
                                                     showButtonPanel="true" 
                                                     showTodayButton="true"
                                                     required="false"/>
-                                        <h:message for="event-search-date-end-val" showDetail="false" showSummary="true" 
+                                        <h:message for="ord-search-date-end-val" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                     </div>
@@ -1491,7 +1491,7 @@
 
                                     <div class="restrict-main-contents-io-title" >
 
-                                        <p:outputLabel for="event-search-date-relative-ctl" 
+                                        <p:outputLabel for="ord-search-date-relative-ctl" 
                                                        value="Relative dates"
                                                        styleClass="datum-label"/>
 
@@ -1499,14 +1499,14 @@
 
                                     <div class="restrict-main-contents-io-content" >
 
-                                        <p:selectBooleanCheckbox id="event-search-date-relative-ctl" 
+                                        <p:selectBooleanCheckbox id="ord-search-date-relative-ctl" 
                                                                  value="#{eventsBB.searchParamsSelected.date_relativeDates_ctl}" 
                                                                  disabled="#{!eventsBB.searchParamsSelected.date_startEnd_ctl}">
-                                            <p:ajax update="event-search-date-end-val
-                                                    event-search-date-start-val
-                                                    event-search-date-end-val
-                                                    event-search-date-relative-start-val
-                                                    event-search-date-relative-end-val" />
+                                            <p:ajax update="ord-search-date-end-val
+                                                    ord-search-date-start-val
+                                                    ord-search-date-end-val
+                                                    ord-search-date-relative-start-val
+                                                    ord-search-date-relative-end-val" />
                                         </p:selectBooleanCheckbox>
                                     </div>
                                 </div>
@@ -1516,15 +1516,15 @@
 
 
                                     <div class="restrict-main-contents-io-title" >
-                                        <p:outputLabel for="event-search-date-relative-start-val" 
+                                        <p:outputLabel for="ord-search-date-relative-start-val" 
                                                        value="start x days from today"/>
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
-                                        <p:inputText id="event-search-date-relative-start-val" 
+                                        <p:inputText id="ord-search-date-relative-start-val" 
                                                      value="#{eventsBB.searchParamsSelected.date_relativeDates_start_val}" 
                                                      disabled="#{!(eventsBB.searchParamsSelected.date_startEnd_ctl and eventsBB.searchParamsSelected.date_relativeDates_ctl)}" />
-                                        <h:message for="event-search-date-relative-start-val" showDetail="false" showSummary="true" 
+                                        <h:message for="ord-search-date-relative-start-val" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                     </div>
@@ -1535,15 +1535,15 @@
 
 
                                     <div class="restrict-main-contents-io-title" >
-                                        <p:outputLabel for="event-search-date-relative-end-val" 
+                                        <p:outputLabel for="ord-search-date-relative-end-val" 
                                                        value="end x days from today"/>
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
-                                        <p:inputText id="event-search-date-relative-end-val" 
+                                        <p:inputText id="ord-search-date-relative-end-val" 
                                                      value="#{eventsBB.searchParamsSelected.date_realtiveDates_end_val}" 
                                                      disabled="#{!(eventsBB.searchParamsSelected.date_startEnd_ctl and eventsBB.searchParamsSelected.date_relativeDates_ctl)}" />
-                                        <h:message for="event-search-date-relative-end-val" showDetail="false" showSummary="true" 
+                                        <h:message for="ord-search-date-relative-end-val" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                     </div>
@@ -1555,16 +1555,16 @@
 
                                     <div class="restrict-main-contents-io-title" >
 
-                                        <p:outputLabel for="event-search-filter-id-ctl" 
+                                        <p:outputLabel for="ord-search-filter-id-ctl" 
                                                        value="filter by event id"/>
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
 
-                                        <p:selectBooleanCheckbox id="event-search-filter-id-ctl" 
+                                        <p:selectBooleanCheckbox id="ord-search-filter-id-ctl" 
                                                                  value="#{eventsBB.searchParamsSelected.bobID_ctl}"
                                                                  disabled="false">
-                                            <p:ajax update="event-search-filter-id-val" />
+                                            <p:ajax update="ord-search-filter-id-val" />
                                         </p:selectBooleanCheckbox>
 
                                     </div>
@@ -1574,17 +1574,17 @@
 
 
                                     <div class="restrict-main-contents-io-title" >
-                                        <p:outputLabel for="event-search-filter-id-val" 
+                                        <p:outputLabel for="ord-search-filter-id-val" 
                                                        value="id:" />
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
-                                        <p:inputText id="event-search-filter-id-val"
+                                        <p:inputText id="ord-search-filter-id-val"
                                                      type="number"
                                                      value="#{eventsBB.searchParamsSelected.bobID_val}"
                                                      disabled="#{!eventsBB.searchParamsSelected.bobID_ctl}"/>
 
-                                        <h:message for="event-search-filter-id-val" showDetail="false" showSummary="true"
+                                        <h:message for="ord-search-filter-id-val" showDetail="false" showSummary="true"
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                                     </div>
@@ -1594,7 +1594,7 @@
 
 
                                     <div class="restrict-main-contents-io-title" >
-                                        <p:outputLabel for="event-search-filter-user-ctl" 
+                                        <p:outputLabel for="ord-search-filter-user-ctl" 
                                                        value="User filter"/>
                                     </div>
 
@@ -1602,11 +1602,11 @@
 
 
 
-                                        <p:selectBooleanCheckbox id="event-search-filter-user-ctl" 
+                                        <p:selectBooleanCheckbox id="ord-search-filter-user-ctl" 
                                                                  value="#{eventsBB.searchParamsSelected.user_ctl}"
                                                                  disabled="#{!(eventsBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
-                                            <p:ajax update="event-search-filter-user-som
-                                                    event-search-user-field-val" />
+                                            <p:ajax update="ord-search-filter-user-som
+                                                    ord-search-user-field-val" />
                                         </p:selectBooleanCheckbox>
 
                                     </div>
@@ -1616,21 +1616,21 @@
 
 
                                     <div class="restrict-main-contents-io-title" >
-                                        <p:selectOneMenu  id="event-search-user-field-val" 
+                                        <p:selectOneMenu  id="ord-search-user-field-val" 
                                                           tabindex="1" 
                                                           value="#{eventsBB.searchParamsSelected.user_field}"
                                                           disabled="#{!eventsBB.searchParamsSelected.user_ctl}">
                                             <f:selectItem itemLabel="select a user field..." 
                                                           noSelectionOption="true" 
                                                           itemDisabled="true"/>
-                                            <f:selectItems id="event-search-user-field-val-items" 
+                                            <f:selectItems id="ord-search-user-field-val-items" 
                                                            value="#{eventsBB.searchParamsSelected.userFieldList}" 
                                                            var="uf" itemValue="#{uf}" itemLabel="#{uf.title}" />
                                         </p:selectOneMenu>
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
-                                        <p:selectOneMenu id="event-search-filter-user-som" required="false" 
+                                        <p:selectOneMenu id="ord-search-filter-user-som" required="false" 
                                                          value="#{eventsBB.searchParamsSelected.user_val}"
                                                          disabled="#{!eventsBB.searchParamsSelected.user_ctl}">
                                             <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
@@ -1646,17 +1646,17 @@
 
 
                                     <div class="restrict-main-contents-io-title" >
-                                        <p:outputLabel for="event-search-filter-domain-ctl" 
+                                        <p:outputLabel for="ord-search-filter-domain-ctl" 
                                                        value="User filter"/>
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
 
 
-                                        <p:selectBooleanCheckbox id="event-search-filter-domain-ctl" 
+                                        <p:selectBooleanCheckbox id="ord-search-filter-domain-ctl" 
                                                                  value="#{eventsBB.searchParamsSelected.eventDomain_ctl}"
                                                                  disabled="#{!(eventsBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
-                                            <p:ajax update="event-search-filter-domain-val" />
+                                            <p:ajax update="ord-search-filter-domain-val" />
                                         </p:selectBooleanCheckbox>
 
                                     </div>
@@ -1666,14 +1666,14 @@
 
                                     <div class="restrict-main-contents-io-content" >
 
-                                        <p:selectOneMenu  id="event-search-filter-domain-val" 
+                                        <p:selectOneMenu  id="ord-search-filter-domain-val" 
                                                           tabindex="1" 
                                                           value="#{eventsBB.searchParamsSelected.eventDomain_val}"
                                                           disabled="#{!eventsBB.searchParamsSelected.eventDomain_ctl}">
                                             <f:selectItem itemLabel="select an event domain..." 
                                                           noSelectionOption="true" 
                                                           itemDisabled="true"/>
-                                            <f:selectItems id="event-search-filter-domain-items" 
+                                            <f:selectItems id="ord-search-filter-domain-items" 
                                                            value="#{eventsBB.searchParamsSelected.eventDomainList}" 
                                                            var="ed" itemValue="#{ed}" itemLabel="#{ed.title}" />
                                             <f:converter converterId="eventDomainConverter" />
@@ -1685,15 +1685,15 @@
 
 
                                     <div class="restrict-main-contents-io-title" >
-                                        <p:outputLabel id="event-filter-property-ol" 
-                                                       for="event-filter-property" 
+                                        <p:outputLabel id="ord-filter-property-ol" 
+                                                       for="ord-filter-property" 
                                                        value="filter by property "/>
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
 
-                                        <p:selectBooleanCheckbox id="event-filter-property" value="#{eventsBB.searchParamsSelected.property_ctl}" >
-                                            <p:ajax update="event-criteria-property-som" />
+                                        <p:selectBooleanCheckbox id="ord-filter-property" value="#{eventsBB.searchParamsSelected.property_ctl}" >
+                                            <p:ajax update="ord-criteria-property-som" />
                                         </p:selectBooleanCheckbox>
 
                                     </div>
@@ -1707,7 +1707,7 @@
 
                                     <div class="restrict-main-contents-io-content" >
 
-                                        <p:selectOneMenu id="event-criteria-property-som" required="false" 
+                                        <p:selectOneMenu id="ord-criteria-property-som" required="false" 
                                                          value="#{eventsBB.searchParamsSelected.property_val}"
                                                          disabled="#{!eventsBB.searchParamsSelected.property_ctl}">
 
@@ -1724,15 +1724,15 @@
 
 
                                     <div class="restrict-main-contents-io-title" >
-                                        <p:outputLabel for="event-search-filter-usetype-ctl" 
+                                        <p:outputLabel for="ord-search-filter-usetype-ctl" 
                                                        value="Property use type filter"/>
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
-                                        <p:selectBooleanCheckbox id="event-search-filter-usetype-ctl" 
+                                        <p:selectBooleanCheckbox id="ord-search-filter-usetype-ctl" 
                                                                  value="#{eventsBB.searchParamsSelected.propertyUseType_ctl}"
                                                                  disabled="false">
-                                            <p:ajax update="event-search-filter-usetype-val" />
+                                            <p:ajax update="ord-search-filter-usetype-val" />
                                         </p:selectBooleanCheckbox>
                                     </div>
                                 </div>
@@ -1744,17 +1744,17 @@
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
-                                        <p:selectOneMenu    id="event-search-filter-usetype-val" 
+                                        <p:selectOneMenu    id="ord-search-filter-usetype-val" 
                                                             tabindex="1" 
                                                             value="#{eventsBB.searchParamsSelected.propertyUseType_val}" 
                                                             disabled="#{!eventsBB.searchParamsSelected.propertyUseType_ctl}">
                                             <f:selectItem   itemLabel="select a use type..." noSelectionOption="true" itemDisabled="true"/>
-                                            <f:selectItems  id="event-search-filter-usetype-items" 
+                                            <f:selectItems  id="ord-search-filter-usetype-items" 
                                                             value="#{eventsBB.propUseTypeList}" 
                                                             var="put" itemValue="#{put}" itemLabel="#{put.name}" />
                                             <f:converter    converterId="propertyUseTypeConverter"/>
                                         </p:selectOneMenu>
-                                        <h:message for="event-search-filter-usetype-val" showDetail="true" showSummary="true" 
+                                        <h:message for="ord-search-filter-usetype-val" showDetail="true" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </div>
                                 </div>
@@ -1763,8 +1763,8 @@
 
 
                                     <div class="restrict-main-contents-io-title" >
-                                        <p:outputLabel id="event-filter-person-ol" 
-                                                       for="event-criteria-person-val" 
+                                        <p:outputLabel id="ord-filter-person-ol" 
+                                                       for="ord-criteria-person-val" 
                                                        value="filter by person"/>
                                     </div>
 
@@ -1772,9 +1772,9 @@
 
 
 
-                                        <p:selectBooleanCheckbox id="event-filter-person-ctl" 
+                                        <p:selectBooleanCheckbox id="ord-filter-person-ctl" 
                                                                  value="#{eventsBB.searchParamsSelected.person_ctl}" >
-                                            <p:ajax update="event-criteria-person-val" />
+                                            <p:ajax update="ord-criteria-person-val" />
                                         </p:selectBooleanCheckbox>
                                     </div>
                                 </div>
@@ -1786,7 +1786,7 @@
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
-                                        <p:selectOneMenu id="event-criteria-person-val" required="false" 
+                                        <p:selectOneMenu id="ord-criteria-person-val" required="false" 
                                                          value="#{eventsBB.searchParamsSelected.person_val}"
                                                          disabled="#{!eventsBB.searchParamsSelected.person_ctl}">
 
@@ -1804,15 +1804,15 @@
 
                                     <div class="restrict-main-contents-io-title" >
 
-                                        <p:outputLabel for="event-search-filter-active-ctl" 
+                                        <p:outputLabel for="ord-search-filter-active-ctl" 
                                                        value="filter by active"/>
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
-                                        <p:selectBooleanCheckbox id="event-search-filter-active-ctl" 
+                                        <p:selectBooleanCheckbox id="ord-search-filter-active-ctl" 
                                                                  value="#{eventsBB.searchParamsSelected.active_ctl}"
                                                                  disabled="false">
-                                            <p:ajax update="event-search-filter-active-val" />
+                                            <p:ajax update="ord-search-filter-active-val" />
                                         </p:selectBooleanCheckbox>
                                     </div>
                                 </div>
@@ -1821,12 +1821,12 @@
 
 
                                     <div class="restrict-main-contents-io-title" >
-                                        <p:outputLabel for="event-search-filter-active-val" 
+                                        <p:outputLabel for="ord-search-filter-active-val" 
                                                        value="is active"/>
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
-                                        <p:selectBooleanCheckbox id="event-search-filter-active-val" 
+                                        <p:selectBooleanCheckbox id="ord-search-filter-active-val" 
                                                                  value="#{eventsBB.searchParamsSelected.active_val}"
                                                                  disabled="#{!eventsBB.searchParamsSelected.active_ctl}">
                                         </p:selectBooleanCheckbox>
@@ -1837,13 +1837,13 @@
 
 
                                     <div class="restrict-main-contents-io-title" >
-                                        <p:outputLabel id="event-query-limit-ol" 
-                                                       for="event-query-limit" 
+                                        <p:outputLabel id="ord-query-limit-ol" 
+                                                       for="ord-query-limit" 
                                                        value="limit results"/>
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
-                                        <p:selectBooleanCheckbox id="event-query-limit" 
+                                        <p:selectBooleanCheckbox id="ord-query-limit" 
                                                                  value="#{eventsBB.searchParamsSelected.limitResultCount_ctl}" />
 
                                     </div>
@@ -1856,11 +1856,11 @@
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
-                                        <p:inputText id="event-filter-limit-it"
+                                        <p:inputText id="ord-filter-limit-it"
                                                      type="number"
                                                      value="#{eventsBB.searchParamsSelected.limitResultCount_val}"
                                                      disabled="#{!eventsBB.searchParamsSelected.limitResultCount_ctl}"/>
-                                        <h:message for="event-filter-limit-it" showDetail="false" showSummary="true"
+                                        <h:message for="ord-filter-limit-it" showDetail="false" showSummary="true"
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </div>
                                 </div>
@@ -1945,7 +1945,7 @@
                                                          process="@none"
                                                          value="Cancel" 
                                                          icon="fa fa-stop" 
-                                                         onclick="PF('event-search-advanced-dialog-var').hide()"/>
+                                                         onclick="PF('ord-search-advanced-dialog-var').hide()"/>
                                     </div>
 
                                     <div class="restrict-main-contents-io-button">
@@ -1955,11 +1955,11 @@
                                                             actionListener="#{eventsBB.runQuery}"
                                                             disabled="#{eventsBB.querySelected.queryExecuted}"
                                                             icon="fa fa-flash"
-                                                            oncomplete="PF('event-search-advanced-dialog-var').hide()"
-                                                            update="event-settings-panel
-                                                            event-list-panel
+                                                            oncomplete="PF('ord-search-advanced-dialog-var').hide()"
+                                                            update="ord-settings-panel
+                                                            ord-list-panel
                                                             form-messages-global
-                                                            event-search-log-form
+                                                            ord-search-log-form
                                                             "/>
                                     </div>
                                 </div>
@@ -2019,13 +2019,13 @@
 
 
 
-                    <p:dialog  id="ceevents-configure-report-dialog"
-                               widgetVar="report-event-diaglog-var"
+                    <p:dialog  id="ceord-configure-report-dialog"
+                               widgetVar="report-ord-diaglog-var"
                                closable="true" responsive="true"
                                dynamic="true"
                                rendered="#{sessionBeasessionUserer.keyCard.hasMuniReaderPermissions}">
 
-                        <h:form id="events-reportconfig-messages-form">
+                        <h:form id="ord-reportconfig-messages-form">
                             <h:messages id="ceev-messages-in-report-dialog" globalOnly="true" showDetail="false" showSummary="true"
                                         warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                             </h:messages>
@@ -2093,12 +2093,12 @@
                                 <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
                                     <div class="restrict-main-contents-io-title" >
                                         <h:outputLabel value="Include event summary chart on page 1" 
-                                                       for="include-event-summary-chart-is" />
+                                                       for="include-ord-summary-chart-is" />
 
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
-                                        <p:inputSwitch  id="include-event-summary-chart-is"
+                                        <p:inputSwitch  id="include-ord-summary-chart-is"
                                                         value="#{eventsBB.reportConfig.includeEventTypeSummaryChart}" 
                                                         onLabel="Yes" offLabel="No" />
                                     </div>
@@ -2152,7 +2152,7 @@
 
                                         <p:commandButton ajax="true" 
                                                          value="Cancel" icon="fa fa-stop" 
-                                                         onclick="PF('report-event-diaglog-var').hide()"/>
+                                                         onclick="PF('report-ord-diaglog-var').hide()"/>
                                     </div>
 
                                     <div class="restrict-main-contents-io-button">

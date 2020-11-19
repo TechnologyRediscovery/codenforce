@@ -1,0 +1,173 @@
+
+
+                                <p:panel id="dashpanel-properties"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="Property search"
+                                         rendered="true"
+                                         footer=""
+                                         toggleableHeader="true"
+                                         menuTitle="">
+                                    
+
+                                        <!--MESSAGES -->
+                                        <h:form id="prop-search-messages-form">
+                                            <p:growl id="prop-search-messages" showDetail="false"/>
+                                        </h:form>
+
+                                        <h:form id="prop-search-query-form">
+
+                                            <!-- NESTED DATA CONTAINER -->
+                                            <div class="ui-g data_container_nested_restrict">
+
+                                                <!--NESTED DATA FIELD GRID:12-->
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                                    <!-- NESTED DATA TITLE -->
+                                                    <div class="restrict-main-contents-io-title">
+                                                        <h:outputLabel value="Select Tpye of Search"
+                                                                       for="prop-search-query-som" 
+                                                                       />
+                                                    </div>
+                                                    <!-- NESTED DATA CONTENT -->
+                                                    <div class="restrict-main-contents-io-content">
+                                                        <p:selectOneMenu id="prop-search-query-som"
+                                                                         tabindex="1"
+                                                                         value="#{propertySearchBB.querySelected}"
+                                                                         style="width: 100%"
+                                                                         >
+                                                            <f:converter converterId="bOBQueryConverter"/>
+  
+                                                            <f:selectItem itemLabel="select one..."
+                                                                          noSelectionOption="true"
+                                                                          itemDisabled="true"
+                                                                          />
+                                                            <f:selectItems id="prop-search-query-si"
+                                                                           value="#{propertySearchBB.queryList}"
+                                                                           var="ql"
+                                                                           itemValue="#{ql}"
+                                                                           itemLabel="#{ql.queryTitle}" 
+                                                                           />
+                                                            <p:ajax update="prop-search-filter-addr-val-0
+                                                                    @form
+                                                                    "
+                                                                    listener="#{propertySearchBB.changeQuerySelected}"
+                                                                    />
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- NESTED DATA CONTAINER -->
+                                            <div class="ui-g data_container_nested_restrict">
+
+                                                <!-- NESTED DATA FIELD GRID:12-->
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                                    <!-- NESTED DATA TITLE -->
+                                                    <div class="restrict-main-contents-io-title">
+                                                        <h:outputLabel value="Enter Search Criteria"
+                                                                       for="cears-query-desc-ot" />
+                                                        <div class="restrict-main-contents-io-link">
+                                                            <p:commandLink id="prop-search-advanced-button"
+                                                                           ajax="true"
+                                                                           actionListener="#{propertyProfileBB.onAdvancedSearchButtonChange}"
+                                                                           oncomplete="PF('prop-search-advanced-var').show()"
+                                                                           rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                           value="Advanced search"
+                                                                           />
+
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- NESTED DATA CONTENT -->
+                                                    <div class="restrict-main-contents-io-content">
+                                                        <p:inputText id="prop-search-filter-addr-val-0"
+                                                                     value="#{propertySearchBB.searchParamsSelected.address_val}"
+                                                                     style="width: 100%;"
+                                                                     tabindex="2"
+                                                                     disabled="#{!propertySearchBB.searchParamsSelected.address_ctl}"
+                                                                     required="false"
+                                                                     styleClass="data_field_value"
+                                                                     placeholder="#{propertySearchBB.querySelected.queryName.desc}"
+                                                                     />
+
+                                                        <p:message for="prop-search-filter-addr-val-0" showDetail="false" showSummary="true"/>
+                                                    </div>
+
+                                                    <!-- NESTED DATA FILTER -->
+                                                    <div class="restrict-main-contents-io-filter">
+
+                                                        <p:selectBooleanCheckbox class="checkbox"
+                                                                                 id="prop-search-filter-addr-ctl-0"
+                                                                                 value="#{propertySearchBB.searchParamsSelected.address_ctl}" >
+                                                            <p:ajax update="prop-search-filter-addr-val-0"/>
+                                                        </p:selectBooleanCheckbox>
+
+                                                        <p:outputLabel for="prop-search-filter-addr-ctl-0" 
+                                                                       value="Filter by street/number"
+                                                                       />
+                                                    </div>
+
+                                                    <!-- NESTED DATA FILTER -->
+                                                    <div class="restrict-main-contents-io-filter">
+
+                                                        <p:selectBooleanCheckbox class="checkbox"
+                                                                                 id="prop-search-appendresults-chkbox-0"
+                                                                                 value="#{propertySearchBB.appendResultsToList}"
+                                                                                 disabled="false" />
+
+                                                        <p:outputLabel for="prop-search-appendresults-chkbox-0"
+                                                                       value="Add to results below"
+                                                                       />
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <!-- NESTED DATA CONTAINER -->
+                                            <div class="ui-g data_container_nested_restrict">
+
+                                                <!--NESTED DATA FIELD GRID:12-->
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                                    <!-- NESTED DATA BUTTON -->
+                                                    <div class="restrict-main-contents-io-button">
+                                                        <p:commandButton id="prop-search-exec-cb-0"
+                                                                         ajax="true"
+                                                                         actionListener="#{propertySearchBB.executeQuery}"
+                                                                         icon="fa fa-search"
+                                                                         value="Search"
+                                                                         style="width: 100%"
+                                                                         disabled="#{propertySearchBB.querySelected.queryExecuted}"
+                                                                         update=" 
+                                                                         @form
+                                                                         
+                                                                         prop-search-results-table
+                                                                         prop-search-clear-cb-0"/>
+
+                                                    </div>
+
+                                                    <!-- NESTED DATA GRAY BUTTON -->
+                                                    <div class="restrict-main-contents-io-button gray_button">
+                                                        <p:commandButton id="prop-search-clear-cb-0"
+                                                                         ajax="true"
+                                                                         actionListener="#{propertySearchBB.resetQuery}"
+                                                                         icon="fa fa-eraser"
+                                <p:panel id="dashpanel-properties"
+                                         collapsed="false"
+                                         closable="true"
+                                         toggleable="true"
+                                         header="Property search"
+                                         rendered="true"
+                                         footer=""
+                                         toggleableHeader="true"
+                                         menuTitle="">
+                                    
+
+                                        <!--MESSAGES -->
+                                        <h:form id="prop-search-messages-form">
+                                            <p:growl id="prop-search-messages" showDetail="false"/>
+                                        </h:form>

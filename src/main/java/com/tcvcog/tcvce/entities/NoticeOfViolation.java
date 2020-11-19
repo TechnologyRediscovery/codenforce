@@ -33,8 +33,12 @@ public class NoticeOfViolation  implements Serializable, Comparable<NoticeOfViol
     private Person recipient;
     
     private String noticeTextBeforeViolations;
+    private List<TextBlock> blocksBeforeViolations;
+    
     private List<CodeViolationDisplayable> violationList;
     private String noticeTextAfterViolations;
+    private List<TextBlock> blocksAfterViolations;
+    
     
     private LocalDateTime dateOfRecord;
     private java.util.Date dateOfRecordUtilDate;
@@ -45,6 +49,8 @@ public class NoticeOfViolation  implements Serializable, Comparable<NoticeOfViol
     private User creationBy;
     
     private int headerImageID;
+    
+    private boolean injectViolations;
    
     private LocalDateTime lockedAndqueuedTS;
     private String lockedAndQueuedTSPretty;
@@ -471,5 +477,48 @@ public class NoticeOfViolation  implements Serializable, Comparable<NoticeOfViol
     public void setActive(boolean active) {
         this.active = active;
     }
-    
+
+    /**
+     * @return the blocksBeforeViolations
+     */
+    public List<TextBlock> getBlocksBeforeViolations() {
+        return blocksBeforeViolations;
+    }
+
+    /**
+     * @return the blocksAfterViolations
+     */
+    public List<TextBlock> getBlocksAfterViolations() {
+        return blocksAfterViolations;
+    }
+
+    /**
+     * @param blocksBeforeViolations the blocksBeforeViolations to set
+     */
+    public void setBlocksBeforeViolations(List<TextBlock> blocksBeforeViolations) {
+        this.blocksBeforeViolations = blocksBeforeViolations;
+    }
+
+    /**
+     * @param blocksAfterViolations the blocksAfterViolations to set
+     */
+    public void setBlocksAfterViolations(List<TextBlock> blocksAfterViolations) {
+        this.blocksAfterViolations = blocksAfterViolations;
+    }
+
+    /**
+     * @return the injectViolations
+     */
+    public boolean isInjectViolations() {
+        return injectViolations;
+    }
+
+    /**
+     * @param injectViolations the injectViolations to set
+     */
+    public void setInjectViolations(boolean injectViolations) {
+        this.injectViolations = injectViolations;
+    }
+
+   
 }

@@ -31,6 +31,12 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
+import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
+import com.tcvcog.tcvce.entities.search.QueryEvent;
+import com.tcvcog.tcvce.entities.search.QueryEventEnum;
+import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
+import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
@@ -49,6 +55,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
@@ -206,6 +214,45 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
         return heavyList;
 
+    }
+    
+    /**
+     * Manages the closing of a case prior to full violation compliance.
+     * Will nullify any existing violations on the CECase
+     * and attach a close case event based on the inputted value
+     * 
+     * @param cse the case to force close
+     * @param closeEventCat the EventCategory associated with the closure reason
+     * @param ua the user doing the force closing
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void cecase_forceclose(CECaseDataHeavy cse, EventCategory closeEventCat, UserAuthorized ua) throws BObStatusException, IntegrationException, EventException{
+        CaseIntegrator ci = getCaseIntegrator();
+        EventCoordinator ec = getEventCoordinator();
+        
+        if(cse.getClosingDate() != null){
+            throw new BObStatusException("Cannot force close an already closed case");
+        }
+        if(closeEventCat == null){
+            throw new BObStatusException("Cannot close case with null closing event");
+        }
+        
+        if(closeEventCat.getEventType() != EventType.Closing){
+            throw new BObStatusException("Cannot close case with an event that's not of type: Closing");
+        }
+        
+        // Nullify violations on case
+        if(cse.getViolationList() != null && !cse.getViolationList().isEmpty()){
+            for(CodeViolation cv: cse.getViolationList()){
+                violation_NullifyCodeViolation(cv, ua);
+            }
+        }
+        
+        cse.setClosingDate(LocalDateTime.now());
+        ci.updateCECaseMetadata(cse);
+        events_processClosingEvent(cse, ec.initEvent(cse, closeEventCat));
+        
     }
 
     /**
@@ -898,6 +945,51 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         return listRpt;
 
     }
+    
+    /**
+     * Prepares a report of municipal case activity for a given time period
+     * @param rpt the report config object with dates set for searching
+     * @param ua the user requesting the report
+     * @return the configured report
+     * @throws SearchException 
+     */
+    public ReportConfigCECaseList report_buildCECaseListReport(ReportConfigCECaseList rpt, UserAuthorized ua) throws SearchException{
+        SearchCoordinator sc = getSearchCoordinator();
+        if(rpt == null || ua == null){
+            return null;
+        }
+        
+        QueryCECase query_opened = sc.initQuery(QueryCECaseEnum.OPENED_30DAYS, ua.getKeyCard());
+        SearchParamsCECase spcse = query_opened.getPrimaryParams();
+        spcse.setDate_startEnd_ctl(true);
+        spcse.setDate_start_val(rpt.getDate_start_val());
+        spcse.setDate_end_val(rpt.getDate_end_val());
+        rpt.setCaseListOpened(sc.runQuery(query_opened).getBOBResultList());
+        
+        QueryCECase query_active = sc.initQuery(QueryCECaseEnum.OPENCASES, ua.getKeyCard());
+        spcse = query_active.getPrimaryParams();
+        spcse.setDate_startEnd_ctl(true);
+        spcse.setDate_start_val(rpt.getDate_start_val());
+        spcse.setDate_end_val(rpt.getDate_end_val());
+        rpt.setCaseListCurrent(sc.runQuery(query_active).getBOBResultList());
+        
+        QueryCECase query_closed = sc.initQuery(QueryCECaseEnum.CLOSED_30DAYS, ua.getKeyCard());
+        spcse = query_closed.getPrimaryParams();
+        spcse.setDate_startEnd_ctl(true);
+        spcse.setDate_start_val(rpt.getDate_start_val());
+        spcse.setDate_end_val(rpt.getDate_end_val());
+        rpt.setCaseListClosed(sc.runQuery(query_closed).getBOBResultList());
+        
+        QueryEvent query_ev = sc.initQuery(QueryEventEnum.MUNI_MONTHYACTIVITY, ua.getKeyCard());
+        SearchParamsEvent spev = query_ev.getPrimaryParams();
+        spev.setDate_startEnd_ctl(true);
+        spev.setDate_start_val(rpt.getDate_start_val());
+        spev.setDate_end_val(rpt.getDate_end_val());
+        rpt.setEventList(sc.runQuery(query_ev).getBOBResultList());
+        
+        return rpt;
+        
+    }
 
     /**
      * Primary configuration mechanism for customizing report data from the
@@ -1117,8 +1209,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         CasePhaseEnum closedPhase = CasePhaseEnum.Closed;
 //        c.setCasePhase(closedPhase);
 
-        c.setClosingDate(LocalDateTime.now());
-        cecase_updateCECaseMetadata(c);
+        if(c.getClosingDate() == null){
+            c.setClosingDate(LocalDateTime.now());
+            cecase_updateCECaseMetadata(c);
+        }
         // now load up the closing event before inserting it
         // we'll probably want to get this text from a resource file instead of
         // hardcoding it down here in the Java
@@ -1196,6 +1290,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
         nov.setViolationList(new ArrayList<CodeViolationDisplayable>());
         nov.setDateOfRecord(LocalDateTime.now());
+        nov.setBlocksBeforeViolations(new ArrayList<TextBlock>());
+        nov.setBlocksAfterViolations(new ArrayList<TextBlock>());
 
         try {
             nov.setStyle(si.getPrintStyle(mdh.getDefaultNOVStyleID()));
@@ -1264,6 +1360,24 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         noticeEvent.setPersonList(persList);
         evCoord.addEvent(noticeEvent, c, ua);
     }
+    
+    
+    /**
+     * Create a new text block skeleton with injectrable set to true
+     * @param muni
+     * @return 
+     */
+    public TextBlock nov_getTemplateBlockSekeleton(Municipality muni){
+        TextBlock tb = new TextBlock();
+        tb.setMuni(muni);
+        tb.setInjectableTemplate(true);
+        tb.setTextBlockCategoryID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString("nov_textblocktemplate_categoryid")));
+        tb.setTextBlockText("inject violations with: ***VIOLATIONS***");
+        
+        return tb;
+                
+    }
 
     /**
      * Called when the NOV is ready to get written to the DB --but before
@@ -1286,6 +1400,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      *
      * @param nov
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public void nov_update(NoticeOfViolation nov) throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
@@ -1314,7 +1429,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         CaseIntegrator ci = getCaseIntegrator();
         nov.setSentTS(LocalDateTime.now());
         nov.setSentBy(user);
-        ci.novUpdateNotice(nov);
+        ci.novRecordMailing(nov);
     }
 
     /**
@@ -1330,7 +1445,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         CaseIntegrator ci = getCaseIntegrator();
         nov.setReturnedTS(LocalDateTime.now());
         nov.setReturnedBy(user);
-        ci.novUpdateNotice(nov);
+        ci.novRecordReturnedNotice(nov);
     }
 
     /**
@@ -1370,6 +1485,70 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         ci.novUpdateHeaderImage(ps, blob);
         
     }
+      
+    /**
+     * Logic container for creating a NOV from a given template/category ID
+     * 
+     * @param nov
+     * @param categoryID 
+     * @return  with text blocks
+     * loaded up into before and after based on default sort order
+     * @throws com.tcvcog.tcvce.domain.IntegrationException  
+     */
+    public NoticeOfViolation nov_assembleNOVFromBlocks(NoticeOfViolation nov, int categoryID) throws IntegrationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        List<TextBlock> blockList = new ArrayList<>();
+        
+        
+        if(categoryID != 0){
+            blockList.addAll(ci.getTextBlocksByCategory(categoryID));
+        }
+        
+        if(!blockList.isEmpty()){
+            for(TextBlock tb: blockList){
+                if(tb.getPlacementOrder() < 0){
+                    nov.getBlocksBeforeViolations().add(tb);
+                    Collections.sort(nov.getBlocksBeforeViolations());
+                } else if (tb.getPlacementOrder() > 0){
+                    nov.getBlocksAfterViolations().add(tb);
+                    Collections.sort(nov.getBlocksAfterViolations());
+                }
+            }
+            
+        }
+        return nov;
+    }
+    
+    /**
+     * Tool for building an NOV from a template block
+     * @param nov
+     * @param temp
+     * @param cse
+     * @return
+     * @throws BObStatusException 
+     */
+    public NoticeOfViolation nov_assembleNOVFromTemplate(NoticeOfViolation nov, TextBlock temp, CECase cse) throws BObStatusException{
+        
+        CaseIntegrator ci = getCaseIntegrator();
+        if(nov == null || temp == null || cse ==null){
+            throw new BObStatusException("Cannot build a notice with null NOV, template or case");
+        }
+        
+        String template = temp.getTextBlockText();
+        int startOfInjectionPoint = template.indexOf(Constants.NOV_VIOLATIONS_INJECTION_POINT);
+        System.out.println("CaseCoor.nov_assembleNOVFromTemplate: Injection point found starts at: " + startOfInjectionPoint);
+        // If the injection point is not found, put the entire template block as text before Violations
+        if(startOfInjectionPoint != -1){
+            nov.setNoticeTextBeforeViolations(template.substring(0, startOfInjectionPoint));
+            nov.setNoticeTextAfterViolations(template.substring(startOfInjectionPoint + Constants.NOV_VIOLATIONS_INJECTION_POINT.length()));
+        } else {
+            nov.setNoticeTextBeforeViolations(template);
+        }
+        
+        
+        return nov;
+    }
+      
     /**
      * Updates only the notes field on Notice of Violation
      *
@@ -2028,6 +2207,32 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         cv.setActive(false);
         ci.updateCodeViolation(cv);
+
+    }
+    /**
+     * Attempts to deactivate a code violation, but will thow an Exception if
+     * the CodeViolation has been used in a notice or in a citation
+     *
+     * @param cv
+     * @param ua
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void violation_NullifyCodeViolation(CodeViolation cv, UserAuthorized ua) throws BObStatusException, IntegrationException {
+        CaseIntegrator ci = getCaseIntegrator();
+//
+//        if (cv.getCitationIDList() != null && !cv.getCitationIDList().isEmpty()) {
+//            throw new BObStatusException("Cannot deactivate a violation that has been used in a citation");
+//        }
+        // inject appropriate values into CV before updating
+        if(cv != null && ua != null){
+            // cannot nullify a violation for which compliance has been achieved
+            if(cv.getActualComplianceDate() != null){
+                cv.setNullifiedTS(LocalDateTime.now());
+                cv.setNullifiedUser(ua);
+                ci.updateCodeViolation(cv);
+            }
+        }
 
     }
 

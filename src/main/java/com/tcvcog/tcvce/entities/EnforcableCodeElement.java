@@ -24,7 +24,9 @@ import java.util.List;
  *  Represents a codesetelement stated with fidelity to the ERD
  * @author ellen bascomb of apt 31y
  */
-public class EnforcableCodeElement extends CodeElement implements Serializable, Cloneable {
+public class EnforcableCodeElement 
+        extends CodeElement 
+        implements Serializable, Cloneable {
 
     public EnforcableCodeElement() {
 
@@ -42,6 +44,9 @@ public class EnforcableCodeElement extends CodeElement implements Serializable, 
     private String daysToComplyNotes;
     private String muniSpecificNotes;
     private List<Fee> feeList;
+    private String defaultViolationDescription;
+    
+    private List<String> injectedValues;
 
     @Override
     public Object clone() throws CloneNotSupportedException {
@@ -185,6 +190,34 @@ public class EnforcableCodeElement extends CodeElement implements Serializable, 
 
     public void setFeeList(List<Fee> feeList) {
         this.feeList = feeList;
+    }
+
+    /**
+     * @return the injectedValues
+     */
+    public List<String> getInjectedValues() {
+        return injectedValues;
+    }
+
+    /**
+     * @param injectedValues the injectedValues to set
+     */
+    public void setInjectedValues(List<String> injectedValues) {
+        this.injectedValues = injectedValues;
+    }
+
+    /**
+     * @return the defaultViolationDescription
+     */
+    public String getDefaultViolationDescription() {
+        return defaultViolationDescription;
+    }
+
+    /**
+     * @param defaultViolationDescription the defaultViolationDescription to set
+     */
+    public void setDefaultViolationDescription(String defaultViolationDescription) {
+        this.defaultViolationDescription = defaultViolationDescription;
     }
 
 }

@@ -19,10 +19,13 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -40,6 +43,12 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
     public CodeCoordinator() {
     }
     
+    /**
+     * Main generator for a fully baked code source and all its elements
+     * @param sourceID
+     * @return
+     * @throws IntegrationException 
+     */
     public CodeSource retrieveCodeSourceByID(int sourceID) throws IntegrationException{
         CodeIntegrator integrator = getCodeIntegrator();
         
@@ -55,20 +64,73 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
+     * Primary factory method for CodeElement objects
+     * @return 
+     */
+    public CodeElement getCodeElementSkeleton(){
+        return new CodeElement();
+    }
+    
+    /**
+     * Primary getter for all code elements system-wide
+     * @param eleid
+     * @return
+     * @throws IntegrationException 
+     */
+    public CodeElement getCodeElement(int eleid) throws IntegrationException{
+        CodeIntegrator ci = getCodeIntegrator();
+        return ci.getCodeElement(eleid);
+    }
+    
+    
+    public void insertCodeElement(CodeElement ele, UserAuthorized ua){
+        
+        
+    }
+    public void updateCodeElement(CodeElement ele, UserAuthorized ua){
+        
+        
+    }
+    
+    
+    
+    public void deactivateCodeElement(CodeElement ele, UserAuthorized ua){
+        
+        
+        
+    }
+    
+    
+    public EnforcableCodeElement getEnforcableCodeElement(int eceID) throws IntegrationException{
+        CodeIntegrator ci = getCodeIntegrator();
+        return ci.getEnforcableCodeElement(eceID);
+        
+    }
+    
+    /**
      * Extracts a complete list of code sets from DB for configuration
      * @return
      * @throws IntegrationException 
      */
     public List<CodeSet> getCodeSetListComplete() throws IntegrationException{
         CodeIntegrator ci = getCodeIntegrator();
-        List<CodeSet> setList = new ArrayList<>();
-        
-        setList = ci.getCodeSets();
+        List<CodeSet> setList = ci.getCodeSets();
         return setList;
         
     }
     
-    public ArrayList<CodeSource> retrieveAllCodeSources() throws IntegrationException{
+    public CodeSource getCodeSource(int sourceID) throws IntegrationException{
+        CodeIntegrator ci = getCodeIntegrator();
+        return ci.getCodeSource(sourceID);
+        
+    }
+    
+    /**
+     * Primary getter for lists of CodeSource objects
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<CodeSource> getCodeSourceList() throws IntegrationException{
         CodeIntegrator integrator = getCodeIntegrator();
         ArrayList<CodeSource> sources = integrator.getCompleteCodeSourceList();
         return sources;
@@ -76,6 +138,17 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
     
     public void updateCodeSource(CodeSource source) throws IntegrationException{
         getCodeIntegrator().updateCodeSource(source);
+        
+    }
+    
+    /**
+     * Factory for CodeSource objects
+     * @param muni
+     * @return 
+     */
+    public CodeSource getCodeSourceSkeleton(Municipality muni){
+        
+        return new CodeSource();
         
     }
     
