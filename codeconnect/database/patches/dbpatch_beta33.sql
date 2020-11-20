@@ -99,7 +99,7 @@ CREATE TABLE public.parcelpersonrole
 
     ); 
 
-CREATE TABLE public.person
+CREATE TABLE public.personnorm
     (
         personid                INTEGER PRIMARY KEY DEFAULT nextval('person_personidseq'),
         name                    TEXT,
@@ -134,19 +134,22 @@ CREATE SEQUENCE IF NOT EXISTS contactphone_phoneid_seq
 CREATE TABLE public.contactphone
     (
         phoneid             INTEGER PRIMARY KEY DEFAULT nextval('contactphone_phoneid_seq'),
+        person_personid         INTEGER NOT NULL CONSTRAINT contactemail_personid_fk REFERENCES personnorm (personid),
         phonenumber         TEXT NOT NULL,
         phoneext            INTEGER,
-        createdts          TIMESTAMP WITH TIME ZONE,
-        created_userid     INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),
         disconnectts        TIMESTAMP WITH TIME ZONE,
         disconnect_userid       INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),    
+        createdts               TIMESTAMP WITH TIME ZONE,
+        createdby_userid        INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),     
+        lastupdatedts           TIMESTAMP WITH TIME ZONE,
+        lastupdatedby_userid    INTEGER CONSTRAINT person_lastupdatdby_userid_fk REFERENCES login (userid),
         deactivatedts           TIMESTAMP WITH TIME ZONE,
-        deactivatedby_userid    INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),     
+        deactivatedby_userid    INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),           
         notes               TEXT
     );
 
 
-CREATE SEQUENCE IF NOT EXISTS contactphone_emailid_seq
+CREATE SEQUENCE IF NOT EXISTS contactemail_emailid_seq
     START WITH 100
     INCREMENT BY 1
     MINVALUE 100
@@ -154,16 +157,18 @@ CREATE SEQUENCE IF NOT EXISTS contactphone_emailid_seq
     CACHE 1;
 
 
-CREATE TABLE public.contactphone
+CREATE TABLE public.contactemail
     (
-        emailid                 INTEGER PRIMARY KEY DEFAULT nextval('contactphone_emailid_seq'),
+        emailid                 INTEGER PRIMARY KEY DEFAULT nextval('contactemail_emailid_seq'),
+        person_personid         INTEGER NOT NULL CONSTRAINT contactemail_personid_fk REFERENCES personnorm (personid),
         emailaddress            TEXT NOT NULL,
         bouncets                TIMESTAMP WITH TIME ZONE,
-
         createdts               TIMESTAMP WITH TIME ZONE,
-        created_userid          INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),     
+        createdby_userid        INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),     
+        lastupdatedts           TIMESTAMP WITH TIME ZONE,
+        lastupdatedby_userid    INTEGER CONSTRAINT person_lastupdatdby_userid_fk REFERENCES login (userid),
         deactivatedts           TIMESTAMP WITH TIME ZONE,
-        deactivatedby_userid    INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),     
+        deactivatedby_userid    INTEGER CONSTRAINT person_deceasedby_userid_fk REFERENCES login (userid),           
         notes                   TEXT
     );
 
@@ -191,29 +196,86 @@ CREATE TABLE mailingaddress
         lastupdatedby_userid    INTEGER CONSTRAINT mailingaddress_lastupdated_userid REFERENCES login (userid),
         notes                   TEXT,
         verifiedts              TIMESTAMP WITH TIME ZONE,
+        createdts               TIMESTAMP WITH TIME ZONE,
+        createdby_userid        INTEGER CONSTRAINT createdby_XXX_userid_fk REFERENCES login (userid),     
+        lastupdatedts           TIMESTAMP WITH TIME ZONE,
+        lastupdatedby_userid    INTEGER CONSTRAINT lastupdatedby_XXX_userid_fk REFERENCES login (userid),
         deactivatedts           TIMESTAMP WITH TIME ZONE,
-        deactivatedby_userid    INTEGER CONSTRAINT mailingaddress_lastupdated_userid REFERENCES login (userid),
+        deactivatedby_userid    INTEGER CONSTRAINT deactivatedby_XXX_userid_fk REFERENCES login (userid),           
 
     );
 
 
 
-CREATE TABLE mailingaddressperson
-FK to mailingaddress
-FK to person
-associationrole
-creationts
-
-CREATE TABLE mailingaddressparcel
-FK to parcel
-FK to mailingaddress
-creationts
+CREATE TABLE public.personmailingaddress
+    (
+        personmailing_personid          INTEGER CONSTRAINT personmailing_personid_fk REFERENCES person (personid),
+        personmailing_addressid         INTEGER CONSTRAINT personmailing_addressid_fk REFERENCES address (addressid),
+        createdts                       TIMESTAMP WITH TIME ZONE,
+        createdby_userid                INTEGER CONSTRAINT createdby_XXX_userid_fk REFERENCES login (userid),     
+        deactivatedts                   TIMESTAMP WITH TIME ZONE,
+        deactivatedby_userid            INTEGER CONSTRAINT deactivatedby_XXX_userid_fk REFERENCES login (userid),           
 
 
-CREATE TABLE parcelunit;
+    );
+
+CREATE SEQUENCE IF NOT EXISTS personmailing_roleid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE public.personmailingrole
+    (
+        roleid              INTEGER PRIMARY KEY DEFAULT nextval('personmailing_roleid_seq'),
+        title               TEXT NOT NULL,
+        createdts          TIMESTAMP WITH TIME ZONE,
+        description         TEXT,
+        muni_municode       INTEGER CONSTRAINT personmailing_municode_fk REFERENCES municipality (municode),
+        deactivatedts       TIMESTAMP WITH TIME ZONE,
+        notes
+
+    ); 
+
+
+CREATE TABLE public.mailingaddressparcel
+    (
+        mailingparcel_parcelid      INTEGER CONSTRAINT mailingparcel_parcelid_fk REFERENCES parcel (parcelkey),
+        mailingparcel_mailingid     INTEGER CONSTRAINT mailingparcel_mailingid_fk REFERENCES mailingaddress (addressid),
+        createdts                   TIMESTAMP WITH TIME ZONE,
+        deactivatedts               TIMESTAMP WITH TIME ZONE,
+        notes                       TEXT
+
+    );
+
+
+CREATE TABLE parcelunit
+    (
+          unitid integer NOT NULL DEFAULT nextval('propertunit_unitid_seq'::regclass),
+          unitnumber text,
+          parcel_parcelkey          INTEGER NOT NULL CONSTRAINT parcelunit_parcelkey_fk REFERENCES parcel (parcelkey),
+          notes text,
+          rentalintentdatestart timestamp with time zone,
+          rentalintentdatestop timestamp with time zone,
+          rentalintentlastupdatedby_userid integer,
+          rentalnotes text,
+          condition_intensityclassid integer,
+          lastupdatedts timestamp with time zone,
+          rental boolean,
+          CONSTRAINT unitid_pk PRIMARY KEY (unitid),
+          CONSTRAINT propunit_conditionintensityclass_classid_fk FOREIGN KEY (condition_intensityclassid)
+              REFERENCES public.intensityclass (classid) MATCH SIMPLE
+              ON UPDATE NO ACTION ON DELETE NO ACTION,
+          CONSTRAINT propunit_rentalintentupdatedby_fk FOREIGN KEY (rentalintentlastupdatedby_userid)
+              REFERENCES public.eventrule (ruleid) MATCH SIMPLE
+              ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+    );
+
 FK parcel
 unitno
-intenttorent
+intenttorent 
 --TODO: The field Use Code can contain APART:x-y UNITS
 
 

@@ -70,6 +70,9 @@ public class NoticeOfViolation  implements Serializable, Comparable<NoticeOfViol
     private boolean useSignatureImage;
     private boolean includeViolationPhotoAttachment;
     
+    private int followupEventDaysRequest;
+    private EventCnF followupEvent;
+    
     private boolean active;
     
 
@@ -518,6 +521,34 @@ public class NoticeOfViolation  implements Serializable, Comparable<NoticeOfViol
      */
     public void setInjectViolations(boolean injectViolations) {
         this.injectViolations = injectViolations;
+    }
+
+    /**
+     * @return the followupEvent
+     */
+    public EventCnF getFollowupEvent() {
+        return followupEvent;
+    }
+
+    /**
+     * @param followupEvent the followupEvent to set
+     */
+    public void setFollowupEvent(EventCnF followupEvent) {
+        this.followupEvent = followupEvent;
+    }
+
+    /**
+     * @return the followupEventDaysRequest
+     */
+    public int getFollowupEventDaysRequest() {
+        return followupEventDaysRequest;
+    }
+
+    /**
+     * @param followupEventDaysRequest the followupEventDaysRequest to set
+     */
+    public void setFollowupEventDaysRequest(int followupEventDaysRequest) {
+        this.followupEventDaysRequest = followupEventDaysRequest;
     }
 
    

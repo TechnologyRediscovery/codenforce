@@ -78,6 +78,7 @@ public class CECaseSearchProfileBB
     private boolean currentCaseSelected;
 
     private NoticeOfViolation currentNotice;
+    private int formNOVFollowupDays;
     private List<CECasePropertyUnitHeavy> caseList;
     private List<CECasePropertyUnitHeavy> filteredCaseList;
     
@@ -183,6 +184,12 @@ public class CECaseSearchProfileBB
             setCurrentMode(getSessionBean().getCeCaseSearchProfilePageModeRequest());
         } 
         setCurrentMode(pageModes.get(0));
+     
+        // NOV
+        formNOVFollowupDays = getSessionBean().getSessMuni().getProfile().getNovDefaultDaysForFollowup();
+        if(formNOVFollowupDays == 0){
+            formNOVFollowupDays = 20;
+        }
         
     }
 
@@ -517,7 +524,7 @@ public class CECaseSearchProfileBB
     
     public void markNoticeOfViolationAsSent(NoticeOfViolation nov) {
         CaseCoordinator caseCoord = getCaseCoordinator();
-        
+        currentNotice = nov;
         try {
             caseCoord.nov_markAsSent(currentCase, nov, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
@@ -536,6 +543,7 @@ public class CECaseSearchProfileBB
                             "Note that because this message is being displayed, the phase change"
                             + "has probably succeeded"));
         }
+        nov_createFollowupEvent(); 
 
     }
     
@@ -654,6 +662,32 @@ public class CECaseSearchProfileBB
         
         return "ceCaseNotices";
         
+    }
+    
+    public void onNOVFollowupEventCreateButtonPush(ActionEvent ev){
+        nov_createFollowupEvent();
+    }
+    
+    
+    public void nov_createFollowupEvent(){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            EventCnF even = cc.nov_createFollowupEvent(currentCase, currentNotice, getSessionBean().getSessUser());
+            if(even != null){
+                
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Successfully created follow-up event ID " + even.getEventID() + " on " + getPrettyDate(even.getTimeStart()), ""));
+            }
+        } catch (BObStatusException | EventException | IntegrationException ex) {
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to generate follow-up event due to an object status, event, or integration error", ""));
+        } 
+        
+        
+        
+    
     }
     
     public String onCitationViewButtonChange(Citation cit){
@@ -1201,6 +1235,20 @@ public class CECaseSearchProfileBB
      */
     public void setCurrentNotice(NoticeOfViolation currentNotice) {
         this.currentNotice = currentNotice;
+    }
+
+    /**
+     * @return the formNOVFollowupDays
+     */
+    public int getFormNOVFollowupDays() {
+        return formNOVFollowupDays;
+    }
+
+    /**
+     * @param formNOVFollowupDays the formNOVFollowupDays to set
+     */
+    public void setFormNOVFollowupDays(int formNOVFollowupDays) {
+        this.formNOVFollowupDays = formNOVFollowupDays;
     }
 
 }

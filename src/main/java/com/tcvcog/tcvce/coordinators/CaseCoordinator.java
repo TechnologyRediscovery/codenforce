@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportCEARList;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
@@ -1517,6 +1518,36 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             
         }
         return nov;
+    }
+    
+    
+    /**
+     * Connects with the EventCoordinator to create a follow-up event for NOVs
+     * @param cse
+     * @param nov
+     * @param ua
+     * @return the generated event
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.EventException
+     */
+    public EventCnF nov_createFollowupEvent(CECase cse, NoticeOfViolation nov, UserAuthorized ua) throws BObStatusException, IntegrationException, EventException{
+        if(cse == null || nov == null || ua ==null){
+            throw new BObStatusException("Cannot create followup event for NOV with null Case, NOV, or User");
+        }
+        
+        EventCoordinator ec = getEventCoordinator();
+        EventCategory cat = ec.getEventCategory(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString("nov_followupeventcatid")));
+        EventCnF fuev = ec.initEvent((IFace_EventRuleGoverned) cse,cat );
+        
+        fuev.setUserCreator(ua);
+        fuev.setTimeStart(LocalDateTime.now().plusDays(nov.getFollowupEventDaysRequest()));
+        fuev.setTimeEnd(fuev.getTimeStart().minusMinutes(cat.getDefaultdurationmins()));
+        
+        List<EventCnF> evlist = ec.addEvent(fuev, (IFace_EventRuleGoverned) cse, ua);
+        return evlist.get(0);
+        
     }
     
     /**

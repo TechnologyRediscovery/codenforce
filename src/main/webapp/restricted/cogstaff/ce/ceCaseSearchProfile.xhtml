@@ -993,6 +993,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             update="novstatus-dialog 
                                                                     cecase-notices-form
                                                                     messages-global-form"
+                                                                    oncomplete=""
                                                             disabled="#{!(empty nov.sentTS) or (empty nov.lockedAndqueuedTS) }"
                                                          />
                                                     </p:column>
@@ -2004,6 +2005,49 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         </h:form>
                     </p:dialog>
 
+
+
+                    <p:dialog     id="cecase-novfollowup-dialog"
+                                  header="Create follow-up event" 
+                                  widgetVar="cecase-novfollowup-dialog-var" 
+                                  responsive="true" 
+                                  width="300"
+                                  modal="true"
+                                  height="250">
+                        <h:form id="cecase-novfollowup-form">
+                            
+                             <p:inputNumber id="nov-followup-days-innum" 
+                                            value="#{ceCaseSearchProfileBB.formNOVFollowupDays}" 
+                                            symbol="%" 
+                                            symbolPosition="s" required="true" emptyValue="empty">
+                                <p:ajax update="output5" />  
+                            </p:inputNumber>
+                            
+                            
+                            
+                            
+                             <p:commandButton    id="cecase-novfollowup-cancel"
+                                                        ajax="true"  tabindex="27"
+                                                        value="Cancel"
+                                                        icon="fa fa-stop"
+                                                        immediate="true"
+                                                        process="@none"
+                                                        onclick="PF('cecase-novfollowup-dialog-var').hide()"
+                                                        />
+                             
+                            <p:commandButton    id="cecase-novfollowup-submit"
+                                                ajax="true"
+                                                styleClass="noFill button-size-small"
+                                                actionListener="#{ceCaseSearchProfileBB.onNOVFollowupEventCreateButtonPush}"
+                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                oncomplete="PF('cecase-novfollowup-dialog-var').hide()"
+                                                icon="fa fa-calendar"
+                                                update="cecase-todos-form
+                                                messages-global-form"/>
+                            
+                        </h:form>
+                        
+                    </p:dialog>
 
 
                     <p:dialog     id="cecase-search-advanced-dialog"

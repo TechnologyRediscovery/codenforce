@@ -188,7 +188,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         Connection con = null;
         // note that muniCode is not returned in this query since it is specified in the WHERE
         String query =  "SELECT profileid, title, description, lastupdatedts, lastupdatedby_userid, \n" +
-                        "       notes, continuousoccupancybufferdays, minimumuserranktodeclarerentalintent\n" +
+                        "       notes, continuousoccupancybufferdays, minimumuserranktodeclarerentalintent, novfollowupdefaultdays \n" +
                         "  FROM public.muniprofile WHERE profileid=?;";
         ResultSet rs = null;
  
@@ -229,6 +229,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         mp.setNotes(rs.getString("notes"));
         mp.setContinuousoccupancybufferdays(rs.getInt("continuousoccupancybufferdays"));
         mp.setMinimumuserranktodeclarerentalintent(rs.getInt("minimumuserranktodeclarerentalintent"));
+        mp.setNovDefaultDaysForFollowup(rs.getInt("novfollowupdefaultdays"));
         
         mp.setEventRuleSetCE(wi.rules_getEventRuleSet(rs.getInt("profileid")));
         mp.setOccPeriodTypeList(oi.getOccPeriodTypeList(rs.getInt("profileid")));
@@ -450,9 +451,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     //xiaohong add
     public ArrayList<MuniProfile> getMuniProfileList() throws IntegrationException {
 
-        String query = "SELECT profileid, title, description, lastupdatedts, lastupdatedby_userid, \n"
-                + "       notes, continuousoccupancybufferdays, minimumuserranktodeclarerentalintent\n"
-                + "  FROM public.muniprofile;";
+        String query = "SELECT profileid FROM public.muniprofile;";
 
         Connection con = null;
         PreparedStatement stmt = null;
@@ -465,7 +464,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt = con.prepareStatement(query);
             rs = stmt.executeQuery();
             while (rs.next()) {
-                muniProfile = generateMuniProfile(rs);
+                muniProfile = getMuniProfile(rs.getInt("profileid"));
+                
                 if (muniProfile != null) {
                     muniProfileList.add(muniProfile);
                 }

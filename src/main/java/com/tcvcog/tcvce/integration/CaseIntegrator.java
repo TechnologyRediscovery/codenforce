@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
@@ -1777,7 +1778,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         String query =  "SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
                         "       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
                         "       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
-                        "       returnedby, notes, creationby, printstyle_styleid, active \n" +
+                        "       returnedby, notes, creationby, printstyle_styleid, active, followupevent_eventid \n" +
                         "  FROM public.noticeofviolation WHERE noticeid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -1894,7 +1895,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         PersonIntegrator pi = getPersonIntegrator();
         UserIntegrator ui = getUserIntegrator();
         SystemIntegrator si = getSystemIntegrator();
-        
+        EventCoordinator ec = getEventCoordinator();
         
         // the magical moment of notice instantiation
         NoticeOfViolation notice = new NoticeOfViolation();
@@ -1928,6 +1929,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         notice.setStyle(si.getPrintStyle(rs.getInt("printstyle_styleid")));
         
         notice.setNotes(rs.getString("notes"));
+        if(rs.getInt("followupevent_eventid") != 0){
+            notice.setFollowupEvent(ec.getEvent(rs.getInt("followupevent_eventid")));
+        }
         
         notice.setActive(rs.getBoolean("active"));
 
