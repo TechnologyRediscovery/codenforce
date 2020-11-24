@@ -694,7 +694,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         UserCoordinator uc = getUserCoordinator();
         CECase newCase = new CECase();
 
-        int casePCC = generateControlCodeFromTime(p.getMuni().getMuniCode());
+        // removed inputted muni here
+        int casePCC = generateControlCodeFromTime(0);
         // caseID set by postgres sequence
         // timestamp set by postgres
         // no closing date, by design of case flow
@@ -802,6 +803,21 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         ec.addEvent(originationEvent, cedh, ua);
         
         return freshID;
+    }
+    
+    /**
+     * Checks for violation status and closes case
+     * @param cse
+     * @param ua 
+     */
+    public void cecase_closeCase(CECase cse, UserAuthorized ua) throws BObStatusException{
+        
+        if(cse == null || ua == null){
+            throw new BObStatusException("Cannot close a case with null Case or User");
+        }
+        
+        
+        
     }
 
     private String cecase_generateCaseInitNoteFromCEAR(CEActionRequest cear) {
@@ -1891,11 +1907,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * closed and a case closing event is generated and added to the case
      *
      * @param c the case whose violations should be checked for compliance
+     * @param ua
      * @throws IntegrationException
      * @throws BObStatusException
      * @throws ViolationException
      */
-    private void violation_checkForFullComplianceAndCloseCaseIfTriggered(CECaseDataHeavy c, UserAuthorized ua)
+    public void violation_checkForFullComplianceAndCloseCaseIfTriggered(CECaseDataHeavy c, UserAuthorized ua)
             throws IntegrationException, BObStatusException, ViolationException, EventException {
 
         EventCoordinator ec = getEventCoordinator();
@@ -2317,11 +2334,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * CodeViolation should have the actual compliance date set from the user's
      * event date of record
      *
+     * @param cse
      * @param cv
      * @param u
      * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.ViolationException
+     * @throws com.tcvcog.tcvce.domain.EventException
      */
-    public void violation_recordCompliance(CodeViolation cv, UserAuthorized u) throws IntegrationException {
+    public void violation_recordCompliance(CECaseDataHeavy cse, CodeViolation cv, UserAuthorized u) 
+            throws IntegrationException, BObStatusException, ViolationException, EventException {
 
         CaseIntegrator ci = getCaseIntegrator();
 
@@ -2330,6 +2352,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         cv.setLastUpdatedUser(u);
 
         ci.updateCodeViolationCompliance(cv);
+        violation_checkForFullComplianceAndCloseCaseIfTriggered(cse, u);
     }
 
     public List<CodeViolation> violation_getCodeViolations(List<Integer> cvIDList) throws IntegrationException{

@@ -384,7 +384,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             EventCnF e = null;
             try {
                 
-                cc.violation_recordCompliance(currentViolation, getSessionBean().getSessUser());
+//                cc.violation_recordCompliance(currentViolation, getSessionBean().getSessUser());
                    getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Compliance recorded", ""));

@@ -242,7 +242,7 @@ public class        BackingBeanUtils
             String numAsString = String.valueOf(dateInMs);
             String reducedNum = numAsString.substring(7);
             //attach Municode to this number
-            reducedNum = reducedNum + muniCode;
+            
             controlCode = Integer.parseInt(reducedNum);
 
             //Let's make sure this PACC doesn't already exist in the database!
