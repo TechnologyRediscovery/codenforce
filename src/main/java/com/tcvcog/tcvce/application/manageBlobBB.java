@@ -100,8 +100,10 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             BlobIntegrator bi = getBlobIntegrator();
             blobList = new ArrayList<>();
             List<Integer> blobIDs = bi.getRecentPhotoBlobs();
+            
+            BlobCoordinator bc = getBlobCoordinator();
             for (int idnum : blobIDs) {
-                blobList.add(bi.getPhotoBlobLight(idnum));
+                blobList.add(bc.getPhotoBlobLight(idnum));
             }
             
         } catch (IntegrationException | ClassNotFoundException | IOException ex) {

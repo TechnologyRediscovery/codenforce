@@ -34,7 +34,6 @@ import com.tcvcog.tcvce.entities.MetadataKey;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
@@ -46,9 +45,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -113,7 +110,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             //Get the blob ID from the Faces context
             int blobID = Integer.parseInt(context.getExternalContext().getRequestParameterMap().get("blobID"));
             try {
-                BlobLight blob = bi.getPhotoBlobLight(blobID);
+                BlobLight blob = getPhotoBlobLight(blobID);
                 if (null == blob.getType()) {
                     throw new BlobTypeException("BlobType is null.");
                 } else {
@@ -216,7 +213,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         BlobIntegrator bi = getBlobIntegrator();
         
-        BlobLight originalBlob = bi.getPhotoBlobLight(blob.getBlobID());
+        BlobLight originalBlob = getPhotoBlobLight(blob.getBlobID());
         
         String newExtension = getFileExtension(blob.getFilename());
         
@@ -234,13 +231,82 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     public Blob getPhotoBlob(int blobID) throws IntegrationException, IOException, ClassNotFoundException {
         BlobIntegrator bi = getBlobIntegrator();
 
-        Blob blob = new Blob(bi.getPhotoBlobLight(blobID));
+        Blob blob = new Blob(getPhotoBlobLight(blobID));
 
         blob.setBytes(bi.getBlobBytes(blobID));
 
         return blob;
     }
+    
+    /**
+     * Uses an existing BlobLight to make a blob by only grabbing the bytes
+     * and attaching them.
+     * @param input
+     * @return
+     * @throws IntegrationException
+     * @throws IOException
+     * @throws ClassNotFoundException 
+     */
+    public Blob getPhotoBlob(BlobLight input) throws IntegrationException, IOException, ClassNotFoundException {
+        BlobIntegrator bi = getBlobIntegrator();
 
+        Blob blob = new Blob(input);
+
+        blob.setBytes(bi.getBlobBytes(input.getBytesID()));
+
+        return blob;
+    }
+
+    /**
+     * A method for grabbing PhotoBlobLights that's safe:
+     * if it encounters an entry that does not yet have a properly
+     * populated metadata column, it strips the metadata and saves it
+     * before returning the blob.
+     * @param blobID
+     * @return
+     * @throws IntegrationException
+     * @throws IOException
+     * @throws ClassNotFoundException 
+     */
+    public BlobLight getPhotoBlobLight(int blobID) throws IntegrationException, IOException, ClassNotFoundException{
+        
+        BlobIntegrator bi = getBlobIntegrator();
+        
+        try {
+        return bi.getPhotoBlobLight(blobID);
+        } catch(BlobException ex) {
+            //The metadata column isn't properly populated.
+            //We'll grab the bytes, strip the metadata from them
+            //And save them in the metadata column before fetching
+            //The blob and returning it.
+            
+            //time to operate
+            //grab the BlobLight without metadata so we don't get the same error
+            Blob patient = getPhotoBlob(bi.getPhotoBlobLightWithoutMetadata(blobID));
+            
+            patient = stripImageMetadata(patient);
+            
+            //Should be all ready, let's update the bytes and the metadata
+            
+            bi.updateBlobBytes(patient);
+            
+            bi.updateBlobMetadata(patient);
+            
+        }
+        
+        /*
+            We are now clear to return the photo.
+        
+            NOTE TO FUTURE DEBUGGERS:
+            This is a recursive function and
+            you will get stuck in an infinite loop if
+            BlobIntegrator.getPhotoBlobLight()
+            throws a BlobException for reasons that the
+            catch block above can't fix.
+        */
+        return getPhotoBlobLight(blobID);
+    }
+    
     public void deletePhotoBlob(BlobLight blob) 
             throws IntegrationException, 
             EventException, 
@@ -479,11 +545,11 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         //For GIGO and optimization purposes, throw out the filename and description
         //if they don't contain non-whitespace
-        if(!filename.matches("\\S")){
+        if(!filename.matches(".*\\S.*")){
             filename = null;
         }
         
-        if(!description.matches("\\S")){
+        if(!description.matches(".*\\S.*")){
             description = null;
         }
         
@@ -497,7 +563,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         List<BlobLight> blobList = new ArrayList<>();
         
         for(Integer id : idList){
-            blobList.add(bi.getPhotoBlobLight(id));
+            blobList.add(getPhotoBlobLight(id));
         }
         
         //No "getPDFBlob()" method!

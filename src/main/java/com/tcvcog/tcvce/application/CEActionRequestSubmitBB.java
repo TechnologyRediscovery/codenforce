@@ -30,7 +30,6 @@ import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.BlobType;
 import java.util.Date;
 import java.io.Serializable;
 import org.primefaces.component.tabview.TabView;
@@ -104,7 +103,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     private java.util.Date currentDate;
 
     private List<Blob> blobList;
-    //private Photograph selectedPhoto;
+    private String blobDescription;
+    private int descriptionBlobID;
 
     /**
      * Creates a new instance of ActionRequestBean
@@ -129,9 +129,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             initializeReqAndMuni();
 
         }
-        
+
         submittingPersonTypes = new ArrayList<>();
-        
+
         //Manually add what person types we want.
         submittingPersonTypes.add(PersonType.MuniStaff);
         submittingPersonTypes.add(PersonType.Owner);
@@ -139,7 +139,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         submittingPersonTypes.add(PersonType.Manager);
         submittingPersonTypes.add(PersonType.Public);
         submittingPersonTypes.add(PersonType.LawEnforcement);
-        
+
     }
 
     public void initializeReqAndMuni() {
@@ -206,10 +206,10 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             System.out.println("CEActionRequestSubmitBB.goBack() | ERROR: " + ex);
             //We must do things a little bit different here to make sure messages are kept after the redirect.
             FacesContext context = getFacesContext();
-                    context.addMessage(null,
+            context.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Something went wrong when we tried to direct you back a page!", ""));
-                    context.getExternalContext().getFlash().setKeepMessages(true);
+            context.getExternalContext().getFlash().setKeepMessages(true);
             return "requestCEActionFlow";
         }
     }
@@ -320,6 +320,12 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
     }
 
+    /**
+     * Not only goes to the next page without connecting photos to the CEAR,
+     * deletes all blobs the user has uploaded.
+     *
+     * @return
+     */
     public String skipPhotoUpload() {
         BlobCoordinator blobc = getBlobCoordinator();
 
@@ -328,16 +334,16 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             for (Blob b : blobList) {
                 try {
                     blobc.deletePhotoBlob(b);
-                } catch (IntegrationException 
-                        | AuthorizationException 
-                        | BObStatusException 
-                        | BlobException 
-                        | EventException 
+                } catch (IntegrationException
+                        | AuthorizationException
+                        | BObStatusException
+                        | BlobException
+                        | EventException
                         | ViolationException ex) {
                     System.out.println(ex);
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "An error occured while skipping photo blob.", ""));
+                                    "An error occured while skipping photo upload.", ""));
                 }
             }
 
@@ -376,16 +382,17 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     }
 
     /**
-     * Going back after uploading photos can cause photos to remain unlinked to 
+     * Going back after uploading photos can cause photos to remain unlinked to
      * an object and slip through the cracks, so we'll save their connections.
      * The user can always delete them later.
-     * @return 
+     *
+     * @return
      */
     public String goBackFromPhotos() {
         try {
             //Just use the uploading 
             savePhotosAndContinue();
-            
+
             return getSessionBean().getNavStack().popLastPage();
         } catch (NavigationException ex) {
             System.out.println("CEActionRequestSubmitBB.goBackFromPhotos() | ERROR: " + ex);
@@ -398,7 +405,32 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             return "requestCEActionFlow";
         }
     }
-    
+
+    /**
+     * Deletes one photo the user selects.
+     *
+     * @param input
+     */
+    public void deletePhoto(Blob input) {
+        BlobCoordinator blobc = getBlobCoordinator();
+        try {
+            blobc.deletePhotoBlob(input);
+        } catch (IntegrationException
+                | AuthorizationException
+                | BObStatusException
+                | BlobException
+                | EventException
+                | ViolationException ex) {
+            System.out.println("CEActionRequestSubmitBB.deletePhoto() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occured while trying to delete the selected photo.", ""));
+        }
+
+        currentRequest.getBlobIDList().remove(new Integer(input.getBlobID()));
+        blobList.remove(input);
+    }
+
     private void setupPersonEntry() {
         UserCoordinator uc = getUserCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
@@ -424,30 +456,30 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
         System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | File: " + ev.getFile().getFileName() + " Type: " + ev.getFile().getContentType());
 
-            BlobCoordinator blobc = getBlobCoordinator();
-            Blob blob = null;
-            try {
-                blob = blobc.getNewBlob();  //init new blob
-                blob.setBytes(ev.getFile().getContents());  // set bytes
-                blob.setFilename(ev.getFile().getFileName());
-                blob.setMunicode(currentRequest.getMuni().getMuniCode());
-                
-                blob = blobc.storeBlob(blob);
-            } catch (IntegrationException | IOException ex) {
-                System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
-                getFacesContext().addMessage(null,
+        BlobCoordinator blobc = getBlobCoordinator();
+        Blob blob = null;
+        try {
+            blob = blobc.getNewBlob();  //init new blob
+            blob.setBytes(ev.getFile().getContents());  // set bytes
+            blob.setFilename(ev.getFile().getFileName());
+            blob.setMunicode(currentRequest.getMuni().getMuniCode());
+
+            blob = blobc.storeBlob(blob);
+        } catch (IntegrationException | IOException ex) {
+            System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
+            getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Something went wrong while trying to upload your photo,please try again.",
                             "If this problem persists, please call your municipal office."));
-            } catch(BlobException ex){
-                System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
-                getFacesContext().addMessage(null,
+        } catch (BlobException ex) {
+            System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
+            getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(),
                             ""));
-            }
+        }
 
-            blobList.add(blob);
+        blobList.add(blob);
     }
 
     /**
@@ -548,10 +580,10 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             for (Blob b : blobList) {
                 try {
                     bc.deletePhotoBlob(b);
-                } catch (IntegrationException 
+                } catch (IntegrationException
                         | AuthorizationException
                         | BObStatusException
-                        | BlobException 
+                        | BlobException
                         | EventException
                         | ViolationException ex) {
                     System.out.println("CEActionRequestSubmitBB.restartRequest | ERROR: " + ex.toString());
@@ -936,6 +968,22 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
     public void setIssueTypeList(List<CEActionRequestIssueType> issueTypeList) {
         this.issueTypeList = issueTypeList;
+    }
+
+    public String getBlobDescription() {
+        return blobDescription;
+    }
+
+    public void setBlobDescription(String blobDescription) {
+        this.blobDescription = blobDescription;
+    }
+
+    public int getDescriptionBlobID() {
+        return descriptionBlobID;
+    }
+
+    public void setDescriptionBlobID(int descriptionBlobID) {
+        this.descriptionBlobID = descriptionBlobID;
     }
 
 }

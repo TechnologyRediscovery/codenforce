@@ -23,16 +23,12 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
-import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.MuniProfile;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
@@ -40,11 +36,7 @@ import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -83,13 +75,7 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
 
     public Municipality getMuni(int muniCode) throws IntegrationException {
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        try {
-            return mi.getMuni(muniCode);
-        } catch (SQLException ex) {
-            System.out.println(ex);
-        }
-
-        return null;
+        return mi.getMuni(muniCode);
 
     }
 

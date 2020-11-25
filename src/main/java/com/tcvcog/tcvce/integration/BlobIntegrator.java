@@ -35,6 +35,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -48,14 +49,16 @@ import java.util.Map;
 public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     
     /**
-     * 
+     * This method should only be used by the BlobCoordinator.
+     * If you need to grab a Blob anywhere else
      * @param blobID the blobID of the meta to be retrieved from db
      * @return the meta pulled from the db
      * @throws IntegrationException thrown instead of SCLException
      * @throws java.io.IOException
      * @throws java.lang.ClassNotFoundException
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
-    public BlobLight getPhotoBlobLight(int blobID) throws IntegrationException, IOException, ClassNotFoundException{
+    public BlobLight getPhotoBlobLight(int blobID) throws IntegrationException, IOException, ClassNotFoundException, BlobException{
         BlobLight blob = null;
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -89,18 +92,82 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public BlobLight generatePhotoBlobLight(ResultSet rs) throws SQLException, IOException, ClassNotFoundException{
+    /**
+     * Only used by the BlobCoordinator to get blobs with broken metadata.
+     * @param blobID the blobID of the meta to be retrieved from db
+     * @return the meta pulled from the db
+     * @throws IntegrationException thrown instead of SCLException
+     * @throws java.io.IOException
+     * @throws java.lang.ClassNotFoundException
+     * @throws com.tcvcog.tcvce.domain.BlobException
+     */
+    public BlobLight getPhotoBlobLightWithoutMetadata(int blobID) throws IntegrationException, IOException, ClassNotFoundException {
+        BlobLight blob = null;
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT photodocid, photodocdescription, photodoccommitted, blobbytes_bytesid, muni_municode, \n"
+                + "uploaddate, blobtype_typeid, uploadpersonid, filename\n"
+                + "FROM public.photodoc LEFT JOIN blobbytes on blobbytes_bytesid = bytesid\n"
+                + "WHERE photodocid = ?;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, blobID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                System.out.println("BlobIntegrator.getBlob: | retrieving blobID "  + blobID);
+                blob = generatePhotoBlobLightWithoutMetadata(rs);
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving blob. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return blob;
+        
+    }
+    
+    private BlobLight generatePhotoBlobLight(ResultSet rs) throws SQLException, IOException, ClassNotFoundException, BlobException{
         BlobLight blob = new BlobLight();
         blob.setBlobID(rs.getInt("photodocid"));
         blob.setBytesID(rs.getInt("blobbytes_bytesid"));
         blob.setDescription(rs.getString("photodocdescription"));
-        blob.setTimestamp(rs.getTimestamp("uploaddate").toLocalDateTime());
+        
+        Timestamp time = rs.getTimestamp("uploaddate");
+        if(time != null){
+            blob.setTimestamp(time.toLocalDateTime());
+        }
         blob.setType(BlobType.blobTypeFromInt(rs.getInt("blobtype_typeid")));
         blob.setFilename(rs.getString("filename"));
         blob.setUploadPersonID(rs.getInt("uploadpersonid"));
         blob.setMunicode(rs.getInt("muni_municode"));
         
         blob.setBlobMetadata(generateBlobMetadata(rs));
+        return blob;
+    }
+    
+     private BlobLight generatePhotoBlobLightWithoutMetadata(ResultSet rs) throws SQLException, IOException, ClassNotFoundException {
+        BlobLight blob = new BlobLight();
+        blob.setBlobID(rs.getInt("photodocid"));
+        blob.setBytesID(rs.getInt("blobbytes_bytesid"));
+        blob.setDescription(rs.getString("photodocdescription"));
+        Timestamp time = rs.getTimestamp("uploaddate");
+        if(time != null){
+            blob.setTimestamp(time.toLocalDateTime());
+        }
+        blob.setType(BlobType.blobTypeFromInt(rs.getInt("blobtype_typeid")));
+        blob.setFilename(rs.getString("filename"));
+        blob.setUploadPersonID(rs.getInt("uploadpersonid"));
+        blob.setMunicode(rs.getInt("muni_municode"));
+        
         return blob;
     }
     
@@ -142,7 +209,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
     } 
     
-    public Metadata generateBlobMetadata(ResultSet rs) throws SQLException, IOException, ClassNotFoundException{
+    public Metadata generateBlobMetadata(ResultSet rs) throws SQLException, IOException, ClassNotFoundException, BlobException{
         Metadata meta = new Metadata();
         meta.setBytesID(rs.getInt("blobbytes_bytesid"));
         meta.setType(BlobType.blobTypeFromInt(rs.getInt("blobtype_typeid")));
@@ -151,9 +218,18 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
         byte[] mapBytes = rs.getBytes("metadatamap");
         
+        try {
         ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(mapBytes));
         
         meta.replaceDataMap((Map<MetadataKey, String>) in.readObject());
+        
+        } catch (NullPointerException ex){
+            throw new BlobException("The metadata column of blobbytes_bytesid = " 
+                                    + meta.getBytesID() + " is null. It is recommended "
+                                    + "to strip the metadata of the image and "
+                                    + "populate the column before fetching it again");
+            
+        }
         
         return meta;
     }
@@ -435,6 +511,41 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setString(1, blob.getFilename());
             stmt.setBytes(2, blob.getBlobMetadata().getMapBytes());
             stmt.setInt(3, blob.getBytesID());
+            
+            System.out.println("BlobIntegrator.storeBlob | Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error updating blob. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
+     * Updates the bytes of a blob.
+     * Should be used only to remove the metadata of blobs that were inserted
+     * before metadata stripping was a thing.
+     * @param blob the meta to be updated
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws java.io.IOException
+     */
+    public void updateBlobBytes(Blob blob) throws  IntegrationException, IOException{
+        
+        Connection con = getPostgresCon();
+        String query = "UPDATE public.blobbytes\n"
+                + " SET blob=?\n"
+                + " WHERE bytesid=?;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setBytes(1, blob.getBytes());
+            stmt.setInt(2, blob.getBytesID());
             
             System.out.println("BlobIntegrator.storeBlob | Statement: " + stmt.toString());
             stmt.execute();
@@ -814,21 +925,19 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         StringBuilder query = new StringBuilder();
 
         query.append("SELECT DISTINCT photodocid\n"
-                + "FROM public.photodoc LEFT JOIN blobbytes on blobbytes_bytesid = bytesid");
+                + "FROM public.photodoc LEFT JOIN blobbytes on blobbytes_bytesid = bytesid\n"
+                + "WHERE (");
 
         PreparedStatement stmt = null;
+        
+        //We will store each thing we would like to test for in this 
+        ArrayList<String> clauses = new ArrayList<>();
         
         //First check if any parameters have been set at all
         if (filename != null
                 || description != null
                 || before != null
-                || after != null) {
-
-            //They have been, let's add a WHERE keyword
-            query.append("\nWHERE (");
-            
-            //We will store each things we would like to test for in this 
-            ArrayList<String> clauses = new ArrayList<>();
+                || after != null) {    
 
             //Dates first
             if (before != null) {
@@ -855,7 +964,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
                     statements.add("filename ILIKE ?");
                 }
 
-                //Join them togeth with an OR in between
+                //Join them together with an OR in between
                 //Then throw the completed clause into the clauses array
                 String finished = String.join(" OR\n", statements);
 
@@ -880,19 +989,19 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
 
                 clauses.add(finished);
             }
-            
-            //We must always include the muni_code in the search.
-            
-            clauses.add("muni_municode = ?");
-            
-            //We want to make sure all clauses are satisfied, so put an AND between them
-            //And use parantheses to make sure that each is a self-contained logical expression
-            String allClauses = String.join(") AND\n(", clauses);
-            
-            query.append(allClauses + ")\n");
 
         }
 
+        //We must always include the muni_code in the search.
+            
+        clauses.add("muni_municode = ?");
+            
+        //We want to make sure all clauses are satisfied, so put an AND between them
+        //And use parantheses to make sure that each is a self-contained logical expression
+        String allClauses = String.join(") AND\n(", clauses);
+            
+        query.append(allClauses + ")\n");
+        
         //add limit 
         query.append("LIMIT 150;");
         
@@ -942,8 +1051,8 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             }
             
         } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error retrieving list of recent blobs. ", ex);
+            System.out.println("BlobIntegrator.searchPhotoBlobs() | ERROR: " + ex);
+            throw new IntegrationException("Error searching Blobs ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
