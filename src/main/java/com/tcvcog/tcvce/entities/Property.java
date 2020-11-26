@@ -20,6 +20,9 @@ public class    Property
         extends PropertyPublic 
         implements IFace_Loggable{
     
+    protected Parcel parcel;
+    protected ParcelInfo parcelInfo;
+
     protected List<PropertyUnit> unitList;
     
     protected int muniCode;
@@ -59,8 +62,6 @@ public class    Property
     protected int livingArea;
     protected boolean taxStatus;
     protected int taxYear;
-    
-    
     
     /**
      * Creates a new instance of Property

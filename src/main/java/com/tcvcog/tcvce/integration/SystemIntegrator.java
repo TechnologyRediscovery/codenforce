@@ -31,6 +31,7 @@ import com.tcvcog.tcvce.entities.ListChangeRequest;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.TrackedEntity;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
@@ -56,7 +57,51 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      */
     public SystemIntegrator() {
     }
+    
+    
+    /**
+     * Utility method for populating record tracking fields:
+     * createdts
+     * createdby_userid
+     * lastupdatedts
+     * lastupdatedby_userid
+     * deactivatedts
+     * deactivated_userid
+     * @param ti
+     * @param rs
+     * @throws SQLException 
+     */
+    protected void populateTrackedFields(TrackedEntity ti, ResultSet rs) throws SQLException, IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
+        
+        if(rs != null){
+            
+            if(rs.getTimestamp("createdts") != null){
+                ti.setCreatedts(rs.getTimestamp("createdts").toLocalDateTime());                
+            }
+            if(rs.getInt("createdby_userid") != 0){
+                ti.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+            }
+            
+            if(rs.getTimestamp("lastupdatedts") != null){
+                ti.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+            }
+            if(rs.getInt("lastupdatedby_userid") != 0){
+                ti.setLastupdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+            }
+            
+            if(rs.getTimestamp("deactivatedts") != null){
+                ti.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+            }
+            if(rs.getInt("deactivatedby_userid") != 0){
+                ti.setDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
+            }
+            
+        }
+    }
 
+    
+    
     public Map<String, Integer> getPrintStyleMap() throws IntegrationException {
         Connection con = getPostgresCon();
         ResultSet rs = null;

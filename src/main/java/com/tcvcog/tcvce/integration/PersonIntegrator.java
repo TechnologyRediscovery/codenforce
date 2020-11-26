@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
@@ -61,6 +62,212 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      */
     public PersonIntegrator() {
     }
+    
+    
+    /**
+     * Looks up a Human given a human and creates a returns a new instance
+     * of Human with all the available information loaded about that person
+     *
+     * @param humanID
+     * @return a Human object with all of the available data loaded
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    
+    public Human getHuman(int humanID) throws IntegrationException {
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        Human h = null;
+
+        try {
+            
+            String s =  "SELECT humanid, name, dob, under18, jobtitle, businessentity, \n" +
+                        "       multihuman, source_sourceid, deceaseddate, deceasedby_userid, \n" +
+                        "       cloneof_humanid, createdts, createdby_userid, lastupdatedts, \n" +
+                        "       lastupdatedby_userid, deactivatedts, deactivatedby_userid, notes\n" +
+                        "  FROM public.human WHERE humanid=?;";
+            
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, humanID);
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                // note that rs.next() is called and the cursor
+                // is advanced to the first row in the rs
+                h = generateHuman(rs);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.getPerson | Unable to retrieve person", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return h;
+    }
+    
+    /**
+     * Populates the member fields on a Human object from a resulset
+     * @param rs with all columns SELECTed
+     * @return the fully-baked Human
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
+    private Human generateHuman(ResultSet rs) throws SQLException, IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        
+        Human h = new Human();
+        
+        h.setHumanID(rs.getInt("humanid"));
+        h.setName(rs.getString("name"));
+        if(rs.getDate("dob").toLocalDate() != null){
+            h.setDob(rs.getDate("dob").toLocalDate());
+        }
+        h.setUnder18(rs.getBoolean("under18"));
+        
+        h.setJobTitle(rs.getString("jobTitle"));
+        h.setBusinessEntity(rs.getBoolean("businessentity"));
+        h.setMultiHuman(rs.getBoolean("multihuman"));
+        if(rs.getInt("source_sourceid") != 0){
+            si.getBOBSource(rs.getInt("source_sourceid"));
+        }
+        
+        si.populateTrackedFields(h, rs);
+        return h;
+        
+    }
+    
+    /**
+     * Updates values for a given record in the human table
+     * @param h containing the new values
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void updateHuman(Human h) throws IntegrationException{
+        
+        String selectQuery =  "UPDATE public.human\n" +
+                                "   SET name=?, dob=?, under18=?, jobtitle=?, businessentity=?, \n" +
+                                "       multihuman=?, source_sourceid=?, deceaseddate=?, deceasedby_userid=?, \n" +
+                                "       cloneof_humanid=?, lastupdatedts=now(), \n" +
+                                "       lastupdatedby_userid=?, deactivatedts=?, deactivatedby_userid=?, \n" +
+                                "       notes=?\n" +
+                                " WHERE humanid=?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(selectQuery);
+            // first SQL row
+            stmt.setString(1, h.getName());
+            if(h.getDob() != null){
+                stmt.setDate(2, java.sql.Date.valueOf(h.getDob()));
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(3, h.isUnder18());
+            stmt.setString(4, h.getJobTitle());
+            stmt.setBoolean(5, h.isBusinessEntity());
+            
+            // second SQL row
+            stmt.setBoolean(6, h.isMultiHuman());
+            if(h.getSource() != null){
+                stmt.setInt(7, h.getSource().getSourceid());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            if(h.getDeceasedDate() != null){
+                stmt.setDate(8, java.sql.Date.valueOf(h.getDeceasedDate()));
+                if(h.getDeceasedBy() != null){
+                    stmt.setInt(9, h.getDeceasedBy().getUserID());
+                } else {
+                    stmt.setNull(9, java.sql.Types.NULL);
+                }
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+                stmt.setNull(9, java.sql.Types.NULL);
+            }
+            
+            // third sql row
+            if(h.getCloneOfHumanID() != 0){
+                stmt.setInt(10, h.getCloneOfHumanID());
+            } else {
+                stmt.setNull(10, java.sql.Types.NULL);
+            }
+            
+            // fourth sql row
+            if(h.getLastupdatedBy() != null){
+                stmt.setInt(11, h.getLastupdatedBy().getUserID());
+            } else {
+                stmt.setNull(11, java.sql.Types.NULL);
+            }
+            
+            
+            stmt.executeUpdate();
+            
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to get persons connected to OccPermitApplication", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        
+        
+    }
+    
+    /**
+     * Creates a record in the human table
+     * @param h fully populated Human
+     * @return the ID of the freshly inserted human record
+     */
+    public int insertHuman(Human h){
+        int freshHumanID = 0;
+        
+        List<PersonOccApplication> personList = new ArrayList<>();
+        String selectQuery =  "";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = con.prepareStatement(selectQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            stmt.setInt(1, application.getId());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                personList.add(generatePersonOccPeriod(rs));
+                
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to get persons connected to OccPermitApplication", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        
+        
+        
+        
+        
+        
+        return freshHumanID;
+        
+    }
+    
+    
+    
+    
 
     /**
      * Looks up a person given a personID and creates a returns a new instance

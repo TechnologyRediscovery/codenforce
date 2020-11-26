@@ -31,9 +31,12 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.Parcel;
+import com.tcvcog.tcvce.entities.ParcelInfo;
 import com.tcvcog.tcvce.entities.PropertyExtData;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.TaxStatus;
+import com.tcvcog.tcvce.entities.TrackedEntity;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
@@ -48,8 +51,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * @author Eric Darsow
+ * Inserts, retrieves, updates, and deactivates property-related fields and tables
+ * in the Database
+ * @author Ellen Bascomb (Apartment 31Y)
  */
 public class PropertyIntegrator extends BackingBeanUtils implements Serializable {
 
@@ -63,7 +67,118 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
     }
     
+    /**
+     * Extracts a Parcel from the DB
+     * @param parcelkey
+     * @return
+     * @throws IntegrationException 
+     */
+    public Parcel getParcel(int parcelkey) throws IntegrationException{
+        
+        Parcel p = null;
+        PropertyCoordinator pc = getPropertyCoordinator();
+        String query =  "SELECT parcelkey, muni_municode, parcelidcnty, source_sourceid, createdts, createdby_userid, \n" +
+                        "       lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, \n" +
+                        "       notes\n" +
+                        "  FROM public.parcel WHERE parcelkey=?;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, parcelkey);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                p = generateParcel(rs);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PropertyIntegrator.getParcel| Unable to retrieve parcel by key", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return p;
+    }
     
+    /**
+     * Populates fields on a Parcel object
+     * @param rs retrieved from the DB with all columns SELECTed
+     * @return
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
+    private Parcel generateParcel(ResultSet rs) throws SQLException, IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        if(rs == null){
+            return  null;
+        }
+        
+        Parcel parcel = new Parcel();
+        
+        parcel.setParcelkey(rs.getInt("parcelkey"));
+        parcel.setParcelidcnty(rs.getString("parcelidcnty"));
+        parcel.setMuni(mi.getMuni(rs.getInt("muni_municode")));
+        if(rs.getInt("source_sourceid") != 0){
+            parcel.setSource(si.getBOBSource(rs.getInt("source_sourceid")));
+        }
+        si.populateTrackedFields(parcel, rs);
+        return parcel;
+        
+    }
+    
+    /**
+     * Extracts a Parcel from the DB
+     * @param parcelid the County Parcel ID
+     * @return fully-baked parcel
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public Parcel getParcelByParID(int parcelid) throws IntegrationException{
+        
+        Parcel p = null;
+        PropertyCoordinator pc = getPropertyCoordinator();
+        String query = "SELECT parcelkey, muni_municode, parcelidcnty, source_sourceid, createdts, createdby_userid, \n" +
+                        "       lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, \n" +
+                        "       notes\n" +
+                        "  FROM public.parcel WHERE parcelidcnty=?;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, parcelid);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                p = generateParcel(rs);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PropertyIntegrator.getParcel | Unable to retrieve parcel by county Parcel ID", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return p;
+    }
+    
+    
+    
+    
+    
+    /**
+     * Extracts property from DB
+     * @deprecated replaced by humanized objects, including parcel
+     * @param propertyID
+     * @return
+     * @throws IntegrationException 
+     */
     public Property getProperty(int propertyID) throws IntegrationException {
         Property p = new Property();
         PropertyCoordinator pc = getPropertyCoordinator();
@@ -100,7 +215,150 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return pc.configureProperty(p);
 
     } // close getProperty()
+    
+    
+    
+    /**
+     * Extracts property from DB
+     * @param infoRecordID
+     * @return
+     * @throws IntegrationException 
+     */
+    public ParcelInfo getParcelInfo(int infoRecordID) throws IntegrationException {
+        ParcelInfo pi = null;
+        
+        PropertyCoordinator pc = getPropertyCoordinator();
+        String query =  "SELECT parcelinfoid, parcel_parcelkey, usegroup, constructiontype, countycode, \n" +
+                        "       notes, ownercode, propclass, locationdescription, bobsource_sourceid, \n" +
+                        "       unfitdatestart, unfitdatestop, unfitby_userid, abandoneddatestart, \n" +
+                        "       abandoneddatestop, abandonedby_userid, vacantdatestart, vacantdatestop, \n" +
+                        "       vacantby_userid, condition_intensityclassid, landbankprospect_intensityclassid, \n" +
+                        "       landbankheld, nonaddressable, usetype_typeid, createdts, createdby_userid, \n" +
+                        "       lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid\n" +
+                        "   FROM public.parcelinfo WHERE parcelinfoid = ?;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, infoRecordID);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                pi = generateParcelInfo(rs);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PropertyIntegrator.getProperty | Unable to retrieve property by ID number", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return pi;
+
+    } // close getProperty()
+    
+    
+    
+    
   
+     /**
+     * Utility method for property search methods whose individual SQL
+     * statements implement various search features. These methods can send
+     * properly configured (i.e. cursor positioned) ResultSet objects to this
+     * method and get back a populated Property object
+     * @param rs
+     * @return the fully baked Property with all fields set from DB data
+     */
+    private ParcelInfo generateParcelInfo(ResultSet rs) throws IntegrationException {
+
+        OccInspectionIntegrator ci = getOccInspectionIntegrator();
+        SystemIntegrator si = getSystemIntegrator();
+        UserIntegrator ui = getUserIntegrator();
+        
+
+        ParcelInfo pi = new ParcelInfo();
+
+        try {
+
+            pi.setUseGroup(rs.getString("usegroup"));
+            pi.setConstructionType(rs.getString("constructiontype"));
+            pi.setCountyCode(rs.getString("countycode"));
+            pi.setOwnerCode(rs.getString("ownercode"));  // for legacy compat
+            pi.setPropClass(rs.getString("propclass"));
+            
+            if(rs.getInt("locationdescription") != 0){
+                pi.setLocationDescriptor(ci.getLocationDescriptor(rs.getInt("locationdescription")));
+            }
+            
+            if(rs.getInt("bobsource_sourceid") != 0){
+                pi.setBobSource(si.getBOBSource(rs.getInt("bobsource_sourceid")));
+            }
+            
+            if(rs.getTimestamp("unfitdatestart") != null){
+                pi.setUnfitDateStart(rs.getTimestamp("unfitdatestart").toLocalDateTime());
+            }
+            
+            if(rs.getTimestamp("unfitdatestop") != null){
+                pi.setUnfitDateStop(rs.getTimestamp("unfitdatestop").toLocalDateTime());
+            }
+            
+            if(rs.getInt("unfitby_userid") != 0){
+                pi.setUnfitBy(ui.getUser(rs.getInt("unfitby_userid")));
+            }
+                
+            if(rs.getTimestamp("abandoneddatestart") != null){
+                pi.setAbandonedDateStart(rs.getTimestamp("abandoneddatestart").toLocalDateTime());
+            }
+            
+            if(rs.getTimestamp("abandoneddatestop") != null){
+                pi.setAbandonedDateStop(rs.getTimestamp("abandoneddatestop").toLocalDateTime());
+            }
+            
+            if(rs.getInt("abandonedby_userid") != 0){
+                pi.setAbandonedBy(ui.getUser(rs.getInt("abandonedby_userid")));
+            }
+            
+            if(rs.getTimestamp("vacantdatestart") != null){
+                pi.setVacantDateStart(rs.getTimestamp("vacantdatestart").toLocalDateTime());
+            }
+            
+            if(rs.getTimestamp("vacantdatestop") != null){
+                pi.setVacantDateStop(rs.getTimestamp("vacantdatestop").toLocalDateTime());
+            }
+            
+            if(rs.getInt("vacantby_userid") != 0){
+                pi.setVacantBy(ui.getUser(rs.getInt("vacantby_userid")));
+            }
+            
+            if(rs.getInt("condition_intensityclassid") != 0){
+                pi.setCondition(si.getIntensityClass(rs.getInt("condition_intensityclassid")));
+            }
+            
+            if(rs.getInt("landbankprospect_intensityclassid") != 0){
+                pi.setLandBankProspect(si.getIntensityClass(rs.getInt("landbankprospect_intensityclassid")));
+            }
+            
+            pi.setLandBankHeld(rs.getBoolean("landbankheld"));
+            pi.setActive(rs.getBoolean("active"));
+            pi.setNonAddressable(rs.getBoolean("nonaddressable"));
+            
+            if(rs.getInt("usetype_typeid") != 0){
+                pi.setUseType(getPropertyUseType(rs.getInt("usetype_typeid")));
+            }
+            
+            si.populateTrackedFields(pi, rs);
+           
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error generating Property from ResultSet", ex);
+        }
+        return pi;
+    }
     
     
 
@@ -109,7 +367,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * statements implement various search features. These methods can send
      * properly configured (i.e. cursor positioned) ResultSet objects to this
      * method and get back a populated Property object
-     *
+     * @deprecated replaced by Parcel
      * @param rs
      * @return the fully baked Property with all fields set from DB data
      */

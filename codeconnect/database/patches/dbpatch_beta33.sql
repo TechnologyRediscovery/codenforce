@@ -92,6 +92,7 @@ CREATE TABLE public.parcel
     (
         parcelkey               INTEGER PRIMARY KEY DEFAULT nextval('parcel_parcelkey_seq'),
         parcelidcnty            TEXT,
+        muni_municode           INTEGER NOT NULL CONSTRAINT parcel_municode_fk REFERENCES municipality (municode),
         source_sourceid         INTEGER CONSTRAINT parcel_sourceid_fk REFERENCES public.bobsource (sourceid),
         createdts               TIMESTAMP WITH TIME ZONE,
         createdby_userid        INTEGER CONSTRAINT parcel_createdby_userid_fk REFERENCES login (userid),     
@@ -102,6 +103,71 @@ CREATE TABLE public.parcel
         notes                   TEXT
     );
     
+
+
+CREATE SEQUENCE IF NOT EXISTS parcelinfo_infoid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE public.parcelinfo
+    (
+        parcelinfoid            INTEGER PRIMARY KEY DEFAULT nextval('parcelinfo_infoid_seq'),
+        parcel_parcelkey        INTEGER CONSTRAINT parcelinfo_parcelkey_fk REFERENCES parcel (parcelkey),
+      usegroup text,
+      constructiontype text,
+      countycode text DEFAULT '02'::text,
+      notes text,
+      ownercode text,
+      propclass text,
+      locationdescription text,
+      bobsource_sourceid integer,
+      unfitdatestart timestamp with time zone,
+      unfitdatestop timestamp with time zone,
+      unfitby_userid integer,
+      abandoneddatestart timestamp with time zone,
+      abandoneddatestop timestamp with time zone,
+      abandonedby_userid integer,
+      vacantdatestart timestamp with time zone,
+      vacantdatestop timestamp with time zone,
+      vacantby_userid integer,
+      condition_intensityclassid integer,
+      landbankprospect_intensityclassid integer,
+      landbankheld boolean DEFAULT false,
+      nonaddressable boolean DEFAULT false,
+      usetype_typeid integer,
+    createdts               TIMESTAMP WITH TIME ZONE,
+    createdby_userid        INTEGER CONSTRAINT parcelinfo_createdby_userid_fk REFERENCES login (userid),     
+    lastupdatedts           TIMESTAMP WITH TIME ZONE,
+    lastupdatedby_userid    INTEGER CONSTRAINT parcelinfo_lastupdatdby_userid_fk REFERENCES login (userid),
+    deactivatedts           TIMESTAMP WITH TIME ZONE,
+    deactivatedby_userid    INTEGER CONSTRAINT parcelinfo_deactivatedby_userid_fk REFERENCES login (userid),    
+  
+  CONSTRAINT parcel_abandoned_userid_fk FOREIGN KEY (abandonedby_userid)
+      REFERENCES public.login (userid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT parcel_bobsourceid_fk FOREIGN KEY (bobsource_sourceid)
+      REFERENCES public.bobsource (sourceid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT parcel_conditionintensityclass_classid_fk FOREIGN KEY (condition_intensityclassid)
+      REFERENCES public.intensityclass (classid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT parcel_landbankprospect_classid_fk FOREIGN KEY (landbankprospect_intensityclassid)
+      REFERENCES public.intensityclass (classid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT parcel_parcelusetypeid_fk FOREIGN KEY (usetype_typeid)
+      REFERENCES public.propertyusetype (propertyusetypeid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT parcel_unfitby_userid_fk FOREIGN KEY (unfitby_userid)
+      REFERENCES public.login (userid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT parcel_vacant_userid_fk FOREIGN KEY (vacantby_userid)
+      REFERENCES public.login (userid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+    
+    );
 
 
 CREATE SEQUENCE IF NOT EXISTS human_humanid_seq
@@ -118,14 +184,9 @@ CREATE TABLE public.human
         dob                     DATE,
         under18                 BOOLEAN,
         jobtitle                TEXT,
-        muni_municode           INTEGER CONSTRAINT human_municode_fk REFERENCES municipality (municode),
         businessentity          BOOLEAN DEFAULT FALSE,
         multihuman              BOOLEAN DEFAULT FALSE,
         source_sourceid         INTEGER CONSTRAINT human_sourceid_fk REFERENCES public.bobsource (sourceid),
-        activationstartdate     DATE,
-        activationstartnotes    TEXT,
-        activationstopdate      DATE,
-        activationstopnotes     TEXT,
         deceaseddate            DATE,
         deceasedby_userid       INTEGER CONSTRAINT human_deceasedby_userid_fk REFERENCES login (userid),
         cloneof_humanid         INTEGER CONSTRAINT human_clone_humanid_fk REFERENCES human (humanid),
@@ -175,12 +236,32 @@ CREATE TABLE public.parcelhuman
 
 
 
+CREATE SEQUENCE IF NOT EXISTS humanmuni_linkid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE public.humanmuni
+(
+    linkid              INTEGER PRIMARY KEY DEFAULT nextval('humanmuni_linkid_seq'),
+    persontype          persontype NOT NULL,
+    human_humanid       INTEGER CONSTRAINT humanmuni_muniid_fk REFERENCES human (humanid),
+    muni_municode       INTEGER CONSTRAINT humanmuni_municode_fk REFERENCES municipality (municode),
+    createdts               TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    deactivatedts           TIMESTAMP WITH TIME ZONE,
+    notes                TEXT
+
+);
+
 CREATE SEQUENCE IF NOT EXISTS contactphonetype_typeid_seq
     START WITH 100
     INCREMENT BY 1
     MINVALUE 100
     NO MAXVALUE
     CACHE 1;
+
 
 CREATE TABLE public.contactphonetype 
     (
@@ -341,11 +422,32 @@ CREATE TABLE parcelunit
 
           CONSTRAINT propunit_conditionintensityclass_classid_fk FOREIGN KEY (condition_intensityclassid)
               REFERENCES public.intensityclass (classid) MATCH SIMPLE
-              ON UPDATE NO ACTION ON DELETE NO ACTION,
-          CONSTRAINT propunit_rentalintentupdatedby_fk FOREIGN KEY (rentalintentlastupdatedby_userid)
-              REFERENCES public.eventrule (ruleid) MATCH SIMPLE
               ON UPDATE NO ACTION ON DELETE NO ACTION
     );
+
+
+CREATE SEQUENCE IF NOT EXISTS parcelunithuman_linkid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE public.parcelunithuman
+    (
+        linkid                  INTEGER PRIMARY KEY DEFAULT nextval('parcelunithuman_linkid_seq'),
+        parcelunit_unitid       INTEGER NOT NULL CONSTRAINT parcelunithuman_unitid_fk REFERENCES parcelunit (unitid),
+        human_humanid           INTEGER NOT NULL CONSTRAINT parcelunithuman_humanid_fk REFERENCES human (humanid),
+        createdts               TIMESTAMP WITH TIME ZONE,
+        createdby_userid        INTEGER CONSTRAINT parcelunithuman_createdby_userid_fk REFERENCES login (userid),     
+        lastupdatedts           TIMESTAMP WITH TIME ZONE,
+        lastupdatedby_userid    INTEGER CONSTRAINT parcelunithuman_lastupdatedby_userid_fk REFERENCES login (userid),
+        deactivatedts           TIMESTAMP WITH TIME ZONE,
+        deactivatedby_userid    INTEGER CONSTRAINT parcelunithuman_deactivatedby_userid_fk REFERENCES login (userid),   
+        notes                   TEXT
+    );
+
+
 
 --TODO: The field Use Code can contain APART:x-y UNITS
 
