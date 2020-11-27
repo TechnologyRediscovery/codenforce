@@ -29,6 +29,7 @@ public  class Parcel
     private Municipality muni;
     private String parcelidcnty;
     private BOBSource source;
+    protected String notes;
     
 
     /**
@@ -76,10 +77,10 @@ public  class Parcel
     }
 
     /**
-     * @param createdts the createdts to set
+     * @param createdts the createdTS to set
      */
-    public void setCreatedts(LocalDateTime createdts) {
-        this.createdts = createdts;
+    public void setCreatedTS(LocalDateTime createdts) {
+        this.createdTS = createdts;
     }
 
     /**
@@ -117,12 +118,7 @@ public  class Parcel
         this.deactivatedBy = deactivatedBy;
     }
 
-    /**
-     * @param notes the notes to set
-     */
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
+   
 
     /**
      * @return the muni
@@ -136,6 +132,20 @@ public  class Parcel
      */
     public void setMuni(Municipality muni) {
         this.muni = muni;
+    }
+
+    /**
+     * @return the notes
+     */
+    public String getNotes() {
+        return notes;
+    }
+
+    /**
+     * @param notes the notes to set
+     */
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
     
     

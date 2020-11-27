@@ -116,34 +116,34 @@ CREATE TABLE public.parcelinfo
     (
         parcelinfoid            INTEGER PRIMARY KEY DEFAULT nextval('parcelinfo_infoid_seq'),
         parcel_parcelkey        INTEGER CONSTRAINT parcelinfo_parcelkey_fk REFERENCES parcel (parcelkey),
-      usegroup text,
-      constructiontype text,
-      countycode text DEFAULT '02'::text,
-      notes text,
-      ownercode text,
-      propclass text,
-      locationdescription text,
-      bobsource_sourceid integer,
-      unfitdatestart timestamp with time zone,
-      unfitdatestop timestamp with time zone,
-      unfitby_userid integer,
-      abandoneddatestart timestamp with time zone,
-      abandoneddatestop timestamp with time zone,
-      abandonedby_userid integer,
-      vacantdatestart timestamp with time zone,
-      vacantdatestop timestamp with time zone,
-      vacantby_userid integer,
-      condition_intensityclassid integer,
-      landbankprospect_intensityclassid integer,
-      landbankheld boolean DEFAULT false,
-      nonaddressable boolean DEFAULT false,
-      usetype_typeid integer,
-    createdts               TIMESTAMP WITH TIME ZONE,
-    createdby_userid        INTEGER CONSTRAINT parcelinfo_createdby_userid_fk REFERENCES login (userid),     
-    lastupdatedts           TIMESTAMP WITH TIME ZONE,
-    lastupdatedby_userid    INTEGER CONSTRAINT parcelinfo_lastupdatdby_userid_fk REFERENCES login (userid),
-    deactivatedts           TIMESTAMP WITH TIME ZONE,
-    deactivatedby_userid    INTEGER CONSTRAINT parcelinfo_deactivatedby_userid_fk REFERENCES login (userid),    
+        usegroup text,
+        constructiontype text,
+        countycode text DEFAULT '02'::text,
+        notes text,
+        ownercode text,
+        propclass text,
+        locationdescription text,
+        bobsource_sourceid integer,
+        unfitdatestart timestamp with time zone,
+        unfitdatestop timestamp with time zone,
+        unfitby_userid integer,
+        abandoneddatestart timestamp with time zone,
+        abandoneddatestop timestamp with time zone,
+        abandonedby_userid integer,
+        vacantdatestart timestamp with time zone,
+        vacantdatestop timestamp with time zone,
+        vacantby_userid integer,
+        condition_intensityclassid integer,
+        landbankprospect_intensityclassid integer,
+        landbankheld boolean DEFAULT false,
+        nonaddressable boolean DEFAULT false,
+        usetype_typeid integer,
+        createdts               TIMESTAMP WITH TIME ZONE,
+        createdby_userid        INTEGER CONSTRAINT parcelinfo_createdby_userid_fk REFERENCES login (userid),     
+        lastupdatedts           TIMESTAMP WITH TIME ZONE,
+        lastupdatedby_userid    INTEGER CONSTRAINT parcelinfo_lastupdatdby_userid_fk REFERENCES login (userid),
+        deactivatedts           TIMESTAMP WITH TIME ZONE,
+        deactivatedby_userid    INTEGER CONSTRAINT parcelinfo_deactivatedby_userid_fk REFERENCES login (userid),    
   
   CONSTRAINT parcel_abandoned_userid_fk FOREIGN KEY (abandonedby_userid)
       REFERENCES public.login (userid) MATCH SIMPLE
@@ -200,60 +200,8 @@ CREATE TABLE public.human
     );
 
 
-CREATE SEQUENCE IF NOT EXISTS parcelhumanrole_roleid_seq
-    START WITH 100
-    INCREMENT BY 1
-    MINVALUE 100
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE TABLE public.parcelhumanrole
-    (
-        roleid              INTEGER PRIMARY KEY DEFAULT nextval('parcelhumanrole_roleid_seq'),
-        title               TEXT NOT NULL,
-        description         TEXT,
-        muni_municode       INTEGER CONSTRAINT parcelhumanrole_municode_fk REFERENCES municipality (municode),
-        deactivatedts       TIMESTAMP WITH TIME ZONE
-
-    ); 
-
--- code enf case is still based on a parcel
-
-CREATE TABLE public.parcelhuman
-    (
-        human_humanid           INTEGER CONSTRAINT parcelhuman_humanid_fk REFERENCES human (humanid),
-        parcel_parcelkey        INTEGER CONSTRAINT parcel_parcelkey_fk REFERENCES parcel (parcelkey),
-        source_sourceid         INTEGER CONSTRAINT parcel_sourceid_fk REFERENCES public.bobsource (sourceid),
-        role_roleid             INTEGER CONSTRAINT parcelhuman_roleid_fk   REFERENCES parcelhumanrole (roleid),
-        createdts               TIMESTAMP WITH TIME ZONE,
-        createdby_userid        INTEGER CONSTRAINT parcelhuman_createdby_userid_fk REFERENCES login (userid),     
-        lastupdatedts           TIMESTAMP WITH TIME ZONE,
-        lastupdatedby_userid    INTEGER CONSTRAINT parcelhuman_lastupdatdby_userid_fk REFERENCES login (userid),
-        deactivatedts           TIMESTAMP WITH TIME ZONE,
-        deactivatedby_userid    INTEGER CONSTRAINT parcelhuman_deactivatedby_userid_fk REFERENCES login (userid),
-        notes                   TEXT    
-    );  
 
 
-
-CREATE SEQUENCE IF NOT EXISTS humanmuni_linkid_seq
-    START WITH 100
-    INCREMENT BY 1
-    MINVALUE 100
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE TABLE public.humanmuni
-(
-    linkid              INTEGER PRIMARY KEY DEFAULT nextval('humanmuni_linkid_seq'),
-    persontype          persontype NOT NULL,
-    human_humanid       INTEGER CONSTRAINT humanmuni_muniid_fk REFERENCES human (humanid),
-    muni_municode       INTEGER CONSTRAINT humanmuni_municode_fk REFERENCES municipality (municode),
-    createdts               TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-    deactivatedts           TIMESTAMP WITH TIME ZONE,
-    notes                TEXT
-
-);
 
 CREATE SEQUENCE IF NOT EXISTS contactphonetype_typeid_seq
     START WITH 100
@@ -356,19 +304,54 @@ CREATE TABLE mailingaddress
 
 
 
-CREATE TABLE public.humanmailingaddress
+CREATE SEQUENCE IF NOT EXISTS parcelunit_unitid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+
+CREATE TABLE parcelunit
     (
-        humanmailing_humanid          INTEGER CONSTRAINT humanmailing_humanid_fk REFERENCES human (humanid),
-        humanmailing_addressid         INTEGER CONSTRAINT humanmailing_addressid_fk REFERENCES mailingaddress (addressid),
-        source_sourceid                 INTEGER CONSTRAINT humanmailing_sourceid_fk REFERENCES public.bobsource (sourceid),
-        createdts                       TIMESTAMP WITH TIME ZONE,
-        createdby_userid                INTEGER CONSTRAINT humanmailing_createdby_userid_fk REFERENCES login (userid),     
-        deactivatedts                   TIMESTAMP WITH TIME ZONE,
-        deactivatedby_userid            INTEGER CONSTRAINT humanmailing_deactivatedby_userid_fk REFERENCES login (userid),  
-        notes                           TEXT         
+          unitid                    INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('parcelunit_unitid_seq'::regclass),
+          unitnumber                text NOT NULL,
+          parcel_parcelkey          INTEGER NOT NULL CONSTRAINT parcelunit_parcelkey_fk REFERENCES parcel (parcelkey),
+          rentalintentdatestart     timestamp with time zone,
+          rentalintentdatestop      timestamp with time zone,
+          rentalnotes               text,
+          condition_intensityclassid integer,
+          source_sourceid           INTEGER CONSTRAINT parcelunit_sourceid_fk REFERENCES public.bobsource (sourceid),
+          createdts                 TIMESTAMP WITH TIME ZONE,
+          createdby_userid          INTEGER CONSTRAINT parcelunit_createdby_userid_fk REFERENCES login (userid),     
+          lastupdatedts             TIMESTAMP WITH TIME ZONE,
+          lastupdatedby_userid      INTEGER CONSTRAINT parcelunit_lastupdatedby_userid_fk REFERENCES login (userid),
+          deactivatedts             TIMESTAMP WITH TIME ZONE,
+          deactivatedby_userid      INTEGER CONSTRAINT parcelunit_deactivatedby_userid_fk REFERENCES login (userid),      
+          notes                     text,
 
-
+          CONSTRAINT propunit_conditionintensityclass_classid_fk FOREIGN KEY (condition_intensityclassid)
+              REFERENCES public.intensityclass (classid) MATCH SIMPLE
+              ON UPDATE NO ACTION ON DELETE NO ACTION
     );
+
+CREATE SEQUENCE IF NOT EXISTS humanparcelrole_roleid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE public.humanparcelrole
+    (
+        roleid              INTEGER PRIMARY KEY DEFAULT nextval('humanparcelrole_roleid_seq'),
+        title               TEXT NOT NULL,
+        description         TEXT,
+        muni_municode       INTEGER CONSTRAINT parcelhumanrole_municode_fk REFERENCES municipality (municode),
+        deactivatedts       TIMESTAMP WITH TIME ZONE
+
+    ); 
+
 
 CREATE SEQUENCE IF NOT EXISTS humanmailing_roleid_seq
     START WITH 100
@@ -390,39 +373,37 @@ CREATE TABLE public.humanmailingrole
     ); 
 
 
+CREATE TABLE public.humanmailingaddress
+    (
+        humanmailing_humanid          INTEGER CONSTRAINT humanmailing_humanid_fk REFERENCES human (humanid),
+        humanmailing_addressid         INTEGER CONSTRAINT humanmailing_addressid_fk REFERENCES mailingaddress (addressid),
+        source_sourceid                 INTEGER CONSTRAINT humanmailing_sourceid_fk REFERENCES public.bobsource (sourceid),
+        createdts                       TIMESTAMP WITH TIME ZONE,
+        createdby_userid                INTEGER CONSTRAINT humanmailing_createdby_userid_fk REFERENCES login (userid),  
+        lastupdatedts           TIMESTAMP WITH TIME ZONE,
+        lastupdatedby_userid    INTEGER CONSTRAINT humanmailing_lastupdatdby_userid_fk REFERENCES login (userid),   
+        deactivatedts                   TIMESTAMP WITH TIME ZONE,
+        deactivatedby_userid            INTEGER CONSTRAINT humanmailing_deactivatedby_userid_fk REFERENCES login (userid),  
+        notes                           TEXT         
+    
+
+
+    );
+
+
 CREATE TABLE public.mailingaddressparcel
     (
         mailingparcel_parcelid      INTEGER CONSTRAINT mailingparcel_parcelid_fk REFERENCES parcel (parcelkey),
         mailingparcel_mailingid     INTEGER CONSTRAINT mailingparcel_mailingid_fk REFERENCES mailingaddress (addressid),
         source_sourceid             INTEGER CONSTRAINT mailingparcel_sourceid_fk REFERENCES public.bobsource (sourceid),
-        createdts                   TIMESTAMP WITH TIME ZONE,
-        deactivatedts               TIMESTAMP WITH TIME ZONE,
+        createdts                       TIMESTAMP WITH TIME ZONE,
+        createdby_userid                INTEGER CONSTRAINT mailingaddressparcel_createdby_userid_fk REFERENCES login (userid),  
+        lastupdatedts                   TIMESTAMP WITH TIME ZONE,
+        lastupdatedby_userid            INTEGER CONSTRAINT mailingaddressparcel_lastupdatdby_userid_fk REFERENCES login (userid),   
+        deactivatedts                   TIMESTAMP WITH TIME ZONE,
+        deactivatedby_userid            INTEGER CONSTRAINT mailingaddressparcel_deactivatedby_userid_fk REFERENCES login (userid),  
         notes                       TEXT
 
-    );
-
-
-CREATE TABLE parcelunit
-    (
-          unitid                    integer NOT NULL DEFAULT nextval('propertunit_unitid_seq'::regclass),
-          unitnumber                text NOT NULL,
-          parcel_parcelkey          INTEGER NOT NULL CONSTRAINT parcelunit_parcelkey_fk REFERENCES parcel (parcelkey),
-          rentalintentdatestart     timestamp with time zone,
-          rentalintentdatestop      timestamp with time zone,
-          rentalnotes               text,
-          condition_intensityclassid integer,
-          source_sourceid           INTEGER CONSTRAINT parcelunit_sourceid_fk REFERENCES public.bobsource (sourceid),
-          createdts                 TIMESTAMP WITH TIME ZONE,
-          createdby_userid          INTEGER CONSTRAINT parcelunit_createdby_userid_fk REFERENCES login (userid),     
-          lastupdatedts             TIMESTAMP WITH TIME ZONE,
-          lastupdatedby_userid      INTEGER CONSTRAINT parcelunit_lastupdatedby_userid_fk REFERENCES login (userid),
-          deactivatedts             TIMESTAMP WITH TIME ZONE,
-          deactivatedby_userid      INTEGER CONSTRAINT parcelunit_deactivatedby_userid_fk REFERENCES login (userid),      
-          notes                     text,
-
-          CONSTRAINT propunit_conditionintensityclass_classid_fk FOREIGN KEY (condition_intensityclassid)
-              REFERENCES public.intensityclass (classid) MATCH SIMPLE
-              ON UPDATE NO ACTION ON DELETE NO ACTION
     );
 
 
@@ -433,21 +414,125 @@ CREATE SEQUENCE IF NOT EXISTS parcelunithuman_linkid_seq
     NO MAXVALUE
     CACHE 1;
 
-CREATE TABLE public.parcelunithuman
+CREATE TABLE public.humanparcelunit
     (
         linkid                  INTEGER PRIMARY KEY DEFAULT nextval('parcelunithuman_linkid_seq'),
         parcelunit_unitid       INTEGER NOT NULL CONSTRAINT parcelunithuman_unitid_fk REFERENCES parcelunit (unitid),
         human_humanid           INTEGER NOT NULL CONSTRAINT parcelunithuman_humanid_fk REFERENCES human (humanid),
         createdts               TIMESTAMP WITH TIME ZONE,
-        createdby_userid        INTEGER CONSTRAINT parcelunithuman_createdby_userid_fk REFERENCES login (userid),     
+        createdby_userid        INTEGER CONSTRAINT humanparcelunit_createdby_userid_fk REFERENCES login (userid),     
         lastupdatedts           TIMESTAMP WITH TIME ZONE,
-        lastupdatedby_userid    INTEGER CONSTRAINT parcelunithuman_lastupdatedby_userid_fk REFERENCES login (userid),
+        lastupdatedby_userid    INTEGER CONSTRAINT humanparcelunit_lastupdatedby_userid_fk REFERENCES login (userid),
         deactivatedts           TIMESTAMP WITH TIME ZONE,
-        deactivatedby_userid    INTEGER CONSTRAINT parcelunithuman_deactivatedby_userid_fk REFERENCES login (userid),   
+        deactivatedby_userid    INTEGER CONSTRAINT humanparcelunit_deactivatedby_userid_fk REFERENCES login (userid),   
         notes                   TEXT
     );
 
 
+
+CREATE SEQUENCE IF NOT EXISTS occperiodlease_leaseid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE public.occperiodlease
+    (
+        leaseid             INTEGER PRIMARY KEY DEFAULT nextval('parcelunithumanlease_leaseid_seq'),
+        datestart           DATE,
+        dateend             DATE,
+        signeddate          DATE,
+        monthlyrent         MONEY,
+        leasor_humanid      INTEGER CONSTRAINT parcelhumanlease
+    
+    );
+
+
+CREATE SEQUENCE IF NOT EXISTS humanparcel_linkid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE public.humanparcel
+    (
+        linkid                  INTEGER PRIMARY KEY DEFAULT nextval('humanparcel_linkid_seq'),
+        human_humanid           INTEGER CONSTRAINT parcelhuman_humanid_fk REFERENCES human (humanid),
+        parcel_parcelkey        INTEGER CONSTRAINT parcel_parcelkey_fk REFERENCES parcel (parcelkey),
+        source_sourceid         INTEGER CONSTRAINT parcel_sourceid_fk REFERENCES public.bobsource (sourceid),
+        role_roleid             INTEGER CONSTRAINT humanparcel_roleid_fk   REFERENCES humanparcelrole (roleid),
+        createdts               TIMESTAMP WITH TIME ZONE,
+        createdby_userid        INTEGER CONSTRAINT parcelhuman_createdby_userid_fk REFERENCES login (userid),     
+        lastupdatedts           TIMESTAMP WITH TIME ZONE,
+        lastupdatedby_userid    INTEGER CONSTRAINT parcelhuman_lastupdatdby_userid_fk REFERENCES login (userid),
+        deactivatedts           TIMESTAMP WITH TIME ZONE,
+        deactivatedby_userid    INTEGER CONSTRAINT parcelhuman_deactivatedby_userid_fk REFERENCES login (userid),
+        notes                   TEXT    
+    );  
+
+
+
+
+CREATE SEQUENCE IF NOT EXISTS humanmuni_linkid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE public.humanmuni
+(
+    linkid              INTEGER PRIMARY KEY DEFAULT nextval('humanmuni_linkid_seq'),
+    persontype          persontype NOT NULL,
+    human_humanid       INTEGER CONSTRAINT humanmuni_muniid_fk REFERENCES human (humanid),
+    muni_municode       INTEGER CONSTRAINT humanmuni_municode_fk REFERENCES municipality (municode),
+    createdts               TIMESTAMP WITH TIME ZONE,
+    createdby_userid        INTEGER CONSTRAINT humanmuni_createdby_userid_fk REFERENCES login (userid),     
+    lastupdatedts           TIMESTAMP WITH TIME ZONE,
+    lastupdatedby_userid    INTEGER CONSTRAINT humanmuni_lastupdatdby_userid_fk REFERENCES login (userid),
+    deactivatedts           TIMESTAMP WITH TIME ZONE,
+    deactivatedby_userid    INTEGER CONSTRAINT humanmuni_deactivatedby_userid_fk REFERENCES login (userid),     
+    notes                TEXT
+
+);
+
+CREATE SEQUENCE IF NOT EXISTS humanoccperiod_linkid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE public.humanoccperiod
+(
+    linkid              INTEGER PRIMARY KEY DEFAULT nextval('humanoccperiod_linkid_seq'),
+    persontype          persontype NOT NULL,
+    human_humanid       INTEGER CONSTRAINT humanmuni_muniid_fk REFERENCES human (humanid),
+    createdts               TIMESTAMP WITH TIME ZONE,
+    createdby_userid        INTEGER CONSTRAINT humanmuni_createdby_userid_fk REFERENCES login (userid),     
+    lastupdatedts           TIMESTAMP WITH TIME ZONE,
+    lastupdatedby_userid    INTEGER CONSTRAINT humanmuni_lastupdatdby_userid_fk REFERENCES login (userid),
+    deactivatedts           TIMESTAMP WITH TIME ZONE,
+    deactivatedby_userid    INTEGER CONSTRAINT humanmuni_deactivatedby_userid_fk REFERENCES login (userid),     
+    notes                TEXT
+
+);
+
+CREATE TABLE public.humancecase
+    (
+        cecase_caseid       INTEGER NOT NULL CONSTRAINT humancecase_caseid_fk REFERENCES cecase (caseid),
+        human_humanid       INTEGER NOT NULL CONSTRAINT humancecase_humanid_fk REFERENCES human (humanid),
+        createdts               TIMESTAMP WITH TIME ZONE,
+        createdby_userid        INTEGER CONSTRAINT humancecase_createdby_userid_fk REFERENCES login (userid),     
+        lastupdatedts           TIMESTAMP WITH TIME ZONE,
+        lastupdatedby_userid    INTEGER CONSTRAINT humancecase_lastupdatdby_userid_fk REFERENCES login (userid),
+        deactivatedts           TIMESTAMP WITH TIME ZONE,
+        deactivatedby_userid    INTEGER CONSTRAINT humancecase_deactivatedby_userid_fk REFERENCES login (userid),     
+        notes                TEXT
+
+    );
 
 --TODO: The field Use Code can contain APART:x-y UNITS
 

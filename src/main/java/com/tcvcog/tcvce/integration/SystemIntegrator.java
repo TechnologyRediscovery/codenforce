@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CasePhaseEnum;
+import com.tcvcog.tcvce.entities.IFace_trackedEntityLink;
 import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
 import com.tcvcog.tcvce.entities.IntensityClass;
@@ -77,7 +78,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         if(rs != null){
             
             if(rs.getTimestamp("createdts") != null){
-                ti.setCreatedts(rs.getTimestamp("createdts").toLocalDateTime());                
+                ti.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                
             }
             if(rs.getInt("createdby_userid") != 0){
                 ti.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
@@ -96,6 +97,50 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             if(rs.getInt("deactivatedby_userid") != 0){
                 ti.setDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
             }
+            
+        }
+    }
+
+    
+    /**
+     * Utility method for populating record tracking fields:
+     * createdts
+     * createdby_userid
+     * lastupdatedts
+     * lastupdatedby_userid
+     * deactivatedts
+     * deactivated_userid
+     * @param te
+     * @param rs
+     * @throws SQLException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    protected void populateTrackedLinkFields(IFace_trackedEntityLink te, ResultSet rs) throws SQLException, IntegrationException{
+        UserIntegrator ui = getUserIntegrator();
+        
+        if(rs != null){
+            
+            if(rs.getTimestamp("createdts") != null){
+                te.setLinkCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                
+            }
+            if(rs.getInt("createdby_userid") != 0){
+                te.setLinkCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+            }
+            
+            if(rs.getTimestamp("lastupdatedts") != null){
+                te.setLinkLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+            }
+            if(rs.getInt("lastupdatedby_userid") != 0){
+                te.setLinkLastUpdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+            }
+            
+            if(rs.getTimestamp("deactivatedts") != null){
+                te.setLinkDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+            }
+            if(rs.getInt("deactivatedby_userid") != 0){
+                te.setLinkDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
+            }
+            te.setLinkNotes(rs.getString("notes"));
             
         }
     }

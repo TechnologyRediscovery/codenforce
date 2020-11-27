@@ -24,10 +24,10 @@ import java.time.format.DateTimeFormatter;
  * that contains creation, update, deactivation , and notes fields
  * @author sylvia
  */
-public class TrackedEntity {
+public abstract class TrackedEntity {
     
     /** Humanization Object standard fields **/
-    protected LocalDateTime createdts;
+    protected LocalDateTime createdTS;
     protected User createdBy;
     protected LocalDateTime lastUpdatedTS;
     protected User lastupdatedBy;
@@ -49,10 +49,10 @@ public class TrackedEntity {
     
     
     /**
-     * @return the createdts
+     * @return the createdTS
      */
-    public LocalDateTime getCreatedts() {
-        return createdts;
+    public LocalDateTime getCreatedTS() {
+        return createdTS;
     }
 
     /**
@@ -93,10 +93,10 @@ public class TrackedEntity {
    
 
     /**
-     * @param createdts the createdts to set
+     * @param createdTS the createdTS to set
      */
-    public void setCreatedts(LocalDateTime createdts) {
-        this.createdts = createdts;
+    public void setCreatedTS(LocalDateTime createdTS) {
+        this.createdTS = createdTS;
     }
 
     /**

@@ -41,11 +41,6 @@ public  class   Human
         protected boolean multiHuman;
         protected BOBSource source;
         
-        protected LocalDate activationStart;
-        protected String activationStartNotes;
-        protected LocalDate activationStop;
-        protected String activationStopNotes;
-        
         protected LocalDate deceasedDate;
         protected User deceasedBy;
         
@@ -109,34 +104,7 @@ public  class   Human
         return source;
     }
 
-    /**
-     * @return the activationStart
-     */
-    public LocalDate getActivationStart() {
-        return activationStart;
-    }
-
-    /**
-     * @return the activationStartNotes
-     */
-    public String getActivationStartNotes() {
-        return activationStartNotes;
-    }
-
-    /**
-     * @return the activationStop
-     */
-    public LocalDate getActivationStop() {
-        return activationStop;
-    }
-
-    /**
-     * @return the activationStopNotes
-     */
-    public String getActivationStopNotes() {
-        return activationStopNotes;
-    }
-
+ 
     /**
      * @return the deceasedDate
      */
@@ -208,33 +176,7 @@ public  class   Human
         this.source = source;
     }
 
-    /**
-     * @param activationStart the activationStart to set
-     */
-    public void setActivationStart(LocalDate activationStart) {
-        this.activationStart = activationStart;
-    }
-
-    /**
-     * @param activationStartNotes the activationStartNotes to set
-     */
-    public void setActivationStartNotes(String activationStartNotes) {
-        this.activationStartNotes = activationStartNotes;
-    }
-
-    /**
-     * @param activationStop the activationStop to set
-     */
-    public void setActivationStop(LocalDate activationStop) {
-        this.activationStop = activationStop;
-    }
-
-    /**
-     * @param activationStopNotes the activationStopNotes to set
-     */
-    public void setActivationStopNotes(String activationStopNotes) {
-        this.activationStopNotes = activationStopNotes;
-    }
+   
 
     /**
      * @param deceasedDate the deceasedDate to set

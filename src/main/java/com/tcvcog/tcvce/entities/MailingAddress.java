@@ -23,7 +23,12 @@ import java.time.LocalDateTime;
  * @author sylvia
  */
 public  class   MailingAddress 
-        extends TrackedEntity { 
+        extends TrackedEntity
+        implements  IFace_deactivatable, 
+                    IFace_keyIdentified,
+                    IFace_noteHolder{ 
+    final String TABLE_NAME = "mailingaddress";
+    
     
     protected int addressID;
     protected String num;
@@ -34,7 +39,9 @@ public  class   MailingAddress
     protected int poBox;
     protected LocalDateTime verifiedTS;
     protected BOBSource source;
-
+    protected String notes;
+    
+    
     /**
      * @return the addressID
      */
@@ -159,6 +166,36 @@ public  class   MailingAddress
      */
     public void setSource(BOBSource source) {
         this.source = source;
+    }
+
+    @Override
+    public boolean isDeactivated() {
+        return deactivatedTS != null;
+    }
+
+    @Override
+    public void setDactivatedTS(LocalDateTime deacTS) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int getDBKey() {
+        return addressID;
+    }
+
+    @Override
+    public String getTableName() {
+        return TABLE_NAME;
+    }
+
+    @Override
+    public String getNotes() {
+        return notes;
+    }
+
+    @Override
+    public void setNotes(String n) {
+        notes = n;
     }
     
 }

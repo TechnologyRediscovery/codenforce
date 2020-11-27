@@ -211,7 +211,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to get persons connected to OccPermitApplication", ex);
+            throw new IntegrationException("PersonIntegrator.updateHuman: Unable to UpdatePerson", ex);
 
         } finally {
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -226,38 +226,91 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * Creates a record in the human table
      * @param h fully populated Human
      * @return the ID of the freshly inserted human record
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public int insertHuman(Human h){
+    public int insertHuman(Human h) throws IntegrationException{
         int freshHumanID = 0;
         
-        List<PersonOccApplication> personList = new ArrayList<>();
-        String selectQuery =  "";
+        String query =    "INSERT INTO public.human(\n" +
+                                "           humanid, name, dob, under18, jobtitle, businessentity, multihuman, \n" +
+                                "            source_sourceid, deceaseddate, deceasedby_userid, cloneof_humanid, \n" +
+                                "            createdts, createdby_userid)\n" +
+                                "    VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, \n" +
+                                "            ?, ?, ?, ?, \n" +
+                                "            now(), ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
+        
         try {
-            stmt = con.prepareStatement(selectQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            stmt.setInt(1, application.getId());
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                personList.add(generatePersonOccPeriod(rs));
-                
+            stmt = con.prepareStatement(query);
+        
+            // first SQL row
+            // DEFAULT ID
+            stmt.setString(1, h.getName());
+            if(h.getDob() != null){
+                stmt.setDate(2, java.sql.Date.valueOf(h.getDob()));
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
             }
+            stmt.setBoolean(3, h.isUnder18());
+            stmt.setString(4, h.getJobTitle());
+            stmt.setBoolean(5, h.isBusinessEntity());
+            stmt.setBoolean(6, h.isMultiHuman());
+            
+            // second SQL row
+            if(h.getSource() != null){
+                stmt.setInt(7, h.getSource().getSourceid());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            if(h.getDeceasedDate() != null){
+                stmt.setDate(8, java.sql.Date.valueOf(h.getDeceasedDate()));
+                if(h.getDeceasedBy() != null){
+                    stmt.setInt(9, h.getDeceasedBy().getUserID());
+                } else {
+                    stmt.setNull(9, java.sql.Types.NULL);
+                }
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+                stmt.setNull(9, java.sql.Types.NULL);
+            }
+            
+            if(h.getCloneOfHumanID() != 0){
+                stmt.setInt(10, h.getCloneOfHumanID());
+            } else {
+                stmt.setNull(10, java.sql.Types.NULL);
+            }
+            
+            // third sql row
+            // creation timestamp set by now()
+            if(h.getCreatedBy() != null){
+                stmt.setInt(11, h.getCreatedBy().getUserID());
+            } else {
+                stmt.setNull(11, java.sql.Types.NULL);
+            }
+            
+            stmt.execute();
+             
+            String retrievalQuery = "SELECT currval('human_humanid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                freshHumanID = rs.getInt(1);
+            }
+            
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to get persons connected to OccPermitApplication", ex);
+            throw new IntegrationException("PersonIntegrator.insertHuman: Unable to Insert new person", ex);
 
         } finally {
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        
-        
-        
-        
         
         
         
