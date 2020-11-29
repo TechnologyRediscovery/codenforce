@@ -33,15 +33,23 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.ContactEmail;
 import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.HumanMailingAddressLink;
+import com.tcvcog.tcvce.entities.HumanMailingAddressRole;
+import com.tcvcog.tcvce.entities.HumanParcelLink;
+import com.tcvcog.tcvce.entities.HumanParcelRole;
+import com.tcvcog.tcvce.entities.LinkedObjectRole;
 import com.tcvcog.tcvce.entities.MailingAddress;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Parcel;
 import com.tcvcog.tcvce.entities.ParcelInfo;
+import com.tcvcog.tcvce.entities.ParcelMailingAddressLink;
 import com.tcvcog.tcvce.entities.PropertyExtData;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.TaxStatus;
 import com.tcvcog.tcvce.entities.TrackedEntity;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -62,12 +70,15 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
     final int MAX_RESULTS = 100;
     final String ACTIVE_FIELD = "property.active";
+    final String HUMAN_PARCEL_ROLE_TABLE_NAME = "humanparcelrole";
+    final String HUMAN_MAILING_ROLE_TABLE_NAME = "humanmailingrole";
+    
 
     /**
      * Creates a new instance of PropertyIntegrator
      */
     public PropertyIntegrator() {
-
+        
     }
     
     /**
@@ -451,9 +462,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @param parcelID
      * @return the list of addresses
      */
-    public List<MailingAddress> getMailingAddressListByParcel(int parcelID) throws IntegrationException{
+    public List<ParcelMailingAddressLink> getMailingAddressListByParcel(int parcelID) throws IntegrationException{
         
-        List<MailingAddress> addrList = new ArrayList<>();
+        List<ParcelMailingAddressLink> pmall = new ArrayList<>();
         
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -462,8 +473,11 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         try {
             
-            String s =  "SELECT mailingparcel_mailingid FROM public.mailingaddressparcel"
-                    + "WHERE mailingparcel_parcelid = ?";
+            String s =  "SELECT mailingparcel_parcelid, mailingparcel_mailingid, source_sourceid, \n" +
+                        "       createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, \n" +
+                        "       deactivatedts, deactivatedby_userid, notes\n" +
+                        "  FROM public.mailingaddressparcel " +
+                        "  WHERE mailingparcel_parcelid = ?";
             
             stmt = con.prepareStatement(s);
             stmt.setInt(1, parcelID);
@@ -473,7 +487,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             while (rs.next()) {
                 // note that rs.next() is called and the cursor
                 // is advanced to the first row in the rs
-                addrList.add(getMailingAddress(rs.getInt("mailingparcel_mailingid")));
+                pmall.add(generateParcelMailingAddressLink(rs));
             }
 
         } catch (SQLException ex) {
@@ -484,7 +498,31 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return addrList;
+        return pmall;
+    }
+    
+    /**
+     * Populator of link object between a parcel and a mailing address
+     * @param rs
+     * @return
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
+    private ParcelMailingAddressLink generateParcelMailingAddressLink(ResultSet rs) throws SQLException, IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        
+        MailingAddress ma = getMailingAddress(rs.getInt("mailingparcel_mailingid"));
+        ParcelMailingAddressLink pmal = new ParcelMailingAddressLink(ma);
+        
+        // populate nonstandard fields:
+        if(rs.getInt("source_soruceid") != 0){
+            pmal.setSource(si.getBOBSource(rs.getInt("source_sourceid")));
+        }
+        // populate standard fields with common method in SI
+        si.populateTrackedLinkFields(pmal, rs);
+        
+        return pmal;
+        
     }
     
     /**
@@ -492,27 +530,28 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @param humanID
      * @return the list of address objects
      */
-    public List<MailingAddress> getMailingAddressListByHuman(int humanID){
+    public List<HumanMailingAddressLink> getMailingAddressListByHuman(int humanID) throws IntegrationException{
         
+        List<HumanMailingAddressLink> hmall = new ArrayList<>();
         
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        ContactEmail em = null;
-
+        
         try {
             
-            String s =  "";
+            String s =  "SELECT humanmailing_humanid, humanmailing_addressid, source_sourceid, \n" +
+                        "       createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, \n" +
+                        "       deactivatedts, deactivatedby_userid, notes\n" +
+                        "  FROM public.humanmailingaddress WHERE humanmailing_humanid=?";
             
             stmt = con.prepareStatement(s);
-            stmt.setInt(1, emailID);
+            stmt.setInt(1, humanID);
 
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                // note that rs.next() is called and the cursor
-                // is advanced to the first row in the rs
-                em = generateContactEmail(rs);
+                hmall.add(generateHumanMailingAddressLink(rs));
             }
 
         } catch (SQLException ex) {
@@ -523,8 +562,60 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return em;
+        return hmall;
     }
+    
+    
+    /**
+     * Populator of link object between a human and a mailing address
+     * @param rs
+     * @return
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
+    private HumanMailingAddressLink generateHumanMailingAddressLink(ResultSet rs) throws SQLException, IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        
+        MailingAddress ma = getMailingAddress(rs.getInt("mailingparcel_mailingid"));
+        HumanMailingAddressLink hmal = new HumanMailingAddressLink(ma);
+        
+        hmal.setRole(getHumanMailingAddressRole(rs.getInt("roleid_roleid")));
+        
+        // populate nonstandard fields:
+        if(rs.getInt("source_soruceid") != 0){
+            hmal.setSource(si.getBOBSource(rs.getInt("source_sourceid")));
+        }
+        // populate standard fields with common method in SI
+        si.populateTrackedLinkFields(hmal, rs);
+        
+        return hmal;
+        
+    }
+    
+    /**
+     * Populator of link object between a human and a mailing address
+     * @param rs
+     * @return
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
+    private HumanParcelLink generateHumanParcelLink(ResultSet rs) throws SQLException, IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        HumanParcelLink hpl = 
+        
+        hmal.setRole(getHumanMailingAddressRole(rs.getInt("roleid_roleid")));
+        
+        // populate nonstandard fields:
+        if(rs.getInt("source_soruceid") != 0){
+            hmal.setSource(si.getBOBSource(rs.getInt("source_sourceid")));
+        }
+        // populate standard fields with common method in SI
+        si.populateTrackedLinkFields(hmal, rs);
+        
+        return hmal;
+        
+    }
+    
     
     /**
      * Updates a record in the mailingaddress table
@@ -668,6 +759,188 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return freshID;
         
     }
+    
+    
+    /**
+     * Extracts a single record from the humanparcelrole table
+     * @param roleID the ID of the role to extract
+     * @return the Objectified role
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public HumanParcelRole getHumanParcelRole(int roleID) throws IntegrationException{
+        if(roleID == 0){
+            return null;
+        }
+        SystemIntegrator si = getSystemIntegrator();
+        
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        HumanParcelRole hpr = null;
+        
+        try {
+            
+            String s =  "SELECT roleid, title, createdts, description, muni_municode, deactivatedts, \n" +
+                        "       notes\n" +
+                        "  FROM public.humanparcelrole WHERE roleid=?;";
+            
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, roleID);
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                hpr = new HumanParcelRole(si.generateLinkedObjectRole(rs),HUMAN_PARCEL_ROLE_TABLE_NAME );
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return hpr;
+    }
+    
+
+    /**
+     * Retrieves a list of parcel roles
+     * @param muni when not null, only grabs muni-specific roles; when null,
+     * all active values will be retrieved, meaning those in COGLand
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+
+    public List<HumanParcelRole> getHumanParcelRoleList(Municipality muni) throws IntegrationException{
+
+        List<HumanParcelRole> roleList = new ArrayList<>();
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            
+            String s =  "SELECT roleid FROM humanparcelrole WHERE muni_municode=?";
+            
+            stmt = con.prepareStatement(s);
+            
+            if(muni == null){
+                stmt.setInt(1, Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("cogland_muniid")));
+            } else {
+                stmt.setInt(1, muni.getMuniCode());
+            }
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                roleList.add(getHumanParcelRole(rs.getInt("roleid")));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return roleList;
+    }
+    
+    
+    /**
+     * Extracts a single record from the humanmailingrole table
+     * @param roleID the ID of the role to extract
+     * @return the objectified role
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public HumanMailingAddressRole getHumanMailingAddressRole(int roleID) throws IntegrationException{
+         SystemIntegrator si = getSystemIntegrator();
+        
+        if(roleID == 0){
+            return null;
+        }
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        HumanMailingAddressRole hmar = null;
+        
+        try {
+            
+            String s =  "SELECT roleid, title, createdts, description, muni_municode, deactivatedts, \n" +
+                        "       notes\n" +
+                        "  FROM public.humanmailingrole WHERE roleid=?;";
+            
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, roleID);
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                hmar = new HumanMailingAddressRole(si.generateLinkedObjectRole(rs),HUMAN_MAILING_ROLE_TABLE_NAME );
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return hmar;
+        
+    }
+    
+    /**
+     * Retrieves a list of mailing roles
+     * @param muni when not null, only grabs muni-specific roles; when null,
+     * all active values will be retrieved, meaning those in COGLand
+     * @return the list of foles
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public List<HumanMailingAddressRole> getHumanMailingAddressRoleList(Municipality muni) throws IntegrationException{
+        
+        List<HumanMailingAddressRole> roleList = new ArrayList<>();
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            
+            String s =  "SELECT roleid FROM humanmailingrole WHERE muni_municode=?";
+            
+            stmt = con.prepareStatement(s);
+            
+            if(muni == null){
+                stmt.setInt(1, Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("cogland_muniid")));
+            } else {
+                stmt.setInt(1, muni.getMuniCode());
+            }
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                roleList.add(getHumanMailingAddressRole(rs.getInt("roleid")));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return roleList;
+    }
+    
     
     
     

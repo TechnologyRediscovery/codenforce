@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
+import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
@@ -28,6 +29,7 @@ import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.IntensitySchema;
+import com.tcvcog.tcvce.entities.LinkedObjectRole;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PrintStyle;
@@ -143,6 +145,41 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             te.setLinkNotes(rs.getString("notes"));
             
         }
+    }
+    
+    /**
+     * Populates common fields among LinkedObjectRole family
+     * @param rs containing each common field in linked objects
+     * @return the superclass ready to be injected into a subtype
+     * @throws java.sql.SQLException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public LinkedObjectRole generateLinkedObjectRole(ResultSet rs) throws SQLException, IntegrationException{
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        LinkedObjectRole lor = new LinkedObjectRole();
+         if(rs != null){
+            
+            lor.setRoleID(rs.getInt("roleid"));
+            
+            lor.setTitle((rs.getString("title")));
+            
+            if(rs.getTimestamp("createdts") != null){
+                lor.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                
+            }
+            lor.setDescription(rs.getString("description"));
+            
+            if(rs.getInt("muni_municode") != 0){
+                lor.setMuni(mc.getMuni(rs.getInt("muni_municode")));
+            }
+            
+            if(rs.getTimestamp("deactivatedts") != null){
+                lor.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+            }
+            lor.setNotes(rs.getString("notes"));
+            
+        }
+        return lor;
+        
     }
 
     

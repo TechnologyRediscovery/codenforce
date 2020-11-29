@@ -335,6 +335,8 @@ CREATE TABLE parcelunit
               ON UPDATE NO ACTION ON DELETE NO ACTION
     );
 
+ALTER TABLE parcelunit ADD COLUMN location_occlocationdescriptor INTEGER CONSTRAINT parcelunit_loc_locationdescriptionid_fk REFERENCES occlocationdescriptor (locationdescriptionid);
+
 CREATE SEQUENCE IF NOT EXISTS humanparcelrole_roleid_seq
     START WITH 100
     INCREMENT BY 1
@@ -346,9 +348,11 @@ CREATE TABLE public.humanparcelrole
     (
         roleid              INTEGER PRIMARY KEY DEFAULT nextval('humanparcelrole_roleid_seq'),
         title               TEXT NOT NULL,
+        createdts           TIMESTAMP WITH TIME ZONE,
         description         TEXT,
         muni_municode       INTEGER CONSTRAINT parcelhumanrole_municode_fk REFERENCES municipality (municode),
-        deactivatedts       TIMESTAMP WITH TIME ZONE
+        deactivatedts       TIMESTAMP WITH TIME ZONE,
+        notes               TEXT
 
     ); 
 
@@ -378,6 +382,7 @@ CREATE TABLE public.humanmailingaddress
         humanmailing_humanid          INTEGER CONSTRAINT humanmailing_humanid_fk REFERENCES human (humanid),
         humanmailing_addressid         INTEGER CONSTRAINT humanmailing_addressid_fk REFERENCES mailingaddress (addressid),
         source_sourceid                 INTEGER CONSTRAINT humanmailing_sourceid_fk REFERENCES public.bobsource (sourceid),
+        role_roleid                     INTEGER CONSTRAINT humanmailing_roleid_fk REFERENCES public.humanmailingrole (roleid),
         createdts                       TIMESTAMP WITH TIME ZONE,
         createdby_userid                INTEGER CONSTRAINT humanmailing_createdby_userid_fk REFERENCES login (userid),  
         lastupdatedts           TIMESTAMP WITH TIME ZONE,
@@ -419,6 +424,7 @@ CREATE TABLE public.humanparcelunit
         linkid                  INTEGER PRIMARY KEY DEFAULT nextval('parcelunithuman_linkid_seq'),
         parcelunit_unitid       INTEGER NOT NULL CONSTRAINT parcelunithuman_unitid_fk REFERENCES parcelunit (unitid),
         human_humanid           INTEGER NOT NULL CONSTRAINT parcelunithuman_humanid_fk REFERENCES human (humanid),
+        role_roleid             INTEGER CONSTRAINT humanparcelunit_roleid_fk   REFERENCES humanparcelrole (roleid),
         createdts               TIMESTAMP WITH TIME ZONE,
         createdby_userid        INTEGER CONSTRAINT humanparcelunit_createdby_userid_fk REFERENCES login (userid),     
         lastupdatedts           TIMESTAMP WITH TIME ZONE,

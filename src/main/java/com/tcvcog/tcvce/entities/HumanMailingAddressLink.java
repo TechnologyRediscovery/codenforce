@@ -27,6 +27,7 @@ public class HumanMailingAddressLink
         implements IFace_trackedEntityLink{
     
     protected BOBSource linkSource;
+    protected HumanMailingAddressRole role;
     
     protected LocalDateTime linkCreatedTS;
     protected User linkCreatedBy;
@@ -195,6 +196,20 @@ public class HumanMailingAddressLink
     @Override
     public void setLinkDeactivatedTS(LocalDateTime linkDeactivatedTS) {
         this.linkDeactivatedTS = linkDeactivatedTS;
+    }
+
+    /**
+     * @return the role
+     */
+    public HumanMailingAddressRole getRole() {
+        return role;
+    }
+
+    /**
+     * @param role the role to set
+     */
+    public void setRole(HumanMailingAddressRole role) {
+        this.role = role;
     }
 
    

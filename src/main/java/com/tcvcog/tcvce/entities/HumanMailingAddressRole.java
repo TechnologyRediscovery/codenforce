@@ -16,16 +16,15 @@
  */
 package com.tcvcog.tcvce.entities;
 
-
 /**
- * Classification container for connections between Humans and Parcels
- * and parcelunits
+ * Represents a database connection between a human and a mailing address
+ * Stores values like "resides at" or "tax mailing"
  * @author sylvia
  */
-public class HumanParcelRole
+public class HumanMailingAddressRole 
         extends LinkedObjectRole{
     
-    public HumanParcelRole(LinkedObjectRole role, String table){
+    public HumanMailingAddressRole(LinkedObjectRole role, String table){
         this.linkingTableName = table;
         this.roleID = role.roleID;
         this.title = role.title;
