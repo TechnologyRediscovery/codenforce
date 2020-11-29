@@ -213,10 +213,7 @@ public  class   Human
             return deactivatedTS != null;
     }
 
-    @Override
-    public void setDactivatedTS(LocalDateTime deacTS) {
-        deactivatedTS = deacTS;
-    }
+   
 
     @Override
     public int getDBKey() {

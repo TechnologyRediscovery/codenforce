@@ -9,6 +9,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.IFace_EventHolder;
+import com.tcvcog.tcvce.entities.OccPeriodHumanLink;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.time.LocalDateTime;
@@ -31,6 +32,7 @@ public  class       OccPeriod
     protected int propertyUnitID;
     
     protected OccPeriodType type;
+    protected List<OccPeriodHumanLink> humans;
     
     protected OccInspection governingInspection;
     

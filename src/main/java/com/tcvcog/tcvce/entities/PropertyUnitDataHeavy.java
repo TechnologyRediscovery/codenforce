@@ -29,6 +29,7 @@ public class        PropertyUnitDataHeavy
         implements  IFace_CredentialSigned{
 
     private List<OccPeriod> periodList;
+    protected List<OccPeriodHumanLink> humans;
     
     private List<PropertyUnitChangeOrder> changeOrderList;
     
@@ -98,6 +99,20 @@ public class        PropertyUnitDataHeavy
 
     public void setChangeOrderList(List<PropertyUnitChangeOrder> changeOrderList) {
         this.changeOrderList = changeOrderList;
+    }
+
+    /**
+     * @return the humans
+     */
+    public List<OccPeriodHumanLink> getHumans() {
+        return humans;
+    }
+
+    /**
+     * @param humans the humans to set
+     */
+    public void setHumans(List<OccPeriodHumanLink> humans) {
+        this.humans = humans;
     }
 
 }

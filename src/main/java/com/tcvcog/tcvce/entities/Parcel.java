@@ -23,13 +23,21 @@ import java.time.LocalDateTime;
  * @author sylvia
  */
 public  class Parcel 
-        extends TrackedEntity{
+        extends TrackedEntity
+        implements IFace_deactivatable, 
+                   IFace_keyIdentified,
+                   IFace_noteHolder{
         
+    final static String TABLE_NAME = "parcel";
+    
+    
     private int parcelkey;
+    private String countyParcelID;
     private Municipality muni;
-    private String parcelidcnty;
     private BOBSource source;
     protected String notes;
+    
+    protected ParcelInfo parcelInfo;
     
 
     /**
@@ -40,10 +48,10 @@ public  class Parcel
     }
 
     /**
-     * @return the parcelidcnty
+     * @return the countyParcelID
      */
-    public String getParcelidcnty() {
-        return parcelidcnty;
+    public String getCountyParcelID() {
+        return countyParcelID;
     }
 
     /**
@@ -63,10 +71,10 @@ public  class Parcel
     }
 
     /**
-     * @param parcelidcnty the parcelidcnty to set
+     * @param countyParcelID the countyParcelID to set
      */
-    public void setParcelidcnty(String parcelidcnty) {
-        this.parcelidcnty = parcelidcnty;
+    public void setCountyParcelID(String countyParcelID) {
+        this.countyParcelID = countyParcelID;
     }
 
     /**
@@ -79,6 +87,7 @@ public  class Parcel
     /**
      * @param createdts the createdTS to set
      */
+    @Override
     public void setCreatedTS(LocalDateTime createdts) {
         this.createdTS = createdts;
     }
@@ -86,6 +95,7 @@ public  class Parcel
     /**
      * @param createdBy the createdBy to set
      */
+    @Override
     public void setCreatedBy(User createdBy) {
         this.createdBy = createdBy;
     }
@@ -93,6 +103,7 @@ public  class Parcel
     /**
      * @param lastUpdatedTS the lastUpdatedTS to set
      */
+    @Override
     public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
         this.lastUpdatedTS = lastUpdatedTS;
     }
@@ -100,20 +111,17 @@ public  class Parcel
     /**
      * @param lastupdatedBy the lastupdatedBy to set
      */
+    @Override
     public void setLastupdatedBy(User lastupdatedBy) {
         this.lastupdatedBy = lastupdatedBy;
     }
 
-    /**
-     * @param deactivatedTS the deactivatedTS to set
-     */
-    public void setDeactivatedTS(LocalDateTime deactivatedTS) {
-        this.deactivatedTS = deactivatedTS;
-    }
+   
 
     /**
      * @param deactivatedBy the deactivatedBy to set
      */
+    @Override
     public void setDeactivatedBy(User deactivatedBy) {
         this.deactivatedBy = deactivatedBy;
     }
@@ -137,6 +145,7 @@ public  class Parcel
     /**
      * @return the notes
      */
+    @Override
     public String getNotes() {
         return notes;
     }
@@ -144,9 +153,26 @@ public  class Parcel
     /**
      * @param notes the notes to set
      */
+    @Override
     public void setNotes(String notes) {
         this.notes = notes;
     }
-    
+
+    @Override
+    public boolean isDeactivated() {
+        return deactivatedTS != null;
+        
+    }
+
+    @Override
+    public int getDBKey() {
+        return parcelkey;
+    }
+
+    @Override
+    public String getTableName() {
+     return TABLE_NAME;    
+    }
+
     
 }

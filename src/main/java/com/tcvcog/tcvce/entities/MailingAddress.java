@@ -31,7 +31,8 @@ public  class   MailingAddress
     
     
     protected int addressID;
-    protected String num;
+    protected String buildingNo;
+    protected String street;
     protected String unitNo;
     protected String city;
     protected String state;
@@ -50,10 +51,10 @@ public  class   MailingAddress
     }
 
     /**
-     * @return the num
+     * @return the buildingNo
      */
-    public String getNum() {
-        return num;
+    public String getBuildingNo() {
+        return buildingNo;
     }
 
     /**
@@ -113,10 +114,10 @@ public  class   MailingAddress
     }
 
     /**
-     * @param num the num to set
+     * @param buildingNo the buildingNo to set
      */
-    public void setNum(String num) {
-        this.num = num;
+    public void setBuildingNo(String buildingNo) {
+        this.buildingNo = buildingNo;
     }
 
     /**
@@ -173,10 +174,6 @@ public  class   MailingAddress
         return deactivatedTS != null;
     }
 
-    @Override
-    public void setDactivatedTS(LocalDateTime deacTS) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 
     @Override
     public int getDBKey() {
@@ -196,6 +193,20 @@ public  class   MailingAddress
     @Override
     public void setNotes(String n) {
         notes = n;
+    }
+
+    /**
+     * @return the street
+     */
+    public String getStreet() {
+        return street;
+    }
+
+    /**
+     * @param street the street to set
+     */
+    public void setStreet(String street) {
+        this.street = street;
     }
     
 }

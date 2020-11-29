@@ -44,7 +44,7 @@ public class HumanMailingAddressLink
         
         
         this.addressID = ma.addressID;
-        this.num = ma.num;
+        this.buildingNo = ma.buildingNo;
         this.unitNo = ma.unitNo;
         this.city = ma.city;
         this.state = ma.state;

@@ -49,7 +49,7 @@ public interface IFace_deactivatable
      * setter for the deactivation timestamp
      * @param deacTS time of deactivation
      */
-    public void setDactivatedTS(LocalDateTime deacTS);
+    public void setDeactivatedTS(LocalDateTime deacTS);
     
     /**
      * Getter for the deactivation timestamp

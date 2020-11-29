@@ -27,5 +27,61 @@ public class ContactPhoneType {
     protected String title;
     protected LocalDateTime createdTS;
     protected LocalDateTime deactivatedTS;
+
+    /**
+     * @return the deactivatedTS
+     */
+    public LocalDateTime getDeactivatedTS() {
+        return deactivatedTS;
+    }
+
+    /**
+     * @param deactivatedTS the deactivatedTS to set
+     */
+    public void setDeactivatedTS(LocalDateTime deactivatedTS) {
+        this.deactivatedTS = deactivatedTS;
+    }
+
+    /**
+     * @return the phoneTypeID
+     */
+    public int getPhoneTypeID() {
+        return phoneTypeID;
+    }
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * @return the createdTS
+     */
+    public LocalDateTime getCreatedTS() {
+        return createdTS;
+    }
+
+    /**
+     * @param phoneTypeID the phoneTypeID to set
+     */
+    public void setPhoneTypeID(int phoneTypeID) {
+        this.phoneTypeID = phoneTypeID;
+    }
+
+    /**
+     * @param title the title to set
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
+     * @param createdTS the createdTS to set
+     */
+    public void setCreatedTS(LocalDateTime createdTS) {
+        this.createdTS = createdTS;
+    }
     
 }

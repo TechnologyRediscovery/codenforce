@@ -136,7 +136,10 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @return 
      */
     private Person configurePerson(Person p){
-        // check stuff, build stuff
+        PersonIntegrator pi = getPersonIntegrator();
+        
+        
+        
         return p;
         
     }

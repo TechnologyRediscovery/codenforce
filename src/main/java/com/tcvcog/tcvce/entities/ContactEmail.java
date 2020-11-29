@@ -25,15 +25,23 @@ import java.time.LocalDateTime;
 public  class   ContactEmail 
         extends Contact{
     
-    protected int emailid;
+    final static String TABLE_NAME = "contactemail";
+    
+    protected int emailID;
+    protected int humanID;
     protected String emailaddress;
     protected LocalDateTime bounceTS;
+    protected String notes;
 
+    public ContactEmail(){
+        
+    }
+    
     /**
-     * @return the emailid
+     * @return the emailID
      */
-    public int getEmailid() {
-        return emailid;
+    public int getEmailID() {
+        return emailID;
     }
 
     /**
@@ -51,10 +59,10 @@ public  class   ContactEmail
     }
 
     /**
-     * @param emailid the emailid to set
+     * @param emailID the emailID to set
      */
-    public void setEmailid(int emailid) {
-        this.emailid = emailid;
+    public void setEmailID(int emailID) {
+        this.emailID = emailID;
     }
 
     /**
@@ -69,6 +77,46 @@ public  class   ContactEmail
      */
     public void setBounceTS(LocalDateTime bounceTS) {
         this.bounceTS = bounceTS;
+    }
+
+    /**
+     * @return the humanID
+     */
+    public int getHumanID() {
+        return humanID;
+    }
+
+    /**
+     * @param humanID the humanID to set
+     */
+    public void setHumanID(int humanID) {
+        this.humanID = humanID;
+    }
+
+    /**
+     * @return the notes
+     */
+    @Override
+    public String getNotes() {
+        return notes;
+    }
+
+    /**
+     * @param notes the notes to set
+     */
+    @Override
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    @Override
+    public int getDBKey() {
+        return emailID;
+    }
+
+    @Override
+    public String getTableName() {
+        return TABLE_NAME;
     }
     
 }

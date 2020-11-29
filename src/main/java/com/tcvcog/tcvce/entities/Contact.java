@@ -20,8 +20,9 @@ package com.tcvcog.tcvce.entities;
  * Superclass for ContactPhone, ContactEmail, etc.
  * @author sylvia
  */
-public  class   Contact 
-        extends TrackedEntity {
+public abstract     class   Contact 
+                    extends TrackedEntity
+                    implements IFace_noteHolder{
     
     
     

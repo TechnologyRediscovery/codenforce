@@ -67,10 +67,6 @@ public  class PersonDataHeavy
         this.creationTimeStamp = p.creationTimeStamp;
 
         // for backwards compatability
-
-        this.firstName = p.firstName;
-        this.lastName = p.lastName;
-
         // frist, middle initial, and last all in lastName
         this.compositeLastName = p.compositeLastName;
         this.businessEntity = p.businessEntity;
@@ -144,7 +140,7 @@ public  class PersonDataHeavy
      */
      public PersonDataHeavy(Person p){
         
-        
+        this.name = p.name;
         this.personID = p.personID;
 
         this.personType = p.personType;
@@ -156,9 +152,6 @@ public  class PersonDataHeavy
         this.creationTimeStamp = p.creationTimeStamp;
 
         // for backwards compatability
-
-        this.firstName = p.firstName;
-        this.lastName = p.lastName;
 
         // frist, middle initial, and last all in lastName
         this.compositeLastName = p.compositeLastName;

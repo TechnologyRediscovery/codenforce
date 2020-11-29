@@ -31,6 +31,7 @@ public class PersonWithChanges
     }
         
     public PersonWithChanges(Person input){
+        this.name = input.name;
         this.personID = input.getPersonID();
         this.personType = input.getPersonType();
         this.muniCode = input.getMuniCode();
@@ -38,8 +39,6 @@ public class PersonWithChanges
         this.source = input.getSource();
         this.creatorUserID = input.getCreatorUserID();
         this.creationTimeStamp = input.getCreationTimeStamp();
-        this.firstName = input.getFirstName();
-        this.lastName = input.getLastName();
         this.compositeLastName = input.isCompositeLastName();
         this.businessEntity = input.isBusinessEntity();
         this.jobTitle = input.getJobTitle();
