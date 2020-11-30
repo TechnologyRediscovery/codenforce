@@ -49,6 +49,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -499,7 +500,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
             this.currentViolation.getBlobIDList().add(blobc.storeBlob(blob).getBlobID());
             this.getBlobList().add(blob);
-        } catch (IntegrationException | IOException ex) {
+        } catch (IntegrationException | IOException | ClassNotFoundException | NoSuchElementException ex) {
             System.out.println("ViolationAddBB.handlePhotoUpload | upload failed! " + ex);
         } catch (BlobException ex) {
             System.out.println("ViolationAddBB.handlePhotoUpload | upload failed! " + ex);

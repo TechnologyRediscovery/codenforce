@@ -16,11 +16,13 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 import javax.annotation.PostConstruct;
 import org.primefaces.event.FileUploadEvent;
 
@@ -59,8 +61,8 @@ public class PropertyFilesBB
             if(blob.getType() == BlobType.PHOTO){
                 getBlobIntegrator().removePhotoPropertyLink(blobID, currProp.getPropertyID());
             }
-            }
-        catch (IntegrationException | ClassNotFoundException | IOException ex) {
+        }
+        catch (IntegrationException | ClassNotFoundException | IOException | BlobTypeException | NoSuchElementException ex) {
             System.out.println(ex);
         }
     }

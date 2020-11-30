@@ -31,6 +31,8 @@ import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.MetadataKey;
+import com.tcvcog.tcvce.entities.MetadataUI;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
@@ -47,6 +49,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
@@ -83,6 +86,8 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     private List<OccPeriod> connectedPeriods;
     private List<Property> connectedProperties;
     
+    private List<MetadataUI> metaList;
+    
     //Files for updating blobs.
     private String newFilename;
     private String newDescription;
@@ -106,7 +111,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
                 blobList.add(bc.getPhotoBlobLight(idnum));
             }
             
-        } catch (IntegrationException | ClassNotFoundException | IOException ex) {
+        } catch (IntegrationException | ClassNotFoundException | IOException | NoSuchElementException | BlobTypeException ex) {
             System.out.println("manageBlobBB.initBean | ERROR: " + ex);
         }
     }
@@ -194,7 +199,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Found " + blobList.size() + " files matching your criteria!", ""));
-        } catch(ClassNotFoundException | IOException | IntegrationException ex){
+        } catch(ClassNotFoundException | IOException | IntegrationException | BlobTypeException ex){
             System.out.println("manageBlobBB.executeQuery() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -213,6 +218,21 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
 
         currentBlobSelected = true;
 
+        //We have to load all the metadata properties into the metadataUI list
+        //So our users can sort it alphabetically, etc.
+        
+        metaList = new ArrayList<>();
+        
+        for(MetadataKey key : selectedBlob.getBlobMetadata().getPropertiesList()){
+            MetadataUI skeleton = new MetadataUI(
+                    key.getLabel(), 
+                    key.getKey(), 
+                    selectedBlob.getBlobMetadata().getProperty(key));
+            
+            metaList.add(skeleton);
+            
+        }
+        
         connectedRequests = new ArrayList<>();
         connectedViolations = new ArrayList<>();
         connectedMunis = new ArrayList<>();
@@ -717,4 +737,12 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         this.newDescription = newDescription;
     }
 
+    public List<MetadataUI> getMetaList() {
+        return metaList;
+    }
+
+    public void setMetaList(List<MetadataUI> metaList) {
+        this.metaList = metaList;
+    }
+    
 }

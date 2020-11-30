@@ -13,6 +13,7 @@ import com.tcvcog.tcvce.entities.BlobType;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import org.primefaces.event.FileUploadEvent;
@@ -56,7 +57,7 @@ public class UploadBlobBB extends BackingBeanUtils implements Serializable {
             blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
             
             blob = blobc.storeBlob(blob);
-        } catch (IntegrationException | IOException ex) {
+        } catch (IntegrationException | IOException | ClassNotFoundException | NoSuchElementException ex) {
             System.out.println("BlobUploadBB.handleBlobUpload | " + ex);
         } catch (BlobException ex){
             System.out.println("BlobUploadBB.handleBlobUpload | " + ex);

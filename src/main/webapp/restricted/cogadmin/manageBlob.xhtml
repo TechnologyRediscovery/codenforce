@@ -182,6 +182,8 @@
                                                          tableStyleClass="primeDataTable"
                                                          draggableRows="false" draggableColumns="true"
                                                          tabindex="6"
+                                                         scrollable="true"
+                                                         scrollHeight="350"
                                                          >
 
                                                 <p:column headerText="ID:">
@@ -301,23 +303,25 @@
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
-                                                    <p:dataTable id="blob-search-results-table"
+                                                    <p:dataTable id="metadata-table"
                                                                  var="property"
-                                                                 value="#{manageBlobBB.selectedBlob.blobMetadata.propertiesList}"
+                                                                 value="#{manageBlobBB.metaList}"
                                                                  rowKey="#{property.key}"
                                                                  tableStyleClass="primeDataTable"
                                                                  draggableRows="false" draggableColumns="true"
                                                                  tabindex="6"
+                                                                 scrollable="true"
+                                                                 scrollHeight="200"
+                                                                 sortBy="#{property.label}"
                                                                  >
 
-                                                        <p:column headerText="Metadata Property">
+                                                        <p:column headerText="Metadata Property" sortBy="#{property.label}">
                                                             <h:outputText value="#{property.label}"/>
                                                         </p:column>
 
-                                                        <p:column headerText="Value">
-                                                            <h:outputText value="#{manageBlobBB.selectedBlob.blobMetadata.getProperty(property)}"/>
+                                                        <p:column headerText="Value" sortBy="#{property.value}">
+                                                            <h:outputText value="#{property.value}"/>
                                                         </p:column>
-
                                                     </p:dataTable>
 
                                                 </p:panelGrid>
@@ -457,7 +461,7 @@
                                                                              action="#{manageBlobBB.goToRequest(cear)}"
                                                                              disabled="#{!manageBlobBB.currentBlobSelected}"/>
                                                         </p:column>
-                                                        
+
                                                         <p:column>
                                                             <p:commandButton value="Remove Link" 
                                                                              action="#{manageBlobBB.removeCEARPhotoLink(request)}"
@@ -781,7 +785,7 @@
                                 </div>
 
                             </div>
-                         
+
                         </div>
 
                     </p:outputPanel>

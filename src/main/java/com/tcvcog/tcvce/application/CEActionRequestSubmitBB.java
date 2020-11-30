@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.NavigationException;
@@ -54,6 +55,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -190,7 +192,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             for (Integer idNum : currentRequest.getBlobIDList()) {
                 try {
                     blobList.add(bc.getPhotoBlob(idNum));
-                } catch (IntegrationException | ClassNotFoundException | IOException ex) {
+                } catch (IntegrationException | ClassNotFoundException | IOException | BlobTypeException | NoSuchElementException ex) {
                     System.out.println("Error occured while fetching request blob list: " + ex);
                 }
             }
@@ -465,7 +467,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             blob.setMunicode(currentRequest.getMuni().getMuniCode());
 
             blob = blobc.storeBlob(blob);
-        } catch (IntegrationException | IOException ex) {
+        } catch (IntegrationException | IOException | ClassNotFoundException | NoSuchElementException ex) {
             System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

@@ -44,12 +44,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import javax.imageio.ImageIO;
@@ -143,8 +146,9 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @throws BlobException
      * @throws IntegrationException
      * @throws IOException 
+     * @throws java.lang.ClassNotFoundException 
      */
-    public Blob storeBlob(Blob blob) throws BlobException, IntegrationException, IOException {
+    public Blob storeBlob(Blob blob) throws BlobException, IntegrationException, IOException, NoSuchElementException, ClassNotFoundException {
         //Test to see if the byte array is larger than a GIGABYTE
         if (blob.getBytes().length > GIGABYTE) {
             throw new BlobException("You cannot upload a file larger than 1 gigabyte.");
@@ -217,10 +221,18 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         String newExtension = getFileExtension(blob.getFilename());
         
-        String originalExtension = getFileExtension(originalBlob.getFilename());
+        String originalExtension = "";
+        
+        if(originalBlob.getFilename() != null){
+            originalExtension = getFileExtension(originalBlob.getFilename());
+        } else{
+            //The system is probably automatically updating the filename
+            //But let's make sure the extension is the same as the file's type
+            originalExtension = getFileExtension(generateFilename(bi.getBlobBytes(blob.getBytesID())));
+        }
         
         if(!newExtension.equals(originalExtension)){
-            throw new BlobTypeException("File extension of new filename is not equal to original extension.");
+            throw new BlobTypeException("File extension of new filename is not the same as the file type");
         }
         
         //If we reach here, the file extensions are equal, we may update the filename.
@@ -228,7 +240,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
     }
 
-    public Blob getPhotoBlob(int blobID) throws IntegrationException, IOException, ClassNotFoundException {
+    public Blob getPhotoBlob(int blobID) throws IntegrationException, IOException, ClassNotFoundException, NoSuchElementException, BlobTypeException {
         BlobIntegrator bi = getBlobIntegrator();
 
         Blob blob = new Blob(getPhotoBlobLight(blobID));
@@ -267,8 +279,9 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      * @throws IOException
      * @throws ClassNotFoundException 
+     * @throws com.tcvcog.tcvce.domain.BlobTypeException 
      */
-    public BlobLight getPhotoBlobLight(int blobID) throws IntegrationException, IOException, ClassNotFoundException{
+    public BlobLight getPhotoBlobLight(int blobID) throws IntegrationException, IOException, ClassNotFoundException, NoSuchElementException, BlobTypeException{
         
         BlobIntegrator bi = getBlobIntegrator();
         
@@ -345,9 +358,25 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @param input
      * @return The blob that was put into it, stripped of metadata
      * @throws java.io.IOException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws java.lang.ClassNotFoundException
+     * @throws com.tcvcog.tcvce.domain.BlobTypeException
      */
-    public Blob stripImageMetadata(Blob input) throws IOException, NoSuchElementException {
+    public Blob stripImageMetadata(Blob input) 
+            throws IOException, 
+            NoSuchElementException, 
+            IntegrationException, 
+            ClassNotFoundException, 
+            BlobTypeException {
 
+        if(input.getFilename() == null){
+            
+            //No file name, let's generate one and save it to the database.
+            input.setFilename(generateFilename(input.getBytes()));
+            
+            updateBlobFilename(input);
+            
+        }
         //First, let's find out what type of file this is.
         String fileExtension = getFileExtension(input.getFilename());
         
@@ -449,6 +478,25 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
+     * Takes the bytes of an untitled file, finds its file type,
+     * and returns a title for that file.
+     * @param bytes
+     * @return 
+     * @throws java.io.IOException 
+     */
+    public String generateFilename(byte[] bytes) throws IOException{
+        
+        InputStream is = new ByteArrayInputStream(bytes);
+        String extension = URLConnection.guessContentTypeFromStream(is);
+        
+        //let's add a random number at the end of untitled
+        //Makes it a little more easily identifiable than just "untitled".
+        String filename = "untitled" + new Random().nextInt(10000) + "." + extension;
+        
+        return filename;
+    }
+    
+    /**
      * Returns a list of all the objects associated with the given blob
      * @param blob
      * @return
@@ -535,11 +583,13 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      * @throws java.io.IOException 
      * @throws java.lang.ClassNotFoundException 
+     * @throws com.tcvcog.tcvce.domain.BlobTypeException 
      */
     public List<BlobLight> searchBlobs(String filename, String description, LocalDateTime before, LocalDateTime after, int municode) 
             throws IntegrationException, 
             IOException, 
-            ClassNotFoundException {
+            ClassNotFoundException,
+            BlobTypeException {
         
         BlobIntegrator bi = getBlobIntegrator();
         
