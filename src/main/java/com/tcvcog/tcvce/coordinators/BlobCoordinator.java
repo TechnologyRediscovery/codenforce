@@ -245,7 +245,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
         Blob blob = new Blob(getPhotoBlobLight(blobID));
 
-        blob.setBytes(bi.getBlobBytes(blobID));
+        blob.setBytes(bi.getBlobBytes(blob.getBytesID()));
 
         return blob;
     }

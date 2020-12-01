@@ -42,7 +42,7 @@
                                                                 >
 
                                                 <f:selectItem itemLabel="INFO" itemValue="Info"  />
-                                                <f:selectItem itemLabel="VIEW" itemValue="View"  />
+                                                <f:selectItem itemLabel="VIEW" itemValue="View" itemDisabled="#{!manageBlobBB.currentBlobSelected}" />
                                                 <f:selectItem itemLabel="CONNECTIONS" itemValue="Objects" itemDisabled="#{!manageBlobBB.currentBlobSelected}"/>
                                                 <f:selectItem itemLabel="UPDATE" itemValue="Update"  itemDisabled="#{!manageBlobBB.currentBlobSelected}"/>
 
@@ -218,7 +218,8 @@
                                                                      update="
                                                                      form-messages-global
                                                                      blob-lists-outpanel
-                                                                     mode-form"
+                                                                     mode-form
+                                                                     blob-info-header-form"
                                                                      />
                                                 </p:column>
                                             </p:dataTable>
@@ -345,10 +346,7 @@
 
                                             <h:form id="blobManage-form-view">
 
-                                                <p:panelGrid columns="4" 
-                                                             layout="grid"
-                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
-                                                             >
+                                                
 
                                                     <p:outputLabel value="View Image:"/>
                                                     <p:spacer height="10px"/>
@@ -358,10 +356,13 @@
                                                     </p:graphicImage>
 
                                                     <p:spacer height="10px"/>
-                                                    <p:commandLink value="#{blob.filename}" action="#{manageBlobBB.downloadSelectedBlob()}"/>
+                                                        <p:commandButton
+                                                            value="Download File" 
+                                                            icon ="pi pi-save" 
+                                                            action="#{manageBlobBB.downloadSelectedBlob()}"
+                                                            ajax="false"/>
                                                     <p:spacer height="10px"/>
 
-                                                </p:panelGrid>
 
                                                 <p:spacer height="10px" />
 
@@ -380,11 +381,6 @@
                                             <p:spacer height="10px"/>
 
                                             <h:form id="blobManage-form-objects">
-
-                                                <p:panelGrid columns="4" 
-                                                             layout="grid"
-                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
-                                                             >
 
                                                     <!--Connected properties -->
 
@@ -453,7 +449,7 @@
                                                         </p:column>
 
                                                         <p:column headerText="Address">
-                                                            <h:outputText value="#{cear.addressOfConcern}"/>
+                                                            <h:outputText value="#{cear.requestProperty.address}"/>
                                                         </p:column>
 
                                                         <p:column>
@@ -464,7 +460,7 @@
 
                                                         <p:column>
                                                             <p:commandButton value="Remove Link" 
-                                                                             action="#{manageBlobBB.removeCEARPhotoLink(request)}"
+                                                                             action="#{manageBlobBB.removeCEARPhotoLink(cear)}"
                                                                              ajax="true"
                                                                              disabled="#{!manageBlobBB.currentBlobSelected}"
                                                                              update="
@@ -502,7 +498,7 @@
                                                         </p:column>
 
                                                         <p:column headerText="Code Violated:">
-                                                            <h:outputText value="#{violation.codeViolated.ordSubSecTitle}"/>
+                                                            <h:outputText value="#{violation.violatedEnfElement.codeElement.ordSubSecNum}: #{violation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
                                                         </p:column>
 
                                                         <p:column>
@@ -668,7 +664,11 @@
                                                         </p:column>
 
                                                     </p:dataTable>
-
+                                                    
+                                                    <p:outputLabel rendered="#{manageBlobBB.allConnectionsEmpty}">
+                                                            No connections found!
+                                                    </p:outputLabel>
+                                                    
                                                     <!-- DELETE FILE CONTROLS! -->
 
                                                     <h:panelGroup rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
@@ -678,28 +678,29 @@
                                                             <p:outputLabel value="Delete Blob"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
-                                                        <p:outputLabel>
+                                                        <p:outputLabel style="display: block; width:50%;">
                                                             A file may only be deleted if all links to other objects have been removed.
-                                                            If you deletes all files pointing to the same data in our database, the data will be destroyed as well.
+                                                            If you delete all files pointing to the same data in our database, the data will be destroyed as well.
                                                         </p:outputLabel>
                                                         <p:spacer height="5px"/>
                                                         <p:commandButton    id="change-property-cb" 
                                                                             actionListener="#{manageBlobBB.deleteSelectedBlob()}"
                                                                             value="Delete Blob" 
                                                                             styleClass="noFill button-size-small"
-                                                                            disabled="#{!manageBlobBB.allConnectionsEmpty and !manageBlobBB.currentBlobSelected}"
-                                                                            icon="fa fa-home"
+                                                                            disabled="#{!manageBlobBB.allConnectionsEmpty}"
+                                                                            icon="pi pi-trash"
                                                                             update="form-messages-global
                                                                             blob-search-messages-form
-                                                                            blob-search-results-panel">
+                                                                            blob-search-results-panel
+                                                                            blob-lists-outpanel
+                                                                            mode-form">
                                                             <p:confirm header="Confirm" 
                                                                        message="Are you sure that you would like to delete #{manageBlobBB.selectedBlob.filename}? 
                                                                        If you will need it later, you should download it first."/>
                                                         </p:commandButton>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
-
-                                                </p:panelGrid>
+                                                    
                                             </h:form>
 
                                         </p:panel>

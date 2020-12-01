@@ -97,20 +97,32 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
      * this is temp for testing, to be replaced by proper query search implementation
      */
     @PostConstruct
-    public void initBean(){
-        
+    public void initBean() {
+
         setCurrentMode("Info");
-        
+
         try {
-            BlobIntegrator bi = getBlobIntegrator();
-            blobList = new ArrayList<>();
-            List<Integer> blobIDs = bi.getRecentPhotoBlobs();
-            
-            BlobCoordinator bc = getBlobCoordinator();
-            for (int idnum : blobIDs) {
-                blobList.add(bc.getPhotoBlobLight(idnum));
+            if (searchFilename == null
+                    && searchDescription == null
+                    && searchBefore == null
+                    && searchAfter == null) {
+                
+                BlobIntegrator bi = getBlobIntegrator();
+                BlobCoordinator bc = getBlobCoordinator();
+                
+                List<Integer> blobIDs = bi.getRecentPhotoBlobs();
+                blobList = new ArrayList<>();
+                
+                for (int idnum : blobIDs) {
+                    blobList.add(bc.getPhotoBlobLight(idnum));
+                }
+                
+            } else {
+                //They already have a query in place
+                //we are probably reloading after deleting a blob.
+                executeQuery();
             }
-            
+
         } catch (IntegrationException | ClassNotFoundException | IOException | NoSuchElementException | BlobTypeException ex) {
             System.out.println("manageBlobBB.initBean | ERROR: " + ex);
         }
@@ -121,56 +133,55 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         // Prepare.
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
-        HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
 
         BufferedInputStream input = null;
         BufferedOutputStream output = null;
 
         BlobCoordinator bc = getBlobCoordinator();
-        
+
         Blob blob = null;
-        
+
         try {
-            
+
             // Init servlet response.
-            response.reset();
-            
-            switch(selectedBlob.getType()){
-            case PDF:
-                response.setHeader("Content-Type", "application/pdf");
-                //PDF downloads not yet supported
-                //blob = bc.getPDFBlob(selectedBlob.getBlobID())
-                break;
-                
-            case PHOTO:
-                response.setHeader("Content-Type", "image/" + bc.getFileExtension(selectedBlob.getFilename()));
-                blob = bc.getPhotoBlob(selectedBlob.getBlobID());
-                break;
-                
-            default:
-                //do nothing
-                break;
-            }
-            
-            if(blob != null){
-            // Open file.
-            input = new BufferedInputStream(new ByteArrayInputStream(blob.getBytes()));
-                
-            response.setHeader("Content-Length", String.valueOf(blob.getBytes().length));
-            
-            response.setHeader("Content-Disposition", "inline; filename=\"" + blob.getFilename() + "\"");
-            
-            output = new BufferedOutputStream(response.getOutputStream(), DEFAULT_BUFFER_SIZE);
+            externalContext.responseReset();
 
-            // Write file contents to response.
-            byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-            int length;
-            while ((length = input.read(buffer)) > 0) {
-                output.write(buffer, 0, length);
+            switch (selectedBlob.getType()) {
+                case PDF:
+                    externalContext.setResponseContentType("application/pdf");
+                    //PDF downloads not yet supported
+                    //blob = bc.getPDFBlob(selectedBlob.getBlobID())
+                    break;
+
+                case PHOTO:
+                    externalContext.setResponseContentType("image/" + bc.getFileExtension(selectedBlob.getFilename()));
+                    blob = bc.getPhotoBlob(selectedBlob.getBlobID());
+                    break;
+
+                default:
+                    //do nothing
+                    break;
             }
 
-            // Finalize task.
-            output.flush();
+            if (blob != null) {
+                // Open file.
+                input = new BufferedInputStream(new ByteArrayInputStream(blob.getBytes()));
+
+                externalContext.setResponseContentLength(blob.getBytes().length);
+
+                externalContext.setResponseHeader("Content-Disposition", "attachment; filename=\"" + blob.getFilename() + "\"");
+
+                output = new BufferedOutputStream(externalContext.getResponseOutputStream(), DEFAULT_BUFFER_SIZE);
+
+                // Write file contents to response.
+                byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+                int length;
+                while ((length = input.read(buffer)) > 0) {
+                    output.write(buffer, 0, length);
+                }
+
+                // Finalize task.
+                output.flush();
             } else {
                 throw new BlobException("BlobType not yet supported for download or blob failed to load.");
             }
@@ -292,6 +303,10 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
 
                 bc.deletePhotoBlob(selectedBlob);
 
+                selectedBlob = null;
+                
+                currentBlobSelected = false;
+                
                 //Reload the blob list
                 initBean();
                 
@@ -459,6 +474,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         try {
             BlobIntegrator bi = getBlobIntegrator();
             bi.removePhotoPropertyLink(selectedBlob.getBlobID(), prop.getPropertyID());
+            connectedProperties.remove(prop);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully removed link between photo and property", ""));
@@ -476,6 +492,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         try {
             BlobIntegrator bi = getBlobIntegrator();
             bi.removePhotoCEARLink(selectedBlob.getBlobID(), request.getRequestID());
+            connectedRequests.remove(request);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully removed link between photo and Code Enforcement Action Request", ""));
@@ -493,6 +510,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         try {
             BlobIntegrator bi = getBlobIntegrator();
             bi.removePhotoViolationsLink(selectedBlob.getBlobID(), violation.getViolationID());
+            connectedViolations.remove(violation);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully removed link between photo and Code Violation", ""));
@@ -510,6 +528,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         try {
             BlobIntegrator bi = getBlobIntegrator();
             bi.removePhotoMuniLink(selectedBlob.getBlobID(), muni.getMuniCode());
+            connectedMunis.remove(muni);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully removed link between photo and Municipality", ""));
@@ -527,6 +546,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         try {
             BlobIntegrator bi = getBlobIntegrator();
             bi.removePhotoInspectedSpaceElementLink(selectedBlob.getBlobID(), element.getElementID());
+            connectedElements.remove(element);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully removed link between photo and Inspected Space Element", ""));
@@ -544,6 +564,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         try {
             BlobIntegrator bi = getBlobIntegrator();
             bi.removePhotoMuniLink(selectedBlob.getBlobID(), period.getPeriodID());
+            connectedPeriods.remove(period);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully removed link between photo and Occ Period", ""));
