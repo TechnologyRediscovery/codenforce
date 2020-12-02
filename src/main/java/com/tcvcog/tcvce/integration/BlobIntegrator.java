@@ -467,7 +467,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
         Connection con = getPostgresCon();
         String query = " UPDATE public.blobbytes\n"
-                + " SET filename=?,\n"
+                + " SET filename=?\n"
                 + " WHERE bytesid=?;\n\n";
         
         PreparedStatement stmt = null;

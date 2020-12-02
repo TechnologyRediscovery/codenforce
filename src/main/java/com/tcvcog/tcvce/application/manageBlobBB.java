@@ -54,7 +54,6 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  *
@@ -102,10 +101,6 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         setCurrentMode("Info");
 
         try {
-            if (searchFilename == null
-                    && searchDescription == null
-                    && searchBefore == null
-                    && searchAfter == null) {
                 
                 BlobIntegrator bi = getBlobIntegrator();
                 BlobCoordinator bc = getBlobCoordinator();
@@ -116,16 +111,136 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
                 for (int idnum : blobIDs) {
                     blobList.add(bc.getPhotoBlobLight(idnum));
                 }
-                
-            } else {
-                //They already have a query in place
-                //we are probably reloading after deleting a blob.
-                executeQuery();
-            }
-
         } catch (IntegrationException | ClassNotFoundException | IOException | NoSuchElementException | BlobTypeException ex) {
             System.out.println("manageBlobBB.initBean | ERROR: " + ex);
         }
+    }
+    
+    /**
+     * Reloads the blobs after changes have been made.
+     * Will also return a user to the blob and mode they
+     * were editing before if possible.
+     */
+    public void reloadBlobs() {
+
+        String tempMode = getCurrentMode();
+
+        int currentBlobID = selectedBlob.getBlobID();
+
+        if (searchFilename == null
+                && searchDescription == null
+                && searchBefore == null
+                && searchAfter == null) {
+            //No search, just reload recent blobs.
+            initBean();
+        } else {
+            executeQuery();
+        }
+
+        if (currentBlobID == 0) {
+            //Blob was deleted, deselect blob and don't search
+            selectedBlob = null;
+            metaList = new ArrayList<>();
+            currentBlobSelected = false;
+            setCurrentMode("Info");
+            reloadConnections();
+        } else {
+            for (BlobLight b : blobList) {
+                if (b.getBlobID() == currentBlobID) {
+                    //This is the blob the user had selected, reload it.
+                    selectBlob(b);
+                    setCurrentMode(tempMode);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Reloads only the connections of the selected blob.
+     * If no blob is selected, it just wipes the connection lists.
+     */
+    public void reloadConnections() {
+
+        connectedRequests = new ArrayList<>();
+        connectedViolations = new ArrayList<>();
+        connectedMunis = new ArrayList<>();
+        connectedElements = new ArrayList<>();
+        connectedPeriods = new ArrayList<>();
+        connectedProperties = new ArrayList<>();
+
+        if (selectedBlob != null) {
+
+            BlobCoordinator bc = getBlobCoordinator();
+
+            try {
+                for (BOb object : bc.getAttachedObjects(selectedBlob)) {
+
+                    //Check to see what class the object is
+                    String className = object.getClass().getSimpleName();
+
+                    switch (className) {
+                        case "CEActionRequest":
+                            connectedRequests.add((CEActionRequest) object);
+                            break;
+
+                        case "CodeViolation":
+                            connectedViolations.add((CodeViolation) object);
+                            break;
+
+                        case "Municipality":
+                            connectedMunis.add((Municipality) object);
+                            break;
+
+                        case "OccInspectedSpaceElement":
+                            connectedElements.add((OccInspectedSpaceElement) object);
+                            break;
+
+                        case "OccPeriod":
+                            connectedPeriods.add((OccPeriod) object);
+                            break;
+                    }
+
+                }
+            } catch (AuthorizationException
+                    | BObStatusException
+                    | EventException
+                    | ViolationException
+                    | IntegrationException ex) {
+                System.out.println("manageBlobBB.reloadConnections() | ERROR: " + ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "An error occurred while trying load file connections!", ""));
+            }
+        }
+    }
+    
+    public void selectBlob(BlobLight blob) {
+
+        newFilename = "";
+        
+        newDescription = "";
+        
+        selectedBlob = blob;
+
+        currentBlobSelected = true;
+
+        //We have to load all the metadata properties into the metadataUI list
+        //So our users can sort it alphabetically, etc.
+        
+        metaList = new ArrayList<>();
+        
+        for(MetadataKey key : selectedBlob.getBlobMetadata().getPropertiesList()){
+            MetadataUI skeleton = new MetadataUI(
+                    key.getLabel(), 
+                    key.getKey(), 
+                    selectedBlob.getBlobMetadata().getProperty(key));
+            
+            metaList.add(skeleton);
+            
+        }
+        
+        reloadConnections();
+        
     }
     
     public void downloadSelectedBlob(){
@@ -217,82 +332,6 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
                             "An error occurred while trying to search for files!", ""));
         }
     }
-
-    public void selectBlob(BlobLight blob) {
-        BlobCoordinator bc = getBlobCoordinator();
-
-        newFilename = "";
-        
-        newDescription = "";
-        
-        selectedBlob = blob;
-
-        currentBlobSelected = true;
-
-        //We have to load all the metadata properties into the metadataUI list
-        //So our users can sort it alphabetically, etc.
-        
-        metaList = new ArrayList<>();
-        
-        for(MetadataKey key : selectedBlob.getBlobMetadata().getPropertiesList()){
-            MetadataUI skeleton = new MetadataUI(
-                    key.getLabel(), 
-                    key.getKey(), 
-                    selectedBlob.getBlobMetadata().getProperty(key));
-            
-            metaList.add(skeleton);
-            
-        }
-        
-        connectedRequests = new ArrayList<>();
-        connectedViolations = new ArrayList<>();
-        connectedMunis = new ArrayList<>();
-        connectedElements = new ArrayList<>();
-        connectedPeriods = new ArrayList<>();
-        connectedProperties = new ArrayList<>();
-        
-        try {
-            for (BOb object : bc.getAttachedObjects(blob)) {
-
-                //Check to see what class the object is
-                
-                String className = object.getClass().getSimpleName();
-                
-                switch(className){
-                    case "CEActionRequest":
-                        connectedRequests.add((CEActionRequest) object);
-                        break;
-                    
-                    case "CodeViolation":
-                        connectedViolations.add((CodeViolation) object);
-                        break;
-                        
-                    case "Municipality":
-                        connectedMunis.add((Municipality) object);
-                        break;
-                        
-                    case "OccInspectedSpaceElement":
-                        connectedElements.add((OccInspectedSpaceElement) object);
-                        break;
-                        
-                    case "OccPeriod":
-                        connectedPeriods.add((OccPeriod) object);
-                        break;
-                }
-                
-            }
-        } catch (AuthorizationException 
-                | BObStatusException 
-                | EventException 
-                | ViolationException 
-                | IntegrationException ex) {
-            System.out.println("manageBlobBB.selectBlob() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occurred while trying to search for files!", ""));
-        }
-
-    }
     
     public void deleteSelectedBlob() {
 
@@ -303,12 +342,11 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
 
                 bc.deletePhotoBlob(selectedBlob);
 
-                selectedBlob = null;
+                //Setting blobID to 0 tells the reloadBlobs() method
+                //not to search for the blob after reloading.
+                selectedBlob.setBlobID(0);
                 
-                currentBlobSelected = false;
-                
-                //Reload the blob list
-                initBean();
+                reloadBlobs();
                 
             } catch (IntegrationException 
                     | EventException 
@@ -345,6 +383,8 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             
             bc.updateBlobFilename(selectedBlob);
             
+            reloadBlobs();
+            
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully updated filename!", ""));
@@ -361,8 +401,8 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             System.out.println("manageBlobBB.updateBlobFilename() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please make sure the filename extension (e.g. .jpg, .png, .pdf) is the same as the current filename extension. "
-                                    + "Changing a file's extension could break the file!", ""));
+                            "Please end the file name with the file extension [" +
+                            bc.getFileExtension(originalName) +"]", ""));
         }
         
     }
@@ -375,6 +415,8 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             selectedBlob.setDescription(newDescription);
             
             bi.updatePhotoBlobDescription(selectedBlob);
+            
+            reloadBlobs();
             
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
