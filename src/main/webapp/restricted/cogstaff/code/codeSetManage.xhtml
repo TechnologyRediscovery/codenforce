@@ -6,7 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
     <h:head>
-        <title>Code Set Management</title>
+        <title>Code book Management</title>
     </h:head>
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
@@ -15,7 +15,7 @@
 
                     <div class="mainContainer">
 
-                        <h1>Manage Municipal Code Sets and Enforceable Code Elements</h1>
+                        <h1>Manage Code Books</h1>
 
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
                                     warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
@@ -28,24 +28,18 @@
                                 <p:panel id = "codesetmanage-panel-selectcodeset"
                                          toggleable = "true"
                                          collapsed ="false"
-                                         header = "Existing code sets"
+                                         header = "Existing code books"
                                          >
 
                                     <h:form id="manageSingleCodeSet">
-                                        <p style="height: 50px"><span style="font-style: italic">
-                                                A code set is a grouping of 
-                                                code elements which apply to a single municipality. 
-                                                Code sets may contain code elements from any source. 
-                                                When an element is added to a code set, it is 
-                                                wrapped in enforcement data specific to the municipality 
-                                                to which the set is attached.</span></p>
+                                        
 
                                         <p:dataTable id="codeSetSelectOneDT" 
                                                      value="#{codeSetBB.currentcodeSetMap}" 
                                                      var="csm" 
                                                      >
 
-                                            <p:column headerText="Code Sets" 
+                                            <p:column headerText="Code Books" 
                                                       styleClass="centeredColumnContent"
                                                       >
 
@@ -95,23 +89,14 @@
 
                                         </p:dataTable> 
 
-                                        <p:spacer height="25px"/>
+                                        <p:spacer height="20px"/>
 
 
-                                        <p:commandButton id="codesetmanage-button-addcodeset" 
-                                                         ajax="true"
-                                                         value="Add New Code Set" 
-                                                         icon="fa fa-plus" 
-                                                         oncomplete="PF('codesetmanage-dialog-addcodeset-var').show();"
-                                                         style="width: 275px"
-                                                         />
-
-                                        <p:spacer height="25px"/>
 
                                         <p:commandButton id="codeSetBuilderButton" 
                                                          ajax="true" 
                                                          icon="fa fa-plus"
-                                                         value="Add Elements To Selected Code Set" 
+                                                         value="Add Elements To Selected Code Book" 
                                                          style="width: 275px"
                                                          oncomplete="PF('codesetmanage-dialog-codeSetBuilder-var').show();"
                                                          update="codesetmanage-dialog-codeSetBuilder
@@ -120,6 +105,15 @@
                                                          disabled="#{codeSetBB.activeEdit()}"/>
 
 
+                                        <p:spacer height="5px"/>
+
+                                        <p:commandButton id="codesetmanage-button-addcodeset" 
+                                                         ajax="true"
+                                                         value="Add New Code Book" 
+                                                         icon="fa fa-plus" 
+                                                         oncomplete="PF('codesetmanage-dialog-addcodeset-var').show();"
+                                                         style="width: 275px"
+                                                         />
                                     </h:form>
 
                                 </p:panel>
@@ -131,11 +125,11 @@
                                 <p:panel id = "codesetmanage-panel-selectcodesetelement"
                                          toggleable = "true"
                                          collapsed ="false"
-                                         header = "Enforceable code elements in code set: #{codeSetElementBB.currentCodeSet.codeSetName}"
+                                         header = "Enforceable code elements in code book: #{codeSetElementBB.currentCodeSet.codeSetName}"
                                          >
 
                                     <p style="height: 50px">The following table displays Enforcable Code Elements, meaning code elements added to a 
-                                        municipality-specific code set wrapped in enforcement data (e.g. max penalty).</p>
+                                        municipality-specific code book wrapped in enforcement data (e.g. max penalty).</p>
 
 
                                     <h:form id="enforcableCodeSetElementsForm">
@@ -369,7 +363,7 @@
 
                                         <p:commandButton 
                                             ajax="false" tabindex="2" icon="fa fa-bomb"
-                                            value="Nuke Selected Element from code set (Along with all its enforcability data!)"
+                                            value="Nuke Selected Element from code book (Along with all its enforcability data!)"
                                             id="addElementToSetButton" disabled="true"
                                             action="#{codeSetElementBB.nukeECE}" />
 
@@ -388,23 +382,23 @@
                                width="600"
                                widgetVar="codesetmanage-dialog-editcodeset-var"
                                closable="true" 
-                               header="Edit Code Set"
+                               header="Edit Code book"
                                >
 
                         <h:form id="codesetmanage-dialog-editcodeset-form" >
 
                             <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5" width="580" >
 
-                                <h:outputText value="Code Set ID :"/>
+                                <h:outputText value="Code book ID :"/>
                                 <h:outputText value="#{codeSetBB.selectedCodeSetID}" style="width: 90%" />
-                                <h:outputText value="Code Set Name :"/>
+                                <h:outputText value="Code book Name :"/>
                                 <p:inputText value="#{codeSetBB.formCodeSetName}"/>
                                 <h:outputText value="Description :" style="width: 90%"/>
                                 <p:inputText value="#{codeSetBB.formCodeSetDescription}"/>
 
                             </h:panelGrid>
 
-                            <p class="note">Moving an existing code set to a new municipality must be done on the 
+                            <p class="note">Moving an existing code book to a new municipality must be done on the 
                                 "back end" by an administrator.</p>
 
                             <p:commandButton ajax="true"
@@ -433,7 +427,7 @@
                                width="600"
                                widgetVar="codesetmanage-dialog-addcodeset-var"
                                closable="true" 
-                               header="Add New Code Set"
+                               header="Add New Code book"
                                >
 
                         <h:form id="codesetmanage-dialog-addcodeset-form" >
@@ -451,10 +445,10 @@
                                     <f:selectItems value="#{codeSetBB.muniNameIDMap}"/>
                                 </p:selectOneMenu>
 
-                                <h:outputText value="New Code Set Name :"/>
+                                <h:outputText value="New Code book Name :"/>
                                 <p:inputText value="#{codeSetBB.formNewCodeSetName}"/>
 
-                                <h:outputText value="New Code Set Description :" style="width: 90%"/>
+                                <h:outputText value="New Code book Description :" style="width: 90%"/>
                                 <p:inputText value="#{codeSetBB.formNewCodeSetDescription}"/>
 
                             </h:panelGrid>
@@ -493,7 +487,7 @@
                             <p:panel id = "eceNo"
                                      toggleable = "true"
                                      collapsed ="false"
-                                     header = "Enforcability data for code set element number: #{codeSetElementBB.selectedECE.codeSetElementID}"
+                                     header = "Enforcability data for code book element number: #{codeSetElementBB.selectedECE.codeSetElementID}"
                                      >
 
 
@@ -611,14 +605,14 @@
                                height="75vh"
                                widgetVar="codesetmanage-dialog-codeSetBuilder-var"
                                closable="true" 
-                               header="Code Set Builder"
+                               header="Code Book Builder"
                                
                                
                                >
 
                         <p:panel  toggleable = "true"
                                   collapsed ="false"
-                                  header = "Current Code Set: #{codeSetBuilderBB.currentCodeSet.codeSetName}"
+                                  header = "Current Code book: #{codeSetBuilderBB.currentCodeSet.codeSetName}"
                                   
                                   >
 
@@ -631,7 +625,7 @@
                                 <h:panelGrid columns="4" cellpadding="10"  
                                              columnClasses="gridTd, gridTd, gridTd, gridTd">
 
-                                    <h:outputText class="bold" value="Current Code Set Name:"/>
+                                    <h:outputText class="bold" value="Current Code Book Name:"/>
                                     <h:outputText value="#{codeSetBuilderBB.currentCodeSet.codeSetName}"/>
                                     <h:outputText class="bold" value="Set ID Number:"/>
                                     <h:outputText value="#{codeSetBuilderBB.currentCodeSet.codeSetID}"/>
@@ -666,8 +660,6 @@
                                     <f:selectItems value="#{codeSetBuilderBB.codeSourceMap}"/>
 
 
-
-
                                 </p:selectOneMenu>
 
                                 <h:message for="sourceMenu" showDetail="true" showSummary="true" 
@@ -676,7 +668,7 @@
 
                                 <p:commandButton
                                     id="getElementsFromCodeSourceButton"
-                                    value="Get Code Elements from Selected Source"
+                                    value="Get Ordinances from Selected Source"
                                     actionListener="#{codeSetBuilderBB.retrieveCodeElementsFromSelectedSource}"
                                     ajax="true" 
                                     icon="fa fa-list"
@@ -686,7 +678,7 @@
                                 <h:form id="codeElemetnAddForm">
 
 
-                                <p class="note">Select multiple elements by clicking them sequentially. 
+                                <p class="note">Select multiple ordinances by clicking them sequentially. 
                                     Un-select a row by holding down control while clicking (using a mouse for this is handy).</p>
 
                                 <p:dataTable
@@ -751,9 +743,9 @@
                                             
                                             >
 
-                                    <p>The values in these input boxes will be copied into each of the code elements you choose to add to the code set. 
+                                    <p>The values in these input boxes will be copied into each of the code elements you choose to add to the code book. 
                                         This allows for bulk adding of code elements all with the same enforceability data. Values for each individual element
-                                        can always be edited by loading the assembled code set through the "Code Sets" page link in the left side bar.</p> 
+                                        can always be edited by loading the assembled code book through the "Code books" page link in the left side bar.</p> 
 
                                     <h:panelGrid columns="4" cellpadding="10"  
                                                  columnClasses="gridTd, gridTd, gridTd,gridTd,">

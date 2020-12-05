@@ -425,6 +425,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         if (nov != null) {
             getSessionBean().setSessNotice(nov);
             currentNotice = nov;
+            refreshCurrentCase();
+            
             System.out.println("NoticeOfViolationBB.onObjectViewButtonChange: " + nov.getNoticeID());
         }
         System.out.println("NoticeOfViolationBB.onObjectViewButtonChange: " + nov);
@@ -876,26 +878,25 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      * Listener for user requests to create a new notice
      * @return 
      */
-    public String onInsertNewNoticeButtonChange() {
+    public void onInsertNewNoticeButtonChange() {
         CaseCoordinator cc = getCaseCoordinator();
         try {
                 if(currentNotice.getRecipient() == null){
                       getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select a notice recipient to save draft", ""));
-                      return "";
                 } else {
                     cc.nov_InsertNotice(currentNotice, currentCase, getSessionBean().getSessUser());
                     getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Notice saved", ""));
                     
                 }
-
+            // make sure our person list is up to date
+            currentCase = getSessionBean().getSessCECase();
+            refreshCurrentCase();
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-            return "";
         }
-        return "ceCaseSearchProfile";
     } // close method
 
    

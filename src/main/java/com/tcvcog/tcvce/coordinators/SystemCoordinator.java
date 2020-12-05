@@ -509,8 +509,8 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
 
     //Side Tool Bar
     //Sidebar Sub Nav Item: Municipal Code
-    private final NavigationSubItem codeSource = getNavSubItem("Code Sources", "/restricted/cogstaff/code/codeSourceManage.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem codeBook = getNavSubItem("Code Book", "/restricted/cogstaff/code/codeSetManage.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem codeSource = getNavSubItem("Oridances", "/restricted/cogstaff/code/codeElementManage.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem codeBook = getNavSubItem("Code Books", "/restricted/cogstaff/code/codeSetManage.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List:Code
     public List<NavigationSubItem> getSidebarCodeConfigList() {

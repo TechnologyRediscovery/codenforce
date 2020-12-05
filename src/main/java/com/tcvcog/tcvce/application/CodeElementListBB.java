@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -41,15 +42,15 @@ public class CodeElementListBB extends BackingBeanUtils implements Serializable 
     }
     
     private CodeElement selectedElement;
-    private ArrayList<CodeElement> codeElementList;
-    private ArrayList<CodeElement> filteredCodeElementList;
+    private List<CodeElement> codeElementList;
+    private List<CodeElement> filteredCodeElementList;
     
     
     
     private CodeSource activeCodeSource;
     
-    private ArrayList<CodeElement> loadCodeElementList(){
-        ArrayList<CodeElement> elList = null;
+    private List<CodeElement> loadCodeElementList(){
+        List<CodeElement> elList = null;
         CodeSource source = getSessionBean().getSessCodeSource();
         CodeIntegrator codeIntegrator = getCodeIntegrator();
         try {
@@ -129,7 +130,7 @@ public class CodeElementListBB extends BackingBeanUtils implements Serializable 
     /**
      * @return the codeElementList
      */
-    public ArrayList<CodeElement> getCodeElementList() {
+    public List<CodeElement> getCodeElementList() {
         if(codeElementList == null){
             codeElementList = loadCodeElementList();
         } 
@@ -160,7 +161,7 @@ public class CodeElementListBB extends BackingBeanUtils implements Serializable 
     /**
      * @return the filteredCodeElementList
      */
-    public ArrayList<CodeElement> getFilteredCodeElementList() {
+    public List<CodeElement> getFilteredCodeElementList() {
         return filteredCodeElementList;
     }
 

@@ -152,6 +152,10 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
         
     }
     
+    public int addCodeElement(CodeElement ele, UserAuthorized ua){
+        return 0;
+    }
+    
     public void addNewCodeSource(CodeSource source) throws IntegrationException{
         System.out.println("CodeCoordinator.addNewCodeSource");
         getCodeIntegrator().insertCodeSource(source);
@@ -185,5 +189,14 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
         return new ArrayList<>();
         
     }
+    
+    public List<CodeElement> getCodeElemements(CodeSource src) throws IntegrationException{
+        if(src ==  null){
+            return null;
+        }
+        CodeIntegrator ci = getCodeIntegrator();
+        return ci.getCodeElements(src.getSourceID());
+    }
+    
     
 }

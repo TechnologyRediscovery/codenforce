@@ -24,7 +24,8 @@ import java.util.Objects;
  *
  * @author ellen bascomb of apt 31y
  */
-public class CodeSource implements Serializable{
+public  class CodeSource 
+        implements Serializable{
     
     private int sourceID;
     private String sourceName;

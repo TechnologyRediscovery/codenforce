@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.integration.CodeIntegrator;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -49,14 +50,14 @@ public class CodeSetBuilderBB extends BackingBeanUtils implements Serializable {
 
     }
 
-    private ArrayList<CodeSource> codeSourceList;
+    private List<CodeSource> codeSourceList;
     private int selectedCodeSourceID;
     private HashMap<String, CodeSource> codeSourceMap;
 
     private CodeSet currentCodeSet;
 
-    private ArrayList<CodeElement> codeElementList;
-    private ArrayList<CodeElement> selectedElementsToAddToSet;
+    private List<CodeElement> codeElementList;
+    private List<CodeElement> selectedElementsToAddToSet;
 
     // default data values for all added EnforcableCodeElements
     private double formMaxPenalty;
@@ -169,7 +170,7 @@ public class CodeSetBuilderBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the codeSourceList
      */
-    public ArrayList<CodeSource> getCodeSourceList() {
+    public List<CodeSource> getCodeSourceList() {
         return codeSourceList;
     }
 
@@ -183,7 +184,7 @@ public class CodeSetBuilderBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the codeElementList
      */
-    public ArrayList<CodeElement> getCodeElementList() {
+    public List<CodeElement> getCodeElementList() {
         return codeElementList;
     }
 
@@ -338,7 +339,7 @@ public class CodeSetBuilderBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the selectedElementsToAddToSet
      */
-    public ArrayList<CodeElement> getSelectedElementsToAddToSet() {
+    public List<CodeElement> getSelectedElementsToAddToSet() {
         return selectedElementsToAddToSet;
     }
 

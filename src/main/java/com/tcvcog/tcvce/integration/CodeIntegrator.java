@@ -32,6 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import javax.faces.application.FacesMessage;
@@ -647,7 +648,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
                 
                 e.setOrdSubSecNum(rs.getString("ordsubsecnum"));
                 e.setOrdSubSecTitle(rs.getString("ordsubsectitle"));
-                e.setOrdSubSecNum(rs.getString("ordsubsubsecnum"));
+                e.setOrdSubSecNum(rs.getString("ordsubsecnum"));
                 
                 e.setOrdTechnicalText(rs.getString("ordtechnicaltext"));
                 
@@ -729,12 +730,12 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException Caught by backing beans and converted into
      * user messages
      */
-    public ArrayList getCodeElements(int sourceID) throws IntegrationException{
+    public List<CodeElement> getCodeElements(int sourceID) throws IntegrationException{
         String query = "SELECT elementid from codeelement where codesource_sourceID = ?;";
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        ArrayList<CodeElement> elementList = new ArrayList();
+        List<CodeElement> elementList = new ArrayList();
          try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
