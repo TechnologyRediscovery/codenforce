@@ -117,10 +117,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <f:facet name="header">
                                                         <h:outputText value="Ordinance" />
                                                     </f:facet>
-                                                    <h:outputText value="#{violation.violatedEnfElement.codeElement.ordSubSecNum}: #{violation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                    <h:outputText value="#{violation.violatedEnfElement.ordSubSecNum}: #{violation.violatedEnfElement.ordSubSecTitle}"/>
                                                     <p:spacer height="3px" />
-                                                    <h:outputText value="#{violation.violatedEnfElement.codeElement.source.sourceName}"/>
-                                                    <h:outputText value=" (#{violation.violatedEnfElement.codeElement.source.sourceYear})"/>
+                                                    <h:outputText value="#{violation.violatedEnfElement.source.sourceName}"/>
+                                                    <h:outputText value=" (#{violation.violatedEnfElement.source.sourceYear})"/>
                                                 </p:column>
 
 
@@ -406,38 +406,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <h:outputLabel value="Ordinance ID: #{violationBB.currentViolation.violatedEnfElement.codeElement.elementID} Details"/>
+                                                        <h:outputLabel value="Ordinance ID: #{violationBB.currentViolation.violatedEnfElement.elementID} Details"/>
                                                     </div>
                                                     <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
                                                         <h:outputText    id="violation-add-source-ot"
-                                                                         value="Source: #{violationBB.currentViolation.violatedEnfElement.codeElement.source.sourceName} (#{violationBB.currentViolation.violatedEnfElement.codeElement.source.sourceYear})"/>
+                                                                         value="Source: #{violationBB.currentViolation.violatedEnfElement.source.sourceName} (#{violationBB.currentViolation.violatedEnfElement.source.sourceYear})"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-add-chapter-ot"
-                                                                         value="Chapter #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterNo}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterTitle}"/>
+                                                                         value="Chapter #{violationBB.currentViolation.violatedEnfElement.ordchapterNo}: #{violationBB.currentViolation.violatedEnfElement.ordchapterTitle}"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-add-section-ot"
-                                                                         value="Section #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecTitle}"/>
+                                                                         value="Section #{violationBB.currentViolation.violatedEnfElement.ordSecNum}: #{violationBB.currentViolation.violatedEnfElement.ordSecTitle}"/>
 
                                                         <h:outputText value=" | " />
 
                                                         <h:outputText    id="violation-add-subsection-ot"
-                                                                         value="Sub-Sec #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                                         value="Sub-Sec #{violationBB.currentViolation.violatedEnfElement.ordSubSecNum}: #{violationBB.currentViolation.violatedEnfElement.ordSubSecTitle}"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-add-category-ot"
-                                                                         value="Category: #{!(empty violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry.category :'' }"/>
+                                                                         value="Category: #{!(empty violationBB.currentViolation.violatedEnfElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.guideEntry.category :'' }"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText   id="violation-add-ord-text"
                                                                         styleClass="monospace"
-                                                                        value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordTechnicalText}"
+                                                                        value="#{violationBB.currentViolation.violatedEnfElement.ordTechnicalText}"
                                                                         escape="false" />
                                                     </div>
 
@@ -463,7 +463,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                     <div class="restrict-data-field-value-inline" >
 
                                                                         <h:outputText   id="violation-ord-text-hf"
-                                                                                        value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordHumanFriendlyText}"
+                                                                                        value="#{violationBB.currentViolation.violatedEnfElement.ordHumanFriendlyText}"
                                                                                         styleClass="data_field_value"
                                                                                         escape="false" />
                                                                     </div>
@@ -481,7 +481,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                                         <h:outputText    id="violation-enfguidelines-ot"
                                                                                          styleClass="data_field_value"
-                                                                                         value="#{!(empty violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry.enforcementGuidelines :'' }"/>
+                                                                                         value="#{!(empty violationBB.currentViolation.violatedEnfElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.guideEntry.enforcementGuidelines :'' }"/>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -530,28 +530,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-add-chapter-ot"
-                                                                         value="Chapter #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterNo}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterTitle}"/>
+                                                                         value="Chapter #{violationBB.currentViolation.violatedEnfElement.ordchapterNo}: #{violationBB.currentViolation.violatedEnfElement.ordchapterTitle}"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-add-section-ot"
-                                                                         value="Section #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecTitle}"/>
+                                                                         value="Section #{violationBB.currentViolation.violatedEnfElement.ordSecNum}: #{violationBB.currentViolation.violatedEnfElement.ordSecTitle}"/>
 
                                                         <h:outputText value=" | " />
 
                                                         <h:outputText    id="violation-add-subsection-ot"
-                                                                         value="Sub-Sec #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                                         value="Sub-Sec #{violationBB.currentViolation.violatedEnfElement.ordSubSecNum}: #{violationBB.currentViolation.violatedEnfElement.ordSubSecTitle}"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-add-category-ot"
-                                                                         value="Category: #{!(empty violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry.category :'' }"/>
+                                                                         value="Category: #{!(empty violationBB.currentViolation.violatedEnfElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.guideEntry.category :'' }"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText   id="violation-add-ord-text"
                                                                         styleClass="monospace"
-                                                                        value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordTechnicalText}"
+                                                                        value="#{violationBB.currentViolation.violatedEnfElement.ordTechnicalText}"
                                                                         escape="false" />
                                                     </div>
                                                 </div>
@@ -928,28 +928,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-update-chapter-ot"
-                                                                         value="Chapter #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterNo}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterTitle}"/>
+                                                                         value="Chapter #{violationBB.currentViolation.violatedEnfElement.ordchapterNo}: #{violationBB.currentViolation.violatedEnfElement.ordchapterTitle}"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-update-section-ot"
-                                                                         value="Section #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecTitle}"/>
+                                                                         value="Section #{violationBB.currentViolation.violatedEnfElement.ordSecNum}: #{violationBB.currentViolation.violatedEnfElement.ordSecTitle}"/>
 
                                                         <h:outputText value=" | " />
 
                                                         <h:outputText    id="violation-update-subsection-ot"
-                                                                         value="Sub-Sec #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                                         value="Sub-Sec #{violationBB.currentViolation.violatedEnfElement.ordSubSecNum}: #{violationBB.currentViolation.violatedEnfElement.ordSubSecTitle}"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-update-category-ot"
-                                                                         value="Category: #{!(empty violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry.category :'' }"/>
+                                                                         value="Category: #{!(empty violationBB.currentViolation.violatedEnfElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.guideEntry.category :'' }"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText   id="violation-update-ord-text"
                                                                         styleClass="monospace"
-                                                                        value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordTechnicalText}"
+                                                                        value="#{violationBB.currentViolation.violatedEnfElement.ordTechnicalText}"
                                                                         escape="false" />
                                                     </div>
                                                 </div>
@@ -1281,73 +1281,73 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-                                <p:column width="10%" sortBy="#{cse.codeElement.source.sourceName}"
-                                          filterBy="#{cse.codeElement.source.sourceName}">
+                                <p:column width="10%" sortBy="#{cse.source.sourceName}"
+                                          filterBy="#{cse.source.sourceName}">
                                     <f:facet name="header">
                                         <h:outputText value="Source" />
                                     </f:facet>
-                                    <h:outputText value="#{cse.codeElement.source.sourceName}(#{cse.codeElement.source.sourceYear})"/>
+                                    <h:outputText value="#{cse.source.sourceName}(#{cse.source.sourceYear})"/>
                                 </p:column>
 
                                 <p:column width="5%" 
-                                          sortBy="#{cse.codeElement.ordchapterNo}">
+                                          sortBy="#{cse.ordchapterNo}">
                                     <f:facet name="header">
                                         <h:outputText value="Chap#"/>
                                     </f:facet>
-                                    <h:outputText value="#{cse.codeElement.ordchapterNo}"/>
+                                    <h:outputText value="#{cse.ordchapterNo}"/>
                                 </p:column>
 
-                                <p:column width="15%" sortBy="#{cse.codeElement.ordchapterTitle}"
-                                          filterBy="#{cse.codeElement.ordchapterTitle}">
+                                <p:column width="15%" sortBy="#{cse.ordchapterTitle}"
+                                          filterBy="#{cse.ordchapterTitle}">
                                     <f:facet name="header">
                                         <h:outputText value="Chapter"/>
                                     </f:facet>
-                                    <h:outputText value="#{cse.codeElement.ordchapterTitle}"/>
+                                    <h:outputText value="#{cse.ordchapterTitle}"/>
                                 </p:column>
 
-                                <p:column width="5%" sortBy="#{cse.codeElement.ordSecNum}">
+                                <p:column width="5%" sortBy="#{cse.ordSecNum}">
                                     <f:facet name="header">
                                         <h:outputText value="Sec#" />
                                     </f:facet>
-                                    <h:outputText value="#{cse.codeElement.ordSecNum}"/>
+                                    <h:outputText value="#{cse.ordSecNum}"/>
                                 </p:column>
 
-                                <p:column width="15%" sortBy="#{cse.codeElement.ordSecTitle}"
-                                          filterBy="#{cse.codeElement.ordSecTitle}">
+                                <p:column width="15%" sortBy="#{cse.ordSecTitle}"
+                                          filterBy="#{cse.ordSecTitle}">
                                     <f:facet name="header">
                                         <h:outputText value="Section" />
                                     </f:facet>
-                                    <h:outputText value="#{cse.codeElement.ordSecTitle}"/>
+                                    <h:outputText value="#{cse.ordSecTitle}"/>
                                 </p:column>
 
-                                <p:column width="5%" sortBy="#{cse.codeElement.ordSubSecNum}">
+                                <p:column width="5%" sortBy="#{cse.ordSubSecNum}">
                                     <f:facet name="header">
                                         <h:outputText value="Sub#" />
                                     </f:facet>
-                                    <h:outputText value="#{cse.codeElement.ordSubSecNum}"/>
+                                    <h:outputText value="#{cse.ordSubSecNum}"/>
                                 </p:column>
 
-                                <p:column sortBy="#{cse.codeElement.ordSubSecTitle}" 
-                                          filterBy="#{cse.codeElement.ordSubSecTitle}"
+                                <p:column sortBy="#{cse.ordSubSecTitle}" 
+                                          filterBy="#{cse.ordSubSecTitle}"
                                           width="15%">
                                     <f:facet name="header">
                                         <h:outputText value="SubSec. Title" />
                                     </f:facet>
-                                    <h:outputText value="#{cse.codeElement.ordSubSecTitle}"/>
+                                    <h:outputText value="#{cse.ordSubSecTitle}"/>
                                 </p:column>
 
-                                <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.category}"
-                                          filterBy="#{cse.codeElement.guideEntry.category}">
+                                <p:column width="10%" sortBy="#{cse.guideEntry.category}"
+                                          filterBy="#{cse.guideEntry.category}">
                                     <f:facet name="header">
                                         <h:outputText value="Category" />
                                     </f:facet>
-                                    <h:outputText value="#{cse.codeElement.guideEntry.category}"/>
+                                    <h:outputText value="#{cse.guideEntry.category}"/>
                                 </p:column>
 
 
 
-                                <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.subCategory}"
-                                          filterBy="#{cse.codeElement.guideEntry.subCategory}">
+                                <p:column width="10%" sortBy="#{cse.guideEntry.subCategory}"
+                                          filterBy="#{cse.guideEntry.subCategory}">
                                     <f:facet name="header">
                                         <h:outputText value="Action" />
                                     </f:facet>
@@ -1443,26 +1443,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputLabel styleClass="bold" value="Technical Text"/>
                                         <p:spacer height="15px"/>
                                         <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{cse.codeElement.ordTechnicalText}"/>
+                                            <h:outputText escape="false" value="#{cse.ordTechnicalText}"/>
                                         </div>
 
                                         <p:spacer height="15px"/>
 
                                         <h:outputLabel styleClass="bold" value="Human friendly text"/>
                                         <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{cse.codeElement.ordHumanFriendlyText}"/>
+                                            <h:outputText escape="false" value="#{cse.ordHumanFriendlyText}"/>
                                         </div>
                                         <p:spacer height="15px"/>
                                         <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
                                         <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{cse.codeElement.guideEntry.enforcementGuidelines}"/>
+                                            <h:outputText escape="false" value="#{cse.guideEntry.enforcementGuidelines}"/>
                                         </div>
 
                                         <p:spacer height="15px"/>
 
                                         <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
                                         <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{cse.codeElement.guideEntry.inspectionGuidelines}"/>
+                                            <h:outputText escape="false" value="#{cse.guideEntry.inspectionGuidelines}"/>
                                         </div>
                                     </div>
                                 </p:rowExpansion>

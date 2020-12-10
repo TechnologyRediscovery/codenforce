@@ -11,18 +11,44 @@ ALTER TABLE public.codeviolation
     ADD COLUMN nullifiedby INTEGER CONSTRAINT codeviolation_nullifiedby_fk REFERENCES login(userid);
 
 
--- RUN ON REMOTE TO HERE
 
 
--- RUN LOCALLY TO HERE
 ALTER TABLE public.codelement
     ADD COLUMN ordsubsubsectitle TEXT;
 
 ALTER TABLE public.codelement
     ADD COLUMN ordsubsubsecnum TEXT;
- 
+
+ALTER TABLE public.codeelement DROP COLUMN lastupdated_userid;
+ALTER TABLE public.codeelement DROP COLUMN isactive;
+
+ALTER TABLE public.codeelement
+    ADD COLUMN createdby_userid        INTEGER CONSTRAINT codeelement_createdby_userid_fk REFERENCES login (userid),     
+    ADD COLUMN lastupdatedby_userid    INTEGER CONSTRAINT codeelement_lastupdatdby_userid_fk REFERENCES login (userid),
+    ADD COLUMN deactivatedts           TIMESTAMP WITH TIME ZONE,
+    ADD COLUMN deactivatedby_userid    INTEGER CONSTRAINT codeelement_deactivatedby_userid_fk REFERENCES login (userid);
  
 
+ ALTER TABLE public.codeelement
+    ADD COLUMN createdts TIMESTAMP WITH TIME ZONE;
+ 
+ ALTER TABLE public.codeelement DROP COLUMN creator_userid;
+
+
+ ALTER TABLE public.codeelement DROP COLUMN datecreated;
+ ALTER TABLE public.codeelement DROP COLUMN datecreated;
+
+-- RUN ON REMOTE TO HERE
+-- RUN LOCALLY TO HERE
+
+
+ALTER TABLE public.codesetelement
+        ADD COLUMN createdts               TIMESTAMP WITH TIME ZONE,
+        ADD COLUMN createdby_userid        INTEGER CONSTRAINT codesetelement_createdby_userid_fk REFERENCES login (userid),     
+        ADD COLUMN lastupdatedts           TIMESTAMP WITH TIME ZONE,
+        ADD COLUMN lastupdatedby_userid    INTEGER CONSTRAINT codesetelement_lastupdatdby_userid_fk REFERENCES login (userid),
+        ADD COLUMN deactivatedts           TIMESTAMP WITH TIME ZONE,
+        ADD COLUMN deactivatedby_userid    INTEGER CONSTRAINT codesetelement_deactivatedby_userid_fk REFERENCES login (userid);
 
 ALTER TABLE textblock 
     ADD COLUMN injectabletemplate BOOLEAN DEFAULT FALSE;

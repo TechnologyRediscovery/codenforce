@@ -559,6 +559,11 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
          return freshID;
     }
     
+    /**
+     * Updates a record in the codeelement table
+     * @param element
+     * @throws IntegrationException 
+     */
     public void updateCodeElement(CodeElement element) throws IntegrationException{
           String query = "UPDATE public.codeelement\n" +
                             "   SET codesource_sourceid=?, ordchapterno=?, ordchaptertitle=?, \n" +
@@ -626,6 +631,12 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
+    /**
+     * Sets the deactivationts in the codeelement table to signal deletion
+     * 
+     * @param element
+     * @throws IntegrationException 
+     */
     public void deactivateCodeElement(CodeElement element) throws IntegrationException{
         String query =  "UPDATE codeelement SET deactivatedts = now(), deactivatedby_userid=? WHERE elementid=?;";
         Connection con = null;
@@ -658,6 +669,12 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
     // *************************************************************
    
      
+    /**
+     * Updates a record in the codeset table, which declares a schema
+     * for organizing enforcable code elements
+     * @param set
+     * @throws IntegrationException 
+     */
     public void updateCodeSetMetadata(CodeSet set) throws IntegrationException{
         String query = "UPDATE public.codeset\n" +
             "SET name=?, description=? WHERE codeSetid=?;";
@@ -683,7 +700,12 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    
+    /**
+     * Retrieves a code set from the DB
+     * @param setID
+     * @return
+     * @throws IntegrationException 
+     */
     public CodeSet getCodeSetBySetID(int setID) throws IntegrationException{
          String query = "SELECT codesetid, name, description, municipality_municode \n" +
                         "FROM public.codeset WHERE codesetid = ?";
@@ -717,6 +739,11 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
+    /**
+     * Builds a mapping of code set names to IDs for municipal configuration
+     * @return
+     * @throws IntegrationException 
+     */
     public Map<String, Integer> getSystemWideCodeSetMap() throws IntegrationException{
         Map<String, Integer> setMap = new HashMap<>();
         String query = "SELECT codesetid, name FROM public.codeset;";
@@ -744,7 +771,13 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         return setMap;
     }
     
-    
+    /**
+     * Genenerator of CodeSet objects from a codeset record
+     * @param rs
+     * @return
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
     private CodeSet populateCodeSetFromRS(ResultSet rs) throws SQLException, IntegrationException{
         CodeSet set = new CodeSet();
         MunicipalityIntegrator muniInt = getMunicipalityIntegrator();
@@ -761,7 +794,13 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-       //xiaohong add
+    
+    
+    /**
+     * Extracts all code sets from the codeset table
+     * @return
+     * @throws IntegrationException 
+     */
     public ArrayList getCodeSets() throws IntegrationException {
         String query = "SELECT codesetid, name, description, municipality_municode\n"
                 + "  FROM public.codeset;";
@@ -807,6 +846,12 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         return codeSetList;
     }
     
+    /**
+     * Gets all codesets (codebooks) for a given municipality
+     * @param muniCode
+     * @return
+     * @throws IntegrationException 
+     */
     public ArrayList getCodeSets(int muniCode) throws IntegrationException{
          String query = "SELECT codesetid, name, description, municipality_municode \n" +
                         "FROM public.codeset WHERE municipality_municode = ?";
@@ -839,6 +884,138 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         return codeSetList;
     }
     
+    
+     /**
+     * Creates and populates single EnforcableCodeElement object based on giving ID number. 
+     * 
+     * @param codeSetElementID
+     * @return the fully-baked EnforcableCodeElement
+     * @throws IntegrationException 
+     */
+    public EnforcableCodeElement getEnforcableCodeElement(int codeSetElementID) throws IntegrationException{
+        EnforcableCodeElement newEce = null;
+        PreparedStatement stmt = null;
+        Connection con = null;
+        String query = "SELECT codesetelementid, codeset_codesetid, codelement_elementid, elementmaxpenalty, \n" +
+                " elementminpenalty, elementnormpenalty, penaltynotes, normdaystocomply, \n" +
+                " daystocomplynotes, munispecificnotes, defaultviolationdescription, createdts, createdby_userid, \n" +
+                " lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid \n" +
+                " FROM public.codesetelement WHERE codesetelementid=?;";
+        ResultSet rs = null;
+ 
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, codeSetElementID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                newEce = generateEnforcableCodeElement(rs);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println("MunicipalityIntegrator.getMuniFromMuniCode | " + ex.toString());
+            throw new IntegrationException("Exception in MunicipalityIntegrator.getMuniFromMuniCode", ex);
+        } finally{
+           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        return newEce;
+    }
+    
+  /**
+   * Returns a ArrayList of fully-baked EnforcableCodeElement objects based on a search with
+   * setID. Handy for then populating data tables of codes, such as in creating
+   * a codeviolation. This involves a rather complicated object composition process
+   * that draws on several other methods in this class for retrieving from the database
+   * 
+   * @param setID
+   * @return all CodeElement objects kicked out by postgres with that setID
+   * @throws com.tcvcog.tcvce.domain.IntegrationException
+   */
+    public ArrayList getEnforcableCodeElementList(int setID) throws IntegrationException{
+        PreparedStatement stmt = null;
+        Connection con = null;
+        String query = "SELECT codesetelementid " +
+                " FROM public.codesetelement WHERE codeset_codesetid=? AND deactivatedts IS NOT NULL;";
+        ResultSet rs = null;
+        ArrayList<EnforcableCodeElement> eceList = new ArrayList();
+ 
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, setID);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                
+                eceList.add(getEnforcableCodeElement(rs.getInt("codesetelementid")));
+                
+            }
+        } catch (SQLException ex) {
+            System.out.println("MunicipalityIntegrator.getMuniFromMuniCode | " + ex.toString());
+            throw new IntegrationException("Exception in MunicipalityIntegrator.getMuniFromMuniCode", ex);
+        } finally{
+           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+           if (con != null) { try { con.close(); } catch (SQLException e) { System.out.println("getEnforcableCodeElementList | " + e.toString());} }
+        } // close finally
+        
+        return eceList;
+    }
+    
+    /**
+     * Generator of EnforcableCodeElement objects given a RS
+     * @param rs with all fields SELECTed
+     * @return the populated object
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
+    private EnforcableCodeElement generateEnforcableCodeElement(ResultSet rs) throws SQLException, IntegrationException{
+        
+        PaymentIntegrator pi = getPaymentIntegrator();
+        UserIntegrator ui = getUserIntegrator();
+        CodeElement ele = getCodeElement(rs.getInt("codelement_elementid"));
+        
+        EnforcableCodeElement newEce = new EnforcableCodeElement(ele);
+        
+        newEce.setCodeSetElementID(rs.getInt("codesetelementid"));
+        
+        newEce.setCodeElement(ele);
+        newEce.setMaxPenalty(rs.getInt("elementmaxpenalty"));
+        newEce.setMinPenalty(rs.getInt("elementminpenalty"));
+        newEce.setNormPenalty(rs.getInt("elementnormpenalty"));
+        newEce.setPenaltyNotes(rs.getString("penaltynotes"));
+        newEce.setNormDaysToComply(rs.getInt("normdaystocomply"));
+        newEce.setDaysToComplyNotes(rs.getString("daystocomplynotes"));
+        newEce.setMuniSpecificNotes(rs.getString("munispecificnotes"));
+        newEce.setFeeList(pi.getFeeList(newEce));
+        newEce.setDefaultViolationDescription(rs.getString("defaultviolationdescription"));
+        
+        if(rs.getTimestamp("createdts") != null){
+            newEce.setEceCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                
+        }
+        if(rs.getInt("createdby_userid") != 0){
+            newEce.setEceCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+        }
+
+        if(rs.getTimestamp("lastupdatedts") != null){
+            newEce.setEceLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+        }
+        if(rs.getInt("lastupdatedby_userid") != 0){
+            newEce.setEceLastupdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+        }
+
+        if(rs.getTimestamp("deactivatedts") != null){
+            newEce.setEceDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+        }
+        if(rs.getInt("deactivatedby_userid") != 0){
+            newEce.setEceDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
+        }
+
+        return newEce;
+    }
+    
     /**
      * Creates what we call an EnforcableCodeElement, which means
  we find an existing code element and add muni-specific 
@@ -848,35 +1025,51 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
  and uses the ID of the codeSet and CodeElement to make
  the many-to-many links in the database.
      * 
-     * @param enforcableCodeElement
+     * @param ece
      * @param codeSetID 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public void addEnforcableCodeElementToCodeSet(EnforcableCodeElement enforcableCodeElement, int codeSetID) throws IntegrationException{
+    public void addEnforcableCodeElementToCodeSet(EnforcableCodeElement ece, int codeSetID) throws IntegrationException{
         PreparedStatement stmt = null;
         Connection con = null;
         String query = "INSERT INTO public.codesetelement(\n" +
                     "codesetelementid, codeset_codesetid, codelement_elementid, elementmaxpenalty, \n" +
                     "elementminpenalty, elementnormpenalty, penaltynotes, normdaystocomply, \n" +
-                    "daystocomplynotes, munispecificnotes, defaultviolationdescription)\n" +
+                    "daystocomplynotes, munispecificnotes, defaultviolationdescription,"
+                    + "createdts, createdby_userid, lastupdatedts, lastupdatedby_userid)\n" +
                     " VALUES (DEFAULT, ?, ?, ?, \n" +
                     "?, ?, ?, ?, \n" +
-                    "?, ?,?);";
+                    "?, ?, ?,"
+                    + "now(), ?, now(), ?);";
  
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, codeSetID);
-            stmt.setInt(2, enforcableCodeElement.getCodeElement().getElementID() );
-            stmt.setDouble(3, enforcableCodeElement.getMaxPenalty());
-            stmt.setDouble(4, enforcableCodeElement.getMinPenalty());
-            stmt.setDouble(5, enforcableCodeElement.getNormPenalty());
-            stmt.setString(6, enforcableCodeElement.getPenaltyNotes());
-            stmt.setInt(7, enforcableCodeElement.getNormDaysToComply());
-            stmt.setString(8, enforcableCodeElement.getDaysToComplyNotes());
-            stmt.setString(9, enforcableCodeElement.getMuniSpecificNotes());
-            stmt.setString(10, enforcableCodeElement.getDefaultViolationDescription());
-            System.out.println("CodeIntegrator.addCodeElementToCodeSet | ece insert: " + stmt.toString());
+            stmt.setInt(2, ece.getElementID() );
+            stmt.setDouble(3, ece.getMaxPenalty());
+            
+            stmt.setDouble(4, ece.getMinPenalty());
+            stmt.setDouble(5, ece.getNormPenalty());
+            stmt.setString(6, ece.getPenaltyNotes());
+            stmt.setInt(7, ece.getNormDaysToComply());
+            
+            stmt.setString(8, ece.getDaysToComplyNotes());
+            stmt.setString(9, ece.getMuniSpecificNotes());
+            stmt.setString(10, ece.getDefaultViolationDescription());
+            
+            if(ece.getEceCreatedBy() != null){
+                stmt.setInt(11, ece.getEceCreatedBy().getUserID());
+            } else {
+                stmt.setNull(11, java.sql.Types.NULL);
+            }
+
+            if(ece.getEceLastupdatedBy() != null){
+                stmt.setInt(12, ece.getEceLastupdatedBy().getUserID());
+            } else {
+                stmt.setNull(12, java.sql.Types.NULL);
+            }
+            
             
             stmt.execute();
             
@@ -890,26 +1083,40 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    public void updateEnforcableCodeElement(EnforcableCodeElement enforcableCodeElement) throws IntegrationException{
+    /**
+     * Updates a record in the codesetelement table
+     * 
+     * @param ece
+     * @throws IntegrationException 
+     */
+    public void updateEnforcableCodeElement(EnforcableCodeElement ece) throws IntegrationException{
         PreparedStatement stmt = null;
         Connection con = null;
         String query =  "UPDATE public.codesetelement\n" +
                         "   SET elementmaxpenalty=?, elementminpenalty=?, elementnormpenalty=?, \n" +
                         "       penaltynotes=?, normdaystocomply=?, daystocomplynotes=?, munispecificnotes=?, defaultviolationdescription=?\n" +
+                        "       lastupdatedts = now(), lastupdatedby_userid=? \n" +
                         " WHERE codesetelementid=?;";
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
-            stmt.setDouble(1, enforcableCodeElement.getMaxPenalty());
-            stmt.setDouble(2, enforcableCodeElement.getMinPenalty());
-            stmt.setDouble(3, enforcableCodeElement.getNormPenalty());
-            stmt.setString(4, enforcableCodeElement.getPenaltyNotes());
-            stmt.setInt(5, enforcableCodeElement.getNormDaysToComply());
-            stmt.setString(6, enforcableCodeElement.getDaysToComplyNotes());
-            stmt.setString(7, enforcableCodeElement.getMuniSpecificNotes());
-            stmt.setString(8, enforcableCodeElement.getDefaultViolationDescription());
+            stmt.setDouble(1, ece.getMaxPenalty());
+            stmt.setDouble(2, ece.getMinPenalty());
+            stmt.setDouble(3, ece.getNormPenalty());
             
-            stmt.setInt(9, enforcableCodeElement.getCodeSetElementID());
+            stmt.setString(4, ece.getPenaltyNotes());
+            stmt.setInt(5, ece.getNormDaysToComply());
+            stmt.setString(6, ece.getDaysToComplyNotes());
+            stmt.setString(7, ece.getMuniSpecificNotes());
+            stmt.setString(8, ece.getDefaultViolationDescription());
+            
+            if(ece.getEceLastUpdatedTS() != null){
+                stmt.setInt(9, ece.getEceLastupdatedBy().getUserID());
+            } else {
+                stmt.setNull(9, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(10, ece.getCodeSetElementID());
             System.out.println("CodeIntegrator.updateEnforcableCodeElement | ece update: " + stmt.toString());
             
             stmt.execute();
@@ -924,16 +1131,29 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    public void deleteEnforcableCodeElementFromCodeSet(EnforcableCodeElement ece ) throws IntegrationException{
+    /**
+     * Deactivates a codesetelement by setting its deactivatedts field
+     * @param ece
+     * @throws IntegrationException 
+     */
+    public void deactivateEnforcableCodeElement(EnforcableCodeElement ece ) throws IntegrationException{
          PreparedStatement stmt = null;
         Connection con = null;
-        String query =  "DELETE FROM public.codesetelement\n" +
+        String query =  "UPDATE public.codesetelement SET deactivatedts = now(), deactivatedby_userid=? \n" +
                         " WHERE codesetelementid = ?;";
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, ece.getCodeSetElementID());
-            System.out.println("CodeIntegrator.deleteEnforcableCodeElementFromCodeSet | stmt: " + stmt.toString());
+            
+            if(ece.getEceDeactivatedBy() != null){
+                stmt.setInt(1, ece.getEceDeactivatedBy().getUserID());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(2, ece.getCodeSetElementID());
+            
+            
             stmt.execute();
             
         } catch (SQLException ex) {
@@ -981,104 +1201,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         return 0;
     }
     
-    /**
-     * Creates and populates single EnforcableCodeElement object based on giving ID number. 
-     * 
-     * @param codeSetElementID
-     * @return the fully-baked EnforcableCodeElement
-     * @throws IntegrationException 
-     */
-    public EnforcableCodeElement getEnforcableCodeElement(int codeSetElementID) throws IntegrationException{
-        EnforcableCodeElement newEce = null;
-        PreparedStatement stmt = null;
-        Connection con = null;
-        String query = "SELECT codesetelementid, codeset_codesetid, codelement_elementid, elementmaxpenalty, \n" +
-                " elementminpenalty, elementnormpenalty, penaltynotes, normdaystocomply, \n" +
-                " daystocomplynotes, munispecificnotes, defaultviolationdescription \n" +
-                " FROM public.codesetelement WHERE codesetelementid=?;";
-        ResultSet rs = null;
- 
-        try {
-            con = getPostgresCon();
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, codeSetElementID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                newEce = generateEnforcableCodeElement(rs);
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println("MunicipalityIntegrator.getMuniFromMuniCode | " + ex.toString());
-            throw new IntegrationException("Exception in MunicipalityIntegrator.getMuniFromMuniCode", ex);
-        } finally{
-           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        return newEce;
-    }
-    
-  /**
-   * Returns a ArrayList of fully-baked EnforcableCodeElement objects based on a search with
- setID. Handy for then populating data tables of codes, such as in creating
-   * a codeviolation. This involves a rather complicated object composition process
-   * that draws on several other methods in this class for retrieving from the database
-   * 
-   * @param setID
-   * @return all CodeElement objects kicked out by postgres with that setID
-   * @throws com.tcvcog.tcvce.domain.IntegrationException
-   */
-    public ArrayList getEnforcableCodeElementList(int setID) throws IntegrationException{
-        PreparedStatement stmt = null;
-        Connection con = null;
-        String query = "SELECT codesetelementid " +
-                " FROM public.codesetelement where codeset_codesetid=?;";
-        ResultSet rs = null;
-        ArrayList<EnforcableCodeElement> eceList = new ArrayList();
- 
-        try {
-            con = getPostgresCon();
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, setID);
-            rs = stmt.executeQuery();
-            
-            while(rs.next()){
-                
-                eceList.add(getEnforcableCodeElement(rs.getInt("codesetelementid")));
-                
-            }
-        } catch (SQLException ex) {
-            System.out.println("MunicipalityIntegrator.getMuniFromMuniCode | " + ex.toString());
-            throw new IntegrationException("Exception in MunicipalityIntegrator.getMuniFromMuniCode", ex);
-        } finally{
-           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-           if (con != null) { try { con.close(); } catch (SQLException e) { System.out.println("getEnforcableCodeElementList | " + e.toString());} }
-        } // close finally
-        
-        return eceList;
-    }
-    
-    private EnforcableCodeElement generateEnforcableCodeElement(ResultSet rs) throws SQLException, IntegrationException{
-        
-        PaymentIntegrator pi = getPaymentIntegrator();
-        
-        EnforcableCodeElement newEce = new EnforcableCodeElement();
-        newEce.setCodeSetElementID(rs.getInt("codesetelementid"));
-        newEce.setCodeElement(getCodeElement(rs.getInt("codelement_elementid")));
-        newEce.setMaxPenalty(rs.getInt("elementmaxpenalty"));
-        newEce.setMinPenalty(rs.getInt("elementminpenalty"));
-        newEce.setNormPenalty(rs.getInt("elementnormpenalty"));
-        newEce.setPenaltyNotes(rs.getString("penaltynotes"));
-        newEce.setNormDaysToComply(rs.getInt("normdaystocomply"));
-        newEce.setDaysToComplyNotes(rs.getString("daystocomplynotes"));
-        newEce.setMuniSpecificNotes(rs.getString("munispecificnotes"));
-        newEce.setFeeList(pi.getFeeList(newEce));
-        newEce.setDefaultViolationDescription(rs.getString("defaultviolationdescription"));
-        
-        return newEce;
-    }
-    
+   
   
     
     // *************************************************************

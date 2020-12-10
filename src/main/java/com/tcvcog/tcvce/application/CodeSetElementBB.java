@@ -97,7 +97,7 @@ public class CodeSetElementBB extends BackingBeanUtils implements Serializable{
         CodeIntegrator ci = getCodeIntegrator();
         if(selectedECE != null){
             try {
-                ci.deleteEnforcableCodeElementFromCodeSet(selectedECE);
+                ci.deactivateEnforcableCodeElement(selectedECE);
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Code set element number " + selectedECE.getCodeSetElementID() + " has been removed forever!", ""));

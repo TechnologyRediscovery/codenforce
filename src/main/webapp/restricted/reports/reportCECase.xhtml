@@ -79,12 +79,12 @@
                                         widgetVar="violation-compactlist-widgetvar-unresolved">
 
                                         <div class="compact-violation-list-container">
-                                            <h:outputText  value="Source: #{v.violatedEnfElement.codeElement.source.sourceName}" />
-                                            <h:outputText  value=" (#{v.violatedEnfElement.codeElement.source.sourceYear})" />
-                                            <h:outputText  value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum}:" />
-                                            <h:outputText  value="#{v.violatedEnfElement.codeElement.ordSecTitle}; " />
-                                            <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
-                                            <h:outputText  value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+                                            <h:outputText  value="Source: #{v.violatedEnfElement.source.sourceName}" />
+                                            <h:outputText  value=" (#{v.violatedEnfElement.source.sourceYear})" />
+                                            <h:outputText  value="&#167;#{v.violatedEnfElement.ordSecNum}:" />
+                                            <h:outputText  value="#{v.violatedEnfElement.ordSecTitle}; " />
+                                            <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
+                                            <h:outputText  value="#{v.violatedEnfElement.ordSubSecTitle}" />
                                             <h:outputText id="sep-compactlist-line-ot-unresolved" value=" | "/>
                                             <h:outputText id="status-compactlist-line-ot-unresolved" styleClass="italic" value="#{v.status.label}"/>
                                         </div>
@@ -102,12 +102,12 @@
                                         widgetVar="violation-compactlist-widgetvar-resolved">
 
                                         <div class="compact-violation-list-container">
-                                            <h:outputText  value="Source: #{v.violatedEnfElement.codeElement.source.sourceName}" />
-                                            <h:outputText  value=" (#{v.violatedEnfElement.codeElement.source.sourceYear})" />
-                                            <h:outputText  value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum}:" />
-                                            <h:outputText  value="#{v.violatedEnfElement.codeElement.ordSecTitle}; " />
-                                            <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
-                                            <h:outputText  value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+                                            <h:outputText  value="Source: #{v.violatedEnfElement.source.sourceName}" />
+                                            <h:outputText  value=" (#{v.violatedEnfElement.source.sourceYear})" />
+                                            <h:outputText  value="&#167;#{v.violatedEnfElement.ordSecNum}:" />
+                                            <h:outputText  value="#{v.violatedEnfElement.ordSecTitle}; " />
+                                            <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
+                                            <h:outputText  value="#{v.violatedEnfElement.ordSubSecTitle}" />
                                             <h:outputText id="sep-compactlist-line-ot-resolved" value=" | "/>
                                             <h:outputText id="status-compactlist-line-ot-resolved" styleClass="italic" value="#{v.status.label}"/>
                                         </div>
@@ -246,15 +246,15 @@
                                      <f:facet name="header">
                                         <h:outputLabel styleClass="bold" value="Ordindance: "  />
                                         <p:spacer height="5px" />
-                                        <h:outputLabel styleClass="mono" value="#{v.violatedEnfElement.codeElement.source.sourceName} 
-                                                      (#{v.violatedEnfElement.codeElement.source.sourceYear}), " />
-                                        <h:outputText   styleClass="mono" value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
-                                        <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
+                                        <h:outputLabel styleClass="mono" value="#{v.violatedEnfElement.source.sourceName} 
+                                                      (#{v.violatedEnfElement.source.sourceYear}), " />
+                                        <h:outputText   styleClass="mono" value="Ch. #{v.violatedEnfElement.ordchapterNo}:" />
+                                        <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.ordchapterTitle}" />
                                         <p:spacer height="2px" />
-                                        <h:outputText   styleClass="mono" value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum}:" />
-                                        <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordSecTitle}; " />
-                                        <h:outputText   styleClass="mono" value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
-                                        <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+                                        <h:outputText   styleClass="mono" value="&#167;#{v.violatedEnfElement.ordSecNum}:" />
+                                        <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.ordSecTitle}; " />
+                                        <h:outputText   styleClass="mono" value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
+                                        <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.ordSubSecTitle}" />
 
                                         <p:spacer height="2px" />
 
@@ -263,7 +263,7 @@
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Full ordinance text: "/>
                                                 <div class="ord-text">
-                                                    <h:outputText value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                                    <h:outputText value="#{v.violatedEnfElement.ordTechnicalText}"/>
                                                 </div>
                                             </h:panelGroup>
 
@@ -331,8 +331,8 @@
                                         var="v">
                             <h4>Photos of code violation:
                                 
-                                    <h:outputText    value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
-                                    <h:outputText    value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+                                    <h:outputText    value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
+                                    <h:outputText    value="#{v.violatedEnfElement.ordSubSecTitle}" />
 
                             </h4>
                             <p:dataTable
@@ -495,9 +495,9 @@
 
 
                                                 <h:outputText id="violation-compactlist-line-ot" value="#{citv}"/>
-                                                <h:outputText id="v-source-name-compactlist-ot" value="(#{citv.violatedEnfElement.codeElement.source.sourceName}" />
+                                                <h:outputText id="v-source-name-compactlist-ot" value="(#{citv.violatedEnfElement.source.sourceName}" />
                                                 <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
-                                                <h:outputText id="v-source-year-compactlist-ot" value="#{citv.violatedEnfElement.codeElement.source.sourceYear})"/>
+                                                <h:outputText id="v-source-year-compactlist-ot" value="#{citv.violatedEnfElement.source.sourceYear})"/>
                                                 <h:outputText id="sep-compactlist-line-ot" value=" | "/>
                                                 <h:outputText id="status-compactlist-line-ot" value="#{citv.status.label}"/>
                                             </p:dataScroller>

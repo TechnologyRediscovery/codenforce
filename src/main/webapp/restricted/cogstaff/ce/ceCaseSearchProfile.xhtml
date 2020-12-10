@@ -864,10 +864,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <f:facet name="header">
                                                             <h:outputText value="Ordinance" />
                                                         </f:facet>
-                                                        <h:outputText  value="&#167;#{v.violatedEnfElement.codeElement.ordSecNum}:" />
-                                                        <h:outputText  value="#{v.violatedEnfElement.codeElement.ordSecTitle}; " />
-                                                        <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
-                                                        <h:outputText  value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+                                                        <h:outputText  value="&#167;#{v.violatedEnfElement.ordSecNum}:" />
+                                                        <h:outputText  value="#{v.violatedEnfElement.ordSecTitle}; " />
+                                                        <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
+                                                        <h:outputText  value="#{v.violatedEnfElement.ordSubSecTitle}" />
                                                     </p:column>
 
                                                     <p:column width="10%" sortBy="#{v.status.label}">
@@ -3025,7 +3025,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <f:facet name="header">
                                         <h:outputText value="Ordinance" />
                                     </f:facet>
-                                    <h:outputText value="#{v.violatedEnfElement.codeElement.ordSecTitle}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                    <h:outputText value="#{v.violatedEnfElement.ordSecTitle}: #{v.violatedEnfElement.ordSubSecTitle}"/>
                                 </p:column>
 
                                 <p:column width="15%">
@@ -3087,14 +3087,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                          ajax="true" oncomplete="PF('linkDialog').show()"/>
 
                                         <h:outputLabel styleClass="bold" value="Violated Element Details: "/>
-                                        <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
-                                                       #{v.violatedEnfElement.codeElement.ordSecNum} 
-                                                       #{v.violatedEnfElement.codeElement.ordSecTitle}:
-                                                       #{v.violatedEnfElement.codeElement.ordSubSecNum} 
-                                                       #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                        <h:outputLabel value="#{v.violatedEnfElement.ordchapterTitle}: 
+                                                       #{v.violatedEnfElement.ordSecNum} 
+                                                       #{v.violatedEnfElement.ordSecTitle}:
+                                                       #{v.violatedEnfElement.ordSubSecNum} 
+                                                       #{v.violatedEnfElement.ordSubSecTitle}"/>
                                         <p:spacer height="5px"/>
 
-                                        <h:outputText styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                        <h:outputText styleClass="mono" value="#{v.violatedEnfElement.ordTechnicalText}"/>
 
                                         <p:spacer height="5px"/>
 

@@ -577,7 +577,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <f:facet name="header">
                                                         <h:outputText value="Ordinance" />
                                                     </f:facet>
-                                                    <h:outputText value="#{v.violatedEnfElement.codeElement.ordSecTitle}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                    <h:outputText value="#{v.violatedEnfElement.ordSecTitle}: #{v.violatedEnfElement.ordSubSecTitle}"/>
                                                 </p:column>
 
                                                 <p:column width="15%">
@@ -651,14 +651,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                          ajax="true" oncomplete="PF('linkDialog').show()"/>
 
                                                         <h:outputLabel styleClass="bold" value="Violated Element Details: "/>
-                                                        <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
-                                                                       #{v.violatedEnfElement.codeElement.ordSecNum} 
-                                                                       #{v.violatedEnfElement.codeElement.ordSecTitle}:
-                                                                       #{v.violatedEnfElement.codeElement.ordSubSecNum} 
-                                                                       #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                        <h:outputLabel value="#{v.violatedEnfElement.ordchapterTitle}: 
+                                                                       #{v.violatedEnfElement.ordSecNum} 
+                                                                       #{v.violatedEnfElement.ordSecTitle}:
+                                                                       #{v.violatedEnfElement.ordSubSecNum} 
+                                                                       #{v.violatedEnfElement.ordSubSecTitle}"/>
                                                         <p:spacer height="5px"/>
 
-                                                        <h:outputText styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                                        <h:outputText styleClass="mono" value="#{v.violatedEnfElement.ordTechnicalText}"/>
 
                                                         <p:spacer height="5px"/>
 
@@ -1149,18 +1149,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                                 <br />
 
-                                                                <h:outputText    value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
-                                                                <h:outputText    value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
+                                                                <h:outputText    value="Ch. #{v.violatedEnfElement.ordchapterNo}:" />
+                                                                <h:outputText    value="#{v.violatedEnfElement.ordchapterTitle}" />
 
                                                                 <p:spacer height="2px" />
 
-                                                                <h:outputText    value="&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
-                                                                <h:outputText    value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+                                                                <h:outputText    value="&#167;#{v.violatedEnfElement.ordSubSecNum} " />
+                                                                <h:outputText    value="#{v.violatedEnfElement.ordSubSecTitle}" />
 
                                                                 <p:spacer height="2px" />
 
-                                                                <h:outputLabel  value="#{v.violatedEnfElement.codeElement.source.sourceName} 
-                                                                                (#{v.violatedEnfElement.codeElement.source.sourceYear}) " />
+                                                                <h:outputLabel  value="#{v.violatedEnfElement.source.sourceName} 
+                                                                                (#{v.violatedEnfElement.source.sourceYear}) " />
 
                                                                 <p:spacer height="5px"/>
 
@@ -1194,7 +1194,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                     <h:panelGroup>
                                                                         <h:outputLabel styleClass="bold" value="Ordinance text: "/>
                                                                         <div class="ord-text">
-                                                                            <h:outputText escape="false" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                                                            <h:outputText escape="false" value="#{v.violatedEnfElement.ordTechnicalText}"/>
                                                                         </div>
                                                                     </h:panelGroup>
 
@@ -1206,7 +1206,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                         <h:outputLabel styleClass="bold" value="Ordinance text: "/>
                                                                         <div class="ord-text">
                                                                             <h:outputText   escape="false"
-                                                                                            value="#{v.violatedEnfElement.codeElement.ordHumanFriendlyText}"/>
+                                                                                            value="#{v.violatedEnfElement.ordHumanFriendlyText}"/>
                                                                         </div>
                                                                     </h:panelGroup>
                                                                 </h:panelGrid>

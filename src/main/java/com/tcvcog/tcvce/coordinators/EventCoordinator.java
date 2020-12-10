@@ -1003,13 +1003,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         sb.append("Compliance with the following code violations was observed:");
         sb.append("<br /><br />");
         
-            sb.append(violation.getViolatedEnfElement().getCodeElement().getOrdchapterNo());
+            sb.append(violation.getViolatedEnfElement().getOrdchapterNo());
             sb.append(".");
-            sb.append(violation.getViolatedEnfElement().getCodeElement().getOrdSecNum());
+            sb.append(violation.getViolatedEnfElement().getOrdSecNum());
             sb.append(".");
-            sb.append(violation.getViolatedEnfElement().getCodeElement().getOrdSubSecNum());
+            sb.append(violation.getViolatedEnfElement().getOrdSubSecNum());
             sb.append(":");
-            sb.append(violation.getViolatedEnfElement().getCodeElement().getOrdSubSecTitle());
+            sb.append(violation.getViolatedEnfElement().getOrdSubSecTitle());
             sb.append(" (ID ");
             sb.append(violation.getViolationID());
             sb.append(")");

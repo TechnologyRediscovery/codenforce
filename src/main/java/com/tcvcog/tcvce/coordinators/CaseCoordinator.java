@@ -1714,17 +1714,17 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
             // build a nice note section that lists the elements cited
             notesBuilder.append("* Chapter ");
-            notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdchapterNo());
+            notesBuilder.append(cv.getCodeViolated().getOrdchapterNo());
             notesBuilder.append(":");
-            notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdchapterTitle());
+            notesBuilder.append(cv.getCodeViolated().getOrdchapterTitle());
             notesBuilder.append(", Section ");
-            notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdSecNum());
+            notesBuilder.append(cv.getCodeViolated().getOrdSecNum());
             notesBuilder.append(":");
-            notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdSecTitle());
+            notesBuilder.append(cv.getCodeViolated().getOrdSecTitle());
             notesBuilder.append(", Subsection ");
-            notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdSubSecNum());
+            notesBuilder.append(cv.getCodeViolated().getOrdSubSecNum());
             notesBuilder.append(": ");
-            notesBuilder.append(cv.getCodeViolated().getCodeElement().getOrdSubSecTitle());
+            notesBuilder.append(cv.getCodeViolated().getOrdSubSecTitle());
             notesBuilder.append("\n\n");
 
             al.add(cv);
@@ -2034,7 +2034,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 //        sb.append(cc.cecase_assembleCECasePropertyUnitHeavy(cse).getProperty().getMuni().getMuniName());
 //        sb.append(")");
 //        sb.append("; Violation: ");
-//        sb.append(cv.getViolatedEnfElement().getCodeElement().getHeaderString());
+//        sb.append(cv.getViolatedEnfElement().getHeaderString());
 //        tfEvent.setDescription(sb.toString());
         violation_verifyCodeViolationAttributes(cse, cv);
         cv.setCreatedBy(ua);

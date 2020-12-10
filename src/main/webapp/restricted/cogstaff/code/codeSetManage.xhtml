@@ -175,74 +175,74 @@
                                                 <h:outputText value="#{cse.codeSetElementID}"/>
                                             </p:column>
 
-                                            <p:column width="10%" sortBy="#{cse.codeElement.source.sourceName}"
-                                                      filterBy="#{cse.codeElement.source.sourceName}">
+                                            <p:column width="10%" sortBy="#{cse.source.sourceName}"
+                                                      filterBy="#{cse.source.sourceName}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Source" />
                                                 </f:facet>
-                                                <h:outputText value="#{cse.codeElement.source.sourceName}(#{cse.codeElement.source.sourceYear})"/>
+                                                <h:outputText value="#{cse.source.sourceName}(#{cse.source.sourceYear})"/>
                                             </p:column>
 
-                                            <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.category}"
-                                                      filterBy="#{cse.codeElement.guideEntry.category}">
+                                            <p:column width="10%" sortBy="#{cse.guideEntry.category}"
+                                                      filterBy="#{cse.guideEntry.category}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Category" />
                                                 </f:facet>
-                                                <h:outputText value="#{cse.codeElement.guideEntry.category}"/>
+                                                <h:outputText value="#{cse.guideEntry.category}"/>
                                             </p:column>
 
-                                            <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.subCategory}"
-                                                      filterBy="#{cse.codeElement.guideEntry.subCategory}">
+                                            <p:column width="10%" sortBy="#{cse.guideEntry.subCategory}"
+                                                      filterBy="#{cse.guideEntry.subCategory}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Sub Category" />
                                                 </f:facet>
-                                                <h:outputText value="#{cse.codeElement.guideEntry.subCategory}"/>
+                                                <h:outputText value="#{cse.guideEntry.subCategory}"/>
                                             </p:column>
 
-                                            <p:column width="5%" sortBy="#{cse.codeElement.ordchapterNo}">
+                                            <p:column width="5%" sortBy="#{cse.ordchapterNo}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Cha#"/>
                                                 </f:facet>
-                                                <h:outputText value="#{cse.codeElement.ordchapterNo}"/>
+                                                <h:outputText value="#{cse.ordchapterNo}"/>
                                             </p:column>
 
-                                            <p:column width="15%" sortBy="#{cse.codeElement.ordchapterTitle}"
-                                                      filterBy="#{cse.codeElement.ordchapterTitle}">
+                                            <p:column width="15%" sortBy="#{cse.ordchapterTitle}"
+                                                      filterBy="#{cse.ordchapterTitle}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Chapter"/>
                                                 </f:facet>
-                                                <h:outputText value="#{cse.codeElement.ordchapterTitle}"/>
+                                                <h:outputText value="#{cse.ordchapterTitle}"/>
                                             </p:column>
 
-                                            <p:column width="5%" sortBy="#{cse.codeElement.ordSecNum}">
+                                            <p:column width="5%" sortBy="#{cse.ordSecNum}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Sec#" />
                                                 </f:facet>
-                                                <h:outputText value="#{cse.codeElement.ordSecNum}"/>
+                                                <h:outputText value="#{cse.ordSecNum}"/>
                                             </p:column>
 
-                                            <p:column width="15%" sortBy="#{cse.codeElement.ordSecTitle}"
-                                                      filterBy="#{cse.codeElement.ordSecTitle}">
+                                            <p:column width="15%" sortBy="#{cse.ordSecTitle}"
+                                                      filterBy="#{cse.ordSecTitle}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Section" />
                                                 </f:facet>
-                                                <h:outputText value="#{cse.codeElement.ordSecTitle}"/>
+                                                <h:outputText value="#{cse.ordSecTitle}"/>
                                             </p:column>
 
-                                            <p:column width="5%" sortBy="#{cse.codeElement.ordSubSecNum}">
+                                            <p:column width="5%" sortBy="#{cse.ordSubSecNum}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Sub#" />
                                                 </f:facet>
-                                                <h:outputText value="#{cse.codeElement.ordSubSecNum}"/>
+                                                <h:outputText value="#{cse.ordSubSecNum}"/>
                                             </p:column>
 
-                                            <p:column sortBy="#{cse.codeElement.ordSubSecTitle}" 
-                                                      filterBy="#{cse.codeElement.ordSubSecTitle}"
+                                            <p:column sortBy="#{cse.ordSubSecTitle}" 
+                                                      filterBy="#{cse.ordSubSecTitle}"
                                                       width="15%">
                                                 <f:facet name="header">
                                                     <h:outputText value="SubSec. Title" />
                                                 </f:facet>
-                                                <h:outputText value="#{cse.codeElement.ordSubSecTitle}"/>
+                                                <h:outputText value="#{cse.ordSubSecTitle}"/>
                                             </p:column>
 
                                             <p:column width="5%" >
@@ -335,26 +335,26 @@
                                                     <h:outputLabel styleClass="bold" value="Technical Text"/>
                                                     <p:spacer height="15px"/>
                                                     <div class="rowExpansion">
-                                                        <h:outputText escape="false" value="#{cse.codeElement.ordTechnicalText}"/>
+                                                        <h:outputText escape="false" value="#{cse.ordTechnicalText}"/>
                                                     </div>
 
                                                     <p:spacer height="15px"/>
 
                                                     <h:outputLabel styleClass="bold" value="Human friendly text"/>
                                                     <div class="rowExpansion">
-                                                        <h:outputText escape="false" value="#{cse.codeElement.ordHumanFriendlyText}"/>
+                                                        <h:outputText escape="false" value="#{cse.ordHumanFriendlyText}"/>
                                                     </div>
                                                     <p:spacer height="15px"/>
                                                     <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
                                                     <div class="rowExpansion">
-                                                        <h:outputText escape="false" value="#{cse.codeElement.guideEntry.enforcementGuidelines}"/>
+                                                        <h:outputText escape="false" value="#{cse.guideEntry.enforcementGuidelines}"/>
                                                     </div>
 
                                                     <p:spacer height="15px"/>
 
                                                     <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
                                                     <div class="rowExpansion">
-                                                        <h:outputText escape="false" value="#{cse.codeElement.guideEntry.inspectionGuidelines}"/>
+                                                        <h:outputText escape="false" value="#{cse.guideEntry.inspectionGuidelines}"/>
                                                     </div>
                                                 </div>
                                             </p:rowExpansion>

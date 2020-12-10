@@ -121,7 +121,7 @@ public class CodeSetBuilderBB extends BackingBeanUtils implements Serializable {
     public String nukeCodeSetElement() {
         CodeIntegrator ci = getCodeIntegrator();
         try {
-            ci.deleteEnforcableCodeElementFromCodeSet(selectedECE);
+            ci.deactivateEnforcableCodeElement(selectedECE);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Success: Removed Enf. Code Element no. " 

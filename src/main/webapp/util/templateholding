@@ -19,18 +19,18 @@
 
                                                             <br />
 
-                                                            <h:outputText    value="Ch. #{v.violatedEnfElement.codeElement.ordchapterNo}:" />
-                                                            <h:outputText    value="#{v.violatedEnfElement.codeElement.ordchapterTitle}" />
+                                                            <h:outputText    value="Ch. #{v.violatedEnfElement.ordchapterNo}:" />
+                                                            <h:outputText    value="#{v.violatedEnfElement.ordchapterTitle}" />
 
                                                             <p:spacer height="2px" />
 
-                                                            <h:outputText    value="&#167;#{v.violatedEnfElement.codeElement.ordSubSecNum} " />
-                                                            <h:outputText    value="#{v.violatedEnfElement.codeElement.ordSubSecTitle}" />
+                                                            <h:outputText    value="&#167;#{v.violatedEnfElement.ordSubSecNum} " />
+                                                            <h:outputText    value="#{v.violatedEnfElement.ordSubSecTitle}" />
 
                                                             <p:spacer height="2px" />
 
-                                                            <h:outputLabel  value="#{v.violatedEnfElement.codeElement.source.sourceName} 
-                                                                            (#{v.violatedEnfElement.codeElement.source.sourceYear}) " />
+                                                            <h:outputLabel  value="#{v.violatedEnfElement.source.sourceName} 
+                                                                            (#{v.violatedEnfElement.source.sourceYear}) " />
 
                                                             <p:spacer height="5px"/>
 
@@ -64,7 +64,7 @@
                                                                 <h:panelGroup>
                                                                     <h:outputLabel styleClass="bold" value="Ordinance text: "/>
                                                                     <div class="ord-text">
-                                                                        <h:outputText escape="false" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                                                        <h:outputText escape="false" value="#{v.violatedEnfElement.ordTechnicalText}"/>
                                                                     </div>
                                                                 </h:panelGroup>
 
@@ -76,7 +76,7 @@
                                                                     <h:outputLabel styleClass="bold" value="Ordinance text: "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText   escape="false"
-                                                                                        value="#{v.violatedEnfElement.codeElement.ordHumanFriendlyText}"/>
+                                                                                        value="#{v.violatedEnfElement.ordHumanFriendlyText}"/>
                                                                     </div>
                                                                 </h:panelGroup>
                                                             </h:panelGrid>

@@ -275,12 +275,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             </p:column>
 
                                                             <p:column width="40%" styleClass="content-align-center"
-                                                                      sortBy="#{violation.bundledViolation.violatedEnfElement.codeElement.ordSubSecTitle}"
+                                                                      sortBy="#{violation.bundledViolation.violatedEnfElement.ordSubSecTitle}"
                                                                       headerText="Ordinance">
-                                                                <h:outputText value="#{violation.bundledViolation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                                <h:outputText value="#{violation.bundledViolation.violatedEnfElement.ordSubSecTitle}"/>
                                                                 <p:spacer height="3px" />
-                                                                <h:outputText value="#{violation.bundledViolation.violatedEnfElement.codeElement.source.sourceName}"/>
-                                                                <h:outputText value=" (#{violation.bundledViolation.violatedEnfElement.codeElement.source.sourceYear})"/>
+                                                                <h:outputText value="#{violation.bundledViolation.violatedEnfElement.source.sourceName}"/>
+                                                                <h:outputText value=" (#{violation.bundledViolation.violatedEnfElement.source.sourceYear})"/>
                                                             </p:column>
 
 
@@ -292,8 +292,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             <p:rowExpansion>
 
                                                                 <div class="outlinedBox">
-                                                                    <h2><h:outputText value="#{violation.bundledViolation.violatedEnfElement.codeElement.source.sourceName}:
-                                                                                      #{violation.bundledViolation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                                    <h2><h:outputText value="#{violation.bundledViolation.violatedEnfElement.source.sourceName}:
+                                                                                      #{violation.bundledViolation.violatedEnfElement.ordSubSecTitle}"/>
                                                                         ; Violation ID: <h:outputText value="#{violation.bundledViolation.violationID}"/> </h2>
                                                                     <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
                                                                                  columnClasses="gridTd, gridTd, gridTd, gridTd">
