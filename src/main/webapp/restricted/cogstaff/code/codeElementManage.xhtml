@@ -42,6 +42,18 @@
                                                 header="Code Sources" >
                                         <h:form id="ord-sources-form">
 
+                                            <p:commandButton   id="source-insert-init-button"
+                                                               ajax="true"
+                                                               rendered="true"
+                                                               value="Create a new code source"
+                                                               icon="fa fa-plus"
+                                                               disabled="false"
+                                                               actionListener="#{codeElementBB.onCodeSourceAddInitButtonChange}"
+                                                               oncomplete="PF('source-add-update-dialog-var').show()"
+                                                               update="source-add-update-dialog
+                                                               source-add-update-form"/>
+
+                                            <p:spacer height="5px" />
 
                                             <p:dataTable
                                                 id="ord-sources-table"
@@ -52,7 +64,15 @@
                                                 value="#{codeElementBB.codeSourceList}"
                                                 tableStyleClass="primeDataTable">
 
-                                                <p:column headerText="Source Name"
+                                                <p:column width="10%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Exp"/>
+                                                    </f:facet>
+                                                    <p:rowToggler/>
+                                                </p:column>
+
+                                                <p:column width="30%"
+                                                            headerText="Source Name"
                                                           styleClass="centeredColumnContent">
 
                                                     <h:outputText value="#{source.sourceName}"/>
@@ -60,20 +80,53 @@
                                                 </p:column>
 
 
-                                                <p:column headerText="Year">
+                                                <p:column width="10%"
+                                                            headerText="Year">
                                                     <h:outputText value="#{source.sourceYear}"/>
                                                 </p:column>
 
-                                                <p:column headerText="View ordinances"
+                                                <p:column   width="15%"
+                                                            headerText="Actions"
                                                           styleClass="centeredColumnContent"
-                                                          style="width: 80px"
+                                                          >
+
+
+                                                    <p:commandButton   id="source-update-init-button"
+                                                                       ajax="true"
+                                                                       rendered="true"
+                                                                       title="Update"
+                                                                       disabled="false"
+                                                                       icon="fa fa-edit"
+                                                                       actionListener="#{codeElementBB.onCodeSourceUpdateInitButtonChange(source)}"
+                                                                       oncomplete="PF('source-add-update-dialog-var').show()"
+                                                                       update="source-add-update-dialog
+                                                                       source-add-update-form"/>
+
+
+
+                                                    <p:commandButton   id="ord-nuke-button"
+                                                                       ajax="true"
+                                                                       rendered="true"
+                                                                       icon="fa fa-trash"
+                                                                       disabled="false"
+                                                                       title="Nuke"
+                                                                       actionListener="#{codeElementBB.onCodeSourceNukeInitButtonChange(source)}"
+                                                                       oncomplete="PF('source-nuke-dialog-var').show()"
+                                                                       update="source-nuke-dialog
+                                                                       source-nuke-form"/>
+
+                                                </p:column>
+                                                <p:column   width="10%"
+                                                            headerText="View"
+                                                          styleClass="centeredColumnContent"
                                                           >
 
                                                     <p:commandButton    id="ord-viewordinances-cb"
-                                                                        icon="#{source.sourceID == codeElementBB.currentCodeSource.sourceID ? 'fa fa-hand-o-right':'fa fa-archive'}"
+                                                                        icon="#{source.sourceID == codeElementBB.currentCodeSource.sourceID ? 'fa fa-hand-o-right':'fa fa-eye'}"
                                                                         style="#{source.sourceID == codeElementBB.currentCodeSource.sourceID ? 'background-color: #dee461; color:black; border:none;':''}"
                                                                         action="#{codeElementBB.onCodeSourceViewButtonChange(source)}"
                                                                         ajax="true"
+                                                                        title="View orinances in this source"
                                                                         update="form-messages-global
                                                                         ord-sources-table
                                                                         ord-list-panel"
@@ -128,7 +181,7 @@
                                                                 <h:outputText value="Link"/>
                                                             </p:column>
                                                             <p:column colspan="4">
-                                                                <h:outputText value="#{source.URL}"/>
+                                                                <h:outputText value="#{source.url}"/>
                                                             </p:column>
                                                         </p:row>
 
@@ -172,18 +225,20 @@
                                                 collapsed="false"
                                                 rendered="true"
                                                 header="Ordinance list" >
-                                        
+
                                         <h:form id="ord-list-form">
-                                        
-                                                    <p:commandButton   id="ord-update-button"
-                                                                       ajax="true"
-                                                                       rendered="true"
-                                                                       value="Add new ordinance to #{codeElementBB.currentCodeSource.sourceName} (#{codeElementBB.currentCodeSource.sourceYear})"
-                                                                       icon="fa fa-plus"
-                                                                       actionListener="#{codeElementBB.onElementUpdateInitButtonChange(ord)}"
-                                                                       oncomplete="PF('ord-add-update-dialog-var').show()"
-                                                                       update="ord-add-update-dialog"/>
-                                                    <p:spacer height="5px" />
+
+                                            <p:commandButton   id="ord-insert-init-button"
+                                                               ajax="true"
+                                                               rendered="true"
+                                                               value="#{(empty(codeElementBB.currentCodeSource)) ? '(first select a code source)':'Add new ordinance to source'}"
+                                                               icon="fa fa-plus"
+                                                               disabled="#{empty(codeElementBB.currentCodeSource)}"
+                                                               actionListener="#{codeElementBB.onElementAddInitButtonChange}"
+                                                               oncomplete="PF('ord-add-update-dialog-var').show()"
+                                                               update="ord-add-update-dialog
+                                                               ord-add-update-form"/>
+                                            <p:spacer height="5px" />
 
                                             <p:dataTable
                                                 id="ord-list-table"
@@ -237,6 +292,12 @@
                                                     <h:outputText value=": "/>
                                                     <h:outputText value="#{ord.ordSubSecTitle}"/>
                                                 </p:column>
+                                                <p:column width="5%" >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Sub Sub" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{ord.ordSubSubSecNum}"/>
+                                                </p:column>
 
                                                 <p:column width="10%" sortBy="#{ord.guideEntry.category}"
                                                           filterBy="#{ord.guideEntry.category}">
@@ -255,13 +316,14 @@
                                                                        ajax="true"
                                                                        rendered="true"
                                                                        title="Update ordinance"
-                                                                       disabled="true"
+                                                                       disabled="false"
                                                                        icon="fa fa-edit"
                                                                        actionListener="#{codeElementBB.onElementUpdateInitButtonChange(ord)}"
                                                                        oncomplete="PF('ord-add-update-dialog-var').show()"
-                                                                       update="ord-add-update-dialog"/>
+                                                                       update="ord-add-update-dialog
+                                                                       ord-add-update-form"/>
 
-                                                    
+
                                                     <p:commandButton   id="ord-notes-add-button"
                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                                                        title="View and add notes"
@@ -276,9 +338,9 @@
                                                                        ajax="true"
                                                                        rendered="true"
                                                                        icon="fa fa-trash"
-                                                                       disabled="true"
+                                                                       disabled="false"
                                                                        title="Nuke ordinance"
-                                                                       actionListener="#{codeElementBB.onElementNukeInitButtonChange}"
+                                                                       actionListener="#{codeElementBB.onElementNukeInitButtonChange(ord)}"
                                                                        oncomplete="PF('ord-nuke-dialog-var').show()"
                                                                        update="ord-nuke-dialog"/>
 
@@ -288,31 +350,74 @@
                                                 <p:rowExpansion>
                                                     <div class="outlinedBox">
 
-                                                        <h2>Details</h2>
-                                                        <h:outputText escape="false" value="Code element ID: #{ord.elementID}"/>
 
-                                                        <div class="outlinedBox">
-                                                            <h2>Code Element Content</h2>
+                                                       
+                                                        <div class="rowExpansion"
+                                                             style="font-size: 1.4em;">
+                                                            <h:outputText value="&quot;" />
+                                                            <h:outputText escape="false" 
+                                                                          value="#{ord.ordTechnicalText}" 
+                                                                          styleClass="monospace"
+                                                                          />
+                                                            <h:outputText value="&quot;" />
+                                                        </div>
 
-                                                            <h:outputLabel styleClass="bold" value="Technical Text"/>
-                                                            <p:spacer height="15px"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText escape="false" value="#{ord.ordTechnicalText}"/>
+
+                                                        <h2>Meta data</h2>
+
+                                                        <div class="ui-g data_container_nested_restrict">
+                                                            <div class="ui-g-12 ui-md-6 ui-lg-12 restrict-data-field" >
+                                                                <div class="restrict-data-field-label-inline" >
+                                                                    <h:outputLabel  for="ord-id">
+                                                                        <h:outputText value="ID" />
+                                                                    </h:outputLabel>
+                                                                </div>
+                                                               <div class="restrict-data-field-value-inline" >
+                                                                   <h:outputText id="ord-id" 
+                                                                                    value="#{ord.elementID}"/>
+                                                                </div>
                                                             </div>
-
-
-                                                            <p:spacer height="15px"/>
-                                                            <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText escape="false" value="#{ord.guideEntry.enforcementGuidelines}"/>
+                                                            <div class="ui-g-12 ui-md-6 ui-lg-12 restrict-data-field" >
+                                                                <div class="restrict-data-field-label-inline" >
+                                                                    <h:outputLabel  for="ord-created">
+                                                                        <h:outputText value="Created" />
+                                                                    </h:outputLabel>
+                                                                </div>
+                                                               <div class="restrict-data-field-value-inline" >
+                                                                   <h:outputText id="ord-created" 
+                                                                                 value="#{codeElementBB.getPrettyDateNoTime(ord.createdTS)}"/>
+                                                                   <h:outputText value="#{!(empty ord.createdBy) ? ' by ' : ''}"/>
+                                                                   <h:outputText value="#{!(empty ord.createdBy) ? ord.createdBy.person.lastName : ''}"/>
+                                                                </div>
                                                             </div>
-
-                                                            <p:spacer height="15px"/>
-
-                                                            <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText escape="false" value="#{ord.guideEntry.inspectionGuidelines}"/>
+                                                            <div class="ui-g-12 ui-md-6 ui-lg-12 restrict-data-field" >
+                                                                <div class="restrict-data-field-label-inline" >
+                                                                    <h:outputLabel  for="ord-updated">
+                                                                        <h:outputText value="Last updated" />
+                                                                    </h:outputLabel>
+                                                                </div>
+                                                               <div class="restrict-data-field-value-inline" >
+                                                                   <h:outputText id="ord-updated" 
+                                                                                 value="#{codeElementBB.getPrettyDateNoTime(ord.lastUpdatedTS)}"/>
+                                                                   <h:outputText value="#{!(empty ord.lastupdatedBy) ? ' by ' : ''}"/>
+                                                                   <h:outputText value="#{!(empty ord.lastupdatedBy) ? ord.lastupdatedBy.person.lastName : ''}"/>
+                                                                </div>
                                                             </div>
+                                                           
+                                                        </div>
+
+
+                                                        <p:spacer height="15px"/>
+                                                        <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{ord.guideEntry.enforcementGuidelines}"/>
+                                                        </div>
+
+                                                        <p:spacer height="15px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{ord.guideEntry.inspectionGuidelines}"/>
                                                         </div>
                                                     </div>
                                                 </p:rowExpansion>
@@ -363,6 +468,46 @@
 
                     </p:dialog>
 
+                    <p:dialog id="source-nuke-dialog"
+                              widgetVar="source-nuke-dialog-var"
+                              header="Remove Code Source"
+                              closeOnEscape="true"
+                              closable="true"
+                              resizable="true"
+                              responsive="true"
+                              height="300" width="550"
+                              rendered="true"
+                              >
+
+                        <h:form id="source-nuke-form">
+
+                            <div class="ui-g data_container_nested_restrict">
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+                                    <div class="restrict-data-field-label-inline" >
+                                        <h:outputLabel for="source-nuke-commit-button">
+                                            <h:outputText value="Caution! There is no easy way to undo this operation. " />
+                                        </h:outputLabel>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+                                    <div class="restrict-main-contents-io-button red_button">
+
+
+                                        <p:commandButton    id="source-nuke-commit-button"
+                                                            ajax="false" 
+                                                            action="#{codeElementBB.onCodeSourceNukeCommitButtonChange}"
+                                                            value="Nuke Code Source" 
+                                                            icon="fa fa-bomb"
+                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                            />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </h:form>
+
+                    </p:dialog>
+
 
                     <p:dialog id="ord-add-update-dialog"
                               widgetVar="ord-add-update-dialog-var"
@@ -371,128 +516,176 @@
                               closable="true"
                               resizable="true"
                               responsive="true"
-                              height="800" width="1000"
+                              height="800" width="1200"
                               rendered="true"
                               >
 
 
-                         <h:messages globalOnly="false"></h:messages>
-
-                        <h2>Current code source data:</h2>
-
-                        <p><span class="bold">Source ID: </span><h:outputText value="#{codeElementBB.currentCodeSource.sourceID}"/> |
-                            <span class="bold">Source Name: </span> <h:outputText value="#{codeElementBB.currentCodeSource.sourceName}"/></p>
-                        <p><span class="bold">Source Description: </span> <h:outputText value="#{codeElementBB.currentCodeSource.sourceDescription}"/></p>
-                        <p><span class="bold">Year: </span><h:outputText value="#{codeElementBB.currentCodeSource.sourceYear}"/>  |  
-                            <span class="bold">Is Active? </span><h:outputText value="#{codeElementBB.currentCodeSource.isActive}"/></p>
-                        <p><span class="bold">Resource URL: </span><h:outputText value="#{codeElementBB.currentCodeSource.URL}"/></p>
-                        <p> <span class="bold">Notes: </span><h:outputText value="#{codeElementBB.currentCodeSource.sourceNotes}"/></p>
-
-                        <hr/>
-
-                        <h:form id="addCodeElement">
-                            <h2>New Element Form:</h2>
-                            <p>Populate the following fields to add an element to the above code source</p>
-
-                            <h:panelGrid columns="4" border="0" cellspacing="10" cellpadding="5" 
-                                         columnClasses="gridTd, gridTd, gridTd, gridTd" 
-                                         footerClass="gridFooter">
-
-                                <h:outputLabel value="Ordiance chapter number (numbers only):"/>
-                                <h:panelGroup>               
-                                    <p:inputText id="cdelOrdChapterNo" value="#{codeElementBB.currentElement.ordchapterNo}" 
-                                                 style="width: 100%;" tabindex="2" required="true" styleClass="inputText"/>
-                                    <h:message for="cdelOrdChapterNo" showDetail="true" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-
-                                <h:outputLabel value="Chapter title:"/>
-                                <h:panelGroup>
-                                    <p:inputText id="cdelOrdChapterTitle" value="#{codeElementBB.currentElement.ordchapterTitle}" 
-                                                 style="width: 100%;" tabindex="3" required="true" styleClass="inputText"/>
-                                    <h:message for="cdelOrdChapterTitle" showDetail="true" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
+                        <h:form id="ord-add-update-form">
+                            <p:scrollPanel>
 
 
-                                <h:outputLabel value="Section number (may contain letters):"/>
-                                <h:panelGroup>
-                                    <p:inputText id="cdelOrdSecNum" value="#{codeElementBB.currentElement.ordSecNum}" 
-                                                 style="width: 100%;" tabindex="4" required="true" styleClass="inputText"/>
-                                    <h:message for="cdelOrdSecNum" showDetail="true" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
-                                </h:panelGroup>
+                                <h:messages globalOnly="false"></h:messages>
 
-                                <h:outputLabel value="Section title:"/>
-                                <h:panelGroup>
-                                    <p:inputText id="ccdelOrdSecTitle" value="#{codeElementBB.currentElement.ordSecTitle}" 
-                                                 style="width: 100%;" tabindex="5" required="true" styleClass="inputText"/>
-                                    <h:message for="ccdelOrdSecTitle" showDetail="true" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
+                                <h2>Current code source data:
 
-                                <h:outputLabel value="Subsection number (may contain letters):"/>
-                                <h:panelGroup>
-                                    <p:inputText id="cdelordSubSecNum" value="#{codeElementBB.currentElement.ordSubSecNum}" 
-                                                 style="width: 100%;" tabindex="6" required="false" styleClass="inputText"/>
-                                    <h:message for="cdelordSubSecNum" showDetail="true" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
+                                    <span class="bold">Source ID: </span><h:outputText value="#{codeElementBB.currentCodeSource.sourceID}"/> |
+                                    <span class="bold">Source Name: </span> <h:outputText value="#{codeElementBB.currentCodeSource.sourceName}"/>
+                                </h2>
 
-                                <h:outputLabel value="Subsection title:"/>
-                                <h:panelGroup>
-                                    <p:inputText id="cdelOrdSubSecTitle" value="#{codeElementBB.currentElement.ordSubSecTitle}" 
-                                                 style="width: 100%;" tabindex="7" required="false" styleClass="inputText"/>
-                                    <h:message for="cdelOrdSubSecTitle" showDetail="true" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>    
-
-                              
+                                <hr/>
 
 
-                                <f:facet name="footer">
+                                <p:commandButton 
+                                    id="element-insert-button-0" 
+                                    value="Commit new ordinance" 
+                                    ajax="false" 
+                                    tabindex="15" 
+                                    disabled="#{codeElementBB.currentElement.elementID != 0}"
+                                    icon="fa fa-plus" 
+                                    action="#{codeElementBB.onElementAddCommitButtonChange}"/>
 
-                                    <h:outputLabel value="Web address of element resource:"/>
-                                    <h:panelGroup>
-                                        <p:inputText id="cdelUrl" value="#{codeElementBB.currentElement.resourceURL}" 
-                                                     style="width: 100%;" tabindex="11" required="false" styleClass="inputText"/>
-                                        <h:message for="cdelUrl" showDetail="true" showSummary="true" 
+                                <p:commandButton 
+                                    id="element-update-button-0" 
+                                    value="Save Updates" 
+                                    disabled="#{codeElementBB.currentElement.elementID == 0}"
+                                    ajax="false" 
+                                    tabindex="15" 
+                                    icon="fa fa-plus" 
+                                    action="#{codeElementBB.onElementUpdateCommitButtonChange}"/>
+                                <div class="gray_button">
+
+                                    <p:commandButton    id="ord-add-update-abort-button0"
+                                                        ajax="true" 
+                                                        value="Cancel" 
+                                                        process="@none" 
+                                                        immediate="true" 
+                                                        oncomplete="PF('ord-add-update-dialog-var).close"
+                                                        icon="fa fa-stop" />
+                                </div>
+
+                                <p>Populate the following fields to add a ordinance to the above code source</p>
+                                <h:panelGrid columns="4" border="0" cellspacing="10" cellpadding="5" 
+                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                             footerClass="gridFooter">
+
+                                    <h:outputLabel value="Ordiance chapter number (numbers only):"/>
+                                    <h:panelGroup>               
+                                        <p:inputText id="cdelOrdChapterNo" value="#{codeElementBB.currentElement.ordchapterNo}" 
+                                                     style="width: 100%;" tabindex="1" required="true" styleClass="inputText"/>
+                                        <h:message for="cdelOrdChapterNo" showDetail="true" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>
-                                    
-                                    <p:spacer height="15px"/>
 
-                                    <h:outputLabel value="Enter the technical text of this ordinance:"/> 
-                                    
+                                    <h:outputLabel value="Chapter title:"/>
                                     <h:panelGroup>
-                                        <p:editor   id="cdelOrdTechnicalText"  value="#{codeElementBB.currentElement.ordTechnicalText}" 
-                                                    controls="bold italic underline strikethrough font size style color 
-                                                    bullets numbering center undo redo rule link removeformat outdent 
-                                                    indent link unlink copy cut paste rule alignleft center alignright"
-                                                    width="1000" required="true"
-                                                    height="200"/>
-                                        <h:message for="cdelOrdTechnicalText" showDetail="true" showSummary="true" 
+                                        <p:inputText id="cdelOrdChapterTitle" value="#{codeElementBB.currentElement.ordchapterTitle}" 
+                                                     style="width: 100%;" tabindex="2" required="true" styleClass="inputText"/>
+                                        <h:message for="cdelOrdChapterTitle" showDetail="true" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>  
-                                    
-                                   
+                                    </h:panelGroup>
 
-                                </f:facet>    
 
-                            </h:panelGrid>
+                                    <h:outputLabel value="Section number (may contain letters):"/>
+                                    <h:panelGroup>
+                                        <p:inputText id="cdelOrdSecNum" value="#{codeElementBB.currentElement.ordSecNum}" 
+                                                     style="width: 100%;" tabindex="3" required="true" styleClass="inputText"/>
+                                        <h:message for="cdelOrdSecNum" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
+                                    </h:panelGroup>
 
-                            <p:spacer height="15px"/>
+                                    <h:outputLabel value="Section title:"/>
+                                    <h:panelGroup>
+                                        <p:inputText id="ccdelOrdSecTitle" value="#{codeElementBB.currentElement.ordSecTitle}" 
+                                                     style="width: 100%;" tabindex="4" required="true" styleClass="inputText"/>
+                                        <h:message for="ccdelOrdSecTitle" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
 
-                            <p:commandButton 
-                                id="insertCodeElement" 
-                                value="Commit new code element" 
-                                ajax="false" 
-                                tabindex="15" 
-                                icon="fa fa-plus" 
-                                action="#{codeElementBB.onElementAddCommitButtonChange}"/>
+                                    <h:outputLabel value="Subsection number (may contain letters):"/>
+                                    <h:panelGroup>
+                                        <p:inputText id="cdelordSubSecNum" value="#{codeElementBB.currentElement.ordSubSecNum}" 
+                                                     style="width: 100%;" tabindex="5" required="false" styleClass="inputText"/>
+                                        <h:message for="cdelordSubSecNum" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>
 
+                                    <h:outputLabel value="Subsection title:"/>created
+                                    <h:panelGroup>
+                                        <p:inputText id="cdelOrdSubSecTitle" value="#{codeElementBB.currentElement.ordSubSecTitle}" 
+                                                     style="width: 100%;" tabindex="6" required="false" styleClass="inputText"/>
+                                        <h:message for="cdelOrdSubSecTitle" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>    
+
+                                    <h:outputLabel value="SubSub section number:"/>
+
+                                    <h:panelGroup>
+                                        <p:inputText id="cdelOrdSubSubSecTitle" value="#{codeElementBB.currentElement.ordSubSubSecNum}" 
+                                                     style="width: 100%;" tabindex="7" required="false" styleClass="inputText"/>
+                                        <h:message for="cdelOrdSubSubSecTitle" showDetail="true" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </h:panelGroup>    
+
+
+
+
+                                    <f:facet name="footer">
+
+
+
+                                        <h:outputLabel value="Enter the technical text of this ordinance:"/> 
+
+                                        <h:panelGroup>
+                                            <p:inputTextarea id="cdelOrdTechnicalText"  
+                                                             value="#{codeElementBB.currentElement.ordTechnicalText}" 
+                                                             required="true"
+                                                             tabindex="8"
+                                                             />
+                                            <h:message for="cdelOrdTechnicalText" showDetail="true" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </h:panelGroup>  
+
+
+
+                                    </f:facet>    
+
+                                </h:panelGrid>
+
+                                <p:spacer height="15px"/>
+
+                                <p:commandButton 
+                                    id="element-insert-button" 
+                                    value="Commit new ordinacne" 
+                                    ajax="false" 
+                                    tabindex="9" 
+                                    disabled="#{codeElementBB.currentElement.elementID != 0}"
+                                    icon="fa fa-plus" 
+                                    action="#{codeElementBB.onElementAddCommitButtonChange}"/>
+
+                                <p:commandButton 
+                                    id="element-update-button" 
+                                    value="Save Updates" 
+                                    disabled="#{codeElementBB.currentElement.elementID == 0}"
+                                    ajax="false" 
+                                    tabindex="10" 
+                                    icon="fa fa-plus" 
+                                    action="#{codeElementBB.onElementUpdateCommitButtonChange}"/>
+                                <p:spacer height="3px" />
+                                <div class="gray_button">
+
+                                    <p:commandButton    id="ord-add-update-abort-button"
+                                                        ajax="true" 
+                                                        value="Cancel" 
+                                                        process="@none" 
+                                                        immediate="true" 
+                                                        tabindex="11"
+                                                        oncomplete="PF('ord-add-update-dialog-var).close"
+                                                        icon="fa fa-stop" />
+                                </div>
+                            </p:scrollPanel>
                         </h:form>
-                        
+
 
                     </p:dialog>
 
@@ -573,6 +766,112 @@
                                                update="ord-notes-form"/>
                         </h:form>
                     </p:dialog>
+
+
+                    <p:dialog id="source-add-update-dialog"
+                              widgetVar="source-add-update-dialog-var"
+                              header="#{codeElementBB.currentCodeSource.sourceID == 0 ? 'Add New Code Source' : 'Update Code Source'}"
+                              closeOnEscape="true"
+                              closable="true"
+                              resizable="true"
+                              responsive="true"
+                              height="600" width="800"
+                              rendered="true"
+                              >
+
+                        <h:form id="source-add-update-form">
+
+
+                            <div style="font-size: inherit;">Source ID Number: 
+                                <h:outputText value="#{codeElementBB.currentCodeSource.sourceID}"/>
+                            </div>
+                            <p:spacer height="15"/>
+                            <p:outputLabel for="selectedSourceName">
+                                <h:outputText value="Code Source Name"/>
+                            </p:outputLabel>
+                            <p:inputText id="selectedSourceName" value="#{codeElementBB.currentCodeSource.sourceName}" 
+                                         style="width: 20%;" tabindex="3" required="true" styleClass="inputText"/>
+                            <h:message for="selectedSourceName" showDetail="false" showSummary="true" 
+                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                            <p:spacer height="15"/>
+                            <p:outputLabel for="selectedSourceYear">
+                                <h:outputText value="Year"/>
+                            </p:outputLabel>
+                            <p:inputText id="selectedSourceYear" value="#{codeElementBB.currentCodeSource.sourceYear}" 
+                                         style="width: 20%;" tabindex="4" required="true" styleClass="inputText"/>
+                            <h:message for="selectedSourceYear" showDetail="false" showSummary="true" 
+                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                            <p:spacer height="15"/>
+                            <p:outputLabel for="selectedSourceDescription">
+                                <h:outputText value="Description of Code Source"/>
+                            </p:outputLabel>
+                            <p:inputTextarea id="selectedSourceDescription" value="#{codeElementBB.currentCodeSource.sourceDescription}" 
+                                             style="width: 100%;" tabindex="5" required="true" styleClass="inputTextarea" />
+                            <h:message for="selectedSourceDescription" showDetail="false" showSummary="true" 
+                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                            <p:spacer height="15"/>
+
+                            <p:outputLabel for="selectedSourceURL">
+                                <h:outputText value="Web link to source specification"/>
+                            </p:outputLabel>
+                            <p:inputText id="selectedSourceURL" value="#{codeElementBB.currentCodeSource.url}" 
+                                         style="width: 100%;" tabindex="7" required="true" styleClass="inputText"/>
+                            <h:message for="selectedSourceURL" showDetail="false" showSummary="true" 
+                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            <p:spacer height="15"/>
+
+                            <p:outputLabel for="selectedSourceNotes">
+                                <h:outputText value="Notes on Source (i.e. Who approved it? When does it expire?)"/>
+                            </p:outputLabel>
+                            <p:inputTextarea id="selectedSourceNotes" value="#{codeElementBB.currentCodeSource.sourceNotes}" 
+                                             style="width: 100%;" tabindex="8" required="true" styleClass="inputText"/>
+                            <h:message for="selectedSourceNotes" showDetail="false" showSummary="true" 
+                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+
+                            <p:commandButton 
+                                id="commitButton" 
+                                ajax="false"
+                                value="Commit updates to code source" 
+                                icon="fa fa-edit"
+                                styleClass="buttonOwnLine" 
+                                disabled="#{codeElementBB.currentCodeSource.sourceID == 0}"
+                                action="#{codeElementBB.onCodeSourceUpdateCommitButtonChange}" />
+
+
+                            <p:commandButton 
+                                id="addNewButton" 
+                                ajax="false"
+                                value="Commit new code source"
+                                icon="fa fa-plus"
+                                styleClass="buttonOwnLine" 
+                                disabled="#{codeElementBB.currentCodeSource.sourceID != 0}"
+                                action="#{codeElementBB.onCodeSourceAddCommitButtonChange}"
+                                />
+
+                            <div class="gray_button">
+
+                                <p:commandButton    id="source-add-update-abort-button"
+                                                    ajax="true" 
+                                                    value="Cancel" 
+                                                    process="@none" 
+                                                    immediate="true" 
+                                                    oncomplete="PF('source-add-update-dialog-var').close"
+                                                    icon="fa fa-stop" />
+                            </div>
+
+
+                        </h:form>
+
+
+                    </p:dialog>
+
+
+
+
                 </f:view>
             </ui:define>
         </ui:composition>

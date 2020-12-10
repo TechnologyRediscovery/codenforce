@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import java.io.Serializable;
 import com.tcvcog.tcvce.entities.CodeSource;
@@ -50,6 +51,15 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         System.out.println("CodeIntegrator.CodeIntegrator");
         
     }
+    
+    
+    // *************************************************************
+    // *********************CODE SOURCES****************************
+    // *************************************************************
+    
+    
+    
+    
 
     /**
      * Utility method for use by methods in this Integrator which allows 
@@ -75,7 +85,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         source.setSourceYear(rs.getInt(3));
         source.setSourceDescription(rs.getString(4));
         source.setIsActive(rs.getBoolean(5));
-        source.setURL(rs.getString(6));
+        source.setUrl(rs.getString(6));
         source.setSourceNotes(rs.getString(7));
         return source;
         
@@ -123,8 +133,9 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
     /**
      * Takes in a CodeSource object and inserts into the DB
      * @param sourceToInsert
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public void insertCodeSource(CodeSource sourceToInsert){
+    public void insertCodeSource(CodeSource sourceToInsert) throws IntegrationException{
         String query = "INSERT INTO public.codesource(\n" +
             "sourceid, name, year, description, isactive, url, notes)\n" +
             "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?);";
@@ -140,17 +151,15 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(2, sourceToInsert.getSourceYear());
             stmt.setString(3, sourceToInsert.getSourceDescription());
             stmt.setBoolean(4, sourceToInsert.isIsActive());
-            stmt.setString(5, sourceToInsert.getURL());
+            stmt.setString(5, sourceToInsert.getUrl());
             stmt.setString(6, sourceToInsert.getSourceNotes());
             stmt.executeUpdate();
             System.out.println("CodeIntegrator.insertCodeSource: executed update with SQL - " + stmt.toString());
              
         } catch (SQLException ex) { 
              System.out.println(ex.toString());
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Business Object (Case, Violation, ...) Database Problem", 
-                            "SQLException Caught by Integrator"));
+             throw new IntegrationException("Cannot insert code source");
+             
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -160,8 +169,9 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
     /**
      * Updates fields in the DB for a given CodeSource objects
      * @param sourceToUpdate
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public void updateCodeSource(CodeSource sourceToUpdate){
+    public void updateCodeSource(CodeSource sourceToUpdate) throws IntegrationException{
          String query = "UPDATE public.codesource\n" +
                 "   SET name=?, year=?, description=?, isactive=?, url=?, \n" +
                 "       notes=?\n" +
@@ -178,17 +188,14 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(2, sourceToUpdate.getSourceYear());
             stmt.setString(3, sourceToUpdate.getSourceDescription());
             stmt.setBoolean(4, sourceToUpdate.isIsActive());
-            stmt.setString(5, sourceToUpdate.getURL());
+            stmt.setString(5, sourceToUpdate.getUrl());
             stmt.setString(6, sourceToUpdate.getSourceNotes());
             stmt.setInt(7, sourceToUpdate.getSourceID());
             stmt.execute();
              
         } catch (SQLException ex) { 
              System.out.println(ex.toString());
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Business Object (Case, Violation, ...) Database Problem", 
-                            "SQLException Caught by Integrator"));
+             throw new IntegrationException("cannot update code source");
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -196,11 +203,34 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     /**
-     * Removes the provided code source from the DB
+     * Toggles the active isactive flag on the passed code source
      * @param source the CodeSource to remove from the DB
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public void deleteCodeSource(CodeSource source){
-        // TODO: Write guts
+    public void deactivateCodeSource(CodeSource source) throws IntegrationException{
+        if(source == null) return;
+        
+        String query = "UPDATE public.codesource\n" +
+                "   SET isactive=FALSE WHERE sourceid=?;";
+
+        // create sql statement up here
+        Connection con = null;
+        PreparedStatement stmt = null;
+
+         try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+           
+            stmt.setInt(1, source.getSourceID());
+            stmt.execute();
+             
+        } catch (SQLException ex) { 
+             System.out.println(ex.toString());
+             throw new IntegrationException("Cannot deactivate code source");
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
     }
     
     /**
@@ -234,7 +264,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         String query = "SELECT sourceid, name, year, "
               + "description, isactive, url, "
               + "notes\n" 
-              + " FROM public.codesource;";
+              + " FROM public.codesource WHERE isactive=TRUE;";
         
         Connection con = null;
         PreparedStatement stmt = null;
@@ -265,6 +295,394 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         
         return codeSources;
     }
+    
+    
+    
+    
+    
+    // *************************************************************
+    // **************CODE ELEMENTS (ORDINANCES)*********************
+    // *************************************************************
+   
+    
+    
+        /**
+     * Core method which grabs data related to a single CodeElement and populates
+     * a CodeElement object which is returned to the client.
+     * 
+     * @param elementID
+     * @return the loaded up CodeElement with database data
+     * @throws IntegrationException 
+     */
+    public CodeElement getCodeElement(int elementID) throws IntegrationException{
+        //System.out.println("CodeIntegrator.getCodeElement | fetching code element by ID");
+        CodeElement newCodeElement = null;
+        PreparedStatement stmt = null;
+        Connection con = getPostgresCon();
+        // note that muniCode is not returned in this query since it is specified in the WHERE
+        String query = "SELECT elementid, codesource_sourceid, ordchapterno, ordchaptertitle, \n" +
+                        "       ordsecnum, ordsectitle, ordsubsecnum, ordsubsectitle, ordtechnicaltext, \n" +
+                        "       ordhumanfriendlytext, resourceurl, guideentryid, notes, legacyid, \n" +
+                        "       ordsubsubsecnum, useinjectedvalues, lastupdatedts, \n" +
+                        "       createdby_userid, lastupdatedby_userid, deactivatedts, deactivatedby_userid, \n" +
+                        "       createdts\n" +
+                        "  FROM public.codeelement WHERE elementid=?;";
+        ResultSet rs = null;
+ 
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, elementID);
+            rs = stmt.executeQuery();
+            
+            // this query will only return 1 row since the WHERE clause selects from an PK column
+            while(rs.next()){
+                newCodeElement = generateCodeElement(rs);
+                 
+            }
+        } catch (SQLException ex) {
+            System.out.println("CodeIntegrator.getCodeElementByElementID | " + ex.toString());
+            throw new IntegrationException("Exception in CodeIntegrator.getCodeElementByElementID", ex);
+        } finally{
+           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+           if (con != null) { try { con.close(); } catch (SQLException e) {System.out.println(e.toString());} }
+        } // close finally
+        return newCodeElement;
+        
+    }
+    
+    
+    /**
+     * Internal Utility method for loading up a CodeElement object given
+     * a result set. Used by all sorts of CodeElement related methods
+     * that are getting data for many code elements back in a single result set.
+     * Note that the client method is responsible for manging ResultSet cursor
+     * position 
+     * @param rs With cursor positioned at the row to extract and populate from
+     * @param e an empty CodeElement. Client class is responsible for instantiation
+     * @return a populated CodeElement extracted from that row in the ResultSet
+     */
+    private CodeElement generateCodeElement(ResultSet rs) throws SQLException, IntegrationException{
+        if(rs == null) return null;
+        CodeElement e = new CodeElement();
+        UserIntegrator ui = getUserIntegrator();
+
+        // to ease the eyes, line spacing corresponds to the field spacing in CodeElement
+
+        e.setElementID(rs.getInt("elementid"));
+
+        e.setGuideEntryID(rs.getInt("guideentryid"));
+        if(rs.getInt("guideentryid") != 0){
+            e.setGuideEntry(getCodeElementGuideEntry(rs.getInt("guideentryid")));
+        } else {
+            e.setGuideEntry(null);
+        }
+
+        e.setSource(getCodeSource(rs.getInt("codesource_sourceid")));
+
+        e.setOrdchapterNo(rs.getInt("ordchapterno"));
+
+        e.setOrdchapterTitle(rs.getString("ordchaptertitle"));
+        e.setOrdSecNum(rs.getString("ordsecnum"));
+        e.setOrdSecTitle(rs.getString("ordsectitle"));
+
+        e.setOrdSubSecNum(rs.getString("ordsubsecnum"));
+        e.setOrdSubSecTitle(rs.getString("ordsubsectitle"));
+        e.setOrdSubSecNum(rs.getString("ordsubsecnum"));
+
+        e.setOrdSubSubSecNum(rs.getString("ordsubsubsecnum"));
+
+        e.setOrdTechnicalText(rs.getString("ordtechnicaltext"));
+
+        e.setOrdHumanFriendlyText(rs.getString("ordhumanfriendlytext"));
+        e.setUseInjectedValues(rs.getBoolean("useinjectedvalues"));
+
+        e.setResourceURL(rs.getString("resourceurl"));
+
+
+        if(rs.getTimestamp("createdts") != null){
+            e.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                
+        }
+        if(rs.getInt("createdby_userid") != 0){
+            e.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+        }
+
+        if(rs.getTimestamp("lastupdatedts") != null){
+            e.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+        }
+        if(rs.getInt("lastupdatedby_userid") != 0){
+            e.setLastupdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+        }
+
+        if(rs.getTimestamp("deactivatedts") != null){
+            e.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+        }
+        if(rs.getInt("deactivatedby_userid") != 0){
+            e.setDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
+        }
+
+                
+                
+                
+        return e;
+    }
+    
+  
+    
+    /**
+     * Key method for returning a fully-assembled link of code elements by source ID.
+     * Each code element returned by a single call to this method contains its own 
+ instance of a CodeSource object whose field values are identical.
+ 
+ NOTE these are CodeElement that can become EnforcableCodeElement when they are
+ added to a codset (which is, in turn, associated with a single muni)
+     * 
+     * @param sourceID the CodeSource id used in the WHERE clause of the embedded SQL statment
+     * @return Fully-baked CodeElement objects in a ArrayList
+     * @throws IntegrationException Caught by backing beans and converted into
+     * user messages
+     */
+    public List<CodeElement> getCodeElements(int sourceID) throws IntegrationException{
+        String query = "SELECT elementid from codeelement where codesource_sourceID = ? AND deactivatedts IS NULL;";
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        List<CodeElement> elementList = new ArrayList();
+         try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            
+            stmt.setInt(1, sourceID);
+            
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                elementList.add(getCodeElement(rs.getInt("elementid")));
+            }
+             
+        } catch (SQLException ex) { 
+             System.out.println(ex.toString());
+             throw new IntegrationException("Error Retrieving code element list", ex);
+        } finally{
+            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+         return elementList;
+    } // close getCodeElements
+    
+    
+    
+    public int insertCodeElement(CodeElement element) throws IntegrationException{
+         String query = "INSERT INTO public.codeelement(\n" +
+                        "            elementid, codesource_sourceid, ordchapterno, ordchaptertitle, \n" +
+                        "            ordsecnum, ordsectitle, ordsubsecnum, ordsubsectitle, ordtechnicaltext, \n" +
+                        "            ordhumanfriendlytext, resourceurl, guideentryid, notes, legacyid, \n" +
+                        "            ordsubsubsecnum, useinjectedvalues, lastupdatedts, \n" +
+                        "            createdby_userid, lastupdatedby_userid, \n" +
+                        "            createdts)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?, ?, \n" +
+                        "            ?, ?, now(), \n" +
+                        "            ?, ?, \n" +
+                        "            now());";
+
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int freshID = 0;
+
+         try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            
+            if(element.getSource() != null){
+                stmt.setInt(1, element.getSource().getSourceID());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            stmt.setInt(2, element.getOrdchapterNo());
+            stmt.setString(3, element.getOrdchapterTitle());
+            
+            stmt.setString(4, element.getOrdSecNum());
+            stmt.setString(5, element.getOrdSecTitle());
+            stmt.setString(6, element.getOrdSubSecNum());
+            stmt.setString(7, element.getOrdSubSecTitle());
+            stmt.setString(8, element.getOrdTechnicalText());
+            
+            stmt.setString(9, element.getOrdHumanFriendlyText());
+            stmt.setString(10, element.getResourceURL());
+            if(element.getGuideEntryID() != 0){
+                stmt.setInt(11, element.getGuideEntryID());
+            } else {
+                stmt.setNull(11, java.sql.Types.NULL);
+            }
+            stmt.setString(12, element.getNotes());
+            stmt.setInt(13, element.getLegacyID());
+            
+            stmt.setString(14, element.getOrdSubSubSecNum());
+            stmt.setBoolean(15, element.isUseInjectedValues());
+            
+            if(element.getCreatedBy() != null){
+                stmt.setInt(16, element.getCreatedBy().getUserID());
+            } else{
+                stmt.setNull(16, java.sql.Types.NULL);
+            }
+            
+            if(element.getLastupdatedBy() != null){
+                stmt.setInt(17, element.getLastupdatedBy().getUserID());
+            } else{
+                stmt.setNull(17, java.sql.Types.NULL);
+            }
+            
+            stmt.execute();
+            
+            String retrievalQuery = "SELECT currval('codeelement_elementid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                freshID = rs.getInt(1);
+            }
+            
+             
+        } catch (SQLException ex) { 
+             System.out.println(ex.toString());
+             throw new IntegrationException("Error inserting code element", ex);
+        } finally{
+            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+         return freshID;
+    }
+    
+    public void updateCodeElement(CodeElement element) throws IntegrationException{
+          String query = "UPDATE public.codeelement\n" +
+                            "   SET codesource_sourceid=?, ordchapterno=?, ordchaptertitle=?, \n" +
+                            "       ordsecnum=?, ordsectitle=?, ordsubsecnum=?, ordsubsectitle=?, \n" +
+                            "       ordtechnicaltext=?, ordhumanfriendlytext=?, resourceurl=?, guideentryid=?, \n" +
+                            "       notes=?, legacyid=?, ordsubsubsecnum=?, useinjectedvalues=?, \n" +
+                            "       lastupdatedts=now(), lastupdatedby_userid=? \n" +
+                            " WHERE elementid=?;";
+
+        Connection con = null;
+        PreparedStatement stmt = null;
+
+         try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+           
+            
+            // no source changes on element update
+            //stmt.setInt(2, element.getSource().getSourceID());
+            
+            if(element.getSource() != null){
+                stmt.setInt(1, element.getSource().getSourceID());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            stmt.setInt(2, element.getOrdchapterNo());
+            stmt.setString(3, element.getOrdchapterTitle());
+            
+            stmt.setString(4, element.getOrdSecNum());
+            stmt.setString(5, element.getOrdSecTitle());
+            stmt.setString(6, element.getOrdSubSecNum());
+            stmt.setString(7, element.getOrdSubSecTitle());
+            
+            stmt.setString(8, element.getOrdTechnicalText());
+            stmt.setString(9, element.getOrdHumanFriendlyText());
+            stmt.setString(10, element.getResourceURL());
+            if(element.getGuideEntryID() != 0){
+                stmt.setInt(11, element.getGuideEntryID());
+            } else {
+                stmt.setNull(11, java.sql.Types.NULL);
+            }
+            stmt.setString(12, element.getNotes());
+            stmt.setInt(13, element.getLegacyID());
+            stmt.setString(14, element.getOrdSubSubSecNum());
+            stmt.setBoolean(15, element.isUseInjectedValues());
+                        
+            if(element.getLastupdatedBy() != null){
+                stmt.setInt(16, element.getLastupdatedBy().getUserID());
+            } else{
+                stmt.setNull(16, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(17, element.getElementID());
+            
+            
+            stmt.executeUpdate();
+            
+             
+        } catch (SQLException ex) { 
+             System.out.println(ex.toString());
+             throw new IntegrationException("Error inserting code element", ex);
+        } finally{
+            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    public void deactivateCodeElement(CodeElement element) throws IntegrationException{
+        String query =  "UPDATE codeelement SET deactivatedts = now(), deactivatedby_userid=? WHERE elementid=?;";
+        Connection con = null;
+        PreparedStatement stmt = null;
+
+         try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            if(element.getDeactivatedBy() != null){
+                stmt.setInt(1, element.getDeactivatedBy().getUserID());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            stmt.setInt(2, element.getElementID());
+            stmt.execute();
+             
+        } catch (SQLException ex) { 
+             System.out.println(ex.toString());
+             throw new IntegrationException("Unable to deactivate code element--"
+                     + "probably because it has been used somewhere in the system. It's here to stay.", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    
+    // *************************************************************
+    // ******CODE SETS and CODE SET ELEMENTS  (Code Books)**********
+    // *************************************************************
+   
+     
+    public void updateCodeSetMetadata(CodeSet set) throws IntegrationException{
+        String query = "UPDATE public.codeset\n" +
+            "SET name=?, description=? WHERE codeSetid=?;";
+        Connection con = null;
+        PreparedStatement stmt = null;
+
+         try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, set.getCodeSetName());
+            stmt.setString(2, set.getCodeSetDescription());
+            stmt.setInt(3, set.getCodeSetID());
+            stmt.execute();
+             
+        } catch (SQLException ex) { 
+             System.out.println(ex.toString());
+             throw new IntegrationException("Error updating code set", ex);
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        
+    }
+    
     
     public CodeSet getCodeSetBySetID(int setID) throws IntegrationException{
          String query = "SELECT codesetid, name, description, municipality_municode \n" +
@@ -341,6 +759,52 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
 
         return set;
         
+    }
+    
+       //xiaohong add
+    public ArrayList getCodeSets() throws IntegrationException {
+        String query = "SELECT codesetid, name, description, municipality_municode\n"
+                + "  FROM public.codeset;";
+
+        //System.out.println("CodeIntegrator.getCodeSets | MuniCode: "+ muniCode);
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        ArrayList<CodeSet> codeSetList = new ArrayList();
+
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                codeSetList.add(populateCodeSetFromRS(rs));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("CodeIntegrator.getCodeSetByMuniCode | " + ex.toString());
+            throw new IntegrationException("Exception in CodeSetIntegrator", ex);
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {/* ignored */ }
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        } // close finally
+        return codeSetList;
     }
     
     public ArrayList getCodeSets(int muniCode) throws IntegrationException{
@@ -615,277 +1079,13 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         return newEce;
     }
     
-    /**
-     * Internal Utility method for loading up a CodeElement object given
-     * a result set. Used by all sorts of CodeElement related methods
-     * that are getting data for many code elements back in a single result set.
-     * Note that the client method is responsible for manging ResultSet cursor
-     * position 
-     * @param rs With cursor positioned at the row to extract and populate from
-     * @param e an empty CodeElement. Client class is responsible for instantiation
-     * @return a populated CodeElement extracted from that row in the ResultSet
-     */
-    private CodeElement generateCodeElement(ResultSet rs, CodeElement e) throws SQLException, IntegrationException{
-                
-                // to ease the eyes, line spacing corresponds to the field spacing in CodeElement
-        
-                e.setElementID(rs.getInt("elementid"));
-                
-                e.setGuideEntryID(rs.getInt("guideentryid"));
-                if(rs.getInt("guideentryid") != 0){
-                    e.setGuideEntry(getCodeElementGuideEntry(rs.getInt("guideentryid")));
-                } else {
-                    e.setGuideEntry(null);
-                }
-                
-                e.setSource(getCodeSource(rs.getInt("codesource_sourceid")));
-                
-                e.setOrdchapterNo(rs.getInt("ordchapterno"));
-                
-                e.setOrdchapterTitle(rs.getString("ordchaptertitle"));
-                e.setOrdSecNum(rs.getString("ordsecnum"));
-                e.setOrdSecTitle(rs.getString("ordsectitle"));
-                
-                e.setOrdSubSecNum(rs.getString("ordsubsecnum"));
-                e.setOrdSubSecTitle(rs.getString("ordsubsectitle"));
-                e.setOrdSubSecNum(rs.getString("ordsubsecnum"));
-                
-                e.setOrdTechnicalText(rs.getString("ordtechnicaltext"));
-                
-                e.setOrdHumanFriendlyText(rs.getString("ordhumanfriendlytext"));
-                e.setIsActive(rs.getBoolean("isactive"));
-                e.setUseInjectedValues(rs.getBoolean("useinjectedvalues"));
-                
-                e.setResourceURL(rs.getString("resourceurl"));
-                
-                if(rs.getTimestamp("datecreated") != null){
-                    e.setDateCreated(rs.getTimestamp("datecreated").toLocalDateTime());
-                }
-                
-                if(rs.getTimestamp("lastupdatedts") != null){
-                    e.setDateCreated(rs.getTimestamp("datecreated").toLocalDateTime());
-                    
-                }
-                
-                
-                
-        return e;
-    }
+  
     
-    /**
-     * Core method which grabs data related to a single CodeElement and populates
-     * a CodeElement object which is returned to the client.
-     * 
-     * @param elementID
-     * @return the loaded up CodeElement with database data
-     * @throws IntegrationException 
-     */
-    public CodeElement getCodeElement(int elementID) throws IntegrationException{
-        //System.out.println("CodeIntegrator.getCodeElement | fetching code element by ID");
-        CodeElement newCodeElement = new CodeElement();
-        PreparedStatement stmt = null;
-        Connection con = getPostgresCon();
-        // note that muniCode is not returned in this query since it is specified in the WHERE
-        String query = "SELECT elementid, guideentryid, codesource_sourceid, ordchapterno, \n" +
-            "ordchaptertitle, ordsecnum, ordsectitle, ordsubsecnum, ordsubsectitle, \n" +
-            "ordtechnicaltext, ordhumanfriendlytext, isactive, \n" +
-            "resourceurl, datecreated, ordsubsubsecnum, useinjectedvalues, creator_userid, \n" +
-            "       lastupdatedts, lastupdated_userid \n" +
-            "FROM public.codeelement WHERE elementid=?;";
-        ResultSet rs = null;
- 
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, elementID);
-            rs = stmt.executeQuery();
-            
-            // this query will only return 1 row since the WHERE clause selects from an PK column
-            while(rs.next()){
-                newCodeElement = generateCodeElement(rs, newCodeElement);
-                 
-            }
-        } catch (SQLException ex) {
-            System.out.println("CodeIntegrator.getCodeElementByElementID | " + ex.toString());
-            throw new IntegrationException("Exception in CodeIntegrator.getCodeElementByElementID", ex);
-        } finally{
-           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-           if (con != null) { try { con.close(); } catch (SQLException e) {System.out.println(e.toString());} }
-        } // close finally
-        return newCodeElement;
-        
-    }
+    // *************************************************************
+    // ********************* CODE GUIDE ****************************
+    // *************************************************************
+   
     
-    
-    /**
-     * Key method for returning a fully-assembled link of code elements by source ID.
-     * Each code element returned by a single call to this method contains its own 
- instance of a CodeSource object whose field values are identical.
- 
- NOTE these are CodeElement that can become EnforcableCodeElement when they are
- added to a codset (which is, in turn, associated with a single muni)
-     * 
-     * @param sourceID the CodeSource id used in the WHERE clause of the embedded SQL statment
-     * @return Fully-baked CodeElement objects in a ArrayList
-     * @throws IntegrationException Caught by backing beans and converted into
-     * user messages
-     */
-    public List<CodeElement> getCodeElements(int sourceID) throws IntegrationException{
-        String query = "SELECT elementid from codeelement where codesource_sourceID = ?;";
-        Connection con = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        List<CodeElement> elementList = new ArrayList();
-         try {
-            con = getPostgresCon();
-            stmt = con.prepareStatement(query);
-            
-            stmt.setInt(1, sourceID);
-            
-            rs = stmt.executeQuery();
-            
-            while(rs.next()){
-                System.out.println("CodeIntegrator.getCodeElementsBySourceID | getting code element!");
-                elementList.add(getCodeElement(rs.getInt("elementid")));
-            }
-             
-        } catch (SQLException ex) { 
-             System.out.println(ex.toString());
-             throw new IntegrationException("Error Retrieving code element list", ex);
-        } finally{
-            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-         return elementList;
-    } // close getCodeElements
-    
-    public void insertCodeElement(CodeElement element) throws IntegrationException{
-         String query = "INSERT INTO public.codeelement( " 
-                 + "elementid, codesource_sourceid, "
-                 + "ordchapterno, ordchaptertitle, ordsecnum, "
-                 + "ordsectitle, ordsubsecnum, ordsubsectitle, " 
-                 + "ordtechnicaltext, ordhumanfriendlytext, "
-                 + "isactive,  "
-                 + "resourceurl, datecreated, ordsubsubsecnum, useinjectedvalues) " +
-                    "    VALUES (DEFAULT, ?, ?, \n" +
-                    "            ?, ?, ?, ?, ?, \n" +
-                    "            ?, ?, \n" +
-                    "            ?, ?, \n" +
-                    "            now(), ?, ?);";
-
-        Connection con = null;
-        PreparedStatement stmt = null;
-
-         try {
-            con = getPostgresCon();
-            stmt = con.prepareStatement(query);
-            
-            stmt.setInt(1, element.getSource().getSourceID());
-            
-            stmt.setInt(2, element.getOrdchapterNo());
-            stmt.setString(3, element.getOrdchapterTitle());
-            stmt.setString(4, element.getOrdSecNum());
-            
-            stmt.setString(5, element.getOrdSecTitle());
-            stmt.setString(6, element.getOrdSubSecNum());
-            stmt.setString(7, element.getOrdSubSecTitle());
-            
-            stmt.setString(8, element.getOrdTechnicalText());
-            stmt.setString(9, element.getOrdHumanFriendlyText());
-            
-            stmt.setBoolean(10, element.isIsActive());
-            stmt.setString(11, element.getResourceURL());
-            stmt.setString(12, element.getOrdSubSubSecNum());
-            stmt.setBoolean(13, element.isUseInjectedValues());
-            
-            
-            System.out.println("CodeIntegrator.insertCodeElement | insert statement: " + stmt.toString());
-            
-            stmt.executeUpdate();
-             
-        } catch (SQLException ex) { 
-             System.out.println(ex.toString());
-             throw new IntegrationException("Error inserting code element", ex);
-        } finally{
-            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
-    public void updateCodeElement(CodeElement element) throws IntegrationException{
-        System.out.println("CodeIntegrator.udpateCodeElement | element to insert chapter name: " + element.getOrdchapterTitle());
-          String query = "UPDATE public.codeelement\n" +
-                "SET ordchapterno=?, ordchaptertitle=?, ordsecnum=?, ordsectitle=?, \n" +
-                "ordsubsecnum=?, ordsubsectitle=?, ordtechnicaltext=?, ordhumanfriendlytext=?, \n" +
-                "isactive=?, resourceurl=?, \n" +
-                "datecreated=now(), ordsubsubsecnum=?, useinjectedvalues=?\n" +
-                " WHERE elementid=?;";
-
-        Connection con = null;
-        PreparedStatement stmt = null;
-
-         try {
-            con = getPostgresCon();
-            stmt = con.prepareStatement(query);
-           
-            
-            // no source changes on element update
-            //stmt.setInt(2, element.getSource().getSourceID());
-            
-            stmt.setInt(1, element.getOrdchapterNo());
-            stmt.setString(2, element.getOrdchapterTitle());
-            stmt.setString(3, element.getOrdSecNum());
-            
-            stmt.setString(4, element.getOrdSecTitle());
-            stmt.setString(5, element.getOrdSubSecNum());
-            stmt.setString(6, element.getOrdSubSecTitle());
-            
-            stmt.setString(7, element.getOrdTechnicalText());
-            stmt.setString(8, element.getOrdHumanFriendlyText());
-            
-            stmt.setBoolean(9, element.isIsActive());
-            stmt.setString(10, element.getResourceURL());
-            
-            stmt.setString(11, element.getOrdSubSubSecNum());
-            stmt.setBoolean(12, element.isUseInjectedValues());
-            stmt.setInt(13, element.getElementID());
-            
-            System.out.println("CodeIntegrator.updateCodeElement | update statement: " + stmt.toString());
-            
-            stmt.execute();
-             
-        } catch (SQLException ex) { 
-             System.out.println(ex.toString());
-             throw new IntegrationException("Error inserting code element", ex);
-        } finally{
-            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
-    public void deleteCodeElement(CodeElement element) throws IntegrationException{
-        String query =  "DELETE FROM public.codeelement\n" +
-                        " WHERE elementid = ?;";
-        Connection con = null;
-        PreparedStatement stmt = null;
-
-         try {
-            con = getPostgresCon();
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, element.getElementID());
-            stmt.execute();
-             
-        } catch (SQLException ex) { 
-             System.out.println(ex.toString());
-             throw new IntegrationException("Unable to delete code element--"
-                     + "probably because it has been used somewhere in the system. It's here to stay.", ex);
-        } finally{
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
     
     public void insertCodeElementGuideEntry(CodeElementGuideEntry cege) throws IntegrationException{
         String query =  "INSERT INTO public.codeelementguide(\n" +
@@ -950,31 +1150,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
         
     }
-    
-    public void updateCodeSetMetadata(CodeSet set) throws IntegrationException{
-        String query = "UPDATE public.codeset\n" +
-            "SET name=?, description=? WHERE codeSetid=?;";
-        Connection con = null;
-        PreparedStatement stmt = null;
-
-         try {
-            con = getPostgresCon();
-            stmt = con.prepareStatement(query);
-            stmt.setString(1, set.getCodeSetName());
-            stmt.setString(2, set.getCodeSetDescription());
-            stmt.setInt(3, set.getCodeSetID());
-            stmt.execute();
-             
-        } catch (SQLException ex) { 
-             System.out.println(ex.toString());
-             throw new IntegrationException("Error updating code set", ex);
-        } finally{
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        
-    }
+   
     
     public void deleteCodeElementGuideEntry(CodeElementGuideEntry ge) throws IntegrationException{
         String query =  "DELETE FROM public.codeelementguide\n" +
@@ -1099,50 +1275,6 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
-    //xiaohong add
-    public ArrayList getCodeSets() throws IntegrationException {
-        String query = "SELECT codesetid, name, description, municipality_municode\n"
-                + "  FROM public.codeset;";
-
-        //System.out.println("CodeIntegrator.getCodeSets | MuniCode: "+ muniCode);
-        Connection con = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        ArrayList<CodeSet> codeSetList = new ArrayList();
-
-        try {
-            con = getPostgresCon();
-            stmt = con.prepareStatement(query);
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                codeSetList.add(populateCodeSetFromRS(rs));
-            }
-
-        } catch (SQLException ex) {
-            System.out.println("CodeIntegrator.getCodeSetByMuniCode | " + ex.toString());
-            throw new IntegrationException("Exception in CodeSetIntegrator", ex);
-        } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException ex) {/* ignored */ }
-            }
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    /* ignored */
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    /* ignored */ }
-            }
-        } // close finally
-        return codeSetList;
-    }
+ 
     
 } // close class

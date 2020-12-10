@@ -12,7 +12,17 @@ ALTER TABLE public.codeviolation
 
 
 -- RUN ON REMOTE TO HERE
+
+
 -- RUN LOCALLY TO HERE
+ALTER TABLE public.codelement
+    ADD COLUMN ordsubsubsectitle TEXT;
+
+ALTER TABLE public.codelement
+    ADD COLUMN ordsubsubsecnum TEXT;
+ 
+ 
+
 
 ALTER TABLE textblock 
     ADD COLUMN injectabletemplate BOOLEAN DEFAULT FALSE;
@@ -43,6 +53,8 @@ INSERT INTO public.eventcategory(
 INSERT INTO public.textblockcategory(
             categoryid, categorytitle, icon_iconid, muni_municode)
     VALUES (101, "Injectable Template", 10, 999);
+
+
 
 
 -- COMMENTS FROM SNAPPER

@@ -570,7 +570,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param ceCase the case to updated, with updated member variables
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public void updateCECaseMetadata(CECaseDataHeavy ceCase) throws IntegrationException{
+    public void updateCECaseMetadata(CECase ceCase) throws IntegrationException{
         String query =  "UPDATE public.cecase\n" +
                         "   SET cecasepubliccc=?, property_propertyid=?, propertyunit_unitid=?, \n" + // 1-3
                         "       login_userid=?, casename=?, originationdate=?, closingdate=?, \n" + // 4-7

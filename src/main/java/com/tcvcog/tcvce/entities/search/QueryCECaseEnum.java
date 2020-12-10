@@ -34,8 +34,8 @@ public  enum QueryCECaseEnum
                             RoleType.MuniReader, 
                             true),
     
-    CLOSED_30DAYS(          "Closed in the past 30 days", 
-                            "Any case closed in the past 30 days", 
+    CLOSED_CASES(          "Closed cases in any time period", 
+                            "Any closed cases", 
                             RoleType.MuniReader, 
                             true),
     

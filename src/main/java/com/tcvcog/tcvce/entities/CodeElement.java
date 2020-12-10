@@ -50,12 +50,108 @@ public  class       CodeElement
     protected boolean useInjectedValues;
     
     protected String resourceURL;
-    protected LocalDateTime dateCreated;
+    
+    protected String notes;
+    protected int legacyID;
     
     protected String headerString;
+    /** Humanization Object standard fields **/
+    protected LocalDateTime createdTS;
+    protected User createdBy;
+    protected LocalDateTime lastUpdatedTS;
+    protected User lastupdatedBy;
+    protected LocalDateTime deactivatedTS;
+    protected User deactivatedBy;
     
-    protected User creator;
 
+    
+    
+    
+    /**
+     * @return the createdTS
+     */
+    public LocalDateTime getCreatedTS() {
+        return createdTS;
+    }
+
+    /**
+     * @return the createdBy
+     */
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    /**
+     * @return the lastUpdatedTS
+     */
+    public LocalDateTime getLastUpdatedTS() {
+        return lastUpdatedTS;
+    }
+
+    /**
+     * @return the lastupdatedBy
+     */
+    public User getLastupdatedBy() {
+        return lastupdatedBy;
+    }
+
+    /**
+     * @return the deactivatedTS
+     */
+    public LocalDateTime getDeactivatedTS() {
+        return deactivatedTS;
+    }
+
+    /**
+     * @return the deactivatedBy
+     */
+    public User getDeactivatedBy() {
+        return deactivatedBy;
+    }
+
+   
+
+    /**
+     * @param createdTS the createdTS to set
+     */
+    public void setCreatedTS(LocalDateTime createdTS) {
+        this.createdTS = createdTS;
+    }
+
+    /**
+     * @param createdBy the createdBy to set
+     */
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    /**
+     * @param lastUpdatedTS the lastUpdatedTS to set
+     */
+    public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
+        this.lastUpdatedTS = lastUpdatedTS;
+    }
+
+    /**
+     * @param lastupdatedBy the lastupdatedBy to set
+     */
+    public void setLastupdatedBy(User lastupdatedBy) {
+        this.lastupdatedBy = lastupdatedBy;
+    }
+
+    /**
+     * @param deactivatedTS the deactivatedTS to set
+     */
+    public void setDeactivatedTS(LocalDateTime deactivatedTS) {
+        this.deactivatedTS = deactivatedTS;
+    }
+
+    /**
+     * @param deactivatedBy the deactivatedBy to set
+     */
+    public void setDeactivatedBy(User deactivatedBy) {
+        this.deactivatedBy = deactivatedBy;
+    }
     
     /**
      * @return the elementID
@@ -217,20 +313,7 @@ public  class       CodeElement
         this.resourceURL = resourceURL;
     }
 
-    /**
-     * @return the dateCreated
-     */
-    public LocalDateTime getDateCreated() {
-        return dateCreated;
-    }
-
-    /**
-     * @param dateCreated the dateCreated to set
-     */
-    public void setDateCreated(LocalDateTime dateCreated) {
-        this.dateCreated = dateCreated;
-    }
-
+   
   
 
     /**
@@ -325,6 +408,34 @@ public  class       CodeElement
      */
     public void setUseInjectedValues(boolean useInjectedValues) {
         this.useInjectedValues = useInjectedValues;
+    }
+
+    /**
+     * @return the notes
+     */
+    public String getNotes() {
+        return notes;
+    }
+
+    /**
+     * @param notes the notes to set
+     */
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    /**
+     * @return the legacyID
+     */
+    public int getLegacyID() {
+        return legacyID;
+    }
+
+    /**
+     * @param legacyID the legacyID to set
+     */
+    public void setLegacyID(int legacyID) {
+        this.legacyID = legacyID;
     }
 
 

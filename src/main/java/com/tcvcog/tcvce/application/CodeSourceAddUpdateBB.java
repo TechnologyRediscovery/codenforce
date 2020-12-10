@@ -57,7 +57,7 @@ public class CodeSourceAddUpdateBB extends BackingBeanUtils implements Serializa
         currentCodeSource.setSourceYear(formSourceYear);
         currentCodeSource.setSourceDescription(formSourceDescription);
         currentCodeSource.setIsActive(formSourceIsActive);
-        currentCodeSource.setURL(formSourceURL);
+        currentCodeSource.setUrl(formSourceURL);
         currentCodeSource.setSourceNotes(formSourceNotes);
         
         try {
@@ -82,7 +82,7 @@ public class CodeSourceAddUpdateBB extends BackingBeanUtils implements Serializa
         newCodeSource.setSourceYear(formSourceYear);
         newCodeSource.setSourceDescription(formSourceDescription);
         newCodeSource.setIsActive(formSourceIsActive);
-        newCodeSource.setURL(formSourceURL);
+        newCodeSource.setUrl(formSourceURL);
         newCodeSource.setSourceNotes(formSourceNotes);
         try {
             getCodeCoordinator().addNewCodeSource(newCodeSource);
@@ -210,7 +210,7 @@ public class CodeSourceAddUpdateBB extends BackingBeanUtils implements Serializa
      */
     public String getFormSourceURL() {
         if(currentCodeSource != null) {
-            formSourceURL = currentCodeSource.getURL();
+            formSourceURL = currentCodeSource.getUrl();
         }
         return formSourceURL;
     }

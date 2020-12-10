@@ -93,17 +93,6 @@
 
 
 
-                                        <p:commandButton id="codeSetBuilderButton" 
-                                                         ajax="true" 
-                                                         icon="fa fa-plus"
-                                                         value="Add Elements To Selected Code Book" 
-                                                         style="width: 275px"
-                                                         oncomplete="PF('codesetmanage-dialog-codeSetBuilder-var').show();"
-                                                         update="codesetmanage-dialog-codeSetBuilder
-                                                         "
-                                                         action="#{codeSetBB.buildCodeSet}"
-                                                         disabled="#{codeSetBB.activeEdit()}"/>
-
 
                                         <p:spacer height="5px"/>
 
@@ -134,6 +123,18 @@
 
                                     <h:form id="enforcableCodeSetElementsForm">
 
+
+                                        <p:commandButton id="codeSetBuilderButton" 
+                                                         ajax="true" 
+                                                         icon="fa fa-plus"
+                                                         value="#{(empty codeSetElementBB.currentCodeSet) ? 'Select a code book' : 'Add ordinance to code book'}" 
+                                                         style="width: 275px"
+                                                         disabled="#{empty codeSetElementBB.currentCodeSet}"
+                                                         oncomplete="PF('codesetmanage-dialog-codeSetBuilder-var').show();"
+                                                         update="codesetmanage-dialog-codeSetBuilder
+                                                         "
+                                                         action="#{codeSetBB.buildCodeSet}"
+                                                         disabled="#{codeSetBB.activeEdit()}"/>
                                         <p:dataTable
                                             id="enforcableCodeSetElementTable"
                                             var="cse"
@@ -639,7 +640,7 @@
                             </h:form>
 
                         </p:panel>
-                        <p:spacer height="20px;"/>
+                        <p:spacer height="5px;"/>
                         <hr/>
 
 
@@ -650,7 +651,7 @@
 
                             <h:form id="codeElementSelectForm">
 
-                                <p class="note">Select a code source (e.g. IPMC 2015) from which you wish to add a code element to this set.</p>
+                                <p class="note">Select a code source (e.g. IPMC 2015) from which you wish to add an element to this code book.</p>
 
                                 <p:selectOneMenu 
                                     id="sourceMenu" 
@@ -704,7 +705,7 @@
                                         <f:facet name="header">
                                             <h:outputText value="Sec. No" />
                                         </f:facet>
-                                        <h:outputText value="#{element.ordSecNum}"/>
+                                        <h:outputText value="#{element.ordSecNum}"/>codesetmanage-dialog-codeSetBuilder
                                     </p:column>
 
                                     <p:column>
@@ -834,7 +835,7 @@
                                 
                                 <p:commandButton 
                                     ajax="false" icon="fa fa-bolt"
-                                    value="Add Selected Elements To Current Code et"
+                                    value="Add Selected Elements To Current Code Book"
                                     id="packageElementForCodeSetButton"
                                     action="#{codeSetBuilderBB.addElementsToCodeSet}"
                                     oncomplete="PF('codesetmanage-dialog-codeSetBuilder-var').hide()"

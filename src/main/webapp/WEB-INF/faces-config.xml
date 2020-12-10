@@ -536,12 +536,6 @@
   
 
     <managed-bean>
-        <managed-bean-name>codeSourceBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CodeSourceBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-
-    <managed-bean>
         <managed-bean-name>codeElementGuideBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CodeElementGuideBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>

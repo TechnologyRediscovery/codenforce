@@ -22,27 +22,28 @@ import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.CodeSource;
-import com.tcvcog.tcvce.integration.CodeIntegrator;
 import java.io.Serializable;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
 /**
- *
+ * Backing bean for codeElementManage.xhtml
+ * Provides facilities for adding, updating, and nuking 
+ * Code Sources
+ * Code Elements (Ordinances)
+ * Code Guide records
+ * 
  * @author ellen bascomb of apt 31y
  */
-public class CodeElementBB extends BackingBeanUtils implements Serializable{
+public class CodeElementBB 
+        extends BackingBeanUtils 
+        implements Serializable{
 
-     /**
-     * Creates a new instance of CodeElementBB
-     */
-    public CodeElementBB() {
-    }
 
+    final String FACESPAGE_NAV_CODEELEMENTMANAGE = "codeElementManage";
+    
     private List<CodeElement> codeElementList;
     private List<CodeElement> codeElementListFiltered;
     private CodeElement currentElement;
@@ -51,10 +52,16 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
     private CodeSource currentCodeSource;
     
     private String formNoteText;
-    
-    
 
-   
+    /**
+     * Creates a new instance of CodeElementBB
+     */
+    public CodeElementBB() {
+    }
+    
+   /**
+    * Initializes the bean
+    */
     @PostConstruct
     public void initBean() {
         CodeCoordinator cc = getCodeCoordinator();
@@ -71,6 +78,12 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
         
     }
     
+    
+    // *************************************************************
+    // *********************CODE SOURCES****************************
+    // *************************************************************
+    
+    
     /**
      * Listener for user requests to view code elements by selecting a source
      * @param source 
@@ -81,6 +94,121 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
         populateElementListByCurrentCodeSource();
     }
     
+    
+    /**
+     * Listener for user requests to start a source udpate operation
+     * @param source 
+     */
+    public void onCodeSourceUpdateInitButtonChange(CodeSource source){
+        currentCodeSource = source;
+        
+        
+    }
+    
+    /**
+     * Listener for user requests to finalize a source update operation
+     * @return 
+     */
+    public String onCodeSourceUpdateCommitButtonChange(){
+        CodeCoordinator cc = getCodeCoordinator();
+        try {
+            cc.updateCodeSource(currentCodeSource);
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Updated code source: " + currentCodeSource.getSourceName(),""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Unable to update code source; This is fatal error.",""));
+            return "";
+        }
+        
+        return FACESPAGE_NAV_CODEELEMENTMANAGE;
+        
+        
+    }
+    
+    /**
+     * Listener for user requests to initiate a source remove operation
+     * @param source 
+     */
+    public void onCodeSourceNukeInitButtonChange(CodeSource source){
+        currentCodeSource = source;
+    }
+    
+    
+    /**
+     * Listener for user requests to finalize a source removal operation
+     * @return 
+     */
+    public String onCodeSourceNukeCommitButtonChange(){
+        
+        CodeCoordinator cc = getCodeCoordinator();
+        try {
+            cc.deactivateCodeSource(currentCodeSource);
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Poof! Code source " + currentCodeSource.getSourceName() + " has been Nuked!"
+                                + "",""));
+            
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Unable to nuke code source, "
+                                + "probably because it is pointed to by one or more code elements.",""));
+            return "";
+                        
+
+        }
+        return FACESPAGE_NAV_CODEELEMENTMANAGE;
+        
+    }
+    
+    /**
+     * Listener for user requests to start the source creation operation
+     */
+    public void onCodeSourceAddInitButtonChange(){
+        CodeCoordinator cc = getCodeCoordinator();
+        currentCodeSource = cc.getCodeSourceSkeleton();
+        
+    }
+    
+    /**
+     * Listener for user requests to finalize the source creation process
+     * @return 
+     */
+    public String onCodeSourceAddCommitButtonChange(){
+        CodeCoordinator cc = getCodeCoordinator();
+        try {
+            cc.addNewCodeSource(currentCodeSource);
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Succcessfully added new code source!",""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Unable to nuke code source, "
+                                + "probably because it is pointed to by one or more code elements.",""));
+            return "";
+            
+        }
+        return FACESPAGE_NAV_CODEELEMENTMANAGE;
+        
+    }
+    
+    
+    
+    
+    
+    
+    // *************************************************************
+    // **************CODE ELEMENTS (ORDINANCES)*********************
+    // *************************************************************
+   
+    
     /**
      * Utility container for population logic
      */
@@ -90,9 +218,13 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
         if(currentCodeSource == null) return;
         try {
             codeElementList = cc.getCodeElemements(currentCodeSource);
-         getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Viewing ordinances in " + getCurrentCodeSource().getSourceName(),""));
+            if(codeElementList != null && !codeElementList.isEmpty()){
+                System.out.println("Loaded code element list of size: " + codeElementList.size());
+            }
+            System.out.println("");
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Viewing ordinances in " + getCurrentCodeSource().getSourceName(),""));
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -104,12 +236,11 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
     }
 
     public String commitUpdatesToCodeElement() {
-        CodeIntegrator integrator = getCodeIntegrator();
-
+        CodeCoordinator cc = getCodeCoordinator();
         // elemet ID is already in our currentElementObject
 
         try {
-            integrator.updateCodeElement(currentElement);
+            cc.updateCodeElement(currentElement, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Code element updated!", ""));
@@ -119,51 +250,79 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to update code element; most sincere apologies!",
                             "This must be corrected by the System Administrator"));
+            return "";
 
         }
 
-        return "codeElementList";
+        return FACESPAGE_NAV_CODEELEMENTMANAGE;
     }
 
     
     /**
      * Listener for user requests to remove a code element
-     * @param ev 
+     * @param ele
+     
      */
-    public void onElementNukeInitButtonChange(ActionEvent ev){
-        // nothing to do here yet
+    public void onElementNukeInitButtonChange(CodeElement ele){
+       currentElement = ele;
         
     }
     
     public String onElementNukeButtonChange() {
+     
         CodeCoordinator cc = getCodeCoordinator();
-        cc.deactivateCodeElement(currentElement, getSessionBean().getSessUser());
-        return "codeElementManage";
-    }
-
-    public void onNoteInitButtonChange(ActionEvent ev){
-        formNoteText = "";
-        
+        try {
+            cc.deactivateCodeElement(currentElement, getSessionBean().getSessUser());
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Deactivated code element " + currentElement.getElementID(),
+                            ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to deactivate element!",
+                            "This is probably because it has been included in a code book"));
+        }
+        return FACESPAGE_NAV_CODEELEMENTMANAGE;
     }
     
-    public void onNoteCommitButtonChange(ActionEvent ev){
-        
-    }
+    
     
     public void onElementAddInitButtonChange(ActionEvent ev){
-        CodeCoordinator cc = getCodeCoordinator();
-        currentElement = cc.getCodeElementSkeleton();
-        
-        
+        if(currentCodeSource != null){
+            
+            CodeCoordinator cc = getCodeCoordinator();
+            currentElement = cc.getCodeElementSkeleton();
+            System.out.println("CodeElementBB.onElementUpdateInitButtonChange:  Updating " + currentElement.getElementID() );
+        } 
         
     }
     
     public void onElementUpdateInitButtonChange(CodeElement ele){
+        System.out.println("CodeElementBB.onElementUpdateInitButtonChange:  Updating " + ele.getElementID() );
         currentElement = ele;
+        System.out.println("test breakpoint");
     }
     
-    public void onElementUpdateCommitButtonChange(){
-        
+    
+    
+    public String onElementUpdateCommitButtonChange(){
+         CodeCoordinator cc = getCodeCoordinator();
+        try {
+            cc.updateCodeElement(currentElement, getSessionBean().getSessUser());
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Updated code element " + currentElement.getElementID(),
+                            ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to update code element; most sincere apologies!",
+                            "This must be corrected by the System Administrator"));
+        }
+        return FACESPAGE_NAV_CODEELEMENTMANAGE;
     }
     
     
@@ -173,20 +332,46 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
         
         currentElement.setSource(currentCodeSource);
 
+        try {
             cc.addCodeElement(currentElement, getSessionBean().getSessUser());
-//            getFacesContext().addMessage(null,
-//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                            "Unable to add code elment to code source",
-//                            "This must be corrected by the System Administrator"));
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Added new code element",""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to add new element", ""));
+        }
 
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Successfully added code element to code source", ""));
-
-        return "codeSourceManage";
+        return FACESPAGE_NAV_CODEELEMENTMANAGE;
     }
+    
+    
+
+    
+    // *************************************************************
+    // *************************** NOTES ***************************
+    // *************************************************************
+   
+    
+    
+    public void onNoteInitButtonChange(ActionEvent ev){
+        formNoteText = "";
+        
+    }
+    
+    public void onNoteCommitButtonChange(ActionEvent ev){
+        
+    }
+    
 
  
+    
+    // *************************************************************
+    // ******************* GETTERS AND SETTERS *********************
+    // *************************************************************
+   
 
     /**
      * @param currentCodeSource the currentCodeSource to set
@@ -199,7 +384,7 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
      * @return the currentElement
      */
     public CodeElement getCurrentElement() {
-        currentElement = getSessionBean().getActiveCodeElement();
+        
         return currentElement;
     }
 
@@ -210,17 +395,6 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
         this.currentElement = currentElement;
     }
 
- 
-
-    /**
-     * Listener for user requests to begin creating a new code element
-     */
-    public void onElementAddInitButtonChange(){
-        CodeCoordinator cc = getCodeCoordinator();
-        currentElement = cc.getCodeElementSkeleton();
-        
-    }
-    
    
 
     /**

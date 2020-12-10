@@ -412,7 +412,7 @@ public class CECaseSearchProfileBB
         try {
             cc.cecase_forceclose(currentCase, closingEventCategorySelected, getSessionBean().getSessUser());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                "Case closed and violations nullified.", ""));
+                "Case closed and unresolved violations nullified.", ""));
         } catch (IntegrationException | BObStatusException | EventException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 

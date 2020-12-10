@@ -806,7 +806,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case OPENED_30DAYS:
                 paramsList.add(genParams_CECase_openedInDateRange(params, cred));
                 break;
-            case CLOSED_30DAYS:
+            case CLOSED_CASES:
                 paramsList.add(genParams_CECase_closedInDateRange(params, cred));
                 break;
             case UNRESOLVED_CITATIONS:
@@ -1629,10 +1629,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * into the Integrator for case list retrieval
      */
     public SearchParamsCECase genParams_CECase_closedInDateRange(SearchParamsCECase params, Credential cred){
-        params.setFilterName("Cases closed in a date range");
-        params.setFilterDescription("Cases with a closed TS within a date range");
+        params.setFilterName("All closed cases");
+        params.setFilterDescription("Any closed cases");
         
-        params.setDate_startEnd_ctl(true);
+        params.setCaseOpen_ctl(true);
+        params.setCaseOpen_val(false);
+        params.setDate_startEnd_ctl(false);
         params.setDate_field(SearchParamsCECaseDateFieldsEnum.CLOSE);
         // subclass specific
 //        params.setCaseOpen_ctl(true);

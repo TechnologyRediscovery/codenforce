@@ -37,6 +37,7 @@ import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
+import com.tcvcog.tcvce.entities.search.SearchParamsCECaseDateFieldsEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
@@ -246,7 +247,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         // Nullify violations on case
         if(cse.getViolationList() != null && !cse.getViolationList().isEmpty()){
             for(CodeViolation cv: cse.getViolationList()){
-                violation_NullifyCodeViolation(cv, ua);
+                if(cv.getActualComplianceDate() == null){
+                    violation_NullifyCodeViolation(cv, ua);
+                }
             }
         }
         
@@ -810,13 +813,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param cse
      * @param ua 
      */
-    public void cecase_closeCase(CECase cse, UserAuthorized ua) throws BObStatusException{
-        
+    public void cecase_closeCase(CECase cse, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        CaseIntegrator ci = getCaseIntegrator();
         if(cse == null || ua == null){
             throw new BObStatusException("Cannot close a case with null Case or User");
         }
+        cse.setClosingDate(LocalDateTime.now());
+        cse.setLastUpdatedBy(ua);
         
-        
+        ci.updateCECaseMetadata(cse);
         
     }
 
@@ -979,23 +984,34 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         QueryCECase query_opened = sc.initQuery(QueryCECaseEnum.OPENED_30DAYS, ua.getKeyCard());
         SearchParamsCECase spcse = query_opened.getPrimaryParams();
         spcse.setDate_startEnd_ctl(true);
+        spcse.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATIONTS);
         spcse.setDate_start_val(rpt.getDate_start_val());
         spcse.setDate_end_val(rpt.getDate_end_val());
         rpt.setCaseListOpened(sc.runQuery(query_opened).getBOBResultList());
+        if(rpt.getCaseListOpened() != null){
+            System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpened().size());
+        }
         
         QueryCECase query_active = sc.initQuery(QueryCECaseEnum.OPENCASES, ua.getKeyCard());
         spcse = query_active.getPrimaryParams();
-        spcse.setDate_startEnd_ctl(true);
+        spcse.setDate_startEnd_ctl(false);
         spcse.setDate_start_val(rpt.getDate_start_val());
         spcse.setDate_end_val(rpt.getDate_end_val());
         rpt.setCaseListCurrent(sc.runQuery(query_active).getBOBResultList());
+        if(rpt.getCaseListCurrent() != null){
+            System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListCurrent().size());
+        }
         
-        QueryCECase query_closed = sc.initQuery(QueryCECaseEnum.CLOSED_30DAYS, ua.getKeyCard());
+        QueryCECase query_closed = sc.initQuery(QueryCECaseEnum.CLOSED_CASES, ua.getKeyCard());
         spcse = query_closed.getPrimaryParams();
+        spcse.setDate_field(SearchParamsCECaseDateFieldsEnum.CLOSE);
         spcse.setDate_startEnd_ctl(true);
         spcse.setDate_start_val(rpt.getDate_start_val());
         spcse.setDate_end_val(rpt.getDate_end_val());
         rpt.setCaseListClosed(sc.runQuery(query_closed).getBOBResultList());
+        if(rpt.getCaseListClosed() != null){
+            System.out.println("CaseCoordinator.report_buildCECaseListReport: Current List size " + rpt.getCaseListClosed().size());
+        }
         
         QueryEvent query_ev = sc.initQuery(QueryEventEnum.MUNI_MONTHYACTIVITY, ua.getKeyCard());
         SearchParamsEvent spev = query_ev.getPrimaryParams();
@@ -1941,6 +1957,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             complianceClosingEvent = ec.initEvent(c, ei.getEventCategory(Integer.parseInt(getResourceBundle(
                     Constants.EVENT_CATEGORY_BUNDLE).getString("closingAfterFullCompliance"))));
             ec.addEvent(complianceClosingEvent, c, ua);
+            
 
         } // close if
 

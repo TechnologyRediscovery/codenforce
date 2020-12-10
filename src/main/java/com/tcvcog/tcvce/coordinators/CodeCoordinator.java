@@ -43,6 +43,32 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
     public CodeCoordinator() {
     }
     
+    // *************************************************************
+    // *********************CODE SOURCES****************************
+    // *************************************************************
+    
+        
+    /**
+     * Factory for CodeSource objects
+     * @return 
+     */
+    public CodeSource getCodeSourceSkeleton(){
+        
+        return new CodeSource();
+        
+    }
+    
+    /**
+     * Retrieval method for code sources
+     * @param sourceID
+     * @return
+     * @throws IntegrationException 
+     */
+    public CodeSource getCodeSource(int sourceID) throws IntegrationException{
+        CodeIntegrator ci = getCodeIntegrator();
+        return ci.getCodeSource(sourceID);
+        
+    }
     /**
      * Main generator for a fully baked code source and all its elements
      * @param sourceID
@@ -50,18 +76,67 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public CodeSource retrieveCodeSourceByID(int sourceID) throws IntegrationException{
+        if(sourceID == 0) return null;
         CodeIntegrator integrator = getCodeIntegrator();
-        
-        
         CodeSource s = integrator.getCodeSource(sourceID);
-        System.out.println("CodeCoordinator.retrieveCodeSourceByID: sourceName: " + s.getSourceName());
-        if(s.getSourceName() == null){
-            
-            System.out.println("CodeCoordinator.retrieveCodeSourceByID: codeSource is null--throwing IntegrationException: ");
-            throw new IntegrationException("Cannot Find Source by that name");
-        }
+       
         return s;
     }
+    
+     /**
+     * Primary getter for lists of CodeSource objects
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<CodeSource> getCodeSourceList() throws IntegrationException{
+        CodeIntegrator integrator = getCodeIntegrator();
+        List<CodeSource> sources = integrator.getCompleteCodeSourceList();
+        return sources;
+    }
+    
+    /**
+     * Logic pass through for insertion of CodeSource objects
+     * @param source
+     * @throws IntegrationException 
+     */
+    public void addNewCodeSource(CodeSource source) throws IntegrationException{
+        getCodeIntegrator().insertCodeSource(source);
+    }
+    
+    /**
+     * Logic pass through for updates to code sources
+     * @param source
+     * @throws IntegrationException 
+     */
+    public void updateCodeSource(CodeSource source) throws IntegrationException{
+        CodeIntegrator ci = getCodeIntegrator();
+        
+        
+        ci.updateCodeSource(source);
+        
+    }
+    
+    /**
+     * Logic pass through for deactivation of a code source
+     * @param source
+     * @throws IntegrationException 
+     */
+    public void deactivateCodeSource(CodeSource source) throws IntegrationException{
+        CodeIntegrator ci = getCodeIntegrator();
+        
+        ci.deactivateCodeSource(source);
+        
+        
+        
+    }
+
+    
+    
+    
+    // *************************************************************
+    // **************CODE ELEMENTS (ORDINANCES)*********************
+    // *************************************************************
+   
     
     /**
      * Primary factory method for CodeElement objects
@@ -71,6 +146,7 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
         return new CodeElement();
     }
     
+      
     /**
      * Primary getter for all code elements system-wide
      * @param eleid
@@ -83,23 +159,56 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     
-    public void insertCodeElement(CodeElement ele, UserAuthorized ua){
+    public List<CodeElement> getCodeElemements(CodeSource src) throws IntegrationException{
+        if(src ==  null){
+            return null;
+        }
+        CodeIntegrator ci = getCodeIntegrator();
+        return ci.getCodeElements(src.getSourceID());
+    }
+    
+    
+    
+    
+   
+    public int addCodeElement(CodeElement ele, UserAuthorized ua) throws IntegrationException{
+        CodeIntegrator ci = getCodeIntegrator();
+        int freshId = 0;
+        if(ua == null || ele == null) return 0;
+        ele.setCreatedBy(ua);
+        ele.setLastupdatedBy(ua);
+        freshId = ci.insertCodeElement(ele);
+        return freshId;
+        
+    }
+    
+    
+    public void updateCodeElement(CodeElement ele, UserAuthorized ua) throws IntegrationException{
+        CodeIntegrator ci = getCodeIntegrator();
+        if(ua == null || ele == null) return;
+        ele.setLastupdatedBy(ua);
+        ci.updateCodeElement(ele);
+        
+    }
+    
+    
+    
+    public void deactivateCodeElement(CodeElement ele, UserAuthorized ua) throws IntegrationException{
+        
+        CodeIntegrator ci = getCodeIntegrator();
+        if(ua == null || ele == null) return;
+        ele.setDeactivatedBy(ua);
+        
+        ci.deactivateCodeElement(ele);
+        
         
         
     }
-    public void updateCodeElement(CodeElement ele, UserAuthorized ua){
-        
-        
-    }
     
     
-    
-    public void deactivateCodeElement(CodeElement ele, UserAuthorized ua){
-        
-        
-        
-    }
-    
+    // *************************************************************
+    // **************CODE SETS (CODE BOOKS)*************************
+    // *************************************************************
     
     public EnforcableCodeElement getEnforcableCodeElement(int eceID) throws IntegrationException{
         CodeIntegrator ci = getCodeIntegrator();
@@ -117,48 +226,6 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
         List<CodeSet> setList = ci.getCodeSets();
         return setList;
         
-    }
-    
-    public CodeSource getCodeSource(int sourceID) throws IntegrationException{
-        CodeIntegrator ci = getCodeIntegrator();
-        return ci.getCodeSource(sourceID);
-        
-    }
-    
-    /**
-     * Primary getter for lists of CodeSource objects
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<CodeSource> getCodeSourceList() throws IntegrationException{
-        CodeIntegrator integrator = getCodeIntegrator();
-        ArrayList<CodeSource> sources = integrator.getCompleteCodeSourceList();
-        return sources;
-    }
-    
-    public void updateCodeSource(CodeSource source) throws IntegrationException{
-        getCodeIntegrator().updateCodeSource(source);
-        
-    }
-    
-    /**
-     * Factory for CodeSource objects
-     * @param muni
-     * @return 
-     */
-    public CodeSource getCodeSourceSkeleton(Municipality muni){
-        
-        return new CodeSource();
-        
-    }
-    
-    public int addCodeElement(CodeElement ele, UserAuthorized ua){
-        return 0;
-    }
-    
-    public void addNewCodeSource(CodeSource source) throws IntegrationException{
-        System.out.println("CodeCoordinator.addNewCodeSource");
-        getCodeIntegrator().insertCodeSource(source);
     }
     
   
@@ -190,13 +257,15 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
         
     }
     
-    public List<CodeElement> getCodeElemements(CodeSource src) throws IntegrationException{
-        if(src ==  null){
-            return null;
-        }
-        CodeIntegrator ci = getCodeIntegrator();
-        return ci.getCodeElements(src.getSourceID());
-    }
+    
+    
+    // *************************************************************
+    // ************************ CODE GUIDE *************************
+    // *************************************************************
+    
+    
+     
+    
     
     
 }
