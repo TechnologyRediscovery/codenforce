@@ -531,9 +531,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             // do nothing, since we already have the person in the system
         }
 
-        int controlCode = generateControlCodeFromTime();
-        currentRequest.setRequestPublicCC(controlCode);
-
+        currentRequest.setRequestPublicCC(generateControlCodeFromTime(currentRequest.getMuniCode()));
         // all requests now are required to be at a known address
         currentRequest.setIsAtKnownAddress(true);
         currentRequest.setActive(true);

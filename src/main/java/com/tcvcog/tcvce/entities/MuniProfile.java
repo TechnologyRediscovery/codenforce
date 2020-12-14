@@ -36,6 +36,8 @@ public class MuniProfile {
     private int continuousoccupancybufferdays;
     private int minimumuserranktodeclarerentalintent;
     
+    private int novDefaultDaysForFollowup;
+    
     private EventRuleSet eventRuleSetCE;
     private List<OccPeriodType> occPeriodTypeList;
 
@@ -222,5 +224,19 @@ public class MuniProfile {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the novDefaultDaysForFollowup
+     */
+    public int getNovDefaultDaysForFollowup() {
+        return novDefaultDaysForFollowup;
+    }
+
+    /**
+     * @param novDefaultDaysForFollowup the novDefaultDaysForFollowup to set
+     */
+    public void setNovDefaultDaysForFollowup(int novDefaultDaysForFollowup) {
+        this.novDefaultDaysForFollowup = novDefaultDaysForFollowup;
     }
 }

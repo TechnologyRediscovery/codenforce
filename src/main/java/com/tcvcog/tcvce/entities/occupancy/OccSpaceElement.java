@@ -49,7 +49,6 @@ public class OccSpaceElement extends CodeElement {
         this.isActive = ele.isIsActive();
 
         this.resourceURL = ele.getResourceURL();
-        this.dateCreated = ele.getDateCreated();
 
         this.headerString = ele.getHeaderString();
         
@@ -76,7 +75,6 @@ public class OccSpaceElement extends CodeElement {
         this.isActive = ele.isIsActive();
 
         this.resourceURL = ele.getResourceURL();
-        this.dateCreated = ele.getDateCreated();
 
         this.headerString = ele.getHeaderString();
         

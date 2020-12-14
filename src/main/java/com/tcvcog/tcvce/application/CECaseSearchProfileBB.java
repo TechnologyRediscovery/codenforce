@@ -17,13 +17,17 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CEActionRequest;
@@ -33,7 +37,9 @@ import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.CaseStageEnum;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Property;
@@ -71,6 +77,7 @@ public class CECaseSearchProfileBB
     private CECaseDataHeavy currentCase;
     private boolean currentCaseSelected;
 
+    private int formNOVFollowupDays;
     private List<CECasePropertyUnitHeavy> caseList;
     private List<CECasePropertyUnitHeavy> filteredCaseList;
     
@@ -78,6 +85,9 @@ public class CECaseSearchProfileBB
     private List<QueryCECase> queryList;
     private QueryCECase querySelected;
     private boolean appendResultsToList;
+    
+    private List<EventCategory> closingEventCategoryList;
+    private EventCategory closingEventCategorySelected;
     
     private ViewOptionsActiveHiddenListsEnum eventViewOptionSelected;
     private List<ViewOptionsActiveHiddenListsEnum> eventViewOptions;
@@ -110,6 +120,7 @@ public class CECaseSearchProfileBB
         SearchCoordinator sc = getSearchCoordinator();
         UserCoordinator uc = getUserCoordinator();
         SystemCoordinator sysCor = getSystemCoordinator();
+        EventCoordinator ec = getEventCoordinator();
         
 
         SessionBean sb = getSessionBean();
@@ -119,7 +130,7 @@ public class CECaseSearchProfileBB
         configureParameters();
 
         caseList = new ArrayList<>();
-        caseList.addAll(sb.getSessCECaseList());
+        caseList.addAll(cc.cecase_refreshCECasePropertyUnitHeavyList(sb.getSessCECaseList()));
         CECase cseTemp = getSessionBean().getSessCECase();
         try {
             if(cseTemp == null){
@@ -131,6 +142,7 @@ public class CECaseSearchProfileBB
             }
             currentCase = cc.cecase_assembleCECaseDataHeavy(cseTemp, getSessionBean().getSessUser());
             System.out.println("CECaseSearchProfile.initBean(): current case ID: " + currentCase.getCaseID());
+            closingEventCategoryList = ec.getEventCategeryList(EventType.Closing);
             
         } catch (IntegrationException | SearchException | BObStatusException ex) {
             System.out.println(ex);
@@ -154,6 +166,7 @@ public class CECaseSearchProfileBB
             reportCECaseList = cc.report_getDefaultReportConfigCECaseList();
         }
         
+        
         ReportConfigCECase rpt = getSessionBean().getReportConfigCECase();
         
         if (rpt != null) {
@@ -170,6 +183,12 @@ public class CECaseSearchProfileBB
             setCurrentMode(getSessionBean().getCeCaseSearchProfilePageModeRequest());
         } 
         setCurrentMode(pageModes.get(0));
+     
+        // NOV
+        formNOVFollowupDays = getSessionBean().getSessMuni().getProfile().getNovDefaultDaysForFollowup();
+        if(formNOVFollowupDays == 0){
+            formNOVFollowupDays = 20;
+        }
         
     }
 
@@ -193,6 +212,10 @@ public class CECaseSearchProfileBB
      * @param ev 
      */
     public void refreshCurrentCase(ActionEvent ev){
+        reloadCase();
+    }
+    
+    public void reloadCase(){
         CaseCoordinator cc = getCaseCoordinator();
         try {
             currentCase = cc.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
@@ -380,6 +403,26 @@ public class CECaseSearchProfileBB
         
     }
     
+    /**
+     * Listener for user requests to deactivate a cecase
+     * @return 
+     */
+    public String onCaseForceCloseCommitButtonChnage(){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            cc.cecase_forceclose(currentCase, closingEventCategorySelected, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                "Case closed and unresolved violations nullified.", ""));
+        } catch (IntegrationException | BObStatusException | EventException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                ex.getMessage(), ""));
+            
+        }
+        return "ceCaseSearchProfile";
+        
+    }
+    
       /**
      * Listener for commencement of note writing process
      *
@@ -439,18 +482,25 @@ public class CECaseSearchProfileBB
     }
     
     public String onEventViewButtonChange(EventCnF ev){
+        getSessionBean().setSessEvent(ev);
         return "events";
         
     }
     
     public String onEventAddButtonChange(){
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            getSessionBean().setSessEvent(ec.initEvent(currentCase, null));
+        } catch (BObStatusException | EventException ex) {
+            System.out.println(ex);
+        } 
         return "events";
         
         
     }
     
     public String onCEARViewButtonChange(CEActionRequest cear){
-        
+        getSessionBean().setSessCEAR(cear);
         return "cEActionRequests";
         
     }
@@ -458,6 +508,7 @@ public class CECaseSearchProfileBB
     
     
     public String onViolationViewButtonChange(CodeViolation cv){
+        getSessionBean().setSessCodeViolation(cv);
         return "ceCaseViolations";
         
     }
@@ -469,7 +520,11 @@ public class CECaseSearchProfileBB
         
     }
     
+    
+    
+    
     public String onNOVViewButtonChange(NoticeOfViolation nov){
+        getSessionBean().setSessNotice(nov);
         return "ceCaseNotices";
         
     }
@@ -479,13 +534,12 @@ public class CECaseSearchProfileBB
         
     }
     
-    public String onNOVAddButtonChange(){
-        
-        return "ceCaseNotices";
-        
-    }
+    
+    
+    
     
     public String onCitationViewButtonChange(Citation cit){
+        getSessionBean().setSessCitation(cit);
         return "ceCaseCitations";
         
         
@@ -505,10 +559,6 @@ public class CECaseSearchProfileBB
         
         return "blobs";
     }
-    
-    
-    
-    
     
 
     /**
@@ -538,6 +588,7 @@ public class CECaseSearchProfileBB
      * @return 
      */
     public String generateReportCECase() {
+        System.out.println("CECaseSearchProfileBB.generateReportCECase");
         CaseCoordinator cc = getCaseCoordinator();
 
         getReportCECase().setCse(currentCase);
@@ -571,7 +622,7 @@ public class CECaseSearchProfileBB
      */
     public void prepareReportCECase(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
-        setReportCECase(cc.report_getDefaultReportConfigCECase(currentCase));
+        reportCECase = cc.report_getDefaultReportConfigCECase(currentCase);
         System.out.println("CaseProfileBB.prepareReportCECase | reportConfigOb: " + getReportCECase());
 
     }
@@ -689,25 +740,43 @@ public class CECaseSearchProfileBB
         }
         configureParameters();
     }
-
+    
+    /**
+     * 
+     * @param ev 
+     */
     public void prepareReportCECaseList(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
 
-        if (getReportCECaseList() == null) {
-            setReportCECaseList(cc.report_getDefaultReportConfigCECaseList());
+        if (reportCECaseList == null) {
+            reportCECaseList = cc.report_getDefaultReportConfigCECaseList();
         }
+        reportCECaseList.setTitle("Code Enforcement Activity Report");
+        reportCECaseList.setDate_start_val(LocalDateTime.now().minusDays(30));
+        reportCECaseList.setDate_end_val(LocalDateTime.now());
         System.out.println("CaseProfileBB.prepareCaseListReport");
 
     }
 
+    /**
+     * 
+     * @return 
+     */
     public String generateReportCECaseList() {
-        getReportCECaseList().setCreator(getSessionBean().getSessUser());
-        getReportCECaseList().setMuni(getSessionBean().getSessMuni());
-        getReportCECaseList().setGenerationTimestamp(LocalDateTime.now());
+        CaseCoordinator cc = getCaseCoordinator();
+        reportCECaseList.setCreator(getSessionBean().getSessUser());
+        reportCECaseList.setMuni(getSessionBean().getSessMuni());
+        reportCECaseList.setGenerationTimestamp(LocalDateTime.now());
 
-        getSessionBean().setReportConfigCECaseList(getReportCECaseList());
+        try {
+            reportCECaseList = cc.report_buildCECaseListReport(reportCECaseList, getSessionBean().getSessUser());
+        } catch (SearchException ex) {
+            System.out.println(ex);
+            
+        }
+        getSessionBean().setReportConfigCECaseList(reportCECaseList);
         getSessionBean().setReportConfigCECase(null);
-        getSessionBean().setSessReport(getReportCECaseList());
+        getSessionBean().setSessReport(reportCECaseList);
 
         return "reportCECaseList";
 
@@ -972,6 +1041,49 @@ public class CECaseSearchProfileBB
      */
     public void setFormNoteText(String formNoteText) {
         this.formNoteText = formNoteText;
+    }
+
+    /**
+     * @return the closingEventList
+     */
+    public List<EventCategory> getClosingEventList() {
+        return closingEventCategoryList;
+    }
+
+    /**
+     * @param closingEventList the closingEventList to set
+     */
+    public void setClosingEventList(List<EventCategory> closingEventList) {
+        this.closingEventCategoryList = closingEventList;
+    }
+
+    /**
+     * @return the closingEventCategorySelected
+     */
+    public EventCategory getClosingEventCategorySelected() {
+        return closingEventCategorySelected;
+    }
+
+    /**
+     * @param closingEventCategorySelected the closingEventCategorySelected to set
+     */
+    public void setClosingEventCategorySelected(EventCategory closingEventCategorySelected) {
+        this.closingEventCategorySelected = closingEventCategorySelected;
+    }
+
+   
+    /**
+     * @return the formNOVFollowupDays
+     */
+    public int getFormNOVFollowupDays() {
+        return formNOVFollowupDays;
+    }
+
+    /**
+     * @param formNOVFollowupDays the formNOVFollowupDays to set
+     */
+    public void setFormNOVFollowupDays(int formNOVFollowupDays) {
+        this.formNOVFollowupDays = formNOVFollowupDays;
     }
 
 }

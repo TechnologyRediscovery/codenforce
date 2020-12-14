@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.PostConstruct;
+import javax.faces.event.ActionEvent;
 import org.primefaces.model.chart.Axis;
 import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.BarChartModel;
@@ -53,10 +54,10 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     
     private BarChartModel violationCountByOrdinance;
     
-    private DonutChartModel violationDonut;
+    private DonutChartModel violreauthenticateationDonut;
     
     
-    private List<CECaseDataHeavy> caseList;
+
     private Map<CasePhaseEnum, Integer> cPhaseMap;
      
 
@@ -71,22 +72,20 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     public void initBean(){
         CaseCoordinator cc = getCaseCoordinator();
         List<CECasePropertyUnitHeavy> csel =  getSessionBean().getSessCECaseList();
-        if(csel != null && !csel.isEmpty()){
-            caseList = cc.cecase_assembleCECaseDataHeavyList(cc.cecase_downcastCECasePropertyUnitHeavyList(csel), getSessionBean().getSessUser());
-        }
+       
         
         DataCoordinator dc = getDataCoordinator();
         
-        if(caseList != null && !caseList.isEmpty()){
-            
-            try {
-                cPhaseMap = dc.getCaseCountsByPhase(caseList);
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-            }
-            generateModelCaseCountByPhase();
-            generateModelCaseCountsByStage();
-        }
+//        if(caseList != null && !caseList.isEmpty()){
+//            
+//            try {
+//                cPhaseMap = dc.getCaseCountsByPhase(caseList);
+//            } catch (IntegrationException ex) {
+//                System.out.println(ex);
+//            }
+//            generateModelCaseCountByPhase();
+//            generateModelCaseCountsByStage();
+//        }
         
         reportCECase = getSessionBean().getReportConfigCECase();
         reportCECaseList = getSessionBean().getReportConfigCECaseList();
@@ -98,6 +97,27 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         } else {
             currentReport = reportCECaseList;
         }
+        System.out.println("ReportingBB.intiBean");
+        
+        
+    }
+    
+    /**
+     * Listener for municipality report start--brings up 
+     * dialog
+     * @param ev 
+     */
+    public void muniActivityReportInit(ActionEvent ev){
+        
+        
+    }
+    
+    /**
+     * Listener to requests to build a monthly activity report
+     * 
+     * @param ev 
+     */
+    public void muniActivityReportGenerate(ActionEvent ev){
         
         
     }
@@ -140,11 +160,11 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         ChartSeries caseCountSeries = new ChartSeries();
         caseCountSeries.setLabel("Count of CE cases");
         Map<CaseStageEnum, Integer> stageMap = null;
-        try {
-             stageMap = dc.getCaseCountsByStage(caseList);
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-        }
+//        try {
+//             stageMap = dc.getCaseCountsByStage(caseList);
+//        } catch (IntegrationException | BObStatusException ex) {
+//            System.out.println(ex);
+//        }
         Integer max = 0;
         if(stageMap != null && stageMap.keySet() != null){
             
@@ -262,19 +282,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         this.violationCountByOrdinance = violationCountByOrdinance;
     }
 
-    /**
-     * @return the caseList
-     */
-    public List<CECaseDataHeavy> getCaseList() {
-        return caseList;
-    }
-
-    /**
-     * @param caseList the caseList to set
-     */
-    public void setCaseList(List<CECaseDataHeavy> caseList) {
-        this.caseList = caseList;
-    }
+   
 
     /**
      * @return the cPhaseMap
@@ -304,19 +312,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         this.caseCountByStage = caseCountByStage;
     }
 
-    /**
-     * @return the violationDonut
-     */
-    public DonutChartModel getViolationDonut() {
-        return violationDonut;
-    }
-
-    /**
-     * @param violationDonut the violationDonut to set
-     */
-    public void setViolationDonut(DonutChartModel violationDonut) {
-        this.violationDonut = violationDonut;
-    }
+   
 
     /**
      * @return the reportConfigOccInspection

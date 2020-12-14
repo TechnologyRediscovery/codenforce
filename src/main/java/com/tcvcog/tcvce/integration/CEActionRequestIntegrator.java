@@ -52,9 +52,13 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
     public CEActionRequestIntegrator() {
     }
     
-    
-    
-
+    /**
+     * Attaches a message to the CEActionRequest inside the PublicInfoBundle, 
+     * uses PACC to find request
+     * @param request
+     * @param message
+     * @throws IntegrationException 
+     */
     public void attachMessageToCEActionRequest(PublicInfoBundleCEActionRequest request, String message) throws IntegrationException {
         String q = "UPDATE public.ceactionrequest\n"
                 + "   SET publicexternalnotes = ? WHERE requestpubliccc = ?;";
@@ -83,6 +87,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
     }
+    
     public void updateActionRequestNotes(CEActionRequest request) throws IntegrationException {
         String q = "UPDATE public.ceactionrequest "
                 + "SET coginternalnotes = ?, "
@@ -118,18 +123,15 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
     }
 
     public List<CEActionRequest> getCEActionRequestByControlCode(int controlCode) throws IntegrationException {
-        CEActionRequest newActionRequest = null;
-
         List<CEActionRequest> requestList = new ArrayList<>();
-        String q = "SELECT requestid, requestpubliccc, public.ceactionrequest.muni_municode AS muni_municode, \n"
+        String q = "SELECT requestid, requestpubliccc, muni_municode, \n"
                 + "	property_propertyid, issuetype_issuetypeid, actrequestor_requestorid, submittedtimestamp, \n"
-                + "	dateofrecord, addressofconcern, \n"
-                + "	notataddress, requestdescription, isurgent, anonymityRequested, \n"
+                + "	dateofrecord, addressofconcern, notataddress, \n"
+                + "	requestdescription, isurgent, anonymityRequested, \n"
                 + "	cecase_caseid, coginternalnotes, status_id, caseattachmenttimestamp, \n"
-                + "	muniinternalnotes, publicexternalnotes, paccenabled, caseattachment_userid, ceactionrequest.active, \n"
-                + "	ceactionrequestissuetype.typeName AS typename\n"
+                + "	muniinternalnotes, publicexternalnotes, paccenabled, caseattachment_userid, active, \n"
+                + "	usersubmitter_userid\n"
                 + "	FROM public.ceactionrequest \n"
-                + "		INNER JOIN ceactionrequestissuetype ON ceactionrequest.issuetype_issuetypeid = ceactionrequestissuetype.issuetypeid"
                 + " WHERE requestpubliccc= ?;";
 
         // for degugging
@@ -480,7 +482,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             
         } catch (SQLException ex) {
             System.out.println(ex);
-            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequest | Integration Error: Unable to update action request", ex);
+            throw new IntegrationException("CEActionRequestIntegrator.updatePACCAccess | Integration Error: Unable to update action request", ex);
         } finally {
             
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -488,8 +490,6 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         } // close finally
 
     }
-    
-    
     
     public void updateActionRequestProperty(CEActionRequest req) throws IntegrationException {
 

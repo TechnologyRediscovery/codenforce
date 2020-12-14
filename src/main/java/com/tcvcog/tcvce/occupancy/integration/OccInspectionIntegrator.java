@@ -1818,6 +1818,56 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
     }
 
+    public List<OccInspection> getOccInspectionListByPACC(int pacc) throws IntegrationException {
+
+        List<OccInspection> inspecList = new ArrayList<>();
+
+        String query = "SELECT inspectionid FROM occinspection WHERE publicaccesscc=? ";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, pacc);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                inspecList.add(getOccInspection(rs.getInt("inspectionid")));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot retrieve occinspectionlist", ex);
+
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        } // close finally
+
+        return inspecList;
+
+    }
+    
     public OccInspection getOccInspection(int inspectionID) throws IntegrationException {
         OccupancyCoordinator oc = getOccupancyCoordinator();
 

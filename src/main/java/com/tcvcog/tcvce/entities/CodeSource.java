@@ -24,14 +24,15 @@ import java.util.Objects;
  *
  * @author ellen bascomb of apt 31y
  */
-public class CodeSource implements Serializable{
+public  class CodeSource 
+        implements Serializable{
     
     private int sourceID;
     private String sourceName;
     private int sourceYear;
     
     private String sourceDescription;
-    private String URL;
+    private String url;
     private boolean isActive;
     private String sourceNotes;
 
@@ -92,17 +93,17 @@ public class CodeSource implements Serializable{
     }
 
     /**
-     * @return the URL
+     * @return the url
      */
-    public String getURL() {
-        return URL;
+    public String getUrl() {
+        return url;
     }
 
     /**
-     * @param URL the URL to set
+     * @param url the url to set
      */
-    public void setURL(String URL) {
-        this.URL = URL;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     /**
@@ -140,7 +141,7 @@ public class CodeSource implements Serializable{
         hash = 300 * hash + this.sourceYear;
         hash = 300 * hash + Objects.hashCode(this.sourceName);
         hash = 300 * hash + Objects.hashCode(this.sourceDescription);
-        hash = 300 * hash + Objects.hashCode(this.URL);
+        hash = 300 * hash + Objects.hashCode(this.url);
         hash = 300 * hash + Objects.hashCode(this.sourceNotes);
         hash = 300 * hash + (this.isActive ? 1 : 0);
         
@@ -174,7 +175,7 @@ public class CodeSource implements Serializable{
         if (!Objects.equals(this.sourceDescription, other.sourceDescription)) {
             return false;
         }
-        if (!Objects.equals(this.URL, other.URL)) {
+        if (!Objects.equals(this.url, other.url)) {
             return false;
         }
         if (!Objects.equals(this.sourceNotes, other.sourceNotes)) {

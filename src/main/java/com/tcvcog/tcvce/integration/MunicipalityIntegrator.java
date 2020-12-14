@@ -22,7 +22,9 @@ import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.MuniProfile;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
@@ -188,7 +190,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         Connection con = null;
         // note that muniCode is not returned in this query since it is specified in the WHERE
         String query =  "SELECT profileid, title, description, lastupdatedts, lastupdatedby_userid, \n" +
-                        "       notes, continuousoccupancybufferdays, minimumuserranktodeclarerentalintent\n" +
+                        "       notes, continuousoccupancybufferdays, minimumuserranktodeclarerentalintent, novfollowupdefaultdays \n" +
                         "  FROM public.muniprofile WHERE profileid=?;";
         ResultSet rs = null;
  
@@ -229,6 +231,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         mp.setNotes(rs.getString("notes"));
         mp.setContinuousoccupancybufferdays(rs.getInt("continuousoccupancybufferdays"));
         mp.setMinimumuserranktodeclarerentalintent(rs.getInt("minimumuserranktodeclarerentalintent"));
+        mp.setNovDefaultDaysForFollowup(rs.getInt("novfollowupdefaultdays"));
         
         mp.setEventRuleSetCE(wi.rules_getEventRuleSet(rs.getInt("profileid")));
         mp.setOccPeriodTypeList(oi.getOccPeriodTypeList(rs.getInt("profileid")));
@@ -450,9 +453,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     //xiaohong add
     public ArrayList<MuniProfile> getMuniProfileList() throws IntegrationException {
 
-        String query = "SELECT profileid, title, description, lastupdatedts, lastupdatedby_userid, \n"
-                + "       notes, continuousoccupancybufferdays, minimumuserranktodeclarerentalintent\n"
-                + "  FROM public.muniprofile;";
+        String query = "SELECT profileid FROM public.muniprofile;";
 
         Connection con = null;
         PreparedStatement stmt = null;
@@ -465,7 +466,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt = con.prepareStatement(query);
             rs = stmt.executeQuery();
             while (rs.next()) {
-                muniProfile = generateMuniProfile(rs);
+                muniProfile = getMuniProfile(rs.getInt("profileid"));
+                
                 if (muniProfile != null) {
                     muniProfileList.add(muniProfile);
                 }
@@ -580,5 +582,43 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             }
         } // close finally
     }
+    
+     /**
+     * Sets the defaultcodeset field on the muni table
+     * @param set
+     * @param muni
+     * @throws BObStatusException 
+     */
+    public void mapCodeSetAsMuniDefault(CodeSet set, Municipality muni) throws BObStatusException, IntegrationException{
+        
+        if(set == null || muni == null){
+            throw new BObStatusException("Cannot link set and muni with null set or muni!");
+            
+        }
+        
+        String query = "UPDATE municipality SET defaultcodeset=? WHERE municode=?; ";
+        Connection con = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, set.getCodeSetID());
+            stmt.setInt(2, muni.getMuniCode());
+            stmt.execute();
+            
+        } catch (SQLException ex) { 
+             System.out.println(ex);
+             throw new IntegrationException("Database exception making code set active in given muni", ex);
+        } finally{
+            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        
+        
+        
+    }
+    
     
 }

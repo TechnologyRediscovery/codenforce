@@ -19,7 +19,7 @@ public class EventCECaseReportBB extends BackingBeanUtils{
     private ReportConfigCEEventList reportConfig; 
     
     /**
-     * Creates a new instance of EventCnFReportBB
+     * Creates a new instance of EventCnFReportBBcecase
      */
     public EventCECaseReportBB() {
     }

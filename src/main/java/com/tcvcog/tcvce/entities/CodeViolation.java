@@ -29,7 +29,7 @@ import java.util.Objects;
 public  class       CodeViolation  
         extends BOb
         implements  Serializable,
-                    Comparable<CodeViolation>{
+                    Comparable<CodeViolation> {
     
     protected int violationID;
     protected EnforcableCodeElement violatedEnfElement;
@@ -68,10 +68,17 @@ public  class       CodeViolation
     protected User complianceUser;
     protected String complianceNote;
     
+    // nullification fields
+    
+    protected LocalDateTime nullifiedTS;
+    protected User nullifiedUser;
+    
     protected boolean leagacyImport;
     protected List<Photograph> photoList;
     protected List<Integer> blobIDList;
     protected List<Integer> photoIDList;
+    
+    protected List<Blob> blobList;
     
     protected int complianceTFExpiryPropID;
     protected Proposal complianceTFExpiryProp;
@@ -775,6 +782,48 @@ public  class       CodeViolation
      */
     public void setComplianceNote(String complianceNote) {
         this.complianceNote = complianceNote;
+    }
+
+    /**
+     * @return the blobList
+     */
+    public List<Blob> getBlobList() {
+        return blobList;
+    }
+
+    /**
+     * @param blobList the blobList to set
+     */
+    public void setBlobList(List<Blob> blobList) {
+        this.blobList = blobList;
+    }
+
+    /**
+     * @return the nullifiedTS
+     */
+    public LocalDateTime getNullifiedTS() {
+        return nullifiedTS;
+    }
+
+    /**
+     * @return the nullifiedUser
+     */
+    public User getNullifiedUser() {
+        return nullifiedUser;
+    }
+
+    /**
+     * @param nullifiedTS the nullifiedTS to set
+     */
+    public void setNullifiedTS(LocalDateTime nullifiedTS) {
+        this.nullifiedTS = nullifiedTS;
+    }
+
+    /**
+     * @param nullifiedUser the nullifiedUser to set
+     */
+    public void setNullifiedUser(User nullifiedUser) {
+        this.nullifiedUser = nullifiedUser;
     }
 
    

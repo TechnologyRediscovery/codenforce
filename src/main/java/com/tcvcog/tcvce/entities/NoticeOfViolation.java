@@ -32,8 +32,12 @@ public class NoticeOfViolation  extends BOb implements Serializable, Comparable<
     private Person recipient;
     
     private String noticeTextBeforeViolations;
+    private List<TextBlock> blocksBeforeViolations;
+    
     private List<CodeViolationDisplayable> violationList;
     private String noticeTextAfterViolations;
+    private List<TextBlock> blocksAfterViolations;
+    
     
     private LocalDateTime dateOfRecord;
     private java.util.Date dateOfRecordUtilDate;
@@ -44,6 +48,8 @@ public class NoticeOfViolation  extends BOb implements Serializable, Comparable<
     private User creationBy;
     
     private int headerImageID;
+    
+    private boolean injectViolations;
    
     private LocalDateTime lockedAndqueuedTS;
     private String lockedAndQueuedTSPretty;
@@ -62,6 +68,9 @@ public class NoticeOfViolation  extends BOb implements Serializable, Comparable<
     private PrintStyle style;
     private boolean useSignatureImage;
     private boolean includeViolationPhotoAttachment;
+    
+    private int followupEventDaysRequest;
+    private EventCnF followupEvent;
     
     private boolean active;
     
@@ -468,5 +477,76 @@ public class NoticeOfViolation  extends BOb implements Serializable, Comparable<
     public void setActive(boolean active) {
         this.active = active;
     }
-    
+
+    /**
+     * @return the blocksBeforeViolations
+     */
+    public List<TextBlock> getBlocksBeforeViolations() {
+        return blocksBeforeViolations;
+    }
+
+    /**
+     * @return the blocksAfterViolations
+     */
+    public List<TextBlock> getBlocksAfterViolations() {
+        return blocksAfterViolations;
+    }
+
+    /**
+     * @param blocksBeforeViolations the blocksBeforeViolations to set
+     */
+    public void setBlocksBeforeViolations(List<TextBlock> blocksBeforeViolations) {
+        this.blocksBeforeViolations = blocksBeforeViolations;
+    }
+
+    /**
+     * @param blocksAfterViolations the blocksAfterViolations to set
+     */
+    public void setBlocksAfterViolations(List<TextBlock> blocksAfterViolations) {
+        this.blocksAfterViolations = blocksAfterViolations;
+    }
+
+    /**
+     * @return the injectViolations
+     */
+    public boolean isInjectViolations() {
+        return injectViolations;
+    }
+
+    /**
+     * @param injectViolations the injectViolations to set
+     */
+    public void setInjectViolations(boolean injectViolations) {
+        this.injectViolations = injectViolations;
+    }
+
+    /**
+     * @return the followupEvent
+     */
+    public EventCnF getFollowupEvent() {
+        return followupEvent;
+    }
+
+    /**
+     * @param followupEvent the followupEvent to set
+     */
+    public void setFollowupEvent(EventCnF followupEvent) {
+        this.followupEvent = followupEvent;
+    }
+
+    /**
+     * @return the followupEventDaysRequest
+     */
+    public int getFollowupEventDaysRequest() {
+        return followupEventDaysRequest;
+    }
+
+    /**
+     * @param followupEventDaysRequest the followupEventDaysRequest to set
+     */
+    public void setFollowupEventDaysRequest(int followupEventDaysRequest) {
+        this.followupEventDaysRequest = followupEventDaysRequest;
+    }
+
+   
 }

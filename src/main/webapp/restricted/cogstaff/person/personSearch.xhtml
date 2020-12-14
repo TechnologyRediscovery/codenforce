@@ -118,9 +118,7 @@
                                                       </p:selectBooleanCheckbox>
                                                   </h:panelGroup>
                                                 <h:panelGroup>
-                                                    <p:outputLabel for="pers-filter-name-first-val">
-                                                        <h:outputText value="First Name"/>
-                                                    </p:outputLabel>
+                                                    
                                                     <p:inputText id="pers-filter-name-first-val" value="#{personSearchBB.paramsSelected.name_first_val}" 
                                                                  style="width: 200px;" tabindex="1" required="false" styleClass="inputText"
                                                                  disabled="#{!personSearchBB.paramsSelected.name_first_ctl or personSearchBB.querySelected.queryExecuted}">
@@ -146,9 +144,7 @@
                                                       </p:selectBooleanCheckbox>
                                                   </h:panelGroup>
                                                 <h:panelGroup>
-                                                    <p:outputLabel for="pers-filter-name-last-val">
-                                                        <h:outputText value="First Name"/>
-                                                    </p:outputLabel>
+                                                    
                                                     <p:inputText id="pers-filter-name-last-val" value="#{personSearchBB.paramsSelected.name_last_val}" 
                                                                  style="width: 200px;" tabindex="1" required="false" styleClass="inputText"
                                                                  disabled="#{!personSearchBB.paramsSelected.name_last_ctl or personSearchBB.querySelected.queryExecuted}">
@@ -232,6 +228,25 @@
                             </h:panelGroup>
                             
                             <h:panelGroup>
+                                
+                                <p:panel    id="pers-add-panel"
+                                            toggleable="true"
+                                            widgetVar="pers-search-query-panel-var"
+                                            collapsed="false"
+                                            header="Add a new person">
+                                    <h:form id="start-new-person-form">
+
+                                        <p:commandButton    id="new-person-cb"
+                                                            ajax="true" actionListener="#{personInfoBB.personCreateInit}"
+                                                            oncomplete="PF('person-addupdate-dialog-var').show()"
+                                                            update="person-addupdate-form"
+                                                            value="Create new Person"
+                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                            icon="fa fa-plus"
+                                                            />
+                                    </h:form>
+                                </p:panel>
+                                
                                 <p:panel    id="pers-search-results-panel"
                                             toggleable="true"
                                             widgetVar="pers-search-results-panel-var"
@@ -329,23 +344,6 @@
                                     </h:form>
                                 </p:panel>
 
-                                <p:panel    id="pers-add-panel"
-                                            toggleable="true"
-                                            widgetVar="pers-search-query-panel-var"
-                                            collapsed="false"
-                                            header="Add a new person">
-                                    <h:form id="start-new-person-form">
-
-                                        <p:commandButton    id="new-person-cb"
-                                                            ajax="true" actionListener="#{personInfoBB.personCreateInit}"
-                                                            oncomplete="PF('person-addupdate-dialog-var').show()"
-                                                            update="person-addupdate-form"
-                                                            value="Create new Person"
-                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                            icon="fa fa-plus"
-                                                            />
-                                    </h:form>
-                                </p:panel>
                             </h:panelGroup>
                         </h:panelGrid>
                         <!--close main container-->
@@ -415,8 +413,11 @@
                                     <p:spacer height="3px"/>
                                     <p:selectOneMenu
                                         id="muniSM" tabindex="2"
-                                        value="#{personInfoBB.workingPerson.muniCode}">
-                                        <f:selectItems id="muniNameList" value="#{personsBB.muniNameIDMap}"/>
+                                        value="#{personInfoBB.workingPerson.muni}">
+                                         <f:converter converterId="muniConverter"/>
+                                        <f:selectItems id="propinfoedit-muninamelist"
+                                                       value="#{sessionBean.sessUser.authMuniList}"
+                                                       var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup>
 
@@ -428,7 +429,7 @@
                                     <h:outputLabel styleClass="bold" value="First Name:" for="formFirstNameIT"/>
                                     <p:spacer height="3px"/>
                                     <p:inputText id="formFirstNameIT" value="#{personInfoBB.workingPerson.firstName}" 
-                                                 style="width: 200px;" tabindex="3" required="true" styleClass="inputText"/>
+                                                 style="width: 200px;" tabindex="3" required="false" styleClass="inputText"/>
                                     <h:message for="formFirstNameIT" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>

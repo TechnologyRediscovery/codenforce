@@ -26,18 +26,24 @@ package com.tcvcog.tcvce.entities;
 public enum EventDomainEnum {
     
     CODE_ENFORCEMENT        (   "Code enforcement cases", 
-                                "cecase_caseid"             ),
+                                "cecase_caseid",
+                                "CE"),
     OCCUPANCY               (   "Occupancy Periods", 
-                                "occperiod_periodid"             ),
+                                "occperiod_periodid",
+                                "OCC"),
     UNIVERSAL               (   "All event subdomains", 
-                                "cecase_caseid"             );  // this field should never
+                                "cecase_caseid",
+                                "UNI");  // this field should never
                                                                 // be used since the Search Coor
     private final String title;                                 // is interpreting UNIVERSAL to run
     private final String dbField;                               // the other two independently
-                                                                // and combine the results
-    private EventDomainEnum(String t, String db){
+                                                                // and combine the results\
+    private final String abbrev;
+    
+    private EventDomainEnum(String t, String db, String ab){
         title = t;
         dbField = db;
+        abbrev = ab;
     }
 
     /**
@@ -52,6 +58,13 @@ public enum EventDomainEnum {
      */
     public String getDbField() {
         return dbField;
+    }
+
+    /**
+     * @return the abbrev
+     */
+    public String getAbbrev() {
+        return abbrev;
     }
 
 

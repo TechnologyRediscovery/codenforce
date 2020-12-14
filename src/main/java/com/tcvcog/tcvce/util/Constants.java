@@ -42,6 +42,9 @@ public class Constants implements Serializable {
     public final static String DEFAULT_UNIT_NUMBER = "-1";
     public final static String TEMP_UNIT_NUM = "-9";
     
+    // NOV keys
+    public final static String NOV_VIOLATIONS_INJECTION_POINT = "***VIOLATIONS***";
+    
     
     
     // Object management configuration parameters

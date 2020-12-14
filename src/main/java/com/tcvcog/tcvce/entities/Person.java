@@ -42,6 +42,7 @@ public  class       Person
      */
     
     protected int muniCode;
+    protected Municipality muni;
     /**
      * Used this to avoid cycles in Municipality creation
      * but now with a super and subclass of muni, we don't need them
@@ -748,6 +749,9 @@ public  class       Person
      * @return the muniName
      */
     public String getMuniName() {
+        if(this.muni != null){
+            muniName = muni.getMuniName();
+        }
         return muniName;
     }
 
@@ -762,6 +766,9 @@ public  class       Person
      * @return the muniCode
      */
     public int getMuniCode() {
+        if(this.muni != null){
+            muniCode = muni.muniCode;
+        }
         return muniCode;
     }
 
@@ -967,6 +974,24 @@ public  class       Person
      */
     public void setSource(BOBSource source) {
         this.source = source;
+    }
+
+    /**
+     * @return the muni
+     */
+    public Municipality getMuni() {
+        return muni;
+    }
+
+    /**
+     * @param muni the muni to set
+     */
+    public void setMuni(Municipality muni) {
+        if(muni != null){
+            this.muniCode = muni.getMuniCode();
+            this.muniName = muni.getMuniName();
+        }
+        this.muni = muni;
     }
 
    

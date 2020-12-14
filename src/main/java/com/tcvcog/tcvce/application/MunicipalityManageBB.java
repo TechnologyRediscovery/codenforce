@@ -156,7 +156,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
             //initialize default current code set list 
             currentCodeSetList = cc.getCodeSetListComplete();
             //initialize default current code source list
-            currentCodeSourceList = cc.retrieveAllCodeSources();
+            currentCodeSourceList = cc.getCodeSourceList();
             //initialize default current muni profile list
             currentMuniProfileList = mc.getMuniProfilesList();
             //initialize default current user list

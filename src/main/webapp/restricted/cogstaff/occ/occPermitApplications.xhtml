@@ -354,8 +354,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:commandButton value="Go to OccPeriod" icon="fa fa-folder" action="#{occPermitApplicationManageBB.goToOccPeriod()}"/>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
-
-                                                    <p:spacer/>
+                                                    
+                                                    <h:panelGroup>
+                                                        <p:outputLabel value="Public access reference num (PACC):"/>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.publicControlCode}"/>
+                                                        </div>
+                                                        <p:spacer height="5px"/>
+                                                        <div class="cearActionsTableOutputLabel">
+                                                            <h:outputText value=" Allow access using ref num? "/>
+                                                            <p:selectBooleanCheckbox id="selr-access-sbcb" value="#{occPermitApplicationManageBB.selectedApplication.paccEnabled}"
+                                                                                     disabled="#{occPermitApplicationManageBB.disablePACCControl}">
+                                                                <p:ajax listener="#{occPermitApplicationManageBB.changePACCAccess}" update="form-messages-global" />
+                                                            </p:selectBooleanCheckbox>
+                                                        </div>
+                                                        <p:spacer height="10px"/>
+                                                    </h:panelGroup>
 
                                                     <p:spacer/>
 

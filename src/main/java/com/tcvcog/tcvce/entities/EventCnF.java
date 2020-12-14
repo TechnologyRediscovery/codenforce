@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -27,7 +28,8 @@ import java.util.Objects;
  */
 public  class       EventCnF 
         extends     BOb
-        implements  Comparable<EventCnF> {
+        implements  Comparable<EventCnF>,
+                    IFace_Loggable{
     
     protected int eventID;
     protected EventCategory category;

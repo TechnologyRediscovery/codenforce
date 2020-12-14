@@ -27,8 +27,8 @@ import java.util.List;
 public class PublicInfoBundleEventCnF extends PublicInfoBundle{
     
     private EventCnF bundledEvent;
-    private PublicInfoBundleCECase cecase;
-    private PublicInfoBundleOccPeriod period;
+    private int cecaseID;
+    private int periodID;
     private List<PublicInfoBundlePerson> personList;
     
     @Override
@@ -56,26 +56,22 @@ public class PublicInfoBundleEventCnF extends PublicInfoBundle{
         bundledEvent = input;
     }
     
-    public PublicInfoBundleCECase getCecase() {
-        return cecase;
+    public int getCecaseID() {
+        return cecaseID;
     }
 
-    public void setCecase(PublicInfoBundleCECase input) {
+    public void setCecaseID(int input) {
         
-        setCaseManagerName(input.getCaseManagerName());
-        setCaseManagerContact(input.getCaseManagerContact());
-        cecase = input;
+        cecaseID = input;
     }
 
-    public PublicInfoBundleOccPeriod getPeriod() {
-        return period;
+    public int getPeriodID() {
+        return periodID;
     }
 
-    public void setPeriod(PublicInfoBundleOccPeriod input) {
+    public void setPeriodID(int input) {
         
-        setCaseManagerName(input.getCaseManagerName());
-        setCaseManagerContact(input.getCaseManagerContact());
-        period = input;
+        periodID = input;
     }
 
     public List<PublicInfoBundlePerson> getPersonList() {

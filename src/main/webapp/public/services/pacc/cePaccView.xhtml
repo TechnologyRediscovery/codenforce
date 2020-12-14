@@ -1,0 +1,490 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!--
+Copyright (C) 2020 Technology Rediscovery LLC.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Public Data Access Portal</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="sysHomeView">
+
+                    <!-- MAIN CONTAINER -->
+                    <div class="mainContainer">
+
+                        <p:growl id="paccMessages" showDetail="false"/>
+
+                        <!-- CONTENTS CONTAINER -->
+                        <div class="public-main-contents-containner">
+
+                            <!--CONTENT MAIN COMPONENT -->
+                            <div class="public-main-contents">
+
+                                <!-- GUIDANCE COMPONENT -->
+                                <div class="public-guide">
+
+                                </div>
+
+                                <h:form id="viewPublicBundlesForm">
+
+                                    <!-- TITLE COMPONENT -->
+                                    <div class="public-title">
+                                        <div class="public-title-main">
+                                            View/Edit Existing Code Enforcement Request/Case
+                                        </div>
+                                        <div class="public-title-sub">
+                                            Check the status of an existing code enforcement requests or cases, 
+                                            or add information to an existing request or case.
+                                        </div>
+                                    </div>
+
+                                    <p>
+                                        Please review the request(s) below for their status, or add additional information to this request. 
+                                        Note that additional information will be sent directly to the code enforcement staff. Any additional 
+                                        information received here become part of the permanent case record and may become public record.
+                                    </p>
+
+                                    <!-- CONTENT IO COMPONENT -->
+                                    <div class="public-main-contents-io">
+                                        <!-- CONTENT IO COMPONENT: CONTENT -->
+                                        <div class="public-main-contents-io-content" >
+
+                                            <!--BUNDLED CE CASES LIST-->
+                                            <p:repeat rendered="#{not empty publicInfoBB.bundledCases}" value="#{publicInfoBB.bundledCases}" var="case">
+
+                                                <p:tabView>
+                                                    <p:tab title="Case Information">
+
+                                                        <p:panelGrid columns="4" 
+                                                                     layout="grid"
+                                                                     columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                                     >
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="PACC Status:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{case.paccStatusMessage}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Case ID:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{case.bundledCase.caseID}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Case Name:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{case.bundledCase.caseName}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Case Manager:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160; Name: #{case.bundledCase.caseManager.person.firstName} #{case.bundledCase.caseManager.person.lastName}"/>
+                                                                    <p:spacer height="5px"/>
+                                                                    <p:outputLabel value="&#160; Email: #{case.bundledCase.caseManager.person.email}"/>
+                                                                    <p:spacer height="5px"/>
+                                                                    <p:outputLabel value="&#160; Phone: #{case.bundledCase.caseManager.person.phoneWork}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Status:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div class="#{case.bundledCase.statusBundle.phaseIcon.styleClass}">
+                                                                    <i class="material-icons status-display-icon-i"><h:outputText value="#{case.bundledCase.statusBundle.phaseIcon.materialIcon}"/></i>
+                                                                </div>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{case.bundledCase.statusBundle.phase.label}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Origination Date:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{case.bundledCase.originiationDatePretty}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup rendered="#{case.bundledCase.closingDatePretty}">
+                                                                <p:outputLabel value="Closing Date:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{case.bundledCase.closingDatePretty }"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Active?"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{case.bundledCase.active ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                        </p:panelGrid>
+
+                                                    </p:tab>
+                                                    <p:tab title="Events">
+
+                                                        <p:dataTable
+                                                            id="caseEventTable"
+                                                            var="e"
+                                                            rowKey="#{e.bundledEvent.eventID}"
+                                                            value="#{case.publicEventList}"
+                                                            tableStyleClass="primeDataTable"
+                                                            resizableColumns="true"
+                                                            rowExpandMode="multiple"
+                                                            expandedRow="false"
+                                                            scrollHeight="400"
+                                                            widgetVar="caseEventTable"
+                                                            >
+
+                                                            <p:column width="3%" exportable="false">
+                                                                <p:rowToggler/>
+                                                            </p:column>
+
+                                                            <p:column width="4%">
+                                                                <i class="material-icons"><h:outputText value="#{e.bundledEvent.category.icon.materialIcon}"/></i>
+                                                            </p:column>
+
+                                                            <p:column width="12%" sortBy="#{e.bundledEvent.category.eventCategoryTitle}"
+                                                                      filterBy="#{e.bundledEvent.category.eventCategoryTitle}"
+                                                                      headerText="Category">
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{e.bundledEvent.category.eventCategoryTitle}"/>
+                                                                </div>
+                                                            </p:column>
+
+                                                            <p:column width="8%" sortBy="#{e.bundledEvent.category.eventType.label}"
+                                                                      filterBy="#{e.bundledEvent.category.eventType.label}"
+                                                                      headerText="Type">
+                                                                <h:outputText value="#{e.bundledEvent.category.eventType.label}"/>
+                                                            </p:column>
+
+                                                            <p:column width="4%" sortBy="#{e.bundledEvent.eventID}"
+                                                                      headerText="ID">
+                                                                <h:outputText value="#{e.bundledEvent.eventID}"/>
+                                                            </p:column>
+
+                                                            <p:column width="9%" sortBy="#{e.bundledEvent.timeStart}"
+                                                                      headerText="Start Date">
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{e.bundledEvent.timeStartPretty}"/>
+                                                                </div>
+                                                            </p:column>
+                                                            <p:column width="9%" sortBy="#{e.bundledEvent.timeEnd}"
+                                                                      headerText="End Date">
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText value="#{e.bundledEvent.timeEndPretty}"/>
+                                                                </div>
+                                                            </p:column>
+
+                                                            <p:rowExpansion>
+
+                                                                <div class="outlinedBox">
+                                                                    <h3><h:outputText value="#{e.bundledEvent.category.eventType.label}:#{e.bundledEvent.category.eventCategoryTitle}"/>
+                                                                        ; Event ID: <h:outputText value="#{e.bundledEvent.eventID}"/> </h3>
+                                                                    <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                                                 columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                                        <h:panelGroup>
+                                                                            <h:outputText styleClass="bold" value="Description" />
+                                                                            <div class="rowExpansion">
+                                                                                <h:outputText value="#{e.bundledEvent.description}"/>
+                                                                            </div>
+                                                                        </h:panelGroup>
+
+                                                                        <h:panelGroup>
+                                                                            <h:outputText styleClass="bold" value="Active Event?"/>
+                                                                            <div class="rowExpansion">
+                                                                                <h:outputText value="#{e.bundledEvent.active}"/>
+                                                                            </div>
+                                                                        </h:panelGroup>
+
+                                                                    </h:panelGrid>
+                                                                </div>
+                                                            </p:rowExpansion>
+
+                                                        </p:dataTable>
+
+                                                    </p:tab>
+                                                    <p:tab title="Violations">
+
+                                                        <p:dataTable
+                                                            id="violation-table"
+                                                            var="violation"
+                                                            rowKey="#{violation.bundledViolation.violationID}"
+                                                            value="#{case.violationList}"
+                                                            tableStyleClass="primeDataTable"
+                                                            resizableColumns="true"
+                                                            rowExpandMode="multiple"
+                                                            reflow="true">
+
+                                                            <p:column width="3%" exportable="false">
+                                                                <p:rowToggler/>
+                                                            </p:column>
+
+                                                            <p:column width="25%" styleClass="content-align-center"
+                                                                      sortBy="#{violation.bundledViolation.dateOfRecord}"
+                                                                      headerText="Date of record">
+                                                                <h:outputText value="#{violation.bundledViolation.dateOfRecordPretty}"/>
+                                                            </p:column>
+                                                            <p:column width="8%" styleClass="content-align-center"
+                                                                      headerText="ID">
+                                                                <h:outputText value="#{violation.bundledViolation.violationID}"/>
+                                                            </p:column>
+
+                                                            <p:column width="40%" styleClass="content-align-center"
+                                                                      sortBy="#{violation.bundledViolation.violatedEnfElement.ordSubSecTitle}"
+                                                                      headerText="Ordinance">
+                                                                <h:outputText value="#{violation.bundledViolation.violatedEnfElement.ordSubSecTitle}"/>
+                                                                <p:spacer height="3px" />
+                                                                <h:outputText value="#{violation.bundledViolation.violatedEnfElement.source.sourceName}"/>
+                                                                <h:outputText value=" (#{violation.bundledViolation.violatedEnfElement.source.sourceYear})"/>
+                                                            </p:column>
+
+
+                                                            <p:column width="25%" styleClass="content-align-center"
+                                                                      headerText="Status">
+                                                                <h:outputText value="#{!(empty violation.bundledViolation.status) ? violation.bundledViolation.status.label : ''}" />
+                                                            </p:column>
+
+                                                            <p:rowExpansion>
+
+                                                                <div class="outlinedBox">
+                                                                    <h2><h:outputText value="#{violation.bundledViolation.violatedEnfElement.source.sourceName}:
+                                                                                      #{violation.bundledViolation.violatedEnfElement.ordSubSecTitle}"/>
+                                                                        ; Violation ID: <h:outputText value="#{violation.bundledViolation.violationID}"/> </h2>
+                                                                    <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                                                 columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                                        <h:panelGroup>
+                                                                            <h:outputText styleClass="bold" value="Description" />
+                                                                            <div class="rowExpansion">
+                                                                                <h:outputText value="#{violation.bundledViolation.description}"/>
+                                                                            </div>
+                                                                        </h:panelGroup>
+
+                                                                        <h:panelGroup>
+                                                                            <h:outputText styleClass="bold" value="Penalty" />
+                                                                            <div class="rowExpansion">
+                                                                                <h:outputText value="$#{violation.bundledViolation.penalty}"/>
+                                                                            </div>
+                                                                        </h:panelGroup>
+
+                                                                        <h:panelGroup>
+                                                                            <h:outputText styleClass="bold" value="Compliance Deadline" />
+                                                                            <div class="rowExpansion">
+                                                                                <h:outputText value="#{violation.bundledViolation.stipulatedComplianceDatePretty}"/>
+                                                                            </div>
+                                                                        </h:panelGroup>
+
+                                                                        <h:panelGroup>
+                                                                            <h:outputText styleClass="bold" value="Compliance met?" />
+                                                                            <div class="rowExpansion">
+                                                                                <h:outputText value="#{not empty violation.bundledViolation.actualComplianceDate ? 'Yes' : 'No' }"/>
+                                                                            </div>
+                                                                        </h:panelGroup>
+
+                                                                        <h:panelGroup rendered="#{not empty violation.bundledViolation.actualComplianceDate}">
+                                                                            <h:outputText styleClass="bold" value="Compliance Met On" />
+                                                                            <div class="rowExpansion">
+                                                                                <h:outputText value="#{violation.bundledViolation.actualComplianceDatePretty}"/>
+                                                                            </div>
+                                                                        </h:panelGroup>
+
+                                                                    </h:panelGrid>
+                                                                </div>
+                                                            </p:rowExpansion>
+
+
+                                                        </p:dataTable>
+
+                                                    </p:tab>
+                                                    <ui:remove>
+                                                        <p:tab title="Messages">
+
+                                                            <!--At this point in time there are no external notes for CE Cases-->
+                                                            
+                                                            <p:outputLabel>Type your message to the code enforcement staff in the box below. </p:outputLabel>
+                                                            <p:spacer height="15px"/>
+                                                            <p:outputLabel value="#{case.bundledCase.externalNotes == '' or empty case.bundledCase.externalNotes ? 
+                                                                                'No messages found!' 
+                                                                                : case.bundledCase.externalNotes}"/>
+                                                            <p:spacer height="10px"/>
+                                                            <p:inputTextarea id="message-ita" style="width: 100%; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
+                                                            <p:spacer height="10px"/>
+                                                             <p:outputLabel rendered="#{cear.showAddMessageButton}"> 
+                                                                <i>Please note that all messages submitted through this portal become part of the permanent case record
+                                                                    and may be included in documents prepare for town councils and magistrates.</i> </p:outputLabel>
+                                                            <p:spacer height="10px"/>
+                                                            <p:commandButton ajax="true" actionListener="#{publicInfoBB.attachMessage(case)}"
+                                                                             value="Submit" icon="fa fa-link"
+                                                                             update="paccMessages"
+                                                                             />
+
+                                                        </p:tab>
+                                                    </ui:remove>
+                                                </p:tabView>
+
+                                            </p:repeat>
+
+                                            <!--BUNDLED CEARS LIST-->
+                                            <p:repeat rendered="#{not empty publicInfoBB.bundledRequests}" value="#{publicInfoBB.bundledRequests}" var="cear">
+
+                                                <p:tabView>
+                                                    <p:tab title="Code Enforcement Request Information">
+
+                                                        <p:panelGrid columns="4" 
+                                                                     layout="grid"
+                                                                     columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                                     >
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="PACC Status:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{cear.paccStatusMessage}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Request ID:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{cear.bundledRequest.requestID}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+                                                            
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Issue:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{cear.bundledRequest.issue.name}"/>
+                                                                    <p:spacer height="5px"/>
+                                                                    <p:outputLabel value="&#160;#{cear.bundledRequest.issue.description}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Request Description:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{cear.bundledRequest.requestDescription}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Status:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <p:outputLabel value="&#160;#{cear.bundledRequest.requestStatus.statusTitle}: #{cear.bundledRequest.requestStatus.description}"/>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Date of Submission:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{cear.bundledRequest.formattedSubmittedTimeStamp}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Active?"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{cear.bundledRequest.active ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                        </p:panelGrid>
+                                                        
+                                                    </p:tab>
+                                                    <p:tab title="Messages">
+
+                                                        <p:outputLabel rendered="#{cear.showAddMessageButton}"> Type your message to the code enforcement staff in the box below. </p:outputLabel>
+                                                            <p:spacer height="15px"/>
+                                                            <p:outputLabel value="#{cear.bundledRequest.publicExternalNotes == '' or empty cear.bundledRequest.publicExternalNotes ? 
+                                                                                'No messages found!' 
+                                                                                : cear.bundledRequest.publicExternalNotes}" escape="false"/>
+                                                            <p:spacer height="10px"/>
+                                                            <p:inputTextarea id="message-ita" rendered="#{cear.showAddMessageButton}" style="width: 100%; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
+                                                            <p:spacer height="10px"/>
+                                                            <p:outputLabel rendered="#{cear.showAddMessageButton}"> 
+                                                                <i>Please note that all messages submitted through this portal become part of the permanent case record
+                                                                    and may be included in documents prepare for town councils and magistrates.</i> </p:outputLabel>
+                                                            <p:spacer height="10px"/>
+                                                            <p:commandButton ajax="true" actionListener="#{publicInfoBB.attachMessage(cear)}"
+                                                                             value="Submit" icon="fa fa-link"
+                                                                             update="paccMessages viewPublicBundlesForm" 
+                                                                             rendered="#{cear.showAddMessageButton}"
+                                                                             />
+                                                        
+                                                    </p:tab>
+                                                </p:tabView>
+
+                                            </p:repeat>
+
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+
+                    </div>
+                </f:view>
+
+                <script>
+                    var y = document.getElementById('public-reviewcase-arrow-id');
+                    y.className += " public-menu-active";
+                </script> 
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>

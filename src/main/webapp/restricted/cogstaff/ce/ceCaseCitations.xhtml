@@ -216,9 +216,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             widgetVar="citation-violation-compactlist-widgetvar">
 
                                                             <h:outputText id="violation-compactlist-line-ot" value="#{v}"/>
-                                                            <h:outputText id="v-source-name-compactlist-ot" value="(#{v.violatedEnfElement.codeElement.source.sourceName}" />
+                                                            <h:outputText id="v-source-name-compactlist-ot" value="(#{v.violatedEnfElement.source.sourceName}" />
                                                             <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
-                                                            <h:outputText id="v-source-year-compactlist-ot" value="#{v.violatedEnfElement.codeElement.source.sourceYear})"/>
+                                                            <h:outputText id="v-source-year-compactlist-ot" value="#{v.violatedEnfElement.source.sourceYear})"/>
                                                             <h:outputText id="sep-compactlist-line-ot" value=" | "/>
                                                             <h:outputText id="status-compactlist-line-ot" value="#{v.status.label}"/>
 
@@ -315,11 +315,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             <h:outputText value="Code Element" />
                                                         </f:facet>
                                                         <div class="rowExpansion">
-                                                            <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
-                                                                           #{v.violatedEnfElement.codeElement.ordSecNum} 
-                                                                           #{v.violatedEnfElement.codeElement.ordSecTitle}:
-                                                                           #{v.violatedEnfElement.codeElement.ordSubSecNum} 
-                                                                           #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                            <h:outputLabel value="#{v.violatedEnfElement.ordchapterTitle}: 
+                                                                           #{v.violatedEnfElement.ordSecNum} 
+                                                                           #{v.violatedEnfElement.ordSecTitle}:
+                                                                           #{v.violatedEnfElement.ordSubSecNum} 
+                                                                           #{v.violatedEnfElement.ordSubSecTitle}"/>
                                                         </div>
                                                     </p:column>
 
@@ -366,11 +366,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             <h:outputText value="Code Element" />
                                                         </f:facet>
                                                         <div class="rowExpansion">
-                                                            <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
-                                                                           #{v.violatedEnfElement.codeElement.ordSecNum} 
-                                                                           #{v.violatedEnfElement.codeElement.ordSecTitle}:
-                                                                           #{v.violatedEnfElement.codeElement.ordSubSecNum} 
-                                                                           #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                            <h:outputLabel value="#{v.violatedEnfElement.ordchapterTitle}: 
+                                                                           #{v.violatedEnfElement.ordSecNum} 
+                                                                           #{v.violatedEnfElement.ordSecTitle}:
+                                                                           #{v.violatedEnfElement.ordSubSecNum} 
+                                                                           #{v.violatedEnfElement.ordSubSecTitle}"/>
                                                         </div>
                                                     </p:column>
 

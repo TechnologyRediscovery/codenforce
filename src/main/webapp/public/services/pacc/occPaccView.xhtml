@@ -1,0 +1,428 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!--
+Copyright (C) 2020 Technology Rediscovery LLC.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Public Data Access Portal</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="sysHomeView">
+
+                    <!-- MAIN CONTAINER -->
+                    <div class="mainContainer">
+
+                        <p:growl id="paccMessages" showDetail="false"/>
+
+                        <!-- CONTENTS CONTAINER -->
+                        <div class="public-main-contents-containner">
+
+                            <!--CONTENT MAIN COMPONENT -->
+                            <div class="public-main-contents">
+
+                                <!-- GUIDANCE COMPONENT -->
+                                <div class="public-guide">
+
+                                </div>
+
+                                <h:form id="viewPublicBundlesForm">
+
+                                    <!-- TITLE COMPONENT -->
+                                    <div class="public-title">
+                                        <div class="public-title-main">
+                                            View/Edit Existing Occupancy Inspection/Application
+                                        </div>
+                                        <div class="public-title-sub">
+                                            Check the status of an existing occupancy inspection or application, 
+                                            or add information to an existing inspection or application.
+                                        </div>
+                                    </div>
+
+                                    <!--Does the paragraph below apply to occupancy stuff?-->
+                                    <ui:remove>
+                                        <p>
+                                            Please review the request(s) below for their status, or add additional information to this request. 
+                                            Note that additional information will be sent directly to the code enforcement staff. Any additional 
+                                            information received here become part of a permanent record and may become public record.
+                                        </p>
+                                    </ui:remove>
+                                    <!-- CONTENT IO COMPONENT -->
+                                    <div class="public-main-contents-io">
+                                        <!-- CONTENT IO COMPONENT: CONTENT -->
+                                        <div class="public-main-contents-io-content" >
+
+                                            <!--BUNDLED OCC INSPECTIONS LIST-->
+                                            <p:repeat rendered="#{not empty publicInfoBB.bundledInspections}" value="#{publicInfoBB.bundledInspections}" var="inspection">
+
+                                                <p:tabView>
+                                                    <p:tab title="Inspection Information">
+
+                                                        <p:panelGrid columns="4" 
+                                                                     layout="grid"
+                                                                     columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                                     >
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="PACC Status:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{inspection.paccStatusMessage}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Inspection ID:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{inspection.bundledInspection.inspectionID}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Inspector:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160; Name: #{inspection.bundledInspection.inspector.person.firstName} #{inspection.bundledInspection.inspector.person.lastName}"/>
+                                                                    <p:spacer height="5px"/>
+                                                                    <p:outputLabel value="&#160; Email: #{inspection.bundledInspection.inspector.person.email}"/>
+                                                                    <p:spacer height="5px"/>
+                                                                    <p:outputLabel value="&#160; Phone: #{inspection.bundledInspection.inspector.person.phoneWork}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Status:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <p:outputLabel value="#{publicInfoBB.inspectionStatus(inspection)}"/>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup rendered="#{inspection.bundledInspection.readyForPassedCertification}">
+                                                                <p:outputLabel value="Inspection Passed Timestamp:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <p:outputLabel value="&#160;#{inspection.bundledInspection.passedInspectionTSPretty}"/>
+                                                                <p:spacer height="10px"/>
+                                                                <p:outputLabel value="Certified By:"/>
+                                                                <p:outputLabel value="&#160;#{inspection.bundledInspection.passedInspectionCertifiedBy.person.firstName} #{inspection.bundledInspection.passedInspectionCertifiedBy.person.lastName}"/>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Effective Record Date:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{inspection.bundledInspection.effectiveDateOfRecordPretty}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Capacity Data:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <p:outputLabel value="&#160;Maximum occupants allowed: #{inspection.bundledInspection.maxOccupantsAllowed}"/>
+                                                                <p:spacer height="5px"/>
+                                                                <p:outputLabel value="&#160;Number of bedrooms: #{inspection.bundledInspection.numBedrooms}"/>
+                                                                <p:spacer height="5px"/>
+                                                                <p:outputLabel value="&#160;Number of bathrooms: #{inspection.bundledInspection.numBathrooms}"/>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Active?"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{inspection.bundledInspection.active ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Active?"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{inspection.bundledInspection.active ? 'Yes' : 'No'}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                        </p:panelGrid>
+
+                                                    </p:tab>
+                                                    <p:tab title="Spaces">
+
+                                                        <p:dataTable
+                                                            id="inspectedSpaceTable"
+                                                            var="space"
+                                                            rowKey="#{space.inspectedSpaceID}"
+                                                            value="#{inspection.bundledInspection.inspectedSpaceList}"
+                                                            tableStyleClass="primeDataTable"
+                                                            resizableColumns="true"
+                                                            rowExpandMode="multiple"
+                                                            expandedRow="false"
+                                                            scrollHeight="400"
+                                                            widgetVar="inspectedSpaceTableVar"
+                                                            >
+
+                                                            <p:column width="3%" exportable="false">
+                                                                <p:rowToggler/>
+                                                            </p:column>
+                                                            
+                                                            <p:column width="12%" headerText="ID:">
+                                                                <h:outputText value="#{space.inspectedSpaceID}"/>
+                                                            </p:column>
+
+                                                            <p:column width="12%" headerText="Type:">
+                                                                <h:outputText value="#{space.type.spaceTypeTitle}"/>
+                                                            </p:column>
+
+                                                            <p:column width="12%" headerText="Location:">
+                                                                <h:outputText value="#{space.location.locationDescription}, Floor #{space.location.buildingFloorNo}"/>
+                                                            </p:column>
+
+                                                            <p:column width="12%" headerText="Status:">
+                                                                <h:outputText value="#{space.status.statusEnum.label}"/>
+                                                            </p:column>
+
+                                                            <p:rowExpansion>
+
+                                                                <div class="outlinedBox">
+                                                                    <h2>Elements in Space ID: <h:outputText value="#{space.inspectedSpaceID}"/> </h2>
+                                                                    <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                                                 columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                                                                        <p:repeat value="#{space.inspectedElementList}" var="element">
+
+                                                                            <h:panelGroup>
+                                                                                <h:outputText styleClass="bold" value="Element ID ##{element.inspectedSpaceElementID}" />
+                                                                                <div class="rowExpansion">
+                                                                                    <h:outputText value="Type: #{element.type.spaceTypeTitle}"/>
+                                                                                    <h:outputText value="Location: #{space.location.locationDescription}, Floor #{space.location.buildingFloorNo}"/>
+                                                                                    <h:outputText value="Status: #{element.status.statusEnum.label}"/>
+                                                                                </div>
+                                                                            </h:panelGroup>
+
+                                                                        </p:repeat>
+
+                                                                    </h:panelGrid>
+                                                                </div>
+                                                            </p:rowExpansion>
+
+                                                        </p:dataTable>
+
+                                                    </p:tab>
+                                                    <ui:remove>
+                                                        <p:tab title="Messages">
+
+                                                            <!--At the time of writing this code, there were no external notes attached to occ inspections-->
+
+                                                            <p:outputLabel>Type your message to the code enforcement staff in the box below.</p:outputLabel>
+                                                            <p:spacer height="15px"/>
+                                                            <p:outputLabel value="#{inspection.bundledInspection.externalNotes == '' or empty inspection.bundledInspection.externalNotes ? 
+                                                                                    'No messages found!' 
+                                                                                    : inspection.bundledInspection.externalNotes}"/>
+                                                            <p:spacer height="10px"/>
+                                                            <p:inputTextarea id="message-ita" style="width: 100%; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
+                                                            <p:spacer height="10px"/>
+                                                            <p:outputLabel rendered="#{inspection.showAddMessageButton}"> 
+                                                                <i>Please note that all messages submitted through this portal become part of permanent occupancy record.</i> </p:outputLabel>
+                                                            <p:spacer height="10px"/>
+                                                            <p:commandButton ajax="true" actionListener="#{publicInfoBB.attachMessage(inspection)}"
+                                                                             value="Submit" icon="fa fa-link"
+                                                                             update="paccMessages"
+                                                                             />
+
+                                                        </p:tab>
+                                                    </ui:remove>
+                                                </p:tabView>
+
+                                            </p:repeat>
+
+                                            <!--BUNDLED OCC APPLICATIONS LIST-->
+                                            <p:repeat rendered="#{not empty publicInfoBB.bundledApplications}" value="#{publicInfoBB.bundledApplications}" var="app">
+
+                                                <p:tabView>
+                                                    <p:tab title="Occupancy Application Information">
+
+                                                        <p:panelGrid columns="4" 
+                                                                     layout="grid"
+                                                                     columnClasses="gridTd, gridTd, gridTd, gridTd" 
+                                                                     >
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="PACC Status:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{app.paccStatusMessage}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Application ID:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{app.bundledApplication.id}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Reason:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{app.bundledApplication.reason.title}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Submission Notes:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{app.bundledApplication.submissionNotes}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Status:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <p:outputLabel value="&#160;#{app.bundledApplication.status.label}"/>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Date of Submission:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{app.bundledApplication.submissionDatePretty}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Property Unit:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;Unit Number: #{app.applicationPropertyUnit.bundledUnit.unitNumber}"/>
+                                                                    <p:spacer height="5px"/>
+                                                                    <p:outputLabel value="&#160;Description: #{app.applicationPropertyUnit.bundledUnit.notes}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Applicant:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{app.applicantPerson.bundledPerson.firstName} #{app.applicantPerson.bundledPerson.lastName}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <p:outputLabel value="Preferred Contact:"/>
+                                                                <p:spacer height="5px"/>
+                                                                <div>
+                                                                    <p:outputLabel value="&#160;#{app.preferredContact.bundledPerson.firstName} #{app.preferredContact.bundledPerson.lastName}"/>
+                                                                </div>
+                                                                <p:spacer height="10px"/>
+                                                            </h:panelGroup>
+
+                                                        </p:panelGrid>
+
+                                                    </p:tab>
+                                                    <p:tab title="Persons">
+
+                                                        <p:dataTable
+                                                            id="applicationPersonTable"
+                                                            var="p"
+                                                            rowKey="#{p.bundledPerson.personID}"
+                                                            value="#{app.attachedPersons}"
+                                                            tableStyleClass="primeDataTable"
+                                                            resizableColumns="true"
+                                                            scrollHeight="400"
+                                                            widgetVar="applicationPersonTable"
+                                                            >
+
+                                                            <p:column width="12%" headerText="First Name">
+                                                                <h:outputText value="#{p.bundledPerson.firstName}"/>
+                                                            </p:column>
+
+                                                            <p:column width="12%" headerText="Last Name">
+                                                                <h:outputText value="#{p.bundledPerson.lastName}"/>
+                                                            </p:column>
+
+                                                            <p:column width="12%" headerText="Role">
+                                                                <h:outputText value="#{p.bundledPerson.applicationPersonType.label}"/>
+                                                            </p:column>
+
+                                                        </p:dataTable>
+
+                                                    </p:tab>
+                                                    <p:tab title="Messages">
+
+                                                        <p:outputLabel rendered="#{app.showAddMessageButton}"> Type your message to the code enforcement staff in the box below.</p:outputLabel>
+                                                        <p:spacer height="15px"/>
+                                                        <p:outputLabel value="#{app.bundledApplication.externalPublicNotes == '' or empty app.bundledApplication.externalPublicNotes ? 
+                                                                                'No messages found!' 
+                                                                                : app.bundledApplication.externalPublicNotes}" escape="false"/>
+                                                        <p:spacer height="10px"/>
+                                                        <p:inputTextarea id="message-ita" rendered="#{app.showAddMessageButton}" style="width: 100%; height: 200px;" value="#{publicInfoBB.publicMessage}"/>
+                                                        <p:spacer height="10px"/>
+                                                        <p:outputLabel rendered="#{app.showAddMessageButton}"> 
+                                                            <i>Please note that all messages submitted through this portal become part of permanent occupancy record.</i> </p:outputLabel>
+                                                        <p:spacer height="10px"/>
+                                                        <p:commandButton ajax="true" actionListener="#{publicInfoBB.attachMessage(app)}"
+                                                                         value="Submit" icon="fa fa-link"
+                                                                         update="paccMessages viewPublicBundlesForm" 
+                                                                         rendered="#{app.showAddMessageButton}"
+                                                                         />
+
+                                                    </p:tab>
+                                                </p:tabView>
+
+                                            </p:repeat>
+
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+
+                    </div>
+                </f:view>
+
+                <script>
+                    var y = document.getElementById('public-reviewcase-arrow-id');
+                    y.className += " public-menu-active";
+                </script> 
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>

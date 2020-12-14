@@ -515,11 +515,6 @@
     </managed-bean>
     
       
-    <managed-bean>
-        <managed-bean-name>codeSourceAddUpdateBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CodeSourceAddUpdateBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
 
 
     <managed-bean>
@@ -528,18 +523,7 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>codeSetElementBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CodeSetElementBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
   
-
-    <managed-bean>
-        <managed-bean-name>codeSourceBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CodeSourceBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
 
     <managed-bean>
         <managed-bean-name>codeElementGuideBB</managed-bean-name>
@@ -559,17 +543,8 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>codeElementListBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CodeElementListBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>codeSetBuilderBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CodeSetBuilderBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+    
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules codebook ~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     
@@ -655,6 +630,14 @@
             <from-outcome>codeGuideLink</from-outcome>
             <to-view-id>/restricted/cogstaff/code/codeGuideLink.xhtml</to-view-id>
         </navigation-case>
+        
+        
+        <navigation-case>
+            <from-outcome>codeElementManage</from-outcome>
+            <to-view-id>/restricted/cogstaff/code/codeElementManage.xhtml</to-view-id>
+        </navigation-case>
+        
+        
         
     </navigation-rule>    
 
@@ -996,11 +979,7 @@
     <!--*********************************************************************-->
     <!--**                       VI. OCCPERIOD                             **-->
     <!--*********************************************************************-->
-    <managed-bean>
-        <managed-bean-name>occPeriodWorkflowBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodWorkflowBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+  
     
     <managed-bean>
         <managed-bean-name>occupancyCoordinator</managed-bean-name>
@@ -1158,6 +1137,12 @@
             <redirect />
         </navigation-case>
         
+        <navigation-case>
+            <from-outcome>occAppSuccess</from-outcome>
+            <to-view-id>/public/services/occPermitAppConf.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
     </navigation-rule>
          
     
@@ -1210,11 +1195,6 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
-    <managed-bean>
-        <managed-bean-name>textBlockBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.TextBlockBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
 
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules code enforcement ~~~~~~~~~~~~~~~~ --> 
@@ -1901,7 +1881,25 @@
         <from-view-id>*</from-view-id>    
         <navigation-case>
             <from-outcome>paccSearch</from-outcome>
-            <to-view-id>/public/services/paccSearch.xhtml</to-view-id>
+            <to-view-id>/public/services/pacc/paccSearch.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+    
+    <navigation-rule>
+        <from-view-id>*</from-view-id>    
+        <navigation-case>
+            <from-outcome>cePaccView</from-outcome>
+            <to-view-id>/public/services/pacc/cePaccView.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>*</from-view-id>    
+        <navigation-case>
+            <from-outcome>occPaccView</from-outcome>
+            <to-view-id>/public/services/pacc/occPaccView.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>
@@ -1949,6 +1947,7 @@
             <redirect />
         </navigation-case>
     </navigation-rule>
+    
         
     <navigation-rule>
         <navigation-case>
@@ -2044,13 +2043,86 @@
     <!--**                       UNKNOWN                                   **-->
     <!--*********************************************************************-->
     
+    <navigation-rule>
+        <navigation-case>
+            <from-view-id>*</from-view-id>
+            <from-outcome>rentalRegistrationFlow</from-outcome>
+            <to-view-id>/public/services/rental/rental0ChooseMuni.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
     
     
     <managed-bean>
-        <managed-bean-name>textBlockBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.TextBlockBB</managed-bean-class>
+        <managed-bean-name>rentalRegistrationBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.rental.RentalRegistrationBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
+    
+    
+    <navigation-rule>
+        
+        
+        <navigation-case>
+            <from-view-id>/public/services/rental/rental0ChooseMuni.xhtml</from-view-id>
+            <from-outcome>chooseRole</from-outcome>
+            <to-view-id>/public/services/rental/rental1Role.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        
+        
+        <navigation-case>
+            <from-view-id>/public/services/rental/rental1Role.xhtml</from-view-id>
+            <from-outcome>chooseProperty</from-outcome>
+            <to-view-id>/public/services/rental/rental2ChooseProperty.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        
+        
+        <navigation-case>
+            <from-view-id>/public/services/rental/rental2ChoosProperty.xhtml</from-view-id>
+            <from-outcome>configureUnits</from-outcome>
+            <to-view-id>/public/services/rental/rental3AddPropertyUnit.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        
+        
+        <navigation-case>
+            <from-view-id>/public/services/rental/rental3AddPropertyUnit.xhtml</from-view-id>
+            <from-outcome>selectUnitForRegistration</from-outcome>
+            <to-view-id>/public/services/rental/rental4SelectForRegistration.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        
+        
+        <navigation-case>
+            <from-view-id>/public/services/rental/renta4SelectForRegistration.xhtml</from-view-id>
+            <from-outcome>personInfo</from-outcome>
+            <to-view-id>/public/services/rental/rental5personsRequirementManage.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        
+        
+        <navigation-case>
+            <from-view-id>/public/services/rental/rental5personsRequirementManage.xhtml</from-view-id>
+            <from-outcome>review</from-outcome>
+            <to-view-id>/public/services/rental/rental6ReviewAndSubmit.xhtml#currentStep</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        
+    </navigation-rule>
+    
+    
+    
+    
+    
     
     <managed-bean>
         <managed-bean-name>dashboardDataBB</managed-bean-name>

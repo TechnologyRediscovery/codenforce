@@ -25,6 +25,7 @@ import com.tcvcog.tcvce.integration.CodeIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,16 +38,16 @@ import javax.faces.application.FacesMessage;
 public class CodeElementGuideBB extends BackingBeanUtils implements Serializable {
       
     private CodeElementGuideEntry currentGuideEntry;
-    private ArrayList<CodeElementGuideEntry> entryList;
-    private ArrayList<CodeElementGuideEntry> filteredEntryList;
+    private List<CodeElementGuideEntry> entryList;
+    private List<CodeElementGuideEntry> filteredEntryList;
     
     private CodeElementGuideEntry selectedGuideEntry;
     
     private CodeSource currentSource;
     
     
-    private ArrayList<CodeElement> elementList;
-    private ArrayList<CodeElement> filteredElementList;
+    private List<CodeElement> elementList;
+    private List<CodeElement> filteredElementList;
     // no selected elements I don't think
     private CodeElement selectedElement;
     
@@ -84,8 +85,9 @@ public class CodeElementGuideBB extends BackingBeanUtils implements Serializable
     }
    
     
-    private ArrayList<CodeElement> loadCodeElementList(){
-        ArrayList<CodeElement> elList = null;
+    private List<CodeElement> loadCodeElementList(){
+        
+        List<CodeElement> elList = null;
         CodeSource source = getSessionBean().getSessCodeSource();
         CodeIntegrator codeIntegrator = getCodeIntegrator();
         try {
@@ -102,7 +104,7 @@ public class CodeElementGuideBB extends BackingBeanUtils implements Serializable
         
     }
     
-     public ArrayList<CodeElement> getElementList() {
+     public List<CodeElement> getElementList() {
         if(elementList == null){
             elementList = loadCodeElementList();
         } 
@@ -165,7 +167,7 @@ public class CodeElementGuideBB extends BackingBeanUtils implements Serializable
     /**
      * @return the entryList
      */
-    public ArrayList<CodeElementGuideEntry> getEntryList() {
+    public List<CodeElementGuideEntry> getEntryList() {
         System.out.println("CodeElementGuideBB.getEntryList");
         CodeIntegrator ci = getCodeIntegrator();
         if(entryList == null){
@@ -211,7 +213,7 @@ public class CodeElementGuideBB extends BackingBeanUtils implements Serializable
     /**
      * @return the filteredEntryList
      */
-    public ArrayList<CodeElementGuideEntry> getFilteredEntryList() {
+    public List<CodeElementGuideEntry> getFilteredEntryList() {
         return filteredEntryList;
     }
 
@@ -248,7 +250,7 @@ public class CodeElementGuideBB extends BackingBeanUtils implements Serializable
     /**
      * @return the filteredElementList
      */
-    public ArrayList<CodeElement> getFilteredElementList() {
+    public List<CodeElement> getFilteredElementList() {
         return filteredElementList;
     }
 

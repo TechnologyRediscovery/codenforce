@@ -392,7 +392,7 @@
                                             <f:facet name="header">
                                                 <h:outputText value="Code Element" />
                                             </f:facet>
-                                            <h:outputText value="#{v.violatedEnfElement.codeElement.ordSecTitle}: #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                            <h:outputText value="#{v.violatedEnfElement.ordSecTitle}: #{v.violatedEnfElement.ordSubSecTitle}"/>
                                         </p:column>
 
                                         <p:column>
@@ -434,14 +434,14 @@
                                                 <h3>Event Info</h3>
 
                                                 <h:outputLabel styleClass="bold" value="Violated Element Details: "/>
-                                                <h:outputLabel value="#{v.violatedEnfElement.codeElement.ordchapterTitle}: 
-                                                           #{v.violatedEnfElement.codeElement.ordSecNum} 
-                                                           #{v.violatedEnfElement.codeElement.ordSecTitle}:
-                                                           #{v.violatedEnfElement.codeElement.ordSubSecNum} 
-                                                           #{v.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                <h:outputLabel value="#{v.violatedEnfElement.ordchapterTitle}: 
+                                                           #{v.violatedEnfElement.ordSecNum} 
+                                                           #{v.violatedEnfElement.ordSecTitle}:
+                                                           #{v.violatedEnfElement.ordSubSecNum} 
+                                                           #{v.violatedEnfElement.ordSubSecTitle}"/>
                                                 <p:spacer height="5px"/>
 
-                                                <h:outputText styleClass="mono" value="#{v.violatedEnfElement.codeElement.ordTechnicalText}"/>
+                                                <h:outputText styleClass="mono" value="#{v.violatedEnfElement.ordTechnicalText}"/>
 
                                                 <p:spacer height="5px"/>
 

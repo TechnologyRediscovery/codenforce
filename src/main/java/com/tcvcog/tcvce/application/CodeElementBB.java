@@ -18,80 +18,229 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.CodeSource;
-import com.tcvcog.tcvce.integration.CodeIntegrator;
 import java.io.Serializable;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
 /**
- *
+ * Backing bean for codeElementManage.xhtml
+ * Provides facilities for adding, updating, and nuking 
+ * Code Sources
+ * Code Elements (Ordinances)
+ * Code Guide records
+ * 
  * @author ellen bascomb of apt 31y
  */
-public class CodeElementBB extends BackingBeanUtils implements Serializable{
+public class CodeElementBB 
+        extends BackingBeanUtils 
+        implements Serializable{
 
-     /**
+
+    final String FACESPAGE_NAV_CODEELEMENTMANAGE = "codeElementManage";
+    
+    private List<CodeElement> codeElementList;
+    private List<CodeElement> codeElementListFiltered;
+    private CodeElement currentElement;
+
+    private List<CodeSource> codeSourceList;
+    private CodeSource currentCodeSource;
+    
+    private String formNoteText;
+
+    /**
      * Creates a new instance of CodeElementBB
      */
     public CodeElementBB() {
     }
-
-    private CodeElement currentElement;
-
-    private CodeSource activeCodeSource;
-
-    private int formOrdChapterNo;
-
-    private String formOrdChapterTitle;
-    private String formOrdSecNum;
-    private String formOrdSecTitle;
-
-    private String formOrdSubSecNum;
-    private String formOrdSubSecTitle;
-    private String formOrdTechnicalText;
-
-    private String formOrdHumanFriendlyText;
-    private boolean formIsActive;
-
-    private String formResourceURL;
-
-    private int formGuideEntryID;
-
-    private CodeElement newElement;
-
-    public CodeElement getNewElement() {
-        return newElement;
+    
+   /**
+    * Initializes the bean
+    */
+    @PostConstruct
+    public void initBean() {
+        CodeCoordinator cc = getCodeCoordinator();
+        try {
+            codeSourceList = cc.getCodeSourceList();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+        if(getSessionBean().getSessCodeSource() != null){
+            currentCodeSource = getSessionBean().getSessCodeSource();
+            populateElementListByCurrentCodeSource();
+        }
+        
     }
+    
+    
+    // *************************************************************
+    // *********************CODE SOURCES****************************
+    // *************************************************************
+    
+    
+    /**
+     * Listener for user requests to view code elements by selecting a source
+     * @param source 
+     */
+    public void onCodeSourceViewButtonChange(CodeSource source){
+        currentCodeSource = source;
+        getSessionBean().setSessCodeSource(source);
+        populateElementListByCurrentCodeSource();
+    }
+    
+    
+    /**
+     * Listener for user requests to start a source udpate operation
+     * @param source 
+     */
+    public void onCodeSourceUpdateInitButtonChange(CodeSource source){
+        currentCodeSource = source;
+        
+        
+    }
+    
+    /**
+     * Listener for user requests to finalize a source update operation
+     * @return 
+     */
+    public String onCodeSourceUpdateCommitButtonChange(){
+        CodeCoordinator cc = getCodeCoordinator();
+        try {
+            cc.updateCodeSource(currentCodeSource);
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Updated code source: " + currentCodeSource.getSourceName(),""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Unable to update code source; This is fatal error.",""));
+            return "";
+        }
+        
+        return FACESPAGE_NAV_CODEELEMENTMANAGE;
+        
+        
+    }
+    
+    /**
+     * Listener for user requests to initiate a source remove operation
+     * @param source 
+     */
+    public void onCodeSourceNukeInitButtonChange(CodeSource source){
+        currentCodeSource = source;
+    }
+    
+    
+    /**
+     * Listener for user requests to finalize a source removal operation
+     * @return 
+     */
+    public String onCodeSourceNukeCommitButtonChange(){
+        
+        CodeCoordinator cc = getCodeCoordinator();
+        try {
+            cc.deactivateCodeSource(currentCodeSource);
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Poof! Code source " + currentCodeSource.getSourceName() + " has been Nuked!"
+                                + "",""));
+            
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Unable to nuke code source, "
+                                + "probably because it is pointed to by one or more code elements.",""));
+            return "";
+                        
 
-    public void setNewElement(CodeElement newElement) {
-        this.newElement = newElement;
+        }
+        return FACESPAGE_NAV_CODEELEMENTMANAGE;
+        
+    }
+    
+    /**
+     * Listener for user requests to start the source creation operation
+     */
+    public void onCodeSourceAddInitButtonChange(){
+        CodeCoordinator cc = getCodeCoordinator();
+        currentCodeSource = cc.getCodeSourceSkeleton();
+        
+    }
+    
+    /**
+     * Listener for user requests to finalize the source creation process
+     * @return 
+     */
+    public String onCodeSourceAddCommitButtonChange(){
+        CodeCoordinator cc = getCodeCoordinator();
+        try {
+            cc.addNewCodeSource(currentCodeSource);
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Succcessfully added new code source!",""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Unable to nuke code source, "
+                                + "probably because it is pointed to by one or more code elements.",""));
+            return "";
+            
+        }
+        return FACESPAGE_NAV_CODEELEMENTMANAGE;
+        
+    }
+    
+    
+    
+    
+    
+    
+    // *************************************************************
+    // **************CODE ELEMENTS (ORDINANCES)*********************
+    // *************************************************************
+   
+    
+    /**
+     * Utility container for population logic
+     */
+    private void populateElementListByCurrentCodeSource(){
+        
+        CodeCoordinator cc = getCodeCoordinator();
+        if(currentCodeSource == null) return;
+        try {
+            codeElementList = cc.getCodeElemements(currentCodeSource);
+            if(codeElementList != null && !codeElementList.isEmpty()){
+                System.out.println("Loaded code element list of size: " + codeElementList.size());
+            }
+            System.out.println("");
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Viewing ordinances in " + getCurrentCodeSource().getSourceName(),""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to load ordiance list",""));
+            
+        }
+        
     }
 
     public String commitUpdatesToCodeElement() {
-        CodeIntegrator integrator = getCodeIntegrator();
-
+        CodeCoordinator cc = getCodeCoordinator();
         // elemet ID is already in our currentElementObject
-        currentElement.setOrdchapterNo(formOrdChapterNo);
-
-        currentElement.setOrdchapterTitle(formOrdChapterTitle);
-        currentElement.setOrdSecNum(formOrdSecNum);
-        currentElement.setOrdSecTitle(formOrdSecTitle);
-
-        currentElement.setOrdSubSecNum(formOrdSubSecNum);
-        currentElement.setOrdSubSecTitle(formOrdSubSecTitle);
-        currentElement.setOrdTechnicalText(formOrdTechnicalText);
-
-        currentElement.setOrdHumanFriendlyText(formOrdHumanFriendlyText);
-        currentElement.setIsActive(formIsActive);
-
-        currentElement.setResourceURL(formResourceURL);
-        currentElement.setGuideEntryID(formGuideEntryID);
 
         try {
-            integrator.updateCodeElement(currentElement);
+            cc.updateCodeElement(currentElement, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Code element updated!", ""));
@@ -101,246 +250,141 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to update code element; most sincere apologies!",
                             "This must be corrected by the System Administrator"));
+            return "";
 
         }
 
-        return "codeElementList";
+        return FACESPAGE_NAV_CODEELEMENTMANAGE;
     }
 
-    public void deleteCodeElement(ActionEvent event) {
-
+    
+    /**
+     * Listener for user requests to remove a code element
+     * @param ele
+     
+     */
+    public void onElementNukeInitButtonChange(CodeElement ele){
+       currentElement = ele;
+        
     }
-
-    public String insertCodeElement() {
-
-        CodeIntegrator codeIntegrator = getCodeIntegrator();
-        CodeElement newCE = new CodeElement();
-
-        newCE.setSource(activeCodeSource);
-
-        newCE.setOrdchapterNo(formOrdChapterNo);
-
-        newCE.setOrdchapterTitle(formOrdChapterTitle);
-        newCE.setOrdSecNum(formOrdSecNum);
-        newCE.setOrdSecTitle(formOrdSecTitle);
-
-        newCE.setOrdSubSecNum(formOrdSecNum);
-        newCE.setOrdSubSecTitle(formOrdSubSecTitle);
-        newCE.setOrdTechnicalText(formOrdTechnicalText);
-
-        newCE.setOrdHumanFriendlyText(formOrdHumanFriendlyText);
-        newCE.setIsActive(formIsActive);
-
-        newCE.setResourceURL(formResourceURL);
-
+    
+    public String onElementNukeButtonChange() {
+     
+        CodeCoordinator cc = getCodeCoordinator();
         try {
-            codeIntegrator.insertCodeElement(newCE);
+            cc.deactivateCodeElement(currentElement, getSessionBean().getSessUser());
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Deactivated code element " + currentElement.getElementID(),
+                            ""));
         } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to add code elment to code source",
+                            "Unable to deactivate element!",
+                            "This is probably because it has been included in a code book"));
+        }
+        return FACESPAGE_NAV_CODEELEMENTMANAGE;
+    }
+    
+    
+    
+    public void onElementAddInitButtonChange(ActionEvent ev){
+        if(currentCodeSource != null){
+            
+            CodeCoordinator cc = getCodeCoordinator();
+            currentElement = cc.getCodeElementSkeleton();
+            System.out.println("CodeElementBB.onElementUpdateInitButtonChange:  Updating " + currentElement.getElementID() );
+        } 
+        
+    }
+    
+    public void onElementUpdateInitButtonChange(CodeElement ele){
+        System.out.println("CodeElementBB.onElementUpdateInitButtonChange:  Updating " + ele.getElementID() );
+        currentElement = ele;
+        System.out.println("test breakpoint");
+    }
+    
+    
+    
+    public String onElementUpdateCommitButtonChange(){
+         CodeCoordinator cc = getCodeCoordinator();
+        try {
+            cc.updateCodeElement(currentElement, getSessionBean().getSessUser());
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Updated code element " + currentElement.getElementID(),
+                            ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to update code element; most sincere apologies!",
                             "This must be corrected by the System Administrator"));
         }
-
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Successfully added code element to code source", ""));
-
-        return "codeSourceManage";
+        return FACESPAGE_NAV_CODEELEMENTMANAGE;
     }
+    
+    
+    public String onElementAddCommitButtonChange() {
+        CodeCoordinator cc = getCodeCoordinator();
+        
+        
+        currentElement.setSource(currentCodeSource);
 
-    /**
-     * @return the formOrdChapterNo
-     */
-    public int getFormOrdChapterNo() {
-        if (currentElement != null) {
-            formOrdChapterNo = currentElement.getOrdchapterNo();
+        try {
+            cc.addCodeElement(currentElement, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Added new code element",""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to add new element", ""));
         }
-        return formOrdChapterNo;
+
+        return FACESPAGE_NAV_CODEELEMENTMANAGE;
     }
+    
+    
+
+    
+    // *************************************************************
+    // *************************** NOTES ***************************
+    // *************************************************************
+   
+    
+    
+    public void onNoteInitButtonChange(ActionEvent ev){
+        formNoteText = "";
+        
+    }
+    
+    public void onNoteCommitButtonChange(ActionEvent ev){
+        
+    }
+    
+
+ 
+    
+    // *************************************************************
+    // ******************* GETTERS AND SETTERS *********************
+    // *************************************************************
+   
 
     /**
-     * @param formOrdChapterNo the formOrdChapterNo to set
+     * @param currentCodeSource the currentCodeSource to set
      */
-    public void setFormOrdChapterNo(int formOrdChapterNo) {
-        this.formOrdChapterNo = formOrdChapterNo;
-    }
-
-    /**
-     * @return the formOrdChapterTitle
-     */
-    public String getFormOrdChapterTitle() {
-        if (currentElement != null) {
-            formOrdChapterTitle = currentElement.getOrdchapterTitle();
-        }
-        return formOrdChapterTitle;
-    }
-
-    /**
-     * @param formOrdChapterTitle the formOrdChapterTitle to set
-     */
-    public void setFormOrdChapterTitle(String formOrdChapterTitle) {
-        this.formOrdChapterTitle = formOrdChapterTitle;
-    }
-
-    /**
-     * @return the formOrdSecNum
-     */
-    public String getFormOrdSecNum() {
-        if (currentElement != null) {
-            formOrdSecNum = currentElement.getOrdSecNum();
-        }
-        return formOrdSecNum;
-    }
-
-    /**
-     * @param formOrdSecNum the formOrdSecNum to set
-     */
-    public void setFormOrdSecNum(String formOrdSecNum) {
-        this.formOrdSecNum = formOrdSecNum;
-    }
-
-    /**
-     * @return the formOrdSecTitle
-     */
-    public String getFormOrdSecTitle() {
-        if (currentElement != null) {
-            formOrdSecTitle = currentElement.getOrdSecTitle();
-        }
-        return formOrdSecTitle;
-    }
-
-    /**
-     * @param formOrdSecTitle the formOrdSecTitle to set
-     */
-    public void setFormOrdSecTitle(String formOrdSecTitle) {
-        this.formOrdSecTitle = formOrdSecTitle;
-    }
-
-    /**
-     * @return the formOrdSubSecNum
-     */
-    public String getFormOrdSubSecNum() {
-        if (currentElement != null) {
-            formOrdSubSecNum = currentElement.getOrdSubSecNum();
-        }
-        return formOrdSubSecNum;
-    }
-
-    /**
-     * @param formOrdSubSecNum the formOrdSubSecNum to set
-     */
-    public void setFormOrdSubSecNum(String formOrdSubSecNum) {
-        this.formOrdSubSecNum = formOrdSubSecNum;
-    }
-
-    /**
-     * @return the formOrdSubSecTitle
-     */
-    public String getFormOrdSubSecTitle() {
-        if (currentElement != null) {
-            formOrdSubSecTitle = currentElement.getOrdSubSecTitle();
-        }
-        return formOrdSubSecTitle;
-    }
-
-    /**
-     * @param formOrdSubSecTitle the formOrdSubSecTitle to set
-     */
-    public void setFormOrdSubSecTitle(String formOrdSubSecTitle) {
-        this.formOrdSubSecTitle = formOrdSubSecTitle;
-    }
-
-    /**
-     * @return the formOrdTechnicalText
-     */
-    public String getFormOrdTechnicalText() {
-        if (currentElement != null) {
-            formOrdTechnicalText = currentElement.getOrdTechnicalText();
-        }
-        return formOrdTechnicalText;
-    }
-
-    /**
-     * @param formOrdTechnicalText the formOrdTechnicalText to set
-     */
-    public void setFormOrdTechnicalText(String formOrdTechnicalText) {
-        this.formOrdTechnicalText = formOrdTechnicalText;
-    }
-
-    /**
-     * @return the formOrdHumanFriendlyText
-     */
-    public String getFormOrdHumanFriendlyText() {
-        if (currentElement != null) {
-            formOrdHumanFriendlyText = currentElement.getOrdHumanFriendlyText();
-        }
-        return formOrdHumanFriendlyText;
-    }
-
-    /**
-     * @param formOrdHumanFriendlyText the formOrdHumanFriendlyText to set
-     */
-    public void setFormOrdHumanFriendlyText(String formOrdHumanFriendlyText) {
-        this.formOrdHumanFriendlyText = formOrdHumanFriendlyText;
-    }
-
-    /**
-     * @return the formIsActive
-     */
-    public boolean isFormIsActive() {
-        if (currentElement != null) {
-            formIsActive = currentElement.isIsActive();
-        } else {
-            formIsActive = true;
-        }
-        return formIsActive;
-    }
-
-    /**
-     * @param formIsActive the formIsActive to set
-     */
-    public void setFormIsActive(boolean formIsActive) {
-        this.formIsActive = formIsActive;
-    }
-
-    /**
-     * @return the formResourceURL
-     */
-    public String getFormResourceURL() {
-        if (currentElement != null) {
-            formResourceURL = currentElement.getResourceURL();
-        }
-        return formResourceURL;
-    }
-
-    /**
-     * @param formResourceURL the formResourceURL to set
-     */
-    public void setFormResourceURL(String formResourceURL) {
-        this.formResourceURL = formResourceURL;
-    }
-
-    /**
-     * @return the activeCodeSource
-     */
-    public CodeSource getActiveCodeSource() {
-        activeCodeSource = getSessionBean().getSessCodeSource();
-        return activeCodeSource;
-    }
-
-    /**
-     * @param activeCodeSource the activeCodeSource to set
-     */
-    public void setActiveCodeSource(CodeSource activeCodeSource) {
-        this.activeCodeSource = activeCodeSource;
+    public void setCurrentCodeSource(CodeSource currentCodeSource) {
+        this.currentCodeSource = currentCodeSource;
     }
 
     /**
      * @return the currentElement
      */
     public CodeElement getCurrentElement() {
-        currentElement = getSessionBean().getActiveCodeElement();
+        
         return currentElement;
     }
 
@@ -351,51 +395,68 @@ public class CodeElementBB extends BackingBeanUtils implements Serializable{
         this.currentElement = currentElement;
     }
 
+   
+
     /**
-     * @return the formGuideEntryID
+     * @return the codeSourceList
      */
-    public int getFormGuideEntryID() {
-        //xiaohong add
-        if (currentElement != null) {
-            formGuideEntryID = currentElement.getGuideEntryID();
-        }
-        return formGuideEntryID;
+    public List<CodeSource> getCodeSourceList() {
+        return codeSourceList;
     }
 
     /**
-     * @param formGuideEntryID the formGuideEntryID to set
+     * @param codeSourceList the codeSourceList to set
      */
-    public void setFormGuideEntryID(int formGuideEntryID) {
-        this.formGuideEntryID = formGuideEntryID;
+    public void setCodeSourceList(List<CodeSource> codeSourceList) {
+        this.codeSourceList = codeSourceList;
     }
 
-    //xiaohong add
-    public void onAddElementToSourceButtonChange() {
-        //xiaohogn add
-        activeCodeSource = getSessionBean().getSessCodeSource();
-        newElement.setSource(activeCodeSource);
-
-        CodeIntegrator codeIntegrator = getCodeIntegrator();
-        try {
-            codeIntegrator.insertCodeElement(newElement);
-            
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Successfully added code element to code source", ""));
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to add code elment to code source",
-                            "This must be corrected by the System Administrator"));
-        }
-        
-        newElement = new CodeElement();
-        
+    /**
+     * @return the currentCodeSource
+     */
+    public CodeSource getCurrentCodeSource() {
+        return currentCodeSource;
     }
 
-    @PostConstruct
-    public void initBean() {
-        newElement = new CodeElement();
+    /**
+     * @return the codeElementList
+     */
+    public List<CodeElement> getCodeElementList() {
+        return codeElementList;
     }
-    
+
+    /**
+     * @param codeElementList the codeElementList to set
+     */
+    public void setCodeElementList(List<CodeElement> codeElementList) {
+        this.codeElementList = codeElementList;
+    }
+
+    /**
+     * @return the formNoteText
+     */
+    public String getFormNoteText() {
+        return formNoteText;
+    }
+
+    /**
+     * @param formNoteText the formNoteText to set
+     */
+    public void setFormNoteText(String formNoteText) {
+        this.formNoteText = formNoteText;
+    }
+
+    /**
+     * @return the codeElementListFiltered
+     */
+    public List<CodeElement> getCodeElementListFiltered() {
+        return codeElementListFiltered;
+    }
+
+    /**
+     * @param codeElementListFiltered the codeElementListFiltered to set
+     */
+    public void setCodeElementListFiltered(List<CodeElement> codeElementListFiltered) {
+        this.codeElementListFiltered = codeElementListFiltered;
+    }
 }

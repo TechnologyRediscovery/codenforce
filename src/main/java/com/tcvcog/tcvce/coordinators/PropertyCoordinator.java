@@ -95,14 +95,14 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             qcse = sc.initQuery(QueryCECaseEnum.PROPINFOCASES, ua.getKeyCard());
             qcse.getPrimaryParams().setProperty_val(prop);
             pdh.setPropInfoCaseList(cc.cecase_assembleCECaseDataHeavyList(sc.runQuery(qcse).getBOBResultList(), ua));
-            
+
             // check list and see if it's emtpy; 
             if (pdh.getPropInfoCaseList() == null) {
                 pdh.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
             }
 
             if (pdh.getPropInfoCaseList().isEmpty()) {
-                createPropertyInfoCase(pdh, ua);
+                pdh.getPropInfoCaseList().add(createPropertyInfoCase(pdh, ua));
             }
 
             // UnitDataHeavy list
@@ -317,23 +317,24 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         }
 
     }
-    
+
     /**
-     * Logic pass through for removals of property and person connections 
-     * and I create a note documenting the removal and post to property
+     * Logic pass through for removals of property and person connections and I
+     * create a note documenting the removal and post to property
+     *
      * @param p
      * @param pers
-     * @param ua the user requesting the link removal for note 
+     * @param ua the user requesting the link removal for note
      * @throws IntegrationException
-     * @throws BObStatusException 
+     * @throws BObStatusException
      */
-    public void connectRemovePersonToProperty(Property p, Person pers, UserAuthorized ua) throws IntegrationException, BObStatusException{
+    public void connectRemovePersonToProperty(Property p, Person pers, UserAuthorized ua) throws IntegrationException, BObStatusException {
         PersonCoordinator pc = getPersonCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
-        
+
         pc.connectRemovePersonToProperty(pers, p);
-        
+
         // build person link removal note
         MessageBuilderParams mbp = new MessageBuilderParams();
         mbp.setUser(ua);
@@ -358,10 +359,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         p.setNotes(sc.appendNoteBlock(mbp));
         // commit person link removal note
         pi.updateProperty(p);
-        
-        
+
     }
-    
 
     public LocalDateTime configureDateTime(Date date) {
         return new java.sql.Timestamp(date.getTime()).toLocalDateTime();
@@ -386,14 +385,20 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * Logic container for choosing a property info case
      *
      * @param pdh
+     * @param ua
      * @return
+     * @throws com.tcvcog.tcvce.domain.SearchException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public CECase determineGoverningPropertyInfoCase(PropertyDataHeavy pdh) {
+    public CECase determineGoverningPropertyInfoCase(PropertyDataHeavy pdh, UserAuthorized ua) throws SearchException, IntegrationException {
         CECaseDataHeavy chosenCECase = null;
         List<CECaseDataHeavy> cseList = pdh.getPropInfoCaseList();
         if (cseList != null && !cseList.isEmpty()) {
             Collections.sort(cseList);
             chosenCECase = cseList.get(0);
+        } else {
+            //There's no existing info case, let's make one.
+            chosenCECase = createPropertyInfoCase(pdh, ua);
         }
         return chosenCECase;
     }
@@ -406,25 +411,32 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param ua
      * @return
      * @throws com.tcvcog.tcvce.domain.SearchException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public PropertyDataHeavy createPropertyInfoCase(PropertyDataHeavy p, UserAuthorized ua) throws SearchException {
+    public CECaseDataHeavy createPropertyInfoCase(PropertyDataHeavy p, UserAuthorized ua) throws SearchException, IntegrationException {
         CaseCoordinator cc = getCaseCoordinator();
         UserCoordinator uc = getUserCoordinator();
-        CECase cse = cc.cecase_initCECase(p, ua);
-        //review all case mems and set app ones for info case
+        CECase cse = null;
+        CECaseDataHeavy csehv = null;
+        if (p != null && ua != null) {
+            cse = cc.cecase_initCECase(p, ua);
+            //review all case mems and set app ones for info case
+            if (cse != null) {
+                try {
+                    cse.setCaseManager(uc.user_getUser(ua.getMyCredential().getGoverningAuthPeriod().getUserID()));
+                    cse.setPropertyInfoCase(true);
+                    cse.setNotes("This is a Case object that contains information and events attached to " + p.getAddress() + ". "
+                            + "This case does not represent an actual code enforcement case.");
+                    cse.setCaseID(cc.cecase_insertNewCECase(cse, ua, null));
+                    csehv = cc.cecase_assembleCECaseDataHeavy(cse, ua);
 
-//        try {
-//            cse.setCaseManager(uc.getUser(ua.getMyCredential().getGoverningAuthPeriod().getUserID()));
-// TODO: Debug later
-//            cc.cecase_insertNewCECase(cse, ua, null);
-//        } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
-//            System.out.println(ex);
-//        }
-        if (p.getPropInfoCaseList() == null) {
-            p.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
+                } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
+                    System.out.println(ex);
+                }
+            }
         }
 
-        return p;
+        return csehv;
     }
 
     /**
@@ -772,11 +784,10 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                 } else {
                     skeleton.setOtherKnownAddress("Updated");
                 }*/
-                
-                if(uc.getOtherKnownAddress() !=null){
+                if (uc.getOtherKnownAddress() != null) {
                     skeleton.setOtherKnownAddress(uc.getOtherKnownAddress());
                 }
-            
+
                 if (uc.getNotes() != null) {
                     skeleton.setNotes(uc.getNotes());
                 }
@@ -790,12 +801,11 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         }
 
         //Time to update the change order
-        
         uc.setActive(false);
         uc.setApprovedOn(Timestamp.valueOf(LocalDateTime.now()));
         uc.setApprovedBy(getSessionBean().getSessUser());
-        
+
         pi.updatePropertyUnitChange(uc);
-        
+
     }
 }

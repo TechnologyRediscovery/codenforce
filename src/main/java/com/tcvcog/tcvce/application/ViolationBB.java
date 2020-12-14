@@ -320,6 +320,9 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.toString(), ""));
         } 
+        getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                    "Stipulated compliance dates is now: " + getPrettyDate(currentViolation.getStipulatedComplianceDate()), ""));
         return "ceCaseViolations";
 
     }
@@ -380,7 +383,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             EventCnF e = null;
             try {
                 
-                cc.violation_recordCompliance(currentViolation, getSessionBean().getSessUser());
+//                cc.violation_recordCompliance(currentViolation, getSessionBean().getSessUser());
                    getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Compliance recorded", ""));
@@ -455,9 +458,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
                             "Fatal error appending note; apologies!", ""));
             return "";
         }
-
         return "ceCaseViolations";
-
     }
 
     /**
@@ -477,9 +478,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      * @param ev
      */
     public void handlePhotoUpload(FileUploadEvent ev) {
-        if (this.currentViolation == null) {
-            this.currentViolation = getSessionBean().getSessCodeViolation();
-        }
+        CaseCoordinator cc = getCaseCoordinator();
         if (ev == null) {
             System.out.println("ViolationAddBB.handlePhotoUpload | event: null");
             return;
@@ -557,6 +556,22 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         return "ceCaseViolations";
 
     }
+    
+    public String onViolationNullifyCommitButtonChange(){
+        CaseCoordinator cc = getCaseCoordinator();
+         try {
+            cc.violation_deactivateCodeViolation(currentViolation, getSessionBean().getSessUser());
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), null));
+            return "";
+
+        }
+        return "ceCaseViolations";
+        
+    }
 
     /**
      * Listener for user request to remove photo on violation
@@ -565,13 +580,40 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      * @return
      */
     public String onPhotoRemoveButtonChange(int photoid) {
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Cannot remove photo yet: unsupported operation", ""));
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            cc.violation_removeLinkBlobToCodeViolation(currentViolation, photoid);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Blob removed with ID " + photoid, ""));
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Cannot remove photo yet: unsupported operation", ""));
+            
+        } 
 
         // do something here
         return "ceCaseViolations";
 
+    }
+    
+    public void onPhotoUpdateDescription(Blob blob){
+        BlobCoordinator bc = getBlobCoordinator();
+        try {
+            bc.updateBlobDescription(blob);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully updated photo description", ""));
+            
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Cannot update photo description", ""));
+            
+        }
+        
     }
 
     public String photosConfirm() {

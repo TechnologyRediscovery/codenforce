@@ -1,0 +1,97 @@
+
+                                              <ui:remove>
+                                                  
+                                            <h2>Code violations</h2>
+
+                                            <p:dataScroller id="violations-ds"
+                                                            value="#{noticeOfViolationBB.currentNotice.violationList}"
+                                                            var="v">
+                                                <div class="violation">
+
+                                                    <h:panelGrid columns="2" rendered="true"
+                                                                 columnClasses="gridTd, gridTd"
+                                                                 headerClass="no-border"
+                                                                 footerClass="no-border">
+
+                                                        <h:panelGroup>
+
+                                                            <h:outputLabel styleClass="bold" value="Ordinance: "  />
+
+                                                            <br />
+
+                                                            <h:outputText    value="Ch. #{v.violatedEnfElement.ordchapterNo}:" />
+                                                            <h:outputText    value="#{v.violatedEnfElement.ordchapterTitle}" />
+
+                                                            <p:spacer height="2px" />
+
+                                                            <h:outputText    value="&#167;#{v.violatedEnfElement.ordSubSecNum} " />
+                                                            <h:outputText    value="#{v.violatedEnfElement.ordSubSecTitle}" />
+
+                                                            <p:spacer height="2px" />
+
+                                                            <h:outputLabel  value="#{v.violatedEnfElement.source.sourceName} 
+                                                                            (#{v.violatedEnfElement.source.sourceYear}) " />
+
+                                                            <p:spacer height="5px"/>
+
+                                                            <h:outputText styleClass="bold" value="Compliance due by: " />
+                                                            <br />
+                                                            <h:outputText   id="stipcompdate-ot" styleClass="compliance-date"
+                                                                            value="#{v.stipulatedComplianceDatePretty}"/>
+
+                                                            <p:spacer height="5px"/>
+
+                                                        </h:panelGroup>
+                                                        <h:panelGroup>
+                                                            <h:outputLabel styleClass="bold" value="Description of violation recorded on #{v.dateOfRecordPretty} 
+                                                                           by code officer #{v.createdBy.person.firstName} #{v.createdBy.person.lastName}:"/>
+
+                                                            <p:spacer height="2px"/>
+
+                                                            <h:outputText value="#{v.description}"/>
+
+                                                            <p:spacer height="2px" />
+
+                                                            <h:outputText style="bold" value="Number of photographs enclosed in attachments: " 
+                                                                          rendered="#{v.includeViolationPhotos}"/>
+                                                            <h:outputText value="#{empty v.photoIDList ? '0' : v.photoIDList.size()}"
+                                                                          rendered="#{v.includeViolationPhotos}"/>
+                                                        </h:panelGroup>
+
+                                                        <f:facet name="footer">
+                                                            <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTd" 
+                                                                            rendered="#{v.includeOrdinanceText}">
+                                                                <h:panelGroup>
+                                                                    <h:outputLabel styleClass="bold" value="Ordinance text: "/>
+                                                                    <div class="ord-text">
+                                                                        <h:outputText escape="false" value="#{v.violatedEnfElement.ordTechnicalText}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+
+                                                            </h:panelGrid>
+
+                                                            <h:panelGrid    id="violation-ord-humanfriendly-pg" columns="1" columnClasses="gridTd" 
+                                                                            rendered="#{v.includeHumanFriendlyText}">
+                                                                <h:panelGroup>
+                                                                    <h:outputLabel styleClass="bold" value="Ordinance text: "/>
+                                                                    <div class="ord-text">
+                                                                        <h:outputText   escape="false"
+                                                                                        value="#{v.violatedEnfElement.ordHumanFriendlyText}"/>
+                                                                    </div>
+                                                                </h:panelGroup>
+                                                            </h:panelGrid>
+                                                        </f:facet>
+                                                    </h:panelGrid>
+                                                    <p:commandButton   ajax="true" 
+                                                                       action="#{noticeOfViolationBB.removeViolationFromList(v)}"
+                                                                       value="remove violation from notice" 
+                                                                       update="form-messages-global
+                                                                       violations-ds"
+                                                                       icon="fa fa-stop" 
+                                                                       styleClass="noFill"/>
+                                                    <hr />
+                                                </div>
+                                            </p:dataScroller>
+                                                                                          </ui:remove>
+
+

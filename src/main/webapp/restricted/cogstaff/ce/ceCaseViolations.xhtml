@@ -117,10 +117,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <f:facet name="header">
                                                         <h:outputText value="Ordinance" />
                                                     </f:facet>
-                                                    <h:outputText value="#{violation.violatedEnfElement.codeElement.ordSubSecNum}: #{violation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                    <h:outputText value="#{violation.violatedEnfElement.ordSubSecNum}: #{violation.violatedEnfElement.ordSubSecTitle}"/>
                                                     <p:spacer height="3px" />
-                                                    <h:outputText value="#{violation.violatedEnfElement.codeElement.source.sourceName}"/>
-                                                    <h:outputText value=" (#{violation.violatedEnfElement.codeElement.source.sourceYear})"/>
+                                                    <h:outputText value="#{violation.violatedEnfElement.source.sourceName}"/>
+                                                    <h:outputText value=" (#{violation.violatedEnfElement.source.sourceYear})"/>
                                                 </p:column>
 
 
@@ -131,7 +131,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <h:outputText value="Status" />
                                                     </f:facet>
 
-                                                    <h:outputText value="#{!(empty violation.status) ? violation.status.label : ''}" />
+                                                    <h:outputText value="#{(!(empty violation.status)) and (empty violation.nullifiedTS) ? violation.status.label : ''}" />
+                                                    <h:outputText value="#{(!(empty violation.nullifiedTS)) ? 'NULLIFIED': ''}" />
                                                 </p:column>
 
 
@@ -197,7 +198,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <div class="ui-g data_container_nested_restrict">
 
                                                 <!--NESTED DATA FIELD VERTICAL-->
-                                                <div class="ui-g-3 ui-md-3 ui-lg-3 restrict-data-field-vertical">
+                                                <div class="ui-g-2 ui-md-2 ui-lg-2 restrict-data-field-vertical">
                                                     <!--NESTED DATA LABEL VERTICAL -->
                                                     <div class="restrict-data-field-label-vertical" >
                                                         <h:outputLabel value=" "/>
@@ -214,7 +215,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
 
                                                 <!--NESTED DATA FIELD VERTICAL-->
-                                                <div class="ui-g-3 ui-md-3 ui-lg-3 restrict-data-field-vertical">
+                                                <div class="ui-g-2 ui-md-2 ui-lg-2 restrict-data-field-vertical">
                                                     <!--NESTED DATA LABEL VERTICAL -->
                                                     <div class="restrict-data-field-label-vertical" >
                                                         <h:outputLabel value="Violation date of record"/>
@@ -239,7 +240,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
 
                                                 <!--NESTED DATA FIELD VERTICAL-->
-                                                <div class="ui-g-3 ui-md-3 ui-lg-3 restrict-data-field-vertical">
+                                                <div class="ui-g-2 ui-md-2 ui-lg-2 restrict-data-field-vertical">
                                                     <!--NESTED DATA LABEL VERTICAL -->
                                                     <div class="restrict-data-field-label-vertical" >
                                                         <h:outputLabel value="Stipulated compliance"/>
@@ -257,7 +258,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
 
                                                 <!--NESTED DATA FIELD VERTICAL-->
-                                                <div class="ui-g-3 ui-md-3 ui-lg-3 restrict-data-field-vertical">
+                                                <div class="ui-g-2 ui-md-2 ui-lg-2 restrict-data-field-vertical">
                                                     <!--NESTED DATA LABEL VERTICAL -->
                                                     <div class="restrict-data-field-label-vertical" >
                                                         <h:outputLabel      for="violation-compdate-ot"
@@ -284,6 +285,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                         value="#{!(empty violationBB.currentViolation.complianceNote) ? 'Note: ' : ''}"/>
                                                         <h:outputText   id="violation-comp-notes-ot1"
                                                                         value="#{violationBB.currentViolation.complianceNote}"/>
+                                                    </div>
+                                                </div>
+                                                <!--NESTED DATA FIELD VERTICAL-->
+                                                <div class="ui-g-2 ui-md-2 ui-lg-2 restrict-data-field-vertical">
+                                                    <!--NESTED DATA LABEL VERTICAL -->
+                                                    <div class="restrict-data-field-label-vertical" >
+                                                        <h:outputLabel      for="nullified-ts-ot"
+                                                                            value="Nullified"/>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText   id="nullified-ts-ot"
+                                                                        value="#{violationBB.getPrettyDate(violationBB.currentViolation.nullifiedTS)}"/>
+
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText   id="violation-nullifiedby-ot0"
+                                                                        value="#{!(empty violationBB.currentViolation.nullifiedUser) ? 'Nullified by user ' : ''}"/>
+                                                        <h:outputText   id="violation-nullifiedby-ot1"
+                                                                        value="#{!(empty violationBB.currentViolation.nullifiedUser) ? violationBB.currentViolation.nullifiedUser.person.firstName : ''}"/>
+                                                        <h:outputText   id="violation-nullifiedby-ot2"
+                                                                        value=" "/>
+                                                        <h:outputText   id="violation-nullifiedby-ot3"
+                                                                        value="#{!(empty violationBB.currentViolation.nullifiedUser) ? violationBB.currentViolation.nullifiedUser.person.lastName : ''}"/>
+                                                        
                                                     </div>
                                                 </div>
                                             </div>
@@ -379,38 +406,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
                                                     <div class="restrict-data-field-label-inline" >
-                                                        <h:outputLabel value="Ordinance ID: #{violationBB.currentViolation.violatedEnfElement.codeElement.elementID} Details"/>
+                                                        <h:outputLabel value="Ordinance ID: #{violationBB.currentViolation.violatedEnfElement.elementID} Details"/>
                                                     </div>
                                                     <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
                                                         <h:outputText    id="violation-add-source-ot"
-                                                                         value="Source: #{violationBB.currentViolation.violatedEnfElement.codeElement.source.sourceName} (#{violationBB.currentViolation.violatedEnfElement.codeElement.source.sourceYear})"/>
+                                                                         value="Source: #{violationBB.currentViolation.violatedEnfElement.source.sourceName} (#{violationBB.currentViolation.violatedEnfElement.source.sourceYear})"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-add-chapter-ot"
-                                                                         value="Chapter #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterNo}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterTitle}"/>
+                                                                         value="Chapter #{violationBB.currentViolation.violatedEnfElement.ordchapterNo}: #{violationBB.currentViolation.violatedEnfElement.ordchapterTitle}"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-add-section-ot"
-                                                                         value="Section #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecTitle}"/>
+                                                                         value="Section #{violationBB.currentViolation.violatedEnfElement.ordSecNum}: #{violationBB.currentViolation.violatedEnfElement.ordSecTitle}"/>
 
                                                         <h:outputText value=" | " />
 
                                                         <h:outputText    id="violation-add-subsection-ot"
-                                                                         value="Sub-Sec #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                                         value="Sub-Sec #{violationBB.currentViolation.violatedEnfElement.ordSubSecNum}: #{violationBB.currentViolation.violatedEnfElement.ordSubSecTitle}"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-add-category-ot"
-                                                                         value="Category: #{!(empty violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry.category :'' }"/>
+                                                                         value="Category: #{!(empty violationBB.currentViolation.violatedEnfElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.guideEntry.category :'' }"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText   id="violation-add-ord-text"
                                                                         styleClass="monospace"
-                                                                        value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordTechnicalText}"
+                                                                        value="#{violationBB.currentViolation.violatedEnfElement.ordTechnicalText}"
                                                                         escape="false" />
                                                     </div>
 
@@ -436,7 +463,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                     <div class="restrict-data-field-value-inline" >
 
                                                                         <h:outputText   id="violation-ord-text-hf"
-                                                                                        value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordHumanFriendlyText}"
+                                                                                        value="#{violationBB.currentViolation.violatedEnfElement.ordHumanFriendlyText}"
                                                                                         styleClass="data_field_value"
                                                                                         escape="false" />
                                                                     </div>
@@ -454,7 +481,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                                         <h:outputText    id="violation-enfguidelines-ot"
                                                                                          styleClass="data_field_value"
-                                                                                         value="#{!(empty violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry.enforcementGuidelines :'' }"/>
+                                                                                         value="#{!(empty violationBB.currentViolation.violatedEnfElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.guideEntry.enforcementGuidelines :'' }"/>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -503,28 +530,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-add-chapter-ot"
-                                                                         value="Chapter #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterNo}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterTitle}"/>
+                                                                         value="Chapter #{violationBB.currentViolation.violatedEnfElement.ordchapterNo}: #{violationBB.currentViolation.violatedEnfElement.ordchapterTitle}"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-add-section-ot"
-                                                                         value="Section #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecTitle}"/>
+                                                                         value="Section #{violationBB.currentViolation.violatedEnfElement.ordSecNum}: #{violationBB.currentViolation.violatedEnfElement.ordSecTitle}"/>
 
                                                         <h:outputText value=" | " />
 
                                                         <h:outputText    id="violation-add-subsection-ot"
-                                                                         value="Sub-Sec #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                                         value="Sub-Sec #{violationBB.currentViolation.violatedEnfElement.ordSubSecNum}: #{violationBB.currentViolation.violatedEnfElement.ordSubSecTitle}"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-add-category-ot"
-                                                                         value="Category: #{!(empty violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry.category :'' }"/>
+                                                                         value="Category: #{!(empty violationBB.currentViolation.violatedEnfElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.guideEntry.category :'' }"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText   id="violation-add-ord-text"
                                                                         styleClass="monospace"
-                                                                        value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordTechnicalText}"
+                                                                        value="#{violationBB.currentViolation.violatedEnfElement.ordTechnicalText}"
                                                                         escape="false" />
                                                     </div>
                                                 </div>
@@ -681,12 +708,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:panel id="violation-update-stipdate-panel"
                                              toggleable="true"
                                              collapsed="false"
-                                             header="Extend stipulated compliance date for Violation ID: #{violationBB.currentViolation.violationID}"
-                                             rendered="#{violationBB.activeUpdateMode and (empty violationBB.currentViolation.stipulatedComplianceDate) and violationBB.currentViolation.allowStipCompDateUpdate }"
+                                             header="Chnage stipulated compliance date for Violation ID: #{violationBB.currentViolation.violationID}"
+                                             rendered="#{violationBB.activeUpdateMode}"
                                              >
 
 
                                         <h:form id="violation-update-stipdate-form">
+                                            <h4>Current Compliance date</h4>
+                                            <p>
+                                                <h:outputText value="#{violationBB.getPrettyDate(violationBB.currentViolation.stipulatedComplianceDate)} "/>
+                                            </p>
 
                                             <div class="ui-g data_container_nested_restrict">
 
@@ -702,7 +733,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
                                                     <div class="restrict-main-contents-io-content" >
 
-                                                        <p:selectBooleanButton id="prop-pers-personlink-chooselinkmethod-sbb"
+                                                        <p:selectBooleanButton id="violation-update-stipdate-sbb"
                                                                                onLabel="Pick a date" 
                                                                                offLabel="Enter a number of days from today"
                                                                                styleClass="selectButton" 
@@ -727,7 +758,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                                         <p:calendar id="update-stipdate-cal"
-                                                                    value="#{violationBB.currentViolation.stipulatedComplianceDateUtilDate}" 
+                                                                    value="#{violationBB.extendedStipCompDate}" 
                                                                     disabled="#{!violationBB.extendStipCompUsingDate}"
                                                                     mode="popup"  
                                                                     showOn="button" 
@@ -771,10 +802,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             </div>
 
                                             <p:commandButton 
+                                                id="update-stipdate-sbb"
                                                 icon="fa fa-trash"
                                                 ajax="false"
                                                 action="#{violationBB.onViolationExtendStipCompDateCommitButtonChange}"
-                                                value="Extend Stipulated Complaince Date"
+                                                value="Change Stipulated Complaince Date"
+                                                disabled="#{!(empty violationBB.currentViolation.actualComplianceDate)}"
+                                                update="form-messages-growl"
                                                 />
 
                                         </h:form>
@@ -894,28 +928,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-update-chapter-ot"
-                                                                         value="Chapter #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterNo}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordchapterTitle}"/>
+                                                                         value="Chapter #{violationBB.currentViolation.violatedEnfElement.ordchapterNo}: #{violationBB.currentViolation.violatedEnfElement.ordchapterTitle}"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-update-section-ot"
-                                                                         value="Section #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSecTitle}"/>
+                                                                         value="Section #{violationBB.currentViolation.violatedEnfElement.ordSecNum}: #{violationBB.currentViolation.violatedEnfElement.ordSecTitle}"/>
 
                                                         <h:outputText value=" | " />
 
                                                         <h:outputText    id="violation-update-subsection-ot"
-                                                                         value="Sub-Sec #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecNum}: #{violationBB.currentViolation.violatedEnfElement.codeElement.ordSubSecTitle}"/>
+                                                                         value="Sub-Sec #{violationBB.currentViolation.violatedEnfElement.ordSubSecNum}: #{violationBB.currentViolation.violatedEnfElement.ordSubSecTitle}"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText    id="violation-update-category-ot"
-                                                                         value="Category: #{!(empty violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.codeElement.guideEntry.category :'' }"/>
+                                                                         value="Category: #{!(empty violationBB.currentViolation.violatedEnfElement.guideEntry) ? violationBB.currentViolation.violatedEnfElement.guideEntry.category :'' }"/>
 
                                                         <p:spacer height="2px" />
 
                                                         <h:outputText   id="violation-update-ord-text"
                                                                         styleClass="monospace"
-                                                                        value="#{violationBB.currentViolation.violatedEnfElement.codeElement.ordTechnicalText}"
+                                                                        value="#{violationBB.currentViolation.violatedEnfElement.ordTechnicalText}"
                                                                         escape="false" />
                                                     </div>
                                                 </div>
@@ -1003,7 +1037,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             <f:selectItems id="violation-severity-update-selitems"
                                                                            value="#{violationBB.severityList}"
                                                                            var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
-
                                                         </h:selectOneMenu>
 
                                                     </div>
@@ -1034,14 +1067,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                              >
 
                                         <h:form id="violationPhotosUploadForm" enctype="multipart/form-data">
-                                            <h2>Upload photos of this violation (3 max)</h2>
+                                            <h2>Photos of this violation (3 max)</h2>
+                                            <p>You must insert violation and re-enter this violation page, then select the violation and click "Update" mode to add photos.</p>
                                             <p:fileUpload fileUploadListener="#{violationBB.handlePhotoUpload}"
                                                           mode="advanced" 
-                                                          update=":violation-photos-form"
+                                                          update="violation-photos-form:photoTable"
                                                           multiple="true"
                                                           fileLimit="3"
-                                                          sizeLimit="900000000" 
-                                                          allowTypes="/(\.|\/)(jpe?g|png)$/"/>    
+                                                          sizeLimit="99999999999" 
+                                                          allowTypes="/(\.|\/)(jpe?g|png)$/"
+                                                          rendered="#{violationBB.activeUpdateMode}"/>    
                                         </h:form>
 
                                         <h:form id="violation-photos-form">
@@ -1051,17 +1086,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <p:dataTable
                                                 id="photoTable"
                                                 var="photo"
-                                                value="#{violationBB.currentViolation.photoList}"
-                                                rowKey="#{photo.photoID}"
+                                                value="#{violationBB.currentViolation.blobList}"
+                                                rowKey="#{photo.blobID}"
                                                 tableStyleClass="primeDataTable"
                                                 draggableRows="false" tabindex="6">
                                                 <p:column width="70%">
                                                     <f:facet name="header">
                                                         <h:outputText value="Photo"/>
                                                     </f:facet>
-                                                    <p:graphicImage width="100%" value="#{imageServices.image}">
-                                                        <f:param name="photoID" value="#{photo.photoID}"/>
+                                                    <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                                        <f:param name="blobID" value="#{photo.blobID}"/>
                                                     </p:graphicImage>
+                                                    
+                                                    <p:commandButton   id="photo-delete-button"
+                                                                       rendered="true"
+                                                                       value="Delete Photo"  
+                                                                       icon="fa fa-eraser"
+                                                                       ajax="true"
+                                                                       update="form-messages-global"
+                                                                       actionListener="#{violationBB.onPhotoRemoveButtonChange(photo.blobID)}"
+                                                                       />
+
                                                 </p:column>
                                                 <p:column>
                                                     <f:facet name="header">
@@ -1071,6 +1116,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                      style="width: 100%;" tabindex="5" required="true" styleClass="inputText">
                                                         <p:ajax />
                                                     </p:inputTextarea>
+                                                    <p:growl    id="photo-desc-growl"
+                                                                for="photo-updatedescr-button" />
+                                                    
+                                                    <p:commandButton   id="photo-updatedescr-button"
+                                                                       rendered="true"
+                                                                       value="Update Desc"  
+                                                                       icon="fa fa-edit"
+                                                                       ajax="true"
+                                                                       update="form-messages-global"
+                                                                       actionListener="#{violationBB.onPhotoUpdateDescription(photo)}"
+                                                                       />
+                                                    
                                                 </p:column>
 
                                             </p:dataTable>
@@ -1118,6 +1175,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </h:form>
 
                                     </p:panel>
+                                    
+                                       <p:panel id="violation-nullify-panel"
+                                             toggleable="true"
+                                             collapsed="false"
+                                             header="Nullify Code Violation"
+                                             rendered="#{violationBB.activeRemoveMode}"
+                                             >
+
+                                        <h:form id="violation-nullify-form">
+
+                                            <div class="ui-g data_container_nested_restrict">
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                                    <div class="restrict-data-field-label-inline" >
+
+                                                        <h:outputLabel  for="violation-nullify-button">
+                                                            <h:outputText value="Nullify a code violation that was once legitimate but is no longer relevant for case closure." />
+                                                        </h:outputLabel>
+                                                    </div>
+                                                </div>
+                                                <div class="restrict-main-contents-io-button red_button">
+
+
+                                                    <p:commandButton 
+                                                        id="violation-nullify-button"
+                                                        icon="fa fa-trash"
+                                                        ajax="false"
+                                                        action="#{violationBB.onViolationRemoveCommitButtonChange}"
+                                                        value="Remove Violation ID:#{violationBB.currentViolation.violationID}"
+                                                        />
+                                                </div>
+                                            </div>
+
+                                        </h:form>
+
+                                    </p:panel>
 
 
                                     <!--Remove Panel-->
@@ -1154,11 +1246,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                     <p:dialog   id="violation-choose-dialog"
-                                height="800" width="1000"
+                                height="800" width="1600"
                                 widgetVar="violation-choose-dialog-var"
                                 responsive="true"
                                 resizable="trie"
                                 closable="true"
+                                closeOnEscape="true"
                                 header="Choose Violation"
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                 > 
@@ -1188,72 +1281,73 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-                                <p:column width="10%" sortBy="#{cse.codeElement.source.sourceName}"
-                                          filterBy="#{cse.codeElement.source.sourceName}">
+                                <p:column width="10%" sortBy="#{cse.source.sourceName}"
+                                          filterBy="#{cse.source.sourceName}">
                                     <f:facet name="header">
                                         <h:outputText value="Source" />
                                     </f:facet>
-                                    <h:outputText value="#{cse.codeElement.source.sourceName}(#{cse.codeElement.source.sourceYear})"/>
+                                    <h:outputText value="#{cse.source.sourceName}(#{cse.source.sourceYear})"/>
                                 </p:column>
 
-                                <p:column width="5%" sortBy="#{cse.codeElement.ordchapterNo}">
+                                <p:column width="5%" 
+                                          sortBy="#{cse.ordchapterNo}">
                                     <f:facet name="header">
                                         <h:outputText value="Chap#"/>
                                     </f:facet>
-                                    <h:outputText value="#{cse.codeElement.ordchapterNo}"/>
+                                    <h:outputText value="#{cse.ordchapterNo}"/>
                                 </p:column>
 
-                                <p:column width="15%" sortBy="#{cse.codeElement.ordchapterTitle}"
-                                          filterBy="#{cse.codeElement.ordchapterTitle}">
+                                <p:column width="15%" sortBy="#{cse.ordchapterTitle}"
+                                          filterBy="#{cse.ordchapterTitle}">
                                     <f:facet name="header">
                                         <h:outputText value="Chapter"/>
                                     </f:facet>
-                                    <h:outputText value="#{cse.codeElement.ordchapterTitle}"/>
+                                    <h:outputText value="#{cse.ordchapterTitle}"/>
                                 </p:column>
 
-                                <p:column width="5%" sortBy="#{cse.codeElement.ordSecNum}">
+                                <p:column width="5%" sortBy="#{cse.ordSecNum}">
                                     <f:facet name="header">
                                         <h:outputText value="Sec#" />
                                     </f:facet>
-                                    <h:outputText value="#{cse.codeElement.ordSecNum}"/>
+                                    <h:outputText value="#{cse.ordSecNum}"/>
                                 </p:column>
 
-                                <p:column width="15%" sortBy="#{cse.codeElement.ordSecTitle}"
-                                          filterBy="#{cse.codeElement.ordSecTitle}">
+                                <p:column width="15%" sortBy="#{cse.ordSecTitle}"
+                                          filterBy="#{cse.ordSecTitle}">
                                     <f:facet name="header">
                                         <h:outputText value="Section" />
                                     </f:facet>
-                                    <h:outputText value="#{cse.codeElement.ordSecTitle}"/>
+                                    <h:outputText value="#{cse.ordSecTitle}"/>
                                 </p:column>
 
-                                <p:column width="5%" sortBy="#{cse.codeElement.ordSubSecNum}">
+                                <p:column width="5%" sortBy="#{cse.ordSubSecNum}">
                                     <f:facet name="header">
                                         <h:outputText value="Sub#" />
                                     </f:facet>
-                                    <h:outputText value="#{cse.codeElement.ordSubSecNum}"/>
+                                    <h:outputText value="#{cse.ordSubSecNum}"/>
                                 </p:column>
 
-                                <p:column sortBy="#{cse.codeElement.ordSubSecTitle}" 
-                                          filterBy="#{cse.codeElement.ordSubSecTitle}"
+                                <p:column sortBy="#{cse.ordSubSecTitle}" 
+                                          filterBy="#{cse.ordSubSecTitle}"
                                           width="15%">
                                     <f:facet name="header">
                                         <h:outputText value="SubSec. Title" />
                                     </f:facet>
-                                    <h:outputText value="#{cse.codeElement.ordSubSecTitle}"/>
+                                    <h:outputText value="#{cse.ordSubSecTitle}"/>
                                 </p:column>
 
-                                <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.category}"
-                                          filterBy="#{cse.codeElement.guideEntry.category}">
+                                <p:column width="10%" sortBy="#{cse.guideEntry.category}"
+                                          filterBy="#{cse.guideEntry.category}">
                                     <f:facet name="header">
                                         <h:outputText value="Category" />
                                     </f:facet>
-                                    <h:outputText value="#{cse.codeElement.guideEntry.category}"/>
+                                    <h:outputText value="#{cse.guideEntry.category}"/>
                                 </p:column>
 
 
 
-                                <p:column width="10%" sortBy="#{cse.codeElement.guideEntry.subCategory}"
-                                          filterBy="#{cse.codeElement.guideEntry.subCategory}">
+                                <p:column width="10%" sortBy="#{cse.guideEntry.subCategory}"
+                                          filterBy="#{cse.guideEntry.subCategory}">
                                     <f:facet name="header">
                                         <h:outputText value="Action" />
                                     </f:facet>
@@ -1349,26 +1443,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputLabel styleClass="bold" value="Technical Text"/>
                                         <p:spacer height="15px"/>
                                         <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{cse.codeElement.ordTechnicalText}"/>
+                                            <h:outputText escape="false" value="#{cse.ordTechnicalText}"/>
                                         </div>
 
                                         <p:spacer height="15px"/>
 
                                         <h:outputLabel styleClass="bold" value="Human friendly text"/>
                                         <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{cse.codeElement.ordHumanFriendlyText}"/>
+                                            <h:outputText escape="false" value="#{cse.ordHumanFriendlyText}"/>
                                         </div>
                                         <p:spacer height="15px"/>
                                         <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
                                         <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{cse.codeElement.guideEntry.enforcementGuidelines}"/>
+                                            <h:outputText escape="false" value="#{cse.guideEntry.enforcementGuidelines}"/>
                                         </div>
 
                                         <p:spacer height="15px"/>
 
                                         <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
                                         <div class="rowExpansion">
-                                            <h:outputText escape="false" value="#{cse.codeElement.guideEntry.inspectionGuidelines}"/>
+                                            <h:outputText escape="false" value="#{cse.guideEntry.inspectionGuidelines}"/>
                                         </div>
                                     </div>
                                 </p:rowExpansion>
@@ -1464,6 +1558,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h:outputText value="Description"/>
                                         </f:facet>
                                         <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                              
                                     </p:column>
                                 </p:dataTable>
                             </p:scrollPanel>

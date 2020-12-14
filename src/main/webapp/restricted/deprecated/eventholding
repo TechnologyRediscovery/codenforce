@@ -1,0 +1,81 @@
+
+
+
+                                            <p:dataScroller
+                                                id="events-datascroller"
+                                                var="e"
+                                                value="#{eventCECaseReportBB.reportConfig.BOBQuery.BOBResultList}"
+                                                widgetVar="ceevent-ds-var">
+
+                                                <div class="event-ds-box-report">
+
+                                                    <div class="status-display-container">
+                                                        <div class="action-request-icon">
+                                                            <i class="material-icons"><h:outputText id="action-request-display-icon-ot" value="#{e.event.category.icon.materialIcon}"/></i>
+                                                        </div>
+                                                        <div class="status-display-status-list-container">
+                                                            <div class="action-request-header">
+                                                                <h:outputText value="#{e.event.category.eventType.label}: #{e.event.category.eventCategoryTitle} "/>
+                                                            </div>
+                                                            <div class="action-request-subheader">
+                                                                <h:panelGrid    columns="2" 
+                                                                                cellpadding="5" 
+                                                                                footerClass="no-border"
+                                                                                columnClasses="event-list-halfwidth, event-list-halfwidth">
+
+                                                                    <h:panelGroup>
+                                                                        <h:outputText value="Property: " styleClass="bold" />
+                                                                        <h:outputText value="#{e.eventCaseBare.property.address} " />
+                                                                        <h:outputText value=" (#{e.eventCaseBare.property.muni.muniName}) " />
+                                                                        <h:outputText value=" | " styleClass="bold" />
+                                                                        <h:outputText value="Prop ID: " styleClass="bold" />
+                                                                        <h:outputText value="#{e.eventCaseBare.property.propertyID} " />
+
+                                                                        <br />  
+
+                                                                        <h:outputText value="Date: " styleClass="bold" />
+                                                                        <h:outputText value="#{e.event.dateOfRecordPretty}"/>
+
+
+                                                                    </h:panelGroup>
+
+                                                                    <h:panelGroup>
+                                                                        <h:outputText value="Case stage: " styleClass="bold" />
+                                                                        <h:outputText value="#{e.eventCaseBare.caseStage.label} " />
+                                                                        <h:outputText value=" | " styleClass="bold" />
+                                                                        <h:outputText value="Event ID: " styleClass="bold" />
+                                                                        <h:outputText value="#{e.event.eventID} " />
+                                                                        <h:outputText value=" | " styleClass="bold" />
+                                                                        <h:outputText value="Case ID: " styleClass="bold" />
+                                                                        <h:outputText value="#{e.eventCaseBare.caseID} " />
+
+                                                                        <br />  
+
+                                                                        <h:outputText value="Event Owner: " styleClass="bold" />
+                                                                        <h:outputText value="#{e.event.owner.person.firstName} #{e.event.owner.person.lastName}"/>
+                                                                        <h:outputText value="   (#{e.event.owner.username})" />
+                                                                    </h:panelGroup>
+
+                                                                    <f:facet name="footer">
+
+                                                                        <div class="rowExpansion">
+                                                                            <h:outputText styleClass="bold" value="Description: " />
+                                                                            <h:outputText styleClass="weight-normal" 
+                                                                                          escape="false"
+                                                                                          value="#{e.event.description}"/>
+                                                                        </div>
+                                                                        <div class="rowExpansion">
+                                                                            <h:outputText styleClass="bold" value="Notes: " 
+                                                                                          rendered="#{!(empty e.event.notes)}"/>
+                                                                            <h:outputText styleClass="weight-normal" 
+                                                                                          value="#{e.event.notes}"
+                                                                                          escape="false"
+                                                                                          rendered="#{!(empty e.event.notes)}"/>
+                                                                        </div>
+                                                                    </f:facet>
+                                                                </h:panelGrid>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </p:dataScroller>

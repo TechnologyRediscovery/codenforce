@@ -30,7 +30,7 @@ import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonOccPeriod;
+import com.tcvcog.tcvce.entities.PersonOccApplication;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -64,6 +64,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     private String currentMode;
     private boolean currentApplicationSelected;
     private boolean unitAlreadyDetermined; //used by occPermitNewPeriod.xhtml to flag whether or not the selected path has already determined a unit.
+    private boolean disablePACCControl;
     private Property propertyForApplication;
     private List<ViewOptionsActiveListsEnum> allViewOptions;
     private ViewOptionsActiveListsEnum currentViewOption;
@@ -94,7 +95,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     private List<OccPermitApplication> applicationList;
 
     private List<PropertyUnit> unitList;
-    private List<PersonOccPeriod> attachedPersons;
+    private List<PersonOccApplication> attachedPersons;
 
     private String internalNoteText;
     private String externalNoteText;
@@ -428,18 +429,18 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         } else {
 
-            attachedPersons.add(new PersonOccPeriod(person));
+            attachedPersons.add(new PersonOccApplication(person));
 
         }
     }
 
-    public void removePersonFromApplication(PersonOccPeriod person) {
+    public void removePersonFromApplication(PersonOccApplication person) {
         attachedPersons.remove(person);
     }
 
     public String addANewPerson() {
 
-        attachedPersons.add(new PersonOccPeriod());
+        attachedPersons.add(new PersonOccApplication());
 
         return "";
     }
@@ -723,6 +724,23 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
                             "This is a system level error that must be corrected by a sys admin--sorries!."));
         }
     }
+    
+    public void changePACCAccess() {
+        System.out.println("CEActionRequestsBB.changePACCAccess");
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+
+        try {
+            oi.updatePACCAccess(selectedApplication);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Done! Public access status is now: " + String.valueOf(selectedApplication.isPaccEnabled())
+                    + " for application ID: " + selectedApplication.getId(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Unable to add change public access code status",
+                    getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+        }
+    }
 
     public String editAttachedUnits() {
 
@@ -746,7 +764,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         List<Person> skeletonHorde = new ArrayList<>();
         
-        for(PersonOccPeriod skeleton : selectedApplication.getAttachedPersons()){
+        for(PersonOccApplication skeleton : selectedApplication.getAttachedPersons()){
             
             skeletonHorde.add(skeleton);
             
@@ -935,6 +953,17 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         return selectedApplication.getStatus() != OccApplicationStatusEnum.Waiting; //paths should be disabled if the occ application is not waiting to be reviewed.
 
+    }
+    
+    /**
+     * @return if the user should not be able to change public access on an object
+     */
+    public boolean isDisablePACCControl() {
+        disablePACCControl = false;
+        if (getSessionBean().getSessUser().getMyCredential().isHasMuniStaffPermissions() == false) {
+            disablePACCControl = true;
+        }
+        return disablePACCControl;
     }
 
     public boolean isCurrentApplicationSelected() {
@@ -1141,11 +1170,11 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
     }
 
-    public List<PersonOccPeriod> getAttachedPersons() {
+    public List<PersonOccApplication> getAttachedPersons() {
         return attachedPersons;
     }
 
-    public void setAttachedPersons(List<PersonOccPeriod> attachedPersons) {
+    public void setAttachedPersons(List<PersonOccApplication> attachedPersons) {
         this.attachedPersons = attachedPersons;
     }
 

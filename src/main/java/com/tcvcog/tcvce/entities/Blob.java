@@ -23,7 +23,6 @@ package com.tcvcog.tcvce.entities;
  */
 public class Blob  extends BlobLight {
 
-
     public Blob(){
     }
     

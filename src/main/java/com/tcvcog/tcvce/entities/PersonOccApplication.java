@@ -11,19 +11,20 @@ import java.io.Serializable;
  *
  * @author sylvia
  */
-public class        PersonOccPeriod 
+public class        PersonOccApplication 
         extends     Person 
         implements  Serializable{
     
+    private int applicationID;
     private boolean applicant;
     private boolean preferredContact;
     private PersonType applicationPersonType;
     private boolean linkActive; //stores if this link is active in the database, not the person object itself
 
-    public PersonOccPeriod() {
+    public PersonOccApplication() {
     }
     
-    public PersonOccPeriod(Person p){
+    public PersonOccApplication(Person p){
         this.personID = p.personID;
 
         this.personType = p.personType;
@@ -117,10 +118,12 @@ public class        PersonOccPeriod
         return applicationPersonType;
     }
 
+    @Override
     public PersonType getPersonType() {
         return personType;
     }
 
+    @Override
     public void setPersonType(PersonType personType) {
         this.personType = personType;
     }
@@ -154,5 +157,13 @@ public class        PersonOccPeriod
     public void setLinkActive(boolean linkActive) {
         this.linkActive = linkActive;
     }
- 
+
+    public int getApplicationID() {
+        return applicationID;
+    }
+
+    public void setApplicationID(int applicationID) {
+        this.applicationID = applicationID;
+    }
+    
 }

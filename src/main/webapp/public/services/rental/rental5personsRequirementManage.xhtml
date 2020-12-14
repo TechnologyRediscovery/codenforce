@@ -1,0 +1,505 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <h:outputStylesheet name="css/style.css"/>
+        <title>Add People To Application</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="sysHomeView">
+                    <h:form id="personsRequirementManageForm">
+
+                        <!-- VALIDATION MESSAGE -->
+                        <p:growl id="growl" showDetail="false"/>
+
+                        <!-- MAIN CONTAINER -->
+                        <div class="mainContainer">
+
+                            <!-- TITLE COMPONENT -->
+                            <div class="public-title">
+                                <div class="public-title-main">
+                                    Rental Registration
+                                </div>
+                                <div class="public-title-sub">
+                                    for property owners, managers, and tenants
+                                </div>
+                            </div>
+
+                            <!-- CONTENTS CONTAINER -->
+                            <div class="public-main-contents-containner">
+
+                                <!--CONTENT MAIN COMPONENT -->
+                                <div class="public-main-contents">
+
+                                    <!-- GUIDANCE COMPONENT -->
+                                    <div class="public-guide occpermit">
+                                        <p:steps activeIndex="5" styleClass="custom" >
+                                            <p:menuitem value="" containerStyleClass="complete"/>
+                                            <p:menuitem value="" containerStyleClass="complete"/>
+                                            <p:menuitem value="" containerStyleClass="complete"/>
+                                            <p:menuitem value="" containerStyleClass="complete"/>
+                                            <p:menuitem value="" containerStyleClass="complete" />
+                                            <p:menuitem value="" />
+                                            <p:menuitem value="" />
+                                        </p:steps>
+                                    </div>
+
+                                    <!-- CONTENT IO COMPONENT -->
+                                    <div class="public-main-contents-io">
+
+                                        <!-- CONTENT IO COMPONENT: INSTRUCTION -->
+                                        <div class="public-main-contents-io-title" >
+                                            6. Add People To Application <span style="font-weight: normal"> (#{rentalRegistrationBB.currentApplication.reason.humanFriendlyDescription})</span>
+                                        </div>
+
+                                        <!-- CONTENT IO COMPONENT: CONTENT -->
+                                        <div class="public-main-contents-io-content" >
+
+                                            <p:focus/>
+
+                                            <p>
+                                                Use filter(s) below. Click "search". In the list that appears, click to attach the desired people. 
+                                                If you can't find the person you are looking for, Click "Add" below to add a person and press the pencil to enter their information.
+                                            </p>
+
+                                            <!-- DATA CONTAINER -->
+                                            <div class="ui-g data-container">
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-2 ">
+                                                    <p:inputText id="last-name-it" 
+                                                                 value="#{rentalRegistrationBB.searchPerson.lastName}"
+                                                                 styleClass="data_field_value"
+                                                                 tabindex="1" 
+                                                                 placeholder="Filter by last name"/>
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-2 ">
+                                                    <p:inputText id="first-name-it" 
+                                                                 value="#{rentalRegistrationBB.searchPerson.firstName}"
+                                                                 styleClass="data_field_value"
+                                                                 tabindex="2" 
+                                                                 placeholder="Filter by first name"/>
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-2 ">
+                                                    <p:inputText id="email-it" 
+                                                                 value="#{rentalRegistrationBB.searchPerson.email}"
+                                                                 styleClass="data_field_value"
+                                                                 tabindex="3" 
+                                                                 placeholder="Filter by email"
+                                                                 />
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-2 ">
+                                                    <p:inputText id="phone-number-it" 
+                                                                 value="#{rentalRegistrationBB.searchPerson.phoneCell}"
+                                                                 styleClass="data_field_value"
+                                                                 tabindex="4" 
+                                                                 placeholder="Filter by phone"
+                                                                 />
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-2 ">
+                                                    <p:inputText id="street-it" 
+                                                                 value="#{rentalRegistrationBB.searchPerson.addressStreet}"
+                                                                 styleClass="data_field_value"
+                                                                 tabindex="5" 
+                                                                 placeholder="Filter by street"
+                                                                 />
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-2 ">
+                                                    <div class="gray_button">
+
+                                                        <p:commandButton update="applicationPersonTable" 
+                                                                         value="Add" 
+                                                                         action="#{rentalRegistrationBB.addANewPerson}" 
+                                                                         style="width:48%"
+                                                                         tabindex="7" 
+                                                                         />
+
+                                                        <p:commandButton value= "Search" 
+                                                                         action="#{rentalRegistrationBB.searchForPersons()}" 
+                                                                         update="results-dt" 
+                                                                         ajax="true"
+                                                                         tabindex="6" 
+                                                                         style="float: right; width:48%"
+                                                                         />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- DATA CONTAINER -->
+                                            <div class="ui-g data-container">
+
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 ">
+
+                                                    <p:dataTable id="results-dt" 
+                                                                 var="person" 
+                                                                 value="#{rentalRegistrationBB.personSearchResults}" 
+                                                                 scrollable="true" 
+                                                                 scrollHeight="100">
+
+                                                        <p:column headerText="Last Name">
+                                                            <h:outputText value="#{person.bundledPerson.lastName}" />
+                                                        </p:column>
+
+                                                        <p:column headerText="First Name">
+                                                            <h:outputText value="#{person.bundledPerson.firstName}" />
+                                                        </p:column>
+
+                                                        <p:column headerText="Street Address">
+                                                            <h:outputText value="#{person.bundledPerson.addressStreet}" />
+                                                        </p:column>
+
+                                                        <p:column headerText="Home Phone">
+                                                            <h:outputText value="#{person.bundledPerson.phoneHome}" />
+                                                        </p:column>
+
+                                                        <p:column headerText="Cell Phone">
+                                                            <h:outputText value="#{person.bundledPerson.phoneCell}" />
+                                                        </p:column>
+
+                                                        <p:column headerText="Work Phone">
+                                                            <h:outputText value="#{person.bundledPerson.phoneWork}" />
+                                                        </p:column>
+
+                                                        <p:column headerText="Email">
+                                                            <h:outputText value="#{person.bundledPerson.email}" />
+                                                        </p:column>
+
+                                                        <p:column headerText="Attach" style="text-align: center">
+                                                            <div class="gray_button">
+                                                                <p:commandButton ajax="true" 
+                                                                                 update=":personsRequirementManageForm:applicationPersonTable" 
+                                                                                 action="#{rentalRegistrationBB.addPersonToApplication(person)}" 
+                                                                                 id="attach-person-cb" 
+                                                                                 value="Attach" 
+                                                                                 />
+                                                            </div>
+                                                        </p:column>
+
+                                                    </p:dataTable>
+
+                                                </div>
+                                            </div>
+
+                                            <p>
+                                                Click the arrow button below the pencil to fill in more of their contact information.(1. #{rentalRegistrationBB.personRequirementDescription.get(0)} 2.#{rentalRegistrationBB.personRequirementDescription.get(1)} 3.#{rentalRegistrationBB.personRequirementDescription.get(2)})
+                                            </p> 
+
+                                            <!-- DATA CONTAINER -->
+                                            <div class="ui-g data-container">
+
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 ">
+
+                                                    <p:dataTable id="applicationPersonTable"
+                                                                 widgetVar="datatable"
+                                                                 rowIndexVar="rowIndex"
+                                                                 var="applicationPerson" value="#{rentalRegistrationBB.attachedPersons}" 
+                                                                 rowKey="#{applicationPerson.bundledPerson.personID}"
+                                                                 editable="true"
+                                                                 styleClass="editTable">  
+
+                                                        <p:column headerText="" style="width: 20px">
+                                                            <p:rowToggler/>
+                                                        </p:column>
+
+                                                        <p:column headerText="Last Name">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{applicationPerson.bundledPerson.lastName}"/></f:facet>
+                                                                <f:facet name="input">
+                                                                    <p:inputText value="#{applicationPerson.bundledPerson.lastName}"
+                                                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                                </f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+
+                                                        <p:column headerText="First Name">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{applicationPerson.bundledPerson.firstName}"/></f:facet>
+                                                                <f:facet name="input">
+                                                                    <p:inputText value="#{applicationPerson.bundledPerson.firstName}"
+                                                                                 onkeydown="PF('datatable').onKeyDown(event)"
+                                                                                 onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                                </f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+
+                                                        <p:column headerText="Person Type">
+                                                            <p:selectOneMenu value="#{applicationPerson.bundledPerson.personType}">
+                                                                <f:selectItems value="#{rentalRegistrationBB.optAndReqPersons}" var="type" itemLabel="#{type.label}" itemValue="#{type}"/>
+                                                            </p:selectOneMenu> 
+                                                        </p:column>  
+
+                                                        <p:column headerText="Edit" style="width: 20px; text-align: center">
+                                                            <p:rowEditor/>
+                                                        </p:column>
+
+                                                        <p:column headerText="Applicant" style="text-align: center">
+                                                            <div class="gray_button">
+                                                                <p:commandButton ajax="true" value="Set as applicant" 
+                                                                                 action="#{rentalRegistrationBB.setApplicant(applicationPerson)}"
+                                                                                 update="#{p:component('currentApplicantLabel')} #{p:component('currentContactLabel')}"
+                                                                                 /> 
+                                                            </div>
+                                                        </p:column>
+
+                                                        <p:column headerText="Preferred Contact" style="text-align: center">
+                                                            <div class="gray_button">
+                                                                <p:commandButton ajax="true" value="Set as preferred contact" 
+                                                                                 action="#{rentalRegistrationBB.setContactPerson(applicationPerson)}"
+                                                                                 update="#{p:component('currentContactLabel')}"
+                                                                                 /> 
+                                                            </div>
+                                                        </p:column>
+
+                                                        <p:column headerText="Remove" style="text-align: center">
+                                                            <div class="gray_button">
+                                                                <p:commandButton ajax="true" value="Remove" 
+                                                                                 action="#{rentalRegistrationBB.removePersonFromApplication(applicationPerson)}"
+                                                                                 update="#{p:component('applicationPersonTable')}"
+                                                                                 /> 
+                                                            </div>
+                                                        </p:column>
+
+                                                        <p:rowExpansion>
+
+                                                            <div class="data_field_title">
+                                                                1. Remember to hit the enter key when you finish filling out a box!
+                                                            </div>
+
+                                                            <div class="ui-g data-container">
+
+                                                                <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                                    <h:outputLabel styleClass="data_field_label" 
+                                                                                   value="Phone (cell):"
+                                                                                   />
+                                                                    <p:inputText styleClass="data_field_value"
+                                                                                 value="#{applicationPerson.bundledPerson.phoneCell}"
+                                                                                 />
+                                                                </div>
+
+                                                                <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                                    <h:outputLabel styleClass="data_field_label" 
+                                                                                   value="Phone (home):"
+                                                                                   />
+                                                                    <p:inputText styleClass="data_field_value"
+                                                                                 value="#{applicationPerson.bundledPerson.phoneHome}"
+                                                                                 />
+                                                                </div>
+
+                                                                <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                                    <h:outputLabel styleClass="data_field_label" 
+                                                                                   value="Phone (work):"
+                                                                                   />
+                                                                    <p:inputText styleClass="data_field_value"
+                                                                                 value="#{applicationPerson.bundledPerson.phoneWork}"
+                                                                                 />
+                                                                </div>
+
+                                                                <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                                    <h:outputLabel styleClass="data_field_label" 
+                                                                                   value="Email:"
+                                                                                   />
+                                                                    <p:inputText styleClass="data_field_value"
+                                                                                 value="#{applicationPerson.bundledPerson.email}"
+                                                                                 />
+                                                                </div>
+
+                                                                <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                                    <h:outputLabel styleClass="data_field_label" 
+                                                                                   value="Street:"
+                                                                                   />
+                                                                    <p:inputText styleClass="data_field_value"
+                                                                                 value="#{applicationPerson.bundledPerson.addressStreet}"
+                                                                                 />
+                                                                </div>
+
+                                                                <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                                    <h:outputLabel styleClass="data_field_label" 
+                                                                                   value="City:"
+                                                                                   />
+                                                                    <p:inputText styleClass="data_field_value"
+                                                                                 value="#{applicationPerson.bundledPerson.addressCity}"
+                                                                                 />
+                                                                </div>
+
+                                                                <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                                    <h:outputLabel styleClass="data_field_label" 
+                                                                                   value="State:"
+                                                                                   />
+                                                                    <p:inputText styleClass="data_field_value"
+                                                                                 value="#{applicationPerson.bundledPerson.addressState}"
+                                                                                 />
+                                                                </div>
+
+                                                                <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                                    <h:outputLabel styleClass="data_field_label" 
+                                                                                   value="Zip Code:"
+                                                                                   />
+                                                                    <p:inputText styleClass="data_field_value"
+                                                                                 value="#{applicationPerson.bundledPerson.addressZip}"
+                                                                                 />
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="data_field_title">
+                                                                2. If you have a separate mailing address, fill out the section below:
+                                                            </div>
+
+                                                            <div class="ui-g data-container">
+
+                                                                <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                                    <h:outputLabel styleClass="data_field_label" 
+                                                                                   value="Use a separate mailing address:"
+                                                                                   />
+                                                                    <p:inputSwitch value="#{applicationPerson.bundledPerson.useSeparateMailingAddress}" 
+                                                                                   onLabel="Yes" 
+                                                                                   offLabel="No"/>
+                                                                </div>
+
+                                                                <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                                    <h:outputLabel styleClass="data_field_label" 
+                                                                                   value="Street:"
+                                                                                   />
+                                                                    <p:inputText styleClass="data_field_value"
+                                                                                 value="#{applicationPerson.bundledPerson.mailingAddressStreet}"
+                                                                                 />
+                                                                </div>
+
+                                                                <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                                    <h:outputLabel styleClass="data_field_label" 
+                                                                                   value="Address third line:"
+                                                                                   />
+                                                                    <p:inputText styleClass="data_field_value"
+                                                                                 value="#{applicationPerson.bundledPerson.mailingAddressThirdLine}"
+                                                                                 />
+                                                                </div>
+                                                                <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                                    <h:outputLabel styleClass="data_field_label" 
+                                                                                   value="City:"
+                                                                                   />
+                                                                    <p:inputText styleClass="data_field_value"
+                                                                                 value="#{applicationPerson.bundledPerson.mailingAddressCity}"
+                                                                                 />
+                                                                </div>
+                                                                <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                                    <h:outputLabel styleClass="data_field_label" 
+                                                                                   value="State:"
+                                                                                   />
+                                                                    <p:inputText styleClass="data_field_value"
+                                                                                 value="#{applicationPerson.bundledPerson.mailingAddressState}"
+                                                                                 />
+                                                                </div>
+                                                                <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                                    <h:outputLabel styleClass="data_field_label" 
+                                                                                   value="Zip Code:"
+                                                                                   />
+                                                                    <p:inputText styleClass="data_field_value"
+                                                                                 value="#{applicationPerson.bundledPerson.mailingAddressZip}"
+                                                                                 />
+                                                                </div>
+                                                            </div>
+
+                                                        </p:rowExpansion>
+
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+
+                                            <h:outputText id ="currentApplicantLabel" value="Current Applicant: #{rentalRegistrationBB.applicantName} | "/>
+
+                                            <h:outputText id ="currentContactLabel" value="Preferred Contact: #{rentalRegistrationBB.contactName}"/>
+
+                                        </div>
+                                    </div>
+
+                                    <!-- CONTENT BUTTON -->
+                                    <div class="public-main-contents-button-left">
+                                        <div class="gray_button">
+                                            <p:commandButton id="goBack"
+                                                              tabindex="9"
+                                                             value="Go Back" styleClass="buttonOwnLine"
+                                                             action="#{rentalRegistrationBB.goBack()}">
+                                                <p:confirm header="Are you sure?" 
+                                                           message="Going back could cause your changes to this page to be lost. Continue?" 
+                                                           icon="pi pi-exclamation-triangle"/>
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+
+                                    <!-- CONTENT BUTTON -->
+                                    <div class="public-main-contents-button-right" >
+                                        <p:commandButton ajax="false" 
+                                                         value="Next Step: Review and Submit"
+                                                         action="#{rentalRegistrationBB.reviewApplication}"
+                                                         style="width: 100%"
+                                                         tabindex="8" />
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                            <p:commandButton value="Yes" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
+                            <p:commandButton value="No" styleClass="ui-confirmdialog-no" icon="pi pi-times"/>
+                        </p:confirmDialog>
+                        
+                    </h:form>
+
+                    <script>
+                        var y = document.getElementById('public-applyoccpermit-arrow-id');
+                        y.className += " public-menu-active";
+                    </script> 
+
+                    <script type="text/javascript">
+
+                        $(function () {
+                            $.extend(PF("datatable"), {
+                                onKeyDown: function (e) {
+                                    var key = e.which,
+                                            keyCode = $.ui.keyCode;
+
+                                    if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                        e.preventDefault();
+                                    }
+                                },
+
+                                onKeyUp: function (e, rowIndex) {
+                                    var key = e.which,
+                                            keyCode = $.ui.keyCode;
+                                    //.ui-row-editor-check .ui-icon-check .ui-c
+                                    if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                        this.tbody
+                                                .find('.ui-row-editor .ui-icon-check')
+                                                .eq(rowIndex)
+                                                .click();
+                                    }
+
+                                    if (key === keyCode.ESCAPE) {
+                                        this.tbody
+                                                .find('.ui-row-editor .ui-icon-close')
+                                                .eq(rowIndex)
+                                                .click();
+                                    }
+                                }
+                            });
+                        });
+
+                    </script>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

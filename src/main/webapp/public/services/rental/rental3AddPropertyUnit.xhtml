@@ -1,0 +1,251 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Configure Unit List</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="occPermitApplicationFlowView">
+                    <h:form id="occPermitApplicationAddPropertyUnitForm">
+
+                        <!-- VALIDATION MESSAGE -->
+                        <p:growl id="growl" showDetail="false"/>
+
+                        <!-- MAIN CONTAINER -->
+                        <div class="mainContainer">
+
+                             <!-- TITLE COMPONENT -->
+                            <div class="public-title">
+                                <div class="public-title-main">
+                                    Rental Registration
+                                </div>
+                                <div class="public-title-sub">
+                                    for property owners, managers, and tenants
+                                </div>
+                            </div>
+
+                            <!-- CONTENTS CONTAINER -->
+                            <div class="public-main-contents-containner">
+
+                                <!--CONTENT MAIN COMPONENT -->
+                                <div class="public-main-contents">
+
+                                    <!-- GUIDANCE COMPONENT -->
+                                    <div class="public-guide occpermit">
+                                        <p:steps activeIndex="2" styleClass="custom" >
+                                            <p:menuitem value="" containerStyleClass="complete"/>
+                                            <p:menuitem value="" containerStyleClass="complete"/>
+                                            <p:menuitem value="" containerStyleClass="complete"/>
+                                            <p:menuitem value="" />
+                                            <p:menuitem value="" />
+                                            <p:menuitem value="" />
+                                            <p:menuitem value="" />
+                                        </p:steps>
+                                    </div>
+
+                                    <!-- CONTENT IO COMPONENT -->
+                                    <div class="public-main-contents-io">
+
+                                        <p:focus/>
+
+                                        <!-- CONTENT IO COMPONENT: INSTRUCTION -->
+                                        <div class="public-main-contents-io-title" >
+                                            4. Configure unit list
+                                        </div>
+
+                                        <!-- CONTENT IO COMPONENT: CONTENT -->
+                                        <div class="public-main-contents-io-content" >
+
+                                            <p>
+                                                Please create a complete list of 
+                                                all the units in the property.
+                                                Click the pencil in the edit column 
+                                                to edit a unit. A unit number 
+                                                is required for all units.
+                                                If you intend to rent please 
+                                                explain your plans under
+                                                "Rental notes".
+                                            </p>
+
+                                            <p:dataTable id="propertyUnitsToAddTable"
+                                                         widgetVar="datatable"
+                                                         rowIndexVar="rowIndex"
+                                                         var="unit"
+                                                         value="#{rentalRegistrationBB.workingPropUnits}"
+                                                         tabindex="1"
+                                                         rowKey="#{unit.bundledUnit.unitID}"
+                                                         editable="true"
+                                                         styleClass="editTable">                                      
+
+                                                <p:column style="width: 5%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Edit" />
+                                                    </f:facet>
+                                                    <p:rowEditor/>
+                                                </p:column>
+
+                                                <p:column style="width: 15%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Unit Number" />
+                                                    </f:facet>
+                                                    <p:cellEditor>
+                                                        <f:facet name="output"><h:outputText value="#{unit.bundledUnit.unitNumber}" /></f:facet>
+                                                        <f:facet name="input">
+                                                            <p:inputText value="#{unit.bundledUnit.unitNumber}"
+                                                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                        </f:facet>
+                                                    </p:cellEditor>
+                                                </p:column>
+
+                                                <p:column style="width: 15%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Rental notes" />
+                                                    </f:facet>
+                                                    <p:cellEditor>
+                                                        <f:facet name="output">
+                                                            <h:outputText value="#{unit.bundledUnit.rentalNotes}" />
+                                                        </f:facet>
+                                                        <f:facet name="input"> 
+                                                            <p:inputText value="#{unit.bundledUnit.rentalNotes}"
+                                                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                        </f:facet>
+                                                    </p:cellEditor>
+                                                </p:column>
+
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Unit Description" />
+                                                    </f:facet>
+                                                    <p:cellEditor>
+                                                        <f:facet name="output">
+                                                            <h:outputText value="#{unit.bundledUnit.notes}" />
+                                                        </f:facet>
+                                                        <f:facet name="input">
+                                                            <p:inputText value="#{unit.bundledUnit.notes}" 
+                                                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                                                        </f:facet>
+                                                    </p:cellEditor>
+                                                </p:column>
+
+
+                                                <p:column style="width: 15%; align-content: center">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Remove" />
+                                                    </f:facet>
+
+                                                    <div class="gray_button"> 
+                                                        <p:commandButton ajax="true" 
+                                                                         value="Remove" 
+                                                                         action="#{rentalRegistrationBB.removeSelectedUnit(unit)}"
+                                                                         update="#{p:component('propertyUnitsToAddTable')}
+                                                                         occPermitApplicationAddPropertyUnitForm"
+                                                                         />   
+                                                    </div>
+
+                                                </p:column>
+
+                                            </p:dataTable>
+
+                                            <script type="text/javascript">
+
+                                                $(function () {
+                                                    $.extend(PF("datatable"), {
+                                                        onKeyDown: function (e) {
+                                                            var key = e.which,
+                                                                    keyCode = $.ui.keyCode;
+
+                                                            if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                                e.preventDefault();
+                                                            }
+                                                        },
+
+                                                        onKeyUp: function (e, rowIndex) {
+                                                            var key = e.which,
+                                                                    keyCode = $.ui.keyCode;
+                                                            //.ui-row-editor-check .ui-icon-check .ui-c
+                                                            if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                                                this.tbody
+                                                                        .find('.ui-row-editor .ui-icon-check')
+                                                                        .eq(rowIndex)
+                                                                        .click();
+                                                            }
+
+                                                            if (key === keyCode.ESCAPE) {
+                                                                this.tbody
+                                                                        .find('.ui-row-editor .ui-icon-close')
+                                                                        .eq(rowIndex)
+                                                                        .click();
+                                                            }
+                                                        }
+                                                    });
+                                                });
+
+                                            </script>
+
+                                            <p:spacer height="20px"/>
+
+                                            <div class="gray_button">
+                                                <p:commandButton ajax="true" 
+                                                                 tabindex="2"
+                                                                 action="#{rentalRegistrationBB.addUnitToNewPropUnits()}" 
+                                                                 update="propertyUnitsToAddTable"
+                                                                 value="Add unit"/>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- CONTENT BUTTON -->
+                                    <div class="public-main-contents-button-left">
+                                        <div class="gray_button">
+                                            <p:commandButton id="goBack"
+                                                              tabindex="4"
+                                                             value="Go Back" styleClass="buttonOwnLine"
+                                                             action="#{rentalRegistrationBB.goBack()}">
+                                                <p:confirm header="Are you sure?" 
+                                                           message="Going back could cause your changes to this page to be lost. Continue?" 
+                                                           icon="pi pi-exclamation-triangle"/>
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+
+
+                                    <!-- CONTENT BUTTON -->
+                                    <div class="public-main-contents-button-right">
+
+                                        <p:commandButton ajax="false"  
+                                                         tabindex="3"
+                                                         action="#{rentalRegistrationBB.finalizeUnitList()}" 
+                                                         value="Next Step: Select Units"
+                                                         style="width: 100%"/>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                            <p:commandButton value="Yes" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
+                            <p:commandButton value="No" styleClass="ui-confirmdialog-no" icon="pi pi-times"/>
+                        </p:confirmDialog>
+                    </h:form>
+                    <script>
+                        var y = document.getElementById('public-applyoccpermit-arrow-id');
+                        y.className += " public-menu-active";
+                    </script> 
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>

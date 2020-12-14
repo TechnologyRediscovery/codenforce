@@ -272,28 +272,28 @@
                                                 <p:column headerText="Section"
                                                           styleClass="centeredColumnContent">
 
-                                                    <h:outputText value="#{element.codeElement.ordSecTitle}"/>
+                                                    <h:outputText value="#{element.ordSecTitle}"/>
 
                                                 </p:column>
 
                                                 <p:column headerText="Subsection"
                                                           styleClass="centeredColumnContent">
 
-                                                    <h:outputText value="#{element.codeElement.ordSubSecTitle}"/>
+                                                    <h:outputText value="#{element.ordSubSecTitle}"/>
 
                                                 </p:column>
 
                                                 <p:column headerText="Category"
                                                           styleClass="centeredColumnContent">
 
-                                                    <h:outputText value="#{element.codeElement.guideEntry.category}"/>
+                                                    <h:outputText value="#{element.guideEntry.category}"/>
 
                                                 </p:column>
 
                                                 <p:column headerText="SubCategory"
                                                           styleClass="centeredColumnContent">
 
-                                                    <h:outputText value="#{element.codeElement.guideEntry.subCategory}"/>
+                                                    <h:outputText value="#{element.guideEntry.subCategory}"/>
 
                                                 </p:column>
 
@@ -348,7 +348,7 @@
 
                                                         <h:outputLabel styleClass="bold" value="Code Element ID:"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText escape="false" value="#{element.codeElement.elementID}"/>
+                                                            <h:outputText escape="false" value="#{element.elementID}"/>
                                                         </div>
                                                         <p:spacer height="15px"/>
 
@@ -387,23 +387,23 @@
 
                                                         <h:outputLabel styleClass="bold" value="Chap"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText escape="false" value="#{element.codeElement.ordchapterNo}"/>
+                                                            <h:outputText escape="false" value="#{element.ordchapterNo}"/>
                                                         </div>
 
                                                         <h:outputLabel styleClass="bold" value="Chapter"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText escape="false" value="#{element.codeElement.ordchapterTitle}"/>
+                                                            <h:outputText escape="false" value="#{element.ordchapterTitle}"/>
                                                         </div>
                                                         <p:spacer height="15px"/>
 
                                                         <h:outputLabel styleClass="bold" value="Sec"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText escape="false" value="#{element.codeElement.ordSecNum}"/>
+                                                            <h:outputText escape="false" value="#{element.ordSecNum}"/>
                                                         </div>
 
                                                         <h:outputLabel styleClass="bold" value="SubSec"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText escape="false" value="#{element.codeElement.ordSubSecNum}"/>
+                                                            <h:outputText escape="false" value="#{element.ordSubSecNum}"/>
                                                         </div>
 
                                                         <p:spacer height="15px"/>
@@ -411,22 +411,22 @@
                                                         <h:outputLabel styleClass="bold" value="Technical Text"/>
                                                         <p:spacer height="15px"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText escape="false" value="#{element.codeElement.ordTechnicalText}"/>
+                                                            <h:outputText escape="false" value="#{element.ordTechnicalText}"/>
                                                         </div>
                                                         <p:spacer height="15px"/>
                                                         <h:outputLabel styleClass="bold" value="Human friendly text"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText escape="false" value="#{element.codeElement.ordHumanFriendlyText}"/>
+                                                            <h:outputText escape="false" value="#{element.ordHumanFriendlyText}"/>
                                                         </div>
                                                         <p:spacer height="15px"/>
                                                         <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText escape="false" value="#{element.codeElement.guideEntry.enforcementGuidelines}"/>
+                                                            <h:outputText escape="false" value="#{element.guideEntry.enforcementGuidelines}"/>
                                                         </div>
                                                         <p:spacer height="15px"/>
                                                         <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
                                                         <div class="rowExpansion">
-                                                            <h:outputText escape="false" value="#{element.codeElement.guideEntry.inspectionGuidelines}"/>
+                                                            <h:outputText escape="false" value="#{element.guideEntry.inspectionGuidelines}"/>
                                                         </div>
                                                     </div>
                                                 </p:rowExpansion>

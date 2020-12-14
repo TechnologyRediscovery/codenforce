@@ -68,9 +68,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
                 + "WHERE photodocid = ?;";
         
         PreparedStatement stmt = null;
-        
         try {
-            
             stmt = con.prepareStatement(query);
             stmt.setInt(1, blobID);
             rs = stmt.executeQuery();
@@ -123,6 +121,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             }
             
         } catch (SQLException ex) {
+            System.out.println(ex);
             //System.out.println(ex);
             throw new IntegrationException("Error retrieving blob. ", ex);
         } finally{
@@ -256,6 +255,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery();
             while(rs.next()){
                 blobIDList.add(rs.getInt("photodocid"));
+
             }
             
         } catch (SQLException ex) {
@@ -683,7 +683,6 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         //property linker table
         String query = "DELETE"
                 + "  FROM public.ceactionrequestphotodoc WHERE photodoc_photodocid = ? AND ceactionrequest_requestid = ?;";
-
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         

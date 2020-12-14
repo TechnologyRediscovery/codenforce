@@ -42,10 +42,6 @@ public class PublicInfoBundleOccInspection extends PublicInfoBundle {
         
         setPacc(input.getPacc());
         
-        input.setInspector(new User());
-        
-        input.setPassedInspectionCertifiedBy(new User());
-        
         input.setCreationTS(LocalDateTime.MIN);
         
         input.setThirdPartyInspector(new Person());

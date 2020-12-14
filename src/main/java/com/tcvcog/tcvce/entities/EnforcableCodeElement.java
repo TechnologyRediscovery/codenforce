@@ -18,22 +18,57 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
  *  Represents a codesetelement stated with fidelity to the ERD
  * @author ellen bascomb of apt 31y
  */
-public class EnforcableCodeElement extends CodeElement implements Serializable, Cloneable {
+public class EnforcableCodeElement 
+        extends CodeElement 
+        implements Serializable, Cloneable {
 
     public EnforcableCodeElement() {
 
+    }
+    
+    public EnforcableCodeElement(CodeElement ele){
+        this.elementID = ele.elementID;
+        this.guideEntry = ele.guideEntry;
+        this.guideEntryID = ele.guideEntryID;
+        this.source = ele.source;
+        this.ordchapterNo = ele.ordchapterNo;
+        this.ordchapterTitle = ele.ordchapterTitle;
+        this.ordSecNum = ele.ordSecNum;
+        this.ordSecTitle = ele.ordSecTitle;
+        this.ordSubSecNum = ele.ordSubSecNum;
+        this.ordSubSecTitle = ele.ordSubSecTitle;
+        this.ordSubSubSecNum = ele.ordSubSubSecNum;
+        this.ordTechnicalText = ele.ordTechnicalText;
+        this.ordHumanFriendlyText = ele.ordHumanFriendlyText;
+        this.isActive = ele.isActive;
+        this.useInjectedValues = ele.useInjectedValues;
+        this.resourceURL = ele.resourceURL;
+        this.notes = ele.notes;
+        this.legacyID = ele.legacyID;
+        this.headerString = ele.headerString;
+        this.createdTS = ele.createdTS;
+        this.createdBy = ele.createdBy;
+        this.lastUpdatedTS = ele.lastUpdatedTS;
+        this.lastupdatedBy = ele.lastupdatedBy;
+        this.deactivatedTS = ele.deactivatedTS;
+        this.deactivatedBy = ele.deactivatedBy;
+        
     }
 
     // code set elements and enforcable code elments are equivalent
     // TODO: unify these names
     private int codeSetElementID;
-    private CodeElement codeElement;
+    protected int codeSetID;
+    
+    // THIS SHOULDN'T Be here, inheritance, not composition!!
+    
     private double maxPenalty;
     private double minPenalty;
     private double normPenalty;
@@ -42,6 +77,18 @@ public class EnforcableCodeElement extends CodeElement implements Serializable, 
     private String daysToComplyNotes;
     private String muniSpecificNotes;
     private List<Fee> feeList;
+    private String defaultViolationDescription;
+    
+    private List<String> injectedValues;
+    
+    
+     /** Humanization Object standard fields **/
+    protected LocalDateTime eceCreatedTS;
+    protected User eceCreatedBy;
+    protected LocalDateTime eceLastUpdatedTS;
+    protected User eceLastupdatedBy;
+    protected LocalDateTime eceDeactivatedTS;
+    protected User eceDeactivatedBy;
 
     @Override
     public Object clone() throws CloneNotSupportedException {
@@ -50,7 +97,7 @@ public class EnforcableCodeElement extends CodeElement implements Serializable, 
 
     @Override
     public String toString() {
-        return codeElement.getHeaderString();
+        return getHeaderString();
     }
 
     /**
@@ -137,19 +184,8 @@ public class EnforcableCodeElement extends CodeElement implements Serializable, 
         this.daysToComplyNotes = daysToComplyNotes;
     }
 
-    /**
-     * @return the codeElement
-     */
-    public CodeElement getCodeElement() {
-        return codeElement;
-    }
-
-    /**
-     * @param codeElement the codeElement to set
-     */
-    public void setCodeElement(CodeElement codeElement) {
-        this.codeElement = codeElement;
-    }
+    
+  
 
     /**
      * @return the codeSetElementID
@@ -185,6 +221,132 @@ public class EnforcableCodeElement extends CodeElement implements Serializable, 
 
     public void setFeeList(List<Fee> feeList) {
         this.feeList = feeList;
+    }
+
+    /**
+     * @return the injectedValues
+     */
+    public List<String> getInjectedValues() {
+        return injectedValues;
+    }
+
+    /**
+     * @param injectedValues the injectedValues to set
+     */
+    public void setInjectedValues(List<String> injectedValues) {
+        this.injectedValues = injectedValues;
+    }
+
+    /**
+     * @return the defaultViolationDescription
+     */
+    public String getDefaultViolationDescription() {
+        return defaultViolationDescription;
+    }
+
+    /**
+     * @param defaultViolationDescription the defaultViolationDescription to set
+     */
+    public void setDefaultViolationDescription(String defaultViolationDescription) {
+        this.defaultViolationDescription = defaultViolationDescription;
+    }
+
+    /**
+     * @return the eceCreatedTS
+     */
+    public LocalDateTime getEceCreatedTS() {
+        return eceCreatedTS;
+    }
+
+    /**
+     * @return the eceCreatedBy
+     */
+    public User getEceCreatedBy() {
+        return eceCreatedBy;
+    }
+
+    /**
+     * @return the eceLastUpdatedTS
+     */
+    public LocalDateTime getEceLastUpdatedTS() {
+        return eceLastUpdatedTS;
+    }
+
+    /**
+     * @return the eceLastupdatedBy
+     */
+    public User getEceLastupdatedBy() {
+        return eceLastupdatedBy;
+    }
+
+    /**
+     * @return the eceDeactivatedTS
+     */
+    public LocalDateTime getEceDeactivatedTS() {
+        return eceDeactivatedTS;
+    }
+
+    /**
+     * @return the eceDeactivatedBy
+     */
+    public User getEceDeactivatedBy() {
+        return eceDeactivatedBy;
+    }
+
+    /**
+     * @param eceCreatedTS the eceCreatedTS to set
+     */
+    public void setEceCreatedTS(LocalDateTime eceCreatedTS) {
+        this.eceCreatedTS = eceCreatedTS;
+    }
+
+    /**
+     * @param eceCreatedBy the eceCreatedBy to set
+     */
+    public void setEceCreatedBy(User eceCreatedBy) {
+        this.eceCreatedBy = eceCreatedBy;
+    }
+
+    /**
+     * @param eceLastUpdatedTS the eceLastUpdatedTS to set
+     */
+    public void setEceLastUpdatedTS(LocalDateTime eceLastUpdatedTS) {
+        this.eceLastUpdatedTS = eceLastUpdatedTS;
+    }
+
+    /**
+     * @param eceLastupdatedBy the eceLastupdatedBy to set
+     */
+    public void setEceLastupdatedBy(User eceLastupdatedBy) {
+        this.eceLastupdatedBy = eceLastupdatedBy;
+    }
+
+    /**
+     * @param eceDeactivatedTS the eceDeactivatedTS to set
+     */
+    public void setEceDeactivatedTS(LocalDateTime eceDeactivatedTS) {
+        this.eceDeactivatedTS = eceDeactivatedTS;
+    }
+
+    /**
+     * @param eceDeactivatedBy the eceDeactivatedBy to set
+     */
+    public void setEceDeactivatedBy(User eceDeactivatedBy) {
+        this.eceDeactivatedBy = eceDeactivatedBy;
+    }
+
+    /**
+     * @return the codeSetID
+     */
+    public int getCodeSetID() {
+        return codeSetID;
+    }
+
+    /**
+     * @param codeSetID the codeSetID to set
+     */
+    public void setCodeSetID(int codeSetID) {
+        this.codeSetID = codeSetID;
     }
 
 }

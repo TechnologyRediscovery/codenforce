@@ -1,0 +1,185 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="css/novstyle.css"/>
+        <h:outputStylesheet name="css/style.css"/>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+        <title>Notice of Violation</title>
+    </h:head>
+    <h:body>
+        <f:view id="view-nov">
+            <div class="nov-container">
+                <div class="header" style="margin-top:#{noticeOfViolationBB.currentNotice.style.nov_page_margin_top}px" >
+                    <p:graphicImage height="#{noticeOfViolationBB.currentNotice.style.header_height}" 
+                                    value="#{blobCoordinator.image}"
+                                    class="nov-header-image"
+                                    alt="Header image ID: #{noticeOfViolationBB.currentNotice.style.header_img_id}">
+                        <f:param name="blobID" value="#{noticeOfViolationBB.currentNotice.style.header_img_id}"/>
+                    </p:graphicImage>
+                </div>
+
+
+                <div class="addressee" style="left: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_left}px; top: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_top}px">
+                    <f:subview id="subview-addressee-normaladdress"
+                               rendered="#{!(noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress)}">
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.recipient.firstName} #{noticeOfViolationBB.currentNotice.recipient.lastName}"/>
+                        <br />
+                        <h:outputText escape="false" value="#{noticeOfViolationBB.currentNotice.recipient.addressStreet}"/>
+                        <br />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.recipient.addressCity}, #{noticeOfViolationBB.currentNotice.recipient.addressState} #{noticeOfViolationBB.currentNotice.recipient.addressZip}"/>
+                    </f:subview>
+
+                    <f:subview id="subview-addressee-normaladdress"
+                               rendered="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress}">
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.recipient.firstName} #{noticeOfViolationBB.currentNotice.recipient.lastName}"/>
+                        <br />
+                        <h:outputText escape="false" value="#{noticeOfViolationBB.currentNotice.recipient.mailingAddressStreet}"/>
+                        <br />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.recipient.mailingAddressCity}, #{noticeOfViolationBB.currentNotice.recipient.mailingAddressState} #{noticeOfViolationBB.currentNotice.recipient.mailingAddressZip}"/>
+                    </f:subview>
+                </div>
+
+                <div class="nov-letter-text" style="margin-top:#{noticeOfViolationBB.currentNotice.style.nov_text_margin_top}px">
+
+
+                    <div class="date-of-record">
+                        <h:outputText id="date-of-record-ot" value="#{noticeOfViolationBB.currentNotice.dateOfRecordPretty}" />
+                    </div> 
+
+                    <div class="property-of-concern">
+                        <div class="bold underline">
+
+                            <h:outputText  value="RE: " />
+
+                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.address} " />
+                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.address_city}, " />
+                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.address_state} " />
+                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.address_zip}" />
+
+                            <h:outputText id="nov-prop-muni" value=" | Lot and block: #{noticeOfViolationBB.currentCase.property.lotAndBlock}" />
+                        </div>
+                    </div>
+
+                    <div class="text-insert">
+                        <h:outputText id="text-before-violations-ot" 
+                                      escape="false"
+                                      value="#{noticeOfViolationBB.currentNotice.noticeTextBeforeViolations}" />
+                    </div>
+
+                    <p:dataScroller id="violations-ds"
+                                    styleClass="nov-viol-ds"
+                                    value="#{noticeOfViolationBB.currentNotice.violationList}"
+                                    var="v">
+                        <div class="violation">
+
+                            <h:panelGrid columns="1" rendered="true"
+                                         columnClasses="gridTd, gridTd"
+                                         headerClass="no-border"
+                                         footerClass="no-border">
+
+                                <h:panelGroup>
+
+                                    <h:outputLabel styleClass="bold" value="Ordinance: "  />
+
+                                    <h:outputLabel  value="#{v.violatedEnfElement.source.sourceName} 
+                                                    (#{v.violatedEnfElement.source.sourceYear}) " />
+                                    <p:spacer height="2px" />
+
+                                    <h:outputText    value="Ch. #{v.violatedEnfElement.ordchapterNo}:" />
+                                    <h:outputText    value="#{v.violatedEnfElement.ordchapterTitle}" />
+
+                                    <h:outputText value=" | " />
+
+                                    <h:outputText    value="&#167;#{v.violatedEnfElement.ordSecNum} " />
+                                    <h:outputText    value="#{v.violatedEnfElement.ordSecTitle}" />
+
+                                    <h:outputText value=" | " />
+
+                                    <h:outputText    value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
+                                    <h:outputText    value="#{v.violatedEnfElement.ordSubSecTitle}" />
+
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTd" 
+                                                    rendered="#{v.includeOrdinanceText}">
+                                        <h:panelGroup>
+                                            <h:outputLabel styleClass="bold" value="Ordinance text: "/>
+                                            <div class="ord-text">
+                                                <h:outputText escape="false" value="#{v.violatedEnfElement.ordTechnicalText}"/>
+                                            </div>
+                                        </h:panelGroup>
+
+                                    </h:panelGrid>
+                                </h:panelGroup>
+
+                                <f:facet name="footer">
+                                    <h:outputLabel styleClass="bold" value="Finding: "/>
+
+                                    <h:outputText value="#{v.description}"/>
+
+                                    <p:spacer height="2px" />
+
+                                    <h:outputText style="bold" value="Number of photographs enclosed in attachments: " 
+                                                  rendered="#{v.includeViolationPhotos}"/>
+                                    <h:outputText value="#{empty v.photoIDList ? '0' : v.photoIDList.size()}"
+                                                  rendered="#{v.includeViolationPhotos}"/>
+                                </f:facet>
+                            </h:panelGrid>
+
+                        </div>
+                        <h4>Photos</h4>
+                        <div class="ui-g data_container_nested_restrict">
+
+
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field" >
+                                    
+                                <p:dataScroller   id="photos-ds"
+                                                  value="#{v.blobList}"
+                                                  var="photo"
+                                                  styleClass="scroller-half">
+                                     <div class="restrict-main-contents-io-content" >
+
+                                        <p:graphicImage width="400" value="#{blobCoordinator.image}">
+                                            <f:param name="blobID" value="#{photo.blobID}"/>
+                                        </p:graphicImage>
+                                    
+                                    </div>
+                                </p:dataScroller>
+                            </div>
+                        </div>
+
+                        <hr />
+                    </p:dataScroller>
+
+                    <div class="text-insert">
+                        <h:outputText id="text-after-violations-ot" 
+                                      escape="false"
+                                      value="#{noticeOfViolationBB.currentNotice.noticeTextAfterViolations}" />
+                    </div>
+
+                    <div class="signature">
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.firstName}" />
+                        <h:outputText value=" " />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.lastName}" />
+                        <br />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.jobTitle}" />
+                        <br />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.phoneWork}" />
+                        <br />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.email}" />
+                    </div>
+
+                </div>
+
+
+            </div>
+        </f:view>
+    </h:body>
+</html>
+

@@ -17,15 +17,19 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.CodeCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.CodeSet;
+import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,11 +38,33 @@ import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
 /**
- *
+ * Backing bean for management of code sets (code books)
  * @author ellen bascomb of apt 31y
  */
-public class CodeSetBB extends BackingBeanUtils implements Serializable {
+public class CodeSetBB 
+        extends BackingBeanUtils 
+        implements Serializable {
+    
 
+
+    private List<CodeSet> codeSetList;
+    private CodeSet currentCodeSet;
+    
+    private Municipality selectedMuniForCodeSet;
+    private Municipality selectedMuniForCodeSetMapping;
+    
+    private List<EnforcableCodeElement> enforcableCodeElementListFiltered;
+    private EnforcableCodeElement currentEnforcableCodeElement;
+    
+    private Map<Municipality, CodeSet> muniSetMap;
+    
+    private List<CodeSource> codeSourceList;
+    private CodeSource selectedCodeSource;
+
+    private List<CodeElement> codeElementList;
+    private List<CodeElement> selectedElementsToAddToSet;
+    
+    
     /**
      * Creates a new instance of CodeSetBB
      */
@@ -47,160 +73,77 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
     
     @PostConstruct
     public void initBean(){
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        CodeCoordinator cc = getCodeCoordinator();
         try {
-            muniNameIDMap = mi.getMunicipalityStringIDMap();
+            codeSetList = cc.getCodeSetListComplete();
+            codeSourceList = cc.getCodeSourceList();
+//            selectedMuniForCodeSet = getSessionBean().getSessMuni();
+            muniSetMap = cc.getMuniCodeSetDefaultMap();
+            codeElementList = new ArrayList<>();
+            selectedElementsToAddToSet = new ArrayList<>();
             
-            //xiaohong add
-            getSessionBean().setSessCodeSet(null);
-            currentcodeSetMap=getCodeSetMap();
             
-        } catch (IntegrationException ex) {
+
+            // if we have a set in the session, make it current on page load
+
+            if(getSessionBean().getSessCodeSet() != null){
+                currentCodeSet = getSessionBean().getSessCodeSet();
+                currentCodeSet = cc.getCodeSet(currentCodeSet.getCodeSetID());
+
+            }
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
         
     }
+
     
     
-    //xiaohong add
-    private boolean selected;
-
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
     
-    private Map<String, Integer> currentcodeSetMap;
+    /**************************************************************************
+    /****************** CODE SET RELATED LISTENERS ****************************
+    /**************************************************************************
     
+    
+    /**
+     * Listener for user requests to view elements in a code set (code book)
+     * @param set 
+     */
+    public void onViewCodeSetButtonChange(CodeSet set) {
+        currentCodeSet = set;
+        getSessionBean().setSessCodeSet(currentCodeSet);
+        getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Viewing Ordinances in Code Book " + currentCodeSet.getCodeSetName(), ""));
 
-    public Map<String, Integer> getCurrentcodeSetMap() {
-        return currentcodeSetMap;
-    }
-
-    public void setCurrentcodeSetMap(Map<String, Integer> currentcodeSetMap) {
-        this.currentcodeSetMap = currentcodeSetMap;
     }
     
     
-    
-    public void onSelectCodeSetsChange(String name, int codesetid){
-        if(selected==true){
-            currentcodeSetMap = new HashMap<>();
-            currentcodeSetMap.put(name, codesetid);
-            selectedCodeSetID = codesetid;
-            manageCodeSetElements();
-            
-        }else if(selected == false){
-            initSelectcodesetpanel();
-            
-        }
+    /**
+     * Listener for user requests to start an update of a given code set
+     * @param set 
+     */
+    public void onCodeSetUpdateInitButtonChange(CodeSet set){
+        currentCodeSet = set;
+        
         
     }
     
-    public boolean activeEdit(){
-        return !selected;
-    }
-    
-    public void initSelectcodesetpanel(){
-        currentcodeSetMap = getCodeSetMap();
-        selectedCodeSetID = null;
-        formNewCodeSetName= null;
-        formNewCodeSetDescription = null;
-        formCodeSetName = null;
-        formCodeSetDescription = null;
-        selected = false;
-        
-        getSessionBean().setSessCodeSet(null);
-        
-    }
-    
-    
-    
-    
-    
-    
-    
-    
+    /**
+     * Listener for user request to finalize a code set update
+     * @param event
+     * @return 
+     */
+    public String onCodeSetUpdateCommitButtonChange(ActionEvent event) {
+        CodeCoordinator cc = getCodeCoordinator();
 
-    private Municipality selectedMuni;
-    private ArrayList<CodeSet> codeSetList;
-    private Map<String, Integer> muniNameIDMap;
-    // used by codeSetElementManage
-    private CodeSet selectedCodeSet;
-    private EnforcableCodeElement selectedEnforcableCodeElement;
-
-    private Map<String, Integer> codeSetMap;
-    private Integer selectedCodeSetID;
-
-    private int currentCodeSetID;
-    private int selectedMuniCode;
-
-    private String currentCodeSetName;
-    private String currentCodeSetDescription;
-    private int currentCodeSetMuniCode;
-    private String currentCodeSetMuniName;
-
-    private CodeSet setToUpdate;
-
-    private String formCodeSetName;
-    private String formCodeSetDescription;
-    
-    private int formNewMuniCode;
-    private String formNewCodeSetName;
-    private String formNewCodeSetDescription;
-
-
-    public String manageCodeSetElements() {
-        if (selectedCodeSetID != null) {
-            CodeIntegrator ci = getCodeIntegrator();
-            try {
-                getSessionBean().setSessCodeSet(ci.getCodeSetBySetID(selectedCodeSetID));
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-            }
-            return "codeSetElementList";
-        } else {
-            System.out.println("nnnn");
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Please select a code set to view", ""));
-            return "";
-        }
-    }
-    public String buildCodeSet() {
-
-        if (selectedCodeSetID != null) {
-            CodeIntegrator ci = getCodeIntegrator();
-            try {
-                getSessionBean().setSessCodeSet(ci.getCodeSetBySetID(selectedCodeSetID));
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-            }
-            return "";
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Please select a code set to build ", ""));
-            return "";
-        }
-    }
-
-    public void commitUpdatesToCodeSet(ActionEvent event) {
-        setToUpdate = new CodeSet();
-
-        setToUpdate.setCodeSetID(selectedCodeSetID);
-        setToUpdate.setCodeSetName(formCodeSetName);
-        setToUpdate.setCodeSetDescription(formCodeSetDescription);
-
-        CodeIntegrator codeInt = getCodeIntegrator();
         try {
-            codeInt.updateCodeSetMetadata(setToUpdate);
-            
-            //xiaohong add
-            initSelectcodesetpanel();
+            cc.updateCodeSetMetadata(currentCodeSet);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully update code set ID " + currentCodeSet.getCodeSetID(),
+                            ""));
+           return "codeSetManage";
             
         } catch (IntegrationException ex) {
             System.out.println(ex.toString());
@@ -208,371 +151,439 @@ public class CodeSetBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to update code set, sorry.",
                             "This must be corrected by the System Administrator"));
-        }
-    }
-
-    public void displaySelectedCodeSet(ActionEvent event) {
-        if (selectedCodeSet != null) {
-            formCodeSetName = selectedCodeSet.getCodeSetName();
-            formCodeSetDescription = selectedCodeSet.getCodeSetDescription();
-
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Hark! No code set selected--Please select a code set", ""));
-
-        }
-    }
-
-    public void addNewCodeSet(ActionEvent event) {
-        CodeSet cs = new CodeSet();
-        cs.setMuniCode(formNewMuniCode);
-        cs.setCodeSetName(formNewCodeSetName);
-        cs.setCodeSetDescription(formNewCodeSetDescription);
-        CodeIntegrator codeInt = getCodeIntegrator();
-
-        try {
-            codeInt.insertCodeSetMetadata(cs);
-            
-            //xiaohong add
-            initSelectcodesetpanel();
-            
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Unable to add code set to DB", "Your fearless system administrator will need to correct this."));
-        }
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "New Code Set named " + cs.getCodeSetName() + " has been added", ""));
-
-//        return "";
-    }
-
-    public String makeSelectedCodeSetActive() {
-
-        if (selectedCodeSet != null) {
-            getSessionBean().setSessCodeSet(selectedCodeSet);
-            return "missionControl";
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN,
-                            "Please select a code set to make your active set", ""));
             return "";
         }
     }
+    
+    
 
-   
-
-   
-
+    
     /**
-     * @return the selectedMuni
+     * Listener for user requests to start a new codebook
+     * @param ev 
      */
-    public Municipality getSelectedMuni() {
-        return selectedMuni;
+    public void onCodeSetAddInitButtonChange(ActionEvent ev){
+        CodeCoordinator cc = getCodeCoordinator();
+        currentCodeSet = cc.getCodeSetSkeleton();
+        
+        
     }
 
     /**
-     * @param selectedMuni the selectedMuni to set
+     * Listener for user requests to commit a new code book
+     * @return 
      */
-    public void setSelectedMuni(Municipality selectedMuni) {
-        this.selectedMuni = selectedMuni;
-    }
-
-    /**
-     * @return the selectedMuniCode
-     */
-    public int getSelectedMuniCode() {
-        return selectedMuniCode;
-    }
-
-    /**
-     * @param selectedMuniCode the selectedMuniCode to set
-     */
-    public void setSelectedMuniCode(int selectedMuniCode) {
-        this.selectedMuniCode = selectedMuniCode;
-    }
-
-    /**
-     * @return the currentCodeSetID
-     */
-    public int getCurrentCodeSetID() {
-        return currentCodeSetID;
-    }
-
-    /**
-     * @param currentCodeSetID the currentCodeSetID to set
-     */
-    public void setCurrentCodeSetID(int currentCodeSetID) {
-        this.currentCodeSetID = currentCodeSetID;
-    }
-
-    /**
-     * @return the currentCodeSetName
-     */
-    public String getCurrentCodeSetName() {
-        return currentCodeSetName;
-    }
-
-    /**
-     * @param currentCodeSetName the currentCodeSetName to set
-     */
-    public void setCurrentCodeSetName(String currentCodeSetName) {
-        this.currentCodeSetName = currentCodeSetName;
-    }
-
-    /**
-     * @return the currentCodeSetDescription
-     */
-    public String getCurrentCodeSetDescription() {
-        return currentCodeSetDescription;
-    }
-
-    /**
-     * @param currentCodeSetDescription the currentCodeSetDescription to set
-     */
-    public void setCurrentCodeSetDescription(String currentCodeSetDescription) {
-        this.currentCodeSetDescription = currentCodeSetDescription;
-    }
-
-    /**
-     * @return the currentCodeSetMuniCode
-     */
-    public int getCurrentCodeSetMuniCode() {
-        return currentCodeSetMuniCode;
-    }
-
-    /**
-     * @param currentCodeSetMuniCode the currentCodeSetMuniCode to set
-     */
-    public void setCurrentCodeSetMuniCode(int currentCodeSetMuniCode) {
-        this.currentCodeSetMuniCode = currentCodeSetMuniCode;
-    }
-
-    /**
-     * @return the formCodeSetName
-     */
-    public String getFormCodeSetName() {
-        if (selectedCodeSetID != null) {
-            CodeIntegrator ci = getCodeIntegrator();
-            try {
-                formCodeSetName = ci.getCodeSetBySetID(selectedCodeSetID).getCodeSetName();
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-            }
-        }
-        return formCodeSetName;
-    }
-
-    /**
-     * @param formCodeSetName the formCodeSetName to set
-     */
-    public void setFormCodeSetName(String formCodeSetName) {
-        this.formCodeSetName = formCodeSetName;
-    }
-
-    /**
-     * @return the formCodeSetDescription
-     */
-    public String getFormCodeSetDescription() {
-        if (selectedCodeSetID != null) {
+    public String onCodeSetAddCommitButtonChange() {
+        int freshID;
+        CodeCoordinator cc = getCodeCoordinator();
+        try {
+            freshID = cc.insertCodeSet(currentCodeSet);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "New Code Set ID" + freshID  + "has been added", ""));
+            return "codeSetManage";
             
-            CodeIntegrator ci = getCodeIntegrator();
-            try {
-                formCodeSetDescription = ci.getCodeSetBySetID(selectedCodeSetID).getCodeSetDescription();
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-            }
+            
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to add code set to DB", "Your fearless system administrator will need to correct this."));
+            return "";
         }
 
-        return formCodeSetDescription;
+    }
+    
+    /**
+     * Listener for user request to start the nuking process of a code set
+     * 
+     * @param set 
+     */
+    public void onCodeSetNukeInitButtonChange(CodeSet set){
+        currentCodeSet = set;
+        
+        
+    }
+    
+    /**
+     * Listener for user requests to commit a code set nuke operation
+     * @return 
+     */
+    public String onCodeSetNukeCommitButtonChange(){
+        CodeCoordinator cc = getCodeCoordinator();
+        try {
+            cc.deactivateCodeSet(currentCodeSet);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Code set ID " + currentCodeSet.getCodeSetID() + " has beeen nuked forever!", ""));
+            return "codeSetManage";
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Cannot nuke code set due to a database error that must be corrected by a admin", ""));
+            return "";
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Cannot nuke code set because it is currently the default in one or more municipalities!", 
+                            "Check the connections displayed on the main page and choose a new active code set for each municipality using this code set"));
+            return "";
+        }
+    }
+    
+    /**
+     * Listener for user request to connect a chosen municipality to a code set
+     * @return 
+     */
+    public String onUpdateMuniCodeSetMapping(){
+         CodeCoordinator cc = getCodeCoordinator();
+        try {
+            cc.activateCodeSetAsMuniDefault(currentCodeSet, selectedMuniForCodeSetMapping);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Code set ID " + currentCodeSet.getCodeSetID() + " has beeen nuked forever!", ""));
+            return "codeSetManage";
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Cannot connect code book to municipality due to a database error that must be corrected by a admin", ""));
+            return "";
+        } catch (BObStatusException ex) { 
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+            
+        }
+        return "codeSetManage";
+    }
+
+    
+    /**************************************************************************
+    /****************** ENFORCABLE CODE ELEMENT METHODS ***********************
+    /****************** roughly in order a user might call them ***************
+    /**************************************************************************
+   
+   
+    /**
+     * Listener for user requests to start the addition process of ECEs to the 
+     * current CodeSet
+     * @param ev
+     */
+    public void onAddCodeElementsToCodeSetInitButtonChange(ActionEvent ev) {
+        
+       // nothing to do here yet
+       
+    }
+     
+    
+   
+    /**
+     * Listener for user requests to grab all elements from a source
+     * to be added to a code book
+     * @param event 
+     */
+    public void retrieveCodeElementsFromSelectedSource(ActionEvent event) {
+        CodeCoordinator cc = getCodeCoordinator();
+        if(selectedCodeSource != null){
+            
+            try {
+                codeElementList.clear();
+                codeElementList.addAll(cc.getCodeElemements(selectedCodeSource));
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Loaded ordinances in code source: " + selectedCodeSource.getSourceName(), ""));
+            } catch (IntegrationException ex) {
+                System.out.println(ex.toString());
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Unable to find any code elements in the selected source, sorry.", ""));
+            }
+        }
     }
 
     /**
-     * @param formCodeSetDescription the formCodeSetDescription to set
+     * Listener for user requests to add one or more elements to a code set
+     * @return 
      */
-    public void setFormCodeSetDescription(String formCodeSetDescription) {
-        this.formCodeSetDescription = formCodeSetDescription;
+    public String onAddSelectedElementsToCodeSetCommitButtonChange() {
+        CodeCoordinator cc = getCodeCoordinator();
+        if (selectedElementsToAddToSet != null && !selectedElementsToAddToSet.isEmpty()) {
+            EnforcableCodeElement ece;
+            
+            for(CodeElement ele: selectedElementsToAddToSet){
+                ece = cc.getEnforcableCodeElementSkeleton(ele);
+                try {
+                    cc.insertEnforcableCodeElement(ece, currentCodeSet, getSessionBean().getSessUser());
+                } catch (IntegrationException | BObStatusException ex) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+                    return "codeSetManage";
+                }
+                
+            } // close for over elements to add
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Success! Added " 
+                            + selectedElementsToAddToSet.size() + " elements to code set: " 
+                            + currentCodeSet.getCodeSetName(), ""));
+            return "codeSetManage";
+            
+        } else {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Please select at least one element from this source to add to the current code set", ""));
+            return "codeSetManage";
+        }
+    }
+    
+    /**
+     * Listener to user requests to start the update operation on an ECE
+     * @param ece 
+     */
+    public void onSetElementUpdateInitButtonChange(EnforcableCodeElement ece){
+        currentEnforcableCodeElement = ece;
+        
+        
+    }
+    
+    
+    /**
+     * Listener for user requests to commit an ece update operation
+     * @return 
+     */
+    public String onSetElementUpdateCommitButtonChange(){
+        CodeCoordinator cc = getCodeCoordinator();
+        try {
+            cc.updateEnforcableCodeElement(currentEnforcableCodeElement, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+              new FacesMessage(FacesMessage.SEVERITY_INFO,
+                  "Successfully updated enforcability info on enforcable ordinance ID: " + currentEnforcableCodeElement.getCodeSetElementID(), ""));
+            return "codeSetManage";
+            
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    ex.getMessage(), ""));
+            return "codeSetManage";
+        }
+        
+    }
+
+    
+    
+    /**
+     * Listener for user request to start the nuking operation on a code set ele
+     * @param ece 
+     */
+    public void onNukeCodeSetElementInit(EnforcableCodeElement ece){
+        currentEnforcableCodeElement = ece;
+        
+    }
+    
+    /**
+     * Listener for user requests to commit a nuke operation on a code set ele
+     * @return 
+     */
+    public String onNukeCodeSetElementCommit() {
+        CodeCoordinator cc = getCodeCoordinator();
+        try {
+            System.out.println("CodeSetBB.onNukeCSECommit: Nuking element ID " + currentEnforcableCodeElement.getCodeSetElementID());
+            cc.deactivateEnforcableCodeElement(currentEnforcableCodeElement, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                            "Success: Removed Enf. Code Element no. " 
+                                    + currentEnforcableCodeElement.getCodeSetElementID() + " from the code book", ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        }
+        return "codeSetManage";
+    }
+
+  
+
+    
+   
+    
+    
+    
+    /**************************************************************************
+    /****************** GETTERS AND SETTERS: NO LOGIC HERE! *******************
+    /**************************************************************************
+    
+    
+
+     /**
+     * @return the currentCodeSet
+     */
+    public CodeSet getCurrentCodeSet() {
+       
+        return currentCodeSet;
+    }
+
+    /**
+     * @return the selectedMuniForCodeSet
+     */
+    public Municipality getSelectedMuniForCodeSet() {
+        return selectedMuniForCodeSet;
+    }
+
+    /**
+     * @param selectedMuniForCodeSet the selectedMuniForCodeSet to set
+     */
+    public void setSelectedMuniForCodeSet(Municipality selectedMuniForCodeSet) {
+        this.selectedMuniForCodeSet = selectedMuniForCodeSet;
+    }
+
+   
+
+  
+
+   
+   
+    /**
+     * @param csl
+     */
+    public void setCodeSetList(List<CodeSet> csl) {
+        codeSetList = csl;
+    }
+
+   
+
+    
+    /**
+     * @return the currentEnforcableCodeElement
+     */
+    public EnforcableCodeElement getCurrentEnforcableCodeElement() {
+        return currentEnforcableCodeElement;
+    }
+
+    /**
+     * @param currentEnforcableCodeElement the currentEnforcableCodeElement to
+ set
+     */
+    public void setCurrentEnforcableCodeElement(EnforcableCodeElement currentEnforcableCodeElement) {
+        this.currentEnforcableCodeElement = currentEnforcableCodeElement;
+    }
+
+   
+
+    /**
+     * @return the codeSourceList
+     */
+    public List<CodeSource> getCodeSourceList() {
+        return codeSourceList;
+    }
+
+    /**
+     * @return the selectedCodeSource
+     */
+    public CodeSource getSelectedCodeSource() {
+        return selectedCodeSource;
+    }
+
+    /**
+     * @return the codeElementList
+     */
+    public List<CodeElement> getCodeElementList() {
+        return codeElementList;
+    }
+
+    /**
+     * @return the selectedElementsToAddToSet
+     */
+    public List<CodeElement> getSelectedElementsToAddToSet() {
+        return selectedElementsToAddToSet;
+    }
+
+    
+
+    /**
+     * @param currentCodeSet the currentCodeSet to set
+     */
+    public void setCurrentCodeSet(CodeSet currentCodeSet) {
+        this.currentCodeSet = currentCodeSet;
+    }
+
+    /**
+     * @param codeSourceList the codeSourceList to set
+     */
+    public void setCodeSourceList(List<CodeSource> codeSourceList) {
+        this.codeSourceList = codeSourceList;
+    }
+
+    /**
+     * @param selectedCodeSource the selectedCodeSource to set
+     */
+    public void setSelectedCodeSource(CodeSource selectedCodeSource) {
+        this.selectedCodeSource = selectedCodeSource;
+    }
+
+    /**
+     * @param codeElementList the codeElementList to set
+     */
+    public void setCodeElementList(List<CodeElement> codeElementList) {
+        this.codeElementList = codeElementList;
+    }
+
+    /**
+     * @param selectedElementsToAddToSet the selectedElementsToAddToSet to set
+     */
+    public void setSelectedElementsToAddToSet(List<CodeElement> selectedElementsToAddToSet) {
+        this.selectedElementsToAddToSet = selectedElementsToAddToSet;
     }
 
     /**
      * @return the codeSetList
      */
-    public ArrayList<CodeSet> getCodeSetList() {
-
-        CodeIntegrator codeInt = getCodeIntegrator();
-        try {
-            codeSetList = codeInt.getCodeSets(selectedMuniCode);
-        } catch (IntegrationException ex) {
-            System.out.println(ex.toString());
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to retrieve code sets by Muni Code, sorry.",
-                            "This must be corrected by the System Administrator"));
-        }
-
+    public List<CodeSet> getCodeSetList() {
         return codeSetList;
     }
 
     /**
-     * @param codeSetList the codeSetList to set
+     * @return the muniSetMap
      */
-    public void setCodeSetList(ArrayList<CodeSet> codeSetList) {
-        this.codeSetList = codeSetList;
+    public Map<Municipality, CodeSet> getMuniSetMap() {
+        return muniSetMap;
     }
 
     /**
-     * @return the selectedCodeSet
+     * @param muniSetMap the muniSetMap to set
      */
-    public CodeSet getSelectedCodeSet() {
-        CodeIntegrator ci = getCodeIntegrator();
-        try {
-            selectedCodeSet = ci.getCodeSetBySetID(selectedCodeSetID);
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        return selectedCodeSet;
+    public void setMuniSetMap(Map<Municipality, CodeSet> muniSetMap) {
+        this.muniSetMap = muniSetMap;
     }
 
     /**
-     * @param selectedCodeSet the selectedCodeSet to set
+     * @return the selectedMuniForCodeSetMapping
      */
-    public void setSelectedCodeSet(CodeSet selectedCodeSet) {
-        this.selectedCodeSet = selectedCodeSet;
+    public Municipality getSelectedMuniForCodeSetMapping() {
+        return selectedMuniForCodeSetMapping;
     }
 
     /**
-     * @return the currentCodeSetMuniName
+     * @param selectedMuniForCodeSetMapping the selectedMuniForCodeSetMapping to set
      */
-    public String getCurrentCodeSetMuniName() {
-        return currentCodeSetMuniName;
+    public void setSelectedMuniForCodeSetMapping(Municipality selectedMuniForCodeSetMapping) {
+        this.selectedMuniForCodeSetMapping = selectedMuniForCodeSetMapping;
     }
 
     /**
-     * @param currentCodeSetMuniName the currentCodeSetMuniName to set
+     * @return the enforcableCodeElementListFiltered
      */
-    public void setCurrentCodeSetMuniName(String currentCodeSetMuniName) {
-        this.currentCodeSetMuniName = currentCodeSetMuniName;
+    public List<EnforcableCodeElement> getEnforcableCodeElementListFiltered() {
+        return enforcableCodeElementListFiltered;
     }
 
     /**
-     * @return the setToUpdate
+     * @param enforcableCodeElementListFiltered the enforcableCodeElementListFiltered to set
      */
-    public CodeSet getSetToUpdate() {
-        return setToUpdate;
-    }
-
-    /**
-     * @param setToUpdate the setToUpdate to set
-     */
-    public void setSetToUpdate(CodeSet setToUpdate) {
-        this.setToUpdate = setToUpdate;
-    }
-
-    /**
-     * @return the formNewMuniCode
-     */
-    public int getFormNewMuniCode() {
-        return formNewMuniCode;
-    }
-
-    /**
-     * @param formNewMuniCode the formNewMuniCode to set
-     */
-    public void setFormNewMuniCode(int formNewMuniCode) {
-        this.formNewMuniCode = formNewMuniCode;
-    }
-
-    /**
-     * @return the selectedEnforcableCodeElement
-     */
-    public EnforcableCodeElement getSelectedEnforcableCodeElement() {
-        return selectedEnforcableCodeElement;
-    }
-
-    /**
-     * @param selectedEnforcableCodeElement the selectedEnforcableCodeElement to
-     * set
-     */
-    public void setSelectedEnforcableCodeElement(EnforcableCodeElement selectedEnforcableCodeElement) {
-        this.selectedEnforcableCodeElement = selectedEnforcableCodeElement;
-    }
-
-    /**
-     * @return the codeSetMap
-     */
-    public Map<String, Integer> getCodeSetMap() {
-        CodeIntegrator ci = getCodeIntegrator();
-        try {
-            codeSetMap = ci.getSystemWideCodeSetMap();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        return codeSetMap;
-    }
-
-    /**
-     * @param codeSetMap the codeSetMap to set
-     */
-    public void setCodeSetMap(Map<String, Integer> codeSetMap) {
-        this.codeSetMap = codeSetMap;
-    }
-
-    /**
-     * @return the selectedCodeSetID
-     */
-    public Integer getSelectedCodeSetID() {
-        return selectedCodeSetID;
-    }
-
-    /**
-     * @param selectedCodeSetID the selectedCodeSetID to set
-     */
-    public void setSelectedCodeSetID(Integer selectedCodeSetID) {
-        this.selectedCodeSetID = selectedCodeSetID;
-    }
-
-    /**
-     * @return the formNewCodeSetName
-     */
-    public String getFormNewCodeSetName() {
-        return formNewCodeSetName;
-    }
-
-    /**
-     * @return the formNewCodeSetDescription
-     */
-    public String getFormNewCodeSetDescription() {
-        return formNewCodeSetDescription;
-    }
-
-    /**
-     * @param formNewCodeSetName the formNewCodeSetName to set
-     */
-    public void setFormNewCodeSetName(String formNewCodeSetName) {
-        this.formNewCodeSetName = formNewCodeSetName;
-    }
-
-    /**
-     * @param formNewCodeSetDescription the formNewCodeSetDescription to set
-     */
-    public void setFormNewCodeSetDescription(String formNewCodeSetDescription) {
-        this.formNewCodeSetDescription = formNewCodeSetDescription;
-    }
-
-    /**
-     * @return the muniNameIDMap
-     */
-    public Map<String, Integer> getMuniNameIDMap() {
-        return muniNameIDMap;
-    }
-
-    /**
-     * @param muniNameIDMap the muniNameIDMap to set
-     */
-    public void setMuniNameIDMap(Map<String, Integer> muniNameIDMap) {
-        this.muniNameIDMap = muniNameIDMap;
+    public void setEnforcableCodeElementListFiltered(List<EnforcableCodeElement> enforcableCodeElementListFiltered) {
+        this.enforcableCodeElementListFiltered = enforcableCodeElementListFiltered;
     }
 
 }

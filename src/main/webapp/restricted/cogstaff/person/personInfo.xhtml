@@ -203,12 +203,14 @@
 
                                 <div class="ui-g-12 ui-md-12 ui-lg-4 data_field">
                                     <h:outputLabel styleClass="data_field_label" value="Municipality" for="personMuniSelectMenu"/>
-                                    <p:selectOneMenu id="personMuniSelectMenu" 
-                                                     required="true" 
-                                                     value="#{personInfoBB.workingPerson.muniCode}"
-                                                     tabindex="5"
-                                                     >
-                                        <f:selectItems id="muniNameList" value="#{personsBB.muniNameIDMap}"/>
+                                    
+                                        <p:selectOneMenu
+                                        id="personMuniSelectMenu" tabindex="5"
+                                        value="#{personInfoBB.workingPerson.muni}">
+                                         <f:converter converterId="muniConverter"/>
+                                        <f:selectItems id="propinfoedit-muninamelist"
+                                                       value="#{sessionBean.sessUser.authMuniList}"
+                                                       var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
                                     </p:selectOneMenu>
                                     <p:message for="personMuniSelectMenu" showDetail="false" showSummary="true" style="width: 100%"/>
                                 </div>
@@ -454,14 +456,14 @@
                                              onclick="PF('person-addupdate-dialog-var').hide()"
                                              />
 
-                            <p:commandButton id="new-person-cb" 
+                            <p:commandButton id="update-person-cb" 
                                              ajax="false"
                                              value="Update person" 
                                              action="#{personInfoBB.personEditCommit(ev)}"
                                              icon="fa fa-edit" 
                                              tabindex="28"
                                              oncomplete="PF('person-addupdate-dialog-var').hide()"
-                                             disabled="#{personInfoBB.workingPerson.personID != 0}"
+                                             disabled="false"
                                              update="messages-left-form"
                                              />
 

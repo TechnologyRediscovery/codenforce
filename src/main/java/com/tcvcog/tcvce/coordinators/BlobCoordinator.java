@@ -38,6 +38,9 @@ import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.awt.image.BufferedImage;
+import com.tcvcog.tcvce.entities.PrintStyle;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -112,6 +115,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             
             //Get the blob ID from the Faces context
             int blobID = Integer.parseInt(context.getExternalContext().getRequestParameterMap().get("blobID"));
+            System.out.println("BlobCoordinator.getImage: image ID " + blobID);
             try {
                 BlobLight blob = getPhotoBlobLight(blobID);
                 if (null == blob.getType()) {
@@ -129,8 +133,10 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
                     }
                 }
             } catch (IntegrationException ex) {
+                System.out.println(ex);
                 System.out.println("BlobCoordinator.getImage | " + ex);
             } catch (FileNotFoundException ex) {
+                System.out.println(ex);
                 System.out.println("BlobCoordinator.getImage | could not find pdf-icon.png ");
             }
             return sc;

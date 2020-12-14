@@ -110,6 +110,38 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return evList;
     }
     
+    /**
+     * Retrieves event Categories by Type
+     * @param et
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<EventCategory> getEventCategeryList(EventType et) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        List<EventCategory> evCatList = new ArrayList<>();
+        if(et != null){
+            evCatList.addAll(ei.getEventCategoryList(et));
+        }
+        return evCatList;
+        
+    }
+    
+    public List<EventCnF> getEventList(List<Integer> evIDList) throws IntegrationException{
+        List<EventCnF> evList = new ArrayList<>();
+        if(evIDList != null && !evIDList.isEmpty()){
+            for(Integer i: evIDList){
+                evList.add(getEvent(i));
+            }
+        }
+        return evList;
+    }
+    
+    public List<EventCnFPropUnitCasePeriodHeavy> getEventHistoryList(UserAuthorized ua) throws IntegrationException, EventException, SearchException{
+        EventIntegrator ei = getEventIntegrator();
+        return assembleEventCnFPropUnitCasePeriodHeavyList(getEventList(ei.getEventHistory(ua.getUserID())));
+        
+    }
+    
     
     /**
      * Creates a data-rich subclass of our events that contains a Property object
@@ -415,15 +447,21 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     public void updateEvent(EventCnF ev, UserAuthorized ua) throws IntegrationException, EventException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();
         EventIntegrator ei = getEventIntegrator();
+         if(ev == null || ua == null){
+            throw new BObStatusException("Event and User cannot be null");
+        }
+        if(ev.getCategory().getUserRankMinimumToUpdate() > ua.getRole().getRank()){
+            throw new BObStatusException("User's rank does not allow deactivation of given event");
+        }
         
         auditEvent(ev);
-        if(ua!= null){
-            ev.setLastUpdatedBy(ua);
-        }
+        ev.setLastUpdatedBy(ua);
         ev.setLastUpdatedTS(LocalDateTime.now());
         ei.updateEvent(ev);
-        pi.eventPersonClear(ev);
-        pi.eventPersonConnect(ev);
+        if(ev.getPersonList() != null && !ev.getPersonList().isEmpty()){
+            pi.eventPersonClear(ev);
+            pi.eventPersonConnect(ev);
+        }
         
     }
     
@@ -451,7 +489,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param ua
      * @throws IntegrationException 
      */
-    public void deactivateEvent(EventCnF ev, UserAuthorized ua) throws IntegrationException{
+    public void removeEvent(EventCnF ev, UserAuthorized ua) throws IntegrationException, BObStatusException{
+        if(ev == null || ua == null){
+            throw new BObStatusException("Event and User cannot be null");
+        }
+        if(ev.getCategory().getUserRankMinimumToUpdate() > ua.getRole().getRank()){
+            throw new BObStatusException("User's rank does not allow deactivation of given event");
+        }
         SystemCoordinator sc = getSystemCoordinator();
         EventIntegrator ei = getEventIntegrator();
         ev.setActive(false);
@@ -547,7 +591,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
    
     /**
      * Logic container for choosing a sensible event view enum value
-     * @param ua
+     * @param ua not used
      * @return 
      */
    
@@ -603,7 +647,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
        Map<EventType, List<EventCategory>> typeCatMap = new HashMap<>();
        List<EventType> typeList = new ArrayList();
        typeList.addAll(Arrays.asList(EventType.values()));
-       if(typeList != null && !typeList.isEmpty()){
+       if(!typeList.isEmpty()){
            for(EventType typ: typeList){
                try {
                    typeCatMap.put(typ, determinePermittedEventCategories_toView(typ, ua));
@@ -959,13 +1003,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         sb.append("Compliance with the following code violations was observed:");
         sb.append("<br /><br />");
         
-            sb.append(violation.getViolatedEnfElement().getCodeElement().getOrdchapterNo());
+            sb.append(violation.getViolatedEnfElement().getOrdchapterNo());
             sb.append(".");
-            sb.append(violation.getViolatedEnfElement().getCodeElement().getOrdSecNum());
+            sb.append(violation.getViolatedEnfElement().getOrdSecNum());
             sb.append(".");
-            sb.append(violation.getViolatedEnfElement().getCodeElement().getOrdSubSecNum());
+            sb.append(violation.getViolatedEnfElement().getOrdSubSecNum());
             sb.append(":");
-            sb.append(violation.getViolatedEnfElement().getCodeElement().getOrdSubSecTitle());
+            sb.append(violation.getViolatedEnfElement().getOrdSubSecTitle());
             sb.append(" (ID ");
             sb.append(violation.getViolationID());
             sb.append(")");

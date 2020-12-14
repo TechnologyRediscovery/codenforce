@@ -228,7 +228,7 @@
                                 <p:panel id="codesourcemanage-panel-listcodesource"
                                          toggleable="true"
                                          collapsed="false"
-                                         header="Code Elements in #{sessionBean.activeCodeSource.sourceName} (#{sessionBean.activeCodeSource.sourceYear})"
+                                         header="Code Elements in #{sessionBean.sessCodeSource.sourceName} (#{sessionBean.activeCodeSource.sourceYear})"
                                          >
 
                                     <p:spacer height="10px"/>
@@ -392,126 +392,6 @@
                                     </h1>
 
                                     <p:spacer height="10"/>
-
-                                    <h:panelGrid columns="3" cellpadding="5" columnClasses="gridTd_code,gridTd_code,gridTd_code" >
-
-                                        <p:outputLabel for="selectedSourceName" value="Code Source Name: "/>
-
-                                        <p:inputText id="selectedSourceName" 
-                                                     value="#{codeSourceAddUpdateBB.formSourceName}" 
-                                                     required="true"
-                                                     />
-
-                                        <p:message for="selectedSourceName" showDetail="false" showSummary="true"/>
-
-                                        <p:outputLabel for="selectedSourceYear" value="Year: "/>
-
-                                        <p:inputText id="selectedSourceYear" 
-                                                     value="#{codeSourceAddUpdateBB.formSourceYear}" 
-                                                     required="true" 
-                                                     />
-
-                                        <p:message for="selectedSourceYear" showDetail="false" showSummary="true" />
-
-                                        <p:outputLabel for="selectedSourceIsActive" value="Active Source? "/>
-
-
-                                        <p:selectBooleanButton id="selectedSourceIsActive"
-                                                               value="#{codeSourceAddUpdateBB.formSourceIsActive}"
-                                                               required="true"
-                                                               onLabel="Yes"
-                                                               offLabel="No"/> 
-
-                                        <p:message for="selectedSourceIsActive" showDetail="false" showSummary="true" />
-
-                                    </h:panelGrid>
-
-                                    <h:panelGrid columns="1" cellpadding="5" columnClasses="gridTd_code_inputTextarea" >
-
-                                        <p:row>
-                                            <p:column>
-                                                <p:outputLabel for="selectedSourceURL" value="Web link to source specification"/>
-                                            </p:column>
-                                            <p:column>
-                                                <p:message for="selectedSourceURL" showDetail="false" showSummary="true"  />
-                                            </p:column>
-
-                                        </p:row>
-                                        <p:row>
-                                            <p:column>
-                                                <p:inputText id="selectedSourceURL" 
-                                                             value="#{codeSourceAddUpdateBB.formSourceURL}" 
-                                                             style="width: 100%;" 
-                                                             required="true"
-                                                             styleClass="inputText"/>
-                                            </p:column>
-                                        </p:row>
-
-                                        <p:row>
-                                            <p:column>
-                                                <p:outputLabel for="selectedSourceDescription" value="Description of Code Source"/>
-                                            </p:column>
-                                            <p:column>
-                                                <p:message for="selectedSourceDescription" showDetail="false" showSummary="true"/>
-                                            </p:column>
-
-                                        </p:row>
-                                        <p:row>
-                                            <p:column>
-                                                <p:inputTextarea id="selectedSourceDescription" 
-                                                                 value="#{codeSourceAddUpdateBB.formSourceDescription}" 
-                                                                 style="width: 100%;"
-                                                                 required="true"
-                                                                 styleClass="inputTextarea" />
-                                            </p:column>
-                                        </p:row>
-
-                                        <p:row>
-                                            <p:column>
-                                                <p:outputLabel for="selectedSourceNotes" value="Notes on Source (i.e. Who approved it? When does it expire?)"/>
-                                            </p:column>
-                                            <p:column>
-                                                <p:message for="selectedSourceNotes" showDetail="false" showSummary="true"  />
-                                            </p:column>
-
-                                        </p:row>
-                                        <p:row>
-                                            <p:column>
-                                                <p:inputTextarea id="selectedSourceNotes" 
-                                                                 value="#{codeSourceAddUpdateBB.formSourceNotes}" 
-                                                                 style="width: 100%;" 
-                                                                 required="true" 
-                                                                 styleClass="inputText"/>
-
-                                            </p:column>
-                                        </p:row>
-                                    </h:panelGrid>
-
-
-                                    <p:commandButton 
-                                        id="commitButton" 
-                                        ajax="true"
-                                        value="Commit updates" 
-                                        icon="fa fa-edit"
-                                        styleClass="buttonOwnLine" 
-                                        disabled="#{codeSourceBB.activeCodeSourceEdit()}"
-                                        actionListener="#{codeSourceAddUpdateBB.commitCodeSourceUpdates}"
-                                        update="codesourcemanage-panel-selectcodesource
-                                        codesourcemanage-panel-listcodesource
-                                        addUpdateSourceForm
-                                        "
-                                        oncomplete="DialogRequest(args,'codesourcemanage-dialog-updatesource-var')"/>
-
-
-                                    <p:commandButton 
-                                        id="addNewButton" 
-                                        ajax="false"
-                                        value="Add new source"
-                                        icon="fa fa-plus"
-                                        styleClass="buttonOwnLine" 
-                                        disabled="#{codeSourceBB.activeCodeSourceAddSource()}"
-                                        action="#{codeSourceAddUpdateBB.addNewSource}"
-                                        />
 
                                 </h:form>
 
@@ -721,7 +601,7 @@
                                             value="Add New Code Element" 
                                             ajax="true" 
                                             icon="fa fa-plus" 
-                                            actionListener="#{codeElementBB.onAddElementToSourceButtonChange()}"
+                                            actionListener="#{codeElementBB.onAddElementCommitButtonChange()}"
                                             oncomplete="DialogRequest(args,'codesourcemanage-dialog-addelementtosource-var')"
                                             update="codesourcemanage-panel-listcodesource
                                             addCodeElement

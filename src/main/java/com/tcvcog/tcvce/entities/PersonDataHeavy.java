@@ -60,6 +60,7 @@ public  class PersonDataHeavy
         this.personType = p.personType;
         this.muniCode = p.muniCode;
         this. muniName = p.muniName;
+        this.muni = p.muni;
 
         this.source = p.source;
         this.creatorUserID = p.creatorUserID;
