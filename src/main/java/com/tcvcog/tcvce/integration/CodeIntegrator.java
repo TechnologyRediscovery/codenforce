@@ -18,7 +18,9 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import java.io.Serializable;
 import com.tcvcog.tcvce.entities.CodeSource;
@@ -26,6 +28,7 @@ import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -315,7 +318,6 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public CodeElement getCodeElement(int elementID) throws IntegrationException{
-        //System.out.println("CodeIntegrator.getCodeElement | fetching code element by ID");
         CodeElement newCodeElement = null;
         PreparedStatement stmt = null;
         Connection con = getPostgresCon();
@@ -707,7 +709,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public CodeSet getCodeSetBySetID(int setID) throws IntegrationException{
-         String query = "SELECT codesetid, name, description, municipality_municode \n" +
+         String query = "SELECT codesetid, name, description, municipality_municode, active  \n" +
                         "FROM public.codeset WHERE codesetid = ?";
         
          //System.out.println("CodeIntegrator.getCodeSets | MuniCode: "+ muniCode);
@@ -740,13 +742,15 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     /**
-     * Builds a mapping of code set names to IDs for municipal configuration
+     * Builds a mapping of municipalities to code sets
      * @return
      * @throws IntegrationException 
      */
-    public Map<String, Integer> getSystemWideCodeSetMap() throws IntegrationException{
-        Map<String, Integer> setMap = new HashMap<>();
-        String query = "SELECT codesetid, name FROM public.codeset;";
+    public HashMap<Municipality, CodeSet> getMuniDefaultCodeSetMap() throws IntegrationException{
+        HashMap<Municipality, CodeSet> muniSetMap = new HashMap<>();
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        
+        String query = "SELECT municode, defaultcodeset FROM public.municipality;";
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -757,7 +761,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                setMap.put(rs.getString("name"), rs.getInt("codesetid"));
+                muniSetMap.put(mc.getMuni(rs.getInt("municode")), getCodeSetBySetID(rs.getInt("defaultcodeset")));
             }
             
         } catch (SQLException ex) { 
@@ -768,9 +772,10 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return setMap;
+        return muniSetMap;
     }
     
+   
     /**
      * Genenerator of CodeSet objects from a codeset record
      * @param rs
@@ -789,6 +794,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         set.setEnfCodeElementList(getEnforcableCodeElementList(rs.getInt("codesetid")));
         
         set.setMuni(muniInt.getMuni(rs.getInt("municipality_municode")));
+        set.setActive(rs.getBoolean("active"));
 
         return set;
         
@@ -802,8 +808,8 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public ArrayList getCodeSets() throws IntegrationException {
-        String query = "SELECT codesetid, name, description, municipality_municode\n"
-                + "  FROM public.codeset;";
+        String query = "SELECT codesetid \n"
+                + "  FROM public.codeset WHERE active=TRUE;";
 
         //System.out.println("CodeIntegrator.getCodeSets | MuniCode: "+ muniCode);
         Connection con = null;
@@ -817,7 +823,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                codeSetList.add(populateCodeSetFromRS(rs));
+                codeSetList.add(getCodeSetBySetID(rs.getInt("codesetid")));
             }
 
         } catch (SQLException ex) {
@@ -853,7 +859,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public ArrayList getCodeSets(int muniCode) throws IntegrationException{
-         String query = "SELECT codesetid, name, description, municipality_municode \n" +
+         String query = "SELECT codesetid \n" +
                         "FROM public.codeset WHERE municipality_municode = ?";
         
          //System.out.println("CodeIntegrator.getCodeSets | MuniCode: "+ muniCode);
@@ -870,7 +876,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                codeSetList.add(populateCodeSetFromRS(rs));
+                codeSetList.add(getCodeSetBySetID(rs.getInt("codesetid")));
             }
             
         } catch (SQLException ex) { 
@@ -937,7 +943,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         PreparedStatement stmt = null;
         Connection con = null;
         String query = "SELECT codesetelementid " +
-                " FROM public.codesetelement WHERE codeset_codesetid=? AND deactivatedts IS NOT NULL;";
+                " FROM public.codesetelement WHERE codeset_codesetid=? AND deactivatedts IS NULL;";
         ResultSet rs = null;
         ArrayList<EnforcableCodeElement> eceList = new ArrayList();
  
@@ -979,9 +985,9 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         
         EnforcableCodeElement newEce = new EnforcableCodeElement(ele);
         
+        newEce.setCodeSetID(rs.getInt("codeset_codesetid"));
         newEce.setCodeSetElementID(rs.getInt("codesetelementid"));
         
-        newEce.setCodeElement(ele);
         newEce.setMaxPenalty(rs.getInt("elementmaxpenalty"));
         newEce.setMinPenalty(rs.getInt("elementminpenalty"));
         newEce.setNormPenalty(rs.getInt("elementnormpenalty"));
@@ -1026,10 +1032,10 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
  the many-to-many links in the database.
      * 
      * @param ece
-     * @param codeSetID 
+     * @return  
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public void addEnforcableCodeElementToCodeSet(EnforcableCodeElement ece, int codeSetID) throws IntegrationException{
+    public int insertEnforcableCodeElementToCodeSet(EnforcableCodeElement ece) throws IntegrationException{
         PreparedStatement stmt = null;
         Connection con = null;
         String query = "INSERT INTO public.codesetelement(\n" +
@@ -1041,11 +1047,13 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
                     "?, ?, ?, ?, \n" +
                     "?, ?, ?,"
                     + "now(), ?, now(), ?);";
- 
+        ResultSet rs = null;
+        int freshECEID = 0;
+        
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, codeSetID);
+            stmt.setInt(1, ece.getCodeSetID());
             stmt.setInt(2, ece.getElementID() );
             stmt.setDouble(3, ece.getMaxPenalty());
             
@@ -1073,14 +1081,26 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             
             stmt.execute();
             
+            String retrievalQuery = "SELECT currval('codesetelement_elementid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                freshECEID = rs.getInt(1);
+            }
+            
+            
+            
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Exception in CodeIntegrator.addEnforcableCodeElementToCodeSet", ex);
         } finally{
            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
+        return freshECEID;
     }
     
     /**
@@ -1094,8 +1114,8 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         Connection con = null;
         String query =  "UPDATE public.codesetelement\n" +
                         "   SET elementmaxpenalty=?, elementminpenalty=?, elementnormpenalty=?, \n" +
-                        "       penaltynotes=?, normdaystocomply=?, daystocomplynotes=?, munispecificnotes=?, defaultviolationdescription=?\n" +
-                        "       lastupdatedts = now(), lastupdatedby_userid=? \n" +
+                        "       penaltynotes=?, normdaystocomply=?, daystocomplynotes=?, munispecificnotes=?, defaultviolationdescription=?, \n" +
+                        "       lastupdatedts=now(), lastupdatedby_userid=? \n" +
                         " WHERE codesetelementid=?;";
         try {
             con = getPostgresCon();
@@ -1137,7 +1157,10 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public void deactivateEnforcableCodeElement(EnforcableCodeElement ece ) throws IntegrationException{
-         PreparedStatement stmt = null;
+        if(ece == null){
+            throw new IntegrationException("Cannot nuke a null ECE!");
+        } 
+        PreparedStatement stmt = null;
         Connection con = null;
         String query =  "UPDATE public.codesetelement SET deactivatedts = now(), deactivatedby_userid=? \n" +
                         " WHERE codesetelementid = ?;";
@@ -1153,8 +1176,9 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             
             stmt.setInt(2, ece.getCodeSetElementID());
             
-            
-            stmt.execute();
+            System.out.println("CodeIntegratator.deacECE: eceid: " + ece.getCodeSetElementID() );
+            System.out.println("CodeIntegratator.deacECE: stmt: " + stmt.getParameterMetaData());
+            stmt.executeUpdate();
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -1173,22 +1197,40 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public int insertCodeSetMetadata(CodeSet codeSetToInsert) throws IntegrationException{
-        
+        if(codeSetToInsert ==  null){
+            throw new IntegrationException("cannot insert a null set");
+            
+        }
         PreparedStatement stmt = null;
         Connection con = null;
         // note that muniCode is not returned in this query since it is specified in the WHERE
         String query = "INSERT INTO public.codeset(\n" +
-                "codesetid, name, description, municipality_municode)\n" +
-                "VALUES (DEFAULT, ?, ?, ?);";
+                "codesetid, name, description, municipality_municode, active)\n" +
+                "VALUES (DEFAULT, ?, ?, ?, TRUE);";
+        
+        ResultSet rs = null;
+        int freshID = 0;
  
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setString(1, codeSetToInsert.getCodeSetName());
             stmt.setString(2, codeSetToInsert.getCodeSetDescription());
-            stmt.setInt(3, codeSetToInsert.getMuniCode());
-            System.out.println("CodeIntegrator.isnertCodeSet | query to insert: " + stmt.toString());
+            if(codeSetToInsert.getMuni() != null){
+                stmt.setInt(3, codeSetToInsert.getMuni().getMuniCode());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
             stmt.execute();
+            
+            
+            String retrievalQuery = "SELECT currval('codeset_codesetid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                freshID = rs.getInt(1);
+            }
             
         } catch (SQLException ex) {
             System.out.println("MunicipalityIntegrator.getMuniFromMuniCode | " + ex.toString());
@@ -1196,12 +1238,44 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         } finally{
            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
-        return 0;
+        return freshID;
     }
     
-   
+    /**
+     * Deactivates a code set record
+     * @param set
+     * @throws BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+   public void deactivateCodeSet(CodeSet set) throws BObStatusException, IntegrationException{
+        if(set == null) throw new BObStatusException("Cannot deactivate null code set");
+        
+        PreparedStatement stmt = null;
+        Connection con = null;
+        // note that muniCode is not returned in this query since it is specified in the WHERE
+        String query = "UPDATE codeset SET active=FALSE WHERE codesetid=?";
+        
+ 
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, set.getCodeSetID());
+            stmt.executeUpdate();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Exception in MunicipalityIntegrator.getMuniFromMuniCode", ex);
+        } finally{
+           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+       
+       
+   }
   
     
     // *************************************************************

@@ -515,11 +515,6 @@
     </managed-bean>
     
       
-    <managed-bean>
-        <managed-bean-name>codeSourceAddUpdateBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CodeSourceAddUpdateBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
 
 
     <managed-bean>
@@ -528,11 +523,6 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>codeSetElementBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CodeSetElementBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
   
 
     <managed-bean>
@@ -553,17 +543,8 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>codeElementListBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CodeElementListBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>codeSetBuilderBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CodeSetBuilderBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+    
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules codebook ~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     
@@ -2142,12 +2123,6 @@
     
     
     
-    
-    <managed-bean>
-        <managed-bean-name>textBlockBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.TextBlockBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>dashboardDataBB</managed-bean-name>

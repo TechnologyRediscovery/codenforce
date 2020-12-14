@@ -65,10 +65,10 @@ public class EnforcableCodeElement
     // code set elements and enforcable code elments are equivalent
     // TODO: unify these names
     private int codeSetElementID;
+    protected int codeSetID;
     
     // THIS SHOULDN'T Be here, inheritance, not composition!!
     
-    private CodeElement codeElement;
     private double maxPenalty;
     private double minPenalty;
     private double normPenalty;
@@ -97,7 +97,7 @@ public class EnforcableCodeElement
 
     @Override
     public String toString() {
-        return codeElement.getHeaderString();
+        return getHeaderString();
     }
 
     /**
@@ -184,19 +184,8 @@ public class EnforcableCodeElement
         this.daysToComplyNotes = daysToComplyNotes;
     }
 
-    /**
-     * @return the codeElement
-     */
-    public CodeElement getCodeElement() {
-        return codeElement;
-    }
-
-    /**
-     * @param codeElement the codeElement to set
-     */
-    public void setCodeElement(CodeElement codeElement) {
-        this.codeElement = codeElement;
-    }
+    
+  
 
     /**
      * @return the codeSetElementID
@@ -344,6 +333,20 @@ public class EnforcableCodeElement
      */
     public void setEceDeactivatedBy(User eceDeactivatedBy) {
         this.eceDeactivatedBy = eceDeactivatedBy;
+    }
+
+    /**
+     * @return the codeSetID
+     */
+    public int getCodeSetID() {
+        return codeSetID;
+    }
+
+    /**
+     * @param codeSetID the codeSetID to set
+     */
+    public void setCodeSetID(int codeSetID) {
+        this.codeSetID = codeSetID;
     }
 
 }

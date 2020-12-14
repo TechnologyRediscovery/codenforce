@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -28,11 +29,13 @@ import java.util.Objects;
 public class CodeSet implements Serializable {
     
     private int codeSetID;
-    private int muniCode;
+    
     private Municipality muni;
     private String codeSetName;
     private String codeSetDescription;
-    private ArrayList<EnforcableCodeElement> enfCodeElementList;
+    protected boolean active;
+    private List<EnforcableCodeElement> enfCodeElementList;
+    
 
     /**
      * @return the codeSetID
@@ -91,31 +94,19 @@ public class CodeSet implements Serializable {
     }
 
    
-    /**
-     * @return the muniCode
-     */
-    public int getMuniCode() {
-        return muniCode;
-    }
-
-    /**
-     * @param muniCode the muniCode to set
-     */
-    public void setMuniCode(int muniCode) {
-        this.muniCode = muniCode;
-    }
+  
 
     /**
      * @return the enfCodeElementList
      */
-    public ArrayList<EnforcableCodeElement> getEnfCodeElementList() {
+    public List<EnforcableCodeElement> getEnfCodeElementList() {
         return enfCodeElementList;
     }
 
     /**
      * @param enfCodeElementList the enfCodeElementList to set
      */
-    public void setEnfCodeElementList(ArrayList<EnforcableCodeElement> enfCodeElementList) {
+    public void setEnfCodeElementList(List<EnforcableCodeElement> enfCodeElementList) {
         this.enfCodeElementList = enfCodeElementList;
     }
     
@@ -123,7 +114,6 @@ public class CodeSet implements Serializable {
     public int hashCode() {
         int hash = 7;
         hash = 200 * hash + this.codeSetID;
-        hash = 200 * hash + this.muniCode;
         hash = 200 * hash + Objects.hashCode(this.codeSetName);
         hash = 200 * hash + Objects.hashCode(this.codeSetDescription);
         
@@ -145,9 +135,6 @@ public class CodeSet implements Serializable {
         if (this.codeSetID != other.codeSetID) {
             return false;
         }
-        if (this.muniCode != other.muniCode) {
-            return false;
-        }
         if (!Objects.equals(this.codeSetName, other.codeSetName)) {
             return false;
         }
@@ -155,6 +142,20 @@ public class CodeSet implements Serializable {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     

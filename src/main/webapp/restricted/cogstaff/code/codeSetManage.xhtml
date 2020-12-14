@@ -17,9 +17,9 @@
 
                         <h1>Manage Code Books</h1>
 
-                        <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
+                        <h:form id="form-messages-global">
+                            <p:growl id="sets-messages-growl" />
+                        </h:form>
 
                         <div class ="two-column-page-flex-container">
 
@@ -31,342 +31,449 @@
                                          header = "Existing code books"
                                          >
 
-                                    <h:form id="manageSingleCodeSet">
-                                        
-
-                                        <p:dataTable id="codeSetSelectOneDT" 
-                                                     value="#{codeSetBB.currentcodeSetMap}" 
-                                                     var="csm" 
-                                                     >
-
-                                            <p:column headerText="Code Books" 
-                                                      styleClass="centeredColumnContent"
-                                                      >
-
-                                                <h:outputText value="#{csm.key}"/>
-
-                                            </p:column>
-
-                                            <p:column headerText ="Option" 
-                                                      styleClass="centeredColumnContent"
-                                                      style="width: 80px"
-                                                      >
-
-                                                <h:form>
-
-                                                    <p:selectBooleanButton onLabel="Deselect" 
-                                                                           offLabel="Select"
-                                                                           value="#{codeSetBB.selected}"
-                                                                           >
-                                                        <p:ajax update="codesetmanage-panel-selectcodeset
-                                                                codesetmanage-panel-selectcodesetelement
-                                                                codesetmanage-dialog-editcodeset
-                                                                codesetmanage-dialog-addcodeset
-                                                                codesetmanage-dialog-editcodesetelement
-                                                                "
-                                                                listener="#{codeSetBB.onSelectCodeSetsChange(csm.key, csm.value)}"/>
-
-                                                    </p:selectBooleanButton>
-
-                                                </h:form>
-
-                                            </p:column>
-
-                                            <p:column headerText="Edit"
-                                                      styleClass="centeredColumnContent"
-                                                      style="width: 80px"
-                                                      >
-
-                                                <p:commandButton id="button-editcodeset" 
-                                                                 ajax="true"
-                                                                 value="Edit" 
-                                                                 icon="fa fa-pencil" 
-                                                                 oncomplete="PF('codesetmanage-dialog-editcodeset-var').show();"
-                                                                 disabled="#{codeSetBB.activeEdit()}"
-                                                                 />
-
-                                            </p:column>
-
-                                        </p:dataTable> 
-
-                                        <p:spacer height="20px"/>
-
-
-
-
-                                        <p:spacer height="5px"/>
+                                    <h:form id="sets-list-form">
 
                                         <p:commandButton id="codesetmanage-button-addcodeset" 
                                                          ajax="true"
-                                                         value="Add New Code Book" 
+                                                         value="Create New Code Book" 
                                                          icon="fa fa-plus" 
-                                                         oncomplete="PF('codesetmanage-dialog-addcodeset-var').show();"
-                                                         style="width: 275px"
+                                                         actionListener="#{codeSetBB.onCodeSetAddInitButtonChange}"
+                                                         oncomplete="PF('set-add-update-dialog-var').show();"
+                                                         update="set-add-update-dialog
+                                                         :set-add-update-form"
+
                                                          />
-                                    </h:form>
+                                        <p:spacer height="5px" />
 
-                                </p:panel>
+                                        <p:dataTable id="sets-list-table" 
+                                                     value="#{codeSetBB.codeSetList}" 
+                                                     var="codeSet" 
+                                                     rowKey="#{codeSet.codeSetID}"
+                                                     resizableColumns="true"
+                                                     >
 
-                            </div>
-
-                            <div class ="object-column">
-
-                                <p:panel id = "codesetmanage-panel-selectcodesetelement"
-                                         toggleable = "true"
-                                         collapsed ="false"
-                                         header = "Enforceable code elements in code book: #{codeSetElementBB.currentCodeSet.codeSetName}"
-                                         >
-
-                                    <p style="height: 50px">The following table displays Enforcable Code Elements, meaning code elements added to a 
-                                        municipality-specific code book wrapped in enforcement data (e.g. max penalty).</p>
-
-
-                                    <h:form id="enforcableCodeSetElementsForm">
-
-
-                                        <p:commandButton id="codeSetBuilderButton" 
-                                                         ajax="true" 
-                                                         icon="fa fa-plus"
-                                                         value="#{(empty codeSetElementBB.currentCodeSet) ? 'Select a code book' : 'Add ordinance to code book'}" 
-                                                         style="width: 275px"
-                                                         disabled="#{empty codeSetElementBB.currentCodeSet}"
-                                                         oncomplete="PF('codesetmanage-dialog-codeSetBuilder-var').show();"
-                                                         update="codesetmanage-dialog-codeSetBuilder
-                                                         "
-                                                         action="#{codeSetBB.buildCodeSet}"
-                                                         disabled="#{codeSetBB.activeEdit()}"/>
-                                        <p:dataTable
-                                            id="enforcableCodeSetElementTable"
-                                            var="cse"
-                                            value="#{codeSetElementBB.currentCodeSet.enfCodeElementList}"
-
-                                            rowKey="#{cse.codeSetElementID}"
-                                            tableStyleClass="primeDataTable"
-                                            scrollable="true"
-                                            scrollHeight="500"
-                                            resizableColumns="true"
-                                            rowExpandMode="single"
-                                            expandedRow="false"
-                                            filteredValue="#{codeSetElementBB.filteredECEList}"
-                                            widgetVar="codeSetElementListTable"
-                                            tabindex="1">
-
-                                            <p:ajax event="rowSelect" immediate="true" 
-                                                    update=":updateECEForm:formMaxPenalty
-                                                    :updateECEForm:eceNo
-                                                    :updateECEForm:formMinPenaltyField
-                                                    :updateECEForm:formNormPenaltyField
-                                                    :updateECEForm:formPenaltyNotesField
-                                                    :updateECEForm:formNormDaysToComplyField
-                                                    :updateECEForm:formNormDaysToComplyNotesField
-                                                    :updateECEForm:formMuniSpecificNotesEditor" />
-
-                                            <p:column width="3%">
+                                            <p:column width="10%">
                                                 <f:facet name="header">
                                                     <h:outputText value="Exp"/>
                                                 </f:facet>
                                                 <p:rowToggler/>
                                             </p:column>
 
-                                            <p:column width="5%" >
-                                                <f:facet name="header">
-                                                    <h:outputText value="ID" />
-                                                </f:facet>
-                                                <h:outputText value="#{cse.codeSetElementID}"/>
+                                            <p:column width="10%"
+                                                      headerText="ID"
+                                                      styleClass="centeredColumnContent">
+
+                                                <h:outputText value="#{codeSet.codeSetID}"/>
+
                                             </p:column>
 
-                                            <p:column width="10%" sortBy="#{cse.source.sourceName}"
-                                                      filterBy="#{cse.source.sourceName}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Source" />
-                                                </f:facet>
-                                                <h:outputText value="#{cse.source.sourceName}(#{cse.source.sourceYear})"/>
+
+                                            <p:column width="30%"
+                                                      headerText="Name">
+                                                <h:outputText value="#{codeSet.codeSetName}"/>
                                             </p:column>
 
-                                            <p:column width="10%" sortBy="#{cse.guideEntry.category}"
-                                                      filterBy="#{cse.guideEntry.category}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Category" />
-                                                </f:facet>
-                                                <h:outputText value="#{cse.guideEntry.category}"/>
+                                            <p:column   width="15%"
+                                                        headerText="Actions"
+                                                        styleClass="centeredColumnContent"
+                                                        >
+
+
+                                                <p:commandButton   id="sets-list-update-cb"
+                                                                   ajax="true"
+                                                                   rendered="true"
+                                                                   title="Update"
+                                                                   disabled="false"
+                                                                   icon="fa fa-edit"
+                                                                   actionListener="#{codeSetBB.onCodeSetUpdateInitButtonChange(codeSet)}"
+                                                                   oncomplete="PF('set-add-update-dialog-var').show()"
+                                                                   update="set-add-update-dialog
+                                                                   :set-add-update-form"/>
+
+
+
+                                                <p:commandButton   id="sets-list-nuke-cb"
+                                                                   ajax="true"
+                                                                   rendered="true"
+                                                                   icon="fa fa-trash"
+                                                                   disabled="false"
+                                                                   title="Nuke"
+                                                                   actionListener="#{codeSetBB.onCodeSetNukeInitButtonChange(codeSet)}"
+                                                                   oncomplete="PF('set-nuke-dialog-var').show()"
+                                                                   update="set-nuke-dialog
+                                                                   set-nuke-form"/>
+
                                             </p:column>
+                                            <p:column   width="10%"
+                                                        headerText="View"
+                                                        styleClass="centeredColumnContent"
+                                                        >
 
-                                            <p:column width="10%" sortBy="#{cse.guideEntry.subCategory}"
-                                                      filterBy="#{cse.guideEntry.subCategory}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Sub Category" />
-                                                </f:facet>
-                                                <h:outputText value="#{cse.guideEntry.subCategory}"/>
-                                            </p:column>
+                                                <p:commandButton    id="sets-list-viewecelist-cb"
+                                                                    icon="#{codeSet.codeSetID == codeSetBB.currentCodeSet.codeSetID ? 'fa fa-hand-o-right':'fa fa-eye'}"
+                                                                    style="#{codeSet.codeSetID == codeSetBB.currentCodeSet.codeSetID ? 'background-color: #dee461; color:black; border:none;':''}"
+                                                                    action="#{codeSetBB.onViewCodeSetButtonChange(codeSet)}"
+                                                                    ajax="true"
+                                                                    title="View orinances in this source"
+                                                                    update="form-messages-global
+                                                                    :sets-list-form
+                                                                    sets-ece-list-panel
+                                                                    :sets-ece-list-form"
+                                                                    />
 
-                                            <p:column width="5%" sortBy="#{cse.ordchapterNo}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Cha#"/>
-                                                </f:facet>
-                                                <h:outputText value="#{cse.ordchapterNo}"/>
-                                            </p:column>
 
-                                            <p:column width="15%" sortBy="#{cse.ordchapterTitle}"
-                                                      filterBy="#{cse.ordchapterTitle}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Chapter"/>
-                                                </f:facet>
-                                                <h:outputText value="#{cse.ordchapterTitle}"/>
-                                            </p:column>
-
-                                            <p:column width="5%" sortBy="#{cse.ordSecNum}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Sec#" />
-                                                </f:facet>
-                                                <h:outputText value="#{cse.ordSecNum}"/>
-                                            </p:column>
-
-                                            <p:column width="15%" sortBy="#{cse.ordSecTitle}"
-                                                      filterBy="#{cse.ordSecTitle}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Section" />
-                                                </f:facet>
-                                                <h:outputText value="#{cse.ordSecTitle}"/>
-                                            </p:column>
-
-                                            <p:column width="5%" sortBy="#{cse.ordSubSecNum}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Sub#" />
-                                                </f:facet>
-                                                <h:outputText value="#{cse.ordSubSecNum}"/>
-                                            </p:column>
-
-                                            <p:column sortBy="#{cse.ordSubSecTitle}" 
-                                                      filterBy="#{cse.ordSubSecTitle}"
-                                                      width="15%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="SubSec. Title" />
-                                                </f:facet>
-                                                <h:outputText value="#{cse.ordSubSecTitle}"/>
-                                            </p:column>
-
-                                            <p:column width="5%" >
-                                                <f:facet name="header">
-                                                    <h:outputText value="Edit" />
-                                                </f:facet>
-                                                <p:commandButton id="button-editelement" 
-                                                                 ajax="true"
-                                                                 icon="fa fa-pencil" 
-                                                                 oncomplete="PF('codesetmanage-dialog-editcodesetelement-var').show();"
-                                                                 actionListener="#{codeSetElementBB.setSelectedECE(cse)}"
-                                                                 update="codesetmanage-dialog-editcodesetelement"
-
-                                                                 />
                                             </p:column>
 
                                             <p:rowExpansion>
-
-                                                <div class="outlinedBox">
-
-                                                    <h2>Enforceability Info</h2>
-
-                                                    <h:panelGrid columns="4" 
-                                                                 cellpadding="10" 
-                                                                 footerClass="gridFooter"
-                                                                 columnClasses="gridTd, gridTd"
-                                                                 >
-                                                        <h:panelGroup>
-                                                            <h:outputLabel styleClass="bold" value="Munimum Penalty"/>
-                                                            <p:spacer height="15px"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText escape="false" value="$#{cse.minPenalty}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-                                                        <h:panelGroup>
-                                                            <h:outputLabel styleClass="bold" value="Norm Penalty"/>
-                                                            <p:spacer height="15px"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText escape="false" value="$#{cse.normPenalty}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-                                                        <h:panelGroup>
-                                                            <h:outputLabel styleClass="bold" value="Maximum Penalty"/>
-                                                            <p:spacer height="15px"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText escape="false" value="$#{cse.maxPenalty}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-                                                        <h:panelGroup>
-                                                            <h:outputLabel styleClass="bold" value="Penalty Notes"/>
-                                                            <p:spacer height="15px"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText escape="false" value="#{cse.penaltyNotes}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-                                                        <h:panelGroup>
-                                                            <h:outputLabel styleClass="bold" value="Default days to comply"/>
-                                                            <p:spacer height="15px"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText escape="false" value="#{cse.normDaysToComply}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-                                                        <h:panelGroup>
-                                                            <h:outputLabel styleClass="bold" value="Compliance timeframe Notes"/>
-                                                            <p:spacer height="15px"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText escape="false" value="#{cse.daysToComplyNotes}"/>
-                                                            </div>
-                                                        </h:panelGroup>
-
-                                                        <f:facet name="footer">
-                                                            <h:outputLabel styleClass="bold" value="Municipality specific implementation notes"/>
-                                                            <p:spacer height="15px"/>
-                                                            <div class="rowExpansion">
-                                                                <h:outputText escape="false" value="#{cse.muniSpecificNotes}"/>
-                                                            </div>
-                                                        </f:facet>
-
-                                                    </h:panelGrid>
-                                                </div>
-
-                                                <div class="outlinedBox">
-                                                    <h2>Code Element Content</h2>
-
-                                                    <h:outputLabel styleClass="bold" value="Technical Text"/>
-                                                    <p:spacer height="15px"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText escape="false" value="#{cse.ordTechnicalText}"/>
-                                                    </div>
-
-                                                    <p:spacer height="15px"/>
-
-                                                    <h:outputLabel styleClass="bold" value="Human friendly text"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText escape="false" value="#{cse.ordHumanFriendlyText}"/>
-                                                    </div>
-                                                    <p:spacer height="15px"/>
-                                                    <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText escape="false" value="#{cse.guideEntry.enforcementGuidelines}"/>
-                                                    </div>
-
-                                                    <p:spacer height="15px"/>
-
-                                                    <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText escape="false" value="#{cse.guideEntry.inspectionGuidelines}"/>
+                                                <div class="ui-g data_container_nested_restrict">
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
+                                                        <div class="restrict-data-field-label-inline" >
+                                                            <h:outputLabel  for="set-descr">
+                                                                <h:outputText value="Description" />
+                                                            </h:outputLabel>
+                                                        </div>
+                                                        <div class="restrict-data-field-value-inline" >
+                                                            <h:outputText id="set-descr" 
+                                                                          value="#{codeSet.codeSetDescription}"/>
+                                                        </div>
                                                     </div>
                                                 </div>
+
                                             </p:rowExpansion>
-                                        </p:dataTable>
 
-                                        <p:spacer height="15px"/>
+                                        </p:dataTable> 
 
-                                        <p:commandButton 
-                                            ajax="false" tabindex="2" icon="fa fa-bomb"
-                                            value="Nuke Selected Element from code book (Along with all its enforcability data!)"
-                                            id="addElementToSetButton" disabled="true"
-                                            action="#{codeSetElementBB.nukeECE}" />
+                                        <p:spacer height="20px"/>
+
+                                    </h:form>
+
+                                </p:panel>
+
+
+
+                                <p:panel id = "codesetmanage-panel-munimappings"
+                                         toggleable = "true"
+                                         collapsed ="false"
+                                         header = "Default municipality code books"
+                                         >
+
+                                    <p:dataScroller id="muni-set-scroller"
+                                                    value="#{codeSetBB.muniSetMap.entrySet}"
+                                                    var="entry"
+                                                    >
+
+                                        <div class="ui-g data_container_nested_restrict">
+                                            <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel  for="kv-muni">
+                                                        <h:outputText value="Description" />
+                                                    </h:outputLabel>
+                                                </div>
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="kv-muni" 
+                                                                  value="#{entry.key.muniName}"/>
+                                                </div>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel  for="kv-set">
+                                                        <h:outputText value="Description" />
+                                                    </h:outputLabel>
+                                                </div>
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="kv-set" 
+                                                                  value="#{entry.value.codeSetName} (ID:#{entry.value.codeSetID})"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </p:dataScroller>
+
+                                </p:panel>
+
+
+                            </div>
+
+                            <div class ="object-column">
+
+                                <p:panel id="sets-ece-list-panel"
+                                         toggleable="true"
+                                         collapsed="false"
+                                         header="Enforcable ordinances in code book: #{codeSetBB.currentCodeSet.codeSetName}"
+                                         >
+
+
+                                    <h:form id="sets-ece-list-form">
+
+
+                                        <p:commandButton id="sets-add-ord-cb" 
+                                                         ajax="true" 
+                                                         icon="fa fa-plus"
+                                                         value="#{(empty codeSetBB.currentCodeSet) ? 'Select a code book' : 'Add ordinance to code book'}" 
+                                                         style="width: 275px"
+                                                         disabled="#{empty codeSetBB.currentCodeSet}"
+                                                         oncomplete="PF('sets-addelements-dialog-var').show();"
+                                                         update="
+                                                         form-messages-global
+                                                         sets-addelements-dialog
+                                                         sets-addelements-form
+                                                         "
+                                                         actionListener="#{codeSetBB.onAddCodeElementsToCodeSetInitButtonChange}" />
+
+                                        <p:spacer height="5px" />
+                                        
+                                        
+                                        <h:outputText id="sets-ece-list-size-ot"
+                                                      value="#{!(empty codeSetBB.currentCodeSet.enfCodeElementList) ? codeSetBB.currentCodeSet.enfCodeElementList.size() : ''}"
+                                                      styleClass="italic" />
+                                        
+                                        <h:outputText id="sets-ece-list-size-label-ot"
+                                                      value="#{!(empty codeSetBB.currentCodeSet.enfCodeElementList) ? ' ordiances contained in this code book' : 'empty code book'}"
+                                                      styleClass="italic" />
+
+                                            <p:dataTable
+                                                id="sets-ece-list-table"
+                                                var="cse"
+                                                value="#{codeSetBB.currentCodeSet.enfCodeElementList}"
+
+                                                rowKey="#{cse.codeSetElementID}"
+                                                tableStyleClass="primeDataTable"
+                                                scrollable="true"
+                                                scrollHeight="500"
+                                                resizableColumns="true"
+                                                rowExpandMode="single"
+                                                expandedRow="false"
+                                                filteredValue="#{codeSetBB.enforcableCodeElementListFiltered}"
+                                                widgetVar="codeSetElementListTable"
+                                                tabindex="1">
+
+                                               
+
+                                                <p:column width="3%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Exp"/>
+                                                    </f:facet>
+                                                    <p:rowToggler/>
+                                                </p:column>
+
+                                                <p:column width="5%" >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="ID" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{cse.codeSetElementID}"/>
+                                                </p:column>
+
+                                                <p:column width="10%" sortBy="#{cse.source.sourceName}"
+                                                          filterBy="#{cse.source.sourceName}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Source" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{cse.source.sourceName}(#{cse.source.sourceYear})"/>
+                                                </p:column>
+
+                                                <p:column width="10%" sortBy="#{cse.guideEntry.category}"
+                                                          filterBy="#{cse.guideEntry.category}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Category" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{cse.guideEntry.category}"/>
+                                                </p:column>
+
+                                                <p:column width="10%" sortBy="#{cse.guideEntry.subCategory}"
+                                                          filterBy="#{cse.guideEntry.subCategory}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Sub Category" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{cse.guideEntry.subCategory}"/>
+                                                </p:column>
+
+                                                <p:column width="5%" sortBy="#{cse.ordchapterNo}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Cha#"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{cse.ordchapterNo}"/>
+                                                </p:column>
+
+                                                <p:column width="15%" sortBy="#{cse.ordchapterTitle}"
+                                                          filterBy="#{cse.ordchapterTitle}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Chapter"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{cse.ordchapterTitle}"/>
+                                                </p:column>
+
+                                                <p:column width="5%" sortBy="#{cse.ordSecNum}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Sec#" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{cse.ordSecNum}"/>
+                                                </p:column>
+
+                                                <p:column width="15%" sortBy="#{cse.ordSecTitle}"
+                                                          filterBy="#{cse.ordSecTitle}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Section" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{cse.ordSecTitle}"/>
+                                                </p:column>
+
+                                                <p:column width="5%" sortBy="#{cse.ordSubSecNum}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Sub#" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{cse.ordSubSecNum}"/>
+                                                </p:column>
+
+                                                <p:column sortBy="#{cse.ordSubSecTitle}" 
+                                                          filterBy="#{cse.ordSubSecTitle}"
+                                                          width="15%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="SubSec. Title" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{cse.ordSubSecTitle}"/>
+                                                </p:column>
+
+                                                <p:column   width="15%"
+                                                            headerText="Actions"
+                                                            styleClass="centeredColumnContent"
+                                                            >
+
+
+                                                    <p:commandButton   id="ece-update-init-cb"
+                                                                       ajax="true"
+                                                                       rendered="true"
+                                                                       title="Update enforcability info"
+                                                                       disabled="false"
+                                                                       icon="fa fa-edit"
+                                                                       actionListener="#{codeSetBB.onSetElementUpdateInitButtonChange(cse)}"
+                                                                       oncomplete="PF('sets-ece-update-dialog-var').show()"
+                                                                       update="sets-ece-update-dialog
+                                                                       :sets-ece-update-form"/>
+
+
+
+                                                    <p:commandButton   id="ece-nuke-init-cb"
+                                                                       ajax="true"
+                                                                       rendered="true"
+                                                                       icon="fa fa-trash"
+                                                                       disabled="false"
+                                                                       title="Nuke enforcable ordinance"
+                                                                       actionListener="#{codeSetBB.onNukeCodeSetElementInit(cse)}"
+                                                                       oncomplete="PF('sets-ece-nuke-dialog-var').show()"
+                                                                       update="sets-ece-nuke-dialog
+                                                                       sets-ece-nuke-form"/>
+
+                                                </p:column>
+
+                                                <p:rowExpansion>
+
+                                                    <div class="outlinedBox">
+
+                                                        <h2>Enforceability Info</h2>
+
+                                                        <h:panelGrid columns="4" 
+                                                                     cellpadding="10" 
+                                                                     footerClass="gridFooter"
+                                                                     columnClasses="gridTd, gridTd"
+                                                                     >
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Munimum Penalty"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText escape="false" value="$#{cse.minPenalty}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Norm Penalty"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText escape="false" value="$#{cse.normPenalty}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Maximum Penalty"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText escape="false" value="$#{cse.maxPenalty}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Penalty Notes"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText escape="false" value="#{cse.penaltyNotes}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Default days to comply"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText escape="false" value="#{cse.normDaysToComply}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <h:panelGroup>
+                                                                <h:outputLabel styleClass="bold" value="Compliance timeframe Notes"/>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText escape="false" value="#{cse.daysToComplyNotes}"/>
+                                                                </div>
+                                                            </h:panelGroup>
+
+                                                            <f:facet name="footer">
+                                                                <h4>Default violation finding</h4>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText escape="false" value="#{cse.defaultViolationDescription}"/>
+                                                                </div>
+
+                                                                <h4>Municipality specific implementation notes</h4>
+                                                                <p:spacer height="15px"/>
+                                                                <div class="rowExpansion">
+                                                                    <h:outputText escape="false" value="#{cse.muniSpecificNotes}"/>
+                                                                </div>
+                                                            </f:facet>
+
+                                                        </h:panelGrid>
+                                                    </div>
+
+                                                    <div class="outlinedBox">
+                                                        <h2>Code Element Content</h2>
+
+                                                        <h:outputLabel styleClass="bold" value="Technical Text"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{cse.ordTechnicalText}"/>
+                                                        </div>
+
+                                                        <p:spacer height="15px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Human friendly text"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{cse.ordHumanFriendlyText}"/>
+                                                        </div>
+                                                        <p:spacer height="15px"/>
+                                                        <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{cse.guideEntry.enforcementGuidelines}"/>
+                                                        </div>
+
+                                                        <p:spacer height="15px"/>
+
+                                                        <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText escape="false" value="#{cse.guideEntry.inspectionGuidelines}"/>
+                                                        </div>
+                                                    </div>
+                                                </p:rowExpansion>
+                                            </p:dataTable>
+
+                                            <p:spacer height="15px"/>
+
+
 
                                     </h:form>
                                 </p:panel>
@@ -376,482 +483,550 @@
                     </div>
 
 
-
-
-
-                    <p:dialog  id="codesetmanage-dialog-editcodeset"
-                               width="600"
-                               widgetVar="codesetmanage-dialog-editcodeset-var"
+                    <p:dialog  id="set-add-update-dialog"
+                               width="800"
+                               height="600"
+                               widgetVar="set-add-update-dialog-var"
                                closable="true" 
-                               header="Edit Code book"
+                               header="#{codeSetBB.currentCodeSet.codeSetID == 0 ? 'Add new code book' : 'Update code book'}"
                                >
 
-                        <h:form id="codesetmanage-dialog-editcodeset-form" >
+                        <h:form id="set-add-update-form" >
 
-                            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5" width="580" >
 
-                                <h:outputText value="Code book ID :"/>
-                                <h:outputText value="#{codeSetBB.selectedCodeSetID}" style="width: 90%" />
+                            <h:panelGrid columns="1" style="margin-bottom:10px" cellpadding="5" width="580" >
+
+                                <h:panelGroup>
+
+                                    <h:outputText value="Municipality:"/>
+
+                                    <p:selectOneMenu 
+                                        id="set-add-update-muni-som" tabindex="1"
+                                        value="#{codeSetBB.currentCodeSet.muni}"
+                                        style="display: block; clear: right;"
+                                        required="true">
+                                        
+                                            <f:selectItem itemLabel="select a municipality..." noSelectionOption="true" itemDisabled="true"/>
+                                            <f:selectItems value="#{systemServicesBB.municipalityListForSearch}" var="muni" itemLabel="#{muni.muniName}"/>
+                                            <f:converter converterId="muniConverter" />
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+
+
                                 <h:outputText value="Code book Name :"/>
-                                <p:inputText value="#{codeSetBB.formCodeSetName}"/>
-                                <h:outputText value="Description :" style="width: 90%"/>
-                                <p:inputText value="#{codeSetBB.formCodeSetDescription}"/>
+                                <p:inputText    id="set-name-it"
+                                                required="true"
+                                                tabindex="2"
+                                                value="#{codeSetBB.currentCodeSet.codeSetName}"/>
+                            </h:panelGroup>
 
-                            </h:panelGrid>
+                            <h:panelGroup>
+                                <h:outputText value="Code book Description :" style="width: 90%"/>
+                                <p:inputText    id="set-descr-it"
+                                                value="#{codeSetBB.currentCodeSet.codeSetDescription}"
+                                                required="false"
+                                                tabindex="3"/>
+                            </h:panelGroup>
 
-                            <p class="note">Moving an existing code book to a new municipality must be done on the 
-                                "back end" by an administrator.</p>
+                        </h:panelGrid>
 
-                            <p:commandButton ajax="true"
-                                             value="Update" 
-                                             style="width:100px"
-                                             actionListener="#{codeSetBB.commitUpdatesToCodeSet}"
-                                             oncomplete="PF('codesetmanage-dialog-editcodeset-var').hide();"
-                                             update="codesetmanage-panel-selectcodeset
-                                             codesetmanage-panel-selectcodesetelement
-                                             codesetmanage-dialog-editcodeset"
 
-                                             />
+                        <p:commandButton    id="set-update-commit-cb"
+                                            ajax="false"
+                                            value="Update code book" 
+                                            icon="fa fa-edit"
+                                            tabindex="4"
+                                            action="#{codeSetBB.onCodeSetUpdateCommitButtonChange}"
+                                            rendered="#{codeSetBB.currentCodeSet.codeSetID != 0}"
 
-                            <p:commandButton ajax="true"
-                                             value="Cancel" 
-                                             style="width:100px"
-                                             oncomplete="PF('codesetmanage-dialog-editcodeset-var').hide();"
-                                             update="codesetmanage-panel-selectcodeset
-                                             codesetmanage-panel-selectcodesetelement
-                                             codesetmanage-dialog-editcodeset"
-                                             />
-                        </h:form>
-                    </p:dialog>  
 
-                    <p:dialog  id="codesetmanage-dialog-addcodeset"
-                               width="600"
-                               widgetVar="codesetmanage-dialog-addcodeset-var"
-                               closable="true" 
-                               header="Add New Code book"
+                                            />
+
+                        <p:commandButton    id="set-add-commit-cb"
+                                            ajax="false"
+                                            icon="fa fa-plus"
+                                            value="Create new code book" 
+                                            rendered="#{codeSetBB.currentCodeSet.codeSetID == 0}"
+                                            action="#{codeSetBB.onCodeSetAddCommitButtonChange}"
+                                            tabindex="4"
+                                            />
+
+                        <p:commandButton    ajax="true"
+                                            value="Cancel" 
+                                            icon="fa fa-stop"
+                                            process="@none"
+                                            immediate="true"
+                                            tabindex="true"
+                                            oncomplete="PF('set-add-update-dialog-var').hide();"
+                                            />
+                    </h:form>
+
+                    <f:subview id="muni-set-mapping-subview"
+                               rendered="#{codeSetBB.currentCodeSet.codeSetID != 0}"
                                >
 
-                        <h:form id="codesetmanage-dialog-addcodeset-form" >
+                        <h:form id="muni-codeboook-mapping-form">
 
-                            <p:spacer height="15px;"/>
+                            <h4>Default municipality codebook</h4>
 
-                            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5" width="580" >
+                            <h:outputText value="Choose a municipality in which to activate code book: #{codeSetBB.currentCodeSet.codeSetName}" />
 
-                                <h:outputText value="Select Municipal Name :"/>
+                            <p:selectOneMenu 
+                                id="muni-set-mapping-muni-som" 
+                                tabindex="1"
+                                value="#{codeSetBB.selectedMuniForCodeSetMapping}"
+                                >
+                                    <f:selectItem itemLabel="select a municipality..." noSelectionOption="true" itemDisabled="true"/>
+                                    <f:selectItems value="#{systemServicesBB.municipalityListForSearch}" var="muni" itemLabel="#{muni.muniName}"/>
+                                    <f:converter converterId="muniConverter" />
+                        </p:selectOneMenu>
 
-                                <p:selectOneMenu 
-                                    id="muni" tabindex="7"
-                                    value="#{codeSetBB.formNewMuniCode}"
-                                    style="display: block; clear: right;">
-                                    <f:selectItems value="#{codeSetBB.muniNameIDMap}"/>
-                                </p:selectOneMenu>
+                        <p:spacer height="5px" />
 
-                                <h:outputText value="New Code book Name :"/>
-                                <p:inputText value="#{codeSetBB.formNewCodeSetName}"/>
+                        <p:commandButton    id="set-add-commit-cb"
+                                            ajax="false"
+                                            icon="fa fa-link"
+                                            value="Make this code set active in selected municipality" 
+                                            actionListener="#{codeSetBB.onUpdateMuniCodeSetMapping}"
+                                            disabled="#{codeSetBB.currentCodeSet.codeSetID != 0}"
+                                            />
 
-                                <h:outputText value="New Code book Description :" style="width: 90%"/>
-                                <p:inputText value="#{codeSetBB.formNewCodeSetDescription}"/>
-
-                            </h:panelGrid>
-
-                            <p:commandButton ajax="true"
-                                             value="Add" 
-                                             style="width:100px"
-                                             actionListener="#{codeSetBB.addNewCodeSet}"
-                                             oncomplete="PF('codesetmanage-dialog-addcodeset-var').hide();"
-                                             update="codesetmanage-panel-selectcodeset
-                                             codesetmanage-panel-selectcodesetelement
-                                             codesetmanage-dialog-addcodeset"
-                                             />
-
-                            <p:commandButton ajax="true"
-                                             value="Cancel" 
-                                             style="width:100px"
-                                             oncomplete="PF('codesetmanage-dialog-addcodeset-var').hide();"
-                                             update="codesetmanage-panel-selectcodeset
-                                             codesetmanage-panel-selectcodesetelement
-                                             codesetmanage-dialog-addcodeset"
-                                             />
-                        </h:form>
-                    </p:dialog> 
+                    </h:form>
 
 
-                    <p:dialog  id="codesetmanage-dialog-editcodesetelement"
-                               width="1100"
-                               widgetVar="codesetmanage-dialog-editcodesetelement-var"
-                               closable="true" 
-                               header="Edit Enforcability Data On Selected Element"
-                               >
 
-                        <h:form id="updateECEForm">
-
-                            <p:panel id = "eceNo"
-                                     toggleable = "true"
-                                     collapsed ="false"
-                                     header = "Enforcability data for code book element number: #{codeSetElementBB.selectedECE.codeSetElementID}"
-                                     >
+                </f:subview>
 
 
-                                <h:panelGrid columns="4" cellpadding="10"  footerClass="gridFooter"
-                                             columnClasses="gridTd, gridTd, gridTd, gridTd">
 
-                                    <h:panelGroup>
-                                        <p:outputLabel for="formMaxPenalty">
-                                            <h:outputText value="Maximum Penalty in $"/>
-                                        </p:outputLabel>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <p:inputText id="formMaxPenalty" value="#{codeSetElementBB.selectedECE.maxPenalty}" 
-                                                     style="width: 50%;" tabindex="3" required="true" styleClass="inputText"/>
-                                        <h:message for="formMaxPenalty" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
-                                        <p:outputLabel for="formMinPenaltyField">
-                                            <h:outputText value="Minimum Penalty in $"/>
-                                        </p:outputLabel>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <p:inputText id="formMinPenaltyField" value="#{codeSetElementBB.selectedECE.minPenalty}" 
-                                                     style="width: 100%;" tabindex="4" required="true" styleClass="inputText"/>
-                                        <h:message for="formMinPenaltyField" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
-                                        <p:outputLabel for="formNormPenaltyField">
-                                            <h:outputText value="Default/Normal Penalty in $"/>
-                                        </p:outputLabel>
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
-                                        <p:inputText id="formNormPenaltyField" value="#{codeSetElementBB.selectedECE.normPenalty}" 
-                                                     style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
-                                        <h:message for="formNormPenaltyField" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
-                                        <p:outputLabel for="formPenaltyNotesField">
-                                            <h:outputText value="Penalty notes"/>
-                                        </p:outputLabel>
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
-                                        <p:inputText id="formPenaltyNotesField" value="#{codeSetElementBB.selectedECE.penaltyNotes}" 
-                                                     style="width: 100%;" tabindex="6" required="false" styleClass="inputText"/>
-                                        <h:message for="formPenaltyNotesField" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
-                                        <p:outputLabel for="formNormDaysToComplyField">
-                                            <h:outputText value="Default days to comply"/>
-                                        </p:outputLabel>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <p:inputText id="formNormDaysToComplyField" value="#{codeSetElementBB.selectedECE.normDaysToComply}" 
-                                                     style="width: 50%;" tabindex="7" required="true" styleClass="inputText"/>
-                                        <h:message for="formNormDaysToComplyField" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
-                                        <p:outputLabel for="formNormDaysToComplyNotesField">
-                                            <h:outputText value="Notes on days to comply"/>
-                                        </p:outputLabel>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <p:inputText id="formNormDaysToComplyNotesField" value="#{codeSetElementBB.selectedECE.daysToComplyNotes}" 
-                                                     style="width: 100%;" tabindex="8" required="false" styleClass="inputText"/>
-                                        <h:message for="formNormDaysToComplyNotesField" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
-
-                                    <h:panelGroup>
-                                        <h:outputLabel styleClass="bold" value="Municipality-Specific Notes:" for="formMuniSpecificNotesEditor"/>
-                                    </h:panelGroup>
-
-                                    <f:facet name="footer">
-                                        <h:panelGroup>
-                                            <p:editor   id="formMuniSpecificNotesEditor"  value="#{codeSetElementBB.selectedECE.muniSpecificNotes}" 
-                                                        controls="bold italic underline strikethrough font size style color 
-                                                        bullets numbering center undo redo rule link removeformat outdent 
-                                                        indent link unlink copy cut paste rule alignleft center alignright"
-                                                        width="1000" required="true"
-                                                        height="200"/>
-                                            <h:message for="formMuniSpecificNotesEditor" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                        </h:panelGroup>
-                                    </f:facet>
-
-                                </h:panelGrid>
-                                <p:spacer height="15px"/>
-                                <p:commandButton 
-                                    ajax="true" tabindex="9" icon="fa fa-edit"
-                                    value="Update Enforcability data for this element"
-                                    id="addElementToSetButton"
-                                    action="#{codeSetElementBB.updateECEData}" 
-                                    update="codesetmanage-panel-selectcodeset
-                                    codesetmanage-panel-selectcodesetelement"
-                                    oncomplete="PF('codesetmanage-dialog-editcodesetelement-var').hide();"/>
-                            </p:panel>
-                        </h:form>
-                    </p:dialog> 
-
-                    <p:dialog  id="codesetmanage-dialog-codeSetBuilder"
-                               width="1100"
-                               
-                               height="75vh"
-                               widgetVar="codesetmanage-dialog-codeSetBuilder-var"
-                               closable="true" 
-                               header="Code Book Builder"
-                               
-                               
-                               >
-
-                        <p:panel  toggleable = "true"
-                                  collapsed ="false"
-                                  header = "Current Code book: #{codeSetBuilderBB.currentCodeSet.codeSetName}"
-                                  
-                                  >
-
-                            <h:form id="codeSetBuilderForm1">
-
-                                <h:messages globalOnly="true"
-                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                </h:messages>
-
-                                <h:panelGrid columns="4" cellpadding="10"  
-                                             columnClasses="gridTd, gridTd, gridTd, gridTd">
-
-                                    <h:outputText class="bold" value="Current Code Book Name:"/>
-                                    <h:outputText value="#{codeSetBuilderBB.currentCodeSet.codeSetName}"/>
-                                    <h:outputText class="bold" value="Set ID Number:"/>
-                                    <h:outputText value="#{codeSetBuilderBB.currentCodeSet.codeSetID}"/>
-                                    <h:outputText class="bold" value="Description:"/>
-                                    <h:outputText value="#{codeSetBuilderBB.currentCodeSet.codeSetDescription}"/>
-                                    <h:outputText class="bold" value="Municipality:"/>
-                                    <h:outputText value="#{codeSetBuilderBB.currentCodeSet.muni.muniName}"/>
-
-                                </h:panelGrid>
-
-                            </h:form>
-
-                        </p:panel>
-                        <p:spacer height="5px;"/>
-                        <hr/>
+            </p:dialog>  
 
 
-                        <p:panel toggleable = "true"
-                                 collapsed ="false"
-                                 header = "Add Code Elements by Source"
-                                 >
-
-                            <h:form id="codeElementSelectForm">
-
-                                <p class="note">Select a code source (e.g. IPMC 2015) from which you wish to add an element to this code book.</p>
-
-                                <p:selectOneMenu 
-                                    id="sourceMenu" 
-                                    value="#{codeSetBuilderBB.selectedCodeSource}">
-                                    
-
-                                    <f:selectItems value="#{codeSetBuilderBB.codeSourceMap}"/>
 
 
-                                </p:selectOneMenu>
 
-                                <h:message for="sourceMenu" showDetail="true" showSummary="true" 
+            <p:dialog  id="sets-ece-update-dialog"
+                       width="1100"
+                       widgetVar="sets-ece-update-dialog-var"
+                       closable="true" 
+                       header="Edit Enforcability Data On Selected Element"
+                       >
+
+                <h:form id="sets-ece-update-form">
+
+                        <h:panelGrid columns="4" cellpadding="10"  footerClass="gridFooter"
+                                     columnClasses="gridTd, gridTd, gridTd, gridTd">
+
+                            <h:panelGroup>
+                                <p:outputLabel for="formMaxPenalty">
+                                    <h:outputText value="Maximum Penalty in $"/>
+                                </p:outputLabel>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:inputText id="formMaxPenalty" value="#{codeSetBB.currentEnforcableCodeElement.maxPenalty}" 
+                                             style="width: 50%;" tabindex="3" required="true" styleClass="inputText"/>
+                                <h:message for="formMaxPenalty" showDetail="false" showSummary="true" 
                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <p:outputLabel for="formMinPenaltyField">
+                                    <h:outputText value="Minimum Penalty in $"/>
+                                </p:outputLabel>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:inputText id="formMinPenaltyField" value="#{codeSetBB.currentEnforcableCodeElement.minPenalty}" 
+                                             style="width: 100%;" tabindex="4" required="true" styleClass="inputText"/>
+                                <h:message for="formMinPenaltyField" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <p:outputLabel for="formNormPenaltyField">
+                                    <h:outputText value="Default/Normal Penalty in $"/>
+                                </p:outputLabel>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <p:inputText id="formNormPenaltyField" value="#{codeSetBB.currentEnforcableCodeElement.normPenalty}" 
+                                             style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
+                                <h:message for="formNormPenaltyField" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <p:outputLabel for="formPenaltyNotesField">
+                                    <h:outputText value="Penalty notes"/>
+                                </p:outputLabel>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <p:inputText id="formPenaltyNotesField" value="#{codeSetBB.currentEnforcableCodeElement.penaltyNotes}" 
+                                             style="width: 100%;" tabindex="6" required="false" styleClass="inputText"/>
+                                <h:message for="formPenaltyNotesField" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <p:outputLabel for="formNormDaysToComplyField">
+                                    <h:outputText value="Default days to comply"/>
+                                </p:outputLabel>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:inputText id="formNormDaysToComplyField" value="#{codeSetBB.currentEnforcableCodeElement.normDaysToComply}" 
+                                             style="width: 50%;" tabindex="7" required="true" styleClass="inputText"/>
+                                <h:message for="formNormDaysToComplyField" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <p:outputLabel for="formNormDaysToComplyNotesField">
+                                    <h:outputText value="Notes on days to comply"/>
+                                </p:outputLabel>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:inputText id="formNormDaysToComplyNotesField" value="#{codeSetBB.currentEnforcableCodeElement.daysToComplyNotes}" 
+                                             style="width: 100%;" tabindex="8" required="false" styleClass="inputText"/>
+                                <h:message for="formNormDaysToComplyNotesField" showDetail="false" showSummary="true" 
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            </h:panelGroup>
 
 
-                                <p:commandButton
-                                    id="getElementsFromCodeSourceButton"
-                                    value="Get Ordinances from Selected Source"
-                                    actionListener="#{codeSetBuilderBB.retrieveCodeElementsFromSelectedSource}"
-                                    ajax="true" 
-                                    icon="fa fa-list"
-                                    update="codeElemetnAddForm"/>
+                            <f:facet name="footer">
+                            <h:panelGroup>
+                                <h:outputLabel styleClass="bold" value="Default violation findings:" for="ece-update-defviolfindings"/>
+                            </h:panelGroup>
+                            
+                                <p:inputTextarea id="ece-update-defviolfindings"
+                                                 value="#{codeSetBB.currentEnforcableCodeElement.defaultViolationDescription}" />
+                            <h:panelGroup>
+                                <h:outputLabel styleClass="bold" value="Municipality-Specific Notes:" for="formMuniSpecificNotesEditor"/>
+                            </h:panelGroup>
                                 
-                                </h:form>
-                                <h:form id="codeElemetnAddForm">
+                                <h:panelGroup>
+                                    <p:editor   id="formMuniSpecificNotesEditor"  value="#{codeSetBB.currentEnforcableCodeElement.muniSpecificNotes}" 
+                                                controls="bold italic underline strikethrough font size style color 
+                                                bullets numbering center undo redo rule link removeformat outdent 
+                                                indent link unlink copy cut paste rule alignleft center alignright"
+                                                width="1000" required="false"
+                                                height="200"/>
+                                    <h:message for="formMuniSpecificNotesEditor" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                            </f:facet>
+
+                        </h:panelGrid>
+                        <p:spacer height="15px"/>
+                        <p:commandButton 
+                            id="sets-ece-udpate-commit-cb"
+                            ajax="false" 
+                            tabindex="9" 
+                            icon="fa fa-edit"
+                            value="Update Enforcability data for this ordinance"
+                            action="#{codeSetBB.onSetElementUpdateCommitButtonChange}" />
+
+                            <p:commandButton    ajax="true"
+                                            value="Cancel" 
+                                            icon="fa fa-stop"
+                                            process="@none"
+                                            immediate="true"
+                                            oncomplete="PF('sets-ece-update-dialog-var').hide();"
+                                            />
+
+                </h:form>
+            </p:dialog> 
+
+            <p:dialog  id="sets-addelements-dialog"
+                       width="1200"
+                       height="800"
+                       widgetVar="sets-addelements-dialog-var"
+                       closable="true" 
+                       header="Add ordinances to code book:  #{codeSetBB.currentCodeSet.codeSetName}"
 
 
-                                <p class="note">Select multiple ordinances by clicking them sequentially. 
-                                    Un-select a row by holding down control while clicking (using a mouse for this is handy).</p>
+                       >
 
-                                <p:dataTable
-                                    id="codeElementTable"
-                                    var="element"
-                                    value="#{codeSetBuilderBB.codeElementList}"
-                                    selectionMode="multiple"
-                                    rowSelectMode="add"
-                                    selection="#{codeSetBuilderBB.selectedElementsToAddToSet}"
-                                    rowKey="#{element.elementID}"
-                                    tableStyleClass="primeDataTable"
-                                    scrollable="true"
-                                    scrollHeight="200">
 
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Chapt. No" />
-                                        </f:facet>
-                                        <h:outputText value="#{element.ordchapterNo}"/>
-                                    </p:column>
 
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Sec. No" />
-                                        </f:facet>
-                                        <h:outputText value="#{element.ordSecNum}"/>codesetmanage-dialog-codeSetBuilder
-                                    </p:column>
+                <h:form id="sets-querysource-form">
 
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Sec. Title" />
-                                        </f:facet>
-                                        <h:outputText value="#{element.ordSecTitle}"/>
-                                    </p:column>
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="SubSec. No" />
-                                        </f:facet>
-                                        <h:outputText value="#{element.ordSubSecNum}"/>
-                                    </p:column>
+                    <p class="note">Select a code source (e.g. IPMC 2015) from which you wish to add an ordinance to this code book.</p>
 
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="SubSec. Title" />
-                                        </f:facet>
-                                        <h:outputText value="#{element.ordSubSecTitle}"/>
-                                    </p:column>
+                    <p:selectOneMenu 
+                        id="sourceMenu" 
+                        value="#{codeSetBB.selectedCodeSource}">
 
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Active?" />
-                                        </f:facet>
-                                        <h:outputText value="#{element.isActive}"/>
-                                    </p:column>
-                                </p:dataTable>
+                        <f:selectItems value="#{codeSetBB.codeSourceList}" var="source" itemLabel="#{source.sourceName} (#{source.sourceYear})"/>
+                        <f:converter converterId="codeSourceConverter" />
+
+                    </p:selectOneMenu>
+
+                    <h:message for="sourceMenu" showDetail="true" showSummary="true" 
+                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+
+                    <p:commandButton
+                        id="sets-addelements-querysource-cb"
+                        value="Get Ordinances from selected Source"
+                        actionListener="#{codeSetBB.retrieveCodeElementsFromSelectedSource}"
+                        ajax="true" 
+                        icon="fa fa-list"
+                        update=":sets-addelements-form"/>
+
+                </h:form>
+
+                <h:form id="sets-addelements-form">
+
+
+                    <p class="note">Select multiple ordinances by clicking them sequentially. 
+                        Un-select a row by holding down control while clicking (using a mouse for this is handy).</p>
+
+                    <p:dataTable
+                        id="codeElementTable"
+                        var="ord"
+                        value="#{codeSetBB.codeElementList}"
+                        selectionMode="multiple"
+                        rowSelectMode="add"
+                        selection="#{codeSetBB.selectedElementsToAddToSet}"
+                        rowKey="#{ord.elementID}"
+                        tableStyleClass="primeDataTable"
+                        scrollable="true"
+                        scrollHeight="200">
+
+                        <p:column width="3%">
+                            <f:facet name="header">
+                                <h:outputText value="Exp"/>
+                            </f:facet>
+                            <p:rowToggler/>
+                        </p:column>
+
+
+                        <p:column width="10%" 
+                                  sortBy="#{ord.ordchapterNo}">
+                            <f:facet name="header">
+                                <h:outputText value="Chapter"/>
+                            </f:facet>
+                            <h:outputText value="#{ord.ordchapterNo}"/>
+                            <h:outputText value=": "/>
+                            <h:outputText value="#{ord.ordchapterTitle}"/>
+                        </p:column>
+
+                        <p:column width="15%" 
+                                  sortBy="#{ord.ordSecNum}"
+                                  filterBy="#{ord.ordSecTitle}">
+                            <f:facet name="header">
+                                <h:outputText value="Section" />
+                            </f:facet>
+                            <h:outputText value="#{ord.ordSecNum}"/>
+                            <h:outputText value=": "/>
+                            <h:outputText value="#{ord.ordSecTitle}"/>
+                        </p:column>
+
+                        <p:column width="15%" sortBy="#{ord.ordSubSecNum}"
+                                  filterBy="#{ord.ordSubSecTitle}">
+                            <f:facet name="header">
+                                <h:outputText value="Sub Section" />
+                            </f:facet>
+                            <h:outputText value="#{ord.ordSubSecNum}"/>
+                            <h:outputText value=": "/>
+                            <h:outputText value="#{ord.ordSubSecTitle}"/>
+                        </p:column>
+                        <p:column width="5%" >
+                            <f:facet name="header">
+                                <h:outputText value="Sub Sub" />
+                            </f:facet>
+                            <h:outputText value="#{ord.ordSubSubSecNum}"/>
+                        </p:column>
+
+                        <p:column width="10%" sortBy="#{ord.guideEntry.category}"
+                                  filterBy="#{ord.guideEntry.category}">
+                            <f:facet name="header">
+                                <h:outputText value="Category" />
+                            </f:facet>
+                            <h:outputText value="#{ord.guideEntry.category}"/>
+                        </p:column>
+
+
+
+                        <p:rowExpansion>
+                            <div class="outlinedBox">
+
+
+
+                                <div class="rowExpansion"
+                                     style="font-size: 1.4em;">
+                                    <h:outputText value="&quot;" />
+                                    <h:outputText escape="false" 
+                                                  value="#{ord.ordTechnicalText}" 
+                                                  styleClass="monospace"
+                                                  />
+                                    <h:outputText value="&quot;" />
+                                </div>
+
+
+                                <h2>Meta data</h2>
+
+                                <div class="ui-g data_container_nested_restrict">
+                                    <div class="ui-g-12 ui-md-6 ui-lg-12 restrict-data-field" >
+                                        <div class="restrict-data-field-label-inline" >
+                                            <h:outputLabel  for="ord-id">
+                                                <h:outputText value="ID" />
+                                            </h:outputLabel>
+                                        </div>
+                                        <div class="restrict-data-field-value-inline" >
+                                            <h:outputText id="ord-id" 
+                                                          value="#{ord.elementID}"/>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-6 ui-lg-12 restrict-data-field" >
+                                        <div class="restrict-data-field-label-inline" >
+                                            <h:outputLabel  for="ord-created">
+                                                <h:outputText value="Created" />
+                                            </h:outputLabel>
+                                        </div>
+                                        <div class="restrict-data-field-value-inline" >
+                                            <h:outputText id="ord-created" 
+                                                          value="#{codeElementBB.getPrettyDateNoTime(ord.createdTS)}"/>
+                                            <h:outputText value="#{!(empty ord.createdBy) ? ' by ' : ''}"/>
+                                            <h:outputText value="#{!(empty ord.createdBy) ? ord.createdBy.person.lastName : ''}"/>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-6 ui-lg-12 restrict-data-field" >
+                                        <div class="restrict-data-field-label-inline" >
+                                            <h:outputLabel  for="ord-updated">
+                                                <h:outputText value="Last updated" />
+                                            </h:outputLabel>
+                                        </div>
+                                        <div class="restrict-data-field-value-inline" >
+                                            <h:outputText id="ord-updated" 
+                                                          value="#{codeElementBB.getPrettyDateNoTime(ord.lastUpdatedTS)}"/>
+                                            <h:outputText value="#{!(empty ord.lastupdatedBy) ? ' by ' : ''}"/>
+                                            <h:outputText value="#{!(empty ord.lastupdatedBy) ? ord.lastupdatedBy.person.lastName : ''}"/>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                                <p:spacer height="15px"/>
+                                <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
+                                <div class="rowExpansion">
+                                    <h:outputText escape="false" value="#{ord.guideEntry.enforcementGuidelines}"/>
+                                </div>
 
                                 <p:spacer height="15px"/>
 
-                                <p:fieldset toggleable="true" collapsed="true" id="eceUpdateFS"
-                                            style="padding:0px; margin: 0px"
-                                            legend="Default enforcability data vaules"
-                                            
-                                            >
+                                <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
+                                <div class="rowExpansion">
+                                    <h:outputText escape="false" value="#{ord.guideEntry.inspectionGuidelines}"/>
+                                </div>
+                            </div>
+                        </p:rowExpansion>
 
-                                    <p>The values in these input boxes will be copied into each of the code elements you choose to add to the code book. 
-                                        This allows for bulk adding of code elements all with the same enforceability data. Values for each individual element
-                                        can always be edited by loading the assembled code book through the "Code books" page link in the left side bar.</p> 
+                    </p:dataTable>
 
-                                    <h:panelGrid columns="4" cellpadding="10"  
-                                                 columnClasses="gridTd, gridTd, gridTd,gridTd,">
-
-                                        <h:panelGroup>
-                                            <p:outputLabel for="formMaxPenalty">
-                                                <h:outputText value="Maximum Penalty in $"/>
-                                            </p:outputLabel>
-                                        </h:panelGroup>
-                                        <h:panelGroup>
-                                            <p:inputText id="formMaxPenalty" value="#{codeSetBuilderBB.formMaxPenalty}" 
-                                                         style="width: 50%;" tabindex="1" required="true" styleClass="inputText"/>
-                                            <h:message for="formMaxPenalty" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                        </h:panelGroup>
-
-                                        <h:panelGroup>
-                                            <p:outputLabel for="formMinPenaltyField">
-                                                <h:outputText value="Minimum Penalty in $"/>
-                                            </p:outputLabel>
-                                        </h:panelGroup>
-                                        <h:panelGroup>
-                                            <p:inputText id="formMinPenaltyField" value="#{codeSetBuilderBB.formMinPenalty}" 
-                                                         style="width: 50%;" tabindex="2" required="true" styleClass="inputText"/>
-                                            <h:message for="formMinPenaltyField" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                        </h:panelGroup>
-
-                                        <h:panelGroup>
-                                            <p:outputLabel for="formNormPenaltyField">
-                                                <h:outputText value="Default/Normal Penalty in $"/>
-                                            </p:outputLabel>
-                                        </h:panelGroup>
-
-                                        <h:panelGroup>
-                                            <p:inputText id="formNormPenaltyField" value="#{codeSetBuilderBB.formNormPenalty}" 
-                                                         style="width: 50%;" tabindex="3" required="true" styleClass="inputText"/>
-                                            <h:message for="formNormPenaltyField" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                        </h:panelGroup>
-                                        <h:panelGroup>
-
-                                            <p:outputLabel for="formPenaltyNotesField">
-                                                <h:outputText value="Penalty notes"/>
-                                            </p:outputLabel>
-                                        </h:panelGroup>
-                                        <h:panelGroup>
-                                            <p:inputText id="formPenaltyNotesField" value="#{codeSetBuilderBB.formPenaltyNotes}" 
-                                                         style="width: 100%;" tabindex="4" required="false" styleClass="inputText"/>
-                                            <h:message for="formPenaltyNotesField" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                        </h:panelGroup>
-
-                                        <h:panelGroup>
-                                            <p:outputLabel for="formNormDaysToComplyField">
-                                                <h:outputText value="Default days to comply"/>
-                                            </p:outputLabel>
-                                        </h:panelGroup>
-                                        <h:panelGroup>
-                                            <p:inputText id="formNormDaysToComplyField" value="#{codeSetBuilderBB.formNormDaysToComply}" 
-                                                         style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
-                                            <h:message for="formNormDaysToComplyField" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                        </h:panelGroup>
-
-                                        <h:panelGroup>
-                                            <p:outputLabel for="formNormDaysToComplyNotesField">
-                                                <h:outputText value="Notes on days to comply"/>
-                                            </p:outputLabel>
-                                        </h:panelGroup>
-                                        <h:panelGroup>
-                                            <p:inputText id="formNormDaysToComplyNotesField" value="#{codeSetBuilderBB.formDaysToComplyNotes}" 
-                                                         style="width: 100%;" tabindex="6" required="false" styleClass="inputText"/>
-                                            <h:message for="formNormDaysToComplyNotesField" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                        </h:panelGroup>
-
-                                    </h:panelGrid>
+                    <p:spacer height="5px"/>
 
 
-                                </p:fieldset>
+                    <p:commandButton 
+                        id="sets-addselectedelements-cb"
+                        ajax="false" 
+                        icon="fa fa-bolt"
+                        value="Add Selected Elements To Current Code Book"
+                        action="#{codeSetBB.onAddSelectedElementsToCodeSetCommitButtonChange}"
+                        
 
-                                <p:spacer height="15px;"/>
+                        />
+                    <p:spacer height="5px"/>
+                    <h:outputText value="Note: Ordinances will be added with default enforcability data which you should edit from the main screen" />
 
-                                <hr/>
-                                
-                                <p:commandButton 
-                                    ajax="false" icon="fa fa-bolt"
-                                    value="Add Selected Elements To Current Code Book"
-                                    id="packageElementForCodeSetButton"
-                                    action="#{codeSetBuilderBB.addElementsToCodeSet}"
-                                    oncomplete="PF('codesetmanage-dialog-codeSetBuilder-var').hide()"
-                                    
-                                    />
-                                <p:spacer height="15px;"/>
+            </h:form>
 
-                            </h:form>
-                        </p:panel>
-                        <p:spacer height="20px;"/>
+        </p:dialog>
+
+        <p:dialog id="set-nuke-dialog"
+                  widgetVar="set-nuke-dialog-var"
+                  header="Nuke code book"
+                  closeOnEscape="true"
+                  closable="true"
+                  resizable="true"
+                  responsive="true"
+                  height="300" width="550"
+                  rendered="true"
+                  >
+
+            <h:form id="set-nuke-form">
+
+                <div class="ui-g data_container_nested_restrict">
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                        <div class="restrict-data-field-label-inline" >
+                            <h:outputLabel  for="set-remove-button">
+                                <h:outputText value="Nuked code sets can only be rescued by sys admins...and they will grumble while doing so." />
+                            </h:outputLabel>
+                        </div>
+                    </div>
+                    <div class="restrict-main-contents-io-button red_button">
 
 
-                    </p:dialog>
-                </f:view>
-            </ui:define>
-        </ui:composition>
-    </h:body>
+                        <p:commandButton    id="set-nuke-button"
+                                            ajax="false" action="#{codeSetBB.onCodeSetNukeCommitButtonChange}"
+                                            value="Nuke code book" 
+                                            icon="fa fa-bomb"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                            />
+                    </div>
+                </div>
+
+            </h:form>
+
+        </p:dialog>
+
+
+
+        <p:dialog id="sets-ece-nuke-dialog"
+                  widgetVar="sets-ece-nuke-dialog-var"
+                  header="Nuke enforcable code element"
+                  closeOnEscape="true"
+                  closable="true"
+                  resizable="true"
+                  responsive="true"
+                  height="300" width="550"
+                  rendered="true"
+                  >
+
+            <h:form id="sets-ece-nuke-form">
+
+                <div class="ui-g data_container_nested_restrict">
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                        <div class="restrict-data-field-label-inline" >
+                            <h:outputLabel  for="ece-remove-button">
+                                <h:outputText value="Removed enforcable elements can only be rescued by sys admins...and they will grumble while doing so." />
+                            </h:outputLabel>
+                        </div>
+                    </div>
+                    <div class="restrict-main-contents-io-button red_button">
+
+
+                        <p:commandButton    id="ece-nuke-button"
+                                            ajax="false" 
+                                            action="#{codeSetBB.onNukeCodeSetElementCommit}"
+                                            value="Nuke enforcable code element" 
+                                            icon="fa fa-bomb"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                            />
+                    </div>
+                </div>
+
+            </h:form>
+
+        </p:dialog>
+
+
+    </f:view>
+</ui:define>
+</ui:composition>
+</h:body>
 </html>
 
