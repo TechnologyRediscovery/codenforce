@@ -585,6 +585,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     //Sidebar Sub Nav Item: System
     private final NavigationSubItem users = getNavSubItem("Users", "/restricted/cogadmin/userConfig.xhtml", "fa fa-user-o", false);
     private final NavigationSubItem icons = getNavSubItem("Icons", "/restricted/cogadmin/iconManage.xhtml", "fa fa-rebel", false);
+    private final NavigationSubItem blobs = getNavSubItem("Files", "/restricted/cogadmin/manageBlob.xhtml", "fa fa-folder", false);
 
     //Store SubNav Items into List: Reports
     public List<NavigationSubItem> getSidebarSystemList() {
@@ -592,6 +593,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         navList = new ArrayList<>();
         navList.add(users);
         navList.add(icons);
+        navList.add(blobs);
         return navList;
     }
 

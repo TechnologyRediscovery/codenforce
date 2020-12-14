@@ -31,6 +31,7 @@ Any value defined here will override the pom.xml file value but is only applicab
         <word>choiceproposal</word>
         <word>codeNforce</word>
         <word>landbankprospect</word>
+        <word>metadata</word>
         <word>propcondition</word>
     </spellchecker-wordlist>
 </project-shared-configuration>

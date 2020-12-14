@@ -12,6 +12,7 @@ import java.io.Serializable;
  * @author sylvia
  */
 public abstract class BOb
+                extends EntityUtils
                 implements Serializable{
     
 }

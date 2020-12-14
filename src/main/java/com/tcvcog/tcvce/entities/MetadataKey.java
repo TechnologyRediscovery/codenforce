@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Technology Rediscovery LLC
+ * Copyright (C) 2020 Turtle Creek Valley
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,17 +16,31 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
-import java.util.List;
+import java.io.Serializable;
 
 /**
- * Defines basic getters and 
- * @author sylvia
+ *
+ * @author Nathan Dietz
  */
-public interface IFace_EventHolder {
+public class MetadataKey implements Serializable {
+
+    private String label;
+    private String key;
     
-    public void setEventList(List<EventCnF> evList);
-    public List<EventCnF> getEventList(ViewOptionsActiveHiddenListsEnum evViewOpt);
-    public List<EventCnF> getEventList();
+    
+    public MetadataKey(String nodeName){
+        key = nodeName;
+        //Place a space between all capital letters and the letters infront of them
+        //i.e. OriginalText -> Original Text
+        label = nodeName.replaceAll("(.)([A-Z])", "$1 $2");
+    }
+    
+    public String getLabel(){
+        return label;
+    }
+
+    public String getKey() {
+        return key;
+    }
     
 }

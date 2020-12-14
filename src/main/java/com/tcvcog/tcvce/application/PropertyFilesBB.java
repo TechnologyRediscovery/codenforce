@@ -16,10 +16,13 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
+import java.io.IOException;
+import java.util.NoSuchElementException;
 import javax.annotation.PostConstruct;
 import org.primefaces.event.FileUploadEvent;
 
@@ -49,17 +52,17 @@ public class PropertyFilesBB
     }
     
     /**
-     * delete blob if the blob is a photo
+     * Removes the link between the current property and the select blob.
      * @param blobID
      */
-    public void deletePhoto(int blobID){
+    public void removePhoto(int blobID){
         try {
-            Blob blob = getBlobCoordinator().getBlob(blobID);
+            Blob blob = getBlobCoordinator().getPhotoBlob(blobID);
             if(blob.getType() == BlobType.PHOTO){
-                getBlobCoordinator().deleteBlob(blobID);
+                getBlobIntegrator().removePhotoPropertyLink(blobID, currProp.getPropertyID());
             }
-            }
-        catch (IntegrationException ex) {
+        }
+        catch (IntegrationException | ClassNotFoundException | IOException | BlobTypeException | NoSuchElementException ex) {
             System.out.println(ex);
         }
     }

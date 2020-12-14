@@ -11,7 +11,6 @@ import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -479,38 +478,28 @@ public class        CECase
      * @return the closingDateUtilDate
      */
     public java.util.Date getClosingDateUtilDate() {
-        if(closingDate != null){
-            return  java.util.Date.from(closingDate.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return null;
+        return convertUtilDate(closingDate);
     }
 
     /**
      * @param cd     
      */
     public void setClosingDateUtilDate(java.util.Date cd) {
-        if(cd != null){
-            this.closingDate = cd.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
+        closingDate = convertUtilDate(cd);
     }
 
     /**
      * @return the originationDateUtilDate
      */
     public java.util.Date getOriginationDateUtilDate() {
-        if(originationDate != null){
-            return  java.util.Date.from(originationDate.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return null;
+        return convertUtilDate(originationDate);
     }
 
     /**
      * @param od     
      */
     public void setOriginationDateUtilDate(java.util.Date od) {
-        if(od != null){
-            this.originationDate = od.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
+        originationDate = convertUtilDate(od);
     }
 
     /**

@@ -18,8 +18,6 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,7 +34,7 @@ import java.util.Objects;
  to an CEActionRequest to do with as they please (print, etc.)
  * @author Eric Darsow
  */
-public class CEActionRequest implements Serializable{
+public class CEActionRequest extends BOb implements Serializable{
 
     /**
      * @return the blobIDList
@@ -414,21 +412,15 @@ public class CEActionRequest implements Serializable{
     /**
      * @return the dateOfRecordUtilDate
      */
-    public java.util.Date getDateOfRecordUtilDate() {
-        Date dateOfRecordUtilDate = null;
-        if(dateOfRecord != null){
-           dateOfRecordUtilDate = Date.from(dateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
-        }        
-        return dateOfRecordUtilDate;
+    public java.util.Date getDateOfRecordUtilDate() {        
+        return convertUtilDate(dateOfRecord);
     }
 
     /**
      * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
      */
     public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        if(dateOfRecordUtilDate != null){
-        dateOfRecord = dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
+        dateOfRecord = convertUtilDate(dateOfRecordUtilDate);
     }
 
     @Override

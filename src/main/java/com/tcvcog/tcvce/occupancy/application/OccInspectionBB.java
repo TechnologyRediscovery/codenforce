@@ -153,7 +153,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             setupUnitMemberVariablesBasedOnCurrentOccPeriod();
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
-        } 
+        }
         
         // general setting of drop-down box lists
         if(workingLocationList == null){

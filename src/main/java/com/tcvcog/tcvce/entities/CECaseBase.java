@@ -7,7 +7,6 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Objects;
 
 /**
@@ -15,7 +14,7 @@ import java.util.Objects;
  * @author sylvia
  */
 public class CECaseBase 
-        extends EntityUtils 
+        extends BOb 
         implements Serializable, 
                     Cloneable{
     
@@ -353,10 +352,7 @@ public class CECaseBase
      * @return the closingDateUtilDate
      */
     public java.util.Date getClosingDateUtilDate() {
-        if(closingDate != null){
-            closingDateUtilDate = java.util.Date.from(
-                    closingDate.atZone(ZoneId.systemDefault()).toInstant());
-        }
+        closingDateUtilDate = convertUtilDate(closingDate);
         return closingDateUtilDate;
     }
 
@@ -364,20 +360,15 @@ public class CECaseBase
      * @param cd     
      */
     public void setClosingDateUtilDate(java.util.Date cd) {
-        if(cd != null){
-            this.closingDate = cd.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
-        this.closingDateUtilDate = cd;
+        closingDate = convertUtilDate(cd);
+        closingDateUtilDate = cd;
     }
 
     /**
      * @return the originationDateUtilDate
      */
     public java.util.Date getOriginationDateUtilDate() {
-        if(originationDate != null){
-            originationDateUtilDate = java.util.Date.from(
-                    originationDate.atZone(ZoneId.systemDefault()).toInstant());
-        }
+        originationDateUtilDate = convertUtilDate(originationDate);
         return originationDateUtilDate;
     }
 
@@ -385,9 +376,7 @@ public class CECaseBase
      * @param od     
      */
     public void setOriginationDateUtilDate(java.util.Date od) {
-        if(od != null){
-            originationDate = od.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
+        originationDate = convertUtilDate(od);
         this.originationDateUtilDate = od;
     }
 
@@ -404,7 +393,5 @@ public class CECaseBase
     public void setSource(BOBSource source) {
         this.source = source;
     }
-
-  
 
 }

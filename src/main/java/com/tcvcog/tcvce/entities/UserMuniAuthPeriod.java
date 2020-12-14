@@ -18,7 +18,6 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,7 +25,7 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class UserMuniAuthPeriod  implements Serializable, Comparable<UserMuniAuthPeriod> {
+public class UserMuniAuthPeriod extends BOb implements Serializable, Comparable<UserMuniAuthPeriod> {
 
     private int userMuniAuthPeriodID;
 
@@ -395,40 +394,28 @@ public class UserMuniAuthPeriod  implements Serializable, Comparable<UserMuniAut
      * @return the stopDateUtilDate
      */
     public java.util.Date getStopDateUtilDate() {
-        java.util.Date stopDateUtilDate = null;
-        if(stopDate != null){
-            stopDateUtilDate = java.util.Date.from(getStopDate().atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return stopDateUtilDate;
+        return convertUtilDate(stopDate);
     }
 
     /**
      * @param stopDateUtilDate the stopDateUtilDate to set
      */
     public void setStopDateUtilDate(java.util.Date stopDateUtilDate) {
-        if(stopDateUtilDate != null){
-            stopDate = stopDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
+        stopDate = convertUtilDate(stopDateUtilDate);
     }
 
     /**
      * @return the startDateUtilDate
      */
     public java.util.Date getStartDateUtilDate() {
-        java.util.Date startDateUtilDate = null;
-        if(startDate != null){
-            startDateUtilDate = java.util.Date.from(getStartDate().atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return startDateUtilDate;
+        return convertUtilDate(startDate);
     }
 
     /**
      * @param startDateUtilDate the startDateUtilDate to set
      */
     public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
-        if(startDateUtilDate != null){
-            startDate = startDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
+        startDate = convertUtilDate(startDateUtilDate);
     }
     
 }

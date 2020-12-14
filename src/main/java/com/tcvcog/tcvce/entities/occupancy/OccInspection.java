@@ -16,12 +16,12 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +31,7 @@ import java.util.Objects;
  *
  * @author Adam Gutonski and Sylvia
  */
-public class OccInspection  implements Comparable<OccInspection> {
+public class OccInspection extends BOb implements Comparable<OccInspection> {
     
     private int inspectionID;
     private User inspector;
@@ -434,9 +434,7 @@ public class OccInspection  implements Comparable<OccInspection> {
      * @return the effectiveDateOfRecordUtilDate
      */
     public java.util.Date getEffectiveDateOfRecordUtilDate() {
-        if(effectiveDateOfRecord != null){
-            effectiveDateOfRecordUtilDate = java.util.Date.from(effectiveDateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
-        }
+        effectiveDateOfRecordUtilDate = convertUtilDate(effectiveDateOfRecord);
         
         return effectiveDateOfRecordUtilDate;
     }
@@ -446,9 +444,7 @@ public class OccInspection  implements Comparable<OccInspection> {
      */
     public void setEffectiveDateOfRecordUtilDate(java.util.Date effectiveDateOfRecordUtilDate) {
         this.effectiveDateOfRecordUtilDate = effectiveDateOfRecordUtilDate;
-        if(effectiveDateOfRecordUtilDate != null){
-            effectiveDateOfRecord = effectiveDateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
+        effectiveDateOfRecord = convertUtilDate(effectiveDateOfRecordUtilDate);
     }
 
     /**

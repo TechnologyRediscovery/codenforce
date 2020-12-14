@@ -10,8 +10,10 @@ import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import org.primefaces.event.FileUploadEvent;
@@ -40,16 +42,7 @@ public class UploadBlobBB extends BackingBeanUtils implements Serializable {
             return;
         }
 
-        // verify blob types here. Post a FacesMessage if file type is not an image
-        String fileType = ev.getFile().getContentType();
-        System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | File: " + ev.getFile().getFileName() + " Type: " + fileType);
-
-        if (!fileType.contains("jpg") && !fileType.contains("gif") && !fileType.contains("png") && !fileType.contains("pdf")) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Incompatible file type. ",
-                            "Please upload supported file types only (jpg, gif, png, pdf)."));
-        }
+        System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | File: " + ev.getFile().getFileName() + " Type: " + ev.getFile().getContentType());
 
         BlobCoordinator blobc = getBlobCoordinator();
         Blob blob = null;
@@ -61,15 +54,16 @@ public class UploadBlobBB extends BackingBeanUtils implements Serializable {
             // set filename
             blob.setFilename(ev.getFile().getFileName());
 
-            // set type
-            if (fileType.contains("jpg") || fileType.contains("gif") || fileType.contains("png")) {
-                blob.setType(BlobType.PHOTO);
-            } else if (fileType.contains("pdf")) {
-                blob.setType(BlobType.PDF);
-            }
-            blob.setBlobID(blobc.storeBlob(blob));
-        } catch (BlobException | IntegrationException ex) {
+            blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
+            
+            blob = blobc.storeBlob(blob);
+        } catch (IntegrationException | IOException | ClassNotFoundException | NoSuchElementException ex) {
             System.out.println("BlobUploadBB.handleBlobUpload | " + ex);
+        } catch (BlobException ex){
+            System.out.println("BlobUploadBB.handleBlobUpload | " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
         }
 
         getSessionBean().getBlobList().add(blob);

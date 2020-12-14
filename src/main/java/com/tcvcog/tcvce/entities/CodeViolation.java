@@ -19,7 +19,6 @@ package com.tcvcog.tcvce.entities;
  
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,6 +27,7 @@ import java.util.Objects;
  * @author ellen bascomb of apt 31y
  */
 public  class       CodeViolation  
+        extends BOb
         implements  Serializable,
                     Comparable<CodeViolation> {
     
@@ -541,30 +541,21 @@ public  class       CodeViolation
      * @return the dateOfRecordUtilDate
      */
     public java.util.Date getDateOfRecordUtilDate() {
-        if(dateOfRecord != null){
-            return java.util.Date.from(dateOfRecord.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return null;
+        return convertUtilDate(dateOfRecord);
     }
 
     /**
      * @return the stipulatedComplianceDateUtilDate
      */
     public java.util.Date getStipulatedComplianceDateUtilDate() {
-        if(stipulatedComplianceDate != null){
-            return java.util.Date.from(stipulatedComplianceDate.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return null;
+        return convertUtilDate(stipulatedComplianceDate);
     }
 
     /**
      * @return the actualComplianceDateUtilDate
      */
     public java.util.Date getActualComplianceDateUtilDate() {
-        if(actualComplianceDate != null){
-            return java.util.Date.from(actualComplianceDate.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return null;
+        return convertUtilDate(actualComplianceDate);
     }
 
     /**
@@ -580,27 +571,21 @@ public  class       CodeViolation
      */
     public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
         this.dateOfRecordUtilDate = dateOfRecordUtilDate;
-        if(dateOfRecordUtilDate != null){
-            dateOfRecord = dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
+        dateOfRecord = convertUtilDate(dateOfRecordUtilDate);
     }
 
     /**
      * @param stipulatedComplianceDateUtilDate the stipulatedComplianceDateUtilDate to set
      */
     public void setStipulatedComplianceDateUtilDate(java.util.Date stipulatedComplianceDateUtilDate) {
-        if(stipulatedComplianceDateUtilDate != null){
-            stipulatedComplianceDate = stipulatedComplianceDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
+        stipulatedComplianceDate = convertUtilDate(stipulatedComplianceDateUtilDate);
     }
 
     /**
      * @param actualComplianceDateUtilDate the actualComplianceDateUtilDate to set
      */
     public void setActualComplianceDateUtilDate(java.util.Date actualComplianceDateUtilDate) {
-        if(actualComplianceDateUtilDate != null){
-            actualComplianceDate = actualComplianceDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
+        actualComplianceDate = convertUtilDate(actualComplianceDateUtilDate);
     }
 
     /**

@@ -23,7 +23,7 @@
                             </h:messages>
                         </h:form>
 
-                            
+
                         <h1>Property Files</h1>
 
 
@@ -32,78 +32,78 @@
                                     widgetVar="prop-files-list-panel-var"
                                     collapsed="false"
                                     header="Property files">
-                                           
-                        <h:form id="propertyPhotoForm">    
-                            
-                            <p:dataTable
-                                id="prop-files-list-table"
-                                var="blob" 
-                                value="#{propertyFilesBB.currProp.blobList}"
-                                tabindex="5"
-                                scrollable="true" scrollHeight="150"
-                                rowKey="#{blob.blobID}">
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="ID" />
-                                    </f:facet>
-                                    <p:commandButton value="delete" actionListener="#{propertyFilesBB.deletePhoto(blob.blobID)}"
-                                                     immediate="true"
-                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                     update=":photoResultTable"/>
-                                    <h:outputText value="#{blob.blobID}"/>
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Description" />
-                                    </f:facet>
-                                    <h:outputText value="#{blob.description}"/>
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Timestamp" />
-                                    </f:facet>
-                                    <h:outputText value="#{blob.timestamp}"/>
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Image" />
-                                    </f:facet>
-                                    <p:graphicImage value="#{blobCoordinator.image}">
-                                        <f:param name="blobID" value="#{blob.blobID}"/>
-                                    </p:graphicImage>
-                                </p:column>
-                            </p:dataTable>
 
-                            <p:spacer height="10px"/>
-                            <hr/>
-                            <p:spacer height="10px"/>
-                        </h:form>
-                        
-                        <h:form id="propertyUploadPhotoForm" enctype="multipart/form-data"> 
-                            <h2>Upload Photo</h2>
-                            <p>Upload a photo of this property</p>
-                            
-                            <p:fileUpload   fileUploadListener="#{propertyFilesBB.handleFileUpload}"
-                                           mode="advanced"
-                                           sizeLimit="900000000"
-                                           allowTypes="/(\.|\/)(jpe?g|png)$/"
-                                           update=""
-                                           />
-                            
-                            <p:spacer height="10px"/>
-                            <hr/>
-                            <p:spacer height="10px"/>
+                            <h:form id="propertyPhotoForm">    
 
-                        </h:form>
+                                <p:dataTable
+                                    id="prop-files-list-table"
+                                    var="blob" 
+                                    value="#{propertyFilesBB.currProp.blobList}"
+                                    tabindex="5"
+                                    scrollable="true" scrollHeight="150"
+                                    rowKey="#{blob.blobID}">
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="ID" />
+                                        </f:facet>
+                                        <p:commandButton value="Remove link between blob and property" actionListener="#{propertyFilesBB.removePhoto(blob.blobID)}"
+                                                         immediate="true"
+                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                         update=":photoResultTable"/>
+                                        <h:outputText value="#{blob.blobID}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Description" />
+                                        </f:facet>
+                                        <h:outputText value="#{blob.description}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Timestamp" />
+                                        </f:facet>
+                                        <h:outputText value="#{blob.timestamp}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Image" />
+                                        </f:facet>
+                                        <p:graphicImage value="#{blobCoordinator.image}">
+                                            <f:param name="blobID" value="#{blob.blobID}"/>
+                                        </p:graphicImage>
+                                    </p:column>
+                                </p:dataTable>
+
+                                <p:spacer height="10px"/>
+                                <hr/>
+                                <p:spacer height="10px"/>
+                            </h:form>
+
+                            <h:form id="propertyUploadPhotoForm" enctype="multipart/form-data"> 
+                                <h2>Upload Photo</h2>
+                                <p>Upload a photo of this property</p>
+
+                                <p:fileUpload   fileUploadListener="#{propertyFilesBB.handleFileUpload}"
+                                                mode="advanced"
+                                                sizeLimit="900000000"
+                                                allowTypes="/(\.|\/)(jpe?g|png)$/"
+                                                update=""
+                                                />
+
+                                <p:spacer height="10px"/>
+                                <hr/>
+                                <p:spacer height="10px"/>
+
+                            </h:form>
 
 
 
                         </p:panel>
-                  
 
-                    <!--close main container-->
+
+                        <!--close main container-->
                     </div>
-                  
+
 
                 </f:view>
             </ui:define>

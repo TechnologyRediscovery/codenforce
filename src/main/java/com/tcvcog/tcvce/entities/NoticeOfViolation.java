@@ -19,7 +19,6 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,7 +26,7 @@ import java.util.List;
  *
  * @author ellen bascomb of apt 31y
  */
-public class NoticeOfViolation  implements Serializable, Comparable<NoticeOfViolation> {
+public class NoticeOfViolation  extends BOb implements Serializable, Comparable<NoticeOfViolation> {
     
     private int noticeID;
     private Person recipient;
@@ -424,7 +423,7 @@ public class NoticeOfViolation  implements Serializable, Comparable<NoticeOfViol
      * @return the dateOfRecordUtilDate
      */
     public java.util.Date getDateOfRecordUtilDate() {
-        dateOfRecordUtilDate = java.util.Date.from(getDateOfRecord().atZone(ZoneId.systemDefault()).toInstant());
+        dateOfRecordUtilDate = convertUtilDate(dateOfRecord);
         return dateOfRecordUtilDate;
     }
 
@@ -432,9 +431,7 @@ public class NoticeOfViolation  implements Serializable, Comparable<NoticeOfViol
      * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
      */
     public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        if(dateOfRecordUtilDate != null){
-            dateOfRecord = dateOfRecordUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
+        dateOfRecord = convertUtilDate(dateOfRecordUtilDate);
         this.dateOfRecordUtilDate = dateOfRecordUtilDate;
     }
 

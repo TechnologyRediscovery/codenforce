@@ -10,9 +10,14 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
 import com.tcvcog.tcvce.entities.CECase;
@@ -30,6 +35,7 @@ import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -116,11 +122,17 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         } catch (SearchException | IntegrationException ex) {
             System.out.println(ex);
         }
-
+        
+        //First try and get the current request from the session bean
+        selectedRequest = getSessionBean().getSessCEAR();
+        
+        //If it's still null, just grab the first from the list.
         if (selectedRequest == null && requestList != null && requestList.size() > 0) {
             selectedRequest = requestList.get(0);
-            generateCEARReasonDonutModel();
+            
         }
+        
+        generateCEARReasonDonutModel();
         searchParams = new SearchParamsCEActionRequests();
         queryList = sc.buildQueryCEARList(getSessionBean().getSessUser().getMyCredential());
 
@@ -795,9 +807,18 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                 break;
             }
         }
+        
         try {
-            getBlobCoordinator().deleteBlob(blobID);
-        } catch (IntegrationException ex) {
+            BlobLight target = getBlobIntegrator().getPhotoBlobLight(blobID);
+            getBlobCoordinator().deletePhotoBlob(target);
+        } catch (IntegrationException 
+                | AuthorizationException 
+                | BObStatusException 
+                | BlobException 
+                | ClassNotFoundException 
+                | EventException 
+                | IOException 
+                | ViolationException ex) {
             System.out.println(ex);
         }
     }

@@ -18,9 +18,16 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
+import java.io.IOException;
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
 
@@ -54,17 +61,22 @@ public  class       CECaseBlobsBB
     
 
     public void deletePhoto(int photoID) {
-        // TODO: remove entry from linker table for deleted photos
-//        for(Integer pid : this.selectedViolation.getBlobIDList()){
-//            if(pid.compareTo(photoID) == 0){
-//                this.selectedViolation.getBlobIDList().remove(pid);
-//                break;
-//            }
-//        }
+        // TODO: A user should not delete a blob before they have manually removed
+        //all links to the blob. You could do it automatically, but we don't
+        //want to remove a photo without knowing what you're removing it drom.
+
         BlobCoordinator blobc = getBlobCoordinator();
         try {
-            blobc.deleteBlob(photoID);
-        } catch (IntegrationException ex) {
+            BlobLight blob = blobc.getPhotoBlob(photoID);
+            blobc.deletePhotoBlob(blob);
+        } catch (IntegrationException
+                | AuthorizationException
+                | BObStatusException
+                | BlobException
+                | ClassNotFoundException
+                | EventException
+                | IOException
+                | ViolationException ex) {
             System.out.println(ex);
         }
     }

@@ -12,7 +12,6 @@ import com.tcvcog.tcvce.entities.IFace_EventHolder;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -344,17 +343,12 @@ public  class       OccPeriod
     public void setNotes(String notes) {
         this.notes = notes;
     }
-
-   
-
    
     /**
      * @return the startDateUtilDate
      */
     public java.util.Date getStartDateUtilDate() {
-         if(startDate != null){
-            startDateUtilDate = java.util.Date.from(getStartDate().atZone(ZoneId.systemDefault()).toInstant());
-        }
+        startDateUtilDate = convertUtilDate(startDate);
          return startDateUtilDate;
     }
 
@@ -362,9 +356,7 @@ public  class       OccPeriod
      * @return the endDateUtilDate
      */
     public java.util.Date getEndDateUtilDate() {
-        if(endDate != null){
-            endDateUtilDate = java.util.Date.from(getEndDate().atZone(ZoneId.systemDefault()).toInstant());
-        }
+        endDateUtilDate = convertUtilDate(endDate);
         return endDateUtilDate;
     }
 
@@ -373,11 +365,7 @@ public  class       OccPeriod
      */
     public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
         this.startDateUtilDate = startDateUtilDate;
-        if(startDateUtilDate != null){
-            startDate = startDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
-        
-        this.startDateUtilDate = startDateUtilDate;
+        startDate = convertUtilDate(startDateUtilDate);
     }
 
     /**
@@ -385,13 +373,8 @@ public  class       OccPeriod
      */
     public void setEndDateUtilDate(java.util.Date endDateUtilDate) {
         this.endDateUtilDate = endDateUtilDate;
-        if(endDateUtilDate != null){
-            endDate = endDateUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
-        this.endDateUtilDate = endDateUtilDate;
+        endDate = convertUtilDate(endDateUtilDate);
     }
-
-    
 
     /**
      * @return the governingInspection

@@ -19,7 +19,6 @@ package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 
@@ -334,10 +333,7 @@ public  class       EventCnF
      * @return the timeStartUtilDate
      */
     public java.util.Date getTimeStartUtilDate() {
-         if(timeStart != null){
-            return java.util.Date.from(this.timeStart.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return null;
+        return convertUtilDate(timeStart);
     }
 
     /**
@@ -352,10 +348,7 @@ public  class       EventCnF
      * @return the timeEndUtilDate
      */
     public java.util.Date getTimeEndUtilDate() {
-         if(timeEnd != null){
-            return java.util.Date.from(this.timeEnd.atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return null;
+        return convertUtilDate(timeEnd);
     }
     
     public String getTimeStartPretty(){
@@ -378,9 +371,7 @@ public  class       EventCnF
      * @param tsud
      */
     public void setTimeStartUtilDate(java.util.Date tsud) {
-        if(tsud != null){
-            timeStart = tsud.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
+        timeStart = convertUtilDate(tsud);
     }
 
     /**
@@ -394,12 +385,8 @@ public  class       EventCnF
      * @param teud
      */
     public void setTimeEndUtilDate(java.util.Date teud) {
-        if(teud != null){
-            timeEnd = teud.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
+        timeEnd = convertUtilDate(teud);
     }
-
-    
 
     /**
      * @return the lastUpdatedBy
@@ -428,9 +415,5 @@ public  class       EventCnF
     public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
         this.lastUpdatedTS = lastUpdatedTS;
     }
-
-
-    
-
-    
+   
 }

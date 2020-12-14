@@ -57,7 +57,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     
   
     
-    public Municipality getMuni(int muniCode) throws IntegrationException, SQLException{
+    public Municipality getMuni(int muniCode) throws IntegrationException {
           PreparedStatement stmt = null;
         Municipality muni = null;
         Connection con = null;

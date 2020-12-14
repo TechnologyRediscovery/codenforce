@@ -75,13 +75,7 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
 
     public Municipality getMuni(int muniCode) throws IntegrationException {
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        try {
-            return mi.getMuni(muniCode);
-        } catch (SQLException ex) {
-            System.out.println(ex);
-        }
-
-        return null;
+        return mi.getMuni(muniCode);
 
     }
 

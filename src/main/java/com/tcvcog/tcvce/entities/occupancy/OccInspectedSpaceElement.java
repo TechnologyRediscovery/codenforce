@@ -17,9 +17,8 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
-import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CodeElement;
-import com.tcvcog.tcvce.entities.Icon;
+import com.tcvcog.tcvce.entities.IFace_BlobHolder;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -32,7 +31,7 @@ import java.util.Objects;
  */
 public class OccInspectedSpaceElement 
         extends OccSpaceElement 
-        implements Serializable, Comparable<OccInspectedSpaceElement>{
+        implements Serializable, Comparable<OccInspectedSpaceElement>, IFace_BlobHolder{
     
     private int inspectedSpaceElementID;
     
@@ -49,7 +48,7 @@ public class OccInspectedSpaceElement
     private User overrideRequiredFlag_thisElementNotInspectedBy;
     private String notes;
     
-    private List<Blob> blobList;
+    private List<Integer> blobIDList;
     private OccLocationDescriptor location;
     private int failureIntensityClassID;
     private OccInspectableStatus status;
@@ -307,17 +306,17 @@ public class OccInspectedSpaceElement
     }
 
     /**
-     * @return the blobList
+     * @return the blobIDList
      */
-    public List<Blob> getBlobList() {
-        return blobList;
+    public List<Integer> getBlobIDList() {
+        return blobIDList;
     }
 
     /**
-     * @param blobList the blobList to set
+     * @param blobIDList the blobIDList to set
      */
-    public void setBlobList(List<Blob> blobList) {
-        this.blobList = blobList;
+    public void setBlobIDList(List<Integer> blobIDList) {
+        this.blobIDList = blobIDList;
     }
 
    

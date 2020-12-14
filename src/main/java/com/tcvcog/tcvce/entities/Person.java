@@ -18,9 +18,7 @@ package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -659,9 +657,7 @@ public  class       Person
      * @return the expiryDateUtilDate
      */
     public java.util.Date getExpiryDateUtilDate() {
-        if(expiryDate != null){
-            expiryDateUtilDate = java.util.Date.from(expiryDate.atZone(ZoneId.systemDefault()).toInstant());
-        }
+        expiryDateUtilDate = convertUtilDate(expiryDate);
         return expiryDateUtilDate;
     }
 
@@ -670,11 +666,7 @@ public  class       Person
      */
     public void setExpiryDateUtilDate(java.util.Date edut) {
         expiryDateUtilDate = edut;
-        if(edut != null){
-            expiryDate = edut.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            
-        }
-        
+        expiryDate = convertUtilDate(edut);
     }
 
     /**
