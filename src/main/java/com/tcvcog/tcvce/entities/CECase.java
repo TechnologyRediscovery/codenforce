@@ -20,6 +20,7 @@ import java.util.Objects;
  * @author sylvia
  */
 public class        CECase 
+        extends     EntityUtils
         implements  Cloneable,
                     IFace_Loggable,
                     IFace_EventHolder,

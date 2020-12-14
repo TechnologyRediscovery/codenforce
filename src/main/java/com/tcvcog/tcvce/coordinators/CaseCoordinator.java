@@ -1507,14 +1507,24 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     }
 
     
+    /**
+     * TODO: NADGIT review
+     * @param ps
+     * @param blob
+     * @throws BlobException
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
       public void nov_updateStyleHeaderImage(PrintStyle ps, Blob blob) throws BlobException, IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
         if(ps == null || blob == null){
             throw new BObStatusException("Cannot update header image with null style or blob");
             
         }
-        int newHeaderBlobID = getBlobIntegrator().storeBlob(blob);
-        ps.setHeader_img_id(newHeaderBlobID);
+        // NADGIT please review and fix
+
+//        int newHeaderBlobID = getBlobIntegrator().storeBlob(blob);
+//        ps.setHeader_img_id(newHeaderBlobID);
         ci.novUpdateHeaderImage(ps, blob);
         
     }
@@ -2212,40 +2222,52 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     
+    /**
+     * TODO: NADGIT please review
+     * @param cv
+     * @param blob
+     * @throws BObStatusException 
+     */
     public void violation_linkBlobToCodeViolation(CodeViolation cv, Blob blob) throws BObStatusException {
         BlobIntegrator bi = getBlobIntegrator();
         if(cv == null || blob == null){
             throw new BObStatusException("Cannot link blob to violation with null blob or viol");
         }
                 
-        try {
-            bi.linkBlobToCodeViolation(blob.getBlobID(), cv.getViolationID());
-            System.out.println("linkBlobBB.linkBlobToCodeViolation | link succesfull");  //TESTING
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR
-                            ,"Failed to link file to selected violation. Sorry! " , ""));
-        }
+//        try {
+//            bi.linkBlobToCodeViolation(blob.getBlobID(), cv.getViolationID());
+//            System.out.println("linkBlobBB.linkBlobToCodeViolation | link succesfull");  //TESTING
+//        } catch (IntegrationException ex) {
+//            System.out.println(ex);
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR
+//                            ,"Failed to link file to selected violation. Sorry! " , ""));
+//        }
         
     }
     
     
+    /**
+     * * TODO: NADGIT please review
+     * @param cv
+     * @param blobID
+     * @throws BObStatusException 
+     */
     public void violation_removeLinkBlobToCodeViolation(CodeViolation cv, int blobID) throws BObStatusException {
         BlobIntegrator bi = getBlobIntegrator();
         if(cv == null || blobID == 0){
             throw new BObStatusException("Cannot link blob to violation with null blob or viol");
         }
                 
-        try {
-            bi.removeLinkBlobToCodeViolation(cv.getViolationID(), blobID);
-            System.out.println("linkBlobBB.linkBlobToCodeViolation | link succesfull");  //TESTING
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR
-                            ,"Failed to link file to selected violation. Sorry! " , ""));
-        }
+//        try {
+//            bi.removeLinkBlobToCodeViolation(cv.getViolationID(), blobID);
+//            System.out.println("linkBlobBB.linkBlobToCodeViolation | link succesfull");  //TESTING
+//        } catch (IntegrationException ex) {
+//            System.out.println(ex);
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR
+//                            ,"Failed to link file to selected violation. Sorry! " , ""));
+//        }
         
     }
     

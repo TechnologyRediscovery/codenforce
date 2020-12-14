@@ -1060,6 +1060,12 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         
     }
     
+    
+    /**
+     * Attempts to upload new photo for header on NOVs
+     * TODO: NADGIT Review and FIX
+     * @param ev 
+     */
     public void onHeaderUploadRequest(FileUploadEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         if (ev == null) {
@@ -1084,8 +1090,11 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                 blob.setBytes(ev.getFile().getContents());  // set bytes  
                 blob.setType(BlobType.PHOTO);
                 blob.setFilename(ev.getFile().getFileName());
-                // Write to DB
-                blob.setBlobID(blobc.storeBlob(blob));
+                
+
+
+                    // Write to DB
+//                blob.setBlobID(blobc.storeBlob(blob));
                 cc.nov_updateStyleHeaderImage(currentNotice.getStyle(), blob);
                 
             } catch (BlobException | IntegrationException | BObStatusException ex) {

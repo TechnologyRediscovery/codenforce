@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -50,6 +51,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -599,10 +602,15 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
 
     }
     
+    
+    /**
+     * TODO: NADIT review
+     * @param blob 
+     */
     public void onPhotoUpdateDescription(Blob blob){
         BlobCoordinator bc = getBlobCoordinator();
         try {
-            bc.updateBlobDescription(blob);
+            bc.updateBlobFilename(blob);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully updated photo description", ""));
@@ -612,7 +620,9 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Cannot update photo description", ""));
             
-        }
+        } catch (IOException | BlobTypeException | ClassNotFoundException ex) {
+            System.out.println(ex);
+        } 
         
     }
 

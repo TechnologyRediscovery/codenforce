@@ -39,7 +39,6 @@ ALTER TABLE public.codeelement
  ALTER TABLE public.codeelement DROP COLUMN datecreated;
 
 -- RUN ON REMOTE TO HERE
--- RUN LOCALLY TO HERE
 
 
 ALTER TABLE public.codesetelement
@@ -50,6 +49,9 @@ ALTER TABLE public.codesetelement
         ADD COLUMN deactivatedts           TIMESTAMP WITH TIME ZONE,
         ADD COLUMN deactivatedby_userid    INTEGER CONSTRAINT codesetelement_deactivatedby_userid_fk REFERENCES login (userid);
 
+ALTER TABLE codeset ADD COLUMN active BOOLEAN DEFAULT TRUE;
+
+-- RUN LOCALLY TO HERE
 ALTER TABLE textblock 
     ADD COLUMN injectabletemplate BOOLEAN DEFAULT FALSE;
 

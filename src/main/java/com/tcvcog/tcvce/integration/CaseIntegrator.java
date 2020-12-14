@@ -1239,7 +1239,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * TODO: Fix the BlobList References
+     * TODO: NADGIT Fix the BlobList References
      * @param cv
      * @return
      * @throws IntegrationException 
@@ -1258,9 +1258,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setInt(1, cv.getViolationID());
             rs = stmt.executeQuery();
 
-            while (rs.next()) {
-                vBlobList.add(bc.getBlob(rs.getInt("photodoc_photodocid")));
-            }
+//            while (rs.next()) {
+//                vBlobList.add(bc.getBlob(rs.getInt("photodoc_photodocid")));
+//            }
             
 //            cv.setBlobIDList(blobList);
 
