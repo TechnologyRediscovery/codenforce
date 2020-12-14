@@ -364,7 +364,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
                 System.out.println("BlobIntegrator.storeBlobBytes | Statement: " + stmt.toString());
                 stmt.execute();
 
-                String idNumQuery = "SELECT currval('photodoc_photodocid_seq');";
+                String idNumQuery = "SELECT currval('blobbytes_seq');";
                 Statement s = con.createStatement();
                 ResultSet rs;
                 rs = s.executeQuery(idNumQuery);
