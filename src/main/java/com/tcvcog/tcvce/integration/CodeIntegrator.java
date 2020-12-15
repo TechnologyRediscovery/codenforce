@@ -678,8 +678,10 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public void updateCodeSetMetadata(CodeSet set) throws IntegrationException{
+        if(set == null) throw  new IntegrationException("Cannot update a null code set");
+        
         String query = "UPDATE public.codeset\n" +
-            "SET name=?, description=? WHERE codeSetid=?;";
+            "SET name=?, description=?, municipality_municode=? WHERE codeSetid=?;";
         Connection con = null;
         PreparedStatement stmt = null;
 
@@ -688,8 +690,13 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(query);
             stmt.setString(1, set.getCodeSetName());
             stmt.setString(2, set.getCodeSetDescription());
-            stmt.setInt(3, set.getCodeSetID());
-            stmt.execute();
+            if(set.getMuni() != null){
+                stmt.setInt(3, set.getMuni().getMuniCode());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            stmt.setInt(4, set.getCodeSetID());
+            stmt.executeUpdate();
              
         } catch (SQLException ex) { 
              System.out.println(ex.toString());

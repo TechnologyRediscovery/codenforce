@@ -605,7 +605,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             stmt = con.prepareStatement(query);
             stmt.setInt(1, set.getCodeSetID());
             stmt.setInt(2, muni.getMuniCode());
-            stmt.execute();
+            stmt.executeUpdate();
             
         } catch (SQLException ex) { 
              System.out.println(ex);
