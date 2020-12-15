@@ -44,13 +44,17 @@ import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
+import java.io.IOException;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -1063,48 +1067,46 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     /**
      * Attempts to upload new photo for header on NOVs
-     * TODO: NADGIT Review and FIX
      * @param ev 
      */
     public void onHeaderUploadRequest(FileUploadEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         if (ev == null) {
+            System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | event: null");
             return;
         }
 
-        // verify blob types here. Post a FacesMessage if file type is not an image
-        String fileType = ev.getFile().getContentType();
-        System.out.println("NoticeOfViolationBB.onHeaderUploadRequest.| File: " + ev.getFile().getFileName() + " Type: " + fileType);
+        System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | File: " + ev.getFile().getFileName() + " Type: " + ev.getFile().getContentType());
 
-        if (!fileType.contains("jpg") && !fileType.contains("jpeg") && !fileType.contains("gif") && !fileType.contains("png")) {
+        BlobCoordinator blobc = getBlobCoordinator();
+        try {
+            Blob blob = blobc.getNewBlob();  //init new blob
+            blob.setBytes(ev.getFile().getContents());  // set bytes  
+            blob.setFilename(ev.getFile().getFileName());
+            blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
+            blob.setDescription("Header image for Notices of Violation in " + getSessionBean().getSessMuni().getMuniName() + " as of " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            // Write to DB
+            blob = blobc.storeBlob(blob);
+            cc.nov_updateStyleHeaderImage(currentNotice.getStyle(), blob);
+//          blobList.add(blob);
+
+        } catch (IntegrationException
+                | BObStatusException
+                | ClassNotFoundException
+                | IOException
+                | NoSuchElementException ex) {
+            System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | " + ex);
+            System.out.println(ex);
+        } catch (BlobException ex) {
+            System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | " + ex);
             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Incompatible file type. ",
-                            "Please upload image files only (jpg, gif, or png)."));
-        } else {
-
-            BlobCoordinator blobc = getBlobCoordinator();
-            Blob blob = null;
-            try {
-                blob = blobc.getNewBlob();  //init new blob
-                blob.setBytes(ev.getFile().getContents());  // set bytes  
-                blob.setType(BlobType.PHOTO);
-                blob.setFilename(ev.getFile().getFileName());
-                
-
-
-                    // Write to DB
-//                blob.setBlobID(blobc.storeBlob(blob));
-                cc.nov_updateStyleHeaderImage(currentNotice.getStyle(), blob);
-                
-            } catch (BlobException | IntegrationException | BObStatusException ex) {
-                System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | " + ex);
-                System.out.println(ex);
-            }
-
-//            blobList.add(blob);
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(),
+                            ""));
         }
+
     }
+    
     /**
      * Listener for user requests to bring up the choose person dialog
      *

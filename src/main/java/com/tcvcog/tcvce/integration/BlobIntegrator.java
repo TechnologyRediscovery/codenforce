@@ -97,7 +97,6 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException thrown instead of SCLException
      * @throws java.io.IOException
      * @throws java.lang.ClassNotFoundException
-     * @throws com.tcvcog.tcvce.domain.BlobException
      */
     public BlobLight getPhotoBlobLightWithoutMetadata(int blobID) throws IntegrationException, IOException, ClassNotFoundException {
         BlobLight blob = null;
@@ -1288,6 +1287,192 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
         return idList;
         
+    }
+    
+    /**
+     * @param blobID the ID of the blob to be linked
+     * @param target the ID of the property the blob will be linked to.
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void linkBlobToProperty(int blobID, int target) throws IntegrationException {
+        
+        Connection con = getPostgresCon();
+        String query =  " INSERT INTO public.propertyphotodoc(photodoc_photodocid, property_propertyid)\n" +
+                        "    VALUES (?, ?);";
+        
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setInt(1, blobID);
+            stmt.setInt(2, target);
+            
+            System.out.println("BlobIntegrator.linkBlobToProperty | Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error inserting blob-Property link. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
+     * @param blobID the ID of the blob to be linked
+     * @param target the ID of the CEAR the blob will be linked to.
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void linkBlobToActionRequest(int blobID, int target) throws IntegrationException {
+        
+        Connection con = getPostgresCon();
+        String query =  " INSERT INTO public.ceactionrequestphotodoc(photodoc_photodocid, ceactionrequest_requestid)\n" +
+                        "    VALUES (?, ?);";
+        
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setInt(1, blobID);
+            stmt.setInt(2, target);
+            
+            System.out.println("BlobIntegrator.linkBlobToActionRequest | Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error inserting blob-CEActionRequest link. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
+     * @param blobID the ID of the blob to be linked
+     * @param target the ID of the violation the blob will be linked to.
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void linkBlobToViolation(int blobID, int target) throws IntegrationException {
+        
+        Connection con = getPostgresCon();
+        String query =  " INSERT INTO public.codeviolationphotodoc(photodoc_photodocid, codeviolation_violationid)\n" +
+                        "    VALUES (?, ?);";
+        
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setInt(1, blobID);
+            stmt.setInt(2, target);
+            
+            System.out.println("BlobIntegrator.linkBlobToViolation | Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error inserting blob-CodeViolation link. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
+     * @param blobID the ID of the blob to be linked
+     * @param municode the code of the muni the blob will be linked to.
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void linkBlobToMuni(int blobID, int municode) throws IntegrationException {
+        
+        Connection con = getPostgresCon();
+        String query =  " INSERT INTO public.muniphotodoc(photodoc_photodocid, muni_municode)\n" +
+                        "    VALUES (?, ?);";
+        
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setInt(1, blobID);
+            stmt.setInt(2, municode);
+            
+            System.out.println("BlobIntegrator.linkBlobToMuni | Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error inserting blob-muni link. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
+     * @param blobID the ID of the blob to be linked
+     * @param target the ID of the Inspected Space Element the blob will be linked to.
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void linkBlobToInspectedSpaceElement(int blobID,  int target) throws IntegrationException {
+        
+        Connection con = getPostgresCon();
+        String query =  " INSERT INTO public.occinspectedspaceelementphotodoc(photodoc_photodocid, occinspectedspaceelementphotodoc)\n" +
+                        "    VALUES (?, ?);";
+        
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setInt(1, blobID);
+            stmt.setInt(2, target);
+            
+            System.out.println("BlobIntegrator.linkBlobToInspectedSpaceElement | Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error inserting blob-OccInspectedSpaceElement link. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
+     * @param blobID the ID of the blob to be linked
+     * @param target the ID of the OccPeriod the blob will be linked to.
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void linkBlobToOccPeriod(int blobID,  int target) throws IntegrationException {
+        
+        Connection con = getPostgresCon();
+        String query =  " INSERT INTO public.occperiodphotodoc(photodoc_photodocid, occperiodphotodoc__occperiod_fk)\n" +
+                        "    VALUES (?, ?);";
+        
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setInt(1, blobID);
+            stmt.setInt(2, target);
+            
+            System.out.println("BlobIntegrator.linkBlobToOccPeriod | Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error inserting blob-linkBlobToOccPeriod link. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
     }
     
 }

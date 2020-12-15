@@ -51,8 +51,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -103,6 +101,8 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
                 if (currentCase != null && !currentCase.getViolationList().isEmpty()) {
                     currentViolation = currentCase.getViolationList().get(0);
                 }
+            } else {
+                
             }
 
             severityList = sc.getIntensitySchemaWithClasses(
@@ -501,7 +501,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             blob.setFilename(ev.getFile().getFileName());
             blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
             this.currentViolation.getBlobIDList().add(blobc.storeBlob(blob).getBlobID());
-            this.getBlobList().add(blob);
+            blobList.add(blob);
         } catch (IntegrationException | IOException | ClassNotFoundException | NoSuchElementException ex) {
             System.out.println("ViolationAddBB.handlePhotoUpload | upload failed! " + ex);
         } catch (BlobException ex) {
@@ -604,13 +604,12 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
     
     
     /**
-     * TODO: NADIT review
      * @param blob 
      */
     public void onPhotoUpdateDescription(Blob blob){
-        BlobCoordinator bc = getBlobCoordinator();
+        BlobIntegrator bi = getBlobIntegrator();
         try {
-            bc.updateBlobFilename(blob);
+            bi.updatePhotoBlobDescription(blob);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully updated photo description", ""));
@@ -618,16 +617,13 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Cannot update photo description", ""));
-            
-        } catch (IOException | BlobTypeException | ClassNotFoundException ex) {
-            System.out.println(ex);
+                            "Failed to update photo description", ""));
         } 
         
     }
 
     public String photosConfirm() {
-        /*  TODO: this obviously
+        // TODO: this obviously
         
         if(this.currentViolation == null){
             this.currentViolation = getSessionBean().getSessionCodeViolation();
@@ -658,10 +654,19 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
                     return "";
             }
         }
-         */
         return "ceCaseViolations";
     }
 
+    /**
+     * TODO: Finish me!
+     * grabs the photos for the currently selected Violation.
+     */
+    public void loadPhotos() {
+        
+        
+        
+    }
+    
     /**
      * @return the currentViolation
      */

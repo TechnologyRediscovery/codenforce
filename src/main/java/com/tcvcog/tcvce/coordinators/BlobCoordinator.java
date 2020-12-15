@@ -149,7 +149,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * TODO: make this method throw exception if blob is corrupted
      * @param blob
      * @return
-     * @throws BlobException
+     * @throws BlobException if blob is too large or of an incorrect file type
      * @throws IntegrationException
      * @throws IOException 
      * @throws java.lang.ClassNotFoundException 
@@ -160,6 +160,12 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             throw new BlobException("You cannot upload a file larger than 1 gigabyte.");
         }
 
+        String filename = blob.getFilename();
+        
+        if(filename == null || filename.isEmpty()){
+            throw new BlobException("You cannot upload a file without a filename.");
+        }
+        
         //First, let's find out what type of file this is.
         String fileExtension = getFileExtension(blob.getFilename());
 
@@ -170,34 +176,34 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         if(!fileExtension.equals(lowerCaseExt)) {
             
-            String filename = blob.getFilename();
             blob.setFilename(filename.replace("." + fileExtension, "." + lowerCaseExt));
 
             fileExtension = lowerCaseExt;
         }
         
         
-        if (fileExtension.equals("jpg")
-                || fileExtension.equals("jpeg")
-                || fileExtension.equals("gif")
-                || fileExtension.equals("png")) {
-            
-            blob.setType(BlobType.PHOTO);
-            
-            blob = stripImageMetadata(blob);
-            return getBlobIntegrator().storePhotoBlob(blob);
-            
-        } else if (fileExtension.contains("pdf")) {
-            
-            blob.setType(BlobType.PDF);
-            
-            //No PDF methods yet!
-            //TODO: Strip metadata from original file and save it in the Metadata dictionary
-            return null;
-            
-        } else {
-            //Incorrect file type
-            throw new BlobException("Incompatible file type, please upload a JPG, JPEG, GIF, PNG, or PDF.");
+        switch (fileExtension) {
+            case "jpg":
+            case "jpeg":
+            case "gif":
+            case "png":
+
+                blob.setType(BlobType.PHOTO);
+
+                blob = stripImageMetadata(blob);
+                return getBlobIntegrator().storePhotoBlob(blob);
+
+            case "pdf":
+
+                blob.setType(BlobType.PDF);
+
+                //No PDF methods yet!
+                //TODO: Strip metadata from original file and save it in the Metadata dictionary
+                return null;
+
+            default:
+                //Incorrect file type
+                throw new BlobException("Incompatible file type, please upload a JPG, JPEG, GIF, PNG, or PDF.");
         }
 
     }
