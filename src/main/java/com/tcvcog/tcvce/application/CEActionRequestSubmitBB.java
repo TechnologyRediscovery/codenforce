@@ -192,7 +192,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             for (Integer idNum : currentRequest.getBlobIDList()) {
                 try {
                     blobList.add(bc.getPhotoBlob(idNum));
-                } catch (IntegrationException | ClassNotFoundException | IOException | BlobTypeException | NoSuchElementException ex) {
+                } catch (IntegrationException | BlobException | NoSuchElementException ex) {
                     System.out.println("Error occured while fetching request blob list: " + ex);
                 }
             }
@@ -467,7 +467,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             blob.setMunicode(currentRequest.getMuni().getMuniCode());
 
             blob = blobc.storeBlob(blob);
-        } catch (IntegrationException | IOException | ClassNotFoundException | NoSuchElementException ex) {
+        } catch (IntegrationException | IOException | BlobTypeException ex) {
             System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -497,7 +497,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         BlobIntegrator blobI = getBlobIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
         SessionBean sb = getSessionBean();
-        BlobIntegrator blobi = getBlobIntegrator();
         SystemIntegrator si = getSystemIntegrator();
 
         int submittedActionRequestID;

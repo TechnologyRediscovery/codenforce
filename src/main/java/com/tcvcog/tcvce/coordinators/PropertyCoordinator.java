@@ -117,8 +117,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             pdh.setPersonList(sc.runQuery(qp).getBOBResultList());
             System.out.println("PropertyCoordinator.assemblePropertyDH: personlist size: " + pdh.getPersonList().size());
 
-            // wait on blobs
-            //pdh.setBlobList(new ArrayList<Integer>());
+            // Load blobs
+            pdh.setBlobList(new ArrayList<Integer>());
             // external data
             pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getPropertyID())));
 

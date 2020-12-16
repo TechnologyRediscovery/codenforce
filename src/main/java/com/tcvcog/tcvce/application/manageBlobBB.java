@@ -111,7 +111,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
                 for (int idnum : blobIDs) {
                     blobList.add(bc.getPhotoBlobLight(idnum));
                 }
-        } catch (IntegrationException | ClassNotFoundException | IOException | NoSuchElementException | BlobTypeException ex) {
+        } catch (IntegrationException | BlobException ex) {
             System.out.println("manageBlobBB.initBean | ERROR: " + ex);
         }
     }
@@ -205,7 +205,8 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
                     | BObStatusException
                     | EventException
                     | ViolationException
-                    | IntegrationException ex) {
+                    | IntegrationException 
+                    | BlobException ex) {
                 System.out.println("manageBlobBB.reloadConnections() | ERROR: " + ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -300,7 +301,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             } else {
                 throw new BlobException("BlobType not yet supported for download or blob failed to load.");
             }
-        } catch (IOException | ClassNotFoundException | IntegrationException | BlobException ex) {
+        } catch (IOException | IntegrationException | BlobException ex) {
             System.out.println("manageBlobBB.downloadSelectedBlob | " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -325,7 +326,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Found " + blobList.size() + " files matching your criteria!", ""));
-        } catch(ClassNotFoundException | IOException | IntegrationException | BlobTypeException ex){
+        } catch(IntegrationException | BlobException ex){
             System.out.println("manageBlobBB.executeQuery() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -388,7 +389,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully updated filename!", ""));
-        } catch(ClassNotFoundException | IOException | IntegrationException ex){
+        } catch(IOException | IntegrationException | BlobException  ex){
             //Rollback the filename
             selectedBlob.setFilename(originalName);
             System.out.println("manageBlobBB.updateBlobFilename() | ERROR: " + ex);
@@ -402,7 +403,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please end the file name with the file extension [" +
-                            bc.getFileExtension(originalName) +"]", ""));
+                            BlobCoordinator.getFileExtension(originalName) +"]", ""));
         }
         
     }

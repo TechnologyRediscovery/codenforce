@@ -29,7 +29,6 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeViolation;
@@ -50,7 +49,6 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -67,7 +65,6 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
 
     private CodeViolation currentViolation;
     private CECaseDataHeavy currentCase;
-    private List<Blob> blobList;
     
     private List<ViewOptionsActiveListsEnum> viewOptionList;
     private ViewOptionsActiveListsEnum selectedViewOption;
@@ -95,14 +92,12 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         SystemCoordinator sc = getSystemCoordinator();
         try {
             currentCase = cc.cecase_assembleCECaseDataHeavy(getSessionBean().getSessCECase(), getSessionBean().getSessUser());
-
+            
             currentViolation = getSessionBean().getSessCodeViolation();
             if (currentViolation == null) {
                 if (currentCase != null && !currentCase.getViolationList().isEmpty()) {
                     currentViolation = currentCase.getViolationList().get(0);
                 }
-            } else {
-                
             }
 
             severityList = sc.getIntensitySchemaWithClasses(
@@ -209,7 +204,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      *
      * @param viol
      */
-    public void onObjetViewButtonChange(CodeViolation viol) {
+    public void onObjectViewButtonChange(CodeViolation viol) {
 
         if (viol != null) {
             getSessionBean().setSessCodeViolation(viol);
@@ -234,7 +229,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         System.out.println("violationBB.OnModeInsertInit");
 
         try {
-            currentViolation = cc.violation_getCodeViolationSkeleton(currentCase);
+            setCurrentViolation(cc.violation_getCodeViolationSkeleton(currentCase));
         } catch (BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -248,11 +243,11 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      * Listener for beginning of update process
      */
     public void onModeUpdateInit() {
-        // nothign to do here yet since the user is selected
+        // nothing to do here yet since the user is selected
     }
 
     /**
-     * Listener for the start of the case remove process
+     * Listener for the start of the case removal process
      */
     public void onModeRemoveInit() {
 
@@ -481,28 +476,25 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      * @param ev
      */
     public void handlePhotoUpload(FileUploadEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
         if (ev == null) {
             System.out.println("ViolationAddBB.handlePhotoUpload | event: null");
             return;
         }
-        if (this.currentViolation.getBlobIDList() == null) {
-            this.currentViolation.setBlobIDList(new ArrayList<Integer>());
-        }
-        if (this.blobList == null) {
-            this.blobList = new ArrayList<>();
-        }
         
         try {
             BlobCoordinator blobc = getBlobCoordinator();
+            BlobIntegrator bi = getBlobIntegrator();
             
             Blob blob = blobc.getNewBlob();
             blob.setBytes(ev.getFile().getContents());
             blob.setFilename(ev.getFile().getFileName());
             blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
-            this.currentViolation.getBlobIDList().add(blobc.storeBlob(blob).getBlobID());
-            blobList.add(blob);
-        } catch (IntegrationException | IOException | ClassNotFoundException | NoSuchElementException ex) {
+            
+            currentViolation.getBlobList().add(blobc.storeBlob(blob));
+            
+            bi.linkBlobToViolation(blob.getBlobID(), currentViolation.getViolationID());
+            
+        } catch (IntegrationException | IOException | BlobTypeException ex) {
             System.out.println("ViolationAddBB.handlePhotoUpload | upload failed! " + ex);
         } catch (BlobException ex) {
             System.out.println("ViolationAddBB.handlePhotoUpload | upload failed! " + ex);
@@ -513,7 +505,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * Responds to user reqeusts to commit a new code violation to the CECase
+     * Responds to user requests to commit a new code violation to the CECase
      *
      * @return
      */
@@ -583,17 +575,17 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      * @return
      */
     public String onPhotoRemoveButtonChange(int photoid) {
-        CaseCoordinator cc = getCaseCoordinator();
+        BlobIntegrator bi = getBlobIntegrator();
         try {
-            cc.violation_removeLinkBlobToCodeViolation(currentViolation, photoid);
+            bi.removePhotoViolationsLink(photoid, currentViolation.getViolationID());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Blob removed with ID " + photoid, ""));
-        } catch (BObStatusException ex) {
-            System.out.println(ex);
+                            "Blob link removed with ID " + photoid, ""));
+        } catch (IntegrationException ex) {
+            System.out.println("ViolationBB.onPhotoRemoveButtonChange() | ERROR: "+ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Cannot remove photo yet: unsupported operation", ""));
+                            "An issue occurred while trying to sever file-violation link.", ""));
             
         } 
 
@@ -626,7 +618,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         // TODO: this obviously
         
         if(this.currentViolation == null){
-            this.currentViolation = getSessionBean().getSessionCodeViolation();
+            this.currentViolation = getSessionBean().getSessCodeViolation();
         }
         if(this.getPhotoList() == null  ||  this.getPhotoList().isEmpty()){
             getFacesContext().addMessage(null,
@@ -656,16 +648,6 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         }
         return "ceCaseViolations";
     }
-
-    /**
-     * TODO: Finish me!
-     * grabs the photos for the currently selected Violation.
-     */
-    public void loadPhotos() {
-        
-        
-        
-    }
     
     /**
      * @return the currentViolation
@@ -676,24 +658,11 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @param currentViolation the currentViolation to set
+     * Sets the current violation, then loads its blobs
+     * @param currentViolation
      */
     public void setCurrentViolation(CodeViolation currentViolation) {
         this.currentViolation = currentViolation;
-    }
-
-    /**
-     * @return the photoList
-     */
-    public List<Blob> getBlobList() {
-        return this.blobList;
-    }
-
-    /**
-     * @param blobList
-     */
-    public void setBlobList(List<Blob> blobList) {
-        this.blobList = blobList;
     }
 
     /**
@@ -815,8 +784,6 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
     public void setExtendStipCompUsingDate(boolean extendStipCompUsingDate) {
         this.extendStipCompUsingDate = extendStipCompUsingDate;
     }
-
-  
 
     /**
      * @return the severityList

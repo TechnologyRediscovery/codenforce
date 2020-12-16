@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.MetadataException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Blob;
@@ -31,14 +32,11 @@ import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.Metadata;
 import com.tcvcog.tcvce.entities.MetadataKey;
-import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.awt.image.BufferedImage;
-import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import java.io.ByteArrayInputStream;
@@ -54,7 +52,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Random;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
@@ -100,10 +97,9 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      *
      * @return
      * @throws BlobTypeException
-     * @throws java.io.IOException
-     * @throws java.lang.ClassNotFoundException
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
-    public StreamedContent getImage() throws BlobTypeException, IOException, ClassNotFoundException {
+    public StreamedContent getImage() throws BlobTypeException, BlobException{
         // should use EL to verify blob type,  but this will check it anyway
         FacesContext context = FacesContext.getCurrentInstance();
         DefaultStreamedContent sc = null;
@@ -152,9 +148,9 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @throws BlobException if blob is too large or of an incorrect file type
      * @throws IntegrationException
      * @throws IOException 
-     * @throws java.lang.ClassNotFoundException 
+     * @throws com.tcvcog.tcvce.domain.BlobTypeException
      */
-    public Blob storeBlob(Blob blob) throws BlobException, IntegrationException, IOException, NoSuchElementException, ClassNotFoundException {
+    public Blob storeBlob(Blob blob) throws BlobException, IOException, IntegrationException, BlobTypeException {
         //Test to see if the byte array is larger than a GIGABYTE
         if (blob.getBytes().length > GIGABYTE) {
             throw new BlobException("You cannot upload a file larger than 1 gigabyte.");
@@ -215,14 +211,14 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @param blob
      * @throws IntegrationException
      * @throws IOException
-     * @throws ClassNotFoundException
      * @throws BlobTypeException if the supplied file extension is different than what we have in the DB
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
     public void updateBlobFilename(BlobLight blob) 
             throws IntegrationException, 
-            IOException, 
-            ClassNotFoundException, 
-            BlobTypeException{
+            IOException,
+            BlobTypeException,
+            BlobException{
         
         //we must make sure that the file extension has not been changed, as
         //Changing it could break the file.
@@ -252,7 +248,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
     }
 
-    public Blob getPhotoBlob(int blobID) throws IntegrationException, IOException, ClassNotFoundException, NoSuchElementException, BlobTypeException {
+    public Blob getPhotoBlob(int blobID) throws IntegrationException, BlobException {
         BlobIntegrator bi = getBlobIntegrator();
 
         Blob blob = new Blob(getPhotoBlobLight(blobID));
@@ -268,10 +264,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @param input
      * @return
      * @throws IntegrationException
-     * @throws IOException
-     * @throws ClassNotFoundException 
      */
-    public Blob getPhotoBlob(BlobLight input) throws IntegrationException, IOException, ClassNotFoundException {
+    public Blob getPhotoBlob(BlobLight input) throws IntegrationException {
         BlobIntegrator bi = getBlobIntegrator();
 
         Blob blob = new Blob(input);
@@ -289,46 +283,44 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @param blobID
      * @return
      * @throws IntegrationException
-     * @throws IOException
-     * @throws ClassNotFoundException 
-     * @throws com.tcvcog.tcvce.domain.BlobTypeException 
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
-    public BlobLight getPhotoBlobLight(int blobID) throws IntegrationException, IOException, ClassNotFoundException, NoSuchElementException, BlobTypeException{
+    public BlobLight getPhotoBlobLight(int blobID) throws IntegrationException, BlobException {
         
         BlobIntegrator bi = getBlobIntegrator();
         
         try {
         return bi.getPhotoBlobLight(blobID);
-        } catch(BlobException ex) {
-            //The metadata column isn't properly populated.
-            //We'll grab the bytes, strip the metadata from them
-            //And save them in the metadata column before fetching
-            //The blob and returning it.
+        } catch(MetadataException ex) {
             
-            //time to operate
-            //grab the BlobLight without metadata so we don't get the same error
-            Blob patient = getPhotoBlob(bi.getPhotoBlobLightWithoutMetadata(blobID));
-            
-            patient = stripImageMetadata(patient);
-            
-            //Should be all ready, let's update the bytes and the metadata
-            
-            bi.updateBlobBytes(patient);
-            
-            bi.updateBlobMetadata(patient);
+            if(ex.isMapNullError()){
+                //The metadata column isn't properly populated.
+                //We'll grab the bytes, strip the metadata from them
+                //And save them in the metadata column before fetching
+                //The blob and returning it.
+
+                //time to operate
+                //grab the BlobLight without metadata so we don't get the same error
+                Blob patient = getPhotoBlob(bi.getPhotoBlobLightWithoutMetadata(blobID));
+                try {
+                patient = stripImageMetadata(patient);
+
+                //Should be all ready, let's update the bytes and the metadata
+
+                bi.updateBlobBytes(patient);
+
+                bi.updateBlobMetadata(patient);
+                
+                } catch(IOException | BlobTypeException exTwo){
+                    throw new BlobException(exTwo);
+                }
+            } else {
+                throw new BlobException(ex);
+            }
             
         }
         
-        /*
-            We are now clear to return the photo.
-        
-            NOTE TO FUTURE DEBUGGERS:
-            This is a recursive function and
-            you will get stuck in an infinite loop if
-            BlobIntegrator.getPhotoBlobLight()
-            throws a BlobException for reasons that the
-            catch block above can't fix.
-        */
+        //We are now clear to return the blob
         return getPhotoBlobLight(blobID);
     }
     
@@ -371,15 +363,14 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @return The blob that was put into it, stripped of metadata
      * @throws java.io.IOException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
-     * @throws java.lang.ClassNotFoundException
      * @throws com.tcvcog.tcvce.domain.BlobTypeException
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
     public Blob stripImageMetadata(Blob input) 
             throws IOException, 
-            NoSuchElementException, 
-            IntegrationException, 
-            ClassNotFoundException, 
-            BlobTypeException {
+            IntegrationException,
+            BlobTypeException,
+            BlobException {
 
         if(input.getFilename() == null){
             
@@ -480,7 +471,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @param filename
      * @return 
      */
-    public String getFileExtension(String filename) {
+    public static String getFileExtension(String filename) {
         //split on every dot
         String[] fileNameTokens = filename.split("\\.");
 
@@ -496,7 +487,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @return 
      * @throws java.io.IOException 
      */
-    public String generateFilename(byte[] bytes) throws IOException{
+    private String generateFilename(byte[] bytes) throws IOException {
         
         InputStream is = new ByteArrayInputStream(bytes);
         String extension = URLConnection.guessContentTypeFromStream(is);
@@ -517,13 +508,15 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.AuthorizationException 
      * @throws com.tcvcog.tcvce.domain.ViolationException 
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.BlobException 
      */
     public List<BOb> getAttachedObjects(BlobLight blob) 
         throws IntegrationException,
             EventException, 
             AuthorizationException, 
             ViolationException, 
-            BObStatusException {
+            BObStatusException, 
+            BlobException{
 
         BlobIntegrator bi = getBlobIntegrator();
 
@@ -593,15 +586,10 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @param municode
      * @return 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
-     * @throws java.io.IOException 
-     * @throws java.lang.ClassNotFoundException 
-     * @throws com.tcvcog.tcvce.domain.BlobTypeException 
+     * @throws com.tcvcog.tcvce.domain.BlobException 
      */
     public List<BlobLight> searchBlobs(String filename, String description, LocalDateTime before, LocalDateTime after, int municode) 
-            throws IntegrationException, 
-            IOException, 
-            ClassNotFoundException,
-            BlobTypeException {
+            throws IntegrationException, BlobException{
         
         BlobIntegrator bi = getBlobIntegrator();
         
@@ -633,5 +621,5 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         return blobList;
         
     }
-
+    
 }

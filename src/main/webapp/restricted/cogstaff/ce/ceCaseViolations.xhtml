@@ -144,7 +144,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="gray_button">
 
                                                         <p:commandButton ajax="true" 
-                                                                         actionListener="#{violationBB.onObjetViewButtonChange(violation)}"
+                                                                         actionListener="#{violationBB.onObjectViewButtonChange(violation)}"
                                                                          icon="#{violation.violationID == violationBB.currentViolation.violationID ? 'fa fa-hand-o-right':'fa fa-gavel'}"
                                                                          style="#{violation.violationID == violationBB.currentViolation.violationID ? 'background-color: #dee461; color:black; border:none;':''}"
                                                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
@@ -1530,7 +1530,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 <p:dataTable
                                     id="photoTable"
                                     var="blob"
-                                    value="#{violationBB.blobList}"
+                                    value="#{violationBB.violationBlobList}"
                                     rowKey="#{blob.blobID}"
                                     tableStyleClass="primeDataTable"
                                     draggableRows="false" tabindex="6">

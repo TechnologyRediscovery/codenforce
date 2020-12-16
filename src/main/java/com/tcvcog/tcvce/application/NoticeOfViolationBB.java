@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
+import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -1092,12 +1093,11 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
         } catch (IntegrationException
                 | BObStatusException
-                | ClassNotFoundException
                 | IOException
                 | NoSuchElementException ex) {
             System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | " + ex);
             System.out.println(ex);
-        } catch (BlobException ex) {
+        } catch (BlobException | BlobTypeException ex) {
             System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

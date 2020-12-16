@@ -23,9 +23,10 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
+import com.tcvcog.tcvce.domain.BlobException;
+import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECase;
@@ -42,6 +43,7 @@ import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
 import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.BlobLight;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -49,7 +51,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.ZoneId;
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1081,14 +1082,21 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param rs
      * @return
      * @throws SQLException
-     * @throws IntegrationException ////////////////////////////
+     * @throws IntegrationException
+     * @throws BlobException 
      */
-    private CodeViolation generateCodeViolationFromRS(ResultSet rs) throws SQLException, IntegrationException {
+    private CodeViolation generateCodeViolationFromRS(ResultSet rs) 
+            throws SQLException, 
+            IntegrationException,
+            BlobException
+            {
 
         CodeViolation v = new CodeViolation();
         CodeIntegrator ci = getCodeIntegrator();
         UserIntegrator ui = getUserIntegrator();
         WorkflowCoordinator wc = getWorkflowCoordinator();
+        BlobIntegrator bi = getBlobIntegrator();
+        BlobCoordinator bc = getBlobCoordinator();
         
         v.setViolationID(rs.getInt("violationid"));
         v.setViolatedEnfElement(ci.getEnforcableCodeElement(rs.getInt("codesetelement_elementid")));
@@ -1149,6 +1157,14 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             v.setNullifiedUser(ui.getUser(rs.getInt("nullifiedby")));
         } 
         
+        List<BlobLight> blobList = new ArrayList<>();
+        
+        for(int id : bi.photosAttachedToViolation(v.getViolationID())){
+            blobList.add(bc.getPhotoBlobLight(id));
+        }
+        
+        v.setBlobList(blobList);
+        
         return v;
     }
 
@@ -1156,9 +1172,12 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * Primary getter method for CodeViolation objects
      * @param violationID
      * @return
-     * @throws IntegrationException 
+     * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
-    public CodeViolation getCodeViolation(int violationID) throws IntegrationException {
+    public CodeViolation getCodeViolation(int violationID) 
+            throws IntegrationException,
+            BlobException {
         String query = "SELECT violationid, codesetelement_elementid, cecase_caseid, dateofrecord, \n" +
                         "       entrytimestamp, stipulatedcompliancedate, actualcompliancedate, \n" +
                         "       penalty, description, notes, legacyimport, compliancetimestamp, \n" +
@@ -1239,46 +1258,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * TODO: NADGIT Fix the BlobList References
-     * @param cv
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Blob> loadViolationPhotoList(CodeViolation cv) throws IntegrationException{
-        List<Blob> vBlobList = new ArrayList<>();
-        BlobCoordinator bc = getBlobCoordinator();
-        
-        String query = "SELECT photodoc_photodocid FROM public.codeviolationphotodoc WHERE codeviolation_violationid = ?";
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, cv.getViolationID());
-            rs = stmt.executeQuery();
-
-//            while (rs.next()) {
-//                vBlobList.add(bc.getBlob(rs.getInt("photodoc_photodocid")));
-//            }
-            
-//            cv.setBlobIDList(blobList);
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot load photos on violation.", ex);
-
-        } finally {
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        
-        return vBlobList;
-    }
-       /**
      * Updates only the notes field on codeviolation table
-     
      * 
      * @param viol
      * @throws IntegrationException
@@ -1772,9 +1752,14 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * Primary getter for the NOV object
      * @param noticeID
      * @return
-     * @throws IntegrationException 
+     * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BlobException
+     * @throws BlobTypeException 
      */
-    public NoticeOfViolation novGet(int noticeID) throws IntegrationException {
+    public NoticeOfViolation novGet(int noticeID) 
+            throws IntegrationException,
+            BlobException,
+            BlobTypeException {
         String query =  "SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
                         "       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
                         "       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
@@ -1883,9 +1868,15 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param rs
      * @return
      * @throws SQLException
-     * @throws IntegrationException 
+     * @throws IntegrationException
+     * @throws BlobTypeException
+     * @throws BlobException 
      */
-    private NoticeOfViolation novGenerate(ResultSet rs) throws SQLException, IntegrationException {
+    private NoticeOfViolation novGenerate(ResultSet rs) 
+            throws SQLException, 
+            IntegrationException,
+            BlobTypeException,
+            BlobException {
 //SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, 
 //       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, 
 //       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, 
@@ -1940,13 +1931,17 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * Looks up all of the CodeViolations assocaited with a given NOV
+     * Looks up all of the CodeViolations associated with a given NOV
      * and extracts their display properties stored in the linking DB's linking table
      * @param nov
      * @return
-     * @throws IntegrationException 
+     * @throws IntegrationException
+     * @throws BlobTypeException
+     * @throws BlobException
      */
-    private NoticeOfViolation populateCodeViolations(NoticeOfViolation nov) throws IntegrationException{
+    private NoticeOfViolation populateCodeViolations(NoticeOfViolation nov) 
+            throws IntegrationException,
+            BlobException{
         String query =  "  SELECT noticeofviolation_noticeid, codeviolation_violationid, includeordtext, \n" +
                         "       includehumanfriendlyordtext, includeviolationphoto\n" +
                         "  FROM public.noticeofviolationcodeviolation WHERE noticeofviolation_noticeid = ?;";
@@ -2087,7 +2082,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      
     /**
      * Extracts all text blocks by a given category
-     * @param categoryID
+     * @param catID
      * @return
      * @throws IntegrationException 
      */
@@ -2162,7 +2157,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
          return ll;
      }
      
-       /**
+     /**
       * Extracts all text blocks associated with a given Muni
       * @param m
       * @return

@@ -66,7 +66,7 @@ public class PropertyFilesBB
                 getBlobIntegrator().removePhotoPropertyLink(blobID, currProp.getPropertyID());
             }
         }
-        catch (IntegrationException | ClassNotFoundException | IOException | BlobTypeException | NoSuchElementException ex) {
+        catch (IntegrationException | BlobException ex) {
             System.out.println(ex);
         }
     }
@@ -109,13 +109,13 @@ public class PropertyFilesBB
             
             blobi.linkBlobToProperty(blob.getBlobID(), currProp.getPropertyID());
             
-        } catch (IntegrationException | IOException | ClassNotFoundException | NoSuchElementException ex) {
+        } catch (IntegrationException | IOException ex) {
             System.out.println("PropertyFilesBB.handleFileUpload | " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Something went wrong while trying to upload your photo,please try again.",
                             "If this problem persists, please call your municipal office."));
-        } catch (BlobException ex) {
+        } catch (BlobException | BlobTypeException ex) {
             System.out.println("PropertyFilesBB.handleFileUpload | " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

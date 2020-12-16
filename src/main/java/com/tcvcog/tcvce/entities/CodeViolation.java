@@ -74,11 +74,8 @@ public  class       CodeViolation
     protected User nullifiedUser;
     
     protected boolean leagacyImport;
-    protected List<Photograph> photoList;
-    protected List<Integer> blobIDList;
-    protected List<Integer> photoIDList;
     
-    protected List<Blob> blobList;
+    protected List<BlobLight> blobList;
     
     protected int complianceTFExpiryPropID;
     protected Proposal complianceTFExpiryProp;
@@ -360,22 +357,6 @@ public  class       CodeViolation
         this.creationTSPretty = creationTSPretty;
     }
 
-    
-
-    /**
-     * @return the list of blobIDs associated with this Violation
-     */
-    public List<Integer> getBlobIDList() {
-        return this.blobIDList;
-    }
-
-    /**
-     * @param blobIDList the blobIDList to set
-     */
-    public void setBlobIDList(List<Integer> blobIDList) {
-        this.blobIDList = blobIDList;
-    }
-
     /**
      * @return the leagacyImport
      */
@@ -437,31 +418,50 @@ public  class       CodeViolation
         return sb.toString();
         
     }
-    
+
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 53 * hash + this.violationID;
-        hash = 53 * hash + Objects.hashCode(this.violatedEnfElement);
-        hash = 53 * hash + this.ceCaseID;
-        hash = 53 * hash + (int) (Double.doubleToLongBits(this.penalty) ^ (Double.doubleToLongBits(this.penalty) >>> 32));
-        hash = 53 * hash + Objects.hashCode(this.description);
-        hash = 53 * hash + Objects.hashCode(this.notes);
-        hash = 53 * hash + Objects.hashCode(this.dateOfCitation);
-        hash = 53 * hash + Objects.hashCode(this.citationIDList);
-        hash = 53 * hash + Objects.hashCode(this.dateOfRecord);
-        hash = 53 * hash + Objects.hashCode(this.dateOfRecordPretty);
-        hash = 53 * hash + Objects.hashCode(this.creationTS);
-        hash = 53 * hash + Objects.hashCode(this.creationTSPretty);
-        hash = 53 * hash + Objects.hashCode(this.stipulatedComplianceDate);
-        hash = 53 * hash + Objects.hashCode(this.actualComplianceDate);
-        hash = 53 * hash + (this.leagacyImport ? 1 : 0);
-        hash = 53 * hash + Objects.hashCode(this.complianceTimeStamp);
-        hash = 53 * hash + Objects.hashCode(this.complianceUser);
-        hash = 53 * hash + Objects.hashCode(this.blobIDList);
+        int hash = 3;
+        hash = 73 * hash + this.violationID;
+        hash = 73 * hash + Objects.hashCode(this.violatedEnfElement);
+        hash = 73 * hash + this.ceCaseID;
+        hash = 73 * hash + Objects.hashCode(this.status);
+        hash = 73 * hash + (this.active ? 1 : 0);
+        hash = 73 * hash + Objects.hashCode(this.icon);
+        hash = 73 * hash + Objects.hashCode(this.ageLeadText);
+        hash = 73 * hash + (int) (Double.doubleToLongBits(this.penalty) ^ (Double.doubleToLongBits(this.penalty) >>> 32));
+        hash = 73 * hash + Objects.hashCode(this.description);
+        hash = 73 * hash + Objects.hashCode(this.notes);
+        hash = 73 * hash + Objects.hashCode(this.dateOfRecord);
+        hash = 73 * hash + Objects.hashCode(this.dateOfRecordUtilDate);
+        hash = 73 * hash + Objects.hashCode(this.dateOfRecordPretty);
+        hash = 73 * hash + Objects.hashCode(this.creationTS);
+        hash = 73 * hash + Objects.hashCode(this.creationTSPretty);
+        hash = 73 * hash + Objects.hashCode(this.createdBy);
+        hash = 73 * hash + (this.allowHostCaseUpdate ? 1 : 0);
+        hash = 73 * hash + (this.allowOrdinanceUpdates ? 1 : 0);
+        hash = 73 * hash + (this.allowDORUpdate ? 1 : 0);
+        hash = 73 * hash + (this.allowStipCompDateUpdate ? 1 : 0);
+        hash = 73 * hash + Objects.hashCode(this.dateOfCitation);
+        hash = 73 * hash + Objects.hashCode(this.citationIDList);
+        hash = 73 * hash + Objects.hashCode(this.noticeIDList);
+        hash = 73 * hash + Objects.hashCode(this.stipulatedComplianceDate);
+        hash = 73 * hash + Objects.hashCode(this.actualComplianceDate);
+        hash = 73 * hash + Objects.hashCode(this.complianceTimeStamp);
+        hash = 73 * hash + Objects.hashCode(this.complianceUser);
+        hash = 73 * hash + Objects.hashCode(this.complianceNote);
+        hash = 73 * hash + Objects.hashCode(this.nullifiedTS);
+        hash = 73 * hash + Objects.hashCode(this.nullifiedUser);
+        hash = 73 * hash + (this.leagacyImport ? 1 : 0);
+        hash = 73 * hash + Objects.hashCode(this.blobList);
+        hash = 73 * hash + this.complianceTFExpiryPropID;
+        hash = 73 * hash + Objects.hashCode(this.complianceTFExpiryProp);
+        hash = 73 * hash + Objects.hashCode(this.severityIntensity);
+        hash = 73 * hash + Objects.hashCode(this.lastUpdatedTS);
+        hash = 73 * hash + Objects.hashCode(this.lastUpdatedUser);
         return hash;
     }
-
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -631,13 +631,6 @@ public  class       CodeViolation
     }
 
     /**
-     * @return the photoIDList
-     */
-    public List<Integer> getPhotoIDList() {
-        return photoIDList;
-    }
-
-    /**
      * @param complianceTFExpiryPropID the complianceTFExpiryPropID to set
      */
     public void setComplianceTFExpiryPropID(int complianceTFExpiryPropID) {
@@ -649,13 +642,6 @@ public  class       CodeViolation
      */
     public void setComplianceTFExpiryProp(Proposal complianceTFExpiryProp) {
         this.complianceTFExpiryProp = complianceTFExpiryProp;
-    }
-
-    /**
-     * @param photoIDList the photoIDList to set
-     */
-    public void setPhotoIDList(List<Integer> photoIDList) {
-        this.photoIDList = photoIDList;
     }
 
     /**
@@ -698,20 +684,6 @@ public  class       CodeViolation
      */
     public void setActive(boolean active) {
         this.active = active;
-    }
-
-    /**
-     * @return the photoList
-     */
-    public List<Photograph> getPhotoList() {
-        return photoList;
-    }
-
-    /**
-     * @param photoList the photoList to set
-     */
-    public void setPhotoList(List<Photograph> photoList) {
-        this.photoList = photoList;
     }
 
     /**
@@ -787,14 +759,14 @@ public  class       CodeViolation
     /**
      * @return the blobList
      */
-    public List<Blob> getBlobList() {
+    public List<BlobLight> getBlobList() {
         return blobList;
     }
 
     /**
      * @param blobList the blobList to set
      */
-    public void setBlobList(List<Blob> blobList) {
+    public void setBlobList(List<BlobLight> blobList) {
         this.blobList = blobList;
     }
 
