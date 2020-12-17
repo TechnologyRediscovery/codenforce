@@ -331,6 +331,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      * @throws java.io.IOException
      */
     private int storeBlobBytes(Blob blob) throws BlobTypeException, IntegrationException, IOException{
+        
         if(blob.getType() == null) throw new BlobTypeException("Attempted to store a blob with null type. ");
         
         Connection con = getPostgresCon();

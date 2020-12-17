@@ -23,6 +23,6 @@ import java.util.List;
  * @author Nathan Dietz
  */
 public interface IFace_BlobHolder {
-    public void setBlobIDList(List<Integer> blobIDList);
-    public List<Integer> getBlobIDList();
+    public void setBlobList(List<Integer> blobIDList);
+    public List<Integer> getBlobList();
 }

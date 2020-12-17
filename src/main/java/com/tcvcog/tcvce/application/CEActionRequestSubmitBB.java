@@ -176,7 +176,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
         if (currentRequest == null) {
             currentRequest = new CEActionRequest();
-            currentRequest.setBlobIDList(new ArrayList<Integer>());
+            currentRequest.setBlobList(new ArrayList<Integer>());
         }
 
         if (currentRequest.getMuni() != null) {
@@ -188,8 +188,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             }
         }
 
-        if (currentRequest.getBlobIDList().size() > 0) {
-            for (Integer idNum : currentRequest.getBlobIDList()) {
+        if (currentRequest.getBlobList().size() > 0) {
+            for (Integer idNum : currentRequest.getBlobList()) {
                 try {
                     blobList.add(bc.getPhotoBlob(idNum));
                 } catch (IntegrationException | BlobException | NoSuchElementException ex) {
@@ -284,7 +284,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         cear = cc.cear_getInititalizedCEActionRequest();
         cear.setDateOfRecordUtilDate(form_dateOfRecord);
         cear.setMuni(selectedMuni);
-        cear.setBlobIDList(new ArrayList<Integer>());
+        cear.setBsetBlobList ArrayList<Integer>());
         cear.setRequestProperty(new Property());
         getSessionBean().setSessCEAR(cear);
         getSessionBean().getNavStack().pushCurrentPage();
@@ -307,8 +307,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 //        User u = getSessionBean().getFacesUser();
 //        if(u == null){
 
-        if (currentRequest.getBlobIDList() == null) {
-            currentRequest.setBlobIDList(new ArrayList<Integer>());
+        if (currentRequest.getBlobList() == null) {
+            currentRequest.setBlosetBlobListrrayList<Integer>());
         }
         getSessionBean().setSessCEAR(currentRequest);
         getSessionBean().setBlobList(new ArrayList<Blob>());
@@ -349,7 +349,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                 }
             }
 
-            currentRequest.setBlobIDList(new ArrayList<Integer>());
+            currentRequest.setBlosetBlobListrrayList<Integer>());
             blobList = new ArrayList<>();
             getSessionBean().setSessCEAR(currentRequest);
         }
@@ -364,9 +364,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public String savePhotosAndContinue() {
 
         BlobIntegrator bi = getBlobIntegrator();
-        currentRequest.setBlobIDList(new ArrayList<Integer>());
+        currentRequest.setBlosetBlobListrrayList<Integer>());
         for (Blob b : blobList) {
-            currentRequest.getBlobIDList().add(b.getBlobID());
+            currentRequest.getBlobList().add(b.getBlobID());
 
             //Also, save the description to the database.
             try {
@@ -429,7 +429,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                             "An error occured while trying to delete the selected photo.", ""));
         }
 
-        currentRequest.getBlobIDList().remove(new Integer(input.getBlobID()));
+        currentRequest.getBlobList().remove(new Integer(input.getBlobID()));
         blobList.remove(input);
     }
 
@@ -544,7 +544,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             // Now go right back to the DB and get the request we just submitted to verify before displaying the PACC
             sb.setSessCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
 
-            for (Integer blobID : currentRequest.getBlobIDList()) {
+            for (Integer blobID : currentRequest.getBlobList()) {
                 try {
                     blobI.linkPhotoBlobToActionRequest(blobID, sb.getSessCEAR().getRequestID());
                 } catch (IntegrationException ex) {

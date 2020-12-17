@@ -801,23 +801,21 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
     public void deletePhoto(int blobID) {
-        for (Integer bid : this.selectedRequest.getBlobIDList()) {
+        for (Integer bid : this.selectedRequest.getBlobList()) {
             if (bid.compareTo(blobID) == 0) {
-                this.selectedRequest.getBlobIDList().remove(bid);
+                this.selectedRequest.getBlobList().remove(bid);
                 break;
             }
         }
         
         try {
-            BlobLight target = getBlobIntegrator().getPhotoBlobLight(blobID);
+            BlobLight target = getBlobCoordinator().getPhotoBlobLight(blobID);
             getBlobCoordinator().deletePhotoBlob(target);
         } catch (IntegrationException 
                 | AuthorizationException 
                 | BObStatusException 
                 | BlobException 
-                | ClassNotFoundException 
                 | EventException 
-                | IOException 
                 | ViolationException ex) {
             System.out.println(ex);
         }

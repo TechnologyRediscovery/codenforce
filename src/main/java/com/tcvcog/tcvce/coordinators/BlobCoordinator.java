@@ -508,15 +508,13 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.AuthorizationException 
      * @throws com.tcvcog.tcvce.domain.ViolationException 
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
-     * @throws com.tcvcog.tcvce.domain.BlobException 
      */
     public List<BOb> getAttachedObjects(BlobLight blob) 
         throws IntegrationException,
             EventException, 
             AuthorizationException, 
             ViolationException, 
-            BObStatusException, 
-            BlobException{
+            BObStatusException{
 
         BlobIntegrator bi = getBlobIntegrator();
 

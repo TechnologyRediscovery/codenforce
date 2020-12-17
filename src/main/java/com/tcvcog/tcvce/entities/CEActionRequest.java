@@ -35,20 +35,6 @@ import java.util.Objects;
  * @author Eric Darsow
  */
 public class CEActionRequest extends BOb implements Serializable{
-
-    /**
-     * @return the blobIDList
-     */
-    public List<Integer> getBlobIDList() {
-        return blobIDList;
-    }
-
-    /**
-     * @param blobIDList the blobIDList to set
-     */
-    public void setBlobIDList(List<Integer> blobIDList) {
-        this.blobIDList = blobIDList;
-    }
     
     // requests no longer have a status--remove when fully updated
     // for the full case model
@@ -101,7 +87,7 @@ public class CEActionRequest extends BOb implements Serializable{
     // tables with the String values are selected
     
     // list of blob id's associated with this request
-    private List<Integer> blobIDList;
+    private List<Integer> blobList; //Replace with list of BlobLights 
     
     /**
      * Creates a new instance of ActionRequest
@@ -123,6 +109,19 @@ public class CEActionRequest extends BOb implements Serializable{
         this.requestID = requestID;
     }
 
+    /**
+     * @return the blobList
+     */
+    public List<Integer> getBlobList() {
+        return blobList;
+    }
+
+    /**
+     * @param blobList the blobList to set
+     */
+    public void setBlobList(List<Integer> blobList) {
+        this.blobList = blobList;
+    }
 
     /**
      * @return the addressOfConcern

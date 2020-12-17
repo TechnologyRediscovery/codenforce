@@ -269,7 +269,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
       * @return a Query subclass with results accessible via q.getResults
       * @throws SearchException 
       */
-     public QueryCECase runQuery(QueryCECase q) throws SearchException{
+     public QueryCECase runQuery(QueryCECase q) throws SearchException {
         CaseIntegrator ci = getCaseIntegrator();
         CaseCoordinator cc = getCaseCoordinator();
         

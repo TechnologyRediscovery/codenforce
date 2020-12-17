@@ -24,8 +24,6 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.BlobException;
-import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -48,7 +46,6 @@ import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
-import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -56,7 +53,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.NoSuchElementException;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
@@ -102,7 +98,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.SearchException
-     * @throws com.tcvcog.tcvce.domain.BlobTypeException
      */
     public CECaseDataHeavy cecase_assembleCECaseDataHeavy(CECase c, UserAuthorized ua)
             throws BObStatusException, 
@@ -164,9 +159,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param cseList
      * @param ua
      * @return
-     * @throws com.tcvcog.tcvce.domain.BlobTypeException
      */
-    public List<CECaseDataHeavy> cecase_assembleCECaseDataHeavyList(List<CECase> cseList, UserAuthorized ua) throws BlobTypeException {
+    public List<CECaseDataHeavy> cecase_assembleCECaseDataHeavyList(List<CECase> cseList, UserAuthorized ua) {
         List<CECaseDataHeavy> cseDHList = new ArrayList<>();
         if (cseList != null && !cseList.isEmpty()) {
             for (CECase cse : cseList) {
@@ -208,7 +202,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param ua
      * @return
      */
-    public List<CECaseDataHeavy> cecase_getCECaseDataHeavyList(List<CECase> cseList, UserAuthorized ua) throws BlobTypeException {
+    public List<CECaseDataHeavy> cecase_getCECaseDataHeavyList(List<CECase> cseList, UserAuthorized ua) {
         List<CECaseDataHeavy> heavyList = new ArrayList<>();
         for (CECase cse : cseList) {
             try {
@@ -270,14 +264,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param caseID
      * @return
      * @throws IntegrationException
-     * @throws BlobTypeException 
      */
     public CECase cecase_getCECase(int caseID) 
-            throws IntegrationException,
-            BlobTypeException{
+            throws IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
         EventCoordinator ec = getEventCoordinator();
-        SearchCoordinator sc = getSearchCoordinator();
+        
         CECase cse = null;
         try {
             cse = ci.getCECase(caseID);
@@ -755,7 +747,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.EventException
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public int cecase_insertNewCECase(CECase freshCase, UserAuthorized ua, CEActionRequest cear) throws IntegrationException, BObStatusException, ViolationException, EventException, SearchException {
+    public int cecase_insertNewCECase(CECase freshCase, UserAuthorized ua, CEActionRequest cear) 
+            throws IntegrationException, 
+            BObStatusException, 
+            ViolationException, 
+            EventException, 
+            SearchException {
 
         CaseIntegrator ci = getCaseIntegrator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
@@ -1291,13 +1288,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param noticeID
      * @return
      * @throws IntegrationException
-     * @throws BlobException
-     * @throws BlobTypeException 
      */
     public NoticeOfViolation nov_getNoticeOfViolation(int noticeID) 
-            throws IntegrationException,  
-            BlobException,
-            BlobTypeException{
+            throws IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
         return ci.novGet(noticeID);
     }
@@ -1308,13 +1301,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param idl
      * @return
      * @throws IntegrationException
-     * @throws BlobTypeException
-     * @throws BlobException 
      */
     public List<NoticeOfViolation> nov_getNoticeOfViolationList(List<Integer> idl) 
-            throws IntegrationException, 
-            BlobTypeException,
-            BlobException {
+            throws IntegrationException {
         List<NoticeOfViolation> novl = new ArrayList<>();
         if(idl != null && !idl.isEmpty()){
             for(Integer i: idl){
@@ -2078,8 +2067,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws BlobException 
      */
     public CodeViolation violation_getCodeViolation(int vid) 
-            throws IntegrationException, 
-            BlobException {
+            throws IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
         CodeViolation cv = ci.getCodeViolation(vid);
         return violation_configureCodeViolation(cv);
@@ -2376,9 +2364,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param cvIDList
      * @return
      * @throws IntegrationException
-     * @throws BlobException 
      */
-    public List<CodeViolation> violation_getCodeViolations(List<Integer> cvIDList) throws IntegrationException, BlobException{
+    public List<CodeViolation> violation_getCodeViolations(List<Integer> cvIDList) throws IntegrationException{
         List<CodeViolation> vl = new ArrayList<>();
         
         if(cvIDList != null && !cvIDList.isEmpty()){

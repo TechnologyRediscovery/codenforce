@@ -295,7 +295,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         actionRequest.setPublicExternalNotes(rs.getString("publicexternalnotes"));
         actionRequest.setActive(rs.getBoolean("active"));
         
-        actionRequest.setBlobIDList(bi.photosAttachedToRequest(actionRequest.getRequestID()));
+        actionRequest.setBlobList(bi.photosAttachedToRequest(actionRequest.getRequestID()));
         
         return actionRequest;
     }

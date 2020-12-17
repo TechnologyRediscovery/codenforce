@@ -205,8 +205,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
                     | BObStatusException
                     | EventException
                     | ViolationException
-                    | IntegrationException 
-                    | BlobException ex) {
+                    | IntegrationException ex) {
                 System.out.println("manageBlobBB.reloadConnections() | ERROR: " + ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,

@@ -48,7 +48,7 @@ public class OccInspectedSpaceElement
     private User overrideRequiredFlag_thisElementNotInspectedBy;
     private String notes;
     
-    private List<Integer> blobIDList;
+    private List<Integer> blobList; //TODO: Replace with BlobLight list
     private OccLocationDescriptor location;
     private int failureIntensityClassID;
     private OccInspectableStatus status;
@@ -306,17 +306,17 @@ public class OccInspectedSpaceElement
     }
 
     /**
-     * @return the blobIDList
+     * @return the blobList
      */
-    public List<Integer> getBlobIDList() {
-        return blobIDList;
+    public List<Integer> getBlobList() {
+        return blobList;
     }
 
     /**
-     * @param blobIDList the blobIDList to set
+     * @param blobList the blobList to set
      */
-    public void setBlobIDList(List<Integer> blobIDList) {
-        this.blobIDList = blobIDList;
+    public void setBlobList(List<Integer> blobList) {
+        this.blobList = blobList;
     }
 
    

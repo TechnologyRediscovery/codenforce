@@ -26,7 +26,6 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
-import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECase;
@@ -1083,12 +1082,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws SQLException
      * @throws IntegrationException
-     * @throws BlobException 
      */
     private CodeViolation generateCodeViolationFromRS(ResultSet rs) 
             throws SQLException, 
-            IntegrationException,
-            BlobException
+            IntegrationException
             {
 
         CodeViolation v = new CodeViolation();
@@ -1158,11 +1155,13 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         } 
         
         List<BlobLight> blobList = new ArrayList<>();
-        
-        for(int id : bi.photosAttachedToViolation(v.getViolationID())){
-            blobList.add(bc.getPhotoBlobLight(id));
+        try {
+            for(int id : bi.photosAttachedToViolation(v.getViolationID())){
+                blobList.add(bc.getPhotoBlobLight(id));
+            }
+        } catch (BlobException ex){
+            throw new IntegrationException("An error occurred while retrieving blobs for a Code Violation", ex);
         }
-        
         v.setBlobList(blobList);
         
         return v;
@@ -1173,11 +1172,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param violationID
      * @return
      * @throws IntegrationException
-     * @throws com.tcvcog.tcvce.domain.BlobException
      */
     public CodeViolation getCodeViolation(int violationID) 
-            throws IntegrationException,
-            BlobException {
+            throws IntegrationException {
         String query = "SELECT violationid, codesetelement_elementid, cecase_caseid, dateofrecord, \n" +
                         "       entrytimestamp, stipulatedcompliancedate, actualcompliancedate, \n" +
                         "       penalty, description, notes, legacyimport, compliancetimestamp, \n" +
@@ -1753,13 +1750,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param noticeID
      * @return
      * @throws IntegrationException
-     * @throws com.tcvcog.tcvce.domain.BlobException
-     * @throws BlobTypeException 
+     * @throws com.tcvcog.tcvce.domain.BlobException 
      */
     public NoticeOfViolation novGet(int noticeID) 
-            throws IntegrationException,
-            BlobException,
-            BlobTypeException {
+            throws IntegrationException{
         String query =  "SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
                         "       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
                         "       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
@@ -1869,14 +1863,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws SQLException
      * @throws IntegrationException
-     * @throws BlobTypeException
-     * @throws BlobException 
      */
     private NoticeOfViolation novGenerate(ResultSet rs) 
             throws SQLException, 
-            IntegrationException,
-            BlobTypeException,
-            BlobException {
+            IntegrationException {
 //SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, 
 //       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, 
 //       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, 
@@ -1936,12 +1926,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param nov
      * @return
      * @throws IntegrationException
-     * @throws BlobTypeException
-     * @throws BlobException
      */
     private NoticeOfViolation populateCodeViolations(NoticeOfViolation nov) 
-            throws IntegrationException,
-            BlobException{
+            throws IntegrationException{
         String query =  "  SELECT noticeofviolation_noticeid, codeviolation_violationid, includeordtext, \n" +
                         "       includehumanfriendlyordtext, includeviolationphoto\n" +
                         "  FROM public.noticeofviolationcodeviolation WHERE noticeofviolation_noticeid = ?;";

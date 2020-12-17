@@ -231,24 +231,24 @@
 
                                         <p:dataTable
                                             id="violation-photo-table"
-                                            var="photoid"
-                                            value="#{cear.photoList}"
-                                            rowKey="#{photoid}"
+                                            var="blob"
+                                            value="#{cear.blobList}"
+                                            rowKey="#{blob.blobID}"
                                             tableStyleClass="primeDataTable"
                                             draggableRows="false" tabindex="6">
                                             <p:column width="80%">
                                                 <f:facet name="header">
                                                     <h:outputText value="Photo"/>
                                                 </f:facet>
-                                                <p:graphicImage width="100%" value="#{imageServices.image}">
-                                                    <f:param name="photoID" value="#{photoid}"/>
+                                                <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                                    <f:param name="blobID" value="#{blob.blobID}"/>
                                                 </p:graphicImage>
                                             </p:column>
                                             <p:column width="20%">
                                                 <f:facet name="header">
                                                     <h:outputText value="Description"/>
                                                 </f:facet>
-                                                <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                                <h:outputText escape="false" value="#{blob.description}"/>
                                             </p:column>
                                         </p:dataTable>
 
