@@ -69,7 +69,6 @@ import javax.faces.event.ActionEvent;
 public class CECaseSearchProfileBB
         extends BackingBeanUtils
         implements Serializable {
-
     
     private PageModeEnum currentMode;
     private List<PageModeEnum> pageModes;
@@ -251,7 +250,7 @@ public class CECaseSearchProfileBB
                     onModeInsertInit();
                     break;
                 case UPDATE:
-                    onModeUpdateInit();
+//                    onModeUpdateInit();
                     break;
                 case REMOVE:
                     onModeRemoveInit();
@@ -349,9 +348,10 @@ public class CECaseSearchProfileBB
     
     /**
      * Listener for beginning of update process
+     * @param ev
      */
-     public void onModeUpdateInit(){
-         // nothign to do here yet since the user is selected
+     public void onModeUpdateInit(ActionEvent ev){
+         // nothing to do here yet since the user is selected
      }
      
      /**
