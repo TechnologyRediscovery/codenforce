@@ -38,7 +38,6 @@ ALTER TABLE public.codeelement
  ALTER TABLE public.codeelement DROP COLUMN datecreated;
  ALTER TABLE public.codeelement DROP COLUMN datecreated;
 
--- RUN ON REMOTE TO HERE
 
 
 ALTER TABLE public.codesetelement
@@ -51,6 +50,7 @@ ALTER TABLE public.codesetelement
 
 ALTER TABLE codeset ADD COLUMN active BOOLEAN DEFAULT TRUE;
 
+-- RUN ON REMOTE TO HERE
 -- RUN LOCALLY TO HERE
 ALTER TABLE textblock 
     ADD COLUMN injectabletemplate BOOLEAN DEFAULT FALSE;
