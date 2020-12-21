@@ -274,7 +274,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
         return blob;
     }
-
+    
     /**
      * A method for grabbing PhotoBlobLights that's safe:
      * if it encounters an entry that does not yet have a properly
@@ -322,6 +322,23 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         //We are now clear to return the blob
         return getPhotoBlobLight(blobID);
+    }
+    
+    /**
+     * Convenience method for getting a list of BlobLights in from a list of IDs
+     * @param idList
+     * @return
+     * @throws IntegrationException
+     * @throws BlobException 
+     */
+    public List<BlobLight> getPhotoBlobLightList(List<Integer> idList) throws IntegrationException, BlobException{
+        
+        List<BlobLight> blobList = new ArrayList<>();
+        
+        for(int id : idList){
+            blobList.add(getPhotoBlobLight(id));
+        }
+        return blobList;
     }
     
     public void deletePhotoBlob(BlobLight blob) 

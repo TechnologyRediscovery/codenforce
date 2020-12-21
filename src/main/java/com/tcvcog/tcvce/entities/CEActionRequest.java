@@ -34,7 +34,7 @@ import java.util.Objects;
  to an CEActionRequest to do with as they please (print, etc.)
  * @author Eric Darsow
  */
-public class CEActionRequest extends BOb implements Serializable{
+public class CEActionRequest extends BOb implements Serializable, IFace_BlobHolder{
     
     // requests no longer have a status--remove when fully updated
     // for the full case model
@@ -87,7 +87,7 @@ public class CEActionRequest extends BOb implements Serializable{
     // tables with the String values are selected
     
     // list of blob id's associated with this request
-    private List<Integer> blobList; //Replace with list of BlobLights 
+    private List<BlobLight> blobList; //Replace with list of BlobLights 
     
     /**
      * Creates a new instance of ActionRequest
@@ -112,14 +112,16 @@ public class CEActionRequest extends BOb implements Serializable{
     /**
      * @return the blobList
      */
-    public List<Integer> getBlobList() {
+    @Override
+    public List<BlobLight> getBlobList() {
         return blobList;
     }
 
     /**
      * @param blobList the blobList to set
      */
-    public void setBlobList(List<Integer> blobList) {
+    @Override
+    public void setBlobList(List<BlobLight> blobList) {
         this.blobList = blobList;
     }
 

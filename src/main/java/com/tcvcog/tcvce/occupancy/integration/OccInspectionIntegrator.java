@@ -18,7 +18,9 @@
 package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -36,6 +38,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceType;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceTypeInspectionDirective;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.Constants;
@@ -914,6 +917,8 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     private OccInspectedSpaceElement generateInspectedSpaceElement(ResultSet rs) throws SQLException, IntegrationException {
         CodeIntegrator ci = getCodeIntegrator();
         UserIntegrator ui = getUserIntegrator();
+        BlobIntegrator bi = getBlobIntegrator();
+        BlobCoordinator bc = getBlobCoordinator();
 
         OccInspectedSpaceElement inspectedEle
                 = new OccInspectedSpaceElement(ci.getCodeElement(rs.getInt("codeelement_id")), rs.getInt("spaceelementid"));
@@ -937,6 +942,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         inspectedEle.setRequired(rs.getBoolean("required"));
         inspectedEle.setFailureIntensityClassID(rs.getInt("failureseverity_intensityclassid"));
 
+        try{
+            List<Integer> idList = bi.photosAttachedToInspectedSpaceElement(inspectedEle.getInspectedSpaceElementID());
+            inspectedEle.setBlobList(bc.getPhotoBlobLightList(idList));
+        } catch(BlobException ex){
+            throw new IntegrationException("An error occurred while trying to retrieve blobs for a OccInspectedSpaceElement", ex);
+        }
         return inspectedEle;
     }
 

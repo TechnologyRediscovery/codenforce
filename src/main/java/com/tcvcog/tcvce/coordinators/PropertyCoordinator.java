@@ -43,6 +43,7 @@ import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
@@ -81,6 +82,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
+        BlobIntegrator bi = getBlobIntegrator();
 
         PropertyDataHeavy pdh = new PropertyDataHeavy(getProperty(prop.getPropertyID()));
 
@@ -117,7 +119,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             System.out.println("PropertyCoordinator.assemblePropertyDH: personlist size: " + pdh.getPersonList().size());
 
             // Load blobs
-            pdh.setBlobList(new ArrayList<Integer>());
+            pdh.setBlobList(bi.photosAttachedToProperty(pdh.getPropertyID()));
             // external data
             pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getPropertyID())));
 

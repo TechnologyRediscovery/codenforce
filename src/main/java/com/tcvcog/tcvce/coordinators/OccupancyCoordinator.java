@@ -79,6 +79,7 @@ import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
@@ -164,6 +165,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         }
         
         OccupancyIntegrator oi = getOccupancyIntegrator();
+        BlobIntegrator bi = getBlobIntegrator();
         OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
         PaymentIntegrator pai = getPaymentIntegrator();
         WorkflowCoordinator chc = getWorkflowCoordinator();
@@ -210,7 +212,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             // PERMIT LIST
             opdh.setPermitList(oi.getOccPermitList(opdh));
             // BLOB LIST
-            opdh.setBlobIDList(oi.getBlobList(opdh));
+            opdh.setBlobIDList(bi.photosAttachedToOccPeriod(opdh.getPeriodID()));
             
             opdh.setGoverningInspection(designateGoverningInspection(opdh));
             

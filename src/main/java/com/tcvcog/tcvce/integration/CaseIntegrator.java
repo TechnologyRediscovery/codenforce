@@ -1750,7 +1750,6 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @param noticeID
      * @return
      * @throws IntegrationException
-     * @throws com.tcvcog.tcvce.domain.BlobException 
      */
     public NoticeOfViolation novGet(int noticeID) 
             throws IntegrationException{

@@ -620,6 +620,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         if(this.currentViolation == null){
             this.currentViolation = getSessionBean().getSessCodeViolation();
         }
+        /*
         if(this.getPhotoList() == null  ||  this.getPhotoList().isEmpty()){
             getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -646,6 +647,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
                     return "";
             }
         }
+        */
         return "ceCaseViolations";
     }
     

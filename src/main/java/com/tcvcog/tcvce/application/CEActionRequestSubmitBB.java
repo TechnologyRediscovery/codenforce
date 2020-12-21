@@ -31,6 +31,7 @@ import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.BlobLight;
 import java.util.Date;
 import java.io.Serializable;
 import org.primefaces.component.tabview.TabView;
@@ -103,8 +104,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
     // located address
     private java.util.Date currentDate;
-
-    private List<Blob> blobList;
+    
     private String blobDescription;
     private int descriptionBlobID;
 
@@ -121,7 +121,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         form_dateOfRecord = java.util.Date.from(java.time.LocalDateTime.now()
                 .atZone(ZoneId.systemDefault()).toInstant());
         // init new, empty photo list
-        blobList = new ArrayList<>();
 
         disabledPersonFormFields = false;
         actionRequestorAssignmentMethod = 1;
@@ -176,7 +175,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
         if (currentRequest == null) {
             currentRequest = new CEActionRequest();
-            currentRequest.setBlobList(new ArrayList<Integer>());
+            currentRequest.setBlobList(new ArrayList<BlobLight>());
         }
 
         if (currentRequest.getMuni() != null) {
@@ -186,17 +185,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             } catch (IntegrationException ex) {
                 System.out.println("Error occured while fetching issue typelist: " + ex);
             }
-        }
-
-        if (currentRequest.getBlobList().size() > 0) {
-            for (Integer idNum : currentRequest.getBlobList()) {
-                try {
-                    blobList.add(bc.getPhotoBlob(idNum));
-                } catch (IntegrationException | BlobException | NoSuchElementException ex) {
-                    System.out.println("Error occured while fetching request blob list: " + ex);
-                }
-            }
-
         }
 
     }
@@ -284,7 +272,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         cear = cc.cear_getInititalizedCEActionRequest();
         cear.setDateOfRecordUtilDate(form_dateOfRecord);
         cear.setMuni(selectedMuni);
-        cear.setBsetBlobList ArrayList<Integer>());
+        cear.setBlobList(new ArrayList<BlobLight>());
         cear.setRequestProperty(new Property());
         getSessionBean().setSessCEAR(cear);
         getSessionBean().getNavStack().pushCurrentPage();
@@ -308,10 +296,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 //        if(u == null){
 
         if (currentRequest.getBlobList() == null) {
-            currentRequest.setBlosetBlobListrrayList<Integer>());
+            currentRequest.setBlobList(new ArrayList<BlobLight>());
         }
         getSessionBean().setSessCEAR(currentRequest);
-        getSessionBean().setBlobList(new ArrayList<Blob>());
         getSessionBean().getNavStack().pushCurrentPage();
         return "photoUpload";
 //            
@@ -331,11 +318,11 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public String skipPhotoUpload() {
         BlobCoordinator blobc = getBlobCoordinator();
 
-        if (blobList.size() > 0) {
+        if (currentRequest.getBlobList().size() > 0) {
 
-            for (Blob b : blobList) {
+            for (BlobLight b : currentRequest.getBlobList()) {
                 try {
-                    blobc.deletePhotoBlob(b);
+                    blobc.deletePhotoBlob((Blob) b);
                 } catch (IntegrationException
                         | AuthorizationException
                         | BObStatusException
@@ -349,8 +336,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                 }
             }
 
-            currentRequest.setBlosetBlobListrrayList<Integer>());
-            blobList = new ArrayList<>();
+            currentRequest.setBlobList(new ArrayList<BlobLight>());
             getSessionBean().setSessCEAR(currentRequest);
         }
 
@@ -364,9 +350,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public String savePhotosAndContinue() {
 
         BlobIntegrator bi = getBlobIntegrator();
-        currentRequest.setBlosetBlobListrrayList<Integer>());
-        for (Blob b : blobList) {
-            currentRequest.getBlobList().add(b.getBlobID());
+        for (BlobLight b : currentRequest.getBlobList()) {
 
             //Also, save the description to the database.
             try {
@@ -429,8 +413,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                             "An error occured while trying to delete the selected photo.", ""));
         }
 
-        currentRequest.getBlobList().remove(new Integer(input.getBlobID()));
-        blobList.remove(input);
+        currentRequest.getBlobList().remove(input);
     }
 
     private void setupPersonEntry() {
@@ -481,7 +464,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                             ""));
         }
 
-        blobList.add(blob);
+        currentRequest.getBlobList().add(blob);
     }
 
     /**
@@ -544,9 +527,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             // Now go right back to the DB and get the request we just submitted to verify before displaying the PACC
             sb.setSessCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
 
-            for (Integer blobID : currentRequest.getBlobList()) {
+            for (BlobLight blob : currentRequest.getBlobList()) {
                 try {
-                    blobI.linkPhotoBlobToActionRequest(blobID, sb.getSessCEAR().getRequestID());
+                    blobI.linkPhotoBlobToActionRequest(blob.getBlobID(), sb.getSessCEAR().getRequestID());
                 } catch (IntegrationException ex) {
                     System.out.println(ex);
                 }
@@ -570,13 +553,10 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
     public String restartRequest() {
 
-        currentRequest = null;
-        getSessionBean().setSessCEAR(null);
-
-        if (blobList.size() > 0) {
+        if (currentRequest.getBlobList().size() > 0) {
             BlobCoordinator bc = getBlobCoordinator();
 
-            for (Blob b : blobList) {
+            for (BlobLight b : currentRequest.getBlobList()) {
                 try {
                     bc.deletePhotoBlob(b);
                 } catch (IntegrationException
@@ -589,7 +569,9 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                 }
             }
         }
-
+        
+        currentRequest = null;
+        getSessionBean().setSessCEAR(null);
         clearNavStack();
         return "requestCEActionFlow";
     }
@@ -880,20 +862,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      */
     public void setCurrentDate(java.util.Date currentDate) {
         this.currentDate = currentDate;
-    }
-
-    /**
-     * @return the blobList
-     */
-    public List<Blob> getBlobList() {
-        return blobList;
-    }
-
-    /**
-     * @param blobList the blobList to set
-     */
-    public void setBlobListList(List<Blob> blobList) {
-        this.blobList = blobList;
     }
 
     /**

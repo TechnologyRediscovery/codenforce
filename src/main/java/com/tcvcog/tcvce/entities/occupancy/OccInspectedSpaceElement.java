@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.IFace_BlobHolder;
 import com.tcvcog.tcvce.entities.User;
@@ -48,7 +49,7 @@ public class OccInspectedSpaceElement
     private User overrideRequiredFlag_thisElementNotInspectedBy;
     private String notes;
     
-    private List<Integer> blobList; //TODO: Replace with BlobLight list
+    private List<BlobLight> blobList; //TODO: Replace with BlobLight list
     private OccLocationDescriptor location;
     private int failureIntensityClassID;
     private OccInspectableStatus status;
@@ -308,18 +309,18 @@ public class OccInspectedSpaceElement
     /**
      * @return the blobList
      */
-    public List<Integer> getBlobList() {
+    @Override
+    public List<BlobLight> getBlobList() {
         return blobList;
     }
 
     /**
      * @param blobList the blobList to set
      */
-    public void setBlobList(List<Integer> blobList) {
+    @Override
+    public void setBlobList(List<BlobLight> blobList) {
         this.blobList = blobList;
-    }
-
-   
+    }   
 
     /**
      * @return the status

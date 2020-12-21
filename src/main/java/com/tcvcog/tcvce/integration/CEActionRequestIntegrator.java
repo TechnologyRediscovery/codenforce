@@ -17,10 +17,12 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestIssueType;
@@ -256,6 +258,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         PropertyIntegrator propI = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
         BlobIntegrator bi = getBlobIntegrator();
+        BlobCoordinator bc = getBlobCoordinator();
         
         actionRequest.setRequestStatus(getRequestStatus(rs.getInt("status_id")));
         actionRequest.setPaccEnabled(rs.getBoolean("paccenabled"));
@@ -295,8 +298,12 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         actionRequest.setPublicExternalNotes(rs.getString("publicexternalnotes"));
         actionRequest.setActive(rs.getBoolean("active"));
         
-        actionRequest.setBlobList(bi.photosAttachedToRequest(actionRequest.getRequestID()));
-        
+        try{
+            List<Integer> blobIDs = bi.photosAttachedToRequest(actionRequest.getRequestID());
+            actionRequest.setBlobList(bc.getPhotoBlobLightList(blobIDs));
+        } catch(BlobException ex){
+            throw new IntegrationException("An error occurred while trying to retrieve blobs for a CEActionRequest", ex);
+        }
         return actionRequest;
     }
 

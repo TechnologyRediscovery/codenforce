@@ -2064,7 +2064,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param vid
      * @return
      * @throws IntegrationException
-     * @throws BlobException 
      */
     public CodeViolation violation_getCodeViolation(int vid) 
             throws IntegrationException {
