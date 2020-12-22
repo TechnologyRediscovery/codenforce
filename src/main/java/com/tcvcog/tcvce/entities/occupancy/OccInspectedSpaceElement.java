@@ -49,7 +49,7 @@ public class OccInspectedSpaceElement
     private User overrideRequiredFlag_thisElementNotInspectedBy;
     private String notes;
     
-    private List<BlobLight> blobList; //TODO: Replace with BlobLight list
+    private List<BlobLight> blobList;
     private OccLocationDescriptor location;
     private int failureIntensityClassID;
     private OccInspectableStatus status;

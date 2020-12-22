@@ -1516,23 +1516,23 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
     
     /**
-     * TODO: NADGIT review
      * @param ps
      * @param blob
+     * @return the PrintStyle with the header image set
      * @throws IntegrationException
      * @throws BObStatusException 
      */
-      public void nov_updateStyleHeaderImage(PrintStyle ps, Blob blob) throws IntegrationException, BObStatusException {
+      public PrintStyle nov_updateStyleHeaderImage(PrintStyle ps, BlobLight blob) throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
         if(ps == null || blob == null){
             throw new BObStatusException("Cannot update header image with null style or blob");
             
         }
-        // TODO: NADGIT please review and fix
 
-//        int newHeaderBlobID = getBlobIntegrator().storeBlob(blob);
-//        ps.setHeader_img_id(newHeaderBlobID);
-        ci.novUpdateHeaderImage(ps, blob);
+        ps.setHeader_img_id(blob.getBlobID());
+        ci.novUpdateHeaderImage(ps);
+     
+        return ps;
         
     }
       

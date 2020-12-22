@@ -531,7 +531,7 @@ public class        BackingBeanUtils
      * @param input
      * @return
      */
-    public java.util.Date convertDate(LocalDateTime input){
+    public static java.util.Date convertDate(LocalDateTime input){
         Date utilDate = null;
         if(input != null){
            utilDate = Date.from(input.atZone(ZoneId.systemDefault()).toInstant());
@@ -545,7 +545,7 @@ public class        BackingBeanUtils
      * @param input
      * @return 
      */
-    public LocalDateTime convertDate(java.util.Date input){
+    public static LocalDateTime convertDate(java.util.Date input){
         LocalDateTime dateTime = null;
         if(input != null){
         dateTime = input.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();

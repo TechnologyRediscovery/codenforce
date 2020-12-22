@@ -6,20 +6,25 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
@@ -29,8 +34,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -219,11 +222,48 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         }
     }
 
-    // TODO: finish me
-    public void deletePhoto(int photoID){
+    public void deletePhoto(BlobLight blob) {
+
+        boolean linkSevered = false;
         
+        try {
+            BlobIntegrator bi = getBlobIntegrator();
+            BlobCoordinator bc = getBlobCoordinator();
+            
+            //I assume that we are removing a photo connected to the OccPeriod
+            //that the OccInspection is connected to. If you need it to delete 
+            
+            bi.removePhotoOccPeriodLink(blob.getBlobID(), currentInspection.getOccPeriodID());
+            
+            linkSevered = true;
+            
+            bc.deletePhotoBlob(blob);
+            
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully deleted photo!", ""));
+        } catch (IntegrationException 
+                | AuthorizationException 
+                | BObStatusException 
+                | EventException 
+                | ViolationException ex) {
+            
+            String message = "An error occurred while trying to delete the selected photo.";
+            
+            if(linkSevered){
+                message = message + " The link between the photo and the Occupancy Period was severed successfully.";
+            }
+            
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            message, ""));
+        } catch(BlobException ex){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "The link between the photo and the Occupancy Period was severed successfully, but the photo was not deleted. There are other objects connected to the photo.", ""));
+        }
+
     }
-    
     
      public void commenceOccInspection(){
 

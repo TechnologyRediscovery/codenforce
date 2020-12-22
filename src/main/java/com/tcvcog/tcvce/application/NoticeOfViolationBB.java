@@ -39,6 +39,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
@@ -1088,8 +1089,9 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             blob.setDescription("Header image for Notices of Violation in " + getSessionBean().getSessMuni().getMuniName() + " as of " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             // Write to DB
             blob = blobc.storeBlob(blob);
-            cc.nov_updateStyleHeaderImage(currentNotice.getStyle(), blob);
-//          blobList.add(blob);
+            PrintStyle newStyle = cc.nov_updateStyleHeaderImage(currentNotice.getStyle(), blob);
+            //newStyle should have the header image ID on it.
+            currentNotice.setStyle(newStyle);
 
         } catch (IntegrationException
                 | BObStatusException

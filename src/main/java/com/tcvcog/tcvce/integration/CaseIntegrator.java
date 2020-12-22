@@ -1713,9 +1713,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
 
     }
     
-     public void novUpdateHeaderImage(PrintStyle ps, Blob blob) throws BObStatusException, IntegrationException{
-         if(ps == null || blob == null){
-             throw new BObStatusException("Cannot update header image with null print or blob");
+     public void novUpdateHeaderImage(PrintStyle ps) throws BObStatusException, IntegrationException{
+         if(ps == null || ps.getHeader_img_id() == 0){
+             throw new BObStatusException("Cannot update header image with null print or header_img_id == 0");
                      
          }
          
@@ -1730,7 +1730,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, blob.getBlobID());
+            stmt.setInt(1, ps.getHeader_img_id());
             stmt.setInt(2, ps.getStyleID());
             
             stmt.execute();

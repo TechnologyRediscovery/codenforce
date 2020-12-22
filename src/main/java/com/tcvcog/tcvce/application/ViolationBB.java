@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeViolation;
@@ -615,13 +616,12 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
     }
 
     public String photosConfirm() {
-        // TODO: this obviously
         
-        if(this.currentViolation == null){
-            this.currentViolation = getSessionBean().getSessCodeViolation();
+        if(currentViolation == null){
+            currentViolation = getSessionBean().getSessCodeViolation();
         }
-        /*
-        if(this.getPhotoList() == null  ||  this.getPhotoList().isEmpty()){
+
+        if(currentViolation.getBlobList() == null  ||  currentViolation.getBlobList().isEmpty()){
             getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                                 "No uploaded photos to commit.", 
@@ -629,14 +629,15 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             return "";
         }
         
-        ImageServices is = getImageServices();
+        BlobIntegrator bi = getBlobIntegrator();
         
-        for(Photograph photo : this.getPhotoList()){
+        for(BlobLight photo : currentViolation.getBlobList()){
             
             try { 
                 // commit and link
-                is.commitPhotograph(photo.getPhotoID());
-                is.linkPhotoToCodeViolation(photo.getPhotoID(), currentViolation.getViolationID());
+                
+                bi.commitPhotograph(photo.getBlobID());
+                bi.linkBlobToViolation(photo.getBlobID(), currentViolation.getViolationID());
                 
             } catch (IntegrationException ex) {
                 System.out.println(ex.toString());
@@ -647,7 +648,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
                     return "";
             }
         }
-        */
+
         return "ceCaseViolations";
     }
     

@@ -652,6 +652,30 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         return idList;
     }
     
+    public void commitPhotograph(int photoID) throws IntegrationException{
+        Connection con = getPostgresCon();
+        String query =  " UPDATE public.photodoc\n" +
+                        " SET photodoccommitted = true\n" +
+                        " WHERE photodocid = ?;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, photoID);
+            
+            System.out.println("ImageServices.commitPhotograph | Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error commiting photo", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
     public void removePhotoPropertyLink(int blobID, int propertyID) throws IntegrationException {
 
         //property linker table
