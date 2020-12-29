@@ -143,3 +143,29 @@ FROM propertyphotodoc, property
 WHERE photodoc.photodocid = propertyphotodoc.photodoc_photodocid 
 	AND propertyphotodoc.property_propertyid = property.propertyid
 	AND property.municipality_municode IS NOT NULL;
+
+
+--pdfdoc table
+
+--Uses the photodoc sequence on purpose, as we don't want there to be any collisions between PDF blobs and Photo blobs.
+
+CREATE TABLE public.pdfdoc
+(
+  pdfdocid integer NOT NULL DEFAULT nextval('photodoc_photodocid_seq'::regclass),
+  pdfdocdescription character varying(100),
+  pdfdoccommitted boolean DEFAULT true,
+  blobbytes_bytesid integer,
+  muni_municode integer,
+  CONSTRAINT pdfdoc_pk PRIMARY KEY (pdfdocid),
+  CONSTRAINT pdfdoc_blobbytes_fk FOREIGN KEY (blobbytes_bytesid)
+      REFERENCES public.blobbytes (bytesid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT pdfdoc_municode_fk FOREIGN KEY (muni_municode)
+      REFERENCES public.municipality (municode) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.photodoc
+  OWNER TO sylvia;

@@ -166,6 +166,134 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * This method should only be used by the BlobCoordinator.
+     * If you need to grab a Blob anywhere else use the coordinator method
+     * @param blobID the blobID of the meta to be retrieved from db
+     * @return the meta pulled from the db
+     * @throws IntegrationException thrown instead of SQLException
+     * @throws com.tcvcog.tcvce.domain.MetadataException
+     */
+    public BlobLight getPDFBlobLight(int blobID) throws IntegrationException, MetadataException{
+        BlobLight blob = null;
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT pdfdocid, pdfdocdescription, pdfdoccommitted, blobbytes_bytesid, muni_municode, \n"
+                + "uploaddate, blobtype_typeid, uploadpersonid, filename, metadatamap\n"
+                + "FROM public.pdfdoc LEFT JOIN blobbytes on blobbytes_bytesid = bytesid\n"
+                + "WHERE pdfdocid = ?;";
+        
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, blobID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                System.out.println("BlobIntegrator.getPDFBlobLight: | retrieving blobID "  + blobID);
+                blob = generatePDFBlobLight(rs);
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving blob. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return blob;
+        
+    }
+    
+    /**
+     * Only used by the BlobCoordinator to get blobs with broken metadata.
+     * @param blobID the blobID of the blob to be retrieved from db
+     * @return the meta pulled from the db
+     * @throws IntegrationException thrown instead of SQLException
+     */
+    public BlobLight getPDFBlobLightWithoutMetadata(int blobID) throws IntegrationException {
+        BlobLight blob = null;
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT pdfdocid, pdfdocdescription, pdfdoccommitted, blobbytes_bytesid, muni_municode, \n"
+                + "uploaddate, blobtype_typeid, uploadpersonid, filename\n"
+                + "FROM public.pdfdoc LEFT JOIN blobbytes on blobbytes_bytesid = bytesid\n"
+                + "WHERE pdfdocid = ?;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, blobID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                System.out.println("BlobIntegrator.getPDFBlobLightWithoutMetadata: | retrieving blobID "  + blobID);
+                blob = generatePDFBlobLightWithoutMetadata(rs);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving blob. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return blob;
+        
+    }
+    
+    /**
+     * @param rs
+     * @return
+     * @throws SQLException
+     * @throws MetadataException 
+     */
+    private BlobLight generatePDFBlobLight(ResultSet rs) throws SQLException, MetadataException{
+        BlobLight blob = new BlobLight();
+        blob.setBlobID(rs.getInt("pdfdocid"));
+        blob.setBytesID(rs.getInt("blobbytes_bytesid"));
+        blob.setDescription(rs.getString("pdfdocdescription"));
+        
+        Timestamp time = rs.getTimestamp("uploaddate");
+        if(time != null){
+            blob.setTimestamp(time.toLocalDateTime());
+        }
+        blob.setType(BlobType.blobTypeFromInt(rs.getInt("blobtype_typeid")));
+        blob.setFilename(rs.getString("filename"));
+        blob.setUploadPersonID(rs.getInt("uploadpersonid"));
+        blob.setMunicode(rs.getInt("muni_municode"));
+        
+        blob.setBlobMetadata(generateBlobMetadata(rs));
+        return blob;
+    }
+    
+    /**
+     * @param rs
+     * @return
+     * @throws SQLException 
+     */
+    private BlobLight generatePDFBlobLightWithoutMetadata(ResultSet rs) throws SQLException {
+        BlobLight blob = new BlobLight();
+        blob.setBlobID(rs.getInt("pdfdocid"));
+        blob.setBytesID(rs.getInt("blobbytes_bytesid"));
+        blob.setDescription(rs.getString("pdfdocdescription"));
+        Timestamp time = rs.getTimestamp("uploaddate");
+        if(time != null){
+            blob.setTimestamp(time.toLocalDateTime());
+        }
+        blob.setType(BlobType.blobTypeFromInt(rs.getInt("blobtype_typeid")));
+        blob.setFilename(rs.getString("filename"));
+        blob.setUploadPersonID(rs.getInt("uploadpersonid"));
+        blob.setMunicode(rs.getInt("muni_municode"));
+        
+        return blob;
+    }
+    
+    /**
      * Gets the bytes 
      * @param bytesID
      * @return
@@ -302,6 +430,95 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt.execute();
             
             String idNumQuery = "SELECT currval('photodoc_photodocid_seq');";
+            Statement s = con.createStatement();
+            ResultSet rs;
+            rs = s.executeQuery(idNumQuery);
+            rs.next();
+            int lastID = rs.getInt(1);
+            
+            //set the IDs so we can throw the blob back and they can access the blob and bytes
+            blob.setBlobID(lastID);
+            blob.setBytesID(bytesID);
+            
+        } catch (SQLException | IOException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error inserting blob. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        return blob;
+    }
+    
+    /**
+     * @return list of Blob IDs for all pdfs uploaded in the past month
+     * @throws IntegrationException 
+     */
+    public List<Integer> getRecentPDFBlobs() throws IntegrationException{
+        ArrayList<Integer> blobIDList = new ArrayList();
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT pdfdocid\n"
+                + "FROM public.pdfdoc LEFT JOIN blobbytes on blobbytes_bytesid = bytesid\n"
+                + "WHERE uploaddate > ?;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setTimestamp(1, java.sql.Timestamp.from(LocalDateTime.now().minusMonths(1)  // past month offset
+                    .atZone(ZoneId.systemDefault()).toInstant()));
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                blobIDList.add(rs.getInt("pdfdocid"));
+
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving list of recent blobs. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return blobIDList;
+        
+    }
+    
+    /**
+     * stores this pdf meta in the db
+     * @param blob the meta to be stored
+     * @return the blobID of the newly stored meta
+     * @throws com.tcvcog.tcvce.domain.BlobTypeException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public Blob storePDFBlob(Blob blob) throws IntegrationException, BlobTypeException{
+        
+        Connection con = getPostgresCon();
+        String query =  " INSERT INTO public.pdfdoc(pdfdocid, pdfdocdescription, blobbytes_bytesid, muni_municode)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?);";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, blob.getDescription());
+            
+            int bytesID = storeBlobBytes(blob);
+            
+            stmt.setInt(2, bytesID);
+            
+            stmt.setInt(3, blob.getMunicode());
+            
+            System.out.println("BlobIntegrator.storePDFBlob | Statement: " + stmt.toString());
+            stmt.execute();
+            
+            //We use the photodoc sequence for both PDFs and Photos so there aren't any collisions
+            String idNumQuery = "SELECT currval('photodoc_photodocid_seq');"; 
             Statement s = con.createStatement();
             ResultSet rs;
             rs = s.executeQuery(idNumQuery);
@@ -461,7 +678,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      * @param blob the meta to be updated
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public void updatePhotoBlobFilename(BlobLight blob) throws  IntegrationException{
+    public void updateBlobFilename(BlobLight blob) throws  IntegrationException{
         
         Connection con = getPostgresCon();
         String query = " UPDATE public.blobbytes\n"
@@ -477,6 +694,39 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setInt(2, blob.getBytesID());
             
             System.out.println("BlobIntegrator.storeBlob | Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error updating blob. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
+     * Since many values in the Blob sphere shouldn't be changed after uploading,
+     * this method only updates the blob description
+     * @param blob the meta to be updated
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void updatePDFBlobDescription(BlobLight blob) throws  IntegrationException{
+        
+        Connection con = getPostgresCon();
+        String query = " UPDATE public.pdfdoc\n"
+                + " SET pdfdocdescription=?\n"
+                + " WHERE pdfdocid=?;\n\n";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, blob.getDescription());            
+            stmt.setInt(2, blob.getBlobID());
+            
+            System.out.println("BlobIntegrator.updatePDFBlobDescription | Statement: " + stmt.toString());
             stmt.execute();
             
         } catch (SQLException ex) {
@@ -588,6 +838,36 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * Removes the pdfdoc row from the pdfdoc table.
+     * No longer removes any connections to the pdfdoc
+     * Users must erase each connection manually via the interface.
+     * This method should only be used by the coordinator.
+     * Use the method on the coordinator to delete blobs, it is safer - checks for connections first.
+     * @param blobID the blob to be removed
+     * @throws IntegrationException thrown instead of a SQLException
+     */
+    public void deletePDFBlob(int blobID) throws IntegrationException{
+        
+        //delete the main photodoc entry
+        String query = "DELETE FROM public.pdfdoc WHERE pdfdocid = ?;";
+        
+        PreparedStatement stmt = null;
+        Connection con = getPostgresCon();
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, blobID);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("BlobIntegrator.deletePDFBlob() | ERROR: "+ ex);
+            throw new IntegrationException("Error deleting blob. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
      * Removes the bytes with the given ID.
      * This method should only be used by the coordinator.
      * Use the Blob removal methods on the coordinator, 
@@ -652,6 +932,42 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         return idList;
     }
     
+    /**
+     * Returns the IDs of all pdf blobs connected to the given bytesID
+     * @param bytesID
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public List<Integer> getPDFBlobsFromBytesID(int bytesID) throws IntegrationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT pdfdocid FROM public.pdfdoc WHERE blobbytes_bytesid = ?;";
+        
+        PreparedStatement stmt = null;
+        
+        List<Integer> idList = new ArrayList<>();
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, bytesID);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                 idList.add(rs.getInt("pdfdocid"));
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving attached blob IDs. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return idList;
+    }
+    
     public void commitPhotograph(int photoID) throws IntegrationException{
         Connection con = getPostgresCon();
         String query =  " UPDATE public.photodoc\n" +
@@ -670,6 +986,34 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Error commiting photo", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
+     * @param photoID
+     * @throws IntegrationException 
+     */
+    public void commitPDF(int photoID) throws IntegrationException{
+        Connection con = getPostgresCon();
+        String query =  " UPDATE public.pdfdoc\n" +
+                        " SET pdfdoccommitted = true\n" +
+                        " WHERE pdfdocid = ?;";
+        
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, photoID);
+            
+            System.out.println("ImageServices.commitPDF | Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error commiting pdf", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -1073,6 +1417,173 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             
         } catch (SQLException ex) {
             System.out.println("BlobIntegrator.searchPhotoBlobs() | ERROR: " + ex);
+            throw new IntegrationException("Error searching Blobs ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return blobIDList;
+        
+    }
+    
+    /**
+     * TEMPORARY SEARCH METHOD FOR BLOBS.
+     * @param filename
+     * @param description
+     * @param before
+     * @param after
+     * @param municode
+     * @deprecated as I don't encourage using this method, it's temporary
+     * @return list of Blob IDs for all photos that meet our search parameters
+     * @throws IntegrationException 
+     */
+    public List<Integer> searchPDFBlobs(String filename,
+                                          String description,
+                                          LocalDateTime before,
+                                          LocalDateTime after,
+                                          int municode)
+                                          throws IntegrationException {
+        ArrayList<Integer> blobIDList = new ArrayList();
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+
+        //Store search terms, more information in a large comment below
+        String[] filenameTokens = null;
+
+        String[] descTokens = null;
+        
+        StringBuilder query = new StringBuilder();
+
+        query.append("SELECT DISTINCT pdfdocid\n"
+                + "FROM public.pdfdoc LEFT JOIN blobbytes on blobbytes_bytesid = bytesid\n"
+                + "WHERE (");
+
+        PreparedStatement stmt = null;
+        
+        //We will store each thing we would like to test for in this 
+        ArrayList<String> clauses = new ArrayList<>();
+        
+        //First check if any parameters have been set at all
+        if (filename != null
+                || description != null
+                || before != null
+                || after != null) {    
+
+            //Dates first
+            if (before != null) {
+                clauses.add("uploaddate < ?");
+            }
+            
+            if (after != null) {
+                clauses.add("uploaddate > ?");
+            }
+
+            //we are going to split apart the filename and description search terms 
+            //on spaces and search for each token.
+            //If a person searches for "house photo", we want "photo of house" to show up
+
+            if (filename != null) {
+
+                ArrayList<String> statements = new ArrayList<>();
+
+                //Split on whitespaces
+                filenameTokens = filename.split("\\s");
+
+                //Add as many ILIKE statements as we have terms
+                for (int i = 0; i < filenameTokens.length; i++) {
+                    statements.add("filename ILIKE ?");
+                }
+
+                //Join them together with an OR in between
+                //Then throw the completed clause into the clauses array
+                String finished = String.join(" OR\n", statements);
+
+                clauses.add(finished);
+
+            }
+
+            if (description != null) {
+                ArrayList<String> statements = new ArrayList<>();
+
+                //Split on whitespaces
+                descTokens = description.split("\\s");
+
+                //Add as many ILIKE statements as we have terms
+                for (int i = 0; i < descTokens.length; i++) {
+                    statements.add("description ILIKE ?");
+                }
+
+                //Join them togeth with an OR in between
+                //Then throw the completed clause into the clauses array
+                String finished = String.join(" OR\n", statements);
+
+                clauses.add(finished);
+            }
+
+        }
+
+        //We must always include the muni_code in the search.
+            
+        clauses.add("muni_municode = ?");
+            
+        //We want to make sure all clauses are satisfied, so put an AND between them
+        //And use parantheses to make sure that each is a self-contained logical expression
+        String allClauses = String.join(") AND\n(", clauses);
+            
+        query.append(allClauses + ")\n");
+        
+        //add limit 
+        query.append("LIMIT 150;");
+        
+        try {
+            
+            stmt = con.prepareStatement(query.toString());
+            
+            int index = 0;
+            
+            //Remember to iterate the index first, then use it.
+            
+            if (before != null) {
+                java.sql.Timestamp stamp = java.sql.Timestamp.valueOf(before);
+                index++;
+                stmt.setTimestamp(index, stamp);
+            }
+            
+            if (after != null) {
+                java.sql.Timestamp stamp = java.sql.Timestamp.valueOf(after);
+                index++;
+                stmt.setTimestamp(index, stamp);
+            }
+            
+            if(filename != null){
+                for(String token : filenameTokens){
+                    index++;
+                    //Also add the wildcards
+                    stmt.setString(index, "%" + token + "%");
+                }
+            }
+            
+            if(description != null){
+                for(String token : descTokens){
+                    index++;
+                    //Also add the wildcards
+                    stmt.setString(index, "%" + token + "%");
+                }
+            }
+            
+            //Finally, set municode
+            index++;
+            stmt.setInt(index, municode);
+            
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                blobIDList.add(rs.getInt("pdfdocid"));
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println("BlobIntegrator.searchPDFBlobs() | ERROR: " + ex);
             throw new IntegrationException("Error searching Blobs ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }

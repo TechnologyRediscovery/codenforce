@@ -59,6 +59,8 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.common.PDStream;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.w3c.dom.NamedNodeMap;
@@ -244,7 +246,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         }
         
         //If we reach here, the file extensions are equal, we may update the filename.
-        bi.updatePhotoBlobFilename(blob);
+        bi.updateBlobFilename(blob);
         
     }
 
@@ -259,13 +261,29 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
+     * @param blobID
+     * @return
+     * @throws IntegrationException
+     * @throws BlobException 
+     */
+    public Blob getPDFBlob(int blobID) throws IntegrationException, BlobException {
+        BlobIntegrator bi = getBlobIntegrator();
+
+        Blob blob = new Blob(getPDFBlobLight(blobID));
+
+        blob.setBytes(bi.getBlobBytes(blob.getBytesID()));
+
+        return blob;
+    }
+    
+    /**
      * Uses an existing BlobLight to make a blob by only grabbing the bytes
      * and attaching them.
      * @param input
      * @return
      * @throws IntegrationException
      */
-    public Blob getPhotoBlob(BlobLight input) throws IntegrationException {
+    public Blob getBlobFromBlobLight(BlobLight input) throws IntegrationException {
         BlobIntegrator bi = getBlobIntegrator();
 
         Blob blob = new Blob(input);
@@ -301,7 +319,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
                 //time to operate
                 //grab the BlobLight without metadata so we don't get the same error
-                Blob patient = getPhotoBlob(bi.getPhotoBlobLightWithoutMetadata(blobID));
+                Blob patient = getBlobFromBlobLight(bi.getPhotoBlobLightWithoutMetadata(blobID));
                 try {
                 patient = stripImageMetadata(patient);
 
@@ -322,6 +340,55 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         //We are now clear to return the blob
         return getPhotoBlobLight(blobID);
+    }
+    
+    /**
+     * A method for grabbing PhotoBlobLights that's safe:
+     * if it encounters an entry that does not yet have a properly
+     * populated metadata column, it strips the metadata and saves it
+     * before returning the blob.
+     * @param blobID
+     * @return
+     * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BlobException
+     */
+    public BlobLight getPDFBlobLight(int blobID) throws IntegrationException, BlobException {
+        
+        BlobIntegrator bi = getBlobIntegrator();
+        
+        try {
+        return bi.getPDFBlobLight(blobID);
+        } catch(MetadataException ex) {
+            
+            if(ex.isMapNullError()){
+                //The metadata column isn't properly populated.
+                //We'll grab the bytes, strip the metadata from them
+                //And save them in the metadata column before fetching
+                //The blob and returning it.
+
+                //time to operate
+                //grab the BlobLight without metadata so we don't get the same error
+                Blob patient = getBlobFromBlobLight(bi.getPDFBlobLightWithoutMetadata(blobID));
+                try {
+                patient = stripPDFMetadata(patient);
+
+                //Should be all ready, let's update the bytes and the metadata
+
+                bi.updateBlobBytes(patient);
+
+                bi.updateBlobMetadata(patient);
+                
+                } catch(IOException | BlobTypeException exTwo){
+                    throw new BlobException(exTwo);
+                }
+            } else {
+                throw new BlobException(ex);
+            }
+            
+        }
+    
+        //We are now clear to return the blob
+        return getPDFBlobLight(blobID);
     }
     
     /**
@@ -441,6 +508,118 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         //These bytes should only be the image file itself, without the metadata. But that in the bytes field.
         
         input.setBytes(baos.toByteArray());
+        
+        return input;
+    }
+    
+    /**
+     * Convenience method for getting a list of BlobLights in from a list of IDs
+     * @param idList
+     * @return
+     * @throws IntegrationException
+     * @throws BlobException 
+     */
+    public List<BlobLight> getPDFBlobLightList(List<Integer> idList) throws IntegrationException, BlobException{
+        
+        List<BlobLight> blobList = new ArrayList<>();
+        
+        for(int id : idList){
+            blobList.add(getPDFBlobLight(id));
+        }
+        return blobList;
+    }
+    
+    /**
+     * @param blob
+     * @throws IntegrationException
+     * @throws EventException
+     * @throws AuthorizationException
+     * @throws ViolationException
+     * @throws BObStatusException
+     * @throws BlobException 
+     */
+    public void deletePDFBlob(BlobLight blob) 
+            throws IntegrationException, 
+            EventException, 
+            AuthorizationException, 
+            ViolationException, 
+            BObStatusException, 
+            BlobException {
+        
+        BlobIntegrator bi = getBlobIntegrator();
+        
+        //First we have to make sure that no objects are attached to this blob
+        List<BOb> connectedObjects = getAttachedObjects(blob);
+        
+        if(!connectedObjects.isEmpty()){
+            throw new BlobException("The coordinator attempted to remove a blob that is currently connected to other objects.");
+        }
+        
+        //The blob isn't attached to anything, let's delete the blob from the photodoc table
+        bi.deletePDFBlob(blob.getBlobID());
+        
+        //Let's see if this blob is still attached to other photodoc rows
+        List<Integer> connectedPDFDocs = bi.getPDFBlobsFromBytesID(blob.getBytesID());
+        
+        if(connectedPDFDocs.isEmpty()){
+            //No rows are referencing this file, let's delete the bytes too
+            bi.deleteBytes(blob.getBytesID());
+        }
+        
+    }
+
+    /**
+     * A method that removes all metadata from an image blob's bytes and puts
+     * them into its Metadata field. Should always be called before saving an
+     * image file to the database.
+     * @param input
+     * @return The blob that was put into it, stripped of metadata
+     * @throws java.io.IOException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BlobTypeException
+     * @throws com.tcvcog.tcvce.domain.BlobException
+     */
+    public Blob stripPDFMetadata(Blob input) 
+            throws IOException, 
+            IntegrationException,
+            BlobTypeException,
+            BlobException {
+
+        if(input.getFilename() == null){
+            
+            //No file name, let's generate one and save it to the database.
+            input.setFilename(generateFilename(input.getBytes()));
+            
+            updateBlobFilename(input);
+            
+        }
+        
+        ByteArrayInputStream bis = new ByteArrayInputStream(input.getBytes());
+
+        //Extract metadata and place it in the blob
+        
+        //Convert ByteArrayInputStream to PDDocument
+        
+        PDDocument doc = new PDDocument();
+        
+        PDStream docStream = new PDStream(doc, bis);
+        
+        //The stream is now embedded into doc (also, bis is closed, so don't use it)
+        
+        //Let's grab the metadata and erase them from the document
+        
+        Metadata blobMeta = new Metadata();
+        
+        //TODO: Grab each property and then set it to 
+        
+        input.setBlobMetadata(blobMeta);
+        
+        
+        //Remember to put the document, with the now erased metadata, back into the bytes field
+        
+        PDStream output = new PDStream(doc);
+        
+        input.setBytes(output.toByteArray());
         
         return input;
     }
@@ -594,6 +773,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     /**
      * TEMPORARY SEARCH METHOD FOR BLOBS.
      * Should search all blob tables, add their entries to one list, and return it.
+     * TODO: Add pdf search
      * @param filename
      * @param description
      * @param before
