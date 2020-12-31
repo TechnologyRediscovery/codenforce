@@ -60,6 +60,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.common.PDStream;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -179,7 +180,6 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             fileExtension = lowerCaseExt;
         }
         
-        
         switch (fileExtension) {
             case "jpg":
             case "jpeg":
@@ -195,9 +195,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
                 blob.setType(BlobType.PDF);
 
-                //No PDF methods yet!
-                //TODO: Strip metadata from original file and save it in the Metadata dictionary
-                return null;
+                blob = stripPDFMetadata(blob);
+                return getBlobIntegrator().storePDFBlob(blob);
 
             default:
                 //Incorrect file type
@@ -610,14 +609,52 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         Metadata blobMeta = new Metadata();
         
-        //TODO: Grab each property and then set it to 
+        PDDocumentInformation docInfo = doc.getDocumentInformation();
+        
+        blobMeta.setProperty(new MetadataKey("Author"), docInfo.getAuthor());
+        
+        docInfo.setAuthor("");
+        
+        blobMeta.setProperty(new MetadataKey("Title"), docInfo.getTitle());
+        
+        docInfo.setTitle("");
+        
+        blobMeta.setProperty(new MetadataKey("Subject"), docInfo.getSubject());
+        
+        docInfo.setSubject("");
+        
+        blobMeta.setProperty(new MetadataKey("Keywords"), docInfo.getKeywords());
+        
+        docInfo.setKeywords("");
+        
+        blobMeta.setProperty(new MetadataKey("Creator"), docInfo.getCreator());
+        
+        docInfo.setCreator("");
+        
+        blobMeta.setProperty(new MetadataKey("Producer"), docInfo.getProducer());
+        
+        docInfo.setProducer("");
+        
+        if(docInfo.getCreationDate() != null){
+            blobMeta.setProperty(new MetadataKey("CreationDate"), docInfo.getCreationDate().toString());
+        
+            docInfo.setCreationDate(null);
+        
+        }
+        
+        if(docInfo.getCreationDate() != null){
+            blobMeta.setProperty(new MetadataKey("ModificationDate"), docInfo.getModificationDate().toString());
+        
+            docInfo.setModificationDate(null);
+        }
         
         input.setBlobMetadata(blobMeta);
         
+        //put the document, with the now erased metadata, back into the bytes field
         
-        //Remember to put the document, with the now erased metadata, back into the bytes field
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
         
-        PDStream output = new PDStream(doc);
+        doc.save(output);
         
         input.setBytes(output.toByteArray());
         
@@ -802,16 +839,32 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         idList.addAll(bi.searchPhotoBlobs(filename, description, before, after, municode));
         
-        //No PDF Search yet!
-        //idList.addAll(bi.searchPDFBlobs(filename, description, before, after));
+        idList.addAll(bi.searchPDFBlobs(filename, description, before, after, municode));
         
         List<BlobLight> blobList = new ArrayList<>();
         
         for(Integer id : idList){
-            blobList.add(getPhotoBlobLight(id));
+            
+            BlobLight result = getPhotoBlobLight(id);
+            
+            if(result != null) {
+            
+                blobList.add(result);
+            
+            }
         }
         
-        //No "getPDFBlob()" method!
+        for(Integer id : idList){
+            
+            BlobLight result = getPDFBlobLight(id);
+            
+            if(result != null) {
+            
+                blobList.add(result);
+            
+            }
+            
+        }
         
         return blobList;
         
