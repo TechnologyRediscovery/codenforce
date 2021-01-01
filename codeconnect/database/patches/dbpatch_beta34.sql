@@ -17,8 +17,6 @@
 -- name but different suffix (apple st. and apple ave)
 
 -- design criteria
--- A single parcel can contain multiple mailing unit (i.e. 1114, 1116, 1118 
-
 -- Largo Way, also had 1115-1121 Morrell ave)
 -- Accommodtate a single address (930 Punta Gorda) that contains multiple
 
@@ -303,10 +301,8 @@ CREATE TABLE parcelunit
 
           CONSTRAINT propunit_conditionintensityclass_classid_fk FOREIGN KEY (condition_intensityclassid)
               REFERENCES public.intensityclass (classid) MATCH SIMPLE
-              ON UPDATE NO ACTION ON DELETE NO ACTION,
-          CONSTRAINT propunit_rentalintentupdatedby_fk FOREIGN KEY (rentalintentlastupdatedby_userid)
-              REFERENCES public.eventrule (ruleid) MATCH SIMPLE
               ON UPDATE NO ACTION ON DELETE NO ACTION
+       
     );
 
 --TODO: The field Use Code can contain APART:x-y UNITS
@@ -318,4 +314,4 @@ CREATE TABLE parcelunit
 
 --IF datepublished IS NULL the patch is still open and receiving changes
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (34, 'database/patches/dbpatch_beta34.sql',NULL, 'ecd', 'LATE DEC 2020 changes');
+    VALUES (34, 'database/patches/dbpatch_beta34.sql','12-29-2020', 'ecd', 'LATE DEC 2020 changes');

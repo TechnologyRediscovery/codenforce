@@ -33,6 +33,7 @@ import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.ProposalCECase;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
@@ -80,6 +81,9 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         generateMainDash();
     }
     
+    /**
+     * @deprecated  with move to flex panels
+     */
     private void generateMainDash(){
         setMainDash(new DefaultDashboardModel());
         DashboardColumn column1 = new DefaultDashboardColumn();
@@ -166,8 +170,20 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
             System.out.println("view case " + cse.getCaseID());
             getSessionBean().setSessCECase(cse);
         }
-        return "ceCaseSearchProfile";
+        return "ceCaseProfile";
     }
+    
+    /**
+     * Listener for user request to explore a property
+     * @param prop
+     * @return 
+     */
+    public String onViewPropertyButtonChange(Property prop){
+        getSessionBean().setSessProperty(prop);
+        return "propertySearchProfile";
+        
+    }
+    
     
     public String onViewOccPeriodButtonChange(OccPeriod per){
         if(per != null){

@@ -1275,6 +1275,19 @@
             <from-outcome>ceCaseSearchProfile</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/ceCaseSearchProfile.xhtml</to-view-id>
         </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCaseProfile</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseProfile.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCaseSearch</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseSearch.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
         <navigation-case>
             <from-outcome>ceCaseWorkflow</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/ceCaseSearchProfile.xhtml</to-view-id>
