@@ -263,8 +263,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             switch (selectedBlob.getType()) {
                 case PDF:
                     externalContext.setResponseContentType("application/pdf");
-                    //PDF downloads not yet supported
-                    //blob = bc.getPDFBlob(selectedBlob.getBlobID())
+                    blob = bc.getPDFBlob(selectedBlob.getBlobID());
                     break;
 
                 case PHOTO:
@@ -365,9 +364,33 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
                                     + "other objects in the system before trying to delete it", ""));
             }
         } else if (selectedBlob.getType() == BlobType.PDF) {
-            getFacesContext().addMessage(null,
+            try {
+
+                bc.deletePDFBlob(selectedBlob);
+
+                //Setting blobID to 0 tells the reloadBlobs() method
+                //not to search for the blob after reloading.
+                selectedBlob.setBlobID(0);
+                
+                reloadBlobs();
+                
+            } catch (IntegrationException 
+                    | EventException 
+                    | AuthorizationException 
+                    | BObStatusException 
+                    | ViolationException ex) {
+                System.out.println("manageBlobBB.deleteSelectedBlob | ERROR: " + ex);
+                getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Deleting PDFs is not yet supported", ""));
+                            "Something went wrong when trying to delete the selected file!", ""));
+            } catch (BlobException ex){
+                System.out.println("manageBlobBB.deleteSelectedBlob | ERROR: " + ex);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Something went wrong when trying to delete the selected file! "
+                                    + "Make sure that the file is not connected to any "
+                                    + "other objects in the system before trying to delete it", ""));
+            }
         }
     }
     

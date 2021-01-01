@@ -592,20 +592,14 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             updateBlobFilename(input);
             
         }
-        
-        ByteArrayInputStream bis = new ByteArrayInputStream(input.getBytes());
 
         //Extract metadata and place it in the blob
         
-        //Convert ByteArrayInputStream to PDDocument
+        //Step 1: put bytes in a document.
         
-        PDDocument doc = new PDDocument();
+        PDDocument doc = PDDocument.load(input.getBytes());
         
-        PDStream docStream = new PDStream(doc, bis);
-        
-        //The stream is now embedded into doc (also, bis is closed, so don't use it)
-        
-        //Let's grab the metadata and erase them from the document
+        //Step 2: grab the metadata and then erase it from the document
         
         Metadata blobMeta = new Metadata();
         
@@ -636,14 +630,14 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         docInfo.setProducer("");
         
         if(docInfo.getCreationDate() != null){
-            blobMeta.setProperty(new MetadataKey("CreationDate"), docInfo.getCreationDate().toString());
+            blobMeta.setProperty(new MetadataKey("CreationDate"), docInfo.getCreationDate().getTime().toString());
         
             docInfo.setCreationDate(null);
         
         }
         
         if(docInfo.getCreationDate() != null){
-            blobMeta.setProperty(new MetadataKey("ModificationDate"), docInfo.getModificationDate().toString());
+            blobMeta.setProperty(new MetadataKey("ModificationDate"), docInfo.getModificationDate().getTime().toString());
         
             docInfo.setModificationDate(null);
         }
@@ -655,6 +649,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         
         doc.save(output);
+        
+        doc.close();
         
         input.setBytes(output.toByteArray());
         
