@@ -642,6 +642,26 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * The Primefaces can't compare enums in EL. So, this translates the type to
+     * an integer value so it can make sure to render the correct elements.
+     * @return 
+     */
+    public int getSelectedBlobType(){
+        switch(selectedBlob.getType()){
+            case PHOTO:
+                return 0;  
+            
+            case PDF:
+                return 1;
+            
+            default:
+                //Invalid type
+                return -1;
+        }
+        
+    }
+    
+    /**
      * Determines whether or not a user should currently be able to select a
      * blob or deselect a blob.
      *

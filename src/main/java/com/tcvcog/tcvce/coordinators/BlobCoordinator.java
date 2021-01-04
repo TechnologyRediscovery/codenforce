@@ -61,7 +61,6 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
-import org.apache.pdfbox.pdmodel.common.PDStream;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.w3c.dom.NamedNodeMap;
@@ -73,7 +72,7 @@ import org.w3c.dom.Node;
  */
 public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
-    private final StreamedContent image = new DefaultStreamedContent();
+    private final DefaultStreamedContent defaultStream = new DefaultStreamedContent();
     private final int GIGABYTE = 1000000000;
 
     public BlobCoordinator() {
@@ -95,8 +94,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * The BlobCoordinator attempts to automatically retrieve an image for the
-     * interface.
+     * The BlobCoordinator attempts to automatically retrieve an defaultStream for the
+ interface.
      *
      * @return
      * @throws BlobTypeException
@@ -108,21 +107,20 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         DefaultStreamedContent sc = null;
 
         if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
-            return image;
+            sc = defaultStream;
         } else {
-            BlobIntegrator bi = getBlobIntegrator();
             
             //Get the blob ID from the Faces context
             int blobID = Integer.parseInt(context.getExternalContext().getRequestParameterMap().get("blobID"));
             System.out.println("BlobCoordinator.getImage: image ID " + blobID);
             try {
-                BlobLight blob = getPhotoBlobLight(blobID);
+                Blob blob = getPhotoBlob(blobID);
                 if (null == blob.getType()) {
                     throw new BlobTypeException("BlobType is null.");
                 } else {
                     switch (blob.getType()) {
                         case PHOTO:
-                            sc = new DefaultStreamedContent(new ByteArrayInputStream(bi.getBlobBytes(blob.getBytesID())));
+                            sc = new DefaultStreamedContent(new ByteArrayInputStream(blob.getBytes()));
                             break;
                         case PDF:
                             sc = new DefaultStreamedContent(new FileInputStream(new File("/home/noah/Documents/COG Project/codeconnect/src/main/webapp/images/pdf-icon.png")));
@@ -132,16 +130,51 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
                     }
                 }
             } catch (IntegrationException ex) {
-                System.out.println(ex);
                 System.out.println("BlobCoordinator.getImage | " + ex);
             } catch (FileNotFoundException ex) {
                 System.out.println(ex);
-                System.out.println("BlobCoordinator.getImage | could not find pdf-icon.png ");
+                System.out.println("BlobCoordinator.getImage | ERROR: could not find pdf-icon.png ");
             }
-            return sc;
+            
         }
+        
+        return sc;
     }
 
+    /**
+     * The BlobCoordinator attempts to automatically retrieve a PDF document for the
+     * interface to display
+     *
+     * @return
+     * @throws BlobTypeException
+     * @throws com.tcvcog.tcvce.domain.BlobException
+     */
+    public StreamedContent getDocument() throws BlobTypeException, BlobException{
+        // should use EL to verify blob type,  but this will check it anyway
+        FacesContext context = FacesContext.getCurrentInstance();
+        DefaultStreamedContent sc = null;
+
+        if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
+            sc = defaultStream;
+        } else {
+            
+            //Get the blob ID from the Faces context
+            int blobID = Integer.parseInt(context.getExternalContext().getRequestParameterMap().get("blobID"));
+            System.out.println("BlobCoordinator.getDocument: document ID " + blobID);
+            try {
+                Blob blob = getPDFBlob(blobID);
+                
+                sc = new DefaultStreamedContent(new ByteArrayInputStream(blob.getBytes()));
+                
+            } catch (IntegrationException ex) {
+                System.out.println("BlobCoordinator.getDocument | " + ex);
+            }
+                
+        }
+        
+        return sc;
+    }
+    
     /**
      * Validates blobs and prepares them for storage, whether they are photos
      * or documents.
@@ -438,9 +471,9 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * A method that removes all metadata from an image blob's bytes and puts
-     * them into its Metadata field. Should always be called before saving an
-     * image file to the database.
+     * A method that removes all metadata from an defaultStream blob's bytes and puts
+ them into its Metadata field. Should always be called before saving an
+ defaultStream file to the database.
      *
      * @param input
      * @return The blob that was put into it, stripped of metadata
@@ -470,7 +503,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
         //Extract metadata and place it in the blob
         
-        //First we need to get an image reader.
+        //First we need to get an defaultStream reader.
         //The file extension is required because the default getImageReaders()
         //method guesses what file type the bytes are, and sometimes it guesses wrong.
         //Using the getImageReadersByFormatName() ensures we get the right one.
@@ -496,7 +529,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         input.setBlobMetadata(blobMeta);
         
-        //Strip the metadata by reading out only the image data and writing it back
+        //Strip the metadata by reading out only the defaultStream data and writing it back
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
@@ -504,7 +537,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         ImageIO.write(temp, fileExtension, baos);
         
-        //These bytes should only be the image file itself, without the metadata. But that in the bytes field.
+        //These bytes should only be the defaultStream file itself, without the metadata. But that in the bytes field.
         
         input.setBytes(baos.toByteArray());
         
@@ -568,9 +601,9 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * A method that removes all metadata from an image blob's bytes and puts
-     * them into its Metadata field. Should always be called before saving an
-     * image file to the database.
+     * A method that removes all metadata from an defaultStream blob's bytes and puts
+ them into its Metadata field. Should always be called before saving an
+ defaultStream file to the database.
      * @param input
      * @return The blob that was put into it, stripped of metadata
      * @throws java.io.IOException
@@ -658,8 +691,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
-     * Takes a Node of image metadata and extracts its values and keys into the Metadata
-     * object. Once it's done extracting all the information it needs, it tosses
+     * Takes a Node of defaultStream metadata and extracts its values and keys into the Metadata
+ object. Once it's done extracting all the information it needs, it tosses
      * the Metadata object back.
      * @param node The node to extract from
      * @param meta The Metadata object to fill with data.
@@ -696,7 +729,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     
     /**
      * Accepts a filename and returns only the file extension
-     * E.g. "image.jpg" -> "jpg"
+     * E.g. "defaultStream.jpg" -> "jpg"
      * @param filename
      * @return 
      */
