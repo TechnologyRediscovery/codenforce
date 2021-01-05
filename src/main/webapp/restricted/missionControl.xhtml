@@ -268,12 +268,12 @@
 
                                             <p:column width="20%" style="text-align: center">
                                                 <f:facet name="header">
-                                                    <h:outputText value="Load"/>
+                                                    <h:outputText value="Actions"/>
                                                 </f:facet>
                                                 <div class="gray_button">
                                                     <p:commandButton id="prop-search-loadprop-button"
                                                                      icon="fa fa-folder-open-o"
-                                                                     value="Load"
+                                                                     value="Details"
                                                                      action="#{missionControlBB.onViewPropertyButtonChange(prop)}"
                                                                      ajax="false"
                                                                      />
@@ -430,13 +430,13 @@
                                             value="#{ceCaseSearchProfileBB.caseList}"
                                             tableStyleClass="primeDataTable">
 
-                                            <p:column width="15%" sortBy="#{c.originationDate}">
+                                            <p:column width="12%" sortBy="#{c.originationDate}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Opened" />
                                                 </f:facet>
                                                 <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDateNoTime(c.originationDate)}"/>
                                             </p:column>
-                                            <p:column width="15%" sortBy="#{c.property.address}">
+                                            <p:column width="12%" sortBy="#{c.property.address}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Property" />
                                                 </f:facet>
@@ -444,7 +444,7 @@
                                                 <p:spacer height="2px"/>
                                                 <h:outputText value=" (#{c.property.muni.muniName})"/>
                                             </p:column>
-                                            <p:column width="15%">
+                                            <p:column width="10%">
                                                 <f:facet name="header">
                                                     <h:outputText value="Name" />
                                                 </f:facet>
@@ -458,13 +458,13 @@
                                                     <i class="material-icons status-display-icon-i"><h:outputText value="#{c.statusBundle.phaseIcon.materialIcon}"/></i>
                                                 </div>
                                             </p:column>
-                                            <p:column width="5%">
+                                            <p:column width="8%">
                                                 <f:facet name="header">
-                                                    <h:outputText value="view" />
+                                                    <h:outputText value="Actions" />
                                                 </f:facet>
                                                 <p:commandButton id="cecase-search-view-case"
                                                                      icon="fa fa-folder-open-o"
-                                                                     value="Load"
+                                                                     value="Details"
                                                                      action="#{missionControlBB.onViewCECaseButtonChange(prop)}"
                                                                      ajax="false"
                                                                      />

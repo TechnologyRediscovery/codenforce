@@ -1999,7 +1999,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
     /**
      * Standard coordinator method which calls the integration method after
-     * checking businses rules. ALSO coordinates creating a corresponding
+     * checking business rules. ALSO coordinates creating a corresponding
      * proposal to match the stipulated compliance date on the violation that's
      * added.
      *
@@ -2016,6 +2016,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public int violation_attachViolationToCase(CodeViolation cv, CECaseDataHeavy cse, UserAuthorized ua)
             throws IntegrationException, ViolationException, BObStatusException, EventException, SearchException {
 
+        if(cv == null || cse == null || ua == null) throw new BObStatusException("Cannot attach violation with null viol, case, or user");
+        
+        
         CaseIntegrator ci = getCaseIntegrator();
         EventCoordinator ec = getEventCoordinator();
         UserCoordinator uc = getUserCoordinator();
@@ -2117,9 +2120,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws ViolationException
      */
     private void violation_verifyCodeViolationAttributes(CECaseDataHeavy cse, CodeViolation cv) throws ViolationException {
+        if(cse == null || cv == null) throw new ViolationException("Cannot verify code violation attributes with null case or violation");
+        
         if (cse.getStatusBundle().getPhase() == CasePhaseEnum.Closed) {
             throw new ViolationException("Cannot update code violations on closed cases!");
-
         }
         if (cv.getStipulatedComplianceDate().isBefore(cv.getDateOfRecord())) {
             throw new ViolationException("Stipulated compliance date cannot be before the violation's date of record");
@@ -2147,7 +2151,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 // check to make sure that particular ordinance isn't already on the case
                 for (CodeViolation tempCv : vlst) {
                     if(tempCv.getViolatedEnfElement().getCodeSetElementID() == ece.getCodeSetElementID()){
-                        throw new BObStatusException("Violatio of ordiance with ID " + ece.getCodeSetElementID());
+                        throw new BObStatusException("Duplicate Violation of ordiance with ID " + ece.getCodeSetElementID() + "Select a different ordinance, please!");
                     }
                 }
             }
@@ -2384,8 +2388,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public void violation_recordCompliance(CECaseDataHeavy cse, CodeViolation cv, UserAuthorized u) 
             throws IntegrationException, BObStatusException, ViolationException, EventException {
 
+        if(cse == null || cv == null || u == null ) throw new BObStatusException("Cannot record compliance on null case, viol, or user");
+        if(cv.getActualComplianceDate() == null){
+            throw new ViolationException("Cannot set compliance with null actual compliance date");
+        }
+        
         CaseIntegrator ci = getCaseIntegrator();
-
+        
         // update violation record for compliance
         cv.setComplianceUser(u);
         cv.setLastUpdatedUser(u);

@@ -48,9 +48,11 @@ CREATE SEQUENCE IF NOT EXISTS parcel_parcelkey_seq
     NO MAXVALUE
     CACHE 1;
 
+
 CREATE TABLE public.parcel
     (
         parcelkey               INTEGER PRIMARY KEY DEFAULT nextval('parcel_parcelkey_seq'),
+        muni_municode           INTEGER NOT NULL CONSTRAINT parcel_muni_fk REFERENCES municipality (municode),
         parcelidcnty            TEXT,
         source_sourceid         INTEGER CONSTRAINT parcel_sourceid_fk REFERENCES public.bobsource (sourceid),
         createdts               TIMESTAMP WITH TIME ZONE,
@@ -234,21 +236,6 @@ CREATE TABLE mailingaddress
     );
 
 
-
-CREATE TABLE public.humanmailingaddress
-    (
-        humanmailing_humanid          INTEGER CONSTRAINT humanmailing_humanid_fk REFERENCES human (humanid),
-        humanmailing_addressid         INTEGER CONSTRAINT humanmailing_addressid_fk REFERENCES mailingaddress (addressid),
-        source_sourceid                 INTEGER CONSTRAINT humanmailing_sourceid_fk REFERENCES public.bobsource (sourceid),
-        createdts                       TIMESTAMP WITH TIME ZONE,
-        createdby_userid                INTEGER CONSTRAINT humanmailing_createdby_userid_fk REFERENCES login (userid),     
-        deactivatedts                   TIMESTAMP WITH TIME ZONE,
-        deactivatedby_userid            INTEGER CONSTRAINT humanmailing_deactivatedby_userid_fk REFERENCES login (userid),  
-        notes                           TEXT         
-
-
-    );
-
 CREATE SEQUENCE IF NOT EXISTS humanmailing_roleid_seq
     START WITH 100
     INCREMENT BY 1
@@ -269,7 +256,25 @@ CREATE TABLE public.humanmailingrole
     ); 
 
 
-CREATE TABLE public.mailingaddressparcel
+
+CREATE TABLE public.humanmailingaddress
+    (
+        humanmailing_humanid          INTEGER CONSTRAINT humanmailing_humanid_fk REFERENCES human (humanid),
+        humanmailing_addressid         INTEGER CONSTRAINT humanmailing_addressid_fk REFERENCES mailingaddress (addressid),
+        role_humanmailingroleid         INTEGER CONSTRAINT humanmailing_role_fk REFERENCES humanmailingrole (roleid),
+        source_sourceid                 INTEGER CONSTRAINT humanmailing_sourceid_fk REFERENCES public.bobsource (sourceid),
+        createdts                       TIMESTAMP WITH TIME ZONE,
+        createdby_userid                INTEGER CONSTRAINT humanmailing_createdby_userid_fk REFERENCES login (userid),     
+        deactivatedts                   TIMESTAMP WITH TIME ZONE,
+        deactivatedby_userid            INTEGER CONSTRAINT humanmailing_deactivatedby_userid_fk REFERENCES login (userid),  
+        notes                           TEXT         
+
+
+    );
+
+
+
+CREATE TABLE public.parcelmailingaddress
     (
         mailingparcel_parcelid      INTEGER CONSTRAINT mailingparcel_parcelid_fk REFERENCES parcel (parcelkey),
         mailingparcel_mailingid     INTEGER CONSTRAINT mailingparcel_mailingid_fk REFERENCES mailingaddress (addressid),

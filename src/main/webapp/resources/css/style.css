@@ -831,6 +831,17 @@ i.status-display-icon-i{
 
 }
 
+.compliance-date-stipulated{
+    color: orange;
+    font-weight: bold;
+}
+
+.compliance-date{
+    color: green;
+    font-weight: bold;
+}
+
+
 
 /***************** CLOSE TEXT AND SPANS ***********************/
 
@@ -2037,10 +2048,19 @@ tr.caseOpen{
 
 /* ****************** PRIMEFACE STYLING RESETING *******************/
 
-body .ui-panel .ui-panel-titlebar{
+/*body .ui-panel .ui-panel-titlebar{
     background-color: #6C6D70;
     border: 1px solid #6C6D70;
+}*/
+
+body .ui-panel .ui-panel-titlebar{
+    background-color: #004864;
+    border: 1px solid #004864;
+    color:white;
 }
+
+
+
 body .ui-dialog .ui-dialog-titlebar{
     background-color: #6C6D70;
     border: 1px solid #6C6D70;

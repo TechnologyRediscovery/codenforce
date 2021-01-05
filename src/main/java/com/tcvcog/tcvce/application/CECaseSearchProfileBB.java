@@ -130,6 +130,7 @@ public class CECaseSearchProfileBB
     private ViewOptionsActiveListsEnum selectedViewOption;
     
     private List<IntensityClass> severityList;
+    private java.util.Date complianceDateForm;
     
     private String formNoteTextViolation;
     private List<EnforcableCodeElement> filteredElementList;
@@ -180,7 +181,7 @@ public class CECaseSearchProfileBB
                 }
             }
             currentCase = cc.cecase_assembleCECaseDataHeavy(cseTemp, getSessionBean().getSessUser());
-            System.out.println("CECaseSearchProfile.initBean(): current case ID: " + currentCase.getCaseID());
+            System.out.println("CECaseSearchProfileBB.initBean(): current case ID: " + currentCase.getCaseID());
             closingEventCategoryList = ec.getEventCategeryList(EventType.Closing);
             
         } catch (IntegrationException | SearchException | BObStatusException ex) {
@@ -876,8 +877,26 @@ public class CECaseSearchProfileBB
      * Listener for user requests to start the compliance recording operation
      * @param viol 
      */
-    public void onViolationComplianceInitButtonChange(CodeViolation viol){
+    public void onViolationRecordComplianceInitButtonChange(CodeViolation viol){
         currentViolation = viol;
+        // set default compliance date of today
+        prepareComplianceDateForm();
+    }
+    
+    /**
+     * Listener for user requests to record compliance from the violation
+     * details dialog (not the violation table, in which case the violation
+     * object is accepted as a parameter
+     * @param ev 
+     */
+    public void onViolationRecordComplianceInitButtonChange(ActionEvent ev){
+        System.out.println("CeCaseSearchProfileBB.onViolationRecordComplianceInitButtonChange | from dialog");
+        prepareComplianceDateForm();
+    }
+    
+    private void prepareComplianceDateForm(){
+        complianceDateForm = java.util.Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
+        
     }
     
     /**
@@ -892,8 +911,16 @@ public class CECaseSearchProfileBB
      * Listener for user requests to start nullify operation
      * @param viol 
      */
-    public void onViolationNullifyButtonChange(CodeViolation viol){
+    public void onViolationNullifyInitButtonChange(CodeViolation viol){
         currentViolation = viol;
+    }
+    
+    /**
+     * Listener for user requests to start nullify operation
+     * @param ev
+     */
+    public void onViolationNullifyInitButtonChange(ActionEvent ev){
+        // nothing to do here
     }
     
     
@@ -905,9 +932,10 @@ public class CECaseSearchProfileBB
      * @param ece
      */
     public void onViolationSelectElementButtonChange(EnforcableCodeElement ece) {
+        System.out.println("CECaseSearchProfileBB.onViolationSelectElementButtonChange: CSEID: " + ece.getCodeSetElementID());
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            setCurrentViolation(cc.violation_injectOrdinance(currentCase, getCurrentViolation(), ece, null));
+            currentViolation = cc.violation_injectOrdinance(currentCase, getCurrentViolation(), ece, null);
         } catch (BObStatusException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -1023,6 +1051,223 @@ public class CECaseSearchProfileBB
         return "ceCaseProfile";
     }
 
+     /**
+     * Listener for user requests to start the update stip date operation
+     * @param ev 
+     */
+    public void onViolationUpdateDORInitButtonChange(ActionEvent ev){
+        System.out.println("CECaseSearchProfileBB.onViolationUpdateDORInitButtonChange");
+        // nothing to do here yet
+        
+    }
+    
+    /**
+     * Listener for user reqeusts to commit updates to a codeViolation
+     *
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException
+     */
+    public String onViolationUpdateDORCommitButtonChange() throws IntegrationException, BObStatusException {
+        CaseCoordinator cc = getCaseCoordinator();
+        EventCoordinator eventCoordinator = getEventCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+
+        EventCategory ec = eventCoordinator.initEventCategory(
+                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
+
+        try {
+
+            cc.violation_updateCodeViolation(currentCase, getCurrentViolation(), getSessionBean().getSessUser());
+
+            // if update succeeds without throwing an error, then generate an
+            // update violation event
+            // TODO: Rewire this to work with new event processing cycle
+//             eventCoordinator.generateAndInsertCodeViolationUpdateEvent(getCurrentCase(), currentViolation, event);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Success! Violation updated and notice event generated", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to edit violation in the database",
+                            "This is a system-level error that msut be corrected by an administrator, Sorry!"));
+
+        } catch (ViolationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            ex.getMessage(), "Please revise the stipulated compliance date"));
+
+        }
+
+        return "ceCaseProfile";
+    }
+    
+    /**
+     * Listener for user requests to start the update stip date operation
+     * @param ev 
+     */
+    public void onViolationUpdateStipDateInitButtonChange(ActionEvent ev){
+        System.out.println("CECaseSearchProfileBB.onViolationUpdateStipDateInitButtonChange");
+        // nothing to do here yet
+        
+    }
+    
+    /**
+     * Listener for user reqeusts to commit updates to a codeViolation
+     *
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException
+     */
+    public String onViolationUpdateStipDateCommitButtonChange() throws IntegrationException, BObStatusException {
+        CaseCoordinator cc = getCaseCoordinator();
+        EventCoordinator eventCoordinator = getEventCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+
+        EventCategory ec = eventCoordinator.initEventCategory(
+                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
+
+        try {
+
+            cc.violation_updateCodeViolation(currentCase, getCurrentViolation(), getSessionBean().getSessUser());
+
+            // if update succeeds without throwing an error, then generate an
+            // update violation event
+            // TODO: Rewire this to work with new event processing cycle
+//             eventCoordinator.generateAndInsertCodeViolationUpdateEvent(getCurrentCase(), currentViolation, event);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Success! Violation updated and notice event generated", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to edit violation in the database",
+                            "This is a system-level error that msut be corrected by an administrator, Sorry!"));
+
+        } catch (ViolationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            ex.getMessage(), "Please revise the stipulated compliance date"));
+
+        }
+
+        return "ceCaseProfile";
+    }
+    
+    
+    /**
+     * Listener for user requests to start the update penalty and severity operation
+     * @param ev 
+     */
+    public void onViolationUpdatePenaltySeverityInitButtonChange(ActionEvent ev){
+        System.out.println("CECaseSearchProfileBB.onViolationUpdatePenalitySeverityInitButtonChange");
+        // nothing to do here yet
+        
+    }
+    
+    
+    /**
+     * Listener for user reqeusts to commit updates to a codeViolation
+     *
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException
+     */
+    public String onViolationUpdatePenaltySeverityCommitButtonChange() throws IntegrationException, BObStatusException {
+        CaseCoordinator cc = getCaseCoordinator();
+        EventCoordinator eventCoordinator = getEventCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+
+        EventCategory ec = eventCoordinator.initEventCategory(
+                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
+
+        try {
+
+            cc.violation_updateCodeViolation(currentCase, getCurrentViolation(), getSessionBean().getSessUser());
+
+            // if update succeeds without throwing an error, then generate an
+            // update violation event
+            // TODO: Rewire this to work with new event processing cycle
+//             eventCoordinator.generateAndInsertCodeViolationUpdateEvent(getCurrentCase(), currentViolation, event);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Success! Violation updated and notice event generated", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to edit violation in the database",
+                            "This is a system-level error that msut be corrected by an administrator, Sorry!"));
+
+        } catch (ViolationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            ex.getMessage(), "Please revise the stipulated compliance date"));
+
+        }
+
+        return "ceCaseProfile";
+    }
+
+    
+    
+    
+    /**
+     * Listener for user requests to start the update findings operation
+     * @param ev 
+     */
+    public void onViolationUpdateFindingsInitButtonChange(ActionEvent ev){
+        System.out.println("CECaseSearchProfileBB.onViolationUpdateFindingsInitButtonChange");
+        // nothing to do here yet
+        
+    }
+    
+    /**
+     * Listener for user reqeusts to commit updates to a codeViolation
+     *
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException
+     */
+    public String onViolationUpdateFindingsCommitButtonChange() throws IntegrationException, BObStatusException {
+        CaseCoordinator cc = getCaseCoordinator();
+        EventCoordinator eventCoordinator = getEventCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+
+        EventCategory ec = eventCoordinator.initEventCategory(
+                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
+
+        try {
+
+            cc.violation_updateCodeViolation(currentCase, getCurrentViolation(), getSessionBean().getSessUser());
+
+            // if update succeeds without throwing an error, then generate an
+            // update violation event
+            // TODO: Rewire this to work with new event processing cycle
+//             eventCoordinator.generateAndInsertCodeViolationUpdateEvent(getCurrentCase(), currentViolation, event);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Success! Violation updated and notice event generated", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to edit violation in the database",
+                            "This is a system-level error that msut be corrected by an administrator, Sorry!"));
+
+        } catch (ViolationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            ex.getMessage(), "Please revise the stipulated compliance date"));
+
+        }
+
+        return "ceCaseProfile";
+    }
+
     
     
     
@@ -1034,35 +1279,38 @@ public class CECaseSearchProfileBB
     public String onViolationRecordComplianceCommitButtonChange() {
         EventCoordinator ec = getEventCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
-        
-            // build event details package
-            EventCnF e = null;
-            try {
-                
-//                cc.violation_recordCompliance(currentViolation, getSessionBean().getSessUser());
-                   getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Compliance recorded", ""));
-                
-                // ************ TODO: Finish me with events ******************//
-                // ************ TODO: Finish me with events ******************//
-                e = ec.generateViolationComplianceEvent(getCurrentViolation());
-                e.setUserCreator(getSessionBean().getSessUser());
-                e.setTimeStart(LocalDateTime.now());
-                
-                // ************ TODO: Finish me with events ******************//
-                // ************ TODO: Finish me with events ******************//
-                
-                   getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Compliance event attached to case", ""));
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-                   getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.toString(), ""));
-                   return "";
-            }
+        if(currentViolation != null){
+            currentViolation.setActualComplianceDateUtilDate(complianceDateForm);
+        }
+        // build event details package
+        EventCnF e = null;
+        try {
+            // Delegate the heavy lifting to the coordinator
+            cc.violation_recordCompliance(currentCase, currentViolation, getSessionBean().getSessUser());
+               getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Compliance recorded for Ordinacnce " + currentViolation.getViolationID(), ""));
+
+            // ************ TODO: Finish me with events ******************//
+            // ************ TODO: Finish me with events ******************//
+            e = ec.generateViolationComplianceEvent(getCurrentViolation());
+            e.setUserCreator(getSessionBean().getSessUser());
+            e.setTimeStart(LocalDateTime.now());
+
+            // ************ TODO: Finish me with events ******************//
+            // ************ TODO: Finish me with events ******************//
+
+               getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Compliance event attached to case", ""));
+        } catch (IntegrationException | BObStatusException | ViolationException | EventException ex) {
+            System.out.println(ex);
+               getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        ex.toString(), ""));
+               return "";
+        }
+
 
         return "ceCaseProfile";
         
@@ -1087,11 +1335,11 @@ public class CECaseSearchProfileBB
 
     /**
      * Listener for user requests to commit new note content to the current
-     * object
+     * violation
      *
-     * @return
+     * @param ev
      */
-    public String onNoteCommitButtonChange() {
+    public void onViolationNoteCommitButtonChange(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
 
         MessageBuilderParams mbp = new MessageBuilderParams();
@@ -1107,14 +1355,13 @@ public class CECaseSearchProfileBB
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Succesfully appended note!", ""));
+            currentViolation = cc.violation_getCodeViolation(currentViolation.getViolationID());
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Fatal error appending note; apologies!", ""));
-            return "";
         }
-        return "ceCaseProfile";
     }
 
   
@@ -1158,7 +1405,7 @@ public class CECaseSearchProfileBB
     }
 
     /**
-     * Responds to user reqeusts to commit a new code violation to the CECase
+     * Responds to user requests to commit a new code violation to the CECase
      *
      * @return
      */
@@ -1167,11 +1414,11 @@ public class CECaseSearchProfileBB
         CaseCoordinator cc = getCaseCoordinator();
 
         try {
-            cc.violation_attachViolationToCase(getCurrentViolation(), currentCase, getSessionBean().getSessUser());
+            cc.violation_attachViolationToCase(currentViolation, currentCase, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Success! Violation attached to case.", ""));
-            getSessionBean().getSessionBean().setSessCodeViolation(getCurrentViolation());
+            getSessionBean().getSessionBean().setSessCodeViolation(currentViolation);
             System.out.println("ViolationBB.onViolationAddCommmitButtonChange | completed violation process");
         } catch (IntegrationException | SearchException | BObStatusException | EventException | ViolationException ex) {
             System.out.println(ex);
@@ -1182,6 +1429,15 @@ public class CECaseSearchProfileBB
         }
         return "ceCaseProfile";
 
+    }
+    
+    /**
+     * Listener for user requests to abort violation add process
+     * @return 
+     */
+    public String onViolationAddAbortButtonChange(){
+        return "";  //reload our current page with dialogs closed
+        
     }
 
     /**
@@ -1762,6 +2018,20 @@ public class CECaseSearchProfileBB
      */
     public void setExtendedStipCompDaysFromToday(int extendedStipCompDaysFromToday) {
         this.extendedStipCompDaysFromToday = extendedStipCompDaysFromToday;
+    }
+
+    /**
+     * @return the complianceDateForm
+     */
+    public java.util.Date getComplianceDateForm() {
+        return complianceDateForm;
+    }
+
+    /**
+     * @param complianceDateForm the complianceDateForm to set
+     */
+    public void setComplianceDateForm(java.util.Date complianceDateForm) {
+        this.complianceDateForm = complianceDateForm;
     }
 
 }
