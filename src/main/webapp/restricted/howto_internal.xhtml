@@ -1,0 +1,305 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"  dir="                           "
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Code Connect Documentation</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="./../../../navContainer_public.xhtml">
+            <ui:define name="content">
+                <f:view id="docHomeView">
+
+                    <!-- MAIN CONTAINER -->
+                    <div class="mainContainer">
+
+                        <!-- TITLE COMPONENT -->
+                        <div class="public-title">
+                            <div class="public-title-main">
+                                "How-To" guides for internal users
+                            </div>
+                        </div>
+
+                        <!-- CONTENTS CONTAINER -->
+                        <div class="public-main-contents-containner">
+
+                            <!--CONTENT MAIN COMPONENT -->
+                            <div class="public-main-contents">
+
+                                <!-- GUIDANCE COMPONENT -->
+                                <div class="public-guide">
+                                    Browse the contents to jump down to a step-by-step guide. Keyword links jump you to topic-specific
+                                    explanations. Topics within a section are designed to be useful one at a time
+                                    and also informative to be read sequentially from top to bottom to get a feel for
+                                    the system's configuration.
+                                </div>
+
+                                <!-- CONTENT IO COMPONENT -->
+                                <div class="public-main-contents-io">
+
+                                    <h2>System users</h2>
+
+                                    <p:accordionPanel activeIndex="null">
+                                        <p:tab title="User types and permissions">
+                                            <h2>Permissions systems overview</h2>
+
+                                            <p>User page access is managed by the Glassfish servlet container security
+                                                mechanism. Within the set of users with access to load page X, access to command
+                                                buttons will vary based on user needs.</p>
+
+                                            <h4>Privilege inheritance</h4>
+                                            <p>In general, the authorized actions of a higher-level user (listed toward the bottom of the list) include all
+                                                of those permitted to users at a lower authorization level. For example, client municipality staff can see everything a 
+                                                client municipality viewer can see.</p>
+
+                                            <hr/>
+
+                                            <h3>Public</h3>
+                                            <p>The most restricted, non-login based user. Not issued an authenticated user token by the server.</p>
+
+                                            <h4>Authorized actions</h4>
+                                            <ol>
+                                                <li>Submit new and retrieve existing code enforcement action requests</li>
+                                                <li>Submit and retrieve previously submitted occupancy permit applications</li>
+                                                <li>Attach note events to cases for which a public access control code has been issued</li>
+                                                <li>View contact information for all participating municipality and umbrella organization offices</li>
+                                            </ol>
+
+                                            <hr/>
+
+                                            <h3>Client municipality viewer</h3>
+
+                                            <p>Embodied in a town council person in an oversight but not
+                                                managerial role in the system.</p>
+
+                                            <ol>
+                                                <li>View municipality-level statistics and query results</li>
+                                                <li>Browse open and historic cases down to the case summary level</li>
+                                                <li>Add communication notes to open cases</li>
+                                            </ol>
+
+                                            <hr/>
+                                            <h3>Client municipality staff</h3>
+                                            <p></p>
+                                            <ol>
+                                                <li>View all municipality-specific data not restricted by authorized Officers</li>
+                                                <li>Add communication and meeting events to both open and closed cases</li>
+                                                <li>Authorize occupancy permit applications to proceed to inspection</li>
+                                                <li>Run all municipality-level data queries</li>
+                                            </ol>
+
+                                            <h4>Data control duties</h4>
+                                            <ol>
+                                                <li>Release case-level reports, permits, etc., to authorized people</li>
+                                                <li>Designate communication events created by muni-staff users as publicly viewable</li>
+                                                <li>Enable, disable, and re-key public access control codes</li>
+                                            </ol>
+
+                                            <hr/>
+
+                                            <h3>Code enforcement officer</h3>
+
+                                            <p>The only non-developer user who can carry out enforcement actions in the system, which are enumerated below:</p>
+                                            <ol>
+                                                <li>Open code enforcement and inspection cases</li>
+                                                <li>Attach violations to code enforcement cases</li>
+                                                <li>Compose notices of violation</li>
+                                                <li>Issue citations for violations</li>
+                                                <li>Carry out inspection-related events</li>
+                                            </ol>
+
+
+                                            <h4>Data control duties</h4>
+                                            <ol>
+                                                <li>Enable, disable, and re-key public access control codes</li>
+                                                <li>Designate events as officer-only events</li>
+                                                <li>Designate most event types as publicly viewable</li>
+                                            </ol>
+
+                                            <hr/>
+
+
+                                            <h3>COG Staff</h3>
+
+                                            <p>Embodied in a person who works for an organization which serves several different municipalities
+                                                and may field case-related inquiries.</p>
+
+                                            <h4>Permissions</h4>
+
+                                            <ol>
+                                                <li>Add message, meeting, and communication events to all cases in authorized municipalities</li>
+                                                <li>Enable, disable, and re-key public access control codes</li>
+                                                <li>Run multi-client municipality queries</li>
+                                                <li>Change a case's manager</li>
+                                                <li>Edit high-level code collections, such as code sources and code books</li>
+                                            </ol>
+
+                                            <h4>Data control duties</h4>
+                                            <ol>
+                                                <li>Enable, disable, and re-key public access control codes</li>
+                                                <li>Reset and audit municipality application review process settings </li>
+                                            </ol>
+
+                                            <hr/>
+
+                                            <h3>System Administrator</h3>
+
+                                            <p>Designated to one user per service umbrella, which in 2018 and 2019
+                                                consists of a council of governments, such as the Turtle Creek Valley Council of Governments
+                                                or the Steel Rivers Council of Governments.</p>
+
+                                            <ol>
+                                                <li>Carry out and audit all actions available to any system user</li>
+                                                <li>Edit municipality-level settings and core data</li>
+                                                <li>Configure system events of all shapes and sizes</li>
+                                                <li>Create high-level code collections, such as code sources and code books</li>
+                                                <li>Designated as the case manager for system-level data storage cases used to log 
+                                                    data changes of various kinds</li>
+                                                <li>View all system user action logs</li>
+                                                <li></li>
+                                                <li></li>
+                                            </ol>
+
+                                            <h4>Data control duties</h4>
+                                            <ol>
+                                                <li>Monitor system data integrity ruthlessly</li>
+                                            </ol>
+                                            <hr/>
+
+                                            <h3>Developer</h3>
+
+                                            <p>Granted system application-level access to both the sever and database to carry out all essential
+                                                system life cycle events:</p>
+
+                                            <ol>
+                                                <li>Compiling source, pushing to server, configuring server</li>
+                                                <li>Creating and restoring database backups</li>
+                                                <li>Create users and grant any system permission available</li>
+                                            </ol>
+
+                                        </p:tab>
+
+                                        <p:tab title="Occupancy permits and payments lifecycle">
+                                            <p>Occupancy permits are created with this workflow</p>
+                                            <ol>
+                                                <li>A person with plain old internet access submits an occupancy permit application</li>
+                                                <li>Payment entries are made whose totals equals or exceed
+                                                    the occupancy inspection fee </li>
+                                                <li>A codeconnect user with occupancy verification permissions 
+                                                    approves the application</li>
+                                            </ol>
+                                        </p:tab>
+
+                                        <p:tab title="Municipal code terms">
+                                            <h:outputText value="Code element, code sets (code books), code sources, and code violations"/>
+                                        </p:tab>
+
+                                    </p:accordionPanel>
+
+                                    <h2>
+                                        Municipal Ordinance management
+                                    </h2>
+                                    
+
+                                    <p:accordionPanel activeIndex="null">
+                                        <p:tab title="How are municipal ordinances organized?">
+                                            <p>A specific chunk of text from a borough ordinance is stored inside a <span class="bold">code element </span>. 
+                                                All code elements live inside a <span class="bold">code source</span>. Thus, to add a code element, you must
+                                                first </p>
+
+                                            <p>A <span class="bold">code source</span> is a set of of <span class="bold">ordinances</span> from the same entity or organization. 
+                                                In our example, the code source is the IPMC 2015 which is made of five code elements, each with its own chapter, section, and subsection listing.</p>
+
+                                            <h:graphicImage id="codeElementGI" value="/resources/diagrams/codeElementComposition.jpg" width="100%"/>
+
+                                            <p>A particular ordinance in any source does not contain any enforcement data, such as the standard 
+                                                compliance window length. </p>
+                                        </p:tab>
+
+                                      
+
+                                        <p:tab title="What is the difference between a code sources, a code elment, and a codebook?">
+                                            
+                                        </p:tab>
+
+                                    </p:accordionPanel>
+
+                                    <div class="public-main-contents-title">
+                                        Code enforcement
+                                    </div>
+
+                                    <p:accordionPanel activeIndex="null">
+                                        <p:tab title="Code Enforcement Action Requests">
+                                            <p>Code enforcement action requests initiate the code enforcement case management 
+                                                process. An action request consists of the following information:</p>
+
+                                            <ul>
+                                                <li>Municipality designation</li>
+                                                <li>Parcel/property identifier in that municipality</li>
+                                                <li>Description of the code enforcement concern, including a concern category</li>
+                                                <li>Contact information for the requesting person</li>
+                                            </ul>
+
+
+                                            <h3>Public vs. internal code enforcement action requests</h3>
+
+                                            <p>Both non-logged in (i.e. public) users and internal users can submit a code enforcement 
+                                                action requests for processing by a code enforcement officer. The exact same form
+                                                is used by both types of users. CodeConnect automatically enters the 
+                                                Contact information for users already logged into the system, thus streamlining
+                                                the process and preserving data integrity for staff who may submit many action requests.</p>
+
+
+
+                                            <h3>request management life cycle</h3>
+
+                                            <ol>
+                                                <li>A public or internal user completes a code enforcement action request and immediately 
+                                                    receives a public access control code (PACC) which allows the user to check on the status of 
+                                                    that request via the public information portal. </li>
+                                                <li>A code officer reviews the request and takes on of the following actions, reflected
+                                                    in the request's status:</li>
+                                                <li>
+                                                    <ul>
+                                                        <li>Opens a new code enforcement case based</li>
+                                                    </ul>
+                                                </li>
+                                                <li></li>
+                                            </ol>
+
+                                            <h3>Public access to code enforcement request statuses</h3>
+
+                                            <p>After submitting a code enforcement request, site users are provided with 
+                                                a six-digit number that called a Public Access Control Code. 
+                                                All significant case events are generally
+                                                released by officers and thus viewable by people via their PACC, including events related to
+                                                a code enforcement case that is opened in response to that request.</p>
+
+                                        </p:tab>
+
+                                        <p:tab title="A property is in violation of a borough ordinance. How do I record this violation?">
+                                        </p:tab>
+
+                                        <p:tab title="What is the difference between a code sources. a code elment, and a codebook?">
+                                        </p:tab>
+
+                                    </p:accordionPanel>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </f:view>
+                <script>
+                    var y = document.getElementById('public-howto-arrow-id');
+                    y.className += " public-menu-active";
+                </script>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

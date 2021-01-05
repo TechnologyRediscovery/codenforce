@@ -2169,6 +2169,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 daysInFuture = FALLBACK_DAYSTOCOMPLY;
             }
             cv.setViolatedEnfElement(ece);
+            cv.setDescription(ece.getDefaultViolationDescription());
             cv.setStipulatedComplianceDate(LocalDateTime.now().plusDays(daysInFuture));
             cv.setDateOfRecord(LocalDateTime.now());
             cv.setPenalty(ece.getNormPenalty());

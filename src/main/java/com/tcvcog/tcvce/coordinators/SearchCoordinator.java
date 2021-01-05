@@ -497,12 +497,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 
             //If our params are searching for a property, then let's make sure 
             //to replace all spaces in the address with wildcards.
-            if(params instanceof SearchParamsProperty ){
-                SearchParamsProperty temp = (SearchParamsProperty) params;
-                if(temp.getAddress_val() != null){
-                    temp.setAddress_val(temp.getAddress_val().replaceAll(" ", "%"));
-                    params = temp;
-                }
+
+            if(params instanceof SearchParamsProperty){
+//                SearchParamsProperty temp = (SearchParamsProperty) params;
+//                temp.setAddress_val(temp.getAddress_val().replaceAll(" ", "%"));
+//                params = temp;
                 
             }
             

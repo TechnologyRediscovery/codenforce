@@ -134,14 +134,14 @@ public class CodeSetBB
      * @param event
      * @return 
      */
-    public String onCodeSetUpdateCommitButtonChange(ActionEvent event) {
+    public String onCodeSetUpdateCommitButtonChange() {
         CodeCoordinator cc = getCodeCoordinator();
 
         try {
             cc.updateCodeSetMetadata(currentCodeSet);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully update code set ID " + currentCodeSet.getCodeSetID(),
+                            "Successfully update code book ID " + currentCodeSet.getCodeSetID(),
                             ""));
            return "codeSetManage";
             
@@ -243,7 +243,7 @@ public class CodeSetBB
             cc.activateCodeSetAsMuniDefault(currentCodeSet, selectedMuniForCodeSetMapping);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Code set ID " + currentCodeSet.getCodeSetID() + " has beeen nuked forever!", ""));
+                            "Code book: " + currentCodeSet.getCodeSetName()+ " is now the active book for " + selectedMuniForCodeSetMapping.getMuniName(), ""));
             return "codeSetManage";
         } catch (IntegrationException ex) {
             System.out.println(ex);
