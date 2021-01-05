@@ -642,7 +642,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * The Primefaces can't compare enums in EL. So, this translates the type to
+     * Primefaces can't compare enums in EL. So, this translates the type to
      * an integer value so it can make sure to render the correct elements.
      * @return 
      */
