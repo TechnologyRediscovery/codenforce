@@ -169,3 +169,156 @@ WITH (
 );
 ALTER TABLE public.photodoc
   OWNER TO sylvia;
+
+-- New linking tables
+
+CREATE TABLE public.ceactionrequestpdfdoc
+(
+  pdfdoc_pdfdocid integer NOT NULL,
+  ceactionrequest_requestid integer NOT NULL,
+  CONSTRAINT ceactionrequestpdfdoc_pk PRIMARY KEY (pdfdoc_pdfdocid, ceactionrequest_requestid),
+  CONSTRAINT ceactionrequestpdfdoc_cear_fk FOREIGN KEY (ceactionrequest_requestid)
+      REFERENCES public.ceactionrequest (requestid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT ceactionrequestpdfdoc_pdfdoc_fk FOREIGN KEY (pdfdoc_pdfdocid)
+      REFERENCES public.pdfdoc (pdfdocid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.ceactionrequestpdfdoc
+  OWNER TO sylvia;
+
+
+CREATE TABLE public.codeviolationpdfdoc
+(
+  pdfdoc_pdfdocid integer NOT NULL,
+  codeviolation_violationid integer NOT NULL,
+  CONSTRAINT codeviolationpdfdoc_pk PRIMARY KEY (pdfdoc_pdfdocid, codeviolation_violationid),
+  CONSTRAINT codeviolationpdfdoc_cv_fk FOREIGN KEY (codeviolation_violationid)
+      REFERENCES public.codeviolation (violationid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT codeviolationpdfdoc_pdfdoc_fk FOREIGN KEY (pdfdoc_pdfdocid)
+      REFERENCES public.pdfdoc (pdfdocid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.codeviolationpdfdoc
+  OWNER TO sylvia;
+
+
+CREATE TABLE public.munipdfdoc
+(
+  pdfdoc_pdfdocid integer NOT NULL,
+  muni_municode integer NOT NULL,
+  CONSTRAINT munipdfdoc_pk PRIMARY KEY (pdfdoc_pdfdocid, muni_municode),
+  CONSTRAINT munipdfdoc_muni_fk FOREIGN KEY (muni_municode)
+      REFERENCES public.municipality (municode) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT munipdfdoc_pdid_fk FOREIGN KEY (pdfdoc_pdfdocid)
+      REFERENCES public.pdfdoc (pdfdocid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.munipdfdoc
+  OWNER TO sylvia;
+
+
+CREATE TABLE public.occinspectedspaceelementpdfdoc
+(
+  pdfdoc_pdfdocid integer NOT NULL,
+  inspectedspaceelement_elementid integer NOT NULL,
+  CONSTRAINT inspchklstspelepdf_pk PRIMARY KEY (pdfdoc_pdfdocid, inspectedspaceelement_elementid),
+  CONSTRAINT occinspectedspaceelementpdfdoc_inspectedele_fk FOREIGN KEY (inspectedspaceelement_elementid)
+      REFERENCES public.occinspectedspaceelement (inspectedspaceelementid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT occinspectedspaceelementpdfdoc_pdfdocid_fk FOREIGN KEY (pdfdoc_pdfdocid)
+      REFERENCES public.pdfdoc (pdfdocid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.occinspectedspaceelementpdfdoc
+  OWNER TO sylvia;
+
+
+CREATE TABLE public.occperiodpdfdoc
+(
+  pdfdoc_pdfdocid integer NOT NULL,
+  occperiod_periodid integer NOT NULL,
+  CONSTRAINT occperiodpdfdoc_pk PRIMARY KEY (pdfdoc_pdfdocid, occperiod_periodid),
+  CONSTRAINT occperiodpdfdoc__occperiod_fk FOREIGN KEY (occperiod_periodid)
+      REFERENCES public.occperiod (periodid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT occperiodpdfdoc_pdfdoc_fk FOREIGN KEY (pdfdoc_pdfdocid)
+      REFERENCES public.pdfdoc (pdfdocid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.occperiodpdfdoc
+  OWNER TO sylvia;
+
+
+CREATE TABLE public.parcelpdfdoc
+(
+  pdfdoc_pdfdocid integer NOT NULL,
+  parcel_parcelkey integer NOT NULL,
+  CONSTRAINT parcelpdfdoc_pk PRIMARY KEY (pdfdoc_pdfdocid, parcel_parcelkey),
+  CONSTRAINT parcelpdfdoc_cv_fk FOREIGN KEY (parcel_parcelkey)
+      REFERENCES public.parcel (parcelkey) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT parcelpdfdoc_phdoc_fk FOREIGN KEY (pdfdoc_pdfdocid)
+      REFERENCES public.pdfdoc (pdfdocid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.parcelpdfdoc
+  OWNER TO sylvia;
+
+
+CREATE TABLE public.parcelphotodoc
+(
+  photodoc_photodocid integer NOT NULL,
+  parcel_parcelkey integer NOT NULL,
+  CONSTRAINT parcelphotodoc_pk PRIMARY KEY (photodoc_photodocid, parcel_parcelkey),
+  CONSTRAINT parcelphotodoc_cv_fk FOREIGN KEY (parcel_parcelkey)
+      REFERENCES public.parcel (parcelkey) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT parcelphotodoc_phdoc_fk FOREIGN KEY (photodoc_photodocid)
+      REFERENCES public.photodoc (photodocid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.parcelphotodoc
+  OWNER TO sylvia;
+
+
+CREATE TABLE public.propertypdfdoc
+(
+  pdfdoc_pdfdocid integer NOT NULL,
+  property_propertyid integer NOT NULL,
+  CONSTRAINT propertypdfdoc_pk PRIMARY KEY (pdfdoc_pdfdocid, property_propertyid),
+  CONSTRAINT propertypdfdoc_pdid_fk FOREIGN KEY (pdfdoc_pdfdocid)
+      REFERENCES public.pdfdoc (pdfdocid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT propertypdfdoc_prop_fk FOREIGN KEY (property_propertyid)
+      REFERENCES public.property (propertyid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.propertypdfdoc
+  OWNER TO sylvia;
