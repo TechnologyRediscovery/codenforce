@@ -235,7 +235,7 @@ public class CECaseSearchProfileBB
         
          currentViolation = getSessionBean().getSessCodeViolation();
             if (currentViolation == null) {
-                if (currentCase != null && !currentCase.getViolationList().isEmpty()) {
+                if (currentCase != null && currentCase.getViolationList() != null && !currentCase.getViolationList().isEmpty()) {
                     currentViolation = currentCase.getViolationList().get(0);
                 }
             }
@@ -275,16 +275,19 @@ public class CECaseSearchProfileBB
     
     /**
      * Listener for requests to reload the current CECaseDataHeavy
-     * @param ev 
+     * @return  
      */
-    public void refreshCurrentCase(ActionEvent ev){
-        reloadCase();
+    public String refreshCurrentCase(){
+        return "ceCaseProfile";
+        
     }
     
     public void reloadCase(){
         CaseCoordinator cc = getCaseCoordinator();
         try {
             currentCase = cc.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                "Refreshed case!", ""));
         } catch (BObStatusException  | IntegrationException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -415,7 +418,7 @@ public class CECaseSearchProfileBB
      * @return 
      */
     public String onCaseOpenButtonChange(){
-        getSessionBean().getNavStack().pushPage("ceCaseSearchProfile");
+        getSessionBean().getNavStack().pushPage("ceCaseProfile");
         return "caseAdd";
         
     }
@@ -432,10 +435,22 @@ public class CECaseSearchProfileBB
       * @return 
       */
      public String onCaseUpdateButtonChange(){
-         CaseCoordinator cc = getCaseCoordinator();
+        
+         updateCaseMetatData(currentCase);
+         return "ceCaseProfile";
+    }
+     
+     /**
+      * Funnel for all updateXXX methods on cases
+      * The caller is responsible for updating notes to 
+      * document the field changes, value by value
+      * @param cse the case with updated fields
+      */
+     private void updateCaseMetatData(CECase cse){
+          CaseCoordinator cc = getCaseCoordinator();
         
         try {
-            cc.cecase_updateCECaseMetadata(currentCase);
+            cc.cecase_updateCECaseMetadata(currentCase, getSessionBean().getSessUser());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "Case metadata updated", ""));
         } catch (BObStatusException | IntegrationException ex) {
@@ -445,8 +460,7 @@ public class CECaseSearchProfileBB
             
         }
          
-         return "ceCaseSearchProfile";
-    }
+     }
      
     
      /**
@@ -472,7 +486,7 @@ public class CECaseSearchProfileBB
                 ex.getMessage(), ""));
             
         }
-        return "ceCaseSearchProfile";
+        return "ceCaseProfile";
         
     }
     
@@ -501,16 +515,77 @@ public class CECaseSearchProfileBB
                 ex.getMessage(), ""));
             
         }
-        return "ceCaseSearchProfile";
+        return "ceCaseProfile";
         
     }
+    
+    /**
+     * Listener for user requests to begin operation
+     * @param ev 
+     */
+    public void onCaseRenameInitButtonChange(ActionEvent ev){
+        
+        
+    }
+    
+    /**
+     * User requests to commit rename operation
+     * @return reload case profile page
+     */
+    public String onCaseRenameCommitButtonChange(){
+        updateCaseMetatData(currentCase);
+        return "ceCaseProfile";
+        
+    }
+    
+    
+    /**
+     * Listener for user requests to begin operation
+     * @param ev 
+     */
+    public void onCaseChangeManagerInitButtonChange(ActionEvent ev){
+        
+        
+    }
+    
+    /**
+     * User requests to commit change manager operation
+     * @return reload case profile page
+     */
+    public String onCaseChangeManagerCommitButtonChange(){
+        updateCaseMetatData(currentCase);
+        return "ceCaseProfile";
+        
+    }
+    
+    
+    /**
+     * Listener for user requests to begin operation
+     * @param ev 
+     */
+    public void onCaseUpdateDORInitButtonChange(ActionEvent ev){
+        
+        
+    }
+    
+    /**
+     * User requests to commit update DOR operation
+     * @return reload case profile page
+     */
+    public String onCaseUpdateDORCommitButtonChange(){
+        updateCaseMetatData(currentCase);
+        return "ceCaseProfile";
+        
+    }
+    
+    
     
       /**
      * Listener for commencement of note writing process
      *
      * @param ev
      */
-    public void onNoteInitButtonChange(ActionEvent ev) {
+    public void onCaseNoteInitButtonChange(ActionEvent ev) {
         formNoteText = new String();
 
     }
@@ -524,7 +599,7 @@ public class CECaseSearchProfileBB
      * @param ev
      * @return 
      */
-    public String onNoteCommitButtonChange(ActionEvent ev) {
+    public String onCaseNoteCommitButtonChange() {
         CaseCoordinator cc = getCaseCoordinator();
         
         MessageBuilderParams mbp = new MessageBuilderParams();
@@ -548,7 +623,7 @@ public class CECaseSearchProfileBB
 
         }
 
-        return "ceCaseSearchProfile";
+        return "ceCaseProfile";
 
     }
     
@@ -853,6 +928,13 @@ public class CECaseSearchProfileBB
 
     }
     
+    /**
+     * Catch all for cancellation requests
+     * @param ev 
+     */
+    public void onOperationCancelButtonChange(ActionEvent ev){
+        //  nothing to do here yet
+    }
     
     
     
@@ -920,7 +1002,8 @@ public class CECaseSearchProfileBB
      * @param ev
      */
     public void onViolationNullifyInitButtonChange(ActionEvent ev){
-        // nothing to do here
+        // nothing to do here since we got to this point 
+        // having viewed the violation so currentViolation is correct
     }
     
     
@@ -1464,7 +1547,10 @@ public class CECaseSearchProfileBB
     public String onViolationNullifyCommitButtonChange(){
         CaseCoordinator cc = getCaseCoordinator();
          try {
-            cc.violation_deactivateCodeViolation(getCurrentViolation(), getSessionBean().getSessUser());
+            cc.violation_NullifyCodeViolation(currentViolation, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Success! Violation nullified.", ""));
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,

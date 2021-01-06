@@ -45,7 +45,12 @@ public enum ViolationStatusEnum {
     UNRESOLVED_CITED(                       "Unresolved with citation", 
                                             "Days since end of compliance timeframe: ",
                                             "codeviolation_unresolved_citation_iconid",
-                                            3);
+                                            3),
+    
+    NULLIFIED(                              "Nullified",
+                                            "",
+                                            "codeviolation_nullified_iconid",
+                                            -1);
     
     
     private final String label;

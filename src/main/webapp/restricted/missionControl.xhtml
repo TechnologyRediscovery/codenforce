@@ -381,7 +381,7 @@
                                                 toggleable="true"
                                                 widgetVar="cecase-caselist-panel-var"
                                                 collapsed="false"
-                                                rendered="#{userConfigBB.activeLookupMode}"
+                                                rendered="#true"
                                                 header="Code Enforcement Case List">
                                     <h:form id="cecase-search-results-form" >
 
@@ -465,7 +465,7 @@
                                                 <p:commandButton id="cecase-search-view-case"
                                                                      icon="fa fa-folder-open-o"
                                                                      value="Details"
-                                                                     action="#{missionControlBB.onViewCECaseButtonChange(prop)}"
+                                                                     action="#{missionControlBB.onViewCECaseButtonChange(c)}"
                                                                      ajax="false"
                                                                      />
                                             </p:column>

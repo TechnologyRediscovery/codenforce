@@ -255,7 +255,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
         cse.setClosingDate(LocalDateTime.now());
         ci.updateCECaseMetadata(cse);
-        events_processClosingEvent(cse, ec.initEvent(cse, closeEventCat));
+        events_processClosingEvent(cse, ec.initEvent(cse, closeEventCat), ua);
         
     }
 
@@ -276,6 +276,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             cse = ci.getCECase(caseID);
             if (cse != null) {
 
+                // Inject all cases with lists of their violations, notices, citations, 
+                // and events, which will be used to determine case phase
                 cse.setNoticeList(nov_getNoticeOfViolationList(ci.novGetList(cse)));
                 Collections.sort(cse.getNoticeList());
                 Collections.reverse(cse.getNoticeList());
@@ -286,6 +288,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 Collections.sort(cse.getViolationList());
                 
                 cse.setEventList(ec.getEventList(cse));
+                Collections.sort(cse.getEventList());
+                Collections.reverse(cse.getEventList());
 
                 cse = cecase_configureCECaseStageAndPhase(cse);
             }
@@ -869,11 +873,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * (opening date, closing date, etc.). If all is well, pass to integrator.
      *
      * @param c the CECaseDataHeavy to be updated
+     * @param ua the user doing the updating
      * @throws BObStatusException
      * @throws IntegrationException
      */
-    public void cecase_updateCECaseMetadata(CECaseDataHeavy c) throws BObStatusException, IntegrationException {
+    public void cecase_updateCECaseMetadata(CECaseDataHeavy c, UserAuthorized ua) throws BObStatusException, IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
+        if(ua == null || c == null) throw new BObStatusException("Cannot update case with null case or user");
+        // the supplied user is the updator
+        c.setLastUpdatedBy(ua);
+        // Logic check for changes to the case closing date
         if (c.getClosingDate() != null) {
             if (c.getClosingDate().isBefore(c.getOriginationDate())) {
                 throw new BObStatusException("You cannot update a case's origination date to be after its closing date");
@@ -1236,7 +1245,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      * @throws BObStatusException
      */
-    private int events_processClosingEvent(CECaseDataHeavy c, EventCnF e) throws IntegrationException, BObStatusException {
+    private int events_processClosingEvent(CECaseDataHeavy c, EventCnF e, UserAuthorized ua) throws IntegrationException, BObStatusException {
         EventIntegrator ei = getEventIntegrator();
 
         CasePhaseEnum closedPhase = CasePhaseEnum.Closed;
@@ -1244,7 +1253,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         if(c.getClosingDate() == null){
             c.setClosingDate(LocalDateTime.now());
-            cecase_updateCECaseMetadata(c);
+            cecase_updateCECaseMetadata(c, ua);
         }
         // now load up the closing event before inserting it
         // we'll probably want to get this text from a resource file instead of
@@ -2080,7 +2089,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         cv.setCitationIDList(ci.getCitations(cv.getViolationID()));
         cv.setNoticeIDList(ci.novGetNOVIDList(cv));
         
-        if (cv.getActualComplianceDate() == null) {
+        // nullification overrides all
+        if(cv.getNullifiedTS() != null){
+                cv.setStatus(ViolationStatusEnum.NULLIFIED);
+                cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString(cv.getStatus().getIconPropertyName()))));
+            
+        } else if (cv.getActualComplianceDate() == null) {
             // violation still within compliance timeframe
             if (cv.getDaysUntilStipulatedComplianceDate() >= 0) {
 
@@ -2318,12 +2333,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         // inject appropriate values into CV before updating
         if(cv != null && ua != null){
             // cannot nullify a violation for which compliance has been achieved
-            if(cv.getActualComplianceDate() != null){
+            if(cv.getActualComplianceDate() == null){
                 cv.setNullifiedTS(LocalDateTime.now());
                 cv.setNullifiedUser(ua);
+                System.out.println("CaseCoordinator.violation_NullifyCodeViolation: ready to nullify in integrator");
                 ci.updateCodeViolation(cv);
+            } else {
+                throw new BObStatusException("Cannot nullify a violation that has compliance marked");
+                
             }
+        } else {
+            throw new BObStatusException("Cannot nullify a violation with null CV or User");
+            
         }
+        
 
     }
 

@@ -878,7 +878,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      * Listener for user requests to create a new notice
      * @return 
      */
-    public void onInsertNewNoticeButtonChange() {
+    public String onInsertNewNoticeButtonChange() {
         CaseCoordinator cc = getCaseCoordinator();
         try {
                 if(currentNotice.getRecipient() == null){
@@ -891,13 +891,18 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                     
                 }
             // make sure our person list is up to date
-            currentCase = getSessionBean().getSessCECase();
-            refreshCurrentCase();
+//            currentCase = getSessionBean().getSessCECase();
+//            refreshCurrentCase();
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+            return "";
+            
         }
+        return "ceCaseProfile";
+        
     } // close method
+    
 
    
 /**
@@ -917,7 +922,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
             return "";
         }
-        return "ceCaseSearchProfile";
+        return "ceCaseProfile";
     } // close method
 
    

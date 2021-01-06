@@ -82,7 +82,7 @@ public class CECaseAddBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully added case to property! Access the case from the list below.", ""));
             //Send them back to the last page!
-            return getSessionBean().getNavStack().popLastPage();
+            return "missionControl";
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -96,16 +96,16 @@ public class CECaseAddBB extends BackingBeanUtils implements Serializable {
                             + "I couldn't do that, though, sorry..",
                             "Best try again or note the error and complain to Eric."));
             System.out.println(ex);
-        } catch (NavigationException ex) {
-            System.out.println("CECaseAddBB.addNewCase() | ERROR: " + ex);
-            //We must do things a little bit different here to make sure messages are kept after the redirect.
-            FacesContext context = getFacesContext();
-                    context.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occured while trying to direct you back to the page you were last on, but your changes were saved."
-                            + " Please return to the page manually.",
-                            "Do not hit the return button again but note the error."));
-                    context.getExternalContext().getFlash().setKeepMessages(true);
+//        } catch (NavigationException ex) {
+//            System.out.println("CECaseAddBB.addNewCase() | ERROR: " + ex);
+//            //We must do things a little bit different here to make sure messages are kept after the redirect.
+//            FacesContext context = getFacesContext();
+//                    context.addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                            "An error occured while trying to direct you back to the page you were last on, but your changes were saved."
+//                            + " Please return to the page manually.",
+//                            "Do not hit the return button again but note the error."));
+//                    context.getExternalContext().getFlash().setKeepMessages(true);
 
         } catch (ViolationException | EventException | SearchException ex) {
             System.out.println(ex);

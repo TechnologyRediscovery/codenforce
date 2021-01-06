@@ -39,7 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         <h:form id="messages-global-form">
 
                             <p:growl id="messages-global-growl"
-                                     redisplay="false"
+                                     redisplay="true"
                                      />
                         </h:form>
 
@@ -53,6 +53,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         </h:form>
 
                         <div class="mainContainer">
+                            <div class="page-links">
+                                <a href="#cecase-profile-panel">case profile</a>
+                                <h:outputText value=" | " />
+                                <a href="#cecase-violations-panel">
+                                    <h:outputText value="violations (#{ceCaseSearchProfileBB.currentCase.violationList.size()})" />
+                                </a>
+                                <h:outputText value=" | " />
+                                <a href="#cecase-notices-panel">
+                                    <h:outputText value="notices (#{ceCaseSearchProfileBB.currentCase.noticeList.size()})" />
+                                </a>
+                                <h:outputText value=" | " />
+                                <a href="#cecase-citations-panel">
+                                    <h:outputText value="citations (#{ceCaseSearchProfileBB.currentCase.citationList.size()})" />
+                                </a>
+                                <h:outputText value=" | " />
+                                <a href="#cecase-events-panel">
+                                    <h:outputText value="events (#{ceCaseSearchProfileBB.currentCase.eventList.size()})" />
+                                </a>
+                                <h:outputText value=" | " />
+                                <a href="#cecase-cears-panel">
+                                    <h:outputText value="action requests (#{ceCaseSearchProfileBB.currentCase.ceActionRequestList.size()})" />
+                                </a>
+                                <h:outputText value=" | " />
+                                <a href="#cecase-blobs-panel">
+                                    <h:outputText value="photos &amp; blobs" />
+                                </a>
+                                <h:outputText value=" | " />
+                                <a href="#cecase-fees-panel">
+                                    <h:outputText value="fees" />
+                                </a>
+                                <h:outputText value=" | " />
+                                <a href="#cecase-payments-panel">
+                                    <h:outputText value="payments" />
+                                </a>
+                                <h:outputText value=" | " />
+                                <a href="#cecase-notes-panel">
+                                    <h:outputText value="notes" />
+                                </a>
+                                <h:outputText value=" | " />
+                                <a href="#cecase-public-panel">
+                                    <h:outputText value="public access" />
+                                </a>
+                            </div>
+
                             <div class="ui-g data_container_nested_restrict">
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
 
@@ -67,7 +111,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                             <div class="ui-g data_container_nested_restrict">
-                                                <div class="ui-g-12 ui-md-8 ui-lg-8 restrict-data-field">
+                                                <div class="ui-g-12 ui-md-10 ui-lg-10 restrict-data-field">
                                                     <div class="restrict-data-field-label-inline" >
                                                         <p:outputLabel for="case-name-ot">
                                                             <h:outputText value="Name "/>
@@ -80,20 +124,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                        value="#{ceCaseSearchProfileBB.currentCase.caseName}" />
                                                     </div>
                                                 </div>
-                                                <div class="ui-g-12 ui-md-4 ui-lg-4 restrict-data-field">
-                                                    <div class="restrict-main-contents-io-button gray_button">
+                                                <div class="ui-g-12 ui-md-2 ui-lg-2 restrict-data-field">
+                                                <div class="restrict-main-contents-io-link">
 
-                                                        <p:commandButton    id="case-rename-cb" 
+                                                        <p:commandLink      id="case-rename-cb" 
                                                                             ajax="true" 
-                                                                            actionListener="#{ceCaseSearchProfileBB.exploreProperty}"
-                                                                            icon="fa fa-edit" 
-                                                                            styleClass="noFill button-size-small"
+                                                                            actionListener="#{ceCaseSearchProfileBB.onCaseRenameInitButtonChange}"
+                                                                            oncomplete="PF('case-rename-dialog-var').show()"
+                                                                            style="color:blue;"
                                                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                            value="rename" />
+                                                                            value="rename case" />
 
 
                                                     </div>
-                                                    
+
                                                 </div>
                                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
                                                     <div class="restrict-data-field-label-inline" >
@@ -124,7 +168,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
                                                 </div>
 
-                                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                                                <div class="ui-g-12 ui-md-8 ui-lg-8 restrict-data-field">
                                                     <div class="restrict-data-field-label-inline" >
                                                         <p:outputLabel for="case-manager-ot">
                                                             <h:outputText value="Manager"/>
@@ -141,12 +185,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                       value="(#{ceCaseSearchProfileBB.currentCase.caseManager.username})" />
                                                     </div>
                                                 </div>
+                                                <div class="ui-g-12 ui-md-4 ui-lg-4 restrict-data-field">
+                                                    <div class="restrict-main-contents-io-link">
+
+                                                        <p:commandLink      id="case-update-manager-cb" 
+                                                                            ajax="true" 
+                                                                            actionListener="#{ceCaseSearchProfileBB.onCaseChangeManagerInitButtonChange}"
+                                                                            style="color:blue;"
+                                                                            oncomplete="PF('case-changemanager-dialog-var').show()"
+                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                            value="change manager" />
+
+
+                                                    </div>
+
+                                                </div>
                                             </div>
 
                                             <div class="ui-g data_container_nested_restrict">
 
                                                 <!--NESTED DATA FIELD VERTICAL-->
-                                                <div class="ui-g-2 ui-md-2 ui-lg-2 restrict-data-field-vertical">
+                                                <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-vertical">
                                                     <!--NESTED DATA LABEL VERTICAL -->
                                                     <div class="restrict-data-field-label-vertical" >
                                                         <h:outputLabel value=" "/>
@@ -167,7 +226,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
 
                                                 <!--NESTED DATA FIELD VERTICAL-->
-                                                <div class="ui-g-2 ui-md-2 ui-lg-2 restrict-data-field-vertical">
+                                                <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-vertical">
                                                     <!--NESTED DATA LABEL VERTICAL -->
                                                     <div class="restrict-data-field-label-vertical" >
                                                         <h:outputLabel value="Opening date"/>
@@ -175,54 +234,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <!--NESTED DATA VALUE VERTICAL -->
                                                     <div class="restrict-data-field-value-vertical" >
                                                         <h:outputText id="selcase-odate-it" value="#{ceCaseSearchProfileBB.currentCase.originiationDatePretty}"/>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE VERTICAL -->
+                                                    <div class="restrict-data-field-value-vertical" >
                                                         <h:outputText id="selcase-age-it" 
                                                                       value=" (#{ceCaseSearchProfileBB.currentCase.caseAge} days ago)" 
                                                                       rendered="#{empty ceCaseSearchProfileBB.currentCase.closingDate}"/>
                                                     </div>
-                                                    <!--NESTED DATA VALUE VERTICAL -->
                                                     <div class="restrict-data-field-value-vertical" >
-                                                        <h:outputText value=" " />
-                                                    </div>
-                                                    <div class="restrict-data-field-value-vertical" >
+                                                        <div class="restrict-main-contents-io-link">
 
-                                                        <p:commandButton    id="violation-update-dor-init-cb" 
-                                                                            ajax="true" 
-                                                                            actionListener="#{ceCaseSearchProfileBB.onViolationUpdateDORInitButtonChange}"
-                                                                            oncomplete="PF('violation-update-dor-dialog-var').show()"
-                                                                            disabled="false"
-                                                                            icon="fa fa-edit" 
-                                                                            styleClass="noFill"
-                                                                            value="Change opening date" />
+                                                            <p:commandLink      id="case-updatedor-init-cb" 
+                                                                                ajax="true" 
+                                                                                actionListener="#{ceCaseSearchProfileBB.onViolationUpdateDORInitButtonChange}"
+                                                                                oncomplete="PF('case-updatedor-dialog-var').show()"
+                                                                                disabled="false"
+                                                                                style="color:blue;"
+                                                                                value="change opening date" />
+                                                        </div>
 
 
                                                     </div>
                                                 </div>
 
                                                 <!--NESTED DATA FIELD VERTICAL-->
-                                                <div class="ui-g-2 ui-md-2 ui-lg-2 restrict-data-field-vertical">
+                                                <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-vertical">
                                                     <!--NESTED DATA LABEL VERTICAL -->
                                                     <div class="restrict-data-field-label-vertical" >
                                                         <h:outputLabel value="Closing date"/>
                                                     </div>
                                                     <!--NESTED DATA VALUE VERTICAL -->
                                                     <div class="restrict-data-field-value-vertical" >
+                                                        <h:outputText value="&nbsp;"/>
                                                         <h:outputText id="selcase-cdate-it" value="#{ceCaseSearchProfileBB.currentCase.closingDatePretty}"/>
                                                     </div>
                                                     <!--NESTED DATA VALUE VERTICAL -->
                                                     <div class="restrict-data-field-value-vertical" >
-                                                        <h:outputText value=" " />
+                                                        <h:outputText value="&nbsp;"/>
                                                     </div>
 
                                                     <div class="restrict-data-field-value-vertical" >
-                                                        <p:commandButton    id="violation-update-stipdate-init-cb" 
-                                                                            ajax="true" 
-                                                                            actionListener="#{ceCaseSearchProfileBB.onViolationUpdateStipDateInitButtonChange}"
-                                                                            oncomplete="PF('violation-update-stipdate-dialog-var').show()"
-                                                                            disabled="false"
-                                                                            icon="fa fa-edit" 
-                                                                            styleClass="noFill"
-                                                                            value="Force close case" />
+                                                         <div class="restrict-main-contents-io-link">
 
+                                                            <p:commandLink      id="cecase-forceclose-init-cb" 
+                                                                                ajax="true" 
+                                                                                actionListener="#{ceCaseSearchProfileBB.onCaseForceCloseInitButtonChange}"
+                                                                                oncomplete="PF('case-forceclose-dialog-var').show()"
+                                                                                disabled="false"
+                                                                                style="color:blue;"
+                                                                                value="force close case" />
+
+                                                        </div>
 
                                                     </div>
                                                 </div>
@@ -231,14 +293,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <div class="ui-g data_container_nested_restrict">
 
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="view-property-cb">
+                                                            <h:outputText value="Case management tools "/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                </div>
                                                 <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
-                                                    <div class="restrict-main-contents-io-button gray_button">
+                                                     <div class="restrict-main-contents-io-link">
 
-                                                        <p:commandButton    id="view-property-cb" 
+                                                        <p:commandLink      id="view-property-cb" 
                                                                             ajax="false" 
                                                                             action="#{ceCaseSearchProfileBB.exploreProperty}"
-                                                                            icon="fa fa-home" 
-                                                                            styleClass="noFill button-size-small"
+                                                                            style="color:blue;"
                                                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                                                             value="property details" />
 
@@ -247,40 +315,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
 
                                                 <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
-                                                    <div class="restrict-main-contents-io-button gray_button">
+                                                     <div class="restrict-main-contents-io-link">
 
-                                                        <p:commandButton    id="refresh-case-cb" 
-                                                                            ajax="true" 
-                                                                            actionListener="#{ceCaseSearchProfile.refreshCurrentCase}"
-                                                                            icon="fa fa-refresh" styleClass="noFill"
+                                                        <p:commandLink      id="refresh-case-cb" 
+                                                                            ajax="false" 
+                                                                            action="#{ceCaseSearchProfileBB.refreshCurrentCase}"
+                                                                            style="color:blue;"
                                                                             value="reload case" 
-                                                                            update="@all"
                                                                             />
 
                                                     </div>
                                                 </div>
 
                                                 <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
-                                                    <div class="restrict-main-contents-io-button gray_button">
-                                                        <p:commandButton    id="case-settings-cb" 
+                                                     <div class="restrict-main-contents-io-link">
+                                                        <p:commandLink      id="case-settings-cb" 
                                                                             ajax="true" 
                                                                             actionListener="#{ceCaseSearchProfileBB.onCaseSettingsInitButtonChnage}"
                                                                             oncomplete="PF('case-update-dialog-var').show()"
                                                                             disabled="false"
-                                                                            icon="fa fa-gears" 
-                                                                            styleClass="noFill"
+                                                                            style="color:blue;"
                                                                             value="case settings" />
 
                                                     </div>
                                                 </div>
 
                                                 <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
-                                                    <div class="restrict-main-contents-io-button gray_button">
+                                                     <div class="restrict-main-contents-io-link">
 
 
-                                                        <p:commandButton   id="print-case-cb" 
+                                                        <p:commandLink     id="print-case-cb" 
                                                                            ajax="true" actionListener="#{ceCaseSearchProfileBB.prepareReportCECase}"
-                                                                           icon="fa fa-print" styleClass="noFill"
+                                                                           style="color:blue;"
                                                                            oncomplete="PF('report-case-profile-diaglog-var').show()"
                                                                            value="print case profile" 
                                                                            update="report-case-profile-form"/>
@@ -288,132 +354,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                             </div>
                                         </h:form>
-                                    </p:panel>
-
-                                    <p:panel id="cecase-violations-panel"
-                                             toggleable="true"
-                                             collapsed="false"
-                                             header="Code Violations (#{ceCaseSearchProfileBB.currentCase.violationList.size()})"
-                                             rendered="true"
-                                             >
-
-
-                                        <h:form id="cecase-violations-form">
-
-                                            <p:commandButton    id="cecase-violation-add-button"
-                                                                ajax="true"
-                                                                styleClass="noFill button-size-small"
-                                                                actionListener="#{ceCaseSearchProfileBB.onViolationAddInit}"
-                                                                value="Add Violation"
-                                                                oncomplete="PF('violation-selectelement-dialog-var').show()"
-                                                                icon="fa fa-plus"
-                                                                />
-
-                                            <p:spacer height="5px" />
-
-                                            <p:dataTable
-                                                id="cecase-violations-table"
-                                                var="v"
-                                                rowKey="#{v.violationID}"
-                                                value="#{ceCaseSearchProfileBB.currentCase.violationList}"
-                                                tableStyleClass="primeDataTable"
-                                                draggableColumns="true"
-                                                reflow="true">
-
-
-                                                <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
-
-                                                <p:column width="10%" sortBy="#{v.status.label}">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Status" />
-                                                    </f:facet>
-                                                    <i class="material-icons"><h:outputText value="#{v.icon.materialIcon}" /></i>
-                                                    <p:spacer height="2px" />
-                                                    <h:outputText value="#{(!(empty v.status)) and (empty v.nullifiedTS) ? v.status.label : ''}" />
-                                                    <h:outputText value="#{!(empty v.nullifiedTS) ? 'NULLIFIED': ''}" />
-                                                </p:column>
-
-                                                <p:column width="10%">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Ordinance" />
-                                                    </f:facet>
-                                                    <h:outputText  value="&#167;#{v.violatedEnfElement.ordSecNum}:" />
-                                                    <h:outputText  value="#{v.violatedEnfElement.ordSecTitle}; " />
-                                                    <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
-                                                    <h:outputText  value="#{v.violatedEnfElement.ordSubSecTitle}" />
-                                                </p:column>
-
-                                                <p:column width="10%">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Date" />
-                                                    </f:facet>
-                                                    <h:outputText value="#{empty(v.actualComplianceDate) ? 'Compliance due on ' : ''}"
-                                                                  styleClass="compliance-date-stipulated"/>
-                                                    <h:outputText value="#{empty(v.actualComplianceDate) ? v.stipulatedComplianceDatePretty : ''}"
-                                                                  styleClass="compliance-date-stipulated"/>
-                                                    <h:outputText value="#{!empty(v.actualComplianceDate) ? 'Compliance achieved on '  : ''}"
-                                                                  styleClass="compliance-date"/>
-                                                    <h:outputText value="#{!empty(v.actualComplianceDate) ? v.actualComplianceDatePretty : ''}"
-                                                                  styleClass="compliance-date"/>
-                                                </p:column>
-
-                                                <p:column width="5%">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Days left" />
-                                                    </f:facet>
-                                                    <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
-
-                                                </p:column>
-
-                                                <p:column width="20%">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Actions" />
-                                                    </f:facet>
-
-                                                    <p:commandButton  id="violation-compliance-init-cb"
-                                                                      ajax="true" 
-                                                                      value="Record compliance"
-                                                                      actionListener="#{ceCaseSearchProfileBB.onViolationRecordComplianceInitButtonChange(v)}"
-                                                                      icon="fa fa-check"
-                                                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions and empty(v.actualComplianceDate)}"
-                                                                      update="violation-compliance-dialog
-                                                                      violation-compliance-form"
-                                                                      oncomplete="PF('violation-compliance-dialog-var').show()"/>
-
-                                                    <p:spacer height="2px" />
-                                                    <div class="gray_button">
-
-                                                        <p:commandButton  id="violation-update-init-cb"
-                                                                          ajax="true" 
-                                                                          value="Details/Actions"
-                                                                          actionListener="#{ceCaseSearchProfileBB.onViolationUpdateInitButtonChange(v)}"
-                                                                          icon="fa fa-cog"
-                                                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                          update="violation-details-dialog
-                                                                          violation-details-form"
-                                                                          oncomplete="PF('violation-details-dialog-var').show()"/>
-                                                    </div>
-
-                                                    <p:spacer height="2px" />
-                                                    <div class="gray_button">
-                                                        <p:commandButton  id="violation-notes-init-cb"
-                                                                          ajax="true" 
-                                                                          value="Notes"
-                                                                          actionListener="#{ceCaseSearchProfileBB.onViolationNotesInitButtonChange(v)}"
-                                                                          icon="fa fa-sticky-note"
-                                                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                          update="violation-notes-dialog
-                                                                          violation-notes-form"
-                                                                          oncomplete="PF('violation-notes-dialog-var').show()"/>
-                                                    </div>
-                                                </p:column>
-
-                                            </p:dataTable>
-
-
-                                        </h:form>
-
-
                                     </p:panel>
 
                                     <p:panel id="cecase-notices-panel"
@@ -643,6 +583,137 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </p:panel>
                                 </div>
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
+                                    <p:panel id="cecase-violations-panel"
+                                             toggleable="true"
+                                             collapsed="false"
+                                             header="Code Violations (#{ceCaseSearchProfileBB.currentCase.violationList.size()})"
+                                             rendered="true"
+                                             >
+
+
+                                        <h:form id="cecase-violations-form">
+
+                                            <p:commandButton    id="cecase-violation-add-button"
+                                                                ajax="true"
+                                                                styleClass="noFill button-size-small"
+                                                                actionListener="#{ceCaseSearchProfileBB.onViolationAddInit}"
+                                                                value="Add Violation"
+                                                                oncomplete="PF('violation-selectelement-dialog-var').show()"
+                                                                icon="fa fa-plus"
+                                                                />
+
+                                            <p:spacer height="5px" />
+
+                                            <p:dataTable
+                                                id="cecase-violations-table"
+                                                var="v"
+                                                rowKey="#{v.violationID}"
+                                                value="#{ceCaseSearchProfileBB.currentCase.violationList}"
+                                                tableStyleClass="primeDataTable"
+                                                draggableColumns="true"
+                                                reflow="true">
+
+
+                                                <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                                <p:column width="10%" sortBy="#{v.status.label}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Status" />
+                                                    </f:facet>
+                                                    <i class="material-icons"><h:outputText value="#{v.icon.materialIcon}" /></i>
+                                                    <p:spacer height="2px" />
+                                                    <h:outputText value="#{!(empty v.status) ? v.status.label : ''}" />
+                                               
+                                                </p:column>
+
+                                                <p:column width="10%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Ordinance" />
+                                                    </f:facet>
+                                                    <h:outputText  value="&#167;#{v.violatedEnfElement.ordSecNum}:" />
+                                                    <h:outputText  value="#{v.violatedEnfElement.ordSecTitle}; " />
+                                                    <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
+                                                    <h:outputText  value="#{v.violatedEnfElement.ordSubSecTitle}" />
+                                                </p:column>
+
+                                                <p:column width="10%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Date" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{(empty v.actualComplianceDate) and (empty v.nullifiedTS) ? 'Compliance due on ' : ''}"
+                                                                  styleClass="compliance-date-stipulated"/>
+                                                    <h:outputText value="#{(empty v.actualComplianceDate) and (empty v.nullifiedTS)  ? v.stipulatedComplianceDatePretty : ''}"
+                                                                  styleClass="compliance-date-stipulated"/>
+                                                    <h:outputText value="#{!empty(v.actualComplianceDate) ? 'Compliance achieved on '  : ''}"
+                                                                  styleClass="compliance-date"/>
+                                                    <h:outputText value="#{!empty(v.actualComplianceDate) ? v.actualComplianceDatePretty : ''}"
+                                                                  styleClass="compliance-date"/>
+                                                    <h:outputText value="#{!empty(v.nullifiedTS) ? 'Nullified on '  : ''}"
+                                                                  styleClass="compliance-date-nullified"/>
+                                                    <h:outputText value="#{!empty(v.nullifiedTS) ? ceCaseSearchProfileBB.getPrettyDate(v.nullifiedTS): ''}"
+                                                                  styleClass="compliance-date-nullified"/>
+                                                </p:column>
+
+                                                <p:column width="5%"
+                                                          sortBy="#{v.daysUntilStipulatedComplianceDate}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Days left" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{empty v.actualComplianceDate and empty v.nullifiedTS ? v.daysUntilStipulatedComplianceDate: ''}"/>
+
+                                                </p:column>
+
+                                                <p:column width="20%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Actions" />
+                                                    </f:facet>
+
+                                                    <p:commandButton  id="violation-compliance-init-cb"
+                                                                      ajax="true" 
+                                                                      value="Record compliance"
+                                                                      actionListener="#{ceCaseSearchProfileBB.onViolationRecordComplianceInitButtonChange(v)}"
+                                                                      icon="fa fa-check"
+                                                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions and empty v.actualComplianceDate and empty v.nullifiedTS}"
+                                                                      update="violation-compliance-dialog
+                                                                      violation-compliance-form"
+                                                                      oncomplete="PF('violation-compliance-dialog-var').show()"/>
+
+                                                    <p:spacer height="2px" />
+                                                    <div class="gray_button">
+
+                                                        <p:commandButton  id="violation-update-init-cb"
+                                                                          ajax="true" 
+                                                                          value="Details/Actions"
+                                                                          actionListener="#{ceCaseSearchProfileBB.onViolationUpdateInitButtonChange(v)}"
+                                                                          icon="fa fa-cog"
+                                                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                          update="violation-details-dialog
+                                                                          violation-details-form"
+                                                                          oncomplete="PF('violation-details-dialog-var').show()"/>
+                                                    </div>
+
+                                                    <p:spacer height="2px" />
+                                                    <div class="gray_button">
+                                                        <p:commandButton  id="violation-notes-init-cb"
+                                                                          ajax="true" 
+                                                                          value="Notes"
+                                                                          actionListener="#{ceCaseSearchProfileBB.onViolationNotesInitButtonChange(v)}"
+                                                                          icon="fa fa-sticky-note"
+                                                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                          update="violation-notes-dialog
+                                                                          violation-notes-form"
+                                                                          oncomplete="PF('violation-notes-dialog-var').show()"/>
+                                                    </div>
+                                                </p:column>
+
+                                            </p:dataTable>
+
+
+                                        </h:form>
+
+
+                                    </p:panel>
 
 
                                     <p:panel id="cecase-events-panel"
@@ -1347,7 +1418,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                                                value="Add New Note"  
                                                                icon="fa fa-sticky-note-o"
-                                                               actionListener="#{ceCaseSearchProfileBB.onNoteInitButtonChange}"
+                                                               actionListener="#{ceCaseSearchProfileBB.onCaseNoteInitButtonChange}"
                                                                oncomplete="PF('cecase-note-dialog-var').show()"
                                                                update="cecase-note-create-form"/>
 
@@ -1484,7 +1555,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                          columnClasses="gridTd, gridTd">
 
                                 <h:panelGroup>
-                                    <h:outputText styleClass="ui-label" value="Note text: "/>
+                                    <h:outputText styleClass="ui-label" value="Note text: (name and time automatically inserted) "/>
                                     <p:editor   id="cecase-notes-editor"
                                                 value="#{ceCaseSearchProfileBB.formNoteText}"
                                                 controls="bold italic underline strikethrough font size style color
@@ -1498,19 +1569,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         ajax="true"  tabindex="27"
                                                         value="Cancel"
                                                         icon="fa fa-stop"
+                                                        process="@none"
                                                         immediate="true"
                                                         onclick="PF('cecase-note-dialog-var').hide()"
                                                         />
 
                                     <p:commandButton   id="cecase-dialog-notes-button-addnote"
-                                                       ajax="true" 
-                                                       actionListener="#{ceCaseSearchProfileBB.onViolationNoteCommitButtonChange}"
-                                                       oncomplete="PF('cecase-note-dialog-var').hide()"
+                                                       ajax="false" 
+                                                       action="#{ceCaseSearchProfileBB.onCaseNoteCommitButtonChange}"
                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
                                                        value="Attach Note"  
                                                        styleClass="inline-button"
-                                                       icon="fa fa-sticky-note-o"
-                                                       update="cecase-notes-form"/>
+                                                       icon="fa fa-sticky-note-o"/>
                                 </h:panelGroup>
                             </h:panelGrid>
                         </h:form>
@@ -1518,7 +1588,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                     <p:dialog   id="case-forceclose-dialog"
-                                height="650" width="900"
+                                height="450" width="600"
                                 header="Force close case"
                                 widgetVar="case-forceclose-dialog-var"
                                 closable="true" 
@@ -1526,32 +1596,237 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 >
 
                         <h:form id="cecase-forceclose-form">
+                            <div   class="ui-g data-container">
 
-                            <h:selectOneMenu id="cecase-forceclose-evcat-som"
-                                             value="#{ceCaseSearchProfileBB.closingEventCategorySelected}"
-                                             styleClass="data_field_value"
-                                             disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
-                                <f:converter converterId="eventCategoryConverter"/>
-                                <f:selectItem itemLabel="select a closing event category" 
-                                              noSelectionOption="true" />
-                                <f:selectItems id="cecase-forceclose-evcat-selitems"
-                                               value="#{ceCaseSearchProfileBB.closingEventList}"
-                                               var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
-                            </h:selectOneMenu>
+                                    <p:outputLabel for="cecase-forceclose-evcat-som"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Reason for closure prior to compliance"/>
+                                    </p:outputLabel>
+                                    <div class="restrict-main-contents-io-content">
+                                        <h:selectOneMenu id="cecase-forceclose-evcat-som"
+                                                         value="#{ceCaseSearchProfileBB.closingEventCategorySelected}"
+                                                         styleClass="data_field_value"
+                                                         disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
 
-                            <p:spacer height="5px" />
-                            <p:commandButton    id="cecase-forceclose-button"
-                                                ajax="false" 
-                                                value="Close case " 
-                                                action="#{ceCaseSearchProfileBB.onCaseForceCloseCommitButtonChnage}"  
-                                                icon="fa fa-stop"/>
+                                            <f:converter converterId="eventCategoryConverter"/>
+                                            <f:selectItem itemLabel="select a closing event category" 
+                                                          noSelectionOption="true" />
+                                            <f:selectItems id="cecase-forceclose-evcat-selitems"
+                                                           value="#{ceCaseSearchProfileBB.closingEventList}"
+                                                           var="ec" itemValue="#{ec}" itemLabel="#{ec.eventCategoryTitle}"/>
+                                        </h:selectOneMenu>
 
+                                    </div>
 
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+                                    <p:commandButton    id="cecase-forceclose-button"
+                                                        ajax="false" 
+                                                        value="Close case ID #{ceCaseSearchProfileBB.currentCase.caseID}" 
+                                                        action="#{ceCaseSearchProfileBB.onCaseForceCloseCommitButtonChnage}"  
+                                                        icon="fa fa-logout"/>
 
+                                </div>
 
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+
+                                    <div class="restrict-main-contents-io-button gray_button">
+
+                                        <p:commandButton    id="cecase-forceclse-abort-button1"
+                                                            ajax="true" 
+                                                            value="Cancel" 
+                                                            process="@none" 
+                                                            immediate="true" 
+                                                            oncomplete="PF('case-forceclose-dialog-var').hide()"
+                                                            actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}" 
+                                                            icon="fa fa-stop" />
+                                    </div>
+                                </div>
+                            </div>
                         </h:form>
+                    </p:dialog>
 
+                    <p:dialog   id="case-reame-dialog"
+                                height="450" width="600"
+                                header="Rename case"
+                                widgetVar="case-rename-dialog-var"
+                                closable="true" 
+                                rendered="true"
+                                >
+
+                        <h:form id="cecase-rename-form">
+                            <div   class="ui-g data-container">
+
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="cecase-name-it"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Case name"/>
+                                    </p:outputLabel>
+                                    <div class="restrict-main-contents-io-content">
+                                        <h:inputText    id="cecase-name-it"
+                                                        styleClass="data_field_value"
+                                                        value="#{ceCaseSearchProfileBB.currentCase.caseName}"/>
+
+                                    </div>
+
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+                                    <p:commandButton    id="cecase-rename-button"
+                                                        ajax="false" 
+                                                        value="Rename case ID #{ceCaseSearchProfileBB.currentCase.caseID}" 
+                                                        action="#{ceCaseSearchProfileBB.onCaseRenameCommitButtonChange}"  
+                                                        icon="fa fa-edit"/>
+
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+
+                                    <div class="restrict-main-contents-io-button gray_button">
+
+                                        <p:commandButton    id="cecase-rename-abort-button1"
+                                                            ajax="true" 
+                                                            value="Cancel" 
+                                                            process="@none" 
+                                                            immediate="true" 
+                                                            actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}" 
+                                                            icon="fa fa-stop"
+                                                            oncomplete="PF('case-rename-dialog-var').hide()"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </h:form>
+                    </p:dialog>
+
+                    <p:dialog   id="case-changemanager-dialog"
+                                height="450" width="600"
+                                header="Change case manager"
+                                widgetVar="case-changemanager-dialog-var"
+                                closable="true" 
+                                rendered="true"
+                                >
+
+                        <h:form id="cecase-changemanager-form">
+                            <div   class="ui-g data-container">
+
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="cecase-manager-som"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Choose a new manager user"/>
+                                    </p:outputLabel>
+                                    <div class="restrict-main-contents-io-content">
+                                        <p:selectOneMenu  id="cecase-manager-som" 
+                                                          tabindex="1" 
+                                                          value="#{ceCaseSearchProfileBB.currentCase.caseManager}"
+                                                          >
+                                            <f:selectItem itemLabel="select a user " 
+                                                          noSelectionOption="true" 
+                                                          itemDisabled="true"/>
+                                            <f:selectItems id="cecase-search-user-field-val-items" 
+                                                           value="#{systemServicesBB.userListForSearch}" 
+                                                           var="usr" itemValue="#{usr}" itemLabel="#{usr.person.firstName} #{usr.person.lastName}; username #{usr.username}" />
+                                            <f:converter converterId="userConverter" />
+                                        </p:selectOneMenu>
+
+                                    </div>
+
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+                                    <p:commandButton    id="cecase-changemanager-button"
+                                                        ajax="false" 
+                                                        value="Change manager of case ID #{ceCaseSearchProfileBB.currentCase.caseID}" 
+                                                        action="#{ceCaseSearchProfileBB.onCaseChangeManagerCommitButtonChange}"  
+                                                        icon="fa fa-user"/>
+
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+
+                                    <div class="restrict-main-contents-io-button gray_button">
+
+                                        <p:commandButton    id="cecase-changemanager-abort-button1"
+                                                            ajax="true" 
+                                                            value="Cancel" 
+                                                            process="@none" 
+                                                            immediate="true" 
+                                                            actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}" 
+                                                            icon="fa fa-stop" />
+                                    </div>
+                                </div>
+                            </div>
+                        </h:form>
+                    </p:dialog>
+
+
+                    <p:dialog   id="case-updatedor-dialog"
+                                height="450" width="600"
+                                header="Update case opening date"
+                                widgetVar="case-updatedor-dialog-var"
+                                closable="true" 
+                                rendered="true"
+                                >
+
+                        <h:form id="cecase-updatedor-form">
+                            <div   class="ui-g data-container">
+
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+
+                                    <div    id="cecase-date-origination-div"
+                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                        <p:outputLabel for="cecase-date-origination-cal"
+                                                       styleClass="data_field_label">
+
+                                            <h:outputText value="Opening date"/>
+                                        </p:outputLabel>
+
+                                        <p:calendar value="#{ceCaseSearchProfileBB.currentCase.originationDateUtilDate}" 
+                                                    mode="popup" 
+                                                    tabindex="3"
+                                                    id="cecase-date-origination-cal"
+                                                    showOn="button"
+                                                    pattern="EEE, dd MMM, yyyy"
+                                                    navigator="true"
+                                                    showButtonPanel="true"
+                                                    showTodayButton="true"
+                                                    required="true"
+                                                    styleClass="data_field_value"/>
+
+                                        <h:message for="cecase-date-origination-cal" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </div>
+
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+                                    <p:commandButton    id="cecase-updatedor-button"
+                                                        ajax="false" 
+                                                        value="Change opening date of case ID #{ceCaseSearchProfileBB.currentCase.caseID}" 
+                                                        action="#{ceCaseSearchProfileBB.onCaseUpdateDORCommitButtonChange}"  
+                                                        icon="fa fa-user"/>
+
+                                </div>
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+
+                                    <div class="restrict-main-contents-io-button gray_button">
+
+                                        <p:commandButton    id="cecase-updatedor-abort-button1"
+                                                            ajax="true" 
+                                                            value="Cancel" 
+                                                            process="@none" 
+                                                            immediate="true" 
+                                                            actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}" 
+                                                            icon="fa fa-stop" 
+                                                            oncomplete="PF('case-updatedor-dialog-var').hide()"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </h:form>
                     </p:dialog>
 
 
@@ -1565,26 +1840,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         <h:form id="updateCaseForm">
 
 
-                            <div    id="cecase-update-container-div"
-                                    class="ui-g data-container">
+                            <div class="ui-g data-container">
 
-                                <div    id="cecase-pacc-div"
-                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                    <p:outputLabel for="cecase-name-it"
-                                                   styleClass="data_field_label">
-                                        <h:outputText value="Case name"/>
-                                    </p:outputLabel>
-
-                                    <h:inputText    id="cecase-name-it"
-                                                    styleClass="data_field_value"
-                                                    value="#{ceCaseSearchProfileBB.currentCase.caseName}"/>
-                                </div>
-
-
-
-                                <div    id="cecase-property-div"
-                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
                                     <ui:remove>
                                         <p:outputLabel  value="Property"
@@ -1605,52 +1863,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 </div>
 
 
-                                <div    id="cecase-date-origination-div"
-                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                    <p:outputLabel for="cecase-date-origination-cal"
-                                                   styleClass="data_field_label">
-
-                                        <h:outputText value="Opening date"/>
-                                    </p:outputLabel>
-
-                                    <p:calendar value="#{ceCaseSearchProfileBB.currentCase.originationDateUtilDate}" 
-                                                mode="popup" 
-                                                tabindex="3"
-                                                id="cecase-date-origination-cal"
-                                                showOn="button"
-                                                pattern="EEE, dd MMM, yyyy"
-                                                navigator="true"
-                                                showButtonPanel="true"
-                                                showTodayButton="true"
-                                                required="true"
-                                                styleClass="data_field_value"/>
-
-                                    <h:message for="cecase-date-origination-cal" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </div>
-
-                                <div    id="cecase-manager-div"
-                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-                                    <p:outputLabel for="cecase-manager-som"
-                                                   styleClass="data_field_label">
-                                        <h:outputText value="Case Manager" />
-                                    </p:outputLabel>
-
-                                    <p:selectOneMenu  id="cecase-manager-som" 
-                                                      tabindex="1" 
-                                                      value="#{ceCaseSearchProfileBB.currentCase.caseManager}"
-                                                      >
-                                        <f:selectItem itemLabel="select a user " 
-                                                      noSelectionOption="true" 
-                                                      itemDisabled="true"/>
-                                        <f:selectItems id="cecase-search-user-field-val-items" 
-                                                       value="#{systemServicesBB.userListForSearch}" 
-                                                       var="usr" itemValue="#{usr}" itemLabel="#{usr.person.firstName} #{usr.person.lastName}; username #{usr.username}" />
-                                        <f:converter converterId="userConverter" />
-                                    </p:selectOneMenu>
-
-                                </div>
 
 
 
@@ -1714,19 +1926,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                 </div>
 
-                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
-                                    <div class="restrict-main-contents-io-button gray_button">
-                                        <p:commandButton    id="case-forceclose-cb" 
-                                                            ajax="true" 
-                                                            actionListener="#{ceCaseSearchProfileBB.onCaseForceCloseInitButtonChange}"
-                                                            oncomplete="PF('case-forceclose-dialog-var').show()"
-                                                            disabled="true"
-                                                            icon="fa fa-close" 
-                                                            styleClass="noFill"
-                                                            value="force close" />
-
-                                    </div>
-                                </div>
 
                             </div> 
 
@@ -4336,7 +4535,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                     <p:dialog   id="violation-nullify-dialog"
-                                height="800" width="1600"
+                                height="300" width="600"
                                 widgetVar="violation-nullify-dialog-var"
                                 responsive="true"
                                 resizable="trie"
@@ -4363,8 +4562,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         id="violation-nullify-button"
                                         icon="fa fa-trash"
                                         ajax="false"
-                                        action="#{ceCaseSearchProfileBB.onViolationRemoveCommitButtonChange}"
-                                        value="Remove Violation ID:#{ceCaseSearchProfileBB.currentViolation.violationID}"
+                                        action="#{ceCaseSearchProfileBB.onViolationNullifyCommitButtonChange}"
+                                        value="Nullify Violation ID:#{ceCaseSearchProfileBB.currentViolation.violationID}"
                                         />
                                 </div>
                             </div>

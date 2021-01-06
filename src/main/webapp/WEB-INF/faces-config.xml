@@ -794,6 +794,12 @@
         </navigation-case>
         
         <navigation-case>
+            <from-outcome>propertySearchProfile</from-outcome>
+            <to-view-id>/restricted/cogstaff/prop/propertySearchProfile.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
             <from-outcome>propertyUnits</from-outcome>
             <to-view-id>/restricted/cogstaff/prop/propertyUnits.xhtml</to-view-id>
             <redirect />

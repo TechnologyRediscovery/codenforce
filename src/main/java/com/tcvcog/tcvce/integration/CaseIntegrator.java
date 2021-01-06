@@ -567,6 +567,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * Use calls to other add methods in this class for adding additional
      * violations, events, and people to a CE case.
      * 
+     * Method will update the case's last udpated time stamp and user, if supplied
+     * by the case object's fields
+     * 
      * @param ceCase the case to updated, with updated member variables
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
@@ -944,11 +947,11 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     public void updateCodeViolation(CodeViolation v) throws IntegrationException {
         String query =  " UPDATE public.codeviolation\n" +
                         "   SET codesetelement_elementid=?, cecase_caseid=?, dateofrecord=?, \n" + // 1-3
-                        "       stipulatedcompliancedate=?, \n" + // 4-5
-                        "       penalty=?, description=?, legacyimport=?, \n" + // 6-8
-                        "       severity_classid=?, compliancetfexpiry_proposalid=?, \n" + // 9-12
-                        "       lastupdatedts=now(), lastupdated_userid=?, active=?,  nullifiedts=?, nullifiedby=? \n" + // 13-14
-                        " WHERE violationid = ?;";
+                        "       stipulatedcompliancedate=?, \n" + // 4
+                        "       penalty=?, description=?, legacyimport=?, \n" + // 5-7
+                        "       severity_classid=?, compliancetfexpiry_proposalid=?, \n" + // 8-9
+                        "       lastupdatedts=now(), lastupdated_userid=?, active=?,  nullifiedts=?, nullifiedby=? \n" + // 10-13
+                        " WHERE violationid = ?;"; //14
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 

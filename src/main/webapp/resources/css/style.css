@@ -301,7 +301,7 @@ i.material-icons{
 
 
 a:link{
-    text-decoration: none;
+    /*text-decoration: none;*/
     color: #181F36;
 }
 
@@ -841,6 +841,11 @@ i.status-display-icon-i{
     font-weight: bold;
 }
 
+.compliance-date-nullified{
+    color: darkslategray;
+    font-weight: bold;
+}
+
 
 
 /***************** CLOSE TEXT AND SPANS ***********************/
@@ -1306,6 +1311,11 @@ gridTd-bignum{
 
 .link-button-container a{
     color:white;
+}
+
+.commandlink-container .commandlink-webstd a:link{
+    
+    
 }
 
 /* ****************** CLOSE BUTTON STYLES ********************/
@@ -2702,7 +2712,8 @@ input{
 
 .data_container_nested_restrict{
     width: 100%;
-    padding-top: 15px;
+    /*removed by ECD in haste to get more head room on cecaseprofile*/
+    /*padding-top: 15px;*/
     margin-bottom: 20px;
 }
 
@@ -2720,8 +2731,12 @@ input{
 .restrict-main-contents-io-link{
     display: inline-block; 
     float: right;
+    /*text-decoration: underline;*/
     font-weight: 200;
-    border-bottom: 1px solid #6C6D70;
+    /*border-bottom: 1px solid #6C6D70;*/
+    
+    /*changed in haste by ECD Jan 2021 for cecase profile facelift*/
+    border-bottom: 1px solid blue; 
 }
 
 .restrict-main-contents-io-link a{
