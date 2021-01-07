@@ -27,8 +27,8 @@ ALTER TABLE public.blobbytes
 
 --This statement should copy some of photodoc's columns into blob
 
-INSERT INTO blobbytes(uploaddate, blobtype_typeid, blob, uploadpersonid, filename)
-SELECT photodocdate, photodoctype_typeid, photodocblob, photodocuploadpersonid, photodocfilename FROM photodoc;
+INSERT INTO blobbytes(uploaddate, blobtype_typeid, blob)
+SELECT photodocdate, photodoctype_typeid, photodocblob FROM photodoc;
 
 --DOUBLE CHECK THE VALUES REALLY DID COPY CORRECTLY BEFORE RUNNING THE REST OF THIS FILE
 
@@ -40,9 +40,11 @@ UPDATE photodoc
 SET blobbytes_bytesid = blobbytes.bytesid
 FROM blobbytes
 WHERE photodoc.photodocblob = blobbytes.blob 
-	AND photodoc.photodocdate = blobbytes.uploaddate
-	AND photodoc.photodocfilename = blobbytes.filename;
+	AND photodoc.photodocdate = blobbytes.uploaddate;
 
+--In order to make sure the two tables connected correctly, it's best to do a SELECT statement on photodoc and ORDER BY blobbytes_bytesid.
+--For some reason the bytes aren't always copied in order, so it might appear as if certain rows are skipped even if they're not.
+--On my copy of the live DB, all rows were properly copied and attached.
 
 --This commented out ALTER TABLE should be implemented at some point, 
 --but on my machine certain rows couldn't be linked with their bytes.
@@ -64,9 +66,7 @@ ALTER TABLE public.photodoc
 ALTER TABLE photodoc
 DROP COLUMN photodocdate,
 DROP COLUMN photodoctype_typeid,
-DROP COLUMN photodocblob,
-DROP COLUMN photodocuploadpersonid,
-DROP COLUMN photodocfilename;
+DROP COLUMN photodocblob;
 
 --Let's add metadata to the blobbytes table
 ALTER TABLE public.blobbytes ADD COLUMN metadatamap bytea;
