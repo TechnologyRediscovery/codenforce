@@ -42,6 +42,7 @@ import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -990,7 +991,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             return null;
         }
         
-        QueryCECase query_opened = sc.initQuery(QueryCECaseEnum.OPENED_30DAYS, ua.getKeyCard());
+        QueryCECase query_opened = sc.initQuery(QueryCECaseEnum.OPENED_INDATERANGE, ua.getKeyCard());
         SearchParamsCECase spcse = query_opened.getPrimaryParams();
         spcse.setDate_startEnd_ctl(true);
         spcse.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATIONTS);
@@ -2084,7 +2085,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         SystemIntegrator si = getSystemIntegrator();
         CaseIntegrator ci = getCaseIntegrator();
         
-        cv.setBlobList(ci.loadViolationPhotoList(cv));
+        // TODO: NADGIT photo stuff
+//        cv.setBlobList(ci.loadViolationPhotoList(cv));
         
         cv.setCitationIDList(ci.getCitations(cv.getViolationID()));
         cv.setNoticeIDList(ci.novGetNOVIDList(cv));
@@ -2349,6 +2351,63 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
 
     }
+    
+    /**
+     * Wires up a given violation's findings to be the default findings for violations
+     * of the given enforcable code element inside the CodeViolation passed in
+     * TODO: Add option of checking that user's permissions and updating all those
+     * muni's code sets as well
+     * 
+     * @param cv
+     * @param ua 
+     * @param cascadeToAuthCodebooks triggers the calling of an internal method for updating 
+     * all code books that are default in any muni in which the UserAuthorized has 
+     * enforcement official permissions (or better)
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public void violation_makeFindingsDefaultInCodebook(CodeViolation cv, UserAuthorized ua, boolean cascadeToAuthCodebooks) throws BObStatusException, IntegrationException{
+       
+       if(cv == null || ua == null) throw new BObStatusException("Cannot update default findings with null violation, codeset, or user");
+       UserCoordinator uc = getUserCoordinator();
+       MunicipalityCoordinator mc = getMuniCoordinator();
+        
+        
+       violation_makeFindingsDefault(cv.getDescription(), cv.getViolatedEnfElement(), ua);
+        
+       
+               
+    } 
+
+    /**
+     * Internal operational code to determine which muni's the user has enforcement official
+     * permissions (or better), and update their codebooks that contain this same
+     * ordinance with default findings
+     * @param cv
+     * @param ua 
+     */
+    private void violation_makeFindingsDefault(String defFindings, EnforcableCodeElement ece, UserAuthorized ua) throws IntegrationException{
+
+        CodeIntegrator ci = getCodeIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+        ece.setDefaultViolationDescription(defFindings); 
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        mbp.setUser(ua);
+        mbp.setExistingContent(ece.getNotes());
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("Default findings changed to: ");
+        sb.append(defFindings);
+        sb.append(" from: ");
+        sb.append(ece.getDefaultViolationDescription());
+        mbp.setNewMessageContent(sb.toString());
+        
+        ece.setNotes(sc.appendNoteBlock(mbp));
+        ci.updateCodeElement(ece);
+        
+        
+    }
+    
+    
 
     /**
      * Logic gateway for updates to a code violation's stipulated compliance date

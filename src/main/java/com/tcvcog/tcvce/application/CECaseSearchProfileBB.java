@@ -139,6 +139,8 @@ public class CECaseSearchProfileBB
     private boolean extendStipCompUsingDate;
     private java.util.Date extendedStipCompDate;
     private int extendedStipCompDaysFromToday;
+    
+    private boolean formMakeFindingsDefault;
 
     
     
@@ -251,6 +253,8 @@ public class CECaseSearchProfileBB
                             ex.getMessage(), ""));
 
         }
+        
+        formMakeFindingsDefault = false;
         
         filteredElementList = null;
         extendStipCompUsingDate = true;
@@ -1347,8 +1351,29 @@ public class CECaseSearchProfileBB
                             ex.getMessage(), "Please revise the stipulated compliance date"));
 
         }
+        
+        if(formMakeFindingsDefault){
+            makeViolationFindingsDefault(currentViolation);
+        }
 
         return "ceCaseProfile";
+    }
+    
+    private void makeViolationFindingsDefault(CodeViolation cv){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            cc.violation_makeFindingsDefaultInCodebook(cv, getSessionBean().getSessUser() , false);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Updated default violation findings",
+                            ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to make violation findings default " + ex.getMessage(),
+                            ""));
+            System.out.println(ex);
+        } 
     }
 
     
@@ -1509,6 +1534,10 @@ public class CECaseSearchProfileBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), ""));
             return "";
+        }
+        
+        if(formMakeFindingsDefault){
+            makeViolationFindingsDefault(currentViolation);
         }
         return "ceCaseProfile";
 
@@ -2118,6 +2147,20 @@ public class CECaseSearchProfileBB
      */
     public void setComplianceDateForm(java.util.Date complianceDateForm) {
         this.complianceDateForm = complianceDateForm;
+    }
+
+    /**
+     * @return the formMakeFindingsDefault
+     */
+    public boolean isFormMakeFindingsDefault() {
+        return formMakeFindingsDefault;
+    }
+
+    /**
+     * @param formMakeFindingsDefault the formMakeFindingsDefault to set
+     */
+    public void setFormMakeFindingsDefault(boolean formMakeFindingsDefault) {
+        this.formMakeFindingsDefault = formMakeFindingsDefault;
     }
 
 }

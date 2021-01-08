@@ -381,7 +381,7 @@
                                                 toggleable="true"
                                                 widgetVar="cecase-caselist-panel-var"
                                                 collapsed="false"
-                                                rendered="#true"
+                                                rendered="true"
                                                 header="Code Enforcement Case List">
                                     <h:form id="cecase-search-results-form" >
 
@@ -427,7 +427,7 @@
                                             rowKey="#{c.caseID}"
                                             rowExpandMode="multiple"
                                             widgetVar="ceViewTable"
-                                            value="#{ceCaseSearchProfileBB.caseList}"
+                                            value="#{sessionBean.sessCECaseList}"
                                             tableStyleClass="primeDataTable">
 
                                             <p:column width="12%" sortBy="#{c.originationDate}">

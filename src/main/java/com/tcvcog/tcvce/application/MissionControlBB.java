@@ -17,6 +17,8 @@ Council of Governments, PA
  */
 
 package com.tcvcog.tcvce.application;
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -28,17 +30,26 @@ import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.ExceptionSeverityEnum;
+import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.domain.SessionException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.ProposalCECase;
 import com.tcvcog.tcvce.entities.ProposalOccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.search.QueryCECase;
+import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import org.primefaces.model.DashboardModel;
 import org.primefaces.model.DashboardColumn;
@@ -66,6 +77,8 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     private List<ProposalCECase> ceProposalList;
     private List<ProposalOccPeriod> occProposalList;
     
+      private List<CECasePropertyUnitHeavy> filteredCaseList;
+    
     /**
      * Creates a new instance of InitiateSessionBB
      */
@@ -77,7 +90,33 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         UserCoordinator uc = getUserCoordinator();
         currentUser = getSessionBean().getSessUser();
         userList = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
+        CaseCoordinator cc = getCaseCoordinator();
+        SearchCoordinator sc = getSearchCoordinator();
         
+        SessionBean sb = getSessionBean();
+        QueryCECase cseQ = sc.initQuery(QueryCECaseEnum.OPENCASES, getSessionBean().getSessUser().getKeyCard());
+        try {
+            cseQ = sc.runQuery(cseQ);
+            
+//            List<CECase> hist = cc.cecase_getCECaseHistory(ua);
+            // NEXT LINE: YUCK!!!!!!!!
+            sb.setSessCECaseList(cc.cecase_assembleCECasePropertyUnitHeavyList(cseQ.getBOBResultList()));
+            
+            if(sb.getSessCECaseList().isEmpty()){
+                sb.setSessCECase(cc.cecase_assembleCECaseDataHeavy(cc.cecase_selectDefaultCECase(sb.getSessUser()), sb.getSessUser()));
+            } else {
+                sb.setSessCECase(cc.cecase_assembleCECaseDataHeavy(sb.getSessCECaseList().get(0), sb.getSessUser()));
+            }
+            
+            
+            
+        } catch (SearchException | BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            
+        } 
+        
+        filteredCaseList = null;
+
         generateMainDash();
     }
     
@@ -357,6 +396,20 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      */
     public void setSelectedUser(User selectedUser) {
         this.selectedUser = selectedUser;
+    }
+
+    /**
+     * @return the filteredCaseList
+     */
+    public List<CECasePropertyUnitHeavy> getFilteredCaseList() {
+        return filteredCaseList;
+    }
+
+    /**
+     * @param filteredCaseList the filteredCaseList to set
+     */
+    public void setFilteredCaseList(List<CECasePropertyUnitHeavy> filteredCaseList) {
+        this.filteredCaseList = filteredCaseList;
     }
 
     

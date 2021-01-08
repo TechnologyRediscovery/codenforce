@@ -1248,6 +1248,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      */
     public List<Blob> loadViolationPhotoList(CodeViolation cv) throws IntegrationException{
+        
         List<Blob> vBlobList = new ArrayList<>();
         BlobCoordinator bc = getBlobCoordinator();
         

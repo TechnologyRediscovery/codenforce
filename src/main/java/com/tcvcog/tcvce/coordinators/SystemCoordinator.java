@@ -163,7 +163,15 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
             sb.append(mbp.getExplanation());
         }
+        
         // NOTE content
+         if (mbp.getNewMessageContent() != null) {
+            sb.append(Constants.FMT_HTML_BREAK);
+            sb.append(Constants.FMT_CONTENT);
+            sb.append(mbp.getNewMessageContent());
+        }
+         
+        // CREATOR INFO
         sb.append(Constants.FMT_HTML_BREAK);
         sb.append(Constants.FMT_NOTEBYLINE);
         if (mbp.getUser() != null) {
@@ -186,12 +194,8 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         sb.append(stampCurrentTimeForNote());
 
 
-        // TITLE SUB
-        if (mbp.getNewMessageContent() != null) {
-            sb.append(Constants.FMT_HTML_BREAK);
-            sb.append(Constants.FMT_CONTENT);
-            sb.append(mbp.getNewMessageContent());
-        }
+     
+       
 
         if (mbp.getCred() != null && mbp.isIncludeCredentialSig()) {
             sb.append(Constants.FMT_SIGNATURELEAD);
@@ -499,7 +503,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             navList.add(propertyItem);
             navList.add(personItem);
             navList.add(occItem);
-            navList.add(CEItem);
+//            navList.add(CEItem);
             navList.add(codeItem);
         } catch (Exception e) {
             System.out.println(e);

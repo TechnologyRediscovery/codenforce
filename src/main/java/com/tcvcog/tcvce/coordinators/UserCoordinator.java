@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.coordinators;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import java.io.Serializable;
 import com.tcvcog.tcvce.entities.Credential;
@@ -387,6 +388,26 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         }
         return rtlAuthorized;
     }
+    
+    /**
+     * Logic container for sifting through a User's permissions and returning only
+     * a list of UMAPs that meet or exceed the given RoleType threshold
+     * @param ua
+     * @param rt the minimum rank the user must have in an authorized muni to get filtered
+     * @return
+     * @throws BObStatusException 
+     */
+    protected List<UserMuniAuthPeriod> auth_user_buildUMAPListMinRank(UserAuthorized ua, RoleType rt) throws BObStatusException{
+        if(ua == null || rt == null){
+            throw new BObStatusException("Cannot build list with null UA or RoleType");
+        }
+        
+        Map<Municipality, List<UserMuniAuthPeriod>> umapList = ua.getMuniAuthPeriodsMap();
+        
+        return null;
+        
+    }
+    
     
     /**
      * Utility method for creating a loaded up object for logging the authorization

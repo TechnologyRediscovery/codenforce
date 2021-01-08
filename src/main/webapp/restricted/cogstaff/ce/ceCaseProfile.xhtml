@@ -125,7 +125,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
                                                 </div>
                                                 <div class="ui-g-12 ui-md-2 ui-lg-2 restrict-data-field">
-                                                <div class="restrict-main-contents-io-link">
+                                                    <div class="restrict-main-contents-io-link">
 
                                                         <p:commandLink      id="case-rename-cb" 
                                                                             ajax="true" 
@@ -274,7 +274,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
 
                                                     <div class="restrict-data-field-value-vertical" >
-                                                         <div class="restrict-main-contents-io-link">
+                                                        <div class="restrict-main-contents-io-link">
 
                                                             <p:commandLink      id="cecase-forceclose-init-cb" 
                                                                                 ajax="true" 
@@ -301,7 +301,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
                                                 </div>
                                                 <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
-                                                     <div class="restrict-main-contents-io-link">
+                                                    <div class="restrict-main-contents-io-link">
 
                                                         <p:commandLink      id="view-property-cb" 
                                                                             ajax="false" 
@@ -315,7 +315,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
 
                                                 <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
-                                                     <div class="restrict-main-contents-io-link">
+                                                    <div class="restrict-main-contents-io-link">
 
                                                         <p:commandLink      id="refresh-case-cb" 
                                                                             ajax="false" 
@@ -328,7 +328,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
 
                                                 <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
-                                                     <div class="restrict-main-contents-io-link">
+                                                    <div class="restrict-main-contents-io-link">
                                                         <p:commandLink      id="case-settings-cb" 
                                                                             ajax="true" 
                                                                             actionListener="#{ceCaseSearchProfileBB.onCaseSettingsInitButtonChnage}"
@@ -341,7 +341,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
 
                                                 <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
-                                                     <div class="restrict-main-contents-io-link">
+                                                    <div class="restrict-main-contents-io-link">
 
 
                                                         <p:commandLink     id="print-case-cb" 
@@ -624,7 +624,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <i class="material-icons"><h:outputText value="#{v.icon.materialIcon}" /></i>
                                                     <p:spacer height="2px" />
                                                     <h:outputText value="#{!(empty v.status) ? v.status.label : ''}" />
-                                               
+
                                                 </p:column>
 
                                                 <p:column width="10%">
@@ -1518,6 +1518,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 widgetVar="cecase-remove-dialog-var"
                                 closable="true"
                                 resizable="true"
+                                closeOnEscape="true"
+                                modal="true"
                                 header="Remove Code Enforcement Case"
                                 >
 
@@ -1544,6 +1546,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 height="300" width="750"
                                 widgetVar="cecase-note-dialog-var"
                                 closable="true"
+                                resizable="true"
+                                responsive="true"
+                                modal="true"
                                 header="Note Builder"
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                 >
@@ -1592,6 +1597,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 header="Force close case"
                                 widgetVar="case-forceclose-dialog-var"
                                 closable="true" 
+                                resizable="true"
+                                responsive="true"
+                                modal="true"
                                 rendered="true"
                                 >
 
@@ -1653,6 +1661,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 header="Rename case"
                                 widgetVar="case-rename-dialog-var"
                                 closable="true" 
+                                closeOnEscape="true"
+                                resizable="true"
+                                responsive="true"
+                                modal="true"
                                 rendered="true"
                                 >
 
@@ -1705,6 +1717,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 header="Change case manager"
                                 widgetVar="case-changemanager-dialog-var"
                                 closable="true" 
+                                resizable="true"
+                                closeOnEscape="true"
+                                modal="true"
                                 rendered="true"
                                 >
 
@@ -1766,6 +1781,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 header="Update case opening date"
                                 widgetVar="case-updatedor-dialog-var"
                                 closable="true" 
+                                responsive="true"
+                                resizable="true"
+                                modal="true"
                                 rendered="true"
                                 >
 
@@ -1835,6 +1853,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 header="Update case details"
                                 widgetVar="case-update-dialog-var"
                                 closable="true" 
+                                closeOnEscape="true"
+                                resizable="true"
+                                responsive="true"
+                                modal="true"
                                 rendered="true"
                                 >
                         <h:form id="updateCaseForm">
@@ -1944,6 +1966,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 header="Notice ID #{noticeOfViolationBB.currentNotice.noticeID} Details"
                                 widgetVar="novstatus-dialog-var"
                                 closable="true" 
+                                responsive="true"
+                                closeOnEscape="true"
+                                resizable="true"
                                 rendered="true"
                                 >
 
@@ -2213,6 +2238,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 height="650" width="900"
                                 widgetVar="cecase-rejectproposal-dialog-var"
                                 closable="true" 
+                                resizable="true"
+                                closeOnEscape="true"
+                                modal="true"
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                 >
 
@@ -2243,6 +2271,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                   header="Create follow-up event" 
                                   widgetVar="cecase-novfollowup-dialog-var" 
                                   responsive="true" 
+                                  resizable="true"
+                                  closeOnEscape="true"
+                                  closable="true"
                                   width="300"
                                   modal="true"
                                   height="250">
@@ -2282,10 +2313,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     </p:dialog>
 
 
-
                     <p:dialog   id="cecase-report-dialog"
                                 widgetVar="report-case-profile-diaglog-var"
                                 closable="true" 
+                                modal="true"
+                                resizable="true"
+                                closeOnEscape="true"
                                 responsive="true"
                                 >
 
@@ -2397,6 +2430,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 height="300" width="750"
                                 widgetVar="nov-template-choose-dialog"
                                 closable="true"
+                                resizable="true"
+                                closeOnEscape="true"
                                 modal="true"
                                 header="Choose a Notice of Violation Template"
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
@@ -2484,7 +2519,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                     <p:dialog   id="nov-add-edit-dialog"
-                                height="600" width="800"
+                                height="800" width="1600"
                                 widgetVar="nov-add-edit-dialog-var"
                                 closable="true"
                                 modal="true"
@@ -2823,8 +2858,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 height="600" width="750"
                                 widgetVar="nov-personchoose-dialog-var"
                                 closable="true"
-                                header="Choose Addressee"
                                 closeOnEscape="true"
+                                resizable="true"
+                                responsive="true"
+                                modal="true"
+                                header="Choose Addressee"
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                 >
 
@@ -3099,6 +3137,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 height="600" width="800"
                                 widgetVar="nov-templatemanage-dialog-var"
                                 closable="true"
+                                modal="true"
                                 responsive="true"
                                 resizable="true"
                                 closeOnEscape="true"
@@ -3251,6 +3290,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 height="600" width="800"
                                 widgetVar="nov-template-view-dialog-var"
                                 closable="true"
+                                modal="true"
                                 closeOnEscape="true"
                                 responsive="true"
                                 resizable="true"
@@ -3441,6 +3481,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 height="600" width="1000"
                                 widgetVar="violation-add-dialog-var"
                                 responsive="true"
+                                modal="true"
                                 resizable="true"
                                 closable="true"
                                 closeOnEscape="true"
@@ -3609,6 +3650,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </div>
 
                                 </div>
+                                
+                                
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:selectBooleanCheckbox id="violation-findings-makedefault-chkbx-0"
+                                                                 value="#{ceCaseSearchProfileBB.formMakeFindingsDefault}"
+                                                                 itemLabel="Make these findings the default for enforcable ordinance ID:#{ceCaseSearchProfileBB.currentViolation.codeViolated.codeSetElementID}"
+                                                                 />
+                                    </div>
+
+                                </div>
 
                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
 
@@ -3681,8 +3734,49 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                         <h:form id="violation-details-form">
 
+                            <h2>
+
+                                <h:outputText    id="violation-add-chapter-ot"
+                                                 value="ch #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordchapterNo}: #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordchapterTitle}"/>
+
+                                <h:outputText value=" , " />
+
+                                <h:outputText    id="violation-add-section-ot"
+                                                 value="sec #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSecNum}: #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSecTitle}"/>
+
+                                <h:outputText value=" , " />
+
+                                <h:outputText    id="violation-add-subsection-ot"
+                                                 value="sub-sec #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSubSecNum}: #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSubSecTitle}"/>
+
+                                <h:outputText value=" , " 
+                                              rendered="#{!(empty ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSubSubSecNum)}"/>
+
+                                <h:outputText    id="violation-add-subsubsection-ot"
+                                                 value="sub sub sec #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSubSubSecNum}"
+                                                 rendered="#{!(empty ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSubSubSecNum)}"/>
+                            </h2>
+
                             <!-- Violation status; single line-->
                             <div class="ui-g data_container_nested_restrict">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
+                                    <div class="restrict-main-contents-io-link">
+
+                                        <p:commandLink id="violation-ord-details-cl" 
+                                                       oncomplete="PF('violation-ord-details-confdialog-var').show()"
+                                                       value="Ordinance technical text" 
+                                                       style="color:blue;"
+                                                       type="button" />
+                                        
+                                        <p:commandLink id="violation-nuke-init-cl" 
+                                                       oncomplete="PF('violation-remove-dialog-var').show()"
+                                                       value="Nuke violation" 
+                                                       style="color:blue;"
+                                                       type="button" />
+                                    </div>
+
+
+                                </div>
                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
 
                                     <div class="restrict-data-field-label-inline" >
@@ -3697,104 +3791,91 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                       />
                                     </div>
                                 </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
 
-                                <div class="restrict-main-contents-io-button">
-                                    <p:commandButton   id="violation-chooseord-update-button"
-                                                       rendered="false"
-                                                       value="Change ordinance"  
-                                                       disabled="#{!ceCaseSearchProfileBB.currentViolation.allowOrdinanceUpdates}"
-                                                       icon="fa fa-search"
-                                                       ajax="true"
-                                                       actionListener="#{ceCaseSearchProfileBB.onViolationSelectElementInitButtonChange}"
-                                                       oncomplete="PF('violation-selectelement-dialog-var').show()"
-                                                       update="violation-selectelement-dialog
-                                                       violation-selectelement-form"/>
-                                </div>
-
-                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
                                     <div class="restrict-data-field-label-inline" >
-                                        <h:outputLabel value="Ordinance ID: #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.elementID} Details"/>
+                                        <p:outputLabel for="violation-prop-ot">
+                                            <h:outputText value="Property"/>
+                                        </p:outputLabel>
                                     </div>
                                     <!--NESTED DATA VALUE INLINE -->
                                     <div class="restrict-data-field-value-inline" >
-                                        <h:outputText    id="violation-add-source-ot"
-                                                         value="Source: #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.source.sourceName} (#{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.source.sourceYear})"/>
-
-                                        <p:spacer height="2px" />
-
-                                        <h:outputText    id="violation-add-chapter-ot"
-                                                         value="Chapter #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordchapterNo}: #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordchapterTitle}"/>
-
-                                        <p:spacer height="2px" />
-
-                                        <h:outputText    id="violation-add-section-ot"
-                                                         value="Section #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSecNum}: #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSecTitle}"/>
-
-                                        <h:outputText value=" | " />
-
-                                        <h:outputText    id="violation-add-subsection-ot"
-                                                         value="Sub-Sec #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSubSecNum}: #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSubSecTitle}"/>
-
-                                        <p:spacer height="2px" />
-
-                                        <h:outputText    id="violation-add-category-ot"
-                                                         value="Category: #{!(empty ceCaseSearchProfileBB.currentViolation.violatedEnfElement.guideEntry) ? ceCaseSearchProfileBB.currentViolation.violatedEnfElement.guideEntry.category :'' }"/>
-
-                                        <p:spacer height="2px" />
-
-                                        <h:outputText   id="violation-add-ord-text"
-                                                        styleClass="monospace"
-                                                        value="#{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordTechnicalText}"
-                                                        escape="false" />
-                                    </div>
-
-                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
-                                        <div class="restrict-main-contents-io-link">
-                                            <p:commandLink id="violation-ord-details-cl" 
-                                                           value="Ordinance details" 
-                                                           type="button" />
-                                        </div>
-
-                                        <p:overlayPanel id="violation-ord-details-overlay" 
-                                                        for="violation-ord-details-cl" 
-                                                        hideEffect="fade">
-                                            <div class="ui-g data_container_nested_restrict">
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-                                                    <div class="restrict-data-field-label-inline" >
-
-                                                        <h:outputLabel  for="violation-ord-text-hf"
-                                                                        styleClass="data_field_label" >
-                                                            <h:outputText value="Human Friendly Text" />
-                                                        </h:outputLabel>
-                                                    </div>
-                                                    <div class="restrict-data-field-value-inline" >
-
-                                                        <h:outputText   id="violation-ord-text-hf"
-                                                                        value="#{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordHumanFriendlyText}"
-                                                                        styleClass="data_field_value"
-                                                                        escape="false" />
-                                                    </div>
-                                                </div>
-                                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-
-                                                    <div class="restrict-data-field-label-inline" >
-
-                                                        <p:outputLabel for="violation-enfguidelines-ot"
-                                                                       styleClass="data_field_label">
-                                                            <h:outputText value="Enforcement Guidelines"/>
-                                                        </p:outputLabel>
-                                                    </div>
-                                                    <div class="restrict-data-field-value-inline" >
-
-                                                        <h:outputText    id="violation-enfguidelines-ot"
-                                                                         styleClass="data_field_value"
-                                                                         value="#{!(empty ceCaseSearchProfileBB.currentViolation.violatedEnfElement.guideEntry) ? ceCaseSearchProfileBB.currentViolation.violatedEnfElement.guideEntry.enforcementGuidelines :'' }"/>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </p:overlayPanel>
+                                        <h:outputText id="violation-prop-ot"
+                                                      value="#{ceCaseSearchProfileBB.currentCase.property.address}"
+                                                      />
+                                        <h:outputText id="violation-prop1-ot"
+                                                      value=", #{ceCaseSearchProfileBB.currentCase.property.muni.muniName}"
+                                                      />
+                                        <h:outputText id="violation-prop2-ot"
+                                                      value="(ID:#{ceCaseSearchProfileBB.currentCase.property.propertyID}) "
+                                                      />
                                     </div>
                                 </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+
+                                    <div class="restrict-data-field-label-inline" >
+                                        <p:outputLabel for="violation-case-ot">
+                                            <h:outputText value="Case Name"/>
+                                        </p:outputLabel>
+                                    </div>
+                                    <!--NESTED DATA VALUE INLINE -->
+                                    <div class="restrict-data-field-value-inline" >
+                                        <h:outputText id="violation-case-ot"
+                                                      value="#{ceCaseSearchProfileBB.currentCase.caseName}"
+                                                      />
+                                        <h:outputText id="violation-case1-ot"
+                                                      value="(ID:#{ceCaseSearchProfileBB.currentCase.caseID})"
+                                                      />
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+
+                                    <div class="restrict-data-field-label-inline" >
+                                        <p:outputLabel for="violation-ord-id-ot">
+                                            <h:outputText value="Ordinance ID"/>
+                                        </p:outputLabel>
+                                    </div>
+                                    <!--NESTED DATA VALUE INLINE -->
+                                    <div class="restrict-data-field-value-inline" >
+                                        <h:outputText       id="violation-ord-id-ot" 
+                                                            value="#{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.elementID} "/>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+
+                                    <div class="restrict-data-field-label-inline" >
+                                        <p:outputLabel for="violation-source-ot">
+                                            <h:outputText value="Source "/>
+                                        </p:outputLabel>
+                                    </div>
+                                    <!--NESTED DATA VALUE INLINE -->
+                                    <div class="restrict-data-field-value-inline" >
+
+                                        <h:outputText    id="violation-source-ot"
+                                                         value="#{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.source.sourceName} (#{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.source.sourceYear})"/>
+
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+
+                                    <div class="restrict-data-field-label-inline" >
+                                        <p:outputLabel for="violation-cat-ot">
+                                            <h:outputText value="Category "/>
+                                        </p:outputLabel>
+                                    </div>
+                                    <!--NESTED DATA VALUE INLINE -->
+                                    <div class="restrict-data-field-value-inline" >
+
+                                        <h:outputText    id="violation-cat-ot"
+                                                         value="#{!(empty ceCaseSearchProfileBB.currentViolation.violatedEnfElement.guideEntry) ? ceCaseSearchProfileBB.currentViolation.violatedEnfElement.guideEntry.category :'' }"/>
+
+                                    </div>
+                                </div>
+
+
+
+
+
 
                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
 
@@ -3810,15 +3891,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                       />
                                     </div>
 
-                                    <div class="restrict-main-contents-io-button">
+                                    <div class="restrict-main-contents-io-link">
 
-                                        <p:commandButton    id="violation-update-findings-init-cb" 
+                                        <p:commandLink      id="violation-update-findings-init-cb" 
                                                             ajax="true" 
                                                             actionListener="#{ceCaseSearchProfileBB.onViolationUpdateFindingsInitButtonChange}"
                                                             oncomplete="PF('violation-update-findings-dialog-var').show()"
                                                             disabled="false"
-                                                            icon="fa fa-edit" 
-                                                            styleClass="noFill"
+                                                            style="color: blue;"
                                                             value="Edit findings" />
                                     </div>
 
@@ -3861,16 +3941,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                 <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
 
-                                    <div class="restrict-main-contents-io-button">
+                                    <div class="restrict-main-contents-io-link">
 
-                                        <p:commandButton    id="violation-update-penaltyseverity-init-cb" 
-                                                            ajax="true" 
-                                                            actionListener="#{ceCaseSearchProfileBB.onViolationUpdatePenaltySeverityInitButtonChange}"
-                                                            oncomplete="PF('violation-update-penaltyseverity-dialog-var').show()"
-                                                            disabled="false"
-                                                            icon="fa fa-edit" 
-                                                            styleClass="noFill"
-                                                            value="Edit Penality or Severity" />
+                                        <p:commandLink    id="violation-update-penaltyseverity-init-cb" 
+                                                          ajax="true" 
+                                                          actionListener="#{ceCaseSearchProfileBB.onViolationUpdatePenaltySeverityInitButtonChange}"
+                                                          oncomplete="PF('violation-update-penaltyseverity-dialog-var').show()"
+                                                          disabled="false"
+                                                          style="color: blue;"
+                                                          styleClass="noFill"
+                                                          value="Edit Penality or Severity" />
                                     </div>
                                 </div>
 
@@ -3921,15 +4001,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         value=" "/>
                                         <h:outputText   id="violation-creator-ot3"
                                                         value="#{!(empty ceCaseSearchProfileBB.currentViolation.complianceUser) ? ceCaseSearchProfileBB.currentViolation.createdBy.person.lastName : ''}"/>
+                                        <h:outputText value="&nbsp;" />
                                     </div>
-                                    <div class="restrict-data-field-value-vertical" >
+                                    <div class="restrict-main-contents-io-link">
 
-                                        <p:commandButton    id="violation-update-dor-init-cb" 
+                                        <p:commandLink      id="violation-update-dor-init-cb" 
                                                             ajax="true" 
                                                             actionListener="#{ceCaseSearchProfileBB.onViolationUpdateDORInitButtonChange}"
                                                             oncomplete="PF('violation-update-dor-dialog-var').show()"
                                                             disabled="false"
-                                                            icon="fa fa-edit" 
+                                                            style="color: blue;"
                                                             styleClass="noFill"
                                                             value="Change Date of Record" />
 
@@ -3950,21 +4031,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <div class="restrict-data-field-value-vertical" >
                                         <h:outputText   id="violation-stipcompdate-ot"
                                                         value="#{ceCaseSearchProfileBB.getPrettyDate(ceCaseSearchProfileBB.currentViolation.stipulatedComplianceDate)}"/>
+                                        <h:outputText value="&nbsp;" />
                                     </div>
                                     <!--NESTED DATA VALUE VERTICAL -->
                                     <div class="restrict-data-field-value-vertical" >
-                                        <h:outputText value=" " />
+                                        <h:outputText value="&nbsp;" />
                                     </div>
 
-                                    <div class="restrict-data-field-value-vertical" >
-                                        <p:commandButton    id="violation-update-stipdate-init-cb" 
-                                                            ajax="true" 
-                                                            actionListener="#{ceCaseSearchProfileBB.onViolationUpdateStipDateInitButtonChange}"
-                                                            oncomplete="PF('violation-update-stipdate-dialog-var').show()"
-                                                            disabled="false"
-                                                            icon="fa fa-edit" 
-                                                            styleClass="noFill"
-                                                            value="Change Compliance Date" />
+                                    <div class="restrict-main-contents-io-link">
+                                        <p:commandLink    id="violation-update-stipdate-init-cb" 
+                                                          ajax="true" 
+                                                          actionListener="#{ceCaseSearchProfileBB.onViolationUpdateStipDateInitButtonChange}"
+                                                          oncomplete="PF('violation-update-stipdate-dialog-var').show()"
+                                                          disabled="false"
+                                                          style="color: blue;"
+                                                          styleClass="noFill"
+                                                          value="Change Compliance Date" />
 
 
                                     </div>
@@ -3981,6 +4063,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <div class="restrict-data-field-value-vertical" >
                                         <h:outputText   id="violation-compdate-ot"
                                                         value="#{ceCaseSearchProfileBB.getPrettyDate(ceCaseSearchProfileBB.currentViolation.actualComplianceDate)}"/>
+                                        <h:outputText value="&nbsp;" />
 
                                     </div>
                                     <!--NESTED DATA VALUE VERTICAL -->
@@ -3998,6 +4081,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         value="#{!(empty ceCaseSearchProfileBB.currentViolation.complianceNote) ? 'Note: ' : ''}"/>
                                         <h:outputText   id="violation-comp-notes-ot1"
                                                         value="#{ceCaseSearchProfileBB.currentViolation.complianceNote}"/>
+                                        <h:outputText value="&nbsp;" />
                                     </div>
 
 
@@ -4025,6 +4109,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <div class="restrict-data-field-value-vertical" >
                                         <h:outputText   id="nullified-ts-ot"
                                                         value="#{ceCaseSearchProfileBB.getPrettyDate(ceCaseSearchProfileBB.currentViolation.nullifiedTS)}"/>
+                                        <h:outputText value="&nbsp;" />
 
                                     </div>
                                     <!--NESTED DATA VALUE VERTICAL -->
@@ -4037,18 +4122,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         value=" "/>
                                         <h:outputText   id="violation-nullifiedby-ot3"
                                                         value="#{!(empty ceCaseSearchProfileBB.currentViolation.nullifiedUser) ? ceCaseSearchProfileBB.currentViolation.nullifiedUser.person.lastName : ''}"/>
+                                        <h:outputText value="&nbsp;" />
 
                                     </div>
 
-                                    <div class="restrict-data-field-value-vertical" >
-                                        <p:commandButton    id="violation-nullify-init-cb" 
-                                                            ajax="true" 
-                                                            actionListener="#{ceCaseSearchProfileBB.onViolationNullifyInitButtonChange}"
-                                                            oncomplete="PF('violation-nullify-dialog-var').show()"
-                                                            disabled="false"
-                                                            icon="fa fa-gears" 
-                                                            styleClass="noFill"
-                                                            value="Nullify Violation" />
+                                    <div class="restrict-main-contents-io-link">
+                                        <p:commandLink    id="violation-nullify-init-cb" 
+                                                          ajax="true" 
+                                                          actionListener="#{ceCaseSearchProfileBB.onViolationNullifyInitButtonChange}"
+                                                          oncomplete="PF('violation-nullify-dialog-var').show()"
+                                                          disabled="false"
+                                                          style="color: blue;"
+                                                          styleClass="noFill"
+                                                          value="Nullify Violation" />
 
 
                                     </div>
@@ -4058,14 +4144,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         </h:form>
                     </p:dialog>
 
+                    <p:confirmDialog id="violation-ord-details-confdialog" 
+                                     widgetVar="violation-ord-details-confdialog-var"
+                                     closeOnEscape="true"
+                                     closable="true"
+                                     responsive="true">
 
+                        >
+                        <div class="ui-g data_container_nested_restrict">
+                            <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                <div class="restrict-data-field-label-inline" >
+
+                                    <h:outputLabel  for="violation-ord-text-hf"
+                                                    styleClass="data_field_label" >
+                                        <h:outputText value="Ordinance Text" />
+                                    </h:outputLabel>
+                                </div>
+                                <div class="restrict-data-field-value-inline" >
+
+
+                                    <h:outputText   id="violation-add-ord-text"
+                                                    styleClass="monospace"
+                                                    value="#{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordTechnicalText}"
+                                                    escape="false" />
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+
+                                <div class="restrict-data-field-label-inline" >
+
+                                    <p:outputLabel for="violation-enfguidelines-ot"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Enforcement Guidelines"/>
+                                    </p:outputLabel>
+                                </div>
+                                <div class="restrict-data-field-value-inline" >
+
+                                    <h:outputText    id="violation-enfguidelines-ot"
+                                                     styleClass="data_field_value"
+                                                     value="#{!(empty ceCaseSearchProfileBB.currentViolation.violatedEnfElement.guideEntry) ? ceCaseSearchProfileBB.currentViolation.violatedEnfElement.guideEntry.enforcementGuidelines :'' }"/>
+                                </div>
+                            </div>
+                        </div>
+                    </p:confirmDialog>
 
 
 
                     <p:dialog   id="violation-update-stipdate-dialog"
-                                height="800" width="1600"
+                                height="700" width="500"
                                 widgetVar="violation-update-stipdate-dialog-var"
                                 responsive="true"
+                                modal="true"
                                 resizable="trie"
                                 closable="true"
                                 closeOnEscape="true"
@@ -4188,7 +4317,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     </p:dialog>
 
                     <p:dialog   id="violation-update-dor-dialog"
-                                height="800" width="1600"
+                                height="400" width="400"
                                 widgetVar="violation-update-dor-dialog-var"
                                 responsive="true"
                                 resizable="trie"
@@ -4241,7 +4370,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         />
                                 </div>
 
-                                <div class="restrict-main-contents-io-button">
+                                <div class="restrict-main-contents-io-button gray_button">
 
 
                                     <p:commandButton    id="violation-update-dor-cancel-button"
@@ -4263,6 +4392,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 height="600" width="600"
                                 widgetVar="violation-compliance-dialog-var"
                                 responsive="true"
+                                modal="true"
                                 resizable="trie"
                                 closable="true"
                                 closeOnEscape="true"
@@ -4341,9 +4471,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                     <p:dialog   id="violation-update-penaltyseverity-dialog"
-                                height="800" width="1600"
+                                height="400" width="600"
                                 widgetVar="violation-update-penaltyseverity-dialog-var"
                                 responsive="true"
+                                modal="true"
                                 resizable="trie"
                                 closable="true"
                                 closeOnEscape="true"
@@ -4407,7 +4538,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         />
                                 </div>
 
-                                <div class="restrict-main-contents-io-button">
+                                <div class="restrict-main-contents-io-button gray_button">
 
 
                                     <p:commandButton    id="violation-update-penalityseverity-cancel-button"
@@ -4428,10 +4559,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                     <p:dialog   id="violation-update-findings-dialog"
-                                height="800" width="1600"
+                                height="400" width="800"
                                 widgetVar="violation-update-findings-dialog-var"
                                 responsive="true"
-                                resizable="trie"
+                                resizable="true"
+                                modal="true"
                                 closable="true"
                                 closeOnEscape="true"
                                 header="Update findings on violation ID: #{ceCaseSearchProfileBB.currentViolation.violationID}"
@@ -4461,32 +4593,46 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </div>
 
                                 </div>
+                                
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
 
-                                <div class="restrict-main-contents-io-button">
+                                    <div class="restrict-main-contents-io-content" >
+                                        <p:selectBooleanCheckbox id="violation-findings-makedefault-chkbx"
+                                                                 value="#{ceCaseSearchProfileBB.formMakeFindingsDefault}"
+                                                                 itemLabel="Make these findings the default for enforcable ordinance ID:#{ceCaseSearchProfileBB.currentViolation.codeViolated.codeSetElementID}"
+                                                                 />
+                                    </div>
 
-
-                                    <p:commandButton 
-                                        id="violation-update-findings-commit-button"
-                                        icon="fa fa-edit"
-                                        ajax="false"
-                                        action="#{ceCaseSearchProfileBB.onViolationUpdateFindingsCommitButtonChange}"
-                                        value="Update findings on violation ID:#{ceCaseSearchProfileBB.currentViolation.violationID}"
-                                        />
                                 </div>
 
-                                <div class="restrict-main-contents-io-button">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                    <div class="restrict-main-contents-io-button">
 
 
-                                    <p:commandButton    id="violation-update-findings-cancel-button"
-                                                        ajax="true"  tabindex="27"
-                                                        value="Cancel"
-                                                        icon="fa fa-stop"
-                                                        immediate="true"
-                                                        process="@none"
-                                                        onclick="PF('violation-update-findings-dialog-var').hide()"
-                                                        />
+                                        <p:commandButton 
+                                            id="violation-update-findings-commit-button"
+                                            icon="fa fa-edit"
+                                            ajax="false"
+                                            action="#{ceCaseSearchProfileBB.onViolationUpdateFindingsCommitButtonChange}"
+                                            value="Update findings on violation ID:#{ceCaseSearchProfileBB.currentViolation.violationID}"
+                                            />
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-button gray_button">
 
 
+                                        <p:commandButton    id="violation-update-findings-cancel-button"
+                                                            ajax="true"  
+                                                            tabindex="27"
+                                                            value="Cancel"
+                                                            icon="fa fa-stop"
+                                                            immediate="true"
+                                                            process="@none"
+                                                            onclick="PF('violation-update-findings-dialog-var').hide()"
+                                                            />
+
+
+                                    </div>
                                 </div>
                             </div>
                         </h:form>
@@ -4498,10 +4644,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 height="800" width="1600"
                                 widgetVar="violation-remove-dialog-var"
                                 responsive="true"
+                                modal="true"
                                 resizable="trie"
                                 closable="true"
                                 closeOnEscape="true"
-                                header="Remove Violation"
+                                header="Nuke Violation"
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                 > 
 
@@ -4512,20 +4659,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <div class="restrict-data-field-label-inline" >
 
                                         <h:outputLabel  for="violation-remove-button">
-                                            <h:outputText value="Violations cannot be removed if they have been used in a notice of violation or citation." />
+                                            <h:outputText value="Violations cannot be nuked if they have been used in a notice of violation or citation." />
                                         </h:outputLabel>
                                     </div>
                                 </div>
-                                <div class="restrict-main-contents-io-button red_button">
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+
+                                    <div class="restrict-main-contents-io-button red_button">
 
 
-                                    <p:commandButton 
-                                        id="violation-remove-button"
-                                        icon="fa fa-trash"
-                                        ajax="false"
-                                        action="#{ceCaseSearchProfileBB.onViolationRemoveCommitButtonChange}"
-                                        value="Remove Violation ID:#{ceCaseSearchProfileBB.currentViolation.violationID}"
-                                        />
+                                        <p:commandButton 
+                                            id="violation-remove-button"
+                                            icon="fa fa-trash"
+                                            ajax="false"
+                                            action="#{ceCaseSearchProfileBB.onViolationRemoveCommitButtonChange}"
+                                            value="Remove Violation ID:#{ceCaseSearchProfileBB.currentViolation.violationID}"
+                                            />
+                                    </div>
+
+                                    <div class="restrict-main-contents-io-button gray_button">
+
+
+                                        <p:commandButton    id="violation-nuke-cancel-button"
+                                                            ajax="true"  
+                                                            tabindex="27"
+                                                            value="Cancel"
+                                                            icon="fa fa-stop"
+                                                            immediate="true"
+                                                            process="@none"
+                                                            onclick="PF('violation-remove-dialog-var').hide()"
+                                                            />
+
+
+                                    </div>
                                 </div>
                             </div>
 
@@ -4540,6 +4706,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 responsive="true"
                                 resizable="trie"
                                 closable="true"
+                                modal="true"
                                 closeOnEscape="true"
                                 header="Nullify Violation"
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
@@ -4547,7 +4714,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         <h:form id="violation-nullify-form">
 
                             <div class="ui-g data_container_nested_restrict">
-                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
                                     <div class="restrict-data-field-label-inline" >
 
                                         <h:outputLabel  for="violation-nullify-button">
@@ -4555,16 +4722,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </h:outputLabel>
                                     </div>
                                 </div>
-                                <div class="restrict-main-contents-io-button red_button">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
+
+                                    <div class="restrict-main-contents-io-button red_button">
 
 
-                                    <p:commandButton 
-                                        id="violation-nullify-button"
-                                        icon="fa fa-trash"
-                                        ajax="false"
-                                        action="#{ceCaseSearchProfileBB.onViolationNullifyCommitButtonChange}"
-                                        value="Nullify Violation ID:#{ceCaseSearchProfileBB.currentViolation.violationID}"
-                                        />
+                                        <p:commandButton 
+                                            id="violation-nullify-button"
+                                            icon="fa fa-trash"
+                                            ajax="false"
+                                            action="#{ceCaseSearchProfileBB.onViolationNullifyCommitButtonChange}"
+                                            value="Nullify Violation ID:#{ceCaseSearchProfileBB.currentViolation.violationID}"
+                                            />
+                                    </div>
+
+
+                                    <div class="restrict-main-contents-io-button gray_button">
+
+
+                                        <p:commandButton    id="violation-nullify-cancel-button"
+                                                            ajax="true"  
+                                                            tabindex="27"
+                                                            value="Cancel"
+                                                            icon="fa fa-stop"
+                                                            immediate="true"
+                                                            process="@none"
+                                                            onclick="PF('violation-nullify-dialog-var').hide()"
+                                                            />
+
+
+                                    </div>
                                 </div>
                             </div>
 
@@ -4578,6 +4765,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 height="800" width="1600"
                                 widgetVar="violation-photos-dialog-var"
                                 responsive="true"
+                                modal="true"
                                 resizable="trie"
                                 closable="true"
                                 closeOnEscape="true"
@@ -4669,6 +4857,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 resizable="trie"
                                 closable="true"
                                 closeOnEscape="true"
+                                modal="true"
                                 header="Violation notes"
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                 > 
@@ -4725,10 +4914,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                     <p:dialog   id="violation-selectelement-dialog"
-                                height="700" width="1000"
+                                height="1000" width="1200"
                                 widgetVar="violation-selectelement-dialog-var"
                                 responsive="true"
-                                resizable="trie"
+                                modal="true"
+                                resizable="true"
                                 closable="true"
                                 closeOnEscape="true"
                                 header="Choose Ordinance"

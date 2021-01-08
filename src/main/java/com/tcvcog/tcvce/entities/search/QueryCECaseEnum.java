@@ -29,8 +29,13 @@ public  enum QueryCECaseEnum
                             RoleType.MuniReader, 
                             true),
     
-    OPENED_30DAYS(          "Opened past 30 days", 
-                            "Cases opene in the past 30 days", 
+    OPEN_ASOFENDDATE(     "Cases that were open as of a given date", 
+                            "Only casese that were open at the end date", 
+                            RoleType.MuniReader, 
+                            true),
+    
+    OPENED_INDATERANGE(     "Opened in a given date range", 
+                            "Cases opened from start to end date", 
                             RoleType.MuniReader, 
                             true),
     

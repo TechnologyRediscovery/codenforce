@@ -803,7 +803,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 break;
             case CURRENT_TIMEFRAMES:
                 break;
-            case OPENED_30DAYS:
+            case OPENED_INDATERANGE:
                 paramsList.add(genParams_CECase_openedInDateRange(params, cred));
                 break;
             case CLOSED_CASES:
