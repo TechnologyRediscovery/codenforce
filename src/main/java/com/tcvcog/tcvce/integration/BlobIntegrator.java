@@ -294,7 +294,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * Gets the bytes 
+     * Gets the binary data of a file in the database
      * @param bytesID
      * @return
      * @throws IntegrationException 
@@ -330,7 +330,12 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         return blobBytes;
         
     } 
-    
+    /**
+     * @param rs
+     * @return
+     * @throws SQLException
+     * @throws MetadataException 
+     */
     private Metadata generateBlobMetadata(ResultSet rs) throws SQLException, MetadataException{
         Metadata meta = new Metadata();
         meta.setBytesID(rs.getInt("blobbytes_bytesid"));
@@ -401,7 +406,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * stores this photo meta in the db
+     * stores this photodoc in the db
      * @param blob the meta to be stored
      * @return the blobID of the newly stored meta
      * @throws com.tcvcog.tcvce.domain.BlobTypeException
@@ -436,7 +441,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             rs.next();
             int lastID = rs.getInt(1);
             
-            //set the IDs so we can throw the blob back and they can access the blob and bytes
+            //set the IDs so after we throw the blob back they can access the blob and bytes
             blob.setBlobID(lastID);
             blob.setBytesID(bytesID);
             
@@ -489,7 +494,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * stores this pdf meta in the db
+     * stores this pdfdoc in the db
      * @param blob the meta to be stored
      * @return the blobID of the newly stored meta
      * @throws com.tcvcog.tcvce.domain.BlobTypeException
@@ -540,7 +545,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * stores the bytes of a meta in the db
+     * stores the binary data of a file in the db
      * @param blob the meta to be stored
      * @return the blobID of the newly stored meta
      * @throws com.tcvcog.tcvce.domain.BlobTypeException
@@ -842,7 +847,8 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      * No longer removes any connections to the pdfdoc
      * Users must erase each connection manually via the interface.
      * This method should only be used by the coordinator.
-     * Use the method on the coordinator to delete blobs, it is safer - checks for connections first.
+     * Use the method on the coordinator to delete blobs, it checks for connections first
+     * so it is safer.
      * @param blobID the blob to be removed
      * @throws IntegrationException thrown instead of a SQLException
      */

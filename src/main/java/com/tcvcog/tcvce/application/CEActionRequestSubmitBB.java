@@ -56,7 +56,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -72,7 +71,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     private CEActionRequest currentRequest;
 
     private Person currentPerson;
-    private int actionRequestorAssignmentMethod;
     private List<Person> personCandidateList;
     private boolean disabledPersonFormFields;
     private List<PersonType> submittingPersonTypes;
@@ -123,7 +121,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         // init new, empty photo list
 
         disabledPersonFormFields = false;
-        actionRequestorAssignmentMethod = 1;
 
         if (currentRequest == null) {
 
@@ -877,22 +874,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public void setCurrentRequest(CEActionRequest currentRequest) {
         this.currentRequest = currentRequest;
     }
-
-    /**
-     * @return the actionRequestorAssignmentMethod
-     */
-    public int getActionRequestorAssignmentMethod() {
-        return actionRequestorAssignmentMethod;
-    }
-
-    /**
-     * @param actionRequestorAssignmentMethod the
-     * actionRequestorAssignmentMethod to set
-     */
-    public void setActionRequestorAssignmentMethod(int actionRequestorAssignmentMethod) {
-        this.actionRequestorAssignmentMethod = actionRequestorAssignmentMethod;
-    }
-
+    
     /**
      * @return the personCandidateList
      */

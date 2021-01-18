@@ -17,6 +17,9 @@
 package com.tcvcog.tcvce.entities;
 
 /**
+ * A wrapper class that stores a PersonOccApplication that is stripped of all sensitive
+ * information.
+ * Look at the JavaDocs of the PublicInfoBundle Class for more information.
  *
  * @author Nathan Dietz
  */
@@ -33,6 +36,11 @@ public class PublicInfoBundlePersonOccApplication extends PublicInfoBundle {
         return bundledPerson;
     }
 
+    /**
+     * Remove all sensitive data from the PersonOccApplication and set it in the
+     * bundledPerson field.
+     * @param input 
+     */
     public void setBundledPerson(PersonOccApplication input) {
         
         //PersonOccPeriod and person share most of the same fields,
@@ -56,6 +64,5 @@ public class PublicInfoBundlePersonOccApplication extends PublicInfoBundle {
         
         bundledPerson = input;
     }
-    
     
 }

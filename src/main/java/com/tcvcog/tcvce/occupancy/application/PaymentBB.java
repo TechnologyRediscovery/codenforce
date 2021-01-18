@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.NavigationException;
@@ -50,8 +51,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     private Payment selectedPayment;
     private ArrayList<PaymentType> paymentTypeList;
     private PaymentType selectedPaymentType;
-    private PaymentType newSelectedPaymentType;
-    private PaymentType newPaymentType;
 
     private OccPeriodDataHeavy currentOccPeriod;
     private CECaseDataHeavy currentCase;
@@ -71,7 +70,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     public void initBean() {
         if (getSessionBean().getNavStack().peekLastPage() != null) {
 
-            refreshFeeAssignedList();
+            refreshLists();
 
             redirected = true;
         }
@@ -85,13 +84,17 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         currentPaymentSelected = false;
     }
 
-    public void refreshFeeAssignedList() {
+    /**
+     * Refreshes payment types, assigned fees, the current OccPeriod or CECase, 
+     * and the payments attached to those entities.
+     */
+    public void refreshLists() {
 
         feeAssignedList = new ArrayList<>();
 
         paymentList = new ArrayList<>();
 
-        boolean paymentSet = false;
+        boolean paymentSet = false; //Once we populate paymentList, we'll set this to true.
 
         PaymentCoordinator pc = getPaymentCoordinator();
         try {
@@ -175,6 +178,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         }
 
         if (!paymentSet) {
+            //We never setpaymentList, let's just grab all the payments
             try {
                 paymentList = pc.getAllPayments();
             } catch (IntegrationException ex) {
@@ -260,14 +264,14 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             // "Select" button wasn't selected
         } else {
             //turn to default setting
-            refreshFeeAssignedList();
+            refreshLists();
 
             currentPaymentSelected = false;
 
             selectedPayment = new Payment();
 
             //Message Noticefication
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Municipality: " + selectedPayment.getPaymentID(), ""));
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Payment: " + selectedPayment.getPaymentID(), ""));
         }
 
     }
@@ -285,6 +289,13 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         }
     }
 
+    /**
+     * Inserts a new Payment object into the database.
+     * When the interface makes a new Payment object, it stores the new Payment
+     * in the "selectedPayment" field. So, in this case, 
+     * the selectedPayment is a new fee.
+     * @return 
+     */
     public String onInsertButtonChange() {
 
         PaymentCoordinator pc = getPaymentCoordinator();
@@ -316,6 +327,10 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         return "payments";
     }
 
+    /**
+     * Applies changes on the selected Payment to the database.
+     * @return 
+     */
     public String onUpdateButtonChange() {
 
         PaymentCoordinator pc = getPaymentCoordinator();
@@ -340,6 +355,11 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * Removes the selected payment from the database.
+     * TODO: This should only deactivate the payment, not remove it.
+     * @return 
+     */
     public String onRemoveButtonChange() {
 
         PaymentCoordinator pc = getPaymentCoordinator();
@@ -364,6 +384,10 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * The user is done managing payments, let's send them back to wherever they came from.
+     * @return 
+     */
     public String finishAndRedir() {
         try {
             return getSessionBean().getNavStack().popLastPage();
@@ -388,16 +412,23 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * @return whether or not the user is currently editing Payments related to an OccPeriod
+     */
     public boolean editingOccPeriod() {
         return (getSessionBean().getNavStack().peekLastPage() != null && currentOccPeriod != null && currentDomain == EventDomainEnum.OCCUPANCY);
     }
 
+    /**
+     * 
+     * @return whether or not the user is currently editing Payments related to a CECase
+     */
     public boolean editingCECase() {
         return (getSessionBean().getNavStack().peekLastPage() != null && currentCase != null && currentDomain == EventDomainEnum.CODE_ENFORCEMENT);
     }
 
     /**
-     * Gets the current address the user is editing
+     * Gets the current address of the current OccPeriod or CECase
      *
      * @return
      */
@@ -407,12 +438,10 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
         if (editingOccPeriod()) {
 
-            PaymentCoordinator pc = getPaymentCoordinator();
-
+            PropertyCoordinator pc = getPropertyCoordinator();
             try {
-                address = pc.getAddressFromPropUnitID(currentOccPeriod.getPropertyUnitID());
+                return pc.getPropertyByPropUnitID(currentOccPeriod.getPropertyUnitID()).getAddress();
             } catch (IntegrationException ex) {
-                address = "";
                 System.out.println(ex.toString());
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -476,6 +505,9 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * @param type The PaymentType to be selected
+     */
     public void onSelectedPayTypeButtonChange(PaymentType type) {
         // "Select" button was selected
         if (currentPaymentSelected == true) {
@@ -514,6 +546,10 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         }
     }
 
+    /**
+     * Applies changes on the selected PaymentType to the database.
+     * @return 
+     */
     public String onUpdatePayTypeButtonChange() {
 
         PaymentCoordinator pc = getPaymentCoordinator();
@@ -535,6 +571,13 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * Inserts a new PaymentType object into the database.
+     * When the interface makes a new PaymentType object, it stores the new type
+     * in the "selectedPaymentType" field. So, in this case, 
+     * the selectedPaymentType is a new fee.
+     * @return 
+     */
     public String onInsertPayTypeButtonChange() {
 
         PaymentCoordinator pc = getPaymentCoordinator();
@@ -554,6 +597,10 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * Remove the selected PaymentType from the database.
+     * @return 
+     */
     public String onRemovePayTypeButtonChange() {
 
         PaymentCoordinator pc = getPaymentCoordinator();
@@ -605,28 +652,6 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
      */
     public void setSelectedPaymentType(PaymentType selectedPaymentType) {
         this.selectedPaymentType = selectedPaymentType;
-    }
-
-    /**
-     * @return the newFormSelectedPaymentType
-     */
-    public PaymentType getNewSelectedPaymentType() {
-        return newSelectedPaymentType;
-    }
-
-    /**
-     * @param newSelectedPaymentType the newFormSelectedPaymentType to set
-     */
-    public void setNewSelectedPaymentType(PaymentType newSelectedPaymentType) {
-        this.newSelectedPaymentType = newSelectedPaymentType;
-    }
-
-    public PaymentType getNewPaymentType() {
-        return newPaymentType;
-    }
-
-    public void setNewPaymentType(PaymentType newPaymentType) {
-        this.newPaymentType = newPaymentType;
     }
 
     public String getCurrentMode() {

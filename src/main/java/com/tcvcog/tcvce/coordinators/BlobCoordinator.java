@@ -94,8 +94,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * The BlobCoordinator attempts to automatically retrieve an defaultStream for the
- interface.
+     * The BlobCoordinator attempts to retrieve an image with a given Blob ID supplied by a JSF parameter. 
+     * If something were to go wrong, automatically retrieve the defaultStream for the interface.
      *
      * @return
      * @throws BlobTypeException
@@ -123,6 +123,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
                             sc = new DefaultStreamedContent(new ByteArrayInputStream(blob.getBytes()));
                             break;
                         case PDF:
+                            //For PDFs, just display an icon
+                            
                             sc = new DefaultStreamedContent(new FileInputStream(new File("/home/noah/Documents/COG Project/codeconnect/src/main/webapp/images/pdf-icon.png")));
                             break;
                         default:
@@ -142,8 +144,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * The BlobCoordinator attempts to automatically retrieve a PDF document for the
-     * interface to display
+     * The BlobCoordinator attempts to retrieve a PDF with a given Blob ID supplied by a JSF parameter. 
+     * If something were to go wrong, automatically retrieve the defaultStream for the interface.
      *
      * @return
      * @throws BlobTypeException
@@ -281,7 +283,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         bi.updateBlobFilename(blob);
         
     }
-
+    
     public Blob getPhotoBlob(int blobID) throws IntegrationException, BlobException {
         BlobIntegrator bi = getBlobIntegrator();
 
@@ -375,7 +377,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
-     * A method for grabbing PhotoBlobLights that's safe:
+     * A method for grabbing PDFBlobLights that's safe:
      * if it encounters an entry that does not yet have a properly
      * populated metadata column, it strips the metadata and saves it
      * before returning the blob.
@@ -440,6 +442,18 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         return blobList;
     }
     
+    /**
+     * Deletes an image from the database, but only if it is not connected to any BObs.
+     * If, after deleting the photodoc entry, the bytes are not connected to any
+     * other photodoc, the bytes themselves are also deleted.
+     * @param blob
+     * @throws IntegrationException
+     * @throws EventException
+     * @throws AuthorizationException
+     * @throws ViolationException
+     * @throws BObStatusException
+     * @throws BlobException 
+     */
     public void deletePhotoBlob(BlobLight blob) 
             throws IntegrationException, 
             EventException, 
@@ -471,9 +485,9 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * A method that removes all metadata from an defaultStream blob's bytes and puts
- them into its Metadata field. Should always be called before saving an
- defaultStream file to the database.
+     * A method that removes all metadata from an image blob's bytes and puts
+     * them into its Metadata field. Should always be called before saving an
+     * image file to the database.
      *
      * @param input
      * @return The blob that was put into it, stripped of metadata
@@ -503,7 +517,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
         //Extract metadata and place it in the blob
         
-        //First we need to get an defaultStream reader.
+        //First we need to get an image reader.
         //The file extension is required because the default getImageReaders()
         //method guesses what file type the bytes are, and sometimes it guesses wrong.
         //Using the getImageReadersByFormatName() ensures we get the right one.
@@ -529,7 +543,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         input.setBlobMetadata(blobMeta);
         
-        //Strip the metadata by reading out only the defaultStream data and writing it back
+        //Strip the metadata by reading out only the image data and writing it back
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
@@ -537,7 +551,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         ImageIO.write(temp, fileExtension, baos);
         
-        //These bytes should only be the defaultStream file itself, without the metadata. But that in the bytes field.
+        //These bytes should only be the image file itself, without the metadata. But that in the bytes field.
         
         input.setBytes(baos.toByteArray());
         
@@ -562,6 +576,9 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
+     * Deletes a PDF from the database, but only if it is not connected to any BObs.
+     * If, after deleting the pdfdoc entry, the bytes are not connected to any
+     * other pdfdoc, the bytes themselves are also deleted.
      * @param blob
      * @throws IntegrationException
      * @throws EventException
@@ -601,9 +618,9 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * A method that removes all metadata from an defaultStream blob's bytes and puts
- them into its Metadata field. Should always be called before saving an
- defaultStream file to the database.
+     * A method that removes all metadata from a PDF blob's bytes and puts
+     * them into its Metadata field. Should always be called before saving a
+     * PDF file to the database.
      * @param input
      * @return The blob that was put into it, stripped of metadata
      * @throws java.io.IOException
@@ -691,8 +708,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
-     * Takes a Node of defaultStream metadata and extracts its values and keys into the Metadata
- object. Once it's done extracting all the information it needs, it tosses
+     * Takes a Node of image metadata and extracts its values and keys into the Metadata
+     * object. Once it's done extracting all the information it needs, it tosses
      * the Metadata object back.
      * @param node The node to extract from
      * @param meta The Metadata object to fill with data.
@@ -728,8 +745,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
-     * Accepts a filename and returns only the file extension
-     * E.g. "defaultStream.jpg" -> "jpg"
+     * Accepts a filename and returns only the file extension.
+     * E.g. "image.jpg" -> "jpg"
      * @param filename
      * @return 
      */

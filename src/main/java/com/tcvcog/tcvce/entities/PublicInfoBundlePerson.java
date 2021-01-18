@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
+ * A wrapper class that stores a Person that is stripped of all sensitive
+ * information.
+ * Look at the JavaDocs of the PublicInfoBundle Class for more information.
  *
  * @author Nathan Dietz
  */
@@ -37,8 +40,14 @@ public class PublicInfoBundlePerson extends PublicInfoBundle {
         return bundledPerson;
     }
     
+    /**
+     * Remove all sensitive data from the Person and set it in the
+     * bundledPerson field.
+     * @param input 
+     */
     public void setBundledPerson(Person input) {
         
+        //If this person is a minor, they should be hidden from the public
         setPaccEnabled(!input.isUnder18());
         
         input.setCreatorUserID(0);

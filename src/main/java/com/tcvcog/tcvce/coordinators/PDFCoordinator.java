@@ -20,7 +20,9 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import java.io.Serializable;
 
 /**
- *
+ * This class will contain methods that dynamically generate PDF reports. These 
+ * methods will not interact with the database directly, but simply generate a 
+ * report and return it.
  * @author Nathan Dietz
  */
 public class PDFCoordinator extends BackingBeanUtils implements Serializable {

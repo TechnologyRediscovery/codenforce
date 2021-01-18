@@ -21,13 +21,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A wrapper class that stores a FeeAssigned that is stripped of all sensitive
+ * information.
+ * Look at the JavaDocs of the PublicInfoBundle Class for more information.
  *
  * @author Nathan Dietz
  */
 public class PublicInfoBundleFeeAssigned extends PublicInfoBundle {
 
     private FeeAssigned bundledFee;
-    private List<PublicInfoBundlePayment> paymentList;
+    //A list of anonymized payments that have been applied to the fee
+    private List<PublicInfoBundlePayment> paymentList; 
     
     private int occPerAssignedFeeID;
     private int occPeriodID;
@@ -48,6 +52,11 @@ public class PublicInfoBundleFeeAssigned extends PublicInfoBundle {
         return bundledFee;
     }
     
+    /**
+     * Remove all sensitive data from the FeeAssigned and set it in the
+     * bundledFee field.
+     * @param input 
+     */
     public void setBundledFee(FeeAssigned input) {
 
         switch(input.getDomain()){

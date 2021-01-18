@@ -19,13 +19,13 @@ package com.tcvcog.tcvce.entities;
 import java.io.Serializable;
 
 /**
- *
+ * 
  * @author Nathan Dietz
  */
 public class MetadataKey implements Serializable {
 
-    private String label;
-    private String key;
+    private final String label;
+    private final String key;
     
     
     public MetadataKey(String nodeName){
