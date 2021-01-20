@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2018 Turtle Creek Valley
-Council of Governments, PA
+ * Copyright (C) 2018 Turtle Creek Valley Council of Governments, PA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -189,6 +188,10 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.BlobTypeException
      */
     public Blob storeBlob(Blob blob) throws BlobException, IOException, IntegrationException, BlobTypeException {
+        if (blob.getBytes()== null || blob.getBytes().length == 0) {
+            throw new BlobException("You cannot upload a file without binary data");
+        }
+        
         //Test to see if the byte array is larger than a GIGABYTE
         if (blob.getBytes().length > GIGABYTE) {
             throw new BlobException("You cannot upload a file larger than 1 gigabyte.");

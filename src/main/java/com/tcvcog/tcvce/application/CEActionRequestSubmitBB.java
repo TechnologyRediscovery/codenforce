@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 cedba
+ * Copyright (C) 2017 Technology Rediscovery LLC.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,9 +32,7 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
-import java.util.Date;
 import java.io.Serializable;
-import org.primefaces.component.tabview.TabView;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestIssueType;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -48,7 +46,6 @@ import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.IOException;
@@ -68,18 +65,19 @@ import org.primefaces.event.FileUploadEvent;
  */
 public class CEActionRequestSubmitBB extends BackingBeanUtils implements Serializable {
 
-    private CEActionRequest currentRequest;
+    private CEActionRequest currentRequest; //the CEAR the user is filling out
 
-    private Person currentPerson;
+    private Person currentPerson; //Used when selecting a person to attach to the CEAR
+    
+    //If the user is an employee with restricted access, they can select some 
+    //persons using the restricted tools. They will appear in this field.
     private List<Person> personCandidateList;
-    private boolean disabledPersonFormFields;
-    private List<PersonType> submittingPersonTypes;
-
-    private TabView tabView;
-    private int currentTabIndex;
+    
+    private List<PersonType> submittingPersonTypes; //A list of person types that can fill out a CEAR;
 
     private List<Property> propList; //TODO: Turn into PublicInfoBundles!
 
+    //Two fields used for searching properties
     private String houseNum;
     private String streetName;
 
@@ -89,20 +87,10 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
     private List<CEActionRequestIssueType> issueTypeList;
 
-    private boolean form_atSpecificAddress;
-    private String form_nonPropertyLocation;
-
-    private String form_requestDescription;
-    private boolean form_isUrgent;
-    private Date form_dateOfRecord;
-
-    private boolean form_anonymous;
-
-    private int submittedRequestPACC;
-
-    // located address
+    //Used by the interface to prevent users from selecting dates in the future.
     private java.util.Date currentDate;
     
+    //Fields used when adding descriptions to blobs.
     private String blobDescription;
     private int descriptionBlobID;
 
@@ -115,13 +103,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     @PostConstruct
     public void initBean() {
 
-        // set date of record to current date
-        form_dateOfRecord = java.util.Date.from(java.time.LocalDateTime.now()
-                .atZone(ZoneId.systemDefault()).toInstant());
-        // init new, empty photo list
-
-        disabledPersonFormFields = false;
-
         if (currentRequest == null) {
 
             initializeReqAndMuni();
@@ -130,7 +111,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
         submittingPersonTypes = new ArrayList<>();
 
-        //Manually add what person types we want.
+        //Manually add what person types users should choose from
         submittingPersonTypes.add(PersonType.MuniStaff);
         submittingPersonTypes.add(PersonType.Owner);
         submittingPersonTypes.add(PersonType.Tenant);
@@ -142,50 +123,55 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
     public void initializeReqAndMuni() {
 
-        CEActionRequest sessReq = getSessionBean().getSessCEAR();
+        currentRequest = getSessionBean().getSessCEAR();
         CaseCoordinator cc = getCaseCoordinator();
-        PropertyIntegrator pi = getPropertyIntegrator();
-        BlobCoordinator bc = getBlobCoordinator();
         User usr = getSessionBean().getSessUser();
 
         if (usr != null) {
 
             selectedMuni = getSessionBean().getSessMuni();
 
-            if (sessReq != null) {
+            if (currentRequest != null) {
 
                 personCandidateList = getSessionBean().getSessPersonList();
 
+            //TODO: This allows you to use persons related to a property, 
+            //but this should only be used by users with restricted access.
+            //So maybe add it to a restricted CEAR interface
+            
+//              PropertyIntegrator pi = getPropertyIntegrator();
 //                if (currentRequest.getRequestProperty() != null) {
-//            TODO: occbeta
-//            try {
-//                personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getPropertyID()).getPersonOccApplicationList();
-//            } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
-//                System.out.println(ex);
-//            }
+//                      try {
+//                          personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getPropertyID()).getPersonOccApplicationList();
+//                      } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
+//                          System.out.println(ex);
+//                      }
 //                }
             }
 
         }
-
-        currentRequest = sessReq;
 
         if (currentRequest == null) {
             currentRequest = new CEActionRequest();
             currentRequest.setBlobList(new ArrayList<BlobLight>());
         }
 
-        if (currentRequest.getMuni() != null) {
+        //Load the issue types so the user can categorize their problem
             try {
-//                issueTypeList = cc.cear_getIssueTypes(currentRequest.getMuni());
                 issueTypeList = cc.cear_getIssueTypes();
             } catch (IntegrationException ex) {
                 System.out.println("Error occured while fetching issue typelist: " + ex);
             }
-        }
-
+            
+            //If at a later date we wish to only get issue types from a certain muni
+            //You can always use:
+            //cc.cear_getIssueTypes(currentRequest.getMuni());
     }
 
+    /**
+     * Return to the previous step
+     * @return 
+     */
     public String goBack() {
         try {
             return getSessionBean().getNavStack().popLastPage();
@@ -196,40 +182,94 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             context.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Something went wrong when we tried to direct you back a page!", ""));
+            
             context.getExternalContext().getFlash().setKeepMessages(true);
+            
             return "requestCEActionFlow";
         }
     }
 
+    /**
+     * A user with restricted access can use their account information
+     * instead of filling out the request manually.
+     * @return 
+     */
     public String requestActionAsFacesUser() {
         currentRequest.setRequestor(getSessionBean().getSessUser().getPerson());
         getSessionBean().setSessCEAR(currentRequest);
         return "reviewAndSubmit";
     }
 
-    //TODO: Determine if die
-    public void changePropertyPersonsDropDown() {
-
-    }
-
-    //TODO: Determine if die
-    public void changeActionRequestorAssignment() {
-
-    }
-
+    /**
+     * A user with restricted access can select a person from a list and use
+     * their information instead of filling out the person manually.
+     * @return 
+     */
     public String assignSelectedRequestorPersonAndContinue() {
         currentRequest.setRequestor(currentPerson);
         getSessionBean().setSessCEAR(currentRequest);
         return "reviewAndSubmit";
     }
 
+    /**
+     * If the user filled in the requestor's information manually, we double-check
+     * that information before setting it on the SessionBean and moving on.
+     * @return 
+     */
     public String validateActionRequestorNewPersonAndContinue() {
+        //Make a copy of the requestor for testing.
+        Person test = currentRequest.getRequestor();
+        
+        //Mostly we need to make sure certain fields were not left blank
+        
+        if(test.getFirstName() == null || test.getFirstName().trim().length() == 0){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please enter in your first name",
+                            ""));
+            return "";
+        }
+        
+        if(test.getLastName() == null || test.getLastName().trim().length() == 0){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please enter in your last name",
+                            ""));
+            return "";
+        }
+        
+        if(test.getAddressStreet() == null || test.getAddressStreet().trim().length() == 0
+                || test.getAddressCity()== null || test.getAddressCity().trim().length() == 0
+                || test.getAddressState()== null || test.getAddressState().trim().length() == 0
+                || test.getAddressZip()== null || test.getAddressZip().trim().length() == 0){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please enter in your full address",
+                            ""));
+            return "";
+        }
+        
+        if(test.getEmail()== null || test.getEmail().trim().length() == 0){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please enter in an email where we can reach you",
+                            ""));
+            return "";
+        }
+        
         getSessionBean().setSessCEAR(currentRequest);
         getSessionBean().getNavStack().pushCurrentPage();
         return "reviewAndSubmit";
     }
-
-    public int insertActionRequestorNewPerson(Person p) {
+    
+    /**
+     * A method used to insert the requestor into the database
+     * when finalizing the request process.
+     * Used by the method submitActionRequest() in this class.
+     * @param p
+     * @return 
+     */
+    private int insertActionRequestorNewPerson(Person p) {
         PersonIntegrator personIntegrator = getPersonIntegrator();
         SystemIntegrator si = getSystemIntegrator();
         int insertedPersonID = 0;
@@ -251,11 +291,13 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         } catch (NullPointerException ex) {
             System.out.println(ex.toString());
         }
+        
+        //Remember to throw back the person's ID!
         return insertedPersonID;
-    } // close storePerson 
+    }
 
     /**
-     * Entry mechanism to the Code Enforcement Action Request creation process
+     * Entry mechanism to the Code Enforcement Action Request creation process:
      * We grab the muni the user selected, set it in the new Action Request and
      * store it in the session bean which we'll access and manipulate over the
      * next few pages and finally submit on the last page. This is a poor
@@ -267,7 +309,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         CEActionRequest cear;
         CaseCoordinator cc = getCaseCoordinator();
         cear = cc.cear_getInititalizedCEActionRequest();
-        cear.setDateOfRecordUtilDate(form_dateOfRecord);
         cear.setMuni(selectedMuni);
         cear.setBlobList(new ArrayList<BlobLight>());
         cear.setRequestProperty(new Property());
@@ -276,6 +317,11 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         return "chooseProperty";
     }
 
+    /**
+     * Stores the property that requires code enforcement before moving on to
+     * the description step.
+     * @return 
+     */
     public String storePropertyInfo() {
         if (currentRequest.getRequestProperty() == null) {
             getFacesContext().addMessage(null,
@@ -288,22 +334,34 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         return "describeConcern";
     }
 
+    /**
+     * Save the descriptive fields of the request on the sessionBean and move
+     * to the next page.
+     * Also validates to make sure the user has filled out all the required fields.
+     * @return 
+     */
     public String saveConcernDescriptions() {
-//        User u = getSessionBean().getFacesUser();
-//        if(u == null){
 
+        if(currentRequest.getIssue() == null){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please specify what kind of issue you are reporting", ""));
+            return "";
+        }
+        
+        if(currentRequest.getRequestDescription()== null || currentRequest.getRequestDescription().trim().length() == 0){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Please give a short description of the issue", ""));
+            return "";
+        }
+        
         if (currentRequest.getBlobList() == null) {
             currentRequest.setBlobList(new ArrayList<BlobLight>());
         }
         getSessionBean().setSessCEAR(currentRequest);
         getSessionBean().getNavStack().pushCurrentPage();
         return "photoUpload";
-//            
-//        } else {
-//            
-//            return "reviewAndSubmit";
-//        }
-
     }
 
     /**
@@ -344,12 +402,17 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         return "requestorDetails";
     }
 
+    /**
+     * The photos the user uploaded are already saved in the database, so let's 
+     * just save the descriptions the user entered in and move on.
+     * @return 
+     */
     public String savePhotosAndContinue() {
 
         BlobIntegrator bi = getBlobIntegrator();
         for (BlobLight b : currentRequest.getBlobList()) {
 
-            //Also, save the description to the database.
+            //save the description to the database.
             try {
                 bi.updatePhotoBlobDescription(b);
             } catch (IntegrationException ex) {
@@ -373,9 +436,13 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      */
     public String goBackFromPhotos() {
         try {
-            //Just use the uploading 
+            //Just use the uploading method
             savePhotosAndContinue();
 
+            //savePhotosAndContinue() puts another page on the stack, so let's 
+            //toss that into the void
+            getSessionBean().getNavStack().popLastPage();
+            
             return getSessionBean().getNavStack().popLastPage();
         } catch (NavigationException ex) {
             System.out.println("CEActionRequestSubmitBB.goBackFromPhotos() | ERROR: " + ex);
@@ -413,6 +480,10 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         currentRequest.getBlobList().remove(input);
     }
 
+    /**
+     * This method sets up the requestor field on the request so it can be manipulated
+     * by the interface when the user enters in their data.
+     */
     private void setupPersonEntry() {
         UserCoordinator uc = getUserCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
@@ -423,9 +494,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-//        skel.setSourceID(Integer.parseInt(
-//                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-//                .getString("actionRequestPublicUserPersonSourceID")));
         currentRequest.setRequestor(skel);
         getSessionBean().setSessCEAR(currentRequest);
     }
@@ -451,7 +519,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Something went wrong while trying to upload your photo,please try again.",
+                            "Something went wrong while trying to upload your photo, please try again.",
                             "If this problem persists, please call your municipal office."));
         } catch (BlobException ex) {
             System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
@@ -465,10 +533,10 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     }
 
     /**
-     * This action method is called when the request code enforcement action
-     * request is submitted online (submit button in submitCERequest
+     * This method finalizes the CEAR submission process by saving the request
+     * in the database as well as all the objects attached to it.
      *
-     * @return the page ID for navigation
+     * @return
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public String submitActionRequest() throws IntegrationException {
@@ -481,13 +549,15 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
         int submittedActionRequestID;
         int personID;
-        // start by pulling the person fields and sending them to be entered
-        // into db as a person. The ID of this person is returned, and used in our
+        // start by pulling the person fields and sending them to be saved
+        // in db as a person. The ID of this person is returned, and used in our
         // insertion of the action request as a whole. 
 
         // LT goal: bundle these into a transaction that is rolled back if either 
         // the person or the request bounces
         if (currentRequest.getRequestor().getPersonID() == 0) {
+            
+            //The person is not in our database, prepared it for saving
             if (getSessionBean().getSessUser() != null) {
                 currentRequest.getRequestor().setSource(
                         si.getBOBSource(Integer.parseInt(
@@ -499,8 +569,11 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                                 getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                                         .getString("actionRequestPublicUserPersonSourceID"))));
             }
+            
+            //insert it into the database.
             personID = insertActionRequestorNewPerson(currentRequest.getRequestor());
             try {
+                //We want to get the entry we just inserted into the database
                 currentRequest.setRequestor(pi.getPerson(personID));
             } catch (IntegrationException ex) {
                 System.out.println(ex);
@@ -510,18 +583,21 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             // do nothing, since we already have the person in the system
         }
 
+        //Generate a PACC for the user to access the CEAR
         currentRequest.setRequestPublicCC(generateControlCodeFromTime(currentRequest.getMuniCode()));
         // all requests now are required to be at a known address
         currentRequest.setIsAtKnownAddress(true);
         currentRequest.setActive(true);
         currentRequest.setDateOfRecord(LocalDateTime.now(ZoneId.systemDefault()));
-//        
+        
         // note that the time stamp is applied by the integration layer
         // with a simple call to the backing bean getTimeStamp method
         try {
             // send the request into the DB
             submittedActionRequestID = ceari.submitCEActionRequest(currentRequest);
-            // Now go right back to the DB and get the request we just submitted to verify before displaying the PACC
+            
+            // get the request we just submitted to attach it to the files the user uploaded
+            // before displaying the PACC
             sb.setSessCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
 
             for (BlobLight blob : currentRequest.getBlobList()) {
@@ -548,6 +624,14 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         }
     }
 
+    /**
+     * Destroys all data the user has filled out so far (also deletes files they
+     * have uploaded) and returns them to the beginning of the request process
+     * so they can start over.
+     * Currently not used by the interface, as it could cause confusion.
+     * Still, this method is here in case it would like to be used at a later date.
+     * @return 
+     */
     public String restartRequest() {
 
         if (currentRequest.getBlobList().size() > 0) {
@@ -573,6 +657,10 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         return "requestCEActionFlow";
     }
 
+    /**
+     * A method that clears the navStack of all entries to ensure the user does 
+     * not retrace steps that are no longer needed.
+     */
     private void clearNavStack() {
         while (getSessionBean().getNavStack().peekLastPage() != null) {
             try {
@@ -583,18 +671,11 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         }
     }
 
-    public void storePropertyLocationInfo(ActionEvent event) {
-
-    }
-
-    public void storeNoPropertyInfo(ActionEvent event) {
-        System.out.println("ActionRequestBean.storeNoPropertyInfo | request location: " + form_nonPropertyLocation);
-    }
-
-    public void incrementalFormContinue(ActionEvent event) {
-        System.out.println("ActionRequestBean.incrementalFormContinue | tabview: " + currentTabIndex);
-    }
-
+    /**
+     * Uses the terms entered by the user to search properties within the muni
+     * the user selected.
+     * @param ev 
+     */
     public void searchForPropertiesSingleMuni(ActionEvent ev) {
         SearchCoordinator sc = getSearchCoordinator();
         UserCoordinator uc = getUserCoordinator();
@@ -637,91 +718,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                             "Your search completed with " + getPropList().size() + " results", ""));
         }
 
-    }
-
-    /**
-     * @return the form_nonPropertyLocation
-     */
-    public String getForm_nonPropertyLocation() {
-        return form_nonPropertyLocation;
-    }
-
-    /**
-     * @param form_nonPropertyLocation the form_nonPropertyLocation to set
-     */
-    public void setForm_nonPropertyLocation(String form_nonPropertyLocation) {
-        this.form_nonPropertyLocation = form_nonPropertyLocation;
-    }
-
-    /**
-     * @return the form_atSpecificAddress
-     */
-    public boolean isForm_atSpecificAddress() {
-        form_atSpecificAddress = true;
-        return form_atSpecificAddress;
-    }
-
-    /**
-     * @param form_atSpecificAddress the form_atSpecificAddress to set
-     */
-    public void setForm_atSpecificAddress(boolean form_atSpecificAddress) {
-        this.form_atSpecificAddress = form_atSpecificAddress;
-    }
-
-    /**
-     * @return the form_requestDescription
-     */
-    public String getForm_requestDescription() {
-        return form_requestDescription;
-    }
-
-    /**
-     * @param form_requestDescription the form_requestDescription to set
-     */
-    public void setForm_requestDescription(String form_requestDescription) {
-        this.form_requestDescription = form_requestDescription;
-    }
-
-    /**
-     * @return the form_isUrgent
-     */
-    public boolean isForm_isUrgent() {
-        return form_isUrgent;
-    }
-
-    /**
-     * @param form_isUrgent the form_isUrgent to set
-     */
-    public void setForm_isUrgent(boolean form_isUrgent) {
-        this.form_isUrgent = form_isUrgent;
-    }
-
-    /**
-     * @return the form_dateOfRecord
-     */
-    public Date getForm_dateOfRecord() {
-        return form_dateOfRecord;
-    }
-
-    /**
-     * @param form_dateOfRecord the form_dateOfRecord to set
-     */
-    public void setForm_dateOfRecord(Date form_dateOfRecord) {
-        this.form_dateOfRecord = form_dateOfRecord;
-    }
-
-    /**
-     * @return the form_anonymous
-     */
-    public boolean isForm_anonymous() {
-        return form_anonymous;
-    }
-
-    /**
-     * @param form_anonymous the form_anonymous to set
-     */
-    public void setForm_anonymous(boolean form_anonymous) {
-        this.form_anonymous = form_anonymous;
     }
 
     /**
@@ -785,22 +781,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      * @param houseNum the houseNum to set
      */
     public void setHouseNum(String houseNum) {
-        System.out.println("ActionRequestBean.setHouseNum");
         this.houseNum = houseNum;
-    }
-
-    /**
-     * @return the tabView
-     */
-    public TabView getTabView() {
-        return tabView;
-    }
-
-    /**
-     * @param tabView the tabView to set
-     */
-    public void setTabView(TabView tabView) {
-        this.tabView = tabView;
     }
 
     /**
@@ -815,20 +796,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      */
     public void setStreetName(String streetName) {
         this.streetName = streetName;
-    }
-
-    /**
-     * @return the submittedRequestPACC
-     */
-    public int getSubmittedRequestPACC() {
-        return submittedRequestPACC;
-    }
-
-    /**
-     * @param submittedRequestPACC the submittedRequestPACC to set
-     */
-    public void setSubmittedRequestPACC(int submittedRequestPACC) {
-        this.submittedRequestPACC = submittedRequestPACC;
     }
 
     /**
@@ -887,28 +854,6 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      */
     public void setPersonCandidateList(List<Person> personCandidateList) {
         this.personCandidateList = personCandidateList;
-    }
-
-    /**
-     * @return the disabledPersonFormFields
-     */
-    public boolean isDisabledPersonFormFields() {
-        return disabledPersonFormFields;
-    }
-
-    /**
-     * @param disabledPersonFormFields the disabledPersonFormFields to set
-     */
-    public void setDisabledPersonFormFields(boolean disabledPersonFormFields) {
-        this.disabledPersonFormFields = disabledPersonFormFields;
-    }
-
-    public int getCurrentTabIndex() {
-        return currentTabIndex;
-    }
-
-    public void setCurrentTabIndex(int currentTabIndex) {
-        this.currentTabIndex = currentTabIndex;
     }
 
     public List<CEActionRequestIssueType> getIssueTypeList() {
