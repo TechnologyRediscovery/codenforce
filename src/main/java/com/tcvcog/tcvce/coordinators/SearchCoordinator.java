@@ -806,6 +806,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case OPENED_INDATERANGE:
                 paramsList.add(genParams_CECase_openedInDateRange(params, cred));
                 break;
+            case OPEN_ASOFENDDATE:
+                paramsList.add(genParams_ceCase_openAsOf(params, cred));
+                break;
             case CLOSED_CASES:
                 paramsList.add(genParams_CECase_closedInDateRange(params, cred));
                 break;
@@ -1530,6 +1533,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setPropInfoCase_val(false);
         
         // filter CECASE-5
+        // THIS SHOULD PROBABLY BE DEFAULT TO CTL TRUE and VAL FALSE
         params.setPersonInfoCase_ctl(false);
         params.setPersonInfoCase_val(false);
         
@@ -1712,6 +1716,36 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         params.setPropInfoCase_ctl(true);
         params.setPropInfoCase_val(false);
+        
+        return params;
+    }
+    
+    public SearchParamsCECase genParams_ceCase_openAsOf(SearchParamsCECase params, Credential cred){
+        params.setFilterName("Finds cases that were open on a given close date");
+        
+        // STANDARD SWITCHES
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+        params.setPersonInfoCase_ctl(true);
+        params.setPersonInfoCase_val(false);
+        
+        params.setPropInfoCase_ctl(true);
+        params.setPropInfoCase_val(false);
+        
+        // SPECIFIC TO THIS QUERY
+        params.setDate_startEnd_ctl(true);
+        params.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATION_DOFRECORD);
+        params.setDate_relativeDates_ctl(false);
+        
+        // start a long time ago
+        params.setDate_start_val(LocalDateTime.now().minusYears(100));
+        // go up til stop date of query
+        params.setDate_end_val(params.getDate_end_val());
+        
+        // but make sure they are open cases
+        params.setCaseOpen_ctl(true);
+        params.setCaseOpen_val(true);
         
         return params;
     }

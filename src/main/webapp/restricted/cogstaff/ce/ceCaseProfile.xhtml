@@ -1594,7 +1594,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                     <p:dialog   id="case-forceclose-dialog"
                                 height="450" width="600"
-                                header="Force close case"
+                                header="close case"
                                 widgetVar="case-forceclose-dialog-var"
                                 closable="true" 
                                 resizable="true"
@@ -1628,6 +1628,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                     </div>
 
+                                </div>
+                                
+                                
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+                                    <p:outputLabel for="case-close-date"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Closing data of record"  />
+                                    </p:outputLabel>
+                                    
+                                    <div class="restrict-main-contents-io-content">
+                                      <p:calendar id="case-close-date"
+                                                  value="#{ceCaseSearchProfileBB.currentCase.closingDateUtilDate}" 
+                                                    mode="popup"  
+                                                    showOn="button" 
+                                                    pattern="EEE, dd MMM, yyyy"
+                                                    navigator="true" 
+                                                    tabindex="1"
+                                                    showButtonPanel="true" 
+                                                    showTodayButton="true"
+                                                    required="true"/>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+                                    <h:outputText value="when a case is closed, violations without compliance are automatically nullified" />
                                 </div>
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                                     <p:commandButton    id="cecase-forceclose-button"

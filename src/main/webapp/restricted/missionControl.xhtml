@@ -18,7 +18,7 @@
                 <f:view id="missionControlView">
                     <div class="mainContainer">
 
-                        
+
                         <h:form id="messages-global-form">
 
                             <p:growl id="messages-global-growl"
@@ -463,11 +463,11 @@
                                                     <h:outputText value="Actions" />
                                                 </f:facet>
                                                 <p:commandButton id="cecase-search-view-case"
-                                                                     icon="fa fa-folder-open-o"
-                                                                     value="Details"
-                                                                     action="#{missionControlBB.onViewCECaseButtonChange(c)}"
-                                                                     ajax="false"
-                                                                     />
+                                                                 icon="fa fa-folder-open-o"
+                                                                 value="Details"
+                                                                 action="#{missionControlBB.onViewCECaseButtonChange(c)}"
+                                                                 ajax="false"
+                                                                 />
                                             </p:column>
                                         </p:dataTable>
 
@@ -583,13 +583,13 @@
                                          toggleableHeader="true"
                                          menuTitle="">
                                     <h:form id="switch-muni-form">
-                                        
-                                    <p:commandButton    id="dash-switchmuni-button-switch"
-                                                        disabled="false"
-                                                        value="Change session credential" 
-                                                        styleClass="button" 
-                                                        action="#{missionControlBB.reauthenticate}" 
-                                                        icon="fa fa-exchange" />
+
+                                        <p:commandButton    id="dash-switchmuni-button-switch"
+                                                            disabled="false"
+                                                            value="Change session credential" 
+                                                            styleClass="button" 
+                                                            action="#{missionControlBB.reauthenticate}" 
+                                                            icon="fa fa-exchange" />
                                     </h:form>
                                 </p:panel>
 
@@ -637,49 +637,49 @@
                               modal="false"
                               height="600">
                         <h:form id="about-form">
-                            
-                        <h2>Help Topic: Dashboard</h2>
 
-                        <p>The dashboard is both a set of links to various system tools and a display of key data metrics of the system.</p>
+                            <h2>Help Topic: Dashboard</h2>
 
-                        <h3>You current municipality</h3>
+                            <p>The dashboard is both a set of links to various system tools and a display of key data metrics of the system.</p>
 
-                        <p>You are always navigating the system from the standpoint of a certain municipality, which is 
-                            always listed in the dark blue top banner bar. You cannot be in an "all municipalities" view mode. </p>
+                            <h3>You current municipality</h3>
 
-                        <p>CodeConnects looks up your current municipality to decide which case lists to show you when 
-                            viewing code enforcement data. On pages for searching or creating muni-specific data, your current
-                            municipality is used to set the default values.</p>
+                            <p>You are always navigating the system from the standpoint of a certain municipality, which is 
+                                always listed in the dark blue top banner bar. You cannot be in an "all municipalities" view mode. </p>
 
-                        <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
+                            <p>CodeConnects looks up your current municipality to decide which case lists to show you when 
+                                viewing code enforcement data. On pages for searching or creating muni-specific data, your current
+                                municipality is used to set the default values.</p>
 
-                        <h4>Switching municipalities</h4>
+                            <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
 
-                        <p>If you are authorized to change your municipality, you can do so with this drop down box and command button. After issuing
-                            the command to switch to a new municipality, the page will reload and both the listing on this page
-                            and in the header bar will reflect these changes.</p>
+                            <h4>Switching municipalities</h4>
 
-                        <h4>What is COG Land?</h4>
+                            <p>If you are authorized to change your municipality, you can do so with this drop down box and command button. After issuing
+                                the command to switch to a new municipality, the page will reload and both the listing on this page
+                                and in the header bar will reflect these changes.</p>
 
-                        <p>COG Land is a dream world where all mistakes are allowed and nothing bad ever happens. 
-                            If you make a mistake, nobody cares so you can tinker and explore and experiment with freedom and ease. All
-                            data stored in COG Land behaves just like a non-dreamland municipality but impacts no actual humans.</p>
+                            <h4>What is COG Land?</h4>
 
-                        <h3>User info verification</h3>
+                            <p>COG Land is a dream world where all mistakes are allowed and nothing bad ever happens. 
+                                If you make a mistake, nobody cares so you can tinker and explore and experiment with freedom and ease. All
+                                data stored in COG Land behaves just like a non-dreamland municipality but impacts no actual humans.</p>
 
-                        <p>CodeConnect is built on a system called Java ServerFaces(JSF) and the PrimeFaces library that works with JSF.
-                            The entire system runs inside a web server called Wildfly. Page control is managed by Glassfish but all other
-                            data in the system is linked to your user that's managed by JSF, hence the heading: 
-                            <span class="italic">Authenticated Faces User</span>.</p>
+                            <h3>User info verification</h3>
 
-                        <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
+                            <p>CodeConnect is built on a system called Java ServerFaces(JSF) and the PrimeFaces library that works with JSF.
+                                The entire system runs inside a web server called Wildfly. Page control is managed by Glassfish but all other
+                                data in the system is linked to your user that's managed by JSF, hence the heading: 
+                                <span class="italic">Authenticated Faces User</span>.</p>
+
+                            <p:commandLink  value="close help" onclick="PF('helpdlg').hide()" styleClass="noFill"/>
                         </h:form>
 
 
                     </p:dialog>
-                    
-                    
-                    
+
+
+
                     <p:dialog   id="cecase-list-report-dialog"
                                 widgetVar="cecase-list-report-dialog-var"
                                 closable="true" 
@@ -793,19 +793,30 @@
                                 </h:panelGroup>
 
                             </h:panelGrid>
+                            <div class="ui-g data_container_nested_restrict">
 
-                            <p:commandLink  ajax="false" 
-                                            action="#{ceCaseSearchProfileBB.generateReportCECaseList}"
-                                            value="Click to generate report in new tab" 
-                                            target="_blank"
-                                            styleClass="font-size:2em;"
-                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                            />
-                            <p:spacer height="5px" />
-                            <p:commandButton ajax="true" 
-                                             value="Cancel" icon="fa fa-stop" immediate="true"
-                                             onclick="PF('report-caselist-profile-diaglog-var').hide()"/>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                                    <div class="restrict-main-contents-io-link">
 
+                                        <p:commandLink  ajax="false" 
+                                                        action="#{ceCaseSearchProfileBB.generateReportCECaseList}"
+                                                        value="Click to generate report in new tab" 
+                                                        target="_blank"
+                                                        styleClass="font-size:2em;"
+                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                        />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                                        <div class="ui-button gray_button">
+
+                                            <p:commandButton ajax="true" 
+                                                             value="Cancel" icon="fa fa-stop" immediate="true"
+                                                             onclick="PF('report-caselist-profile-diaglog-var').hide()"/>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </h:form>
                     </p:dialog>
 

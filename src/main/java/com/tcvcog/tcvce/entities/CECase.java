@@ -259,7 +259,16 @@ public class        CECase
    
     
     public long getCaseAge() {
-        return EntityUtils.getTimePeriodAsDays(originationDate, LocalDateTime.now());
+        if(closingDate != null){
+            return EntityUtils.getTimePeriodAsDays(originationDate, closingDate);
+        } else {
+            return EntityUtils.getTimePeriodAsDays(originationDate, LocalDateTime.now());
+        }
+    }
+    
+    public long getCaseAgeAsOf(LocalDateTime ageEndTime){
+        return EntityUtils.getTimePeriodAsDays(originationDate, ageEndTime);
+        
     }
 
     /**

@@ -233,10 +233,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public void cecase_forceclose(CECaseDataHeavy cse, EventCategory closeEventCat, UserAuthorized ua) throws BObStatusException, IntegrationException, EventException{
         CaseIntegrator ci = getCaseIntegrator();
         EventCoordinator ec = getEventCoordinator();
-        
-        if(cse.getClosingDate() != null){
-            throw new BObStatusException("Cannot force close an already closed case");
+        if(cse == null){
+            throw new BObStatusException("Cannot close a null case");
         }
+//        if(cse.getClosingDate() != null){
+//            throw new BObStatusException("Cannot force close an already closed case");
+//        }
         if(closeEventCat == null){
             throw new BObStatusException("Cannot close case with null closing event");
         }
@@ -254,7 +256,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             }
         }
         
-        cse.setClosingDate(LocalDateTime.now());
+//        cse.setClosingDate(LocalDateTime.now());
         ci.updateCECaseMetadata(cse);
         events_processClosingEvent(cse, ec.initEvent(cse, closeEventCat), ua);
         
@@ -997,20 +999,32 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         spcse.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATIONTS);
         spcse.setDate_start_val(rpt.getDate_start_val());
         spcse.setDate_end_val(rpt.getDate_end_val());
-        rpt.setCaseListOpened(sc.runQuery(query_opened).getBOBResultList());
-        if(rpt.getCaseListOpened() != null){
-            System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpened().size());
+        rpt.setCaseListOpenedInDateRange(sc.runQuery(query_opened).getBOBResultList());
+        if(rpt.getCaseListOpenedInDateRange() != null){
+            System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpenedInDateRange().size());
         }
         
-        QueryCECase query_active = sc.initQuery(QueryCECaseEnum.OPENCASES, ua.getKeyCard());
-        spcse = query_active.getPrimaryParams();
-        spcse.setDate_startEnd_ctl(false);
+        QueryCECase query_active_asof = sc.initQuery(QueryCECaseEnum.OPEN_ASOFENDDATE, ua.getKeyCard());
+        spcse = query_active_asof.getPrimaryParams();
         spcse.setDate_start_val(rpt.getDate_start_val());
         spcse.setDate_end_val(rpt.getDate_end_val());
-        rpt.setCaseListCurrent(sc.runQuery(query_active).getBOBResultList());
-        if(rpt.getCaseListCurrent() != null){
-            System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListCurrent().size());
+        rpt.setCaseListOpenAsOfDateEnd(sc.runQuery(query_active_asof).getBOBResultList());
+        if(rpt.getCaseListOpenAsOfDateEnd() != null){
+            System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpenAsOfDateEnd().size());
+            // compute average case age for opened as of date list
+            if(!rpt.getCaseListOpenAsOfDateEnd().isEmpty()){
+                long sumOfAges = 0l;
+                for(CECase cse: rpt.getCaseListOpenAsOfDateEnd()){
+                    sumOfAges += cse.getCaseAgeAsOf(rpt.getDate_end_val());
+                }
+                double avg = (double) sumOfAges / (double) rpt.getCaseListOpenAsOfDateEnd().size();
+                rpt.setAverageAgeOfCasesOpenAsOfReportEndDate(avg);
+            }
         }
+        
+        
+        
+        
         
         QueryCECase query_closed = sc.initQuery(QueryCECaseEnum.CLOSED_CASES, ua.getKeyCard());
         spcse = query_closed.getPrimaryParams();
@@ -1018,9 +1032,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         spcse.setDate_startEnd_ctl(true);
         spcse.setDate_start_val(rpt.getDate_start_val());
         spcse.setDate_end_val(rpt.getDate_end_val());
-        rpt.setCaseListClosed(sc.runQuery(query_closed).getBOBResultList());
-        if(rpt.getCaseListClosed() != null){
-            System.out.println("CaseCoordinator.report_buildCECaseListReport: Current List size " + rpt.getCaseListClosed().size());
+        rpt.setCaseListClosedInDateRange(sc.runQuery(query_closed).getBOBResultList());
+        if(rpt.getCaseListClosedInDateRange() != null){
+            System.out.println("CaseCoordinator.report_buildCECaseListReport: Current List size " + rpt.getCaseListClosedInDateRange().size());
         }
         
         QueryEvent query_ev = sc.initQuery(QueryEventEnum.MUNI_MONTHYACTIVITY, ua.getKeyCard());

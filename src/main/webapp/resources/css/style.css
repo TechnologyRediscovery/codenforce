@@ -2719,8 +2719,8 @@ input{
 
 .data_container_nested_restrict_report{
     width: 100%;
-    padding-top: 5px;
-    margin-bottom: 5px;
+    padding-top: 1px;
+    margin-bottom: 1px;
 }
 
 .restrict-main-contents-io-title{
@@ -2768,8 +2768,8 @@ input{
 }
 
 .restrict-data-field_report{
-    margin-top: 3px;
-    margin-bottom: 3px;
+    margin-top: 1px;
+    margin-bottom: 1px;
 }
 
 .restrict-data-field-label-inline{
