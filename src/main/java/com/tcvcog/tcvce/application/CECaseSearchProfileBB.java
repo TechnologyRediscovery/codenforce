@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
@@ -44,10 +45,13 @@ import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
+import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.PageModeEnum;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.User;
@@ -55,6 +59,7 @@ import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
+import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
@@ -67,6 +72,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -144,6 +150,32 @@ public class CECaseSearchProfileBB
 
     
     
+    /*******************************************************
+     *              Event collapse fields
+     *              FROM EventsBB
+    /*******************************************************/
+    
+    private EventCnF currentEvent;
+    
+    private Map<EventType, List<EventCategory>> typeCatMap;
+    private boolean updateNewEventFieldsWithCatChange;
+    
+    private List<EventType> eventTypeCandidates;
+    private EventType eventTypeSelected;
+    
+    private List<EventCategory> eventCategoryCandidates;
+    private EventCategory eventCategorySelected;
+    
+    private int eventDurationFormField;
+    
+    private List<Person> eventPersonCandidates;
+    private int eventPersonIDForLookup;
+    private Person eventPersonSelected;
+    
+    private String formEventNoteText;
+    
+    
+    
     
     /**
      * Creates a new instance of CECaseSearchBB
@@ -173,20 +205,28 @@ public class CECaseSearchProfileBB
 
         caseList = new ArrayList<>();
         caseList.addAll(cc.cecase_refreshCECasePropertyUnitHeavyList(sb.getSessCECaseList()));
-        CECase cseTemp = getSessionBean().getSessCECase();
+        CECaseDataHeavy cseTemp = getSessionBean().getSessCECase();
         try {
-            if(cseTemp == null){
-                if(caseList != null && !caseList.isEmpty()){
-                    cseTemp = caseList.get(0);
-                } else {
-                    cseTemp = cc.cecase_selectDefaultCECase(sb.getSessUser());
-                }
-            }
-            currentCase = cc.cecase_assembleCECaseDataHeavy(cseTemp, getSessionBean().getSessUser());
-            System.out.println("CECaseSearchProfileBB.initBean(): current case ID: " + currentCase.getCaseID());
-            closingEventCategoryList = ec.getEventCategeryList(EventType.Closing);
             
-        } catch (IntegrationException | SearchException | BObStatusException ex) {
+            // TODO: edie
+            // deal with event page load issues later
+//            if(cseTemp == null){
+//                if(caseList != null && !caseList.isEmpty()){
+//                    cseTemp = caseList.get(0);
+//                } else {
+//                    cseTemp = cc.cecase_selectDefaultCECase(sb.getSessUser());
+//                }
+//            }
+            currentCase = cseTemp;
+            // request scoped bean: don't reload ergbob
+//            currentCase = cc.cecase_assembleCECaseDataHeavy(cseTemp, getSessionBean().getSessUser());
+            if(currentCase.getEventList() != null && !currentCase.getEventList().isEmpty()){
+                injectSessionEvent(currentCase.getEventList().get(0));
+            }
+            System.out.println("CECaseSearchProfileBB.initBean(): current case ID: " + currentCase.getCaseID());
+            setClosingEventCategoryList(ec.getEventCategeryList(EventType.Closing));
+            
+        } catch (IntegrationException  ex) {
             System.out.println(ex);
         }
 
@@ -260,6 +300,28 @@ public class CECaseSearchProfileBB
         extendStipCompUsingDate = true;
         currentCodeSet = getSessionBean().getSessMuni().getCodeSet();
 
+        // EVENT STUFF
+        setTypeCatMap(ec.assembleEventTypeCatMap_toEnact(EventDomainEnum.CODE_ENFORCEMENT, currentCase, getSessionBean().getSessUser()));
+        eventTypeCandidates = new ArrayList<>(getTypeCatMap().keySet());
+        eventCategoryCandidates = new ArrayList<>();
+        if(eventTypeCandidates != null && !eventTypeCandidates.isEmpty()){
+            eventTypeSelected = getEventTypeCandidates().get(0);
+            eventCategoryCandidates.addAll(getTypeCatMap().get(eventTypeSelected));
+        }
+        eventPersonCandidates = new ArrayList<>();
+        
+        updateNewEventFieldsWithCatChange = true;
+    }
+    
+    /**
+     * Sets the session event
+     * @param ev 
+     */
+    public void injectSessionEvent(EventCnF ev){
+        if(ev != null){
+            getSessionBean().setSessEvent(ev);
+        }
+        
     }
 
     /**
@@ -302,6 +364,7 @@ public class CECaseSearchProfileBB
     
      /**
      * Responds to the user clicking one of the page modes: LOOKUP, ADD, UPDATE, REMOVE
+     * @deprecated no longer used during page collapse and simplification DEC/JAN '21
      * @param mode     
      */
     public void setCurrentMode(PageModeEnum mode) {
@@ -632,46 +695,27 @@ public class CECaseSearchProfileBB
     }
     
     public String onProposalViewButtonChange(Proposal prop){
-        
         return "workflow";
-        
     }
     
     public String onProposalsListButtonChange(){
         return "workflow";
-        
     }
     
-    public String onEventViewButtonChange(EventCnF ev){
-        getSessionBean().setSessEvent(ev);
-        return "events";
-        
+    public void onEventViewButtonChange(EventCnF ev){
+        if(ev != null){
+            System.out.println("CECaseSearchProfileBB.onEventViewButtonChange: Event ID: " + ev.getEventID());
+            getSessionBean().setSessEvent(ev);
+            currentEvent = ev;
+        }
     }
-    
-    public String onEventAddButtonChange(){
-        EventCoordinator ec = getEventCoordinator();
-        try {
-            getSessionBean().setSessEvent(ec.initEvent(currentCase, null));
-        } catch (BObStatusException | EventException ex) {
-            System.out.println(ex);
-        } 
-        return "events";
-        
-        
-    }
+  
     
     public String onCEARViewButtonChange(CEActionRequest cear){
         getSessionBean().setSessCEAR(cear);
         return "cEActionRequests";
         
     }
-    
-    
-    
-
-    
-    
-    
     
     public String onNOVViewButtonChange(NoticeOfViolation nov){
         getSessionBean().setSessNotice(nov);
@@ -683,10 +727,6 @@ public class CECaseSearchProfileBB
         System.out.println("ceCaseSearchProfileBB.onHowToNextStepButtonChange");
         
     }
-    
-    
-    
-    
     
     public String onCitationViewButtonChange(Citation cit){
         getSessionBean().setSessCitation(cit);
@@ -1684,6 +1724,397 @@ public class CECaseSearchProfileBB
     
     /*******************************************************
     /*******************************************************
+     **              EVENTS!!                             **
+    /*******************************************************/
+    /*******************************************************/
+      
+    public void onEventAddInitButtonChange(){
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            EventCnF ev = ec.initEvent(currentCase, null);
+            getSessionBean().setSessEvent(ev);
+            ev.setCeCaseID(currentCase.getBObID());
+            currentEvent = ev;
+        } catch (BObStatusException | EventException ex) {
+            System.out.println(ex);
+        } 
+    }
+    
+      public void hideEvent(EventCnF event){
+        EventIntegrator ei = getEventIntegrator();
+        event.setHidden(true);
+        try {
+            ei.updateEvent(event);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                           "Success! event ID: " + event.getEventID() + " is now hidden", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not hide event, sorry; this is a system erro", ""));
+        }
+    }
+    
+    public void unHideEvent(EventCnF event){
+        EventIntegrator ei = getEventIntegrator();
+        event.setHidden(false);
+        try {
+            ei.updateEvent(event);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                           "Success! Unhid event ID: " + event.getEventID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                           "Could not unhide event, sorry; this is a system erro", ""));
+        }
+    }
+    
+    
+      /**
+     * Actionlistener Called when the user selects their own EventCategory to add to the case
+     * and is a pass-through method to the initiateNewEvent method
+     *
+     * @param ev
+     */
+    public void initiateUserChosenEventCreation(ActionEvent ev) {
+        initiateNewEvent();
+    }
+    
+    
+    /**
+     * Listener method for starting event edits
+     * @param ev 
+     */
+    public void initiateEventEdit(EventCnFPropUnitCasePeriodHeavy ev){
+        setCurrentEvent(ev);
+    }
+      /**
+     * Logic container for setting up new event which will be displayed 
+     * in the overlay window for the User
+     */
+    private void initiateNewEvent() {
+        System.out.println("EventsBB.initiateNewEvent");
+        EventCoordinator ec = getEventCoordinator();
+        
+        EventCnF ev = null;
+            
+        try {
+            if(getCurrentEvent() == null){
+
+                ev = ec.initEvent(currentCase, null);
+//                ev.setCategory(eventCategorySelected);
+                ev.setCeCaseID(currentCase.getBObID());
+                ev.setUserCreator(getSessionBean().getSessUser());
+                currentEvent = ec.assembleEventCnFPropUnitCasePeriodHeavy(ev);
+
+            }
+                
+        } catch (BObStatusException | EventException | IntegrationException | SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        }
+    }
+
+    public String onEventRemoveCommitButtonChange(){
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            ec.removeEvent(getCurrentEvent(), getSessionBean().getSessUser());
+             getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Removed event ID " + getCurrentEvent().getEventID(), ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                ex.getMessage(), ""));
+             return "";
+        }
+        
+        return "ceCaseProfile";
+        
+    }
+    
+    /**
+     * All Code Enforcement case events are funneled through this method which
+     * has to carry out a number of checks based on the type of event being
+     * created. The event is then passed to the addEvent_processForCECaseDomain on the
+     * Event Coordinator who will do some more checking about the event before
+     * writing it to the DB
+     *
+     * @return 
+     */
+    public String onEventAddCommitButtonChange() {
+        System.out.println("EventsBB.onEventAddCommitButtonChange");
+        EventCoordinator ec = getEventCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        
+        List<EventCnFPropUnitCasePeriodHeavy> evDoneList;
+            
+        // category is already set from initialization sequence
+
+        try {
+            getCurrentEvent().setCategory(getEventCategorySelected());
+            getCurrentEvent().setDomain(EventDomainEnum.CODE_ENFORCEMENT);
+            if(getCurrentEvent().getDomain() == null && getCurrentEvent().getDomain() == EventDomainEnum.UNIVERSAL){
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Event must have a domain that's not universal", ""));
+                return "";
+            }
+            if(getEventCategorySelected() == null){
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Event must have a category ", ""));
+                return "";
+            } else {
+                List<EventCnF> evSimpleList = ec.addEvent(getCurrentEvent(), currentCase, getSessionBean().getSessUser());
+                evDoneList = ec.assembleEventCnFPropUnitCasePeriodHeavyList(evSimpleList);
+
+                if(evDoneList != null && !evDoneList.isEmpty()){
+                    for(EventCnF evt: evDoneList){
+
+                        getFacesContext().addMessage(null,
+                                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                        "Successfully logged event with an ID " + evt.getEventID() + " ", ""));
+                    }
+                    setCurrentEvent(evDoneList.get(0));
+                    sc.logObjectView(getSessionBean().getSessUser(), getCurrentEvent());
+                }
+                getSessionBean().setSessEvent(getCurrentEvent());
+                return "ceCaseProfile";
+            }
+    
+        } catch (IntegrationException | BObStatusException | EventException | SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(),
+                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
+        } 
+
+       return "";
+    }
+    
+      /**
+     * Listener for user requests to update an event
+     * @return 
+     */
+    public String onEventUpdateCommitButtonChange(){
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            ec.updateEvent(getCurrentEvent(), getSessionBean().getSessUser());
+        } catch (IntegrationException | BObStatusException | EventException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(),
+                            ""));
+            return "";
+        } 
+        
+        return "ceCaseProfile";
+    }
+    
+    public void onPersonListCommitButtonChange(ActionEvent ev){
+        
+        // nothing to do on the back end
+        
+    }
+    
+    /**
+     * Listener for user requests to search for a person by ID
+     * @param ev 
+     */
+    public void onPersonLookupByIDButtonChange(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        if(eventPersonIDForLookup == 0){
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Shall not look up person with ID of 0",
+                            "Please enter a positive, non-zero ID"));
+             return;
+            
+        }
+        try {
+            eventPersonCandidates.add(pc.getPerson(eventPersonIDForLookup));
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Located " + eventPersonCandidates.size() + " persons with this ID",
+                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
+        } catch (IntegrationException ex) {
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(),
+                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
+        }
+        
+        
+    }
+    
+    /**
+     * Listener for user changes to the selected event type
+     */
+    public void onEventTypeMenuChange(){
+        System.out.println("EventsBB.onEventTypeMenuChange");
+        refreshAvailableEventCategories();
+        
+    }
+  
+    /**
+     * Listener method for changes in EventType selected by User
+     */
+    public void refreshAvailableEventCategories(){
+        
+        if(getEventTypeSelected() != null){
+            getEventCategoryCandidates().clear();
+            getEventCategoryCandidates().addAll(getTypeCatMap().get(getEventTypeSelected()));
+            if(!eventCategoryCandidates.isEmpty()){
+                setEventCategorySelected(getEventCategoryCandidates().get(0));
+            }
+            System.out.println("EventsBB.refreshavailableEventCategories");
+        }
+    }
+     /**
+     * Listener for user changes to the event category list on event add
+     */
+    public void onEventCategoryMenuChange(){
+        
+        configureEventFieldsOnAddConfig();
+    }
+   
+      /**
+     * Sets current event field values to those suggested by the 
+     * selected event category
+     */
+    private void configureEventFieldsOnAddConfig(){
+        if(eventCategorySelected != null 
+                && currentEvent != null 
+                && updateNewEventFieldsWithCatChange){
+            currentEvent.setTimeStart(LocalDateTime.now());
+            setEventDurationFormField(getEventCategorySelected().getDefaultdurationmins());
+            currentEvent.setTimeEnd(getCurrentEvent().getTimeStart().plusMinutes(getEventCategorySelected().getDefaultdurationmins()));
+            currentEvent.setDescription(getEventCategorySelected().getHostEventDescriptionSuggestedText());
+        }
+    }
+    
+    public void onTimeStartChange(){
+        if(getCurrentEvent().getTimeStart() != null){
+            getCurrentEvent().setTimeEnd(getCurrentEvent().getTimeStart().plusMinutes(getEventDurationFormField()));
+            
+        }
+    }
+    
+    public void onEventDurationChange(){
+        System.out.println("EventsBB.onEventDurtaionChange");
+        if(getCurrentEvent().getTimeStart() != null){
+            getCurrentEvent().setTimeEnd(getCurrentEvent().getTimeStart().plusMinutes(getEventDurationFormField()));
+        }
+    }
+    
+
+    /**
+     * Listener pass through method for finalizing event edits
+     * @param ev 
+     */
+    public void finalizeEventUpdateListener(ActionEvent ev){
+        finalizeEventUpdate();
+    }
+    
+    /**
+     * Event update processing
+     */
+    public void finalizeEventUpdate() {
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            ec.updateEvent(getCurrentEvent(), getSessionBean().getSessUser());
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Event udpated!", ""));
+        } catch (IntegrationException | EventException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    ex.getMessage(),
+                    ""));
+        } 
+
+    }
+
+    /**
+     * Listener method for adding the selected person to a queue
+     * @param ev 
+     */
+    public void queueSelectedPerson(ActionEvent ev) {
+        EventCoordinator ec = getEventCoordinator();
+        if (eventPersonSelected != null) {
+            getCurrentEvent().getPersonList().add(eventPersonSelected);
+        } else {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Please select one or more people to attach to this event",
+                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
+        }
+    }
+
+    public void deQueuePersonFromEvent(Person p) {
+        if (getCurrentEvent().getPersonList() != null) {
+            getCurrentEvent().getPersonList().remove(p);
+        }
+    }
+
+   
+      /**
+     * Listener for commencement of note writing process
+     *
+     * @param ev
+     */
+    public void onEventNoteInitButtonChange(ActionEvent ev) {
+        formEventNoteText = "";
+
+    }
+
+    /**
+     * Listener for user requests to commit new note content to the current
+     * object
+     *
+     * @return
+     */
+    public String onNoteCommitButtonChange() {
+        EventCoordinator ec = getEventCoordinator();
+
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        mbp.setCred(getSessionBean().getSessUser().getKeyCard());
+        mbp.setExistingContent(getCurrentEvent().getNotes());
+        mbp.setNewMessageContent(getFormNoteText());
+        mbp.setHeader("Notice of Violation Note");
+        mbp.setUser(getSessionBean().getSessUser());
+
+        try {
+
+            ec.updateEventNotes(mbp, getCurrentEvent(), getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Succesfully appended note!", ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Fatal error appending note; apologies!", ""));
+            return "";
+        }
+
+        return "ceCaseProfile";
+
+    }
+
+    
+    
+   
+    
+    /*******************************************************
+    /*******************************************************
      **              GETTERS AND SETTERS                  **
     /*******************************************************/
     /*******************************************************/
@@ -1956,14 +2387,14 @@ public class CECaseSearchProfileBB
      * @return the closingEventList
      */
     public List<EventCategory> getClosingEventList() {
-        return closingEventCategoryList;
+        return getClosingEventCategoryList();
     }
 
     /**
      * @param closingEventList the closingEventList to set
      */
     public void setClosingEventList(List<EventCategory> closingEventList) {
-        this.closingEventCategoryList = closingEventList;
+        this.setClosingEventCategoryList(closingEventList);
     }
 
     /**
@@ -2161,6 +2592,188 @@ public class CECaseSearchProfileBB
      */
     public void setFormMakeFindingsDefault(boolean formMakeFindingsDefault) {
         this.formMakeFindingsDefault = formMakeFindingsDefault;
+    }
+
+    /**
+     * @return the currentEvent
+     */
+    public EventCnF getCurrentEvent() {
+        return currentEvent;
+    }
+
+    /**
+     * @return the eventTypeCandidates
+     */
+    public List<EventType> getEventTypeCandidates() {
+        return eventTypeCandidates;
+    }
+
+    /**
+     * @return the eventTypeSelected
+     */
+    public EventType getEventTypeSelected() {
+        return eventTypeSelected;
+    }
+
+    /**
+     * @return the eventCategoryCandidates
+     */
+    public List<EventCategory> getEventCategoryCandidates() {
+        return eventCategoryCandidates;
+    }
+
+    /**
+     * @return the eventCategorySelected
+     */
+    public EventCategory getEventCategorySelected() {
+        return eventCategorySelected;
+    }
+
+    /**
+     * @return the eventDurationFormField
+     */
+    public int getEventDurationFormField() {
+        return eventDurationFormField;
+    }
+
+    /**
+     * @return the eventPersonCandidates
+     */
+    public List<Person> getEventPersonCandidates() {
+        return eventPersonCandidates;
+    }
+
+    /**
+     * @return the eventPersonIDForLookup
+     */
+    public int getEventPersonIDForLookup() {
+        return eventPersonIDForLookup;
+    }
+
+    /**
+     * @return the eventPersonSelected
+     */
+    public Person getEventPersonSelected() {
+        return eventPersonSelected;
+    }
+
+    /**
+     * @return the formEventNoteText
+     */
+    public String getFormEventNoteText() {
+        return formEventNoteText;
+    }
+
+    /**
+     * @param currentEvent the currentEvent to set
+     */
+    public void setCurrentEvent(EventCnF currentEvent) {
+        this.currentEvent = currentEvent;
+    }
+
+    /**
+     * @param eventTypeCandidates the eventTypeCandidates to set
+     */
+    public void setEventTypeCandidates(List<EventType> eventTypeCandidates) {
+        this.eventTypeCandidates = eventTypeCandidates;
+    }
+
+    /**
+     * @param eventTypeSelected the eventTypeSelected to set
+     */
+    public void setEventTypeSelected(EventType eventTypeSelected) {
+        this.eventTypeSelected = eventTypeSelected;
+    }
+
+    /**
+     * @param eventCategoryCandidates the eventCategoryCandidates to set
+     */
+    public void setEventCategoryCandidates(List<EventCategory> eventCategoryCandidates) {
+        this.eventCategoryCandidates = eventCategoryCandidates;
+    }
+
+    /**
+     * @param eventCategorySelected the eventCategorySelected to set
+     */
+    public void setEventCategorySelected(EventCategory eventCategorySelected) {
+        this.eventCategorySelected = eventCategorySelected;
+    }
+
+    /**
+     * @param eventDurationFormField the eventDurationFormField to set
+     */
+    public void setEventDurationFormField(int eventDurationFormField) {
+        this.eventDurationFormField = eventDurationFormField;
+    }
+
+    /**
+     * @param eventPersonCandidates the eventPersonCandidates to set
+     */
+    public void setEventPersonCandidates(List<Person> eventPersonCandidates) {
+        this.eventPersonCandidates = eventPersonCandidates;
+    }
+
+    /**
+     * @param eventPersonIDForLookup the eventPersonIDForLookup to set
+     */
+    public void setEventPersonIDForLookup(int eventPersonIDForLookup) {
+        this.eventPersonIDForLookup = eventPersonIDForLookup;
+    }
+
+    /**
+     * @param eventPersonSelected the eventPersonSelected to set
+     */
+    public void setEventPersonSelected(Person eventPersonSelected) {
+        this.eventPersonSelected = eventPersonSelected;
+    }
+
+    /**
+     * @param formEventNoteText the formEventNoteText to set
+     */
+    public void setFormEventNoteText(String formEventNoteText) {
+        this.formEventNoteText = formEventNoteText;
+    }
+
+    /**
+     * @return the closingEventCategoryList
+     */
+    public List<EventCategory> getClosingEventCategoryList() {
+        return closingEventCategoryList;
+    }
+
+    /**
+     * @return the typeCatMap
+     */
+    public Map<EventType, List<EventCategory>> getTypeCatMap() {
+        return typeCatMap;
+    }
+
+    /**
+     * @return the updateNewEventFieldsWithCatChange
+     */
+    public boolean isUpdateNewEventFieldsWithCatChange() {
+        return updateNewEventFieldsWithCatChange;
+    }
+
+    /**
+     * @param closingEventCategoryList the closingEventCategoryList to set
+     */
+    public void setClosingEventCategoryList(List<EventCategory> closingEventCategoryList) {
+        this.closingEventCategoryList = closingEventCategoryList;
+    }
+
+    /**
+     * @param typeCatMap the typeCatMap to set
+     */
+    public void setTypeCatMap(Map<EventType, List<EventCategory>> typeCatMap) {
+        this.typeCatMap = typeCatMap;
+    }
+
+    /**
+     * @param updateNewEventFieldsWithCatChange the updateNewEventFieldsWithCatChange to set
+     */
+    public void setUpdateNewEventFieldsWithCatChange(boolean updateNewEventFieldsWithCatChange) {
+        this.updateNewEventFieldsWithCatChange = updateNewEventFieldsWithCatChange;
     }
 
 }

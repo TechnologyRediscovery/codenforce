@@ -430,11 +430,21 @@
                                             value="#{sessionBean.sessCECaseList}"
                                             tableStyleClass="primeDataTable">
 
-                                            <p:column width="12%" sortBy="#{c.originationDate}">
+                                            <p:column width="5%" >
+                                                <f:facet name="header">
+                                                    <h:outputText value="ID" />
+                                                </f:facet>
+                                                <h:outputText value="#{c.caseID}"/>
+                                            </p:column>
+                                            <p:column width="10%" sortBy="#{c.originationDate}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Opened" />
                                                 </f:facet>
                                                 <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDateNoTime(c.originationDate)}"/>
+                                                <p:spacer height="2px"/>
+                                                <h:outputText value="Age: #{c.caseAge} days"
+                                                              style="font-style: italic"/>
+                                                
                                             </p:column>
                                             <p:column width="12%" sortBy="#{c.property.address}">
                                                 <f:facet name="header">
