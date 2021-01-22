@@ -701,10 +701,10 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         PropertyUnit propUnit = new PropertyUnit();
         propUnit.setPropertyID(p.getPropertyID());
         propUnit.setUnitNumber(Constants.TEMP_UNIT_NUM);
-//        propUnit.setRental(false);
-        propUnit.setActive(true);
+        propUnit.setUnitNumber("");
+        propUnit.setRentalNotes("");
         propUnit.setNotes("");
-//        propUnit.setPropertyUnitPersonList(new ArrayList<Person>());
+        propUnit.setActive(true);
         return propUnit;
     }
 

@@ -74,35 +74,29 @@
                                                          rowKey="#{unit.bundledUnit.unitID}"
                                                          >                                         
 
-                                                <p:column>
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Unit Number" />
-                                                    </f:facet>
+                                                <p:column headerText="Unit Number">
                                                     <h:outputText value="#{unit.bundledUnit.unitNumber}" />
                                                 </p:column>
 
-                                                <p:column>
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Rental Notes:" />
-                                                    </f:facet>
+                                                <p:column headerText="Rental Notes:">
                                                     <h:outputText value="#{unit.bundledUnit.rentalNotes}" />
                                                 </p:column>
 
-                                                <p:column>
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Unit Description" />
-                                                    </f:facet>
+                                                <p:column headerText="Unit Description">
                                                     <h:outputText value="#{unit.bundledUnit.notes}" />
                                                 </p:column>
 
                                                 <p:column style="text-align: center">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Apply"/>
-                                                    </f:facet>
                                                     <p:commandButton ajax="false" 
-                                                                     value="Select Unit" 
+                                                                     value="Apply for Occupancy" 
                                                                      tabindex="1"
-                                                                     action="#{occPermitApplicationBB.selectPropertyUnit(unit)}"/>
+                                                                     action="#{occPermitApplicationBB.selectPropertyUnit(unit)}"
+                                                                     rendered="#{!occPermitApplicationBB.alreadyAppliedFor(unit.bundledUnit.unitNumber)}"/>
+                                                    <p:commandButton disabled="true" 
+                                                                     value="Already Applied" 
+                                                                     tabindex="1"
+                                                                     rendered="#{occPermitApplicationBB.alreadyAppliedFor(unit.bundledUnit.unitNumber)}"/>
+                                                    
                                                 </p:column>
 
                                             </p:dataTable>
