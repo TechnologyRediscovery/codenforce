@@ -264,7 +264,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         BlobIntegrator bi = getBlobIntegrator();
         
-        BlobLight originalBlob = getPhotoBlobLight(blob.getBlobID());
+        BlobLight originalBlob = bi.getPhotoBlobLightWithoutMetadata(blob.getBlobID());
         
         String newExtension = getFileExtension(blob.getFilename());
         
@@ -772,8 +772,13 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     private String generateFilename(byte[] bytes) throws IOException {
         
         InputStream is = new ByteArrayInputStream(bytes);
-        String extension = URLConnection.guessContentTypeFromStream(is);
         
+        
+        String fileType = URLConnection.guessContentTypeFromStream(is);
+        
+        //guessContentType will give us a string like "image/png", so let's grab the string after the "/"
+        String extension = fileType.substring(fileType.indexOf("/")+1);
+        extension = extension.trim();
         //let's add a random number at the end of untitled
         //Makes it a little more easily identifiable than just "untitled".
         String filename = "untitled" + new Random().nextInt(10000) + "." + extension;
