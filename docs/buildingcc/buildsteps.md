@@ -9,7 +9,7 @@
 
 ## Build steps: 35,000 ft
 Steps for creating test system only; no security setup steps are included
-1. Get Linux (XUbuntu is our common distro) with root privileges
+1. [Get Linux](#Linux) (XUbuntu is our common distro) with root privileges
 2. Install postgreSQL
 3. Install Java EE JDK
 4. Install NetBeans 8.2 (Later versions not yet supported by codeNforce)
@@ -19,7 +19,8 @@ Steps for creating test system only; no security setup steps are included
 8. Build codeNforce with Maven and test deployment in browser
 
 
-
+### Linux
+Most folks on the team use [XUbuntu 18.04LTS+](https://xubuntu.org/). You'll need root privileges. We've also had folks attempt the entire build on Linux confined inside the Microsoft Corporations Windows Subsystem for Linux, but eventually jumped to a non-virtualized box. We've also built in a containerized Ubuntu in VirtualBox.
 
 
 Directions for inserting the postgres driver in wildfly:
