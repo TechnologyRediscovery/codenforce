@@ -19,6 +19,8 @@ package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 
@@ -95,6 +97,22 @@ public  class       EventCnF
         this.notes = ev.notes;
         
         this.personList = ev.personList;
+    }
+    
+    /**
+     * Computes how long the event lasted using timeStart and timeEnd
+     * @return 0 unless timeEnd is after timeStart, in which case total duration
+     * in mins is returned
+     */
+    public long computeEventDurationMins(){
+        long duration = 0;
+        if(timeStart != null && timeEnd != null){
+            if(timeEnd.isAfter(timeStart)){
+                long sec = timeEnd.toEpochSecond(ZoneOffset.UTC) - timeEnd.toEpochSecond(ZoneOffset.UTC);
+                duration = (long) ((double) sec / 60.0);
+            }
+        }
+        return duration;
     }
     
     

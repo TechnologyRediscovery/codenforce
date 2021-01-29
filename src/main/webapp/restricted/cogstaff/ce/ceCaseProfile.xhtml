@@ -583,7 +583,117 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </p:panel>
                                 </div>
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                                    <p:panel id="cecase-events-future-panel"
+                                             toggleable="true"
+                                             collapsed="false"
+                                             header="Upcoming Events"
+                                             rendered="true"
+                                             >
 
+
+
+                                        <h:form id="cecase-events-future-form">
+
+
+                                            <p:dataTable id="cecase-events-future-table"
+                                                         var="eventfuture"
+                                                         value="#{ceCaseSearchProfileBB.currentCase.futureEventList}"
+                                                         tableStyleClass="primeDataTable"
+                                                         rowKey="#{eventfuture.eventID}"
+                                                         >
+
+                                                <p:column headerText="ID"
+                                                          width="10%"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{eventfuture.eventID}"/>
+
+                                                </p:column>
+                                                <p:column headerText="Date"
+                                                          sortBy="#{eventfuture.timeStart}"
+                                                          styleClass="centeredColumnContent">
+                                                    <h:outputText value="#{empty eventfuture.timeStart ? ceCaseSearchProfileBB.getPrettyDate(eventfuture.creationts) : ceCaseSearchProfileBB.getPrettyDate(eventfuture.timeStart) }" />
+
+
+                                                </p:column>
+
+                                                <p:column headerText="Category"
+                                                          sortBy="#{eventfuture.category.eventCategoryTitle}"
+                                                          styleClass="centeredColumnContent">
+                                                    <div class="#{eventfuture.category.icon.styleClass}">
+                                                        <i class="material-icons status-display-icon-i"><h:outputText value="#{eventfuture.category.icon.materialIcon}"/></i>
+                                                    </div>
+                                                    <h:outputText value="#{eventfuture.category.eventType.label}:" />
+                                                    <p:spacer height="1px" />
+                                                    <h:outputText value="#{eventfuture.category.eventCategoryTitle}" />
+
+
+                                                </p:column>
+
+                                                <p:column headerText="Description"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <h:outputText value="#{eventfuture.description}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Actions"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <p:commandButton    id="event-open0-button"
+                                                                        ajax="true"
+                                                                        styleClass="noFill button-size-small"
+                                                                        action="#{ceCaseSearchProfileBB.onEventViewButtonChange(eventfuture)}"
+                                                                        value="View"
+                                                                        icon="fa fa-folder-open-o"
+                                                                        oncomplete="PF('event-profile-dialog-var').show()"
+                                                                        update="event-profile-dialog
+                                                                        event-profile-form"
+                                                                        />
+
+                                                    <p:spacer height="2px" />
+
+                                                    <p:commandButton    id="event-update0-button"
+                                                                        ajax="true"
+                                                                        styleClass="noFill button-size-small"
+                                                                        action="#{ceCaseSearchProfileBB.onEventViewButtonChange(eventfuture)}"
+                                                                        value="Update"
+                                                                        icon="fa fa-folder-open-o"
+                                                                        oncomplete="PF('event-update-dialog-var').show()"
+                                                                        update="event-profile-dialog
+                                                                        event-profile-form"
+                                                                        />
+                                                    <p:spacer height="2px" />
+
+                                                    <p:commandButton    id="event-dismiss0-button"
+                                                                        ajax="true"
+                                                                        styleClass="noFill button-size-small"
+                                                                        action="#{ceCaseSearchProfileBB.onEventViewButtonChange(eventfuture)}"
+                                                                        value="Dismiss and deactivate"
+                                                                        icon="fa fa-folder-open-o"
+                                                                        oncomplete="PF('event-deactivate-dialog-var').show()"
+                                                                        update="event-profile-dialog
+                                                                        event-profile-form"
+                                                                        />
+                                                    <p:spacer height="2px" />
+
+                                                    <p:commandButton    id="event-shiftpast-button"
+                                                                        ajax="true"
+                                                                        styleClass="noFill button-size-small"
+                                                                        action="#{ceCaseSearchProfileBB.onEventViewButtonChange(eventfuture)}"
+                                                                        value="Shift to past"
+                                                                        icon="fa fa-edit"
+                                                                        oncomplete="PF('event-shiftpast-dialog-var').show()"
+                                                                        update="event-update-dialog
+                                                                        event-update-form"
+                                                                        />
+                                                </p:column>
+                                            </p:dataTable>
+
+
+                                        </h:form>
+
+                                    </p:panel>
                                     <p:panel id="cecase-violations-panel"
                                              toggleable="true"
                                              collapsed="false"
@@ -758,26 +868,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <p:dataTable id="cecase-events-table"
                                                          var="event"
-                                                         value="#{ceCaseSearchProfileBB.currentCase.eventList}"
+                                                         resizableColumns="true"
+                                                         sortMode="multiple"
+                                                         value="#{ceCaseSearchProfileBB.currentCase.getEventList(ceCaseSearchProfileBB.eventViewOptionSelected)}"
                                                          tableStyleClass="primeDataTable"
                                                          rowKey="#{event.eventID}"
                                                          >
 
-                                                 <p:column headerText="ID"
-                                                           width="10%"
+                                                <p:column headerText="ID"
+                                                          width="10%"
                                                           styleClass="centeredColumnContent">
 
                                                     <h:outputText value="#{event.eventID}"/>
 
                                                 </p:column>
                                                 <p:column headerText="Date"
+                                                          sortBy="#{event.timeStart}"
                                                           styleClass="centeredColumnContent">
                                                     <h:outputText value="#{empty event.timeStart ? ceCaseSearchProfileBB.getPrettyDate(event.creationts) : ceCaseSearchProfileBB.getPrettyDate(event.timeStart) }" />
-                                                    
+
 
                                                 </p:column>
 
                                                 <p:column headerText="Category"
+                                                          sortBy="#{event.category.eventCategoryTitle}"
                                                           styleClass="centeredColumnContent">
                                                     <div class="#{event.category.icon.styleClass}">
                                                         <i class="material-icons status-display-icon-i"><h:outputText value="#{event.category.icon.materialIcon}"/></i>
@@ -795,7 +909,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <h:outputText value="#{event.description}"/>
 
                                                 </p:column>
-                                               
+
                                                 <p:column headerText="Actions"
                                                           styleClass="centeredColumnContent">
 
@@ -807,7 +921,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                         icon="fa fa-folder-open-o"
                                                                         oncomplete="PF('event-profile-dialog-var').show()"
                                                                         update="event-profile-dialog
-                                                                                event-profile-form"
+                                                                        event-profile-form"
                                                                         />
                                                     <p:spacer height="2px" />
                                                     <p:commandButton    id="event-update-button"
@@ -818,7 +932,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                         icon="fa fa-edit"
                                                                         oncomplete="PF('event-update-dialog-var').show()"
                                                                         update="event-update-dialog
-                                                                                event-update-form"
+                                                                        event-update-form"
                                                                         />
                                                 </p:column>
                                             </p:dataTable>
@@ -2923,7 +3037,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         id="newRecipientPersonTD"
                                         var="person"
                                         rowKey="#{person.personID}"
-                                        value="#{noticeOfViolationBB.personCandidateList}"
+                                        value="#{ceCaseSearchProfileBB.currentCasePropDataHeavy.personList}"
                                         tableStyleClass="primeDataTable"
                                         expandedRow="false"
                                         rowExpandMode="single"
@@ -3091,6 +3205,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             </div>
 
 
+                            <div    id="prop-pers-personlink-byid-div"
+                                    class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+                                <h:form id="nov-recipient-addnew-form">
+
+                                    <p:commandButton id="nov-recipient-addnew-button"
+                                                             rendered="true"
+                                                             ajax="true"
+                                                             icon="fa fa-user"
+                                                             value="Add new person"
+                                                             actionListener="#{ceCaseSearchProfileBB.personCreateInit}" 
+                                                             oncomplete="PF('person-addupdate-dialog-var').show()"
+                                                             update="person-addupdate-form"
+                                                             />
+
+                                </h:form>
+                            </div>
+
+                            
                             <div    id="prop-pers-personlink-byid-div"
                                     class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
@@ -5228,8 +5360,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     </p:confirmDialog>
 
 
-
-
                     <p:dialog   id="event-profile-dialog"
                                 height="800" width="1600"
                                 widgetVar="event-profile-dialog-var"
@@ -5389,21 +5519,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputText id="event-active-ot" 
                                                       value="#{ceCaseSearchProfileBB.currentEvent.active ? 'Yes':'No'}" />
                                     </div>
+                                    <div class="restrict-data-field-value-inline" >
+                                        <div class="restrict-main-contents-io-link">
+
+                                                        <p:commandLink      id="case-deactivate-cb" 
+                                                                            ajax="true" 
+                                                                            actionListener="#{ceCaseSearchProfileBB.onEventRemoveInitButtonChange}"
+                                                                            oncomplete="PF('event-deactivate-dialog-var').show()"
+                                                                            style="color:blue;"
+                                                                            rendered="#{ceCaseSearchProfileBB.currentEvent.active}"
+                                                                            value="deactivate event" />
+
+
+                                                    </div>
+                                    </div>
+                                    <div class="restrict-data-field-value-inline" >
+                                        <div class="restrict-main-contents-io-link">
+
+                                                        <p:commandLink      id="case-reactivate-cb" 
+                                                                            ajax="false" 
+                                                                            actionListener="#{ceCaseSearchProfileBB.onEventReactivateCommitButtonChange}"
+                                                                            style="color:blue;"
+                                                                            rendered="#{!ceCaseSearchProfileBB.currentEvent.active}"
+                                                                            value="reactivate event" />
+
+
+                                                    </div>
+                                    </div>
                                 </div>
 
                             </div>
-                            
-                                    <div class="restrict-main-contents-io-button gray_button">
 
-                                        <p:commandButton    id="event-profile-done-button"
-                                                            ajax="true" 
-                                                            value="Done" 
-                                                            process="@none" 
-                                                            immediate="true" 
-                                                            oncomplete="PF('event-profile-dialog-var').hide()"
-                                                            actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}" 
-                                                            icon="fa fa-stop" />
-                                    </div>
+                            <div class="restrict-main-contents-io-button gray_button">
+
+                                <p:commandButton    id="event-profile-done-button"
+                                                    ajax="true" 
+                                                    value="Done" 
+                                                    process="@none" 
+                                                    immediate="true" 
+                                                    oncomplete="PF('event-profile-dialog-var').hide()"
+                                                    actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}" 
+                                                    icon="fa fa-stop" />
+                            </div>
                         </h:form>
 
                         <h:form id="event-notes-form">
@@ -5411,6 +5568,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             <p:commandButton   id="event-notes-add-button"
                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                                value="Add New Note"  
+                                               disabled="true"
                                                icon="fa fa-sticky-note-o"
                                                actionListener="#{ceCaseSearchProfileBB.onEventNoteInitButtonChange}"
                                                oncomplete="PF('event-note-dialog-var').show()"
@@ -5432,18 +5590,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         height="200"/>
 
 
-                            <p:commandButton    id="event-note-button-cancel"
-                                                ajax="true" 
-                                                tabindex="27"
-                                                value="Cancel"
-                                                icon="fa fa-stop"
-                                                process="@none"
-                                                immediate="true"
-                                                onclick="PF('event-profile-dialog-var').hide()"
-                                                />
 
                             <p:commandButton   id="event-dialog-notes-button-addnote"
                                                ajax="false" 
+                                               disabled="true"
                                                actionListener="#{ceCaseSearchProfileBB.onNoteCommitButtonChange}"
                                                oncomplete="PF('event-note-dialog-var').hide()"
                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
@@ -5456,7 +5606,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                     </p:dialog>
 
-                  
+
 
 
 
@@ -5478,7 +5628,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                             <div class="ui-g data_container_nested_restrict">
 
-                               
+
                                 <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field">
                                     <div class="restrict-main-contents-io-title" >
                                         <h:outputLabel for="event-add-type-solb">
@@ -5546,21 +5696,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <p:selectBooleanCheckbox  id="event-add-updatefields-sbb" 
                                                                   label="Auto fill event details"
                                                                   title="Description and duration will be set automatically"
-                                                                value="#{ceCaseSearchProfileBB.updateNewEventFieldsWithCatChange}" 
-                                                                disabled="false"
-                                                                >
+                                                                  value="#{ceCaseSearchProfileBB.updateNewEventFieldsWithCatChange}" 
+                                                                  disabled="false"
+                                                                  >
                                             <p:ajax />
                                         </p:selectBooleanCheckbox>
 
                                     </div>
-                                    
-                                    
+
+
 
 
                                 </div>
 
                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-                                     <h2><h:outputText id="event-add-currtypecat-type-ot"
+                                    <h2><h:outputText id="event-add-currtypecat-type-ot"
                                                       value="#{ceCaseSearchProfileBB.eventTypeSelected.label}"
                                                       />
                                         <h:outputText value=": " />
@@ -5663,6 +5813,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <div class="restrict-main-contents-io-button gray_button">
                                         <p:commandButton  value="Manage person connections" 
                                                           onclick="PF('event-personchoose-dialog-var').show()" 
+                                                          disabled="true"
                                                           update="event-personchoose-dialog"
                                                           icon="fa fa-user"/>    
                                     </div>
@@ -5690,20 +5841,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     disabled="#{empty ceCaseSearchProfileBB.eventCategorySelected}"
                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                     value="Create new event "  
-                                                    icon="fa fa-bolt"/>
+                                                    icon="fa fa-bolt"
+                                                    update="messages-global-form"/>
                             </div>
-                            
-                                    <div class="restrict-main-contents-io-button gray_button">
 
-                                        <p:commandButton    id="event-add-cancel-button"
-                                                            ajax="true" 
-                                                            value="Cancel" 
-                                                            process="@none" 
-                                                            immediate="true" 
-                                                            oncomplete="PF('event-add-dialog-var').hide()"
-                                                            actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}" 
-                                                            icon="fa fa-stop" />
-                                    </div>
+                            <div class="restrict-main-contents-io-button gray_button">
+
+                                <p:commandButton    id="event-add-cancel-button"
+                                                    ajax="true" 
+                                                    value="Cancel" 
+                                                    process="@none" 
+                                                    immediate="true" 
+                                                    oncomplete="PF('event-add-dialog-var').hide()"
+                                                    actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}" 
+                                                    icon="fa fa-stop" />
+                            </div>
 
                         </h:form>
                     </p:dialog>
@@ -5816,20 +5968,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         action="#{ceCaseSearchProfileBB.onEventUpdateCommitButtonChange}" 
                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                         value="Save edits"  
-                                                        icon="fa fa-edit"/>
+                                                        icon="fa fa-edit"
+                                                        update="messages-global-form"/>
                                 </div>
-                                
-                                    <div class="restrict-main-contents-io-button gray_button">
 
-                                        <p:commandButton    id="event-profile-done-button"
-                                                            ajax="true" 
-                                                            value="Cancel" 
-                                                            process="@none" 
-                                                            immediate="true" 
-                                                            oncomplete="PF('event-update-dialog-var').hide()"
-                                                            actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}" 
-                                                            icon="fa fa-stop" />
-                                    </div>
+                                <div class="restrict-main-contents-io-button gray_button">
+
+                                    <p:commandButton    id="event-profile-done-button"
+                                                        ajax="true" 
+                                                        value="Cancel" 
+                                                        process="@none" 
+                                                        immediate="true" 
+                                                        oncomplete="PF('event-update-dialog-var').hide()"
+                                                        actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}" 
+                                                        icon="fa fa-stop" />
+                                </div>
                             </div>
 
                         </h:form>
@@ -5839,15 +5992,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-                    <p:dialog   id="event-nuke-dialog"
-                                height="800" width="1600"
-                                widgetVar="event-nuke-dialog-var"
+                    <p:dialog   id="event-deactivate-dialog"
+                                height="600" width="400"
+                                widgetVar="event-deactivate-dialog-var"
                                 responsive="true"
                                 resizable="trie"
                                 closable="true"
                                 closeOnEscape="true"
                                 modal="true"
-                                header="Nuke event id #{ceCaseSearchProfileBB.currentEvent.eventID}"
+                                header="Deactivate event id #{ceCaseSearchProfileBB.currentEvent.eventID}"
                                 rendered="true"
                                 > 
 
@@ -5857,22 +6010,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         <h:form id="event-remove-form">
 
                             <div class="ui-g data_container_nested_restrict">
-                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
                                     <div class="restrict-data-field-label-inline" >
                                         <h:outputLabel  for="event-remove-button">
-                                            <h:outputText value="Removed events can only be rescued by sys admins." />
+                                            <h:outputText value="Deactivated events can be recovered by changing event view options" />
                                         </h:outputLabel>
                                     </div>
                                 </div>
-                                <div class="restrict-main-contents-io-button red_button">
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
 
-
-                                    <p:commandButton ajax="false" action="#{ceCaseSearchProfileBB.onEventRemoveCommitButtonChange}"
-                                                     value="Nuke event" icon="fa fa-bomb"
-                                                     rendered="#{ceCaseSearchProfileBB.currentEvent.category.userRankMinimumToUpdate le systemServicesBB.bbSessionUser.role.rank}"
-                                                     />
-                                </div>
-                                
                                     <div class="restrict-main-contents-io-button gray_button">
 
                                         <p:commandButton    id="event-nuke-cancel-button"
@@ -5884,6 +6030,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}" 
                                                             icon="fa fa-stop" />
                                     </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+                                    <div class="restrict-main-contents-io-button red_button">
+
+
+                                        <p:commandButton ajax="false" action="#{ceCaseSearchProfileBB.onEventRemoveCommitButtonChange}"
+                                                         value="Deactivate event"
+                                                         icon="fa fa-close"
+                                                         rendered="true"
+                                                         />
+                                    </div>
+                                </div>
                             </div>
 
                         </h:form>
@@ -6175,6 +6333,345 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                         </h:form>
                     </p:dialog>
+                    
+
+                    <p:dialog   id="person-addupdate-dialog"
+                                height="650" width="900"
+                                widgetVar="person-addupdate-dialog-var"
+                                closable="true" 
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                >
+
+
+                        <h:form id="person-addupdate-form">
+
+                            
+                            <h:panelGrid columns="1"
+                                         columnClasses="gridTd">
+                                <h:panelGroup id="person-update-h1-pg" rendered="#{ceCaseSearchProfileBB.workingPerson.personID != 0}">
+                                    <h2>
+                                        <h:outputText value="Update record: " /> 
+                                        <h:outputText id="pers-form-header-fname" value="#{ceCaseSearchProfileBB.workingPerson.firstName} "/>
+                                        <h:outputText id="pers-form-header-lname" value="#{ceCaseSearchProfileBB.workingPerson.lastName}"/>
+                                        <h:outputText value=", " /> 
+                                        <h:outputText id="pers-form-header-id" value="ID: #{ceCaseSearchProfileBB.workingPerson.personID}"/> 
+                                    </h2>
+                                    <p>This record was last updated on: <h:outputText id="pers-form-lastupdated" value="#{ceCaseSearchProfileBB.workingPerson.lastUpdatedPretty}"/></p>
+                                </h:panelGroup>
+                                <h:panelGroup id="person-add-h1-pg" rendered="#{ceCaseSearchProfileBB.workingPerson.personID == 0}">
+                                    <h2>
+                                        <h:outputText value="Create new Person" /> 
+                                    </h2>
+                                </h:panelGroup>
+                            </h:panelGrid>
+                            
+
+
+                            <h:messages globalOnly="true" showDetail="true" showSummary="true" id="messages-global"
+                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                            </h:messages>
+
+                            <h:panelGrid columns="3" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd, gridTd"
+                                         footerClass="gridFooter">
+
+                                <ui:remove>FIRST ROW</ui:remove>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Person Type:" for="personTypeSelectMenu"/>
+                                    <p:spacer height="3px"/>
+                                    <p:selectOneMenu id="personTypeSelectMenu" required="true" 
+                                                     value="#{ceCaseSearchProfileBB.workingPerson.personType}"
+                                                     tabindex="1"
+                                                     rendered="#{!(empty ceCaseSearchProfileBB.workingPerson)}">
+                                        <f:selectItems value="#{personCoordinator.personTypes}"
+                                                       var="pt" itemValue="#{pt}" itemLabel="#{pt.label}"/>
+                                    </p:selectOneMenu>
+                                    <h:message for="personTypeSelectMenu" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Municipality" for="personMuniSelectMenu"/>
+                                    <p:spacer height="3px"/>
+                                    <p:selectOneMenu
+                                        id="muniSM" tabindex="2"
+                                        value="#{ceCaseSearchProfileBB.workingPerson.muni}">
+                                         <f:converter converterId="muniConverter"/>
+                                        <f:selectItems id="propinfoedit-muninamelist"
+                                                       value="#{sessionBean.sessUser.authMuniList}"
+                                                       var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+
+                                <h:panelGroup></h:panelGroup>
+
+                                <ui:remove>SECOND ROW</ui:remove>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="First Name:" for="formFirstNameIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formFirstNameIT" value="#{ceCaseSearchProfileBB.workingPerson.firstName}" 
+                                                 style="width: 200px;" tabindex="3" required="false" styleClass="inputText"/>
+                                    <h:message for="formFirstNameIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Last Name:" for="formLastNameIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formLastNameIT" value="#{ceCaseSearchProfileBB.workingPerson.lastName}" 
+                                                 style="width: 200px;" tabindex="4" required="true" styleClass="inputText"/>
+                                    <h:message for="formLastNameIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Job Title:" for="formJobTitleIT"/>
+                                    <p:inputText id="formJobTitleIT" value="#{ceCaseSearchProfileBB.workingPerson.jobTitle}"
+                                                 style="width: 150px;" tabindex="5" required="false" styleClass="inputText"/>
+                                    <p:spacer height="3px"/>
+                                    <h:message for="formJobTitleIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                <ui:remove>THIRD ROW</ui:remove>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Phone(cell):" for="formCellIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formCellIT" value="#{ceCaseSearchProfileBB.workingPerson.phoneCell}" 
+                                                 style="width: 150px;" tabindex="6" required="false" styleClass="inputText" maxlength="12"/>
+                                    <h:message for="formCellIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Phone(home):" for="formHomeIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formHomeIT" value="#{ceCaseSearchProfileBB.workingPerson.phoneHome}" 
+                                                 style="width: 150px;" tabindex="7" required="false" styleClass="inputText" maxlength="12"/>
+                                    <h:message for="formHomeIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Phone(work)" for="formWorkIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formWorkIT" value="#{ceCaseSearchProfileBB.workingPerson.phoneWork}" 
+                                                 style="width: 150px;" tabindex="8" required="false" styleClass="inputText" maxlength="12"/>
+                                    <h:message for="formWorkIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+
+                                    <h:outputLabel styleClass="bold" value="Email:" for="formEmailIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formEmailIT" value="#{ceCaseSearchProfileBB.workingPerson.email}" 
+                                                 style="width: 250px;" tabindex="9" required="false" styleClass="inputText">
+                                        <ui:remove>
+                                            Thanks SO https://stackoverflow.com/questions/7875108/email-validation-using-regular-expression-in-jsf-2-primefaces 
+                                            <f:validateRegex pattern="(^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[\p{L}\p{M}\p{N}.-]*(\.[\p{L}\p{M}]{2,})$)?"/>
+                                        </ui:remove>
+                                    </p:inputText>
+                                    <h:message for="formEmailIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <ui:remove>FOURTH ROW</ui:remove>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Street:" for="formStreetIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formStreetIT" value="#{ceCaseSearchProfileBB.workingPerson.addressStreet}" 
+                                                 style="width: 250px;" tabindex="10" required="false" styleClass="inputText"/>
+                                    <h:message for="formStreetIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="City:" for="formCityIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formCityIT" value="#{ceCaseSearchProfileBB.workingPerson.addressCity}" 
+                                                 style="width: 250px;" tabindex="11" required="false" styleClass="inputText"/>
+                                    <h:message for="formCityIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="State:" for="formStateIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formStateIT" value="#{ceCaseSearchProfileBB.workingPerson.addressState}" 
+                                                 style="width: 50px;" tabindex="12" required="false" styleClass="inputText"/>
+                                    <h:message for="formStateIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="ZipCode:" for="formZipIT"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="formZipIT" value="#{ceCaseSearchProfileBB.workingPerson.addressZip}" 
+                                                 style="width: 100px;" tabindex="13" required="false" styleClass="inputText"/>
+                                    <h:message for="formZipIT" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <ui:remove>FIFTH ROW</ui:remove>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Active Person?" for="isActiveFormIS"/>
+                                    <p:spacer height="3px"/>
+                                    <p:selectBooleanCheckbox id="isActiveFormIS" value="#{ceCaseSearchProfileBB.workingPerson.active}" tabindex="14"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Allowed to expire?" for="canexpire-sbcb"/>
+                                    <p:spacer height="3px"/>
+                                    <p:selectBooleanCheckbox id="canexpire-sbcb" value="#{ceCaseSearchProfileBB.workingPerson.canExpire}" 
+                                                             tabindex="15"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" for="expiry-date-cal">
+                                        <h:outputText value="Expiry date"/>
+                                    </h:outputLabel>
+                                    <p:spacer height="3px"/>
+                                    <p:calendar value="#{ceCaseSearchProfileBB.workingPerson.expiryDateUtilDate}" 
+                                                mode="popup"  id="expiry-date-cal"
+                                                showOn="button" pattern="EEE, dd MMM, yyyy"
+                                                navigator="true" tabindex="16" timeInput="true" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
+                                                showButtonPanel="true" showTodayButton="false"
+                                                required="false">
+                                    </p:calendar>
+                                    <h:message for="expiry-date-cal" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Expiry notes" for="expiry-notes-it"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="expiry-notes-it" value="#{ceCaseSearchProfileBB.workingPerson.expiryNotes}" 
+                                                 style="width: 100px;" tabindex="17" required="false" styleClass="inputText"/>
+                                    <h:message for="expiry-notes-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <ui:remove>SIXTH ROW</ui:remove>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Person under 18?" for="isUnder18-pupdate-sbcb"/>
+                                    <p:spacer height="3px"/>
+                                    <p:selectBooleanCheckbox id="isUnder18-pupdate-sbcb" 
+                                                             value="#{ceCaseSearchProfileBB.workingPerson.under18}" 
+                                                             tabindex="18"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Composite last name?" for="composite-sbcb"/>
+                                    <p:spacer height="3px"/>
+                                    <p:selectBooleanCheckbox id="composite-sbcb" 
+                                                             value="#{ceCaseSearchProfileBB.workingPerson.compositeLastName}" 
+                                                             tabindex="19"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Person data source ID" for="datasource-it"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="datasource-it" value="#{ceCaseSearchProfileBB.workingPerson.source.title}" 
+                                                 tabindex="19"
+                                                 rendered="#{!(empty ceCaseSearchProfileBB.workingPerson.source)}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Business entity?" for="business-sbcb"/>
+                                    <p:spacer height="3px"/>
+                                    <p:selectBooleanCheckbox id="business-sbcb" value="#{ceCaseSearchProfileBB.workingPerson.businessEntity}" 
+                                                             tabindex="20"/>
+                                </h:panelGroup>
+
+                                <ui:remove>SEVENTH ROW</ui:remove>
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Use separate mailing address?" for="sep-mailing-sbcb"/>
+                                    <p:spacer height="3px"/>
+                                    <p:selectBooleanCheckbox id="sep-mailing-sbcb" 
+                                                             value="#{ceCaseSearchProfileBB.workingPerson.useSeparateMailingAddress}" 
+                                                             tabindex="21"/>
+                                </h:panelGroup>
+
+                    <ui:remove>EIGTH ROW</ui:remove>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Mailing street" for="form-mail-street-it"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="form-mail-street-it" value="#{ceCaseSearchProfileBB.workingPerson.mailingAddressStreet}" 
+                                                 style="width: 250px;" tabindex="22" required="false" styleClass="inputText"/>
+                                    <h:message for="form-mail-street-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Mailing city" for="form-mail-city-it"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="form-mail-city-it" value="#{ceCaseSearchProfileBB.workingPerson.mailingAddressCity}" 
+                                                 style="width: 200px;" tabindex="23" required="false" styleClass="inputText"/>
+                                    <h:message for="form-mail-city-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Mailing state" for="form-mail-state-it"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="form-mail-state-it" value="#{ceCaseSearchProfileBB.workingPerson.mailingAddressState}" 
+                                                 style="width: 50px;" tabindex="24" required="false" styleClass="inputText"/>
+                                    <h:message for="form-mail-state-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel styleClass="bold" value="Mailing zip" for="form-mail-zip-it"/>
+                                    <p:spacer height="3px"/>
+                                    <p:inputText id="form-mail-zip-it" value="#{ceCaseSearchProfileBB.workingPerson.mailingAddressZip}" 
+                                                 style="width: 100px;" tabindex="25" required="false" styleClass="inputText"/>
+                                    <h:message for="form-mail-zip-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+
+                            </h:panelGrid>
+
+                            <hr />
+
+                            <p:spacer height="5px"/>
+
+
+
+                            <p:commandButton    id="cancel-cb"
+                                                ajax="true"  tabindex="27"
+                                                value="Cancel" 
+                                                icon="fa fa-stop" 
+                                                immediate="true"
+                                                process="@none"
+                                                onclick="PF('person-addupdate-dialog-var').hide()"
+                                                />
+                      
+
+                            <p:commandButton id="new-person-cb" 
+                                             ajax="true"
+                                             value="Create new Person" 
+                                             actionListener="#{ceCaseSearchProfileBB.personCreateCommit}"
+                                             icon="fa fa-plus" tabindex="29"
+                                             oncomplete="PF('person-addupdate-dialog-var').hide()"
+                                             disabled="#{ceCaseSearchProfileBB.workingPerson.personID != 0}"
+                                             update="messages-global-form
+                                                    nov-chooseperson-list-form"
+                                             />
+
+                        </h:form>
+
+                    </p:dialog>
+                    
+                    
                 </f:view>
             </ui:define>
         </ui:composition>

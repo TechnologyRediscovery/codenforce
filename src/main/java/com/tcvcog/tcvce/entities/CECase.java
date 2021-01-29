@@ -127,6 +127,18 @@ public class        CECase
     public List<EventCnF> getEventList() {
         return eventList;
     }
+    
+    public List<EventCnF> getFutureEventList(){
+        List<EventCnF> futureEvents = new ArrayList<>();
+        // get active not hidden
+        List<EventCnF> candidateEvents = getEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN);
+        for(EventCnF ev: candidateEvents){
+            if(ev.timeStart != null && ev.timeStart.isAfter(LocalDateTime.now())){
+                futureEvents.add(ev);
+            }
+        }
+        return futureEvents;
+    }
      
 
     @Override

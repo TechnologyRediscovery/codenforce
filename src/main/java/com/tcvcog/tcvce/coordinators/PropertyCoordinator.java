@@ -66,6 +66,19 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     private final String DEFAULTUNITNUMBER = "-1";
     private final boolean DEFAULTRENTAL = false;
 
+    
+    /**
+     * Pass through for getting a property count by municode
+     * @param muniCode
+     * @return
+     * @throws IntegrationException 
+     */
+    public int computeTotalProperties(int muniCode) throws IntegrationException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        return pi.getPropertyCount(muniCode);
+    }
+    
+    
     /**
      * Logic container for initializing members on the Property subclass
      * PropertyWithLists

@@ -211,6 +211,11 @@
                                                         <p:spacer height="5px" />
                                                         <h:outputText value="#{e.category.eventCategoryTitle}"/>
                                                     </div>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="#{e.property.address}"/>
+                                                        <p:spacer height="5px" />
+                                                        <h:outputText value="Case ID: #{e.cecase.caseID}"/>
+                                                    </div>
                                                 </p:column>
 
                                                 <p:column width="9%" sortBy="#{e.timeStart}">

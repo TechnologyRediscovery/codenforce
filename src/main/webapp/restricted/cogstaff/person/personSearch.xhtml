@@ -42,7 +42,9 @@
                                         
                                         <p:spacer height="5px" />
                                         
-                                        <p:selectOneMenu id="search-query-som" tabindex="1" value="#{personSearchBB.querySelected}">
+                                        <p:selectOneMenu id="search-query-som" 
+                                                         tabindex="1" 
+                                                         value="#{personSearchBB.querySelected}">
                                             <f:converter converterId="bOBQueryConverter"/>
                                             <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
                                             <f:selectItems id="search-query-si" value="#{personSearchBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />

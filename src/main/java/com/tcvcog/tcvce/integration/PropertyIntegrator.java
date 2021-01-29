@@ -64,6 +64,43 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     }
     
     
+    /**
+     * Hacky utility method for counting properties by municode
+     * @param muniCode
+     * @return 0 or the count of properties in a given municipality
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public int getPropertyCount(int muniCode) throws IntegrationException{
+        int cnt = 0;
+        if(muniCode != 0){
+
+            String sql = "select count(propertyid) from property where municipality_municode = ?;";
+
+            Connection con = getPostgresCon();
+            ResultSet rs = null;
+            PreparedStatement stmt = null;
+
+            try {
+                stmt = con.prepareStatement(sql);
+                stmt.setInt(1, muniCode);
+                rs = stmt.executeQuery();
+                while (rs.next()) {
+                    cnt = rs.getInt("count");
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.toString());
+                throw new IntegrationException("Unable to count properties by municode", ex);
+            } finally {
+                 if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+                 if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+                 if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+            } // close finally
+        }
+
+        return cnt;
+    }
+    
+    
     public Property getProperty(int propertyID) throws IntegrationException {
         Property p = new Property();
         PropertyCoordinator pc = getPropertyCoordinator();

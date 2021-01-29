@@ -57,16 +57,30 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
         return configureMuniDataHeavy(mdh, ua);
     }
 
+    /**
+     * Sets various variables and lists on a data heavy muni
+     * @param mdh
+     * @param ua
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException
+     * @throws AuthorizationException
+     * @throws EventException 
+     */
     private MunicipalityDataHeavy configureMuniDataHeavy(MunicipalityDataHeavy mdh, UserAuthorized ua) throws IntegrationException, BObStatusException, AuthorizationException, EventException {
-        PropertyCoordinator pc = getPropertyCoordinator();
-        CourtEntityIntegrator cei = getCourtEntityIntegrator();
-        // FIX THIS WHEN WE HAVE STABLE AUTHORIZATION PROCEDURES
-//        muni.setUserList(uc.extractUsersFromUserAuthorized(uc.getUserAuthorizedListForConfig(muni)));
-        try {
-            mdh.setMuniPropertyDH(pc.assemblePropertyDataHeavy(pc.getProperty(mdh.getMuniOfficePropertyId()), ua));
-            mdh.setCourtEntities(cei.getCourtEntityList(mdh.getMuniCode()));
-        } catch (SearchException ex) {
-            System.out.println(ex);
+        if(mdh != null && ua != null){
+            PropertyCoordinator pc = getPropertyCoordinator();
+            CourtEntityIntegrator cei = getCourtEntityIntegrator();
+            // FIX THIS WHEN WE HAVE STABLE AUTHORIZATION PROCEDURES
+    //        muni.setUserList(uc.extractUsersFromUserAuthorized(uc.getUserAuthorizedListForConfig(muni)));
+            try {
+                mdh.setMuniPropertyDH(pc.assemblePropertyDataHeavy(pc.getProperty(mdh.getMuniOfficePropertyId()), ua));
+                mdh.setCourtEntities(cei.getCourtEntityList(mdh.getMuniCode()));
+            } catch (SearchException ex) {
+                System.out.println(ex);
+            }
+
+            mdh.setPropertyCount(pc.computeTotalProperties(mdh.getMuniCode()));
         }
 
         return mdh;

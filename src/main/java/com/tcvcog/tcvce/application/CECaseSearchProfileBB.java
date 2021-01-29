@@ -52,7 +52,9 @@ import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonDataHeavy;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
@@ -94,6 +96,7 @@ public class CECaseSearchProfileBB
     private List<PageModeEnum> pageModes;
 
     private CECaseDataHeavy currentCase;
+    private PropertyDataHeavy currentCasePropDataHeavy;
     private boolean currentCaseSelected;
 
     private int formNOVFollowupDays;
@@ -175,6 +178,12 @@ public class CECaseSearchProfileBB
     private String formEventNoteText;
     
     
+    /*******************************************************
+     *              Person utilities
+    /*******************************************************/
+    
+    private Person workingPerson;
+    
     
     
     /**
@@ -195,6 +204,7 @@ public class CECaseSearchProfileBB
         UserCoordinator uc = getUserCoordinator();
         SystemCoordinator sysCor = getSystemCoordinator();
         EventCoordinator ec = getEventCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         
 
         SessionBean sb = getSessionBean();
@@ -217,19 +227,20 @@ public class CECaseSearchProfileBB
 //                    cseTemp = cc.cecase_selectDefaultCECase(sb.getSessUser());
 //                }
 //            }
-            currentCase = cseTemp;
+//            currentCase = cseTemp;
             // request scoped bean: don't reload ergbob
-//            currentCase = cc.cecase_assembleCECaseDataHeavy(cseTemp, getSessionBean().getSessUser());
+            currentCase = cc.cecase_assembleCECaseDataHeavy(cseTemp, getSessionBean().getSessUser());
             if(currentCase.getEventList() != null && !currentCase.getEventList().isEmpty()){
                 injectSessionEvent(currentCase.getEventList().get(0));
             }
+           
+            
             System.out.println("CECaseSearchProfileBB.initBean(): current case ID: " + currentCase.getCaseID());
             setClosingEventCategoryList(ec.getEventCategeryList(EventType.Closing));
             
-        } catch (IntegrationException  ex) {
+        } catch (IntegrationException | BObStatusException | SearchException  ex) {
             System.out.println(ex);
         }
-
 
         propListForSearch = sb.getSessPropertyList();
         caseStageList = CaseStageEnum.values();
@@ -255,6 +266,8 @@ public class CECaseSearchProfileBB
             rpt.setTitle("Code Enforcement Case Summary");
             reportCECase = rpt;
         }
+        
+        refreshCasePropertyDataHeavy();
         
         pageModes = new ArrayList<>();
         pageModes.add(PageModeEnum.LOOKUP);
@@ -311,6 +324,23 @@ public class CECaseSearchProfileBB
         eventPersonCandidates = new ArrayList<>();
         
         updateNewEventFieldsWithCatChange = true;
+    }
+    
+    /**
+     * Utility method for reloading the property data heavy version of this
+     * case's property
+     */
+    private void refreshCasePropertyDataHeavy(){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        if(currentCase != null){
+            try {
+                currentCasePropDataHeavy = pc.assemblePropertyDataHeavy(currentCase.getProperty(), getSessionBean().getSessUser());
+            } catch (IntegrationException | BObStatusException | SearchException ex) {
+                  getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Fatal error loading property data heavy", ""));
+            
+            }
+        }
     }
     
     /**
@@ -1819,6 +1849,10 @@ public class CECaseSearchProfileBB
         }
     }
 
+    public void onEventRemoveInitButtonChange(ActionEvent ev){
+        // do nothing yet
+    }
+    
     public String onEventRemoveCommitButtonChange(){
         EventCoordinator ec = getEventCoordinator();
         try {
@@ -1827,6 +1861,27 @@ public class CECaseSearchProfileBB
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Removed event ID " + getCurrentEvent().getEventID(), ""));
         } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                ex.getMessage(), ""));
+             return "";
+        }
+        
+        return "ceCaseProfile";
+        
+    }
+
+    
+    public String onEventReactivateCommitButtonChange(){
+        EventCoordinator ec = getEventCoordinator();
+        try {
+            currentEvent.setActive(true);
+            ec.updateEvent(currentEvent, getSessionBean().getSessUser());
+             getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Reactivated event ID " + getCurrentEvent().getEventID(), ""));
+        } catch (IntegrationException | BObStatusException | EventException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -1885,6 +1940,7 @@ public class CECaseSearchProfileBB
                     sc.logObjectView(getSessionBean().getSessUser(), getCurrentEvent());
                 }
                 getSessionBean().setSessEvent(getCurrentEvent());
+                
                 return "ceCaseProfile";
             }
     
@@ -1894,9 +1950,9 @@ public class CECaseSearchProfileBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(),
                             "This is a non-user system-level error that must be fixed by your Sys Admin"));
+            return "";
         } 
 
-       return "";
     }
     
       /**
@@ -2109,6 +2165,55 @@ public class CECaseSearchProfileBB
 
     }
 
+    
+    
+   
+    
+    /*******************************************************
+    /*******************************************************
+     **              Person management on cases           **
+    /*******************************************************/
+    /*******************************************************/
+    
+    /**
+     * Listener for beginning of person add process
+     * @param ev 
+     */
+    public void personCreateInit(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        workingPerson = pc.personCreateMakeSkeleton(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni());
+    }
+    
+    /**
+     * Action listener for creation of new person objectgs
+     * @param ev
+     */
+    public void personCreateCommit(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+    
+        try {
+            int freshID = pc.personCreate(workingPerson, getSessionBean().getSessUser());
+            PersonDataHeavy freshPerson = pc.assemblePersonDataHeavy(pc.getPerson(freshID),getSessionBean().getSessUser().getKeyCard());
+            getSessionBean().setSessPerson(freshPerson);
+
+            Property property = currentCase.getProperty();
+            
+            pc.connectPersonToProperty(freshPerson, property);
+            getFacesContext().addMessage(null,
+                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                     "Successfully added " + freshPerson.getFirstName() + " to the Database!" 
+                         + " and connected to " + property.getAddress(), ""));
+           } catch (IntegrationException ex) {
+               System.out.println(ex.toString());
+                  getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                               "Unable to add new person to the database, my apologies!", ""));
+           }
+        //make sure the person list includes our fresh person
+        refreshCasePropertyDataHeavy();
+        
+    }
+    
     
     
    
@@ -2774,6 +2879,34 @@ public class CECaseSearchProfileBB
      */
     public void setUpdateNewEventFieldsWithCatChange(boolean updateNewEventFieldsWithCatChange) {
         this.updateNewEventFieldsWithCatChange = updateNewEventFieldsWithCatChange;
+    }
+
+    /**
+     * @return the workingPerson
+     */
+    public Person getWorkingPerson() {
+        return workingPerson;
+    }
+
+    /**
+     * @param workingPerson the workingPerson to set
+     */
+    public void setWorkingPerson(Person workingPerson) {
+        this.workingPerson = workingPerson;
+    }
+
+    /**
+     * @return the currentCasePropDataHeavy
+     */
+    public PropertyDataHeavy getCurrentCasePropDataHeavy() {
+        return currentCasePropDataHeavy;
+    }
+
+    /**
+     * @param currentCasePropDataHeavy the currentCasePropDataHeavy to set
+     */
+    public void setCurrentCasePropDataHeavy(PropertyDataHeavy currentCasePropDataHeavy) {
+        this.currentCasePropDataHeavy = currentCasePropDataHeavy;
     }
 
 }

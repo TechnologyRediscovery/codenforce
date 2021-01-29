@@ -41,6 +41,18 @@ public class QueryEvent
         
     }
 
+    public long computeTotalEventDurationsInResults(){
+        long totalDuration = 0;
+        if(this.isQueryExecuted()){
+            if(this.results != null && !this.results.isEmpty()){
+                for(EventCnF ev: this.results){
+                    totalDuration = totalDuration + ev.computeEventDurationMins();
+                }
+            }
+        }
+        return totalDuration;
+    }
+    
     
     @Override
     public List<SearchParamsEvent> getParamsList() {

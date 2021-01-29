@@ -173,7 +173,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
                 System.out.println("EventsBB.initbean: Current event loading error");
             }
                 
-        } else { // we don't have a session event, se make a new one
+        } else { // we don't have a session event, so make a new one
             initiateNewEvent();
         }
         
@@ -203,16 +203,41 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         }
         eventList = new ArrayList<>();
         filteredEventList = new ArrayList<>();
-         
+        
+        initEventSearch();
+    }
+    
+    
+    private void initEventSearch(){
         //**************************************
         //************** SEARCH ****************
         //**************************************
          
+        SearchCoordinator sc = getSearchCoordinator();
+        EventCoordinator ec = getEventCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
         queryList = sc.buildQueryEventList(getSessionBean().getSessUser().getMyCredential());
         
-        // Setting default query
-        if(queryList != null && !queryList.isEmpty()){
-            querySelected = queryList.get(0);
+        // get session query
+        QueryEvent qev = getSessionBean().getQueryEvent();
+        if(qev != null){
+            if(qev.isQueryExecuted()){
+                querySelected = qev;
+            } else {
+                try {
+                    querySelected = sc.runQuery(qev);
+                } catch (SearchException ex) {
+                    System.out.println(ex);
+                }
+            } // we've got results, so extract results
+            eventList = querySelected.getBOBResultList();
+        
+        } else {
+            // Setting default query
+            if(queryList != null && !queryList.isEmpty()){
+                querySelected = queryList.get(0);
+            }
         }
         
         typeCatMapForSearch = ec.assembleEventTypeCatMap_toView(getSessionBean().getSessUser());
@@ -224,6 +249,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         
         propUseTypeList = pc.getPropertyUseTypeList();
         
+        // Default to clearing list upon query reset
         appendResultsToList = false;
         
         
@@ -231,7 +257,10 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         // which would have been placed there by the generateReport method in this bean
         reportConfig = getSessionBean().getReportConfigCEEventList();
         configureSearchParameters();
+        
+        
     }
+    
     
     /**
      * Listener for user changes to the event domain
@@ -658,9 +687,18 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         }
     }
     
+    /**
+     * Listener for user requests to reset the query list
+     * @param ev 
+     */
     public void resetQuery(ActionEvent ev){
         
         SearchCoordinator sc = getSearchCoordinator();
+        
+        if(!appendResultsToList && eventList != null){
+            eventList.clear();
+        }
+        // Don't do this stuff??
         queryList = sc.buildQueryEventList(getSessionBean().getSessUser().getMyCredential());
         if(queryList != null && !queryList.isEmpty()){
             querySelected = queryList.get(0);
@@ -776,7 +814,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
             System.out.println(ex);
             getFacesContext().addMessage(null,
                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                           "Could not unhide event, sorry; this is a system erro", ""));
+                           "Could not unhide event, sorry; this is a system error", ""));
         }
     }
     
@@ -811,7 +849,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         EventCnF ev = null;
             
         try {
-            if(currentEvent == null){
+            if(currentEvent == null && eventDomainActive != null){
 
                 ev = ec.initEvent(currentERGBOb, null);
 //                ev.setCategory(eventCategorySelected);

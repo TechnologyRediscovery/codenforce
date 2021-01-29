@@ -165,6 +165,8 @@ public class    SessionBean
     private QueryEvent queryEvent;
     private List<QueryEvent> queryEventList;
     
+    private QueryEvent queryEventFuture7Days;
+    
     
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                  VI OccPeriod                                  <<< */
@@ -1564,6 +1566,20 @@ public class    SessionBean
      */
     public void setCeCaseSearchProfilePageModeRequest(PageModeEnum ceCaseSearchProfilePageModeRequest) {
         this.ceCaseSearchProfilePageModeRequest = ceCaseSearchProfilePageModeRequest;
+    }
+
+    /**
+     * @return the queryEventFuture7Days
+     */
+    public QueryEvent getQueryEventFuture7Days() {
+        return queryEventFuture7Days;
+    }
+
+    /**
+     * @param queryEventFuture7Days the queryEventFuture7Days to set
+     */
+    public void setQueryEventFuture7Days(QueryEvent queryEventFuture7Days) {
+        this.queryEventFuture7Days = queryEventFuture7Days;
     }
     
 }

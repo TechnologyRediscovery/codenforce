@@ -232,6 +232,17 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         return "occPeriodWorkflow";
     }
     
+    /**
+     * Listener for user requests to view an event from the dashboard 
+     * on the events page
+     * @param ev
+     * @return 
+     */
+    public String onViewEventButtonChange(EventCnFPropUnitCasePeriodHeavy ev){
+        getSessionBean().setSessEvent(ev);
+        return "events";
+        
+    }
     
     public String switchToUser(){
         System.out.println("MissionControlBB.switchToUser");

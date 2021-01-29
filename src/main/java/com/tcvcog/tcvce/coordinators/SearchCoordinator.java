@@ -52,6 +52,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     private static final int PASTPERIOD_YEAR = 365;
     private static final int PASTPERIOD_TODAY = 0;
     
+    private static final long DAYS_IN_WEEK = 7;
+    private static final long HOURS_IN_DAY = 24;
+    
+    
     
     /**
      * Creates a new instance of SearchCoordinator
@@ -724,6 +728,15 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
              case MUNI_MONTHYACTIVITY:
                  paramsList.add(genParams_event_muniMonthly(params, cred));
                  break;
+             case MUNI_24HR_ACTIVITY:
+                 paramsList.add(genParams_event_muni24HR(params, cred));
+                 break;
+             case MUNI_7DAY_ACTIVITY:
+                 paramsList.add(genParams_event_muni7Day(params, cred));
+                 break;
+             case MUINI_FUTURE_7DAYS:
+                 paramsList.add(genParams_event_future7days(params, cred));
+                 break;
              case OCCPERIOD:
                  paramsList.add(genParams_event_occperid(params, cred));
                  break;
@@ -1394,9 +1407,58 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
     public SearchParamsEvent genParams_event_muniMonthly(SearchParamsEvent params, Credential cred ){
         params.setDate_startEnd_ctl(true);
-        params.setDate_field(SearchParamsEventDateFieldsEnum.CREATED_TS);
+        params.setDate_field(SearchParamsEventDateFieldsEnum.TIME_START);
         params.setDate_end_val(LocalDateTime.now());
         params.setDate_start_val(LocalDateTime.now().minusDays(30));
+        params.setLimitResultCount_ctl(false);
+        params.setEventDomain_ctl(true);
+        params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
+        
+        // all other event controls are off by default
+        
+        return params;
+        
+    }
+    
+    
+    public SearchParamsEvent genParams_event_muni24HR(SearchParamsEvent params, Credential cred ){
+        params.setDate_startEnd_ctl(true);
+        params.setDate_field(SearchParamsEventDateFieldsEnum.TIME_START);
+        params.setDate_end_val(LocalDateTime.now());
+        params.setDate_start_val(LocalDateTime.now().minusHours(HOURS_IN_DAY));
+        params.setLimitResultCount_ctl(false);
+        params.setEventDomain_ctl(true);
+        params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
+        
+        // all other event controls are off by default
+        
+        return params;
+        
+    }
+    
+    
+    public SearchParamsEvent genParams_event_muni7Day(SearchParamsEvent params, Credential cred ){
+        params.setDate_startEnd_ctl(true);
+        params.setDate_field(SearchParamsEventDateFieldsEnum.TIME_START);
+        params.setDate_end_val(LocalDateTime.now());
+        params.setDate_start_val(LocalDateTime.now().minusDays(DAYS_IN_WEEK));
+        params.setLimitResultCount_ctl(false);
+        params.setEventDomain_ctl(true);
+        params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
+        
+        // all other event controls are off by default
+        
+        return params;
+        
+    }
+    
+    
+    
+    public SearchParamsEvent genParams_event_future7days(SearchParamsEvent params, Credential cred ){
+        params.setDate_startEnd_ctl(true);
+        params.setDate_field(SearchParamsEventDateFieldsEnum.TIME_START);
+        params.setDate_start_val(LocalDateTime.now());
+        params.setDate_end_val(LocalDateTime.now().plusDays(DAYS_IN_WEEK));
         params.setLimitResultCount_ctl(false);
         params.setEventDomain_ctl(true);
         params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
