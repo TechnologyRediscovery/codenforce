@@ -2730,10 +2730,11 @@ input{
 
 .restrict-main-contents-io-link{
     display: inline-block; 
-    float: right;
+    float: next;
     /*text-decoration: underline;*/
     font-weight: 200;
     /*border-bottom: 1px solid #6C6D70;*/
+    margin-left:10px;
     
     /*changed in haste by ECD Jan 2021 for cecase profile facelift*/
     border-bottom: 1px solid blue; 

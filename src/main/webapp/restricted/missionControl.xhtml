@@ -174,7 +174,7 @@
                                             toggleable="true"
                                             style="width: 100%;"
                                             widgetVar="event-serach-panel-var"
-                                            collapsed="false"
+                                            collapsed="true"
                                             rendered="true"
                                             header="Activity in #{sessionBean.sessMuni.muniName}" >
 
@@ -802,12 +802,24 @@
 
                                         <p:commandButton   id="cecase-search-loadhistory-button" 
                                                            ajax="true" 
+                                                           rendered="false"
                                                            actionListener="#{ceCaseSearchProfileBB.loadCECaseHistory}"
                                                            icon="fa fa-clock-o" 
                                                            styleClass="button"
                                                            value="load case history" 
                                                            update="messages-global-form
                                                            cecase-search-results-form"/>
+                                        
+                                        <p:commandButton   id="cecase-export-excel-button" 
+                                                           ajax="false" 
+                                                           icon="fa fa-file-text-o" 
+                                                           styleClass="button"
+                                                           value="Export CSV" 
+                                                           >
+                                            <p:dataExporter type="csv" 
+                                                            target="cecase-search-results-table"
+                                                            fileName="caseExport" />
+                                        </p:commandButton>
 
 
                                         <p:commandButton   id="print-case-list-cb" 

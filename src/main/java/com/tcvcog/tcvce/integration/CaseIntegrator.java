@@ -2464,7 +2464,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     public Citation getCitation(int id) throws IntegrationException{
 
         String query = "SELECT citationid, citationno, status_statusid, origin_courtentity_entityid, \n" +
-                        "login_userid, dateofrecord, transtimestamp, isactive, notes, officialtext FROM public.citation WHERE citationid=?;";
+                        "login_userid, dateofrecord, transtimestamp, isactive, notes, officialtext "
+                + "     FROM public.citation WHERE citationid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -2493,6 +2494,24 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * Utility method for retrieving a list of Citation objects
+     * @param citIDList a list of citation IDs
+     * @return list of Citations, will always return an instantiated List
+     * @throws IntegrationException 
+     */
+    public List<Citation> getCitations(List<Integer> citIDList) throws IntegrationException{
+        
+        List<Citation> citL = new ArrayList<>();
+        if(citIDList != null && !citIDList.isEmpty()){
+            for(Integer i: citIDList){
+                citL.add(getCitation(i));
+            }
+        }
+        return citL;
+        
+    }
+    
+    /**
      * Extracts a list of Citation IDs from the DB given a Property
      * @param prop
      * @return
@@ -2504,7 +2523,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
         String query =  "SELECT citationid FROM public.citation 	INNER JOIN public.cecase ON cecase.caseid = citation.caseid \n" +
                         "INNER JOIN public.property ON cecase.property_propertyID = property.propertyID \n" +
-                        "WHERE propertyID=?; ";
+                        "WHERE propertyID=? AND citation.isactive = TRUE; ";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -2534,20 +2553,20 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     /**
      * Extracts citations from the DB given a CECase
      * @param ceCase
-     * @return
+     * @return list of Citations IDs of citations that are active only by cecase
      * @throws IntegrationException 
      */
-    public List<Citation> getCitations(CECase ceCase) throws IntegrationException{
-            
+    public List<Integer> getCitations(CECase ceCase) throws IntegrationException{
+        CaseCoordinator cc = getCaseCoordinator();
         String query =  "SELECT DISTINCT ON (citationID) citation.citationid, codeviolation.cecase_caseID FROM public.citationviolation 	\n" +
                         "	INNER JOIN public.citation ON citation.citationid = citationviolation.citation_citationid\n" +
                         "	INNER JOIN public.codeviolation on codeviolation.violationid = citationviolation.codeviolation_violationid\n" +
                         "	INNER JOIN public.cecase ON cecase.caseid = codeviolation.cecase_caseID\n" +
-                        "	WHERE codeviolation.cecase_caseID=?;";
+                        "	WHERE codeviolation.cecase_caseID=? AND citation.isactive=TRUE;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        List<Citation> citationList = new ArrayList();
+        List<Integer> citationIDList = new ArrayList();
         
         try {
             stmt = con.prepareStatement(query);
@@ -2555,7 +2574,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                citationList.add(getCitation(rs.getInt("citationid")));
+                citationIDList.add(rs.getInt("citationid"));
             }
             
         } catch (SQLException ex) {
@@ -2567,7 +2586,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return citationList;
+        return citationIDList;
     }
     
     /**
@@ -2576,7 +2595,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    private List<Integer> getCodeViolations(Citation cid) throws IntegrationException{
+    public List<Integer> getCodeViolations(Citation cid) throws IntegrationException{
         
         String query =  "SELECT codeviolation_violationid FROM public.citationviolation 	\n" +
                         "	INNER JOIN public.citation ON citation.citationid = citationviolation.citation_citationid\n" +
@@ -2609,6 +2628,25 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return idl;
+    }
+    
+    /**
+     * Utility method for grabbing code violations given a list of Integers
+     * which are Violation ID numbers
+     * @param vidList
+     * @return the List, possibly containing codeViolations.
+     * @throws IntegrationException 
+     */
+    public List<CodeViolation> getCodeViolations(List<Integer> vidList) throws IntegrationException{
+        List<CodeViolation> cvList = new ArrayList<>();
+        if(vidList != null && !vidList.isEmpty()){
+            for(Integer i: vidList){
+                cvList.add(getCodeViolation(i));
+            }
+        }
+        return cvList;
+        
+        
     }
     
     /**

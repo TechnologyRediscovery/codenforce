@@ -285,7 +285,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 Collections.sort(cse.getNoticeList());
                 Collections.reverse(cse.getNoticeList());
 
-                cse.setCitationList(ci.getCitations(cse));
+                cse.setCitationList(citation_getCitationList(cse));
 
                 cse.setViolationList(violation_getCodeViolations(ci.getCodeViolations(cse.getCaseID())));
                 Collections.sort(cse.getViolationList());
@@ -1404,18 +1404,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         } else {
             throw new BObStatusException("Notice is already locked and queued for sending");
         }
-        EventCnF noticeEvent = evCoord.initEvent(c, evCoord.initEventCategory(Integer.parseInt(getResourceBundle(
-                Constants.EVENT_CATEGORY_BUNDLE).getString("noticeQueued"))));
-        
-        String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
-        
-        noticeEvent.setDescription(queuedNoticeEventNotes);
-        noticeEvent.setUserCreator(ua);
-        
-        ArrayList<Person> persList = new ArrayList();
-        persList.add(nov.getRecipient());
-        noticeEvent.setPersonList(persList);
-        evCoord.addEvent(noticeEvent, c, ua);
+     
+        // Deactivated notice event for lock and queue--only for mailing
+//        EventCnF noticeEvent = evCoord.initEvent(c, evCoord.initEventCategory(Integer.parseInt(getResourceBundle(
+//                Constants.EVENT_CATEGORY_BUNDLE).getString("noticeQueued"))));
+//        
+//        String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
+//        
+//        noticeEvent.setDescription(queuedNoticeEventNotes);
+//        noticeEvent.setUserCreator(ua);
+//        
+//        ArrayList<Person> persList = new ArrayList();
+//        persList.add(nov.getRecipient());
+//        noticeEvent.setPersonList(persList);
+//        evCoord.addEvent(noticeEvent, c, ua);
     }
     
     
@@ -1669,6 +1671,27 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     // *************************************************************************
     // *                     CITATIONS                                         *
     // *************************************************************************
+    
+    /**
+     * Logic container for assembling a list of citations by a CECase
+     * @param cse
+     * @return fully-baked citation objects
+     * @throws IntegrationException 
+     */
+    private List<Citation> citation_getCitationList(CECase cse) throws IntegrationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        List<Citation> citList = new ArrayList<>();
+        if(cse!= null){
+            List<Integer> citIDList = ci.getCitations(cse);
+            if(citIDList != null && !citIDList.isEmpty()){
+                for(Integer i: citIDList){
+                    citList.add(citation_getCitation(i));
+                }
+            }
+        }
+        return citList;
+    }
+    
     /**
      * Getter for Citation objects
      *
@@ -1679,6 +1702,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public Citation citation_getCitation(int citationID) throws IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
         Citation cit = ci.getCitation(citationID);
+        cit.setViolationList(ci.getCodeViolations(ci.getCodeViolations(citationID)));
+        
 
         return cit;
 
@@ -1710,16 +1735,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         cit.setIsActive(true);
         cit.setStatus(citation_getStartingCitationStatus());
         cit.setOrigin_courtentity(getSessionBean().getSessMuni().getCourtEntities().get(0));
-        List<CodeViolation> l = new ArrayList<>();
+        List<CodeViolation> cvlst = new ArrayList<>();
         if (cse.getViolationList() != null && !cse.getViolationList().isEmpty()) {
-
             for (CodeViolation v : cse.getViolationList()) {
                 if (v.getActualComplianceDate() == null) {
-                    l.add(v);
+                    cvlst.add(v);
+                    System.out.println("CaseCoordinator.citation_getCitationSkeleton: Adding ViolID: " + v.getViolationID());
                 }
             }
         }
-        cit.setViolationList(l);
+        cit.setViolationList(cvlst);
 
         return cit;
 
@@ -1789,10 +1814,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      *
      * @param c
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public void citation_updateCitation(Citation c) throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
-        if (c.getStatus() != null && !c.getStatus().isNonStatusEditsForbidden()) {
+        if (c.getStatus() != null) {
             ci.updateCitation(c);
         } else {
             throw new BObStatusException("Cannot update this citation at its current status");
@@ -1809,12 +1835,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      */
     public void citation_removeCitation(Citation c) throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
-        if (c.getStatus() != null && !c.getStatus().isNonStatusEditsForbidden()) {
+        
+        if(c != null){
             c.setIsActive(false);
             ci.updateCitation(c);
-        } else {
-            throw new BObStatusException("Cannot remove this citation at its current status");
         }
+        // Deactivated to allow for any citation to be removed
+        
+
+//        if (c.getStatus() != null && !c.getStatus().isNonStatusEditsForbidden()) {
+//            c.setIsActive(false);
+//            ci.updateCitation(c);
+//        } else {
+//            throw new BObStatusException("Cannot remove this citation at its current status");
+//        }
 
     }
 

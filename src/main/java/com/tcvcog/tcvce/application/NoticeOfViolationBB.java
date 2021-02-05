@@ -102,6 +102,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private List<ViewOptionsActiveListsEnum> viewOptionList;
     private ViewOptionsActiveListsEnum selectedViewOption;
     
+    private boolean nov_createNoticeFollowupEvent;
+    
     // MIGRATED FROM TEXT BLOCK BB
     
     
@@ -439,12 +441,16 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private void onModeLookupInit() {
     }
     
-    
-    public void markNoticeOfViolationAsSent(NoticeOfViolation nov) {
-        CaseCoordinator caseCoord = getCaseCoordinator();
+    public void markNoticeOfViolationAsSentInit(NoticeOfViolation nov){
         currentNotice = nov;
+    }
+    
+    
+    public void markNoticeOfViolationAsSent() {
+        CaseCoordinator caseCoord = getCaseCoordinator();
+        
         try {
-            caseCoord.nov_markAsSent(currentCase, nov, getSessionBean().getSessUser());
+            caseCoord.nov_markAsSent(currentCase, currentNotice, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Marked notice as sent and added event to case",
@@ -461,7 +467,10 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                             "Note that because this message is being displayed, the phase change"
                             + "has probably succeeded"));
         }
-        nov_createFollowupEvent(); 
+
+        if(nov_createNoticeFollowupEvent){
+            nov_createFollowupEvent(); 
+        }
 
     }
     
@@ -1614,6 +1623,20 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setDraftNoticeLoaded(boolean draftNoticeLoaded) {
         this.draftNoticeLoaded = draftNoticeLoaded;
+    }
+
+    /**
+     * @return the nov_createNoticeFollowupEvent
+     */
+    public boolean isNov_createNoticeFollowupEvent() {
+        return nov_createNoticeFollowupEvent;
+    }
+
+    /**
+     * @param nov_createNoticeFollowupEvent the nov_createNoticeFollowupEvent to set
+     */
+    public void setNov_createNoticeFollowupEvent(boolean nov_createNoticeFollowupEvent) {
+        this.nov_createNoticeFollowupEvent = nov_createNoticeFollowupEvent;
     }
 
 }
