@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2018 Turtle Creek Valley
-Council of Governments, PA
+ * Copyright (C) 2018 Turtle Creek Valley Council of Governments, PA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +23,7 @@ import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.MetadataException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Blob;
@@ -31,14 +31,11 @@ import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.Metadata;
 import com.tcvcog.tcvce.entities.MetadataKey;
-import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.awt.image.BufferedImage;
-import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import java.io.ByteArrayInputStream;
@@ -54,7 +51,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Random;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
@@ -62,6 +58,8 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.w3c.dom.NamedNodeMap;
@@ -73,7 +71,7 @@ import org.w3c.dom.Node;
  */
 public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
-    private final StreamedContent image = new DefaultStreamedContent();
+    private final DefaultStreamedContent defaultStream = new DefaultStreamedContent();
     private final int GIGABYTE = 1000000000;
 
     public BlobCoordinator() {
@@ -95,37 +93,37 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * The BlobCoordinator attempts to automatically retrieve an image for the
-     * interface.
+     * The BlobCoordinator attempts to retrieve an image with a given Blob ID supplied by a JSF parameter. 
+     * If something were to go wrong, automatically retrieve the defaultStream for the interface.
      *
      * @return
      * @throws BlobTypeException
-     * @throws java.io.IOException
-     * @throws java.lang.ClassNotFoundException
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
-    public StreamedContent getImage() throws BlobTypeException, IOException, ClassNotFoundException {
+    public StreamedContent getImage() throws BlobTypeException, BlobException{
         // should use EL to verify blob type,  but this will check it anyway
         FacesContext context = FacesContext.getCurrentInstance();
         DefaultStreamedContent sc = null;
 
         if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
-            return image;
+            sc = defaultStream;
         } else {
-            BlobIntegrator bi = getBlobIntegrator();
             
             //Get the blob ID from the Faces context
             int blobID = Integer.parseInt(context.getExternalContext().getRequestParameterMap().get("blobID"));
             System.out.println("BlobCoordinator.getImage: image ID " + blobID);
             try {
-                BlobLight blob = getPhotoBlobLight(blobID);
+                Blob blob = getPhotoBlob(blobID);
                 if (null == blob.getType()) {
                     throw new BlobTypeException("BlobType is null.");
                 } else {
                     switch (blob.getType()) {
                         case PHOTO:
-                            sc = new DefaultStreamedContent(new ByteArrayInputStream(bi.getBlobBytes(blob.getBytesID())));
+                            sc = new DefaultStreamedContent(new ByteArrayInputStream(blob.getBytes()));
                             break;
                         case PDF:
+                            //For PDFs, just display an icon
+                            
                             sc = new DefaultStreamedContent(new FileInputStream(new File("/home/noah/Documents/COG Project/codeconnect/src/main/webapp/images/pdf-icon.png")));
                             break;
                         default:
@@ -133,33 +131,78 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
                     }
                 }
             } catch (IntegrationException ex) {
-                System.out.println(ex);
                 System.out.println("BlobCoordinator.getImage | " + ex);
             } catch (FileNotFoundException ex) {
                 System.out.println(ex);
-                System.out.println("BlobCoordinator.getImage | could not find pdf-icon.png ");
+                System.out.println("BlobCoordinator.getImage | ERROR: could not find pdf-icon.png ");
             }
-            return sc;
+            
         }
+        
+        return sc;
     }
 
+    /**
+     * The BlobCoordinator attempts to retrieve a PDF with a given Blob ID supplied by a JSF parameter. 
+     * If something were to go wrong, automatically retrieve the defaultStream for the interface.
+     *
+     * @return
+     * @throws BlobTypeException
+     * @throws com.tcvcog.tcvce.domain.BlobException
+     */
+    public StreamedContent getDocument() throws BlobTypeException, BlobException{
+        // should use EL to verify blob type,  but this will check it anyway
+        FacesContext context = FacesContext.getCurrentInstance();
+        DefaultStreamedContent sc = null;
+
+        if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
+            sc = defaultStream;
+        } else {
+            
+            //Get the blob ID from the Faces context
+            int blobID = Integer.parseInt(context.getExternalContext().getRequestParameterMap().get("blobID"));
+            System.out.println("BlobCoordinator.getDocument: document ID " + blobID);
+            try {
+                Blob blob = getPDFBlob(blobID);
+                
+                sc = new DefaultStreamedContent(new ByteArrayInputStream(blob.getBytes()));
+                
+            } catch (IntegrationException ex) {
+                System.out.println("BlobCoordinator.getDocument | " + ex);
+            }
+                
+        }
+        
+        return sc;
+    }
+    
     /**
      * Validates blobs and prepares them for storage, whether they are photos
      * or documents.
      * TODO: make this method throw exception if blob is corrupted
      * @param blob
      * @return
-     * @throws BlobException
+     * @throws BlobException if blob is too large or of an incorrect file type
      * @throws IntegrationException
      * @throws IOException 
-     * @throws java.lang.ClassNotFoundException 
+     * @throws com.tcvcog.tcvce.domain.BlobTypeException
      */
-    public Blob storeBlob(Blob blob) throws BlobException, IntegrationException, IOException, NoSuchElementException, ClassNotFoundException {
+    public Blob storeBlob(Blob blob) throws BlobException, IOException, IntegrationException, BlobTypeException {
+        if (blob.getBytes()== null || blob.getBytes().length == 0) {
+            throw new BlobException("You cannot upload a file without binary data");
+        }
+        
         //Test to see if the byte array is larger than a GIGABYTE
         if (blob.getBytes().length > GIGABYTE) {
             throw new BlobException("You cannot upload a file larger than 1 gigabyte.");
         }
 
+        String filename = blob.getFilename();
+        
+        if(filename == null || filename.isEmpty()){
+            throw new BlobException("You cannot upload a file without a filename.");
+        }
+        
         //First, let's find out what type of file this is.
         String fileExtension = getFileExtension(blob.getFilename());
 
@@ -170,34 +213,32 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         if(!fileExtension.equals(lowerCaseExt)) {
             
-            String filename = blob.getFilename();
             blob.setFilename(filename.replace("." + fileExtension, "." + lowerCaseExt));
 
             fileExtension = lowerCaseExt;
         }
         
-        
-        if (fileExtension.equals("jpg")
-                || fileExtension.equals("jpeg")
-                || fileExtension.equals("gif")
-                || fileExtension.equals("png")) {
-            
-            blob.setType(BlobType.PHOTO);
-            
-            blob = stripImageMetadata(blob);
-            return getBlobIntegrator().storePhotoBlob(blob);
-            
-        } else if (fileExtension.contains("pdf")) {
-            
-            blob.setType(BlobType.PDF);
-            
-            //No PDF methods yet!
-            //TODO: Strip metadata from original file and save it in the Metadata dictionary
-            return null;
-            
-        } else {
-            //Incorrect file type
-            throw new BlobException("Incompatible file type, please upload a JPG, JPEG, GIF, PNG, or PDF.");
+        switch (fileExtension) {
+            case "jpg":
+            case "jpeg":
+            case "gif":
+            case "png":
+
+                blob.setType(BlobType.PHOTO);
+
+                blob = stripImageMetadata(blob);
+                return getBlobIntegrator().storePhotoBlob(blob);
+
+            case "pdf":
+
+                blob.setType(BlobType.PDF);
+
+                blob = stripPDFMetadata(blob);
+                return getBlobIntegrator().storePDFBlob(blob);
+
+            default:
+                //Incorrect file type
+                throw new BlobException("Incompatible file type, please upload a JPG, JPEG, GIF, PNG, or PDF.");
         }
 
     }
@@ -209,21 +250,21 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @param blob
      * @throws IntegrationException
      * @throws IOException
-     * @throws ClassNotFoundException
      * @throws BlobTypeException if the supplied file extension is different than what we have in the DB
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
     public void updateBlobFilename(BlobLight blob) 
             throws IntegrationException, 
-            IOException, 
-            ClassNotFoundException, 
-            BlobTypeException{
+            IOException,
+            BlobTypeException,
+            BlobException{
         
         //we must make sure that the file extension has not been changed, as
         //Changing it could break the file.
         
         BlobIntegrator bi = getBlobIntegrator();
         
-        BlobLight originalBlob = getPhotoBlobLight(blob.getBlobID());
+        BlobLight originalBlob = bi.getPhotoBlobLightWithoutMetadata(blob.getBlobID());
         
         String newExtension = getFileExtension(blob.getFilename());
         
@@ -242,14 +283,30 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         }
         
         //If we reach here, the file extensions are equal, we may update the filename.
-        bi.updatePhotoBlobFilename(blob);
+        bi.updateBlobFilename(blob);
         
     }
-
-    public Blob getPhotoBlob(int blobID) throws IntegrationException, IOException, ClassNotFoundException, NoSuchElementException, BlobTypeException {
+    
+    public Blob getPhotoBlob(int blobID) throws IntegrationException, BlobException {
         BlobIntegrator bi = getBlobIntegrator();
 
         Blob blob = new Blob(getPhotoBlobLight(blobID));
+
+        blob.setBytes(bi.getBlobBytes(blob.getBytesID()));
+
+        return blob;
+    }
+    
+    /**
+     * @param blobID
+     * @return
+     * @throws IntegrationException
+     * @throws BlobException 
+     */
+    public Blob getPDFBlob(int blobID) throws IntegrationException, BlobException {
+        BlobIntegrator bi = getBlobIntegrator();
+
+        Blob blob = new Blob(getPDFBlobLight(blobID));
 
         blob.setBytes(bi.getBlobBytes(blob.getBytesID()));
 
@@ -262,10 +319,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @param input
      * @return
      * @throws IntegrationException
-     * @throws IOException
-     * @throws ClassNotFoundException 
      */
-    public Blob getPhotoBlob(BlobLight input) throws IntegrationException, IOException, ClassNotFoundException {
+    public Blob getBlobFromBlobLight(BlobLight input) throws IntegrationException {
         BlobIntegrator bi = getBlobIntegrator();
 
         Blob blob = new Blob(input);
@@ -274,7 +329,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
         return blob;
     }
-
+    
     /**
      * A method for grabbing PhotoBlobLights that's safe:
      * if it encounters an entry that does not yet have a properly
@@ -283,49 +338,125 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @param blobID
      * @return
      * @throws IntegrationException
-     * @throws IOException
-     * @throws ClassNotFoundException 
-     * @throws com.tcvcog.tcvce.domain.BlobTypeException 
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
-    public BlobLight getPhotoBlobLight(int blobID) throws IntegrationException, IOException, ClassNotFoundException, NoSuchElementException, BlobTypeException{
+    public BlobLight getPhotoBlobLight(int blobID) throws IntegrationException, BlobException {
         
         BlobIntegrator bi = getBlobIntegrator();
         
         try {
         return bi.getPhotoBlobLight(blobID);
-        } catch(BlobException ex) {
-            //The metadata column isn't properly populated.
-            //We'll grab the bytes, strip the metadata from them
-            //And save them in the metadata column before fetching
-            //The blob and returning it.
+        } catch(MetadataException ex) {
             
-            //time to operate
-            //grab the BlobLight without metadata so we don't get the same error
-            Blob patient = getPhotoBlob(bi.getPhotoBlobLightWithoutMetadata(blobID));
-            
-            patient = stripImageMetadata(patient);
-            
-            //Should be all ready, let's update the bytes and the metadata
-            
-            bi.updateBlobBytes(patient);
-            
-            bi.updateBlobMetadata(patient);
+            if(ex.isMapNullError()){
+                //The metadata column isn't properly populated.
+                //We'll grab the bytes, strip the metadata from them
+                //And save them in the metadata column before fetching
+                //The blob and returning it.
+
+                //time to operate
+                //grab the BlobLight without metadata so we don't get the same error
+                Blob patient = getBlobFromBlobLight(bi.getPhotoBlobLightWithoutMetadata(blobID));
+                try {
+                patient = stripImageMetadata(patient);
+
+                //Should be all ready, let's update the bytes and the metadata
+
+                bi.updateBlobBytes(patient);
+
+                bi.updateBlobMetadata(patient);
+                
+                } catch(IOException | BlobTypeException exTwo){
+                    throw new BlobException(exTwo);
+                }
+            } else {
+                throw new BlobException(ex);
+            }
             
         }
         
-        /*
-            We are now clear to return the photo.
-        
-            NOTE TO FUTURE DEBUGGERS:
-            This is a recursive function and
-            you will get stuck in an infinite loop if
-            BlobIntegrator.getPhotoBlobLight()
-            throws a BlobException for reasons that the
-            catch block above can't fix.
-        */
+        //We are now clear to return the blob
         return getPhotoBlobLight(blobID);
     }
     
+    /**
+     * A method for grabbing PDFBlobLights that's safe:
+     * if it encounters an entry that does not yet have a properly
+     * populated metadata column, it strips the metadata and saves it
+     * before returning the blob.
+     * @param blobID
+     * @return
+     * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BlobException
+     */
+    public BlobLight getPDFBlobLight(int blobID) throws IntegrationException, BlobException {
+        
+        BlobIntegrator bi = getBlobIntegrator();
+        
+        try {
+        return bi.getPDFBlobLight(blobID);
+        } catch(MetadataException ex) {
+            
+            if(ex.isMapNullError()){
+                //The metadata column isn't properly populated.
+                //We'll grab the bytes, strip the metadata from them
+                //And save them in the metadata column before fetching
+                //The blob and returning it.
+
+                //time to operate
+                //grab the BlobLight without metadata so we don't get the same error
+                Blob patient = getBlobFromBlobLight(bi.getPDFBlobLightWithoutMetadata(blobID));
+                try {
+                patient = stripPDFMetadata(patient);
+
+                //Should be all ready, let's update the bytes and the metadata
+
+                bi.updateBlobBytes(patient);
+
+                bi.updateBlobMetadata(patient);
+                
+                } catch(IOException | BlobTypeException exTwo){
+                    throw new BlobException(exTwo);
+                }
+            } else {
+                throw new BlobException(ex);
+            }
+            
+        }
+    
+        //We are now clear to return the blob
+        return getPDFBlobLight(blobID);
+    }
+    
+    /**
+     * Convenience method for getting a list of BlobLights in from a list of IDs
+     * @param idList
+     * @return
+     * @throws IntegrationException
+     * @throws BlobException 
+     */
+    public List<BlobLight> getPhotoBlobLightList(List<Integer> idList) throws IntegrationException, BlobException{
+        
+        List<BlobLight> blobList = new ArrayList<>();
+        
+        for(int id : idList){
+            blobList.add(getPhotoBlobLight(id));
+        }
+        return blobList;
+    }
+    
+    /**
+     * Deletes an image from the database, but only if it is not connected to any BObs.
+     * If, after deleting the photodoc entry, the bytes are not connected to any
+     * other photodoc, the bytes themselves are also deleted.
+     * @param blob
+     * @throws IntegrationException
+     * @throws EventException
+     * @throws AuthorizationException
+     * @throws ViolationException
+     * @throws BObStatusException
+     * @throws BlobException 
+     */
     public void deletePhotoBlob(BlobLight blob) 
             throws IntegrationException, 
             EventException, 
@@ -365,15 +496,14 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @return The blob that was put into it, stripped of metadata
      * @throws java.io.IOException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
-     * @throws java.lang.ClassNotFoundException
      * @throws com.tcvcog.tcvce.domain.BlobTypeException
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
     public Blob stripImageMetadata(Blob input) 
             throws IOException, 
-            NoSuchElementException, 
-            IntegrationException, 
-            ClassNotFoundException, 
-            BlobTypeException {
+            IntegrationException,
+            BlobTypeException,
+            BlobException {
 
         if(input.getFilename() == null){
             
@@ -432,6 +562,155 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
+     * Convenience method for getting a list of BlobLights in from a list of IDs
+     * @param idList
+     * @return
+     * @throws IntegrationException
+     * @throws BlobException 
+     */
+    public List<BlobLight> getPDFBlobLightList(List<Integer> idList) throws IntegrationException, BlobException{
+        
+        List<BlobLight> blobList = new ArrayList<>();
+        
+        for(int id : idList){
+            blobList.add(getPDFBlobLight(id));
+        }
+        return blobList;
+    }
+    
+    /**
+     * Deletes a PDF from the database, but only if it is not connected to any BObs.
+     * If, after deleting the pdfdoc entry, the bytes are not connected to any
+     * other pdfdoc, the bytes themselves are also deleted.
+     * @param blob
+     * @throws IntegrationException
+     * @throws EventException
+     * @throws AuthorizationException
+     * @throws ViolationException
+     * @throws BObStatusException
+     * @throws BlobException 
+     */
+    public void deletePDFBlob(BlobLight blob) 
+            throws IntegrationException, 
+            EventException, 
+            AuthorizationException, 
+            ViolationException, 
+            BObStatusException, 
+            BlobException {
+        
+        BlobIntegrator bi = getBlobIntegrator();
+        
+        //First we have to make sure that no objects are attached to this blob
+        List<BOb> connectedObjects = getAttachedObjects(blob);
+        
+        if(!connectedObjects.isEmpty()){
+            throw new BlobException("The coordinator attempted to remove a blob that is currently connected to other objects.");
+        }
+        
+        //The blob isn't attached to anything, let's delete the blob from the photodoc table
+        bi.deletePDFBlob(blob.getBlobID());
+        
+        //Let's see if this blob is still attached to other photodoc rows
+        List<Integer> connectedPDFDocs = bi.getPDFBlobsFromBytesID(blob.getBytesID());
+        
+        if(connectedPDFDocs.isEmpty()){
+            //No rows are referencing this file, let's delete the bytes too
+            bi.deleteBytes(blob.getBytesID());
+        }
+        
+    }
+
+    /**
+     * A method that removes all metadata from a PDF blob's bytes and puts
+     * them into its Metadata field. Should always be called before saving a
+     * PDF file to the database.
+     * @param input
+     * @return The blob that was put into it, stripped of metadata
+     * @throws java.io.IOException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BlobTypeException
+     * @throws com.tcvcog.tcvce.domain.BlobException
+     */
+    public Blob stripPDFMetadata(Blob input) 
+            throws IOException, 
+            IntegrationException,
+            BlobTypeException,
+            BlobException {
+
+        if(input.getFilename() == null){
+            
+            //No file name, let's generate one and save it to the database.
+            input.setFilename(generateFilename(input.getBytes()));
+            
+            updateBlobFilename(input);
+            
+        }
+
+        //Extract metadata and place it in the blob
+        
+        //Step 1: put bytes in a document.
+        
+        PDDocument doc = PDDocument.load(input.getBytes());
+        
+        //Step 2: grab the metadata and then erase it from the document
+        
+        Metadata blobMeta = new Metadata();
+        
+        PDDocumentInformation docInfo = doc.getDocumentInformation();
+        
+        blobMeta.setProperty(new MetadataKey("Author"), docInfo.getAuthor());
+        
+        docInfo.setAuthor("");
+        
+        blobMeta.setProperty(new MetadataKey("Title"), docInfo.getTitle());
+        
+        docInfo.setTitle("");
+        
+        blobMeta.setProperty(new MetadataKey("Subject"), docInfo.getSubject());
+        
+        docInfo.setSubject("");
+        
+        blobMeta.setProperty(new MetadataKey("Keywords"), docInfo.getKeywords());
+        
+        docInfo.setKeywords("");
+        
+        blobMeta.setProperty(new MetadataKey("Creator"), docInfo.getCreator());
+        
+        docInfo.setCreator("");
+        
+        blobMeta.setProperty(new MetadataKey("Producer"), docInfo.getProducer());
+        
+        docInfo.setProducer("");
+        
+        if(docInfo.getCreationDate() != null){
+            blobMeta.setProperty(new MetadataKey("CreationDate"), docInfo.getCreationDate().getTime().toString());
+        
+            docInfo.setCreationDate(null);
+        
+        }
+        
+        if(docInfo.getCreationDate() != null){
+            blobMeta.setProperty(new MetadataKey("ModificationDate"), docInfo.getModificationDate().getTime().toString());
+        
+            docInfo.setModificationDate(null);
+        }
+        
+        input.setBlobMetadata(blobMeta);
+        
+        //put the document, with the now erased metadata, back into the bytes field
+        
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        
+        doc.save(output);
+        
+        doc.close();
+        
+        input.setBytes(output.toByteArray());
+        
+        return input;
+    }
+    
+    /**
      * Takes a Node of image metadata and extracts its values and keys into the Metadata
      * object. Once it's done extracting all the information it needs, it tosses
      * the Metadata object back.
@@ -469,12 +748,12 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
-     * Accepts a filename and returns only the file extension
+     * Accepts a filename and returns only the file extension.
      * E.g. "image.jpg" -> "jpg"
      * @param filename
      * @return 
      */
-    public String getFileExtension(String filename) {
+    public static String getFileExtension(String filename) {
         //split on every dot
         String[] fileNameTokens = filename.split("\\.");
 
@@ -490,11 +769,16 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @return 
      * @throws java.io.IOException 
      */
-    public String generateFilename(byte[] bytes) throws IOException{
+    private String generateFilename(byte[] bytes) throws IOException {
         
         InputStream is = new ByteArrayInputStream(bytes);
-        String extension = URLConnection.guessContentTypeFromStream(is);
         
+        
+        String fileType = URLConnection.guessContentTypeFromStream(is);
+        
+        //guessContentType will give us a string like "image/png", so let's grab the string after the "/"
+        String extension = fileType.substring(fileType.indexOf("/")+1);
+        extension = extension.trim();
         //let's add a random number at the end of untitled
         //Makes it a little more easily identifiable than just "untitled".
         String filename = "untitled" + new Random().nextInt(10000) + "." + extension;
@@ -517,7 +801,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             EventException, 
             AuthorizationException, 
             ViolationException, 
-            BObStatusException {
+            BObStatusException{
 
         BlobIntegrator bi = getBlobIntegrator();
 
@@ -580,6 +864,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     /**
      * TEMPORARY SEARCH METHOD FOR BLOBS.
      * Should search all blob tables, add their entries to one list, and return it.
+     * TODO: Add pdf search
      * @param filename
      * @param description
      * @param before
@@ -587,15 +872,10 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @param municode
      * @return 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
-     * @throws java.io.IOException 
-     * @throws java.lang.ClassNotFoundException 
-     * @throws com.tcvcog.tcvce.domain.BlobTypeException 
+     * @throws com.tcvcog.tcvce.domain.BlobException 
      */
     public List<BlobLight> searchBlobs(String filename, String description, LocalDateTime before, LocalDateTime after, int municode) 
-            throws IntegrationException, 
-            IOException, 
-            ClassNotFoundException,
-            BlobTypeException {
+            throws IntegrationException, BlobException{
         
         BlobIntegrator bi = getBlobIntegrator();
         
@@ -613,19 +893,35 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         idList.addAll(bi.searchPhotoBlobs(filename, description, before, after, municode));
         
-        //No PDF Search yet!
-        //idList.addAll(bi.searchPDFBlobs(filename, description, before, after));
+        idList.addAll(bi.searchPDFBlobs(filename, description, before, after, municode));
         
         List<BlobLight> blobList = new ArrayList<>();
         
         for(Integer id : idList){
-            blobList.add(getPhotoBlobLight(id));
+            
+            BlobLight result = getPhotoBlobLight(id);
+            
+            if(result != null) {
+            
+                blobList.add(result);
+            
+            }
         }
         
-        //No "getPDFBlob()" method!
+        for(Integer id : idList){
+            
+            BlobLight result = getPDFBlobLight(id);
+            
+            if(result != null) {
+            
+                blobList.add(result);
+            
+            }
+            
+        }
         
         return blobList;
         
     }
-
+    
 }

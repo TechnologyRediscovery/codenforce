@@ -22,6 +22,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * A wrapper class that stores a Property that is stripped of all sensitive
+ * information.
+ * Look at the JavaDocs of the PublicInfoBundle Class for more information.
  *
  * @author Nathan Dietz
  */
@@ -43,6 +46,11 @@ public class PublicInfoBundleProperty extends PublicInfoBundle {
         return bundledProperty;
     }
     
+    /**
+     * Remove all sensitive data from the Property and set it in the
+     * bundledProperty field.
+     * @param input
+     */
     public void setBundledProperty(Property input) {
         
         

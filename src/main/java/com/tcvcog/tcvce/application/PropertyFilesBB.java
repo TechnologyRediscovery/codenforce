@@ -16,14 +16,18 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import org.primefaces.event.FileUploadEvent;
 
 /**
@@ -62,22 +66,64 @@ public class PropertyFilesBB
                 getBlobIntegrator().removePhotoPropertyLink(blobID, currProp.getPropertyID());
             }
         }
-        catch (IntegrationException | ClassNotFoundException | IOException | BlobTypeException | NoSuchElementException ex) {
+        catch (IntegrationException | BlobException ex) {
             System.out.println(ex);
         }
     }
     
     public void handleFileUpload(FileUploadEvent ev){
         
-        try{
-        Blob blob = getBlobCoordinator().getNewBlob();
-        blob.setBytes(ev.getFile().getContents());
-        blob.setType(BlobType.PHOTO); // TODO: BAD CHANGE THIS SOON
-         // DO nothing because I'm moving on to other issues,
-        // need to be able to compile before I can do much in the way of testing
-        } catch (IntegrationException ex){
-            
+        if (ev == null) {
+            System.out.println("PropertyFilesBB.handlePhotoUpload | event: null");
+            return;
         }
+
+        System.out.println("PropertyFilesBB.handlePhotoUpload | File: " + ev.getFile().getFileName() + " Type: " + ev.getFile().getContentType());
+
+        BlobCoordinator blobc = getBlobCoordinator();
+        Blob blob = null;
+        try {
+            blob = blobc.getNewBlob();  //init new blob
+            blob.setBytes(ev.getFile().getContents());  // set bytes
+            blob.setFilename(ev.getFile().getFileName());
+            
+            int municode = currProp.getMuniCode();
+            
+            if(municode == 0){
+                municode = currProp.getMuni().getMuniCode();
+            }
+            
+            blob.setMunicode(municode);
+            
+            if(blob.getDescription() == null || blob.getDescription().isEmpty()){
+                
+                blob.setDescription("Picture of " + currProp.getAddress());
+                
+            }
+
+            blob = blobc.storeBlob(blob);
+            
+            //Connect blob to prop.
+            
+            BlobIntegrator blobi = getBlobIntegrator();
+            
+            blobi.linkBlobToProperty(blob.getBlobID(), currProp.getPropertyID());
+            
+        } catch (IntegrationException | IOException ex) {
+            System.out.println("PropertyFilesBB.handleFileUpload | " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Something went wrong while trying to upload your photo,please try again.",
+                            "If this problem persists, please call your municipal office."));
+        } catch (BlobException | BlobTypeException ex) {
+            System.out.println("PropertyFilesBB.handleFileUpload | " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(),
+                            ""));
+        }
+        
+        
     }
    
 

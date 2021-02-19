@@ -151,7 +151,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return the data-rich subclass of EventCnF
      * @throws EventException
      * @throws IntegrationException 
-     * @throws com.tcvcog.tcvce.domain.SearchException 
+     * @throws com.tcvcog.tcvce.domain.SearchException
      */
     public EventCnFPropUnitCasePeriodHeavy assembleEventCnFPropUnitCasePeriodHeavy(EventCnF ev) 
                            throws EventException, IntegrationException, SearchException{

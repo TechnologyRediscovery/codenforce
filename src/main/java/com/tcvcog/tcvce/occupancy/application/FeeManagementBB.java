@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.NavigationException;
@@ -79,7 +80,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     private ArrayList<EnforcableCodeElement> filteredElementList;
     private EnforcableCodeElement selectedCodeElement;
 
-    private List<Fee> existingFeeList;
+    private HashMap<Integer, Fee> existingFeeList;
     private ArrayList<Fee> workingFeeList;
     private Fee selectedWorkingFee;
     private List<Fee> allFees;
@@ -89,11 +90,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     private String currentMode;
     private boolean waived;
     private boolean redirected;
-    private boolean currentFeeSelected;
+    private boolean currentFeeSelected; //Can be used to see if any entity is currently selected, not just fees
 
-    /**
-     * Creates a new instance of NewJSFManagedBean
-     */
     public FeeManagementBB() {
     }
 
@@ -110,11 +108,12 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         //initialize default select button in list-column: false
         currentFeeSelected = false;
 
+        //Check if we were redirected here from another page
         if (getSessionBean().getNavStack().peekLastPage() != null) {
 
-            refreshFeeAssignedList();
-
             redirected = true;
+            
+            refreshFeeAssignedList();
 
             if (allFees == null) {
 
@@ -174,17 +173,15 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      */
     public void setCurrentMode(String currentMode) throws IntegrationException {
 
-        //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
-        String tempCurMode = this.currentMode;
         //reset default setting every time the Mode has been selected 
         currentFeeSelected = false;
-        //check the currentMode == null or not
-        if (currentMode == null) {
-            this.currentMode = tempCurMode;
-        } else {
+        
+        //We can only use the input if it's not null
+        if (currentMode != null) {
             this.currentMode = currentMode;
         }
-        //create an instance object of fees if current mode == "Insert"
+        
+        //create an instance of both fees if current mode == "Insert"
         if (getActiveInsertMode()) {
             selectedAssignedFee = new FeeAssigned();
 
@@ -225,7 +222,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                 feeAssignedList = new ArrayList<>();
                 feeAssignedList.add(skeleton);
 
-            } else {
+            } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT){
 
                 MoneyCECaseFeeAssigned skeleton = (MoneyCECaseFeeAssigned) currentFee;
 
@@ -249,9 +246,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
             //Message Noticefication
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Current Selected Assigned Fee: " + selectedAssignedFee.getAssignedFeeID(), ""));
-
-            // "Select" button wasn't selected
+            
         } else {
+            // "Select" button was deselected
             //turn to default setting
             currentFeeSelected = false;
 
@@ -276,10 +273,15 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             selectedPeriodType = currentType;
 
             try {
-                existingFeeList = selectedPeriodType.getPermittedFees();
-                workingFeeList = new ArrayList<>(existingFeeList);
+                
+                workingFeeList = new ArrayList<>(selectedPeriodType.getPermittedFees());
+                for(Fee fee : workingFeeList){
+                    existingFeeList.put(fee.getFeeID(), fee);
+                }                
+                
             } catch (NullPointerException e) {
-                System.out.println("OccPeriodType has no existing permitted fee list, making new ArrayList...");
+                System.out.println("OccPeriodType has no existing permitted fee list, making new lists...");
+                existingFeeList = new HashMap<>();
                 workingFeeList = new ArrayList<>();
             }
             //update the current selected fee list in side panel
@@ -290,8 +292,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             //Message Noticefication
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Current Selected Occ Period Type: " + selectedPeriodType.getTypeID(), ""));
 
-            // "Select" button wasn't selected
+            
         } else {
+            // "Select" button was deselected
             //turn to default setting
             currentFeeSelected = false;
 
@@ -320,11 +323,14 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             selectedCodeElement = currentElement;
 
             try {
-                existingFeeList = selectedCodeElement.getFeeList();
-                workingFeeList = new ArrayList<>(existingFeeList);
+                workingFeeList = new ArrayList<>(selectedCodeElement.getFeeList());
+                for(Fee fee : workingFeeList){
+                    existingFeeList.put(fee.getFeeID(), fee);
+                }
             } catch (NullPointerException e) {
-                System.out.println("EnforcableCodeElement has no existing permitted fee list, making new ArrayList...");
+                System.out.println("EnforcableCodeElement has no existing permitted fee list, making new lists...");
                 workingFeeList = new ArrayList<>();
+                existingFeeList = new HashMap<>();
             }
             //update the current selected fee list in side panel
 
@@ -371,8 +377,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             //Message Noticefication
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Current Selected Fee: " + selectedFeeType.getName(), ""));
 
-            // "Select" button wasn't selected
+            
         } else {
+            // "Select" button was deselected
+
             //turn to default setting
             currentFeeSelected = false;
             selectedFeeType = new Fee();
@@ -385,6 +393,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * Inserts a new FeeAssigned object into the database.
+     * When the interface makes a new FeeAssigned object, it stores the new fee
+     * in the "selectedAssignedFee" field. So, in this case, 
+     * the selectedAssignedFee is a new fee.
+     * @return 
+     */
     public String onInsertAssignedFeeButtonChange() {
 
         PaymentCoordinator pc = getPaymentCoordinator();
@@ -420,11 +435,16 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             }
         }
 
+        //Refresh so the new fee will show up in the list.
         refreshFeeAssignedList();
 
         return "feeManage";
     }
 
+    /**
+     * Applies changes on the selected AssignedFee to the database.
+     * @return 
+     */
     public String onUpdateAssignedFeeButtonChange() {
 
         PaymentCoordinator pc = getPaymentCoordinator();
@@ -459,10 +479,17 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                                 "Unable to update fee in database, sorry!", "Check server print out..."));
             }
         }
+        
+        //Refresh the list so the user can see the now updated fee
         refreshFeeAssignedList();
         return "feeManage";
     }
 
+    /**
+     * Waive the selected fee - remember, finanical data should not be deleted,
+     * so fees need to be waived instead.
+     * @return 
+     */
     public String onRemoveAssignedFeeButtonChange() {
 
         PaymentCoordinator pc = getPaymentCoordinator();
@@ -501,12 +528,17 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                                 "We encountered a problem while waiving the fee!", ""));
             }
         }
-
+        
+        //Refresh the list so the user can see the now updated fee
         refreshFeeAssignedList();
 
         return "feeManage";
     }
 
+    /**
+     * The user is done editing managing fees, let's redirect them back to whatever page they were last.
+     * @return 
+     */
     public String finishAndRedir() {
         try {
             return getSessionBean().getNavStack().popLastPage();
@@ -550,6 +582,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * Applies changes on the selected Fee to the database.
+     * @return 
+     */
     public String onUpdateFeeButtonChange() {
 
         PaymentCoordinator pc = getPaymentCoordinator();
@@ -577,6 +613,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         return "feeTypeManage";
     }
 
+    /**
+     * Inserts a new Fee object into the database.
+     * When the interface makes a new Fee object, it stores the new fee
+     * in the "selectedFeeType" field. So, in this case, 
+     * the selectedFeeType is a new fee.
+     * @return 
+     */
     public String onInsertFeeButtonChange() {
         PaymentCoordinator pc = getPaymentCoordinator();
         if (getSelectedFeeType() != null) {
@@ -602,6 +645,14 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * Remove the selected Fee. 
+     * 
+     * Fee objects do not represent actually applied
+     * fees or any financial data - they're just templates that are then assigned
+     * to other entities via AssignedFee. So, it's okay for users to edit or remove
+     * them at will.
+     */
     public void onRemoveFeeButtonChange() {
         PaymentCoordinator pc = getPaymentCoordinator();
 
@@ -612,7 +663,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                 System.out.println(ex.toString());
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Successfully added occupancy inspection fee to database!", ""));
+                                "An error occurred while trying to delete the selected fee from the database.", ""));
             }
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -640,6 +691,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * A method used to only remove a Fee from the list of Fees permitted for
+     * a given entity. It doesn't delete the fee from the database.
+     * @param selectedFee 
+     */
     public void removePermittedFee(Fee selectedFee) {
         workingFeeList.remove(selectedFee);
     }
@@ -657,7 +713,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             boolean duplicate = false;
 
             for (Fee test : workingFeeList) {
-                duplicate = test.getOccupancyInspectionFeeID() == selectedFee.getOccupancyInspectionFeeID();
+                duplicate = test.getFeeID() == selectedFee.getFeeID();
                 if (duplicate) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -672,47 +728,66 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
     }
 
+    /**
+     * Looks through the working list of permitted Fees and compares with the 
+     * list of permitted Fees in the database.
+     * 
+     * As you can see, it's a pretty heavy operation, as we need to scan the
+     * list multiple times to insert and deactive Fees as they are permitted and
+     * prohibited respectively.
+     * @return 
+     */
     public String onUpdatePermissionButtonChange() {
 
-        if (existingFeeList == null) {
+        if (currentDomain == EventDomainEnum.OCCUPANCY) {
 
-            for (Fee workingFee : workingFeeList) {
-
-                if (currentDomain == EventDomainEnum.OCCUPANCY) {
+            if (existingFeeList.isEmpty() || existingFeeList == null) {
+                
+                //There are no currently permitted Fees for this entity
+                //Let's skip scanning and insert them all to save on processing time.
+                for (Fee workingFee : workingFeeList) {
                     insertOrReactivateOccPeriodJoin(workingFee);
-                } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
+                }
+
+            } else {
+
+                    //First check for fees that the user just prohibited
+                    scanExistingOccPeriodFeeListWithDeactivate();
+
+                    //Now we can check for newly permitted fees.
+                    scanExistingOccPeriodFeeListWithInsert();
+
+            }
+        } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
+
+            if (existingFeeList.isEmpty() || existingFeeList == null) {
+                
+                //There are no currently permitted Fees for this entity
+                //Let's skip scanning and insert them all to save on processing time.
+                for (Fee workingFee : workingFeeList) {
+
                     insertOrReactivateCodeElementJoin(workingFee);
                 }
-            }
 
-        } else {
+            } else {
+                    
+                    //First check for fees that the user just prohibited
+                    scanExistingCodeElementFeeListWithDeactivate();
 
-            if (currentDomain == EventDomainEnum.OCCUPANCY) {
-
-                scanExistingOccPeriodFeeListWithDeactivate();
-
-            } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
-
-                scanExistingCodeElementFeeListWithDeactivate();
-
-            }
-
-            if (currentDomain == EventDomainEnum.OCCUPANCY) {
-
-                scanExistingOccPeriodFeeListWithInsert();
-
-            } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
-
-                scanExistingCodeElementFeeListWithInsert();
+                    //Now we can check for newly permitted fees.
+                    scanExistingCodeElementFeeListWithInsert();
 
             }
         }
-
+        //Refresh the lists so the user can see their applied changes.
         refreshTypesAndElements();
 
         return "feePermissions";
     }
-
+    /**
+     * Activates a join between a workingFee and the selectedPeriodType.
+     * @param workingFee 
+     */
     public void insertOrReactivateOccPeriodJoin(Fee workingFee) {
 
         PaymentCoordinator pc = getPaymentCoordinator();
@@ -727,7 +802,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
 
     }
-
+    
+    /**
+     * Activates a join between a workingFee and the selectedCodeElement
+     * @param workingFee 
+     */
     public void insertOrReactivateCodeElementJoin(Fee workingFee) {
 
         PaymentCoordinator pc = getPaymentCoordinator();
@@ -743,120 +822,140 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * Compares the workingFeeList with the existingFeeList, checking to see if 
+     * any fee permission joins need to be activated or updated.
+     */
     public void scanExistingOccPeriodFeeListWithInsert() {
 
         PaymentCoordinator pc = getPaymentCoordinator();
 
         for (Fee workingFee : workingFeeList) {
-            int notThisFee = 0;
-            for (Fee existingFee : existingFeeList) {
-
-                if (existingFee.getOccupancyInspectionFeeID() == workingFee.getOccupancyInspectionFeeID()) {
+                if (existingFeeList.containsKey(workingFee.getFeeID())) {
+                    //The working fee is in the existing fee list, let's update it
                     try {
                         pc.updateFeeJoin(workingFee, selectedPeriodType);
                     } catch (IntegrationException ex) {
                         System.out.println("FeeManagementBB.scanExistingOccPeriodFeeListWithInsert() | Error: " + ex.toString());
+                        getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "An error occurred while trying to update an existing fee permission", ""));
                     }
                     break;
                 } else {
-                    notThisFee++;
+                    //The working fee is new
+                    insertOrReactivateOccPeriodJoin(workingFee);
                 }
-
-            }
-
-            if (notThisFee == existingFeeList.size()) {
-                insertOrReactivateOccPeriodJoin(workingFee);
-
-            }
-        }
-
-    }
-
-    public void scanExistingCodeElementFeeListWithInsert() {
-
-        PaymentCoordinator pc = getPaymentCoordinator();
-
-        for (Fee workingFee : workingFeeList) {
-            int notThisFee = 0;
-            for (Fee existingFee : existingFeeList) {
-
-                if (existingFee.getOccupancyInspectionFeeID() == workingFee.getOccupancyInspectionFeeID()) {
-                    try {
-                        pc.updateFeeJoin(workingFee, selectedCodeElement);
-                    } catch (IntegrationException ex) {
-                        System.out.println("FeeManagementBB.scanExistingCodeElementFeeListWithInsert() | Error: " + ex.toString());
-                    }
-                    break;
-                } else {
-                    notThisFee++;
-                }
-
-            }
-
-            if (notThisFee == existingFeeList.size()) {
-                insertOrReactivateCodeElementJoin(workingFee);
-            }
-
-        }
-
-    }
-
-    public void scanExistingOccPeriodFeeListWithDeactivate() {
-
-        PaymentCoordinator pc = getPaymentCoordinator();
-
-        for (Fee existingFee : existingFeeList) {
-            int notThisFee = 0;
-            for (Fee workingFee : workingFeeList) {
-                if (existingFee.getOccupancyInspectionFeeID() != workingFee.getOccupancyInspectionFeeID()) {
-                    notThisFee++;
-                }
-
-            }
-
-            if (notThisFee == workingFeeList.size()) {
-
-                try {
-                    pc.deactivateFeeJoin(existingFee, selectedPeriodType);
-                } catch (IntegrationException ex) {
-                    System.out.println("FeeManagementBB.scanExistingOccPeriodFeeListWithDeactivate() | Error: " + ex.toString());
-                }
-
-            }
-
-        }
-
-    }
-
-    public void scanExistingCodeElementFeeListWithDeactivate() {
-
-        PaymentCoordinator pc = getPaymentCoordinator();
-
-        for (Fee existingFee : existingFeeList) {
-            int notThisFee = 0;
-            for (Fee workingFee : workingFeeList) {
-                if (existingFee.getOccupancyInspectionFeeID() != workingFee.getOccupancyInspectionFeeID()) {
-                    notThisFee++;
-                }
-
-            }
-
-            if (notThisFee == workingFeeList.size()) {
-
-                try {
-                    pc.deactivateFeeJoin(existingFee, selectedCodeElement);
-                } catch (IntegrationException ex) {
-                    System.out.println("FeeManagementBB.scanExistingCodeElementFeeListWithDeactivate() | Error: " + ex.toString());
-                }
-
-            }
-
         }
 
     }
 
     /**
-     * Refreshes the lists of assigned fees, the current Domain, etc.
+     * Compares the workingFeeList with the existingFeeList, checking to see if 
+     * any fee permission joins need to be activated or updated.
+     */
+    public void scanExistingCodeElementFeeListWithInsert() {
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+
+        for (Fee workingFee : workingFeeList) {
+                if (existingFeeList.containsKey(workingFee.getFeeID())) {
+                    //The working fee is in the existing fee list, let's update it
+                    try {
+                        pc.updateFeeJoin(workingFee, selectedCodeElement);
+                    } catch (IntegrationException ex) {
+                        System.out.println("FeeManagementBB.scanExistingCodeElementFeeListWithInsert() | Error: " + ex.toString());
+                        getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "An error occurred while trying to update an existing fee permission", ""));
+                    }
+                    break;
+                } else {
+                    //The working fee is new
+                    insertOrReactivateCodeElementJoin(workingFee);
+                }
+        }
+
+    }
+
+    /**
+     * Finds which fees have been removed from the workingFeeList and deactivates
+     * them in the database.
+     */
+    public void scanExistingOccPeriodFeeListWithDeactivate() {
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+
+        //Work on a clone of the existingFeeList so we don't cause errors.
+        HashMap<Integer, Fee> tempMap = new HashMap<>(existingFeeList);
+        
+        /*
+        If any fees were removed from the workingFeeList, they would only be 
+        in the existingFeeList. Let's remove all the fees that are in the 
+        workingFeeList from the existingFeeList so we can isolate the no longer
+        permitted fees.
+        */
+        for(Fee fee : workingFeeList){
+            tempMap.remove(fee.getFeeID());
+        }
+        
+        List<Fee> prohibitedFees = new ArrayList<>(tempMap.values());
+        
+        for (Fee prohibitedFee : prohibitedFees) {
+                try {
+                    pc.deactivateFeeJoin(prohibitedFee, selectedPeriodType);
+                } catch (IntegrationException ex) {
+                    System.out.println("FeeManagementBB.scanExistingOccPeriodFeeListWithDeactivate() | Error: " + ex.toString());
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "An error occurred while trying to remove an existing fee permission", ""));
+                }
+
+            }
+
+    }
+
+/**
+     * Finds which fees have been removed from the workingFeeList and deactivates
+     * them in the database.
+     */
+    public void scanExistingCodeElementFeeListWithDeactivate() {
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+
+        //Work on a clone of the existingFeeList so we don't cause errors.
+        HashMap<Integer, Fee> tempMap = new HashMap<>(existingFeeList);
+        
+        /*
+        If any fees were removed from the workingFeeList, they would only be 
+        in the existingFeeList. Let's remove all the fees that are in the 
+        workingFeeList from the existingFeeList so we can isolate the no longer
+        permitted fees.
+        */
+        for(Fee fee : workingFeeList){
+            tempMap.remove(fee.getFeeID());
+        }
+        
+        List<Fee> prohibitedFees = new ArrayList<>(tempMap.values());
+        
+        for (Fee prohibitedFee : prohibitedFees) {
+                try {
+                    pc.deactivateFeeJoin(prohibitedFee, selectedCodeElement);
+                } catch (IntegrationException ex) {
+                    System.out.println("FeeManagementBB.scanExistingCodeElementFeeListWithDeactivate() | Error: " + ex.toString());
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "An error occurred while trying to update an existing fee permission", ""));
+                }
+
+            }
+
+    }
+
+
+    /**
+     * Refreshes the lists of assigned fees and loads the session BOb (either
+     * an OccPeriod or a CECase)
      */
     public void refreshFeeAssignedList() {
 
@@ -926,9 +1025,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         }
     }
 
+    /**
+     * Refreshes Fee templates and the list of code elements
+     */
     public void refreshTypesAndElements() {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         OccupancyCoordinator oc = getOccupancyCoordinator();
         CodeCoordinator ec = getCodeCoordinator();
@@ -967,6 +1068,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * The user has selected a violation, display all of its associated fees.
+     * @param e 
+     */
     public void violationSelected(ActionEvent e) {
 
         feeList.clear();
@@ -1104,14 +1209,6 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.filteredTypeList = filteredTypeList;
     }
 
-    public List<Fee> getExistingFeeList() {
-        return existingFeeList;
-    }
-
-    public void setExistingFeeList(List<Fee> existingFeeList) {
-        this.existingFeeList = existingFeeList;
-    }
-
     public ArrayList<Fee> getWorkingFeeList() {
         return workingFeeList;
     }
@@ -1138,9 +1235,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     public String getOccPeriodAddress() {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            return pc.getAddressFromPropUnitID(currentOccPeriod.getPropertyUnitID());
+            return pc.getPropertyByPropUnitID(currentOccPeriod.getPropertyUnitID()).getAddress();
         } catch (IntegrationException ex) {
             System.out.println(ex.toString());
             getFacesContext().addMessage(null,
@@ -1153,7 +1250,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * This is used by the interface to display the returned value
+     * This is used by the interface to display whether the selected fee is waived
      *
      * @return Whether or not the currently selected fee has been waived
      */

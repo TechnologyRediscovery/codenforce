@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Technology Rediscovery LLC.
+ * Copyright (C) 2020 Turtle Creek Valley
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,15 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.entities;
+package com.tcvcog.tcvce.coordinators;
 
-import java.util.List;
+import com.tcvcog.tcvce.application.BackingBeanUtils;
+import java.io.Serializable;
 
 /**
- * Interface for any object that has attached blob IDs
+ * This class will contain methods that dynamically generate PDF reports. These 
+ * methods will not interact with the database directly, but simply generate a 
+ * report and return it.
  * @author Nathan Dietz
  */
-public interface IFace_BlobHolder {
-    public void setBlobList(List<BlobLight> blobIDList);
-    public List<BlobLight> getBlobList();
+public class PDFCoordinator extends BackingBeanUtils implements Serializable {
+
+    public PDFCoordinator() {
+    }
+    
 }

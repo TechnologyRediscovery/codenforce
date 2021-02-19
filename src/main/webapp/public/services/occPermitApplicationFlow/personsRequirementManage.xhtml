@@ -280,6 +280,15 @@
 
                                                                 <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
                                                                     <h:outputLabel styleClass="data_field_label" 
+                                                                                   value="Under 18? "
+                                                                                   />
+                                                                    <p:inputSwitch onLabel="Yes" offLabel="No" styleClass="data_field_value"
+                                                                                   value="#{applicationPerson.bundledPerson.under18}"
+                                                                                 />
+                                                                </div>
+                                                                
+                                                                <div class="ui-g-12 ui-md-12 ui-lg-3 data_field">
+                                                                    <h:outputLabel styleClass="data_field_label" 
                                                                                    value="Phone (cell):"
                                                                                    />
                                                                     <p:inputText styleClass="data_field_value"

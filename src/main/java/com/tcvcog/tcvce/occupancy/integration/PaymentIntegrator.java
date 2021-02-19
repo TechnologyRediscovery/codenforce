@@ -416,7 +416,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, fee.getMoneyFeeAssigned());
+            stmt.setInt(1, fee.getFee().getFeeID());
             stmt.setInt(2, fee.getOccPeriodID());
             stmt.setInt(3, fee.getAssignedBy().getUserID());
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
@@ -436,7 +436,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             }
 
             stmt.setString(9, fee.getNotes());
-            stmt.setInt(10, fee.getFee().getOccupancyInspectionFeeID());
+            stmt.setInt(10, fee.getFee().getFeeID());
             stmt.setInt(11, fee.getOccPeriodTypeID());
             System.out.println("PaymentTypeIntegrator.insertOccPeriodFee | sql: " + stmt.toString());
             System.out.println("TRYING TO EXECUTE INSERT METHOD");
@@ -475,7 +475,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, fee.getMoneyFeeAssigned());
+            stmt.setInt(1, fee.getFee().getFeeID());
             stmt.setInt(2, fee.getCaseID());
             stmt.setInt(3, fee.getAssignedBy().getUserID());
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
@@ -493,7 +493,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
                 stmt.setNull(8, java.sql.Types.NULL);
             }
             stmt.setString(9, fee.getNotes());
-            stmt.setInt(10, fee.getFee().getOccupancyInspectionFeeID());
+            stmt.setInt(10, fee.getFee().getFeeID());
             stmt.setInt(11, fee.getCodeSetElement());
             System.out.println("PaymentTypeIntegrator.insertCECaseFee | sql: " + stmt.toString());
             System.out.println("TRYING TO EXECUTE INSERT METHOD");
@@ -532,7 +532,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, fee.getMoneyFeeAssigned());
+            stmt.setInt(1, fee.getFee().getFeeID());
             stmt.setInt(2, fee.getOccPeriodID());
             stmt.setInt(3, fee.getAssignedBy().getUserID());
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
@@ -549,7 +549,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
                 stmt.setNull(8, java.sql.Types.NULL);
             }
             stmt.setString(9, fee.getNotes());
-            stmt.setInt(10, fee.getFee().getOccupancyInspectionFeeID());
+            stmt.setInt(10, fee.getFee().getFeeID());
             stmt.setInt(11, fee.getOccPeriodTypeID());
             stmt.setInt(12, fee.getOccPerAssignedFeeID());
             System.out.println("PaymentTypeIntegrator.updateOccPeriodFee | sql: " + stmt.toString());
@@ -588,7 +588,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, fee.getMoneyFeeAssigned());
+            stmt.setInt(1, fee.getFee().getFeeID());
             stmt.setInt(2, fee.getCaseID());
             stmt.setInt(3, fee.getAssignedBy().getUserID());
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(fee.getAssigned()));
@@ -605,7 +605,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
                 stmt.setNull(8, java.sql.Types.NULL);
             }
             stmt.setString(9, fee.getNotes());
-            stmt.setInt(10, fee.getFee().getOccupancyInspectionFeeID());
+            stmt.setInt(10, fee.getFee().getFeeID());
             stmt.setInt(11, fee.getCodeSetElement());
             stmt.setInt(12, fee.getCeCaseAssignedFeeID());
             System.out.println("PaymentTypeIntegrator.updateOccPeriodFee | sql: " + stmt.toString());
@@ -640,7 +640,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         FeeAssigned fee = new FeeAssigned();
 
         try {
-            fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
+            fee.setFee(getFee(rs.getInt("fee_feeid")));
             fee.setAssignedBy(ui.getUser(rs.getInt("assignedby_userid")));
             fee.setAssigned(rs.getTimestamp("assignedbyts").toLocalDateTime());
             fee.setWaivedBy(ui.getUser(rs.getInt("waivedby_userid")));
@@ -648,8 +648,6 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             fee.setReducedBy(rs.getDouble("reduceby"));
             fee.setReducedByUser(ui.getUser(rs.getInt("reduceby_userid")));
             fee.setNotes(rs.getString("notes"));
-            fee.setFee(getFee(rs.getInt("fee_feeid")));
-            fee.setMoneyFeeAssigned(rs.getInt("moneyfeeassigned_assignedid"));
 
         } catch (SQLException ex) {
             System.out.println(ex);
@@ -717,7 +715,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         Fee fee = new Fee();
 
         try {
-            fee.setOccupancyInspectionFeeID(rs.getInt("feeid"));
+            fee.setFeeID(rs.getInt("feeid"));
             fee.setMuni(mi.getMuni(rs.getInt("muni_municode")));
             fee.setName(rs.getString("feename"));
             fee.setAmount(rs.getDouble("feeamount"));
@@ -1220,7 +1218,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(1, fee.getFeeID());
             stmt.setInt(2, type.getTypeID());
             stmt.setBoolean(3, fee.isAutoAssigned());
             stmt.execute();
@@ -1256,7 +1254,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(1, fee.getFeeID());
             stmt.setInt(2, type.getTypeID());
             stmt.execute();
 
@@ -1293,7 +1291,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(1, fee.getFeeID());
             stmt.setInt(2, type.getTypeID());
             System.out.println("TRYING TO EXECUTE UPDATE METHOD");
             stmt.executeUpdate();
@@ -1331,7 +1329,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         try {
             stmt = con.prepareStatement(query);
             stmt.setBoolean(1, fee.isAutoAssigned());
-            stmt.setInt(2, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(2, fee.getFeeID());
             stmt.setInt(3, type.getTypeID());
             System.out.println("TRYING TO EXECUTE UPDATE METHOD");
             stmt.executeUpdate();
@@ -1366,7 +1364,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(1, fee.getFeeID());
             stmt.setInt(2, element.getCodeSetElementID());
             stmt.setBoolean(3, fee.isAutoAssigned());
             stmt.execute();
@@ -1402,7 +1400,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(1, fee.getFeeID());
             stmt.setInt(2, element.getCodeSetElementID());
             stmt.execute();
 
@@ -1439,7 +1437,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(1, fee.getFeeID());
             stmt.setInt(2, element.getCodeSetElementID());
             System.out.println("TRYING TO EXECUTE UPDATE METHOD");
             stmt.executeUpdate();
@@ -1477,7 +1475,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         try {
             stmt = con.prepareStatement(query);
             stmt.setBoolean(1, fee.isAutoAssigned());
-            stmt.setInt(2, fee.getOccupancyInspectionFeeID());
+            stmt.setInt(2, fee.getFeeID());
             stmt.setInt(3, element.getCodeSetElementID());
             System.out.println("TRYING TO EXECUTE UPDATE METHOD");
             stmt.executeUpdate();
@@ -1914,50 +1912,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         return payTypeList;
     }
-
-    /* I think I built this all by accident while trying to de-bug my converter...
-        public void generatePaymentTypeTitleIDMap() throws IntegrationException{
-        HashMap<String, Integer> payMap = new HashMap<>();
-        
-        Connection con = getPostgresCon();
-        String query = "SELECT typeid, pmttypetitle FROM paymenttype;";
-        ResultSet rs = null;
-        Statement stmt = null;
- 
-        try {
-            stmt = con.createStatement();
-            rs = stmt.executeQuery(query);
-            while(rs.next()){
-                payMap.put(rs.getString("pmttypetitle"), rs.getInt("typeid"));
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Exception in PaymentTypeIntegrator.generatePaymentTypeTitleIDMap", ex);
-
-        } finally{
-           if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored * } }
-           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored * } }
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored *} }
-        } // close finally
-        
-        paymentTypeMap = payMap;
-    }
-
-    /**
-     * @return the paymentTypeMap
-     *
-    public HashMap getPaymentTypeMap() throws IntegrationException {
-        generatePaymentTypeTitleIDMap();
-        return paymentTypeMap;
-    }
-
-    /**
-     * @param paymentTypeMap the paymentTypeMap to set
-     *
-    public void setPaymentTypeMap(HashMap paymentTypeMap) {
-        this.paymentTypeMap = paymentTypeMap;
-    }
-     */
+    
     public void updateOccupancyInspectionFee(Fee oif) throws IntegrationException {
         String query = "UPDATE public.moneyfee\n"
                 + "   SET muni_municode=?, feename=?, feeamount=(?::numeric::money), effectivedate=?, \n"
@@ -1973,7 +1928,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(oif.getEffectiveDate()));
             stmt.setTimestamp(5, java.sql.Timestamp.valueOf(oif.getExpiryDate()));
             stmt.setString(6, oif.getNotes());
-            stmt.setInt(7, oif.getOccupancyInspectionFeeID());
+            stmt.setInt(7, oif.getFeeID());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -2002,7 +1957,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, oif.getOccupancyInspectionFeeID());
+            stmt.setInt(1, oif.getFeeID());
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -2114,7 +2069,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         Fee newOif = new Fee();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         try {
-            newOif.setOccupancyInspectionFeeID(rs.getInt("feeid"));
+            newOif.setFeeID(rs.getInt("feeid"));
             newOif.setMuni(mi.getMuni(rs.getInt("muni_municode")));
             newOif.setName(rs.getString("feename"));
             newOif.setAmount(rs.getDouble("feeamount"));

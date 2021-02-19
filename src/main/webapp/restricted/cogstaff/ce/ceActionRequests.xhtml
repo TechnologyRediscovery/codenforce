@@ -604,14 +604,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                     <p:dataTable
                                                         id="photoTable"
-                                                        var="photoid"
-                                                        value="#{cEActionRequestsBB.selectedRequest.blobIDList}"
-                                                        rowKey="#{photoid.intValue()}"
+                                                        var="blob"
+                                                        value="#{cEActionRequestsBB.selectedRequest.blobList}"
+                                                        rowKey="#{blob.blobID}"
                                                         tableStyleClass="primeDataTable"
                                                         draggableRows="false" tabindex="6">
                                                         <p:column width="10%" headerText="Manage">
                                                             <p:commandButton ajax="true" 
-                                                                             actionListener="#{cEActionRequestsBB.deletePhoto(photoid)}"
+                                                                             actionListener="#{cEActionRequestsBB.deletePhoto(blob.blobID)}"
                                                                              value="Delete" 
                                                                              icon="fa fa-bomb"
                                                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
@@ -619,11 +619,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         </p:column>
                                                         <p:column headerText="Photo">
                                                             <p:graphicImage width="100%" value="#{blobCoordinator.image}">
-                                                                <f:param name="blobID" value="#{photoid.intValue()}"/>
+                                                                <f:param name="blobID" value="#{blob.blobID}"/>
                                                             </p:graphicImage>
                                                         </p:column>
+                                                        <p:column width="20%" headerText="Filename">
+                                                            <h:outputText escape="false" value="#{blob.filename}"/>
+                                                        </p:column>
                                                         <p:column width="20%" headerText="Description">
-                                                            <h:outputText escape="false" value="#{blobCoordinator.getBlob(photoid).description}"/>
+                                                            <h:outputText escape="false" value="#{blob.description}"/>
                                                         </p:column>
                                                     </p:dataTable>
                                                 

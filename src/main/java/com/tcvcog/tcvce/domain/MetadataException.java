@@ -14,33 +14,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.entities;
-
-import java.io.Serializable;
+package com.tcvcog.tcvce.domain;
 
 /**
- * 
+ *
  * @author Nathan Dietz
  */
-public class MetadataKey implements Serializable {
-
-    private final String label;
-    private final String key;
+public class MetadataException extends BaseException{
     
+    //flags that this error is thrown as the result of a null metadata column
+    boolean mapNullError = false; 
     
-    public MetadataKey(String nodeName){
-        key = nodeName;
-        //Place a space between all capital letters and the letters infront of them
-        //i.e. OriginalText -> Original Text
-        label = nodeName.replaceAll("(.)([A-Z])", "$1 $2");
+    public MetadataException(){
+        super();
+        
     }
     
-    public String getLabel(){
-        return label;
+    public MetadataException(String message){
+        super(message);
+    }
+    
+    public MetadataException(Exception e){
+        super(e);
+    }
+    
+    public MetadataException(String message, Exception e){
+        super(message, e);
+        
     }
 
-    public String getKey() {
-        return key;
+    public boolean isMapNullError() {
+        return mapNullError;
+    }
+
+    public void setMapNullError(boolean mapNullError) {
+        this.mapNullError = mapNullError;
     }
     
 }

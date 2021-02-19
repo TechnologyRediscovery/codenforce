@@ -20,7 +20,7 @@ package com.tcvcog.tcvce.entities;
 import java.time.LocalDateTime;
 import java.util.Date;
 /**
- *
+ * A Payment that has been made on a FeeAssigned object
  * @author Adam Gutonski & Nathan Dietz
  */
 public class Payment extends BOb {

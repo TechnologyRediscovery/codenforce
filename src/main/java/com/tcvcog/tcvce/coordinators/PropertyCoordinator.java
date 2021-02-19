@@ -43,6 +43,7 @@ import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
@@ -50,7 +51,6 @@ import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -82,6 +82,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
+        BlobIntegrator bi = getBlobIntegrator();
 
         PropertyDataHeavy pdh = new PropertyDataHeavy(getProperty(prop.getPropertyID()));
 
@@ -117,8 +118,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             pdh.setPersonList(sc.runQuery(qp).getBOBResultList());
             System.out.println("PropertyCoordinator.assemblePropertyDH: personlist size: " + pdh.getPersonList().size());
 
-            // wait on blobs
-            //pdh.setBlobList(new ArrayList<Integer>());
+            // Load blobs
+            pdh.setBlobList(bi.photosAttachedToProperty(pdh.getPropertyID()));
             // external data
             pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getPropertyID())));
 
@@ -700,10 +701,10 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         PropertyUnit propUnit = new PropertyUnit();
         propUnit.setPropertyID(p.getPropertyID());
         propUnit.setUnitNumber(Constants.TEMP_UNIT_NUM);
-//        propUnit.setRental(false);
-        propUnit.setActive(true);
+        propUnit.setUnitNumber("");
+        propUnit.setRentalNotes("");
         propUnit.setNotes("");
-//        propUnit.setPropertyUnitPersonList(new ArrayList<Person>());
+        propUnit.setActive(true);
         return propUnit;
     }
 

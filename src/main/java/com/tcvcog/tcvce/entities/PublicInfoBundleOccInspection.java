@@ -20,6 +20,9 @@ import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import java.time.LocalDateTime;
 
 /**
+ * A wrapper class that stores a CECase that is stripped of all sensitive
+ * information.
+ * Look at the JavaDocs of the PublicInfoBundle Class for more information.
  *
  * @author Nathan Dietz
  */
@@ -38,6 +41,11 @@ public class PublicInfoBundleOccInspection extends PublicInfoBundle {
         return bundledInspection;
     }
     
+    /**
+     * Remove all sensitive data from the OccInspection and set it in the
+     * bundledInspection field.
+     * @param input 
+     */
     public void setBundledInspection(OccInspection input) {
         
         setPacc(input.getPacc());

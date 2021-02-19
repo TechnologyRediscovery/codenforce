@@ -9,7 +9,7 @@ package com.tcvcog.tcvce.domain;
  *
  * @author noah
  */
-public class BlobTypeException extends BlobException{
+public class BlobTypeException extends BaseException{
     
     public BlobTypeException(){
         super();

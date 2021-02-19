@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A wrapper class that stores an EventCnF that is stripped of all sensitive
+ * information.
+ * Look at the JavaDocs of the PublicInfoBundle Class for more information.
  *
  * @author Nathan Dietz
  */
@@ -29,7 +32,7 @@ public class PublicInfoBundleEventCnF extends PublicInfoBundle{
     private EventCnF bundledEvent;
     private int cecaseID;
     private int periodID;
-    private List<PublicInfoBundlePerson> personList;
+    private List<PublicInfoBundlePerson> personList; //A list of anonymized persons attached to the Event
     
     @Override
     public String toString(){
@@ -42,6 +45,11 @@ public class PublicInfoBundleEventCnF extends PublicInfoBundle{
         return bundledEvent;
     }
 
+    /**
+     * Remove all sensitive data from the EventCnF and set it in the
+     * bundledEvent field.
+     * @param input 
+     */
     public void setBundledEvent(EventCnF input) {
         
         input.setUserCreator(new User());

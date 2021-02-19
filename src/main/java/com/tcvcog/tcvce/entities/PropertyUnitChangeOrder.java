@@ -57,6 +57,7 @@ public class PropertyUnitChangeOrder extends ChangeOrder {
         unitID = proposed.getUnitID();
 
         //check each field for changes
+        //If the fields are not the same, then save the proposed field
         if (!compareStrings(original.getUnitNumber(), proposed.getUnitNumber())) {
             unitNumber = proposed.getUnitNumber();
         }

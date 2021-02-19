@@ -197,7 +197,6 @@
                                                                              required="true" 
                                                                              tabindex="5"
                                                                              value="#{cEActionRequestSubmitBB.currentRequest.requestor.personType}"
-                                                                             disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
                                                                              styleClass="data_field_value"
                                                                              label="Role"
                                                                              style="min-width: 100%;"
@@ -231,8 +230,6 @@
                                                                          tabindex="6"
                                                                          value="#{cEActionRequestSubmitBB.currentRequest.requestor.firstName}" 
                                                                          styleClass="data_field_value" 
-                                                                         required="true"
-                                                                         disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
                                                                          label="First Name"
                                                                          />
                                                         </div>
@@ -244,10 +241,8 @@
                                                             <p:inputText id="requestorLastName" 
                                                                          size="30" 
                                                                          value="#{cEActionRequestSubmitBB.currentRequest.requestor.lastName}" 
-                                                                         styleClass="data_field_value" 
-                                                                         required="true" 
+                                                                         styleClass="data_field_value"
                                                                          tabindex="7"
-                                                                         disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
                                                                          label="Last Name"
                                                                          />
                                                         </div>
@@ -260,9 +255,7 @@
                                                                          size="30" 
                                                                          value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressStreet}" 
                                                                          styleClass="data_field_value" 
-                                                                         required="true" 
                                                                          tabindex="8"
-                                                                         disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
                                                                          label="Street Adress"
                                                                          />
                                                         </div>
@@ -275,9 +268,7 @@
                                                                          size="30" 
                                                                          value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressCity}" 
                                                                          styleClass="data_field_value" 
-                                                                         required="true" 
                                                                          tabindex="9"
-                                                                         disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
                                                                          label="City"
                                                                          />
                                                         </div>
@@ -291,9 +282,7 @@
                                                                          size="2" 
                                                                          value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressState}" 
                                                                          styleClass="data_field_value" 
-                                                                         required="true" 
                                                                          tabindex="10"
-                                                                         disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
                                                                          label="State"
                                                                          />
 
@@ -307,9 +296,7 @@
                                                                          size="10" 
                                                                          value="#{cEActionRequestSubmitBB.currentRequest.requestor.addressZip}" 
                                                                          styleClass="data_field_value" 
-                                                                         required="true" 
                                                                          tabindex="11"
-                                                                         disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
                                                                          label="ZIP Code"
                                                                          />
                                                         </div>
@@ -322,9 +309,7 @@
                                                                          size="15" 
                                                                          value="#{cEActionRequestSubmitBB.currentRequest.requestor.phoneCell}" 
                                                                          styleClass="data_field_value"
-                                                                         required="false" 
                                                                          tabindex="12"
-                                                                         disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
                                                                          label="Phone(cell)"
                                                                          />
                                                         </div>
@@ -336,10 +321,8 @@
                                                             <p:inputText id="requestorEmail" 
                                                                          size="30" 
                                                                          value="#{cEActionRequestSubmitBB.currentRequest.requestor.email}" 
-                                                                         styleClass="data_field_value" 
-                                                                         required="true"
+                                                                         styleClass="data_field_value"
                                                                          tabindex="13"
-                                                                         disabled="#{cEActionRequestSubmitBB.disabledPersonFormFields}"
                                                                          label="Email"
                                                                          />
                                                         </div>
@@ -391,5 +374,3 @@
         </ui:composition>
     </h:body>
 </html>
-
-

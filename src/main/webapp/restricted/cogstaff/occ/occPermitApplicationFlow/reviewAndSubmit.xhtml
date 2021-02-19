@@ -28,28 +28,24 @@
                             <h:panelGroup>
                                 <h:panelGrid columns="1" cellpadding="10" footerClass="gridFooter" style="width: 500px" styleClass="ui-panelgrid-blank">
                                     <p:column>
-                                        <p:outputLabel value="Reason for application: #{sessionBean.occPermitApplication.reason.title}" />
+                                        <p:outputLabel value="Reason for application: #{sessionBean.sessOccPermitApplication.reason.title}" />
                                     </p:column>
                                     
                                     <p:column>
-                                        <p:outputLabel value="Property Address: #{sessionBean.occPermitApplication.applicationPropertyUnit.thisProperty.address}" />
-                                    </p:column>
-                                    
-                                    <p:column> 
-                                        <p:outputLabel value ="Multiunit: #{sessionBean.occPermitApplication.multiUnit ? 'Yes' : 'No'}" />
+                                        <p:outputLabel value="Property Address: #{occPermitApplicationBB.selectedProperty.bundledProperty.address}" />
                                     </p:column>
                                     
                                     <p:column>
-                                        <p:outputLabel value="Property Unit: #{sessionBean.occPermitApplication.applicationPropertyUnit.unitNumber}" />
+                                        <p:outputLabel value="Property Unit: #{sessionBean.sessOccPermitApplication.applicationPropertyUnit.unitNumber}" />
                                     </p:column>
                                     
                                     <p:column>
-                                        <p:outputLabel value="Applicant: #{sessionBean.occPermitApplication.applicantPerson.firstName} #{sessionBean.occPermitApplication.applicantPerson.lastName}" />
+                                        <p:outputLabel value="Applicant: #{sessionBean.sessOccPermitApplication.applicantPerson.firstName} #{sessionBean.sessOccPermitApplication.applicantPerson.lastName}" />
                                     </p:column>
                                     
                                     <p:column>                                        
                                         <p:outputLabel value="Application Persons:" />
-                                        <p:dataTable var="applicationPerson" value="#{sessionBean.occPermitApplication.attachedPersons}"
+                                        <p:dataTable var="applicationPerson" value="#{sessionBean.sessOccPermitApplication.attachedPersons}"
                                          rowKey="#{applicationPerson.personID}">
                                              
                                             <p:column headerText="Name">
@@ -63,7 +59,7 @@
                                     </p:column>
 
                                     <p:column>
-                                        <p:outputLabel value="Notes: #{sessionBean.occPermitApplication.submissionNotes}" />
+                                        <p:outputLabel value="Notes: #{sessionBean.sessOccPermitApplication.submissionNotes}" />
                                     </p:column>                                    
                                 </h:panelGrid>
                             </h:panelGroup>

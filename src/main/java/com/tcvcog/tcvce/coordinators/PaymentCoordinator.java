@@ -30,12 +30,9 @@ import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
-import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -67,6 +64,12 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
+    /**
+     * This method checks if any Fees associated with a certain type of OccPeriod
+     * are to be automatically assigned to it. If so, it assigns them.
+     * @param period
+     * @throws IntegrationException 
+     */
     public void insertAutoAssignedFees(OccPeriod period) throws IntegrationException {
 
         PaymentIntegrator pi = getPaymentIntegrator();
@@ -81,7 +84,6 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
                 skeleton.setOccPeriodID(period.getPeriodID());
                 skeleton.setOccPeriodTypeID(period.getType().getTypeID());
-                skeleton.setMoneyFeeAssigned(fee.getOccupancyInspectionFeeID());
                 skeleton.setAssignedBy(getSessionBean().getSessUser());
                 skeleton.setAssigned(LocalDateTime.now());
                 skeleton.setLastModified(LocalDateTime.now());
@@ -96,6 +98,13 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
+    /**
+     * This method checks if any Fees associated with a certain type of CodeViolation
+     * are to be automatically assigned to it. If so, it assigns them.
+     * @param cse
+     * @param violation
+     * @throws IntegrationException 
+     */
     public void insertAutoAssignedFees(CECase cse, CodeViolation violation) throws IntegrationException {
 
         PaymentIntegrator pi = getPaymentIntegrator();
@@ -112,7 +121,6 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
                 skeleton.setCaseID(cse.getCaseID());
                 skeleton.setCodeSetElement(codeElement.getCodeSetElementID());
-                skeleton.setMoneyFeeAssigned(fee.getOccupancyInspectionFeeID());
                 skeleton.setAssignedBy(getSessionBean().getSessUser());
                 skeleton.setAssigned(LocalDateTime.now());
                 skeleton.setLastModified(LocalDateTime.now());
@@ -275,7 +283,6 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     public void removeFee(Fee input) throws IntegrationException {
         PaymentIntegrator pi = getPaymentIntegrator();
-
     }
 
     public List<Fee> getFeeList() throws IntegrationException {
@@ -425,6 +432,13 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
+    /**
+     * TODO: This method should be changed to only deactivate the payment, deleting
+     * financial data is bad!
+     * @param input
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
     public void removePayment(Payment input) throws BObStatusException, IntegrationException {
 
         PaymentIntegrator paymentIntegrator = getPaymentIntegrator();
@@ -433,15 +447,6 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
         } else {
             throw new BObStatusException("Please select a payment record from the table to delete.");
         }
-    }
-
-    public String getAddressFromPropUnitID(int propUnitID) throws IntegrationException {
-
-        PropertyIntegrator pi = getPropertyIntegrator();
-        PropertyUnit unit = pi.getPropertyUnit(propUnitID);
-        Property prop = pi.getProperty(unit.getPropertyID());
-        return prop.getAddress();
-
     }
 
     public void updatePaymentType(PaymentType input) throws IntegrationException {

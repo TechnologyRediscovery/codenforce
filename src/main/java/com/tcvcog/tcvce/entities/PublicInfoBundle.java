@@ -1,25 +1,56 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) Technology Rediscovery LLC. 2020
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 
 /**
- *
- * @author sylvia
+ * PublicInfoBundle is a wrapping that removes all information a public user should not know about a BOb.
+ * e.g. A PublicInfoBundlePerson has the first two letters of the first and last
+ * name, and only the beginning characters of the email address. This way a public user can
+ * identify themselves, but malicious users can't use the website as an email.
+ * search engine.
+ * @author Nathan Dietz
  */
 public abstract class PublicInfoBundle implements Serializable {
 
+    /*
+    pacc = Public Access Control Code. The public user uses this code to view/edit
+    CEActionRequests, OccPermitApplications, etc.
+    
+    It is rare, but possible for multiple PublicInfoBundles to have the same 
+    code if they are somehow related to one another.
+    It is not that there is a PACC for each PublicInfoBundle
+    Each public user gets 1 PACC for all the bundles they need!
+    */
     private int pacc;
+    
+    
     private boolean showDetailsPageButton;
     private boolean showAddMessageButton;
+    
+    //If false, public users cannot view this bundle using its PACC
     private boolean paccEnabled;
+    
+    //A possible explanation as to why the user can't view the PACC
+    //Typically automatically generated.
     private String paccStatusMessage;
     
-    private String typeName;
+    private String typeName; //The type of object the bundle is holding.
     private String dateOfRecord; 
     
     // some info bundles like an action request may not be associated with a

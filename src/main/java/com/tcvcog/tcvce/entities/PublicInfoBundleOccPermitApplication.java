@@ -22,16 +22,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A wrapper class that stores a OccPermitApplication that is stripped of all sensitive
+ * information.
+ * Look at the JavaDocs of the PublicInfoBundle Class for more information.
  *
  * @author Nathan Dietz
  */
 public class PublicInfoBundleOccPermitApplication extends PublicInfoBundle {
     
     private OccPermitApplication bundledApplication;
+    
+    //An anonymized version of the unit the application is for.
     private PublicInfoBundlePropertyUnit applicationPropertyUnit;
+    //An anonymized version of the applicant.
     private PublicInfoBundlePerson applicantPerson;
+    //An anonymized version of the preferredContact.
     private PublicInfoBundlePerson preferredContact;
+    //An anonmyized version of the OccPeriod the application is attached to.
     private PublicInfoBundleOccPeriod connectedPeriod;
+    //Anonymized versions of the various persons that are related to this occupation.
     private List<PublicInfoBundlePersonOccApplication> attachedPersons;
     
     @Override
@@ -45,6 +54,11 @@ public class PublicInfoBundleOccPermitApplication extends PublicInfoBundle {
         return bundledApplication;
     }
 
+    /**
+     * Remove all sensitive data from the OccPermitApplication and set it in the
+     * bundledApplication field.
+     * @param input 
+     */
     public void setBundledApplication(OccPermitApplication input) {
         
         input.setInternalNotes("*****");

@@ -337,7 +337,7 @@
                                             
                                             <p:spacer height="10px"/>
 
-                                            <h:form id="blobManage-form-view">
+                                            <h:form id="blobManage-form-view-image" rendered="#{manageBlobBB.selectedBlobType == 0}">
 
                                                 <p:outputLabel value="View Image:"/>
                                                 <p:spacer height="10px"/>
@@ -345,6 +345,25 @@
                                                 <p:graphicImage width="100%" value="#{blobCoordinator.image}">
                                                     <f:param name="blobID" value="#{manageBlobBB.selectedBlob.blobID}"/>
                                                 </p:graphicImage>
+
+                                                <p:spacer height="10px"/>
+                                                <p:commandButton
+                                                    value="Download File" 
+                                                    icon ="pi pi-save" 
+                                                    action="#{manageBlobBB.downloadSelectedBlob()}"
+                                                    ajax="false"/>
+                                                <p:spacer height="10px"/>
+
+                                            </h:form>
+                                            
+                                            <h:form id="blobManage-form-view-pdf" rendered="#{manageBlobBB.selectedBlobType == 1}">
+
+                                                <p:outputLabel value="View PDF:"/>
+                                                <p:spacer height="10px"/>
+
+                                                <p:media width="100%" height="700px" player="pdf" value="#{blobCoordinator.document}">
+                                                    <f:param name="blobID" value="#{manageBlobBB.selectedBlob.blobID}"/>
+                                                </p:media>
 
                                                 <p:spacer height="10px"/>
                                                 <p:commandButton

@@ -5,9 +5,6 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 /**
  *
  * @author sylvia
@@ -41,8 +38,6 @@ public class CodeViolationDisplayable extends CodeViolation {
         this.stipulatedComplianceDate = cv.stipulatedComplianceDate;
         this.actualComplianceDate = cv.actualComplianceDate;
         this.leagacyImport = cv.leagacyImport;
-        this.blobIDList = cv.blobIDList;
-        this.photoIDList = cv.photoIDList;
         this.complianceTimeStamp = cv.complianceTimeStamp;
         this.complianceUser = cv.complianceUser;
         this.complianceTFExpiryPropID = cv.complianceTFExpiryPropID;
@@ -59,7 +54,6 @@ public class CodeViolationDisplayable extends CodeViolation {
         this.allowOrdinanceUpdates = cv.allowOrdinanceUpdates;
         this.allowStipCompDateUpdate = cv.allowStipCompDateUpdate;
         this.complianceNote = cv.complianceNote;
-        this.photoList = cv.photoList;
         this.blobList = cv.blobList;
         
         includeViolationPhotos = true;

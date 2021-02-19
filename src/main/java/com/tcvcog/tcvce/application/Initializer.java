@@ -48,6 +48,7 @@ import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.PDFCoordinator;
 import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 
 import javax.servlet.ServletContext;
@@ -163,12 +164,15 @@ public class Initializer implements ServletContextListener{
         // this is a session-scoped bean stored in the session map
         SearchCoordinator sc = new SearchCoordinator();
         servletContext.setAttribute("searchCoordinator", sc);
-         
+        
         BlobCoordinator blobCoordinator = new BlobCoordinator();
         servletContext.setAttribute("blobCoordinator", blobCoordinator);
         
         BlobIntegrator blobIntegrator = new BlobIntegrator();
         servletContext.setAttribute("blobIntegrator", blobIntegrator);
+        
+        PDFCoordinator pdfCoordinator = new PDFCoordinator();
+        servletContext.setAttribute("pdfCoordinator", pdfCoordinator);
         
         PersonCoordinator persCoor = new PersonCoordinator();
         servletContext.setAttribute("personCoordinator", persCoor);

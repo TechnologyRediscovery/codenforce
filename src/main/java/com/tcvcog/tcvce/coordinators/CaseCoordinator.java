@@ -24,7 +24,6 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -39,26 +38,21 @@ import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECaseDateFieldsEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
-import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
@@ -106,7 +100,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
     public CECaseDataHeavy cecase_assembleCECaseDataHeavy(CECase c, UserAuthorized ua)
-            throws BObStatusException, IntegrationException, SearchException {
+            throws BObStatusException, 
+            IntegrationException, 
+            SearchException
+           {
 
         Credential cred = null;
         if (ua != null && c != null) {
@@ -228,6 +225,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param ua the user doing the force closing
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.EventException
      */
     public void cecase_forceclose(CECaseDataHeavy cse, EventCategory closeEventCat, UserAuthorized ua) throws BObStatusException, IntegrationException, EventException{
         CaseIntegrator ci = getCaseIntegrator();
@@ -262,15 +260,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     /**
      * Primary pathway for retrieving the data-light superclass CECase.
      * Implements business logic.
-     *
+     * 
      * @param caseID
      * @return
      * @throws IntegrationException
      */
-    public CECase cecase_getCECase(int caseID) throws IntegrationException {
+    public CECase cecase_getCECase(int caseID) 
+            throws IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
         EventCoordinator ec = getEventCoordinator();
-        SearchCoordinator sc = getSearchCoordinator();
+        
         CECase cse = null;
         try {
             cse = ci.getCECase(caseID);
@@ -673,9 +672,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public List<CECase> cecase_getCECaseHistory(UserAuthorized ua) throws IntegrationException, BObStatusException {
         CaseIntegrator caseInt = getCaseIntegrator();
         List<CECase> cl = new ArrayList<>();
-        List<Integer> cseidl = null;
         if (ua != null) {
-            cseidl = caseInt.getCECaseHistoryList(ua.getMyCredential().getGoverningAuthPeriod().getUserID());
+            List<Integer> cseidl = caseInt.getCECaseHistoryList(ua.getMyCredential().getGoverningAuthPeriod().getUserID());
             if (!cseidl.isEmpty()) {
                 for (Integer i : cseidl) {
                     cl.add(cecase_getCECase(i));
@@ -742,13 +740,19 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param freshCase
      * @param ua
      * @param cear
+     * @return 
      * @throws IntegrationException
      * @throws BObStatusException
      * @throws ViolationException
      * @throws com.tcvcog.tcvce.domain.EventException
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public int cecase_insertNewCECase(CECase freshCase, UserAuthorized ua, CEActionRequest cear) throws IntegrationException, BObStatusException, ViolationException, EventException, SearchException {
+    public int cecase_insertNewCECase(CECase freshCase, UserAuthorized ua, CEActionRequest cear) 
+            throws IntegrationException, 
+            BObStatusException, 
+            ViolationException, 
+            EventException, 
+            SearchException {
 
         CaseIntegrator ci = getCaseIntegrator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
@@ -812,6 +816,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * Checks for violation status and closes case
      * @param cse
      * @param ua 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
     public void cecase_closeCase(CECase cse, UserAuthorized ua) throws BObStatusException, IntegrationException{
         CaseIntegrator ci = getCaseIntegrator();
@@ -1278,24 +1284,26 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * Configuration intermediary for NOVs
+     * 
      * @param noticeID
      * @return
-     * @throws IntegrationException 
+     * @throws IntegrationException
      */
-    public NoticeOfViolation nov_getNoticeOfViolation(int noticeID) throws IntegrationException{
+    public NoticeOfViolation nov_getNoticeOfViolation(int noticeID) 
+            throws IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
         return ci.novGet(noticeID);
     }
     
     
     /**
-     *  Utility method for extracting a list of NOV ID's from the db
+     * Utility method for extracting a list of NOV ID's from the db
      * @param idl
-     * @return 
-     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @return
+     * @throws IntegrationException
      */
-    public List<NoticeOfViolation> nov_getNoticeOfViolationList(List<Integer> idl) throws IntegrationException{
+    public List<NoticeOfViolation> nov_getNoticeOfViolationList(List<Integer> idl) 
+            throws IntegrationException {
         List<NoticeOfViolation> novl = new ArrayList<>();
         if(idl != null && !idl.isEmpty()){
             for(Integer i: idl){
@@ -1508,24 +1516,23 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
     
     /**
-     * TODO: NADGIT review
      * @param ps
      * @param blob
-     * @throws BlobException
+     * @return the PrintStyle with the header image set
      * @throws IntegrationException
      * @throws BObStatusException 
      */
-      public void nov_updateStyleHeaderImage(PrintStyle ps, Blob blob) throws BlobException, IntegrationException, BObStatusException {
+      public PrintStyle nov_updateStyleHeaderImage(PrintStyle ps, BlobLight blob) throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
         if(ps == null || blob == null){
             throw new BObStatusException("Cannot update header image with null style or blob");
             
         }
-        // NADGIT please review and fix
 
-//        int newHeaderBlobID = getBlobIntegrator().storeBlob(blob);
-//        ps.setHeader_img_id(newHeaderBlobID);
-        ci.novUpdateHeaderImage(ps, blob);
+        ps.setHeader_img_id(blob.getBlobID());
+        ci.novUpdateHeaderImage(ps);
+     
+        return ps;
         
     }
       
@@ -1674,6 +1681,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param cse
      * @return
      * @throws BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public Citation citation_getCitationSkeleton(UserAuthorized ua, CECase cse) throws BObStatusException, IntegrationException {
         if (!ua.getKeyCard().isHasEnfOfficialPermissions()) {
@@ -1765,6 +1773,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      *
      * @param c
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public void citation_updateCitation(Citation c) throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
@@ -1882,11 +1891,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
     public List<CEActionRequestIssueType> cear_getIssueTypes(Municipality muni) throws IntegrationException {
 
-        List<CEActionRequestIssueType> typeList = new ArrayList();
-
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
 
-        typeList = ceari.getRequestIssueTypeList(muni);
+        List<CEActionRequestIssueType> typeList = ceari.getRequestIssueTypeList(muni);
 
         return typeList;
 
@@ -1894,11 +1901,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
     public List<CEActionRequestIssueType> cear_getIssueTypes() throws IntegrationException {
 
-        List<CEActionRequestIssueType> typeList = new ArrayList();
-
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
 
-        typeList = ceari.getRequestIssueTypeList();
+        List<CEActionRequestIssueType> typeList = ceari.getRequestIssueTypeList();
 
         return typeList;
 
@@ -1937,6 +1942,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      * @throws BObStatusException
      * @throws ViolationException
+     * @throws com.tcvcog.tcvce.domain.EventException
      */
     public void violation_checkForFullComplianceAndCloseCaseIfTriggered(CECaseDataHeavy c, UserAuthorized ua)
             throws IntegrationException, BObStatusException, ViolationException, EventException {
@@ -1978,8 +1984,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * object
      *
      * @param c
-     * @param ece
      * @return
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public CodeViolation violation_getCodeViolationSkeleton(CECaseDataHeavy c) throws BObStatusException {
         CodeViolation v = new CodeViolation();
@@ -2053,7 +2059,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         return insertedViolationID;
     }
 
-    public CodeViolation violation_getCodeViolation(int vid) throws IntegrationException {
+    /**
+     * 
+     * @param vid
+     * @return
+     * @throws IntegrationException
+     */
+    public CodeViolation violation_getCodeViolation(int vid) 
+            throws IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
         CodeViolation cv = ci.getCodeViolation(vid);
         return violation_configureCodeViolation(cv);
@@ -2071,8 +2084,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     private CodeViolation violation_configureCodeViolation(CodeViolation cv) throws IntegrationException {
         SystemIntegrator si = getSystemIntegrator();
         CaseIntegrator ci = getCaseIntegrator();
-        
-        cv.setBlobList(ci.loadViolationPhotoList(cv));
         
         cv.setCitationIDList(ci.getCitations(cv.getViolationID()));
         cv.setNoticeIDList(ci.novGetNOVIDList(cv));
@@ -2222,57 +2233,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         ci.updateCodeViolationNotes(viol);
     }
     
-    
-    /**
-     * TODO: NADGIT please review
-     * @param cv
-     * @param blob
-     * @throws BObStatusException 
-     */
-    public void violation_linkBlobToCodeViolation(CodeViolation cv, Blob blob) throws BObStatusException {
-        BlobIntegrator bi = getBlobIntegrator();
-        if(cv == null || blob == null){
-            throw new BObStatusException("Cannot link blob to violation with null blob or viol");
-        }
-                
-//        try {
-//            bi.linkBlobToCodeViolation(blob.getBlobID(), cv.getViolationID());
-//            System.out.println("linkBlobBB.linkBlobToCodeViolation | link succesfull");  //TESTING
-//        } catch (IntegrationException ex) {
-//            System.out.println(ex);
-//            getFacesContext().addMessage(null,
-//                    new FacesMessage(FacesMessage.SEVERITY_ERROR
-//                            ,"Failed to link file to selected violation. Sorry! " , ""));
-//        }
-        
-    }
-    
-    
-    /**
-     * * TODO: NADGIT please review
-     * @param cv
-     * @param blobID
-     * @throws BObStatusException 
-     */
-    public void violation_removeLinkBlobToCodeViolation(CodeViolation cv, int blobID) throws BObStatusException {
-        BlobIntegrator bi = getBlobIntegrator();
-        if(cv == null || blobID == 0){
-            throw new BObStatusException("Cannot link blob to violation with null blob or viol");
-        }
-                
-//        try {
-//            bi.removeLinkBlobToCodeViolation(cv.getViolationID(), blobID);
-//            System.out.println("linkBlobBB.linkBlobToCodeViolation | link succesfull");  //TESTING
-//        } catch (IntegrationException ex) {
-//            System.out.println(ex);
-//            getFacesContext().addMessage(null,
-//                    new FacesMessage(FacesMessage.SEVERITY_ERROR
-//                            ,"Failed to link file to selected violation. Sorry! " , ""));
-//        }
-        
-    }
-    
-
     /**
      * Attempts to deactivate a code violation, but will thow an Exception if
      * the CodeViolation has been used in a notice or in a citation
@@ -2330,8 +2290,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param daysToExtend the number of days in the future FROM TODAY to extend the window
      * @param cse
      * @param ua 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.ViolationException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public void violation_extendStipulatedComplianceDate(CodeViolation cv, long daysToExtend, CECaseDataHeavy cse, UserAuthorized ua) throws BObStatusException, ViolationException, IntegrationException{
+    public void violation_extendStipulatedComplianceDate(CodeViolation cv, long daysToExtend, CECaseDataHeavy cse, UserAuthorized ua) 
+            throws BObStatusException, ViolationException, IntegrationException {
 
         if(cv == null || cse == null || ua == null){
             throw new BObStatusException("Cannot extend compliance date given a null violation, case, or user");
@@ -2395,6 +2359,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         violation_checkForFullComplianceAndCloseCaseIfTriggered(cse, u);
     }
 
+    /**
+     * 
+     * @param cvIDList
+     * @return
+     * @throws IntegrationException
+     */
     public List<CodeViolation> violation_getCodeViolations(List<Integer> cvIDList) throws IntegrationException{
         List<CodeViolation> vl = new ArrayList<>();
         
@@ -2410,10 +2380,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     
     /**
      * Utility method for grabbing a list of CodeViolations given a CECase
-     *
+     * TODO: Currently causes infinite recursion
      * @param ceCase
      * @return
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public List<CodeViolation> violation_getCodeViolations(CECaseDataHeavy ceCase) throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();

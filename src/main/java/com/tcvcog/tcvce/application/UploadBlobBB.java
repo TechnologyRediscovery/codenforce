@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
+import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobType;
@@ -57,9 +58,9 @@ public class UploadBlobBB extends BackingBeanUtils implements Serializable {
             blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
             
             blob = blobc.storeBlob(blob);
-        } catch (IntegrationException | IOException | ClassNotFoundException | NoSuchElementException ex) {
+        } catch (IntegrationException | IOException | NoSuchElementException ex) {
             System.out.println("BlobUploadBB.handleBlobUpload | " + ex);
-        } catch (BlobException ex){
+        } catch (BlobException | BlobTypeException ex){
             System.out.println("BlobUploadBB.handleBlobUpload | " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

@@ -71,9 +71,9 @@
                                                           update="requestCEActionFlowFormDescribePhoto growl"
                                                           multiple="true"
                                                           fileLimit="3" 
-                                                          sizeLimit="900000000" 
+                                                          sizeLimit="900000000"
                                                           allowTypes="/(\.|\/)(jpe?g|png|gif|JPG|JPE?G|PNG|GIF)$/"
-                                                          />    
+                                                          />
                                         </h:form>
 
                                         <h:form id="requestCEActionFlowFormDescribePhoto">
@@ -83,7 +83,7 @@
 
                                             <p:dataTable id="photoTable"
                                                          var="blob"
-                                                         value="#{cEActionRequestSubmitBB.blobList}"
+                                                         value="#{cEActionRequestSubmitBB.currentRequest.blobList}"
                                                          rowKey="#{blob.blobID}"
                                                          tableStyleClass="primeDataTable"
                                                          draggableRows="false"

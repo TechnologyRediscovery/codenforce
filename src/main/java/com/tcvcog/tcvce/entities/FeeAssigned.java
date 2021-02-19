@@ -21,22 +21,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
+ * This BOb represents a fee that has actually been assigned to an entity.
  * @author Nathan Dietz
  */
-public class FeeAssigned implements Serializable {
+public class FeeAssigned extends BOb implements Serializable {
 
     protected int assignedFeeID;
     protected EventDomainEnum domain;
-    protected List<Payment> paymentList;
-    protected int moneyFeeAssigned;
+    protected List<Payment> paymentList; //All the payments that have been made on this fee
     protected User assignedBy;
     protected LocalDateTime assigned;
     protected User waivedBy;
     protected LocalDateTime lastModified;
-    protected double reducedBy;
+    protected double reducedBy; //Amount the template Fee is reduced by. Subtract this from the Fee's amount field
     protected User reducedByUser;
     protected String notes;
-    protected Fee fee;
+    protected Fee fee; //The fee that has been assigned
 
     public FeeAssigned() {
     }
@@ -64,15 +64,7 @@ public class FeeAssigned implements Serializable {
     public void setPaymentList(List<Payment> paymentList) {
         this.paymentList = paymentList;
     }
-
-    public int getMoneyFeeAssigned() {
-        return moneyFeeAssigned;
-    }
-
-    public void setMoneyFeeAssigned(int moneyFeeAssigned) {
-        this.moneyFeeAssigned = moneyFeeAssigned;
-    }
-
+    
     public User getAssignedBy() {
         return assignedBy;
     }

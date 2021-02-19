@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2018 Turtle Creek Valley
-Council of Governments, PA
+ * Copyright (C) 2018 Turtle Creek Valley Council of Governments, PA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +17,8 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities;
 
 /**
- * This implementation of Blob inherits the descriptive fields from BlobLight, and also holds the bytes of file itself.
+ * This implementation of Blob inherits the descriptive fields from BlobLight, 
+ * but also holds the binary data of the file itself.
  * @author noah
  */
 public class Blob  extends BlobLight {

@@ -17,10 +17,12 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CEActionRequestIssueType;
@@ -250,10 +252,13 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         // create the action request object
         CEActionRequest actionRequest = new CEActionRequest();
+        
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
         PropertyIntegrator propI = getPropertyIntegrator();
         UserIntegrator ui = getUserIntegrator();
+        BlobIntegrator bi = getBlobIntegrator();
+        BlobCoordinator bc = getBlobCoordinator();
         
         actionRequest.setRequestStatus(getRequestStatus(rs.getInt("status_id")));
         actionRequest.setPaccEnabled(rs.getBoolean("paccenabled"));
@@ -293,6 +298,12 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         actionRequest.setPublicExternalNotes(rs.getString("publicexternalnotes"));
         actionRequest.setActive(rs.getBoolean("active"));
         
+        try{
+            List<Integer> blobIDs = bi.photosAttachedToRequest(actionRequest.getRequestID());
+            actionRequest.setBlobList(bc.getPhotoBlobLightList(blobIDs));
+        } catch(BlobException ex){
+            throw new IntegrationException("An error occurred while trying to retrieve blobs for a CEActionRequest", ex);
+        }
         return actionRequest;
     }
 
@@ -392,45 +403,10 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
-        newActionRequest = populatePhotodocIDs(newActionRequest);
+        
         
         return newActionRequest;
     } // close getActionRequest
-
-    
-    
-    private CEActionRequest populatePhotodocIDs(CEActionRequest cear) throws IntegrationException{
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("SELECT photodoc_photodocid FROM public.ceactionrequestphotodoc");
-        sb.append(" WHERE ceactionrequest_requestid = ?;");
-        
-        Connection con = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        try {
-            con = getPostgresCon();
-            stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(1, cear.getRequestID());
-            // Retrieve action data from postgres
-            rs = stmt.executeQuery();
-            // loop through the result set and each to the request
-            cear.setBlobIDList(new ArrayList<Integer>());
-            while (rs.next()) {
-                cear.getBlobIDList().add(rs.getInt("photodoc_photodocid"));
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("CEActionRequestorIntegrator.getActionRequest | Integration Error: Unable to retrieve photos on request", ex);
-        } finally {
-            
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        
-        return cear;
-    }
     
     /**
      * Updates the status of the passed in CEActionRequest. 
