@@ -111,17 +111,18 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
             qcse.getPrimaryParams().setPersonInfoCaseID_val(pers);
             pdh.setCaseList(sc.runQuery(qcse).getResults());
         
-            QueryOccPeriod qop = sc.initQuery(QueryOccPeriodEnum.PERSONS, cred);
-            qop.getPrimaryParams().setPerson_val(pers);
-            pdh.setPeriodList(sc.runQuery(qop).getBOBResultList());
+//            QueryOccPeriod qop = sc.initQuery(QueryOccPeriodEnum.PERSONS, cred);
+//            qop.getPrimaryParams().setPerson_val(pers);
+//            pdh.setPeriodList(sc.runQuery(qop).getBOBResultList());
+
+//            TURNED OFF TO MIGRATE TO HUMANIZATION
+//            QueryProperty qprop = sc.initQuery(QueryPropertyEnum.PERSONS, cred);
+//            qprop.getPrimaryParams().setPerson_val(pers);
+//            pdh.setPropertyList(sc.runQuery(qprop).getBOBResultList());
             
-            QueryProperty qprop = sc.initQuery(QueryPropertyEnum.PERSONS, cred);
-            qprop.getPrimaryParams().setPerson_val(pers);
-            pdh.setPropertyList(sc.runQuery(qprop).getBOBResultList());
-            
-            QueryEvent qe = sc.initQuery(QueryEventEnum.PERSONS, cred);
-            qe.getPrimaryParams().setPerson_val(pers);
-            pdh.setEventList(sc.runQuery(qe).getBOBResultList());
+//            QueryEvent qe = sc.initQuery(QueryEventEnum.PERSONS, cred);
+//            qe.getPrimaryParams().setPerson_val(pers);
+//            pdh.setEventList(sc.runQuery(qe).getBOBResultList());
         
         } catch (SearchException ex) {
             System.out.println(ex);
@@ -154,6 +155,11 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         pi.updatePerson(p);
     }
     
+    /**
+     * Creates skeleton or starter person for new person creation
+     * @param m
+     * @return 
+     */
     public Person personCreateMakeSkeleton(Municipality m){
         Person newP = new Person();
         newP.setPersonType(PersonType.Public);
@@ -164,11 +170,19 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         newP.setCompositeLastName(false);
         newP.setUseSeparateMailingAddress(false);
         newP.setMuniCode(m.getMuniCode());
+        newP.setMuni(m);
         newP.setAddressState("PA");
         return newP;
         
     }
     
+    /**
+     * Checks logic of incoming person objects and passes write off to Integrator
+     * @param p
+     * @param ua
+     * @return
+     * @throws IntegrationException 
+     */
     public int personCreate(Person p, UserAuthorized ua) throws IntegrationException{
         SystemIntegrator si = getSystemIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
@@ -178,7 +192,6 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         p.setSource( si.getBOBSource(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                                 .getString("bobsourcePersonInternal"))));
         return pi.insertPerson(p);
-        
         
     }
     

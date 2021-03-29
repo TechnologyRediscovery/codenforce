@@ -618,17 +618,11 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
     public String onViewCaseButtonChange(CECase cse) {
         CaseCoordinator cc = getCaseCoordinator();
         if (cse != null) {
+            System.out.println("PropertyProfile.onViewCaseButtonChange: setting in session case ID " + cse.getCaseID());
 
-            try {
-                getSessionBean().setSessCECase(cc.cecase_assembleCECaseDataHeavy(cse, getSessionBean().getSessUser()));
-            } catch (BObStatusException | IntegrationException | SearchException ex) {
-                System.out.println(ex);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Could not load CE Case for viewing, sorry! " + ex.toString(), ""));
-            }
+            getSessionBean().setSessCECase(cse);
         }
-        return "ceCaseSearchProfile";
+        return "ceCaseProfile";
     }
 
     /**

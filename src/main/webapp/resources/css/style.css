@@ -301,7 +301,7 @@ i.material-icons{
 
 
 a:link{
-    text-decoration: none;
+    /*text-decoration: none;*/
     color: #181F36;
 }
 
@@ -831,6 +831,22 @@ i.status-display-icon-i{
 
 }
 
+.compliance-date-stipulated{
+    color: orange;
+    font-weight: bold;
+}
+
+.compliance-date{
+    color: green;
+    font-weight: bold;
+}
+
+.compliance-date-nullified{
+    color: darkslategray;
+    font-weight: bold;
+}
+
+
 
 /***************** CLOSE TEXT AND SPANS ***********************/
 
@@ -1295,6 +1311,11 @@ gridTd-bignum{
 
 .link-button-container a{
     color:white;
+}
+
+.commandlink-container .commandlink-webstd a:link{
+    
+    
 }
 
 /* ****************** CLOSE BUTTON STYLES ********************/
@@ -2037,10 +2058,19 @@ tr.caseOpen{
 
 /* ****************** PRIMEFACE STYLING RESETING *******************/
 
-body .ui-panel .ui-panel-titlebar{
+/*body .ui-panel .ui-panel-titlebar{
     background-color: #6C6D70;
     border: 1px solid #6C6D70;
+}*/
+
+body .ui-panel .ui-panel-titlebar{
+    background-color: #004864;
+    border: 1px solid #004864;
+    color:white;
 }
+
+
+
 body .ui-dialog .ui-dialog-titlebar{
     background-color: #6C6D70;
     border: 1px solid #6C6D70;
@@ -2682,14 +2712,15 @@ input{
 
 .data_container_nested_restrict{
     width: 100%;
-    padding-top: 15px;
+    /*removed by ECD in haste to get more head room on cecaseprofile*/
+    /*padding-top: 15px;*/
     margin-bottom: 20px;
 }
 
 .data_container_nested_restrict_report{
     width: 100%;
-    padding-top: 5px;
-    margin-bottom: 5px;
+    padding-top: 1px;
+    margin-bottom: 1px;
 }
 
 .restrict-main-contents-io-title{
@@ -2699,9 +2730,14 @@ input{
 
 .restrict-main-contents-io-link{
     display: inline-block; 
-    float: right;
+    float: next;
+    /*text-decoration: underline;*/
     font-weight: 200;
-    border-bottom: 1px solid #6C6D70;
+    /*border-bottom: 1px solid #6C6D70;*/
+    margin-left:10px;
+    
+    /*changed in haste by ECD Jan 2021 for cecase profile facelift*/
+    border-bottom: 1px solid blue; 
 }
 
 .restrict-main-contents-io-link a{
@@ -2733,8 +2769,8 @@ input{
 }
 
 .restrict-data-field_report{
-    margin-top: 3px;
-    margin-bottom: 3px;
+    margin-top: 1px;
+    margin-bottom: 1px;
 }
 
 .restrict-data-field-label-inline{

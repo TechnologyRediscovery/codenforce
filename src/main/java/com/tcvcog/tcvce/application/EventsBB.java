@@ -157,13 +157,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
 
         eventDomainList = new ArrayList(Arrays.asList(EventDomainEnum.values()));
         
-        
-        if(eventTypeCandidates != null && !eventTypeCandidates.isEmpty()){
-            eventTypeSelected = getEventTypeCandidates().get(0);
-            eventCategoryCandidates.addAll(typeCatMap.get(eventTypeSelected));
-        }
-        eventList = new ArrayList<>();
-        filteredEventList = new ArrayList<>();
+     
         
         EventCnF sessEv =  getSessionBean().getSessEvent();
         if(sessEv != null){
@@ -171,40 +165,79 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
             
             try {
                 currentEvent = ec.assembleEventCnFPropUnitCasePeriodHeavy(sessEv);
+                // Modified currentEvent selection logic during page collapse JAN-21
+//                currentEvent = ec.assembleEventCnFPropUnitCasePeriodHeavy(sessEv);
                 
             } catch (EventException | IntegrationException | SearchException ex) {
                 System.out.println(ex);
                 System.out.println("EventsBB.initbean: Current event loading error");
             }
                 
-        } else { // we don't have a session event, so set page domain based on domain request on sessionbean
-            
+        } else { // we don't have a session event, so make a new one
+            initiateNewEvent();
         }
         
-//        EventDomainEnum sessEvDomainReq = getSessionBean().getSessEventsPageEventDomainRequest();
-//        if(sessEvDomainReq != null && currentEvent != null){
-//            if(sessEvDomainReq == currentEvent.getDomain()){
-//                // let the logic down in method figure out domain
-//                configureEventDomainAndEventList(null);
-//                
-//            } else {
-//                // eventDomain takes precedence
-//                configureEventDomainAndEventList(currentEvent.getDomain());
-//            }
-//        }
+        EventDomainEnum sessEvDomainReq = getSessionBean().getSessEventsPageEventDomainRequest();
+        
+
+        if(sessEvDomainReq != null && currentEvent != null){
+            if(sessEvDomainReq == currentEvent.getDomain()){
+                // let the logic down in method figure out domain
+                configureEventDomain(null);
+                
+            } else {
+                // eventDomain takes precedence
+                configureEventDomain(currentEvent.getDomain());
+            }
+        }
         // send down the eventDomainRequest
         
-        configureEventDomainAndEventList(null);
-         
+        configureEventDomain(null);
+        
+        typeCatMap = ec.assembleEventTypeCatMap_toEnact(eventDomainActive, currentERGBOb, getSessionBean().getSessUser());
+        eventTypeCandidates = new ArrayList<>(getTypeCatMap().keySet());
+        eventCategoryCandidates = new ArrayList<>();
+        if(eventTypeCandidates != null && !eventTypeCandidates.isEmpty()){
+            eventTypeSelected = getEventTypeCandidates().get(0);
+            eventCategoryCandidates.addAll(typeCatMap.get(eventTypeSelected));
+        }
+        eventList = new ArrayList<>();
+        filteredEventList = new ArrayList<>();
+        
+        initEventSearch();
+    }
+    
+    
+    private void initEventSearch(){
         //**************************************
         //************** SEARCH ****************
         //**************************************
          
+        SearchCoordinator sc = getSearchCoordinator();
+        EventCoordinator ec = getEventCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
         queryList = sc.buildQueryEventList(getSessionBean().getSessUser().getMyCredential());
         
-        // Setting default query
-        if(queryList != null && !queryList.isEmpty()){
-            querySelected = queryList.get(0);
+        // get session query
+        QueryEvent qev = getSessionBean().getQueryEvent();
+        if(qev != null){
+            if(qev.isQueryExecuted()){
+                querySelected = qev;
+            } else {
+                try {
+                    querySelected = sc.runQuery(qev);
+                } catch (SearchException ex) {
+                    System.out.println(ex);
+                }
+            } // we've got results, so extract results
+            eventList = querySelected.getBOBResultList();
+        
+        } else {
+            // Setting default query
+            if(queryList != null && !queryList.isEmpty()){
+                querySelected = queryList.get(0);
+            }
         }
         
         typeCatMapForSearch = ec.assembleEventTypeCatMap_toView(getSessionBean().getSessUser());
@@ -216,6 +249,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         
         propUseTypeList = pc.getPropertyUseTypeList();
         
+        // Default to clearing list upon query reset
         appendResultsToList = false;
         
         
@@ -223,14 +257,17 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         // which would have been placed there by the generateReport method in this bean
         reportConfig = getSessionBean().getReportConfigCEEventList();
         configureSearchParameters();
+        
+        
     }
+    
     
     /**
      * Listener for user changes to the event domain
      
      */
     public void onEventDomainListChange(){
-        configureEventDomainAndEventList(eventDomianSelected);
+        configureEventDomain(eventDomianSelected);
         
         
     }
@@ -312,39 +349,9 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
 
     }
     
-    /**
-     * Based on the requested domain, session objects are grabbed and 
-     * used for setting the bean's central members
-     */
-    private void configureEventDomainAndEventList(EventDomainEnum eventDomainRequested){
-        System.out.println("EventsBB.configureEventDomainAndEventList | domainReq: " +eventDomainRequested);
-        
-        SessionBean sb = getSessionBean();
-        EventCoordinator ec = getEventCoordinator();
-        PropertyCoordinator pc = getPropertyCoordinator();
-        
-        // Step 1: Check if we have a currentEvent, if so, see what domain it is
-        // and set our page mode
-        if(eventDomainRequested == null){
-
-            if(currentEvent != null && currentEvent.getEventID() == 0){
-                eventDomainActive = currentEvent.getDomain();
-                setCurrentMode(PageModeEnum.INSERT);
-            }  else if (currentEvent != null && currentEvent.getEventID() != 0){
-                eventDomainActive = currentEvent.getDomain();
-                setCurrentMode(PageModeEnum.VIEW);
-            // we've got a null currentEvent, so we're in search mode
-            } else {
-                eventDomainActive = EventDomainEnum.UNIVERSAL;
-                setCurrentMode(PageModeEnum.LOOKUP);
-            }
-        } else {
-            eventDomainActive = eventDomainRequested;
-            setCurrentERGBObUsingEventDomain();
-
-        }
-        
-        
+    private void configureEventList(){
+         EventCoordinator ec = getEventCoordinator();
+         SessionBean sb = getSessionBean();
         // setup our eventList based on current page settings
         try {
         System.out.println("EventsBB.configureEventDomainAndEventList | domainActive: " +eventDomainActive.getTitle());
@@ -392,6 +399,34 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * Based on the requested domain, session objects are grabbed and 
+     * used for setting the bean's central members
+     */
+    private void configureEventDomain(EventDomainEnum eventDomainRequested){
+        System.out.println("EventsBB.configureEventDomainAndEventList | domainReq: " +eventDomainRequested);
+        
+        // Step 1: Check if we have a currentEvent, if so, see what domain it is
+        // and set our page mode
+        if(eventDomainRequested == null){
+
+            if(currentEvent != null && currentEvent.getDomain() != null){
+                eventDomainActive = currentEvent.getDomain();
+                setCurrentMode(PageModeEnum.INSERT);
+            // we've got a null currentEvent, so we're in search mode
+            } else {
+                eventDomainActive = EventDomainEnum.UNIVERSAL;
+                setCurrentMode(PageModeEnum.LOOKUP);
+            }
+        } else {
+            eventDomainActive = eventDomainRequested;
+            setCurrentERGBObUsingEventDomain();
+
+        }
+        
+       
+    }
+    
+    /**
      * Examines the current value of active event domain and gets the proper
      * CECase or OccPeriod loaded up
      */
@@ -399,23 +434,23 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         CaseCoordinator cc = getCaseCoordinator();
         OccupancyCoordinator oc = getOccupancyCoordinator();
         if(eventDomainActive != null){
-        try{
-            switch(eventDomainActive){
-                    case CODE_ENFORCEMENT:
-                        currentERGBOb = cc.cecase_assembleCECaseDataHeavy(getSessionBean().getSessCECase(), getSessionBean().getSessUser());
-                        break;
-                    case OCCUPANCY:
-                        currentERGBOb = oc.assembleOccPeriodDataHeavy(getSessionBean().getSessOccPeriod(), getSessionBean().getSessUser().getKeyCard());
-                        break;
-                    case UNIVERSAL:
-                        currentERGBOb = null;
-                        break;
-                    default:
-                        break;
-                }
-        } catch (BObStatusException | IntegrationException | SearchException ex){
-            System.out.println(ex);
-        }
+            try{
+                switch(eventDomainActive){
+                        case CODE_ENFORCEMENT:
+                            currentERGBOb = cc.cecase_assembleCECaseDataHeavy(getSessionBean().getSessCECase(), getSessionBean().getSessUser());
+                            break;
+                        case OCCUPANCY:
+                            currentERGBOb = oc.assembleOccPeriodDataHeavy(getSessionBean().getSessOccPeriod(), getSessionBean().getSessUser().getKeyCard());
+                            break;
+                        case UNIVERSAL:
+                            currentERGBOb = null;
+                            break;
+                        default:
+                            break;
+                    }
+            } catch (BObStatusException | IntegrationException | SearchException ex){
+                System.out.println(ex);
+            }
         }
     }
     
@@ -447,6 +482,20 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         }
         
     }
+    
+    private String generatePageReturnString(){
+        switch(eventDomainActive){
+            case CODE_ENFORCEMENT:
+                return "ceCaseProfile";
+            case OCCUPANCY:
+                return "occPeriodProfile";
+            case UNIVERSAL:
+                return "events";
+                
+        }
+        return "";
+    }
+    
       
     /**
      * Event search setup infrastructure
@@ -638,9 +687,18 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         }
     }
     
+    /**
+     * Listener for user requests to reset the query list
+     * @param ev 
+     */
     public void resetQuery(ActionEvent ev){
         
         SearchCoordinator sc = getSearchCoordinator();
+        
+        if(!appendResultsToList && eventList != null){
+            eventList.clear();
+        }
+        // Don't do this stuff??
         queryList = sc.buildQueryEventList(getSessionBean().getSessUser().getMyCredential());
         if(queryList != null && !queryList.isEmpty()){
             querySelected = queryList.get(0);
@@ -756,7 +814,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
             System.out.println(ex);
             getFacesContext().addMessage(null,
                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                           "Could not unhide event, sorry; this is a system erro", ""));
+                           "Could not unhide event, sorry; this is a system error", ""));
         }
     }
     
@@ -791,7 +849,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         EventCnF ev = null;
             
         try {
-            if(currentEvent == null){
+            if(currentEvent == null && eventDomainActive != null){
 
                 ev = ec.initEvent(currentERGBOb, null);
 //                ev.setCategory(eventCategorySelected);
@@ -834,7 +892,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
              return "";
         }
         
-        return "events";
+        return generatePageReturnString();
         
     }
     
@@ -885,7 +943,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
                     sc.logObjectView(getSessionBean().getSessUser(), currentEvent);
                 }
                 getSessionBean().setSessEvent(currentEvent);
-                return "events";
+                return generatePageReturnString();
             }
     
         } catch (IntegrationException | BObStatusException | EventException | SearchException ex) {
@@ -896,9 +954,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
                             "This is a non-user system-level error that must be fixed by your Sys Admin"));
         } 
 
-        // nullify the session's case so that the reload of currentCase
-        // no the cecaseProfile.xhtml will trigger a new DB read
-        return "";
+       return "";
     }
     
     private void buildERGBObTitle(){
@@ -956,7 +1012,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
             return "";
         } 
         
-        return "events";
+        return generatePageReturnString();
     }
     
     public void onPersonListCommitButtonChange(ActionEvent ev){
@@ -1102,7 +1158,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
             return "";
         }
 
-        return "events";
+        return generatePageReturnString();
 
     }
 

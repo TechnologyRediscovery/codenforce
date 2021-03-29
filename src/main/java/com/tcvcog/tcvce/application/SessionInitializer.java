@@ -33,6 +33,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.User;
@@ -45,6 +46,8 @@ import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
+import com.tcvcog.tcvce.entities.search.QueryEvent;
+import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import javax.faces.application.FacesMessage;
@@ -587,6 +590,15 @@ public  class       SessionInitializer
         sb.setQueryEventList(sc.buildQueryEventList(cred));
         if(!sb.getQueryEventList().isEmpty()){
             sb.setQueryEvent(sb.getQueryEventList().get(0));
+        }
+        // start with default CE domain
+        sb.setSessEventsPageEventDomainRequest(EventDomainEnum.CODE_ENFORCEMENT);
+        
+        QueryEvent futureEvents = sc.initQuery(QueryEventEnum.MUINI_FUTURE_7DAYS, cred);
+        try {
+            sb.setQueryEventFuture7Days(sc.runQuery(futureEvents));
+        } catch (SearchException ex) {
+            System.out.println(ex);
         }
     }
 

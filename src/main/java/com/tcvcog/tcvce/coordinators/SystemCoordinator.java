@@ -163,7 +163,15 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
             sb.append(mbp.getExplanation());
         }
+        
         // NOTE content
+         if (mbp.getNewMessageContent() != null) {
+            sb.append(Constants.FMT_HTML_BREAK);
+            sb.append(Constants.FMT_CONTENT);
+            sb.append(mbp.getNewMessageContent());
+        }
+         
+        // CREATOR INFO
         sb.append(Constants.FMT_HTML_BREAK);
         sb.append(Constants.FMT_NOTEBYLINE);
         if (mbp.getUser() != null) {
@@ -186,12 +194,8 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         sb.append(stampCurrentTimeForNote());
 
 
-        // TITLE SUB
-        if (mbp.getNewMessageContent() != null) {
-            sb.append(Constants.FMT_HTML_BREAK);
-            sb.append(Constants.FMT_CONTENT);
-            sb.append(mbp.getNewMessageContent());
-        }
+     
+       
 
         if (mbp.getCred() != null && mbp.isIncludeCredentialSig()) {
             sb.append(Constants.FMT_SIGNATURELEAD);
@@ -399,10 +403,11 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     }
 
     //Sub NavItem: Code Enf
-    private final NavigationSubItem CECaseSearch = getNavSubItem("Search for Cases", "/restricted/cogstaff/ce/ceCaseSearchProfile.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem CECaseProfile = getNavSubItem("Case Profile", "/restricted/cogstaff/ce/ceCaseSearchProfile.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CECaseSearch = getNavSubItem("Search for Cases", "/restricted/cogstaff/ce/ceCaseSearch.xhtml", "fa fa-sign-in", false);
+    private final NavigationSubItem CECaseProfile = getNavSubItem("Case Profile", "/restricted/cogstaff/ce/ceCaseProfile.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CEViolations = getNavSubItem("Violations", "/restricted/cogstaff/ce/ceCaseViolations.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem CENotices = getNavSubItem("Notices", "/restricted/cogstaff/ce/ceCaseNotices.xhtml", "fa fa-sign-in", false);
+    // removed during cecase page collapse
+//    private final NavigationSubItem CENotices = getNavSubItem("Notices", "/restricted/cogstaff/ce/ceCaseNotices.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CECitations = getNavSubItem("Citations", "/restricted/cogstaff/ce/ceCaseCitations.xhtml", "fa fa-sign-in", false);
     private final NavigationSubItem CERequests = getNavSubItem("Requests", "/restricted/cogstaff/ce/ceActionRequests.xhtml", "fa fa-sign-in", false);
 
@@ -413,7 +418,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         navList.add(CECaseSearch);
         navList.add(CECaseProfile);
         navList.add(CEViolations);
-        navList.add(CENotices);
+//        navList.add(CENotices);
         navList.add(CECitations);
         navList.add(CERequests);
         return navList;
@@ -498,7 +503,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             navList.add(propertyItem);
             navList.add(personItem);
             navList.add(occItem);
-            navList.add(CEItem);
+//            navList.add(CEItem);
             navList.add(codeItem);
         } catch (Exception e) {
             System.out.println(e);

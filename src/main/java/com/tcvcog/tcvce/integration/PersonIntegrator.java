@@ -477,7 +477,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             }
             stmt.setBoolean(17, personToStore.isActive());
             
-            
             stmt.setBoolean(18, personToStore.isUnder18());
             stmt.setInt(19, personToStore.getVerifiedByUserID());
             stmt.setBoolean(20, personToStore.isCompositeLastName());

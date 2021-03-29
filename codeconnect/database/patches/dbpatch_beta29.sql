@@ -9,6 +9,8 @@ ALTER TABLE login ADD COLUMN homemuni INTEGER CONSTRAINT login_homemuni_fk REFER
 
 ALTER TABLE citation ADD COLUMN officialtext TEXT;
 
+
+
 -- FROM NADGIT
 -- ****************************************************************************
 -- RUN THIS CREATE TYPE BY ITSELF!
@@ -112,6 +114,38 @@ alter table propertyunitchange drop column rentalintent;
 
 alter table propertyunitchange add column rentalnotes text;
 
+
+-- FROM SNAPPERS
+
+CREATE SEQUENCE taxstatus_taxstatusid_seq
+    INCREMENT 1
+    START 1000
+    MINVALUE 1000;
+
+CREATE TABLE taxstatus(
+    taxstatusid         int primary key,
+    year                int,
+    paidstatus          text,
+    tax                 decimal,
+    penalty             decimal,
+    interest            decimal,
+    total               decimal,
+    datepaid            date
+);
+
+ALTER TABLE taxstatus
+    alter column taxstatusid
+    set default nextval('taxstatus_taxstatusid_seq');
+comment on table taxstatus IS
+'Scraped data from Allegheny County http://www2.alleghenycounty.us/RealEstate/. Description valid as of August 2020';
+
+
+alter table propertyexternaldata
+   add column taxstatus_taxstatusid int references taxstatus(taxstatusid),
+   drop column tax,
+   drop column taxsubcode,
+   drop column taxstatus,
+   drop column taxstatusyear;
 
 --IF datepublished IS NULL the patch is still open and receiving changes
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)

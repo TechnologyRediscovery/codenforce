@@ -102,6 +102,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private List<ViewOptionsActiveListsEnum> viewOptionList;
     private ViewOptionsActiveListsEnum selectedViewOption;
     
+    private boolean nov_createNoticeFollowupEvent;
+    
     // MIGRATED FROM TEXT BLOCK BB
     
     
@@ -181,9 +183,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        
       
-        
+        nov_createNoticeFollowupEvent = true;
         
         
     } // close initbean
@@ -439,12 +440,19 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private void onModeLookupInit() {
     }
     
-    
-    public void markNoticeOfViolationAsSent(NoticeOfViolation nov) {
-        CaseCoordinator caseCoord = getCaseCoordinator();
+    public void markNoticeOfViolationAsSentInit(NoticeOfViolation nov){
         currentNotice = nov;
+        currentNotice.setFollowupEventDaysRequest(20);
+        getSessionBean().setSessNotice(currentNotice);
+        System.out.println("NoticeOfViolationBB.markNoticeOfViolationAsSentInit: NOV " + currentNotice.getNoticeID());
+    }
+    
+    
+    public String markNoticeOfViolationAsSent(ActionEvent ev) {
+        CaseCoordinator caseCoord = getCaseCoordinator();
+        currentNotice = getSessionBean().getSessNotice();
         try {
-            caseCoord.nov_markAsSent(currentCase, nov, getSessionBean().getSessUser());
+            caseCoord.nov_markAsSent(currentCase, currentNotice, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Marked notice as sent and added event to case",
@@ -461,8 +469,12 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                             "Note that because this message is being displayed, the phase change"
                             + "has probably succeeded"));
         }
-        nov_createFollowupEvent(); 
 
+        if(nov_createNoticeFollowupEvent){
+            nov_createFollowupEvent(); 
+        }
+        return "ceCaseProfile";
+        
     }
     
     
@@ -473,6 +485,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     public void nov_createFollowupEvent(){
         CaseCoordinator cc = getCaseCoordinator();
+        currentCase = getSessionBean().getSessCECase();
+        currentNotice = getSessionBean().getSessNotice();
         try {
             EventCnF even = cc.nov_createFollowupEvent(currentCase, currentNotice, getSessionBean().getSessUser());
             if(even != null){
@@ -486,10 +500,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to generate follow-up event due to an object status, event, or integration error", ""));
         } 
-        
-        
-        
-    
     }
     
     public void onNoticeDetailsButtonChange(NoticeOfViolation nov){
@@ -878,7 +888,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      * Listener for user requests to create a new notice
      * @return 
      */
-    public void onInsertNewNoticeButtonChange() {
+    public String onInsertNewNoticeButtonChange() {
         CaseCoordinator cc = getCaseCoordinator();
         try {
                 if(currentNotice.getRecipient() == null){
@@ -891,13 +901,18 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                     
                 }
             // make sure our person list is up to date
-            currentCase = getSessionBean().getSessCECase();
-            refreshCurrentCase();
+//            currentCase = getSessionBean().getSessCECase();
+//            refreshCurrentCase();
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+            return "";
+            
         }
+        return "ceCaseProfile";
+        
     } // close method
+    
 
    
 /**
@@ -917,7 +932,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
             return "";
         }
-        return "ceCaseSearchProfile";
+        return "ceCaseProfile";
     } // close method
 
    
@@ -1609,6 +1624,20 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setDraftNoticeLoaded(boolean draftNoticeLoaded) {
         this.draftNoticeLoaded = draftNoticeLoaded;
+    }
+
+    /**
+     * @return the nov_createNoticeFollowupEvent
+     */
+    public boolean isNov_createNoticeFollowupEvent() {
+        return nov_createNoticeFollowupEvent;
+    }
+
+    /**
+     * @param nov_createNoticeFollowupEvent the nov_createNoticeFollowupEvent to set
+     */
+    public void setNov_createNoticeFollowupEvent(boolean nov_createNoticeFollowupEvent) {
+        this.nov_createNoticeFollowupEvent = nov_createNoticeFollowupEvent;
     }
 
 }

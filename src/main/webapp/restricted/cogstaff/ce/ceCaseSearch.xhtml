@@ -1154,7 +1154,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <p:commandButton    id="cecase-events-add-button"
                                                                     ajax="false"
                                                                     styleClass="noFill button-size-small"
-                                                                    action="#{ceCaseSearchProfileBB.onEventAddButtonChange}"
+                                                                    action="#{ceCaseSearchProfileBB.onEventAddInitButtonChange}"
                                                                     value="Add Event"
                                                                     icon="fa fa-plus"
                                                                     />
@@ -1719,7 +1719,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                                                    value="Add New Note"  
                                                                    icon="fa fa-sticky-note-o"
-                                                                   actionListener="#{ceCaseSearchProfileBB.onNoteInitButtonChange}"
+                                                                   actionListener="#{ceCaseSearchProfileBB.onCaseNoteInitButtonChange}"
                                                                    oncomplete="PF('cecase-note-dialog-var').show()"
                                                                    update="cecase-note-create-form"/>
 
@@ -2530,7 +2530,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                     <p:commandButton   id="cecase-dialog-notes-button-addnote"
                                                        ajax="true" 
-                                                       actionListener="#{ceCaseSearchProfileBB.onNoteCommitButtonChange}"
+                                                       actionListener="#{ceCaseSearchProfileBB.onViolationNoteCommitButtonChange}"
                                                        oncomplete="PF('cecase-note-dialog-var').hide()"
                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
                                                        value="Attach Note"  

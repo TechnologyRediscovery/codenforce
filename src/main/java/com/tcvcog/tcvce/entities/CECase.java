@@ -127,6 +127,18 @@ public class        CECase
     public List<EventCnF> getEventList() {
         return eventList;
     }
+    
+    public List<EventCnF> getFutureEventList(){
+        List<EventCnF> futureEvents = new ArrayList<>();
+        // get active not hidden
+        List<EventCnF> candidateEvents = getEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN);
+        for(EventCnF ev: candidateEvents){
+            if(ev.timeStart != null && ev.timeStart.isAfter(LocalDateTime.now())){
+                futureEvents.add(ev);
+            }
+        }
+        return futureEvents;
+    }
      
 
     @Override
@@ -259,7 +271,16 @@ public class        CECase
    
     
     public long getCaseAge() {
-        return EntityUtils.getTimePeriodAsDays(originationDate, LocalDateTime.now());
+        if(closingDate != null){
+            return EntityUtils.getTimePeriodAsDays(originationDate, closingDate);
+        } else {
+            return EntityUtils.getTimePeriodAsDays(originationDate, LocalDateTime.now());
+        }
+    }
+    
+    public long getCaseAgeAsOf(LocalDateTime ageEndTime){
+        return EntityUtils.getTimePeriodAsDays(originationDate, ageEndTime);
+        
     }
 
     /**

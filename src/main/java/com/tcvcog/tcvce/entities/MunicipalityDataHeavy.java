@@ -70,6 +70,11 @@ public  class       MunicipalityDataHeavy
     
     private String credentialSignature;
     
+    /**
+     * Stats
+     */
+    private int propertyCount;
+    
     
     
     
@@ -658,6 +663,20 @@ public  class       MunicipalityDataHeavy
      */
     public void setDefaultOccPeriodID(int defaultOccPeriodID) {
         this.defaultOccPeriodID = defaultOccPeriodID;
+    }
+
+    /**
+     * @return the propertyCount
+     */
+    public int getPropertyCount() {
+        return propertyCount;
+    }
+
+    /**
+     * @param propertyCount the propertyCount to set
+     */
+    public void setPropertyCount(int propertyCount) {
+        this.propertyCount = propertyCount;
     }
 
 

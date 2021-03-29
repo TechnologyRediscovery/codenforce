@@ -997,6 +997,175 @@
 
                                         </p:panel>
 
+                                        <p:panel    id="prop-cases-panel"
+                                                    toggleable="true"
+                                                    widgetVar="prop-cases-panel-var"
+                                                    collapsed="false"
+                                                    header="Code Enforcement Cases"
+                                                    rendered="#{propertyProfileBB.getActiveViewMode() }">
+                                            <h:form id="prop-cases-panel-form">
+
+                                                <p:commandButton   id="prop-cases-newcase-button"
+                                                                   ajax="fase"
+                                                                   action="#{propertyProfileBB.onCreateNewCaseButtonChange}"
+                                                                   oncomplete="PF('prop-persons-manage-var').show()"
+                                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                   value="Create New Code Enforcement Case"
+                                                                   icon="fa fa-archive"
+                                                                   />
+
+                                                <p:spacer height="5px" />
+
+                                                <p:dataTable id="prop-cases-table"
+                                                             var="cse"
+                                                             value="#{propertyProfileBB.currentProperty.ceCaseList}"
+                                                             tableStyleClass="primeDataTable"
+                                                             rowKey="#{cse.caseID}"
+                                                             >
+
+                                                    <p:column headerText="Date Opened"
+                                                              styleClass="centeredColumnContent"
+                                                              sortBy="#{cse.originationDate}">
+
+                                                        <h:outputText value="#{!(empty cse.originationDate) ? propertyProfileBB.getPrettyDate(cse.originationDate) : ''}"/>
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Status"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{cse.statusBundle.phase.caseOpen ? 'Open' : 'Closed'}"/>
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Name"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{cse.caseName}"/>
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Manager"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{!(empty cse.caseManager) ? cse.caseManager.person.lastName:'No manager '}"/>
+
+                                                    </p:column>
+                                                    <p:column headerText="ID"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{cse.caseID}"/>
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Options"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <p:commandButton    id="prop-person-viewcase-button"
+                                                                            ajax="false"
+                                                                            styleClass="noFill button-size-small"
+                                                                            action="#{propertyProfileBB.onViewCaseButtonChange(cse)}"
+                                                                            icon="fa fa-folder-open-o"
+                                                                            value="View"
+                                                                            />
+
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </h:form>
+
+                                        </p:panel>
+
+
+                                        <p:panel    id="prop-units-panel"
+                                                    toggleable="true"
+                                                    widgetVar="prop-events-panel-var"
+                                                    collapsed="false"
+                                                    header="Units"
+                                                    rendered="#{propertyProfileBB.getActiveViewMode() }">
+                                            <h:form id="prop-units-panel-form">
+
+
+                                                <p:commandButton    id="prop-units-explore-button"
+                                                                    ajax="false"
+                                                                    value="Configure Units"
+                                                                    styleClass="noFill button-size-small"
+                                                                    action="#{propertyProfileBB.onPropUnitExploreButtonChange}"
+                                                                    icon="fa fa-hotel"
+                                                                    />
+
+                                                <p:spacer height="5px" />
+
+                                                <p:dataTable id="prop-units-table"
+                                                             var="unit"
+                                                             value="#{propertyProfileBB.currentProperty.unitWithListsList}"
+                                                             tableStyleClass="primeDataTable"
+                                                             rowKey="#{unit.unitID}"
+                                                             >
+
+                                                    <p:column headerText="Number"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{unit.unitNumber}"/>
+
+                                                    </p:column>
+
+                                                    <p:column headerText="# Occ Periods"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{unit.periodList.size()}"/>
+
+                                                    </p:column>
+
+
+                                                    <p:column headerText="Rent start"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.rentalIntentDateStart)}"/>
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Rent stop"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.rentalIntentDateStart)}"/>
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Last updated"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.lastUpdatedTS)}"/>
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Sys ID"
+                                                              styleClass="centeredColumnContent">
+                                                        <h:outputText value="#{unit.unitID}"/>
+
+
+                                                    </p:column>
+
+                                                    <p:column headerText="Options"
+                                                              styleClass="centeredColumnContent">
+
+                                                        <p:commandButton   id="prop-unit-newperiod-button"
+                                                                           ajax="true"
+                                                                           actionListener="#{propertyOccPeriodsBB.initiateNewOccPeriodCreation(unit)}"
+                                                                           oncomplete="PF('prop-addperiod-dialog-var').show()"
+                                                                           rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                           value="New Occ Period"
+                                                                           icon="fa fa-id-card-o"
+                                                                           />
+
+
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </h:form>
+
+
+
+                                        </p:panel>
+
 
                                         <p:panel id="prop-workflow-panel"
                                                  toggleable="true"
@@ -1264,175 +1433,6 @@
 
                                                 </p:dataTable>
                                             </h:form>
-
-
-                                        </p:panel>
-
-                                        <p:panel    id="prop-cases-panel"
-                                                    toggleable="true"
-                                                    widgetVar="prop-cases-panel-var"
-                                                    collapsed="false"
-                                                    header="Code Enforcement Cases"
-                                                    rendered="#{propertyProfileBB.getActiveViewMode() }">
-                                            <h:form id="prop-cases-panel-form">
-
-                                                <p:commandButton   id="prop-cases-newcase-button"
-                                                                   ajax="fase"
-                                                                   action="#{propertyProfileBB.onCreateNewCaseButtonChange}"
-                                                                   oncomplete="PF('prop-persons-manage-var').show()"
-                                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                                   value="Create New Code Enforcement Case"
-                                                                   icon="fa fa-archive"
-                                                                   />
-
-                                                <p:spacer height="5px" />
-
-                                                <p:dataTable id="prop-cases-table"
-                                                             var="cse"
-                                                             value="#{propertyProfileBB.currentProperty.ceCaseList}"
-                                                             tableStyleClass="primeDataTable"
-                                                             rowKey="#{cse.caseID}"
-                                                             >
-
-                                                    <p:column headerText="Date Opened"
-                                                              styleClass="centeredColumnContent"
-                                                              sortBy="#{cse.originationDate}">
-
-                                                        <h:outputText value="#{!(empty cse.originationDate) ? propertyProfileBB.getPrettyDate(cse.originationDate) : ''}"/>
-
-                                                    </p:column>
-
-                                                    <p:column headerText="Status"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <h:outputText value="#{cse.statusBundle.phase.caseOpen ? 'Open' : 'Closed'}"/>
-
-                                                    </p:column>
-
-                                                    <p:column headerText="Name"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <h:outputText value="#{cse.caseName}"/>
-
-                                                    </p:column>
-
-                                                    <p:column headerText="Manager"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <h:outputText value="#{!(empty cse.caseManager) ? cse.caseManager.person.lastName:'No manager '}"/>
-
-                                                    </p:column>
-                                                    <p:column headerText="ID"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <h:outputText value="#{cse.caseID}"/>
-
-                                                    </p:column>
-
-                                                    <p:column headerText="Options"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <p:commandButton    id="prop-person-viewcase-button"
-                                                                            ajax="false"
-                                                                            styleClass="noFill button-size-small"
-                                                                            action="#{propertyProfileBB.onViewCaseButtonChange(cse)}"
-                                                                            icon="fa fa-folder-open-o"
-                                                                            value="View"
-                                                                            />
-
-                                                    </p:column>
-                                                </p:dataTable>
-                                            </h:form>
-
-                                        </p:panel>
-
-
-                                        <p:panel    id="prop-units-panel"
-                                                    toggleable="true"
-                                                    widgetVar="prop-events-panel-var"
-                                                    collapsed="false"
-                                                    header="Units"
-                                                    rendered="#{propertyProfileBB.getActiveViewMode() }">
-                                            <h:form id="prop-units-panel-form">
-
-
-                                                <p:commandButton    id="prop-units-explore-button"
-                                                                    ajax="false"
-                                                                    value="Configure Units"
-                                                                    styleClass="noFill button-size-small"
-                                                                    action="#{propertyProfileBB.onPropUnitExploreButtonChange}"
-                                                                    icon="fa fa-hotel"
-                                                                    />
-
-                                                <p:spacer height="5px" />
-
-                                                <p:dataTable id="prop-units-table"
-                                                             var="unit"
-                                                             value="#{propertyProfileBB.currentProperty.unitWithListsList}"
-                                                             tableStyleClass="primeDataTable"
-                                                             rowKey="#{unit.unitID}"
-                                                             >
-
-                                                    <p:column headerText="Number"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <h:outputText value="#{unit.unitNumber}"/>
-
-                                                    </p:column>
-
-                                                    <p:column headerText="# Occ Periods"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <h:outputText value="#{unit.periodList.size()}"/>
-
-                                                    </p:column>
-
-
-                                                    <p:column headerText="Rent start"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.rentalIntentDateStart)}"/>
-
-                                                    </p:column>
-
-                                                    <p:column headerText="Rent stop"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.rentalIntentDateStart)}"/>
-
-                                                    </p:column>
-
-                                                    <p:column headerText="Last updated"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.lastUpdatedTS)}"/>
-
-                                                    </p:column>
-
-                                                    <p:column headerText="Sys ID"
-                                                              styleClass="centeredColumnContent">
-                                                        <h:outputText value="#{unit.unitID}"/>
-
-
-                                                    </p:column>
-
-                                                    <p:column headerText="Options"
-                                                              styleClass="centeredColumnContent">
-
-                                                        <p:commandButton   id="prop-unit-newperiod-button"
-                                                                           ajax="true"
-                                                                           actionListener="#{propertyOccPeriodsBB.initiateNewOccPeriodCreation(unit)}"
-                                                                           oncomplete="PF('prop-addperiod-dialog-var').show()"
-                                                                           rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                                           value="New Occ Period"
-                                                                           icon="fa fa-id-card-o"
-                                                                           />
-
-
-                                                    </p:column>
-                                                </p:dataTable>
-                                            </h:form>
-
 
 
                                         </p:panel>

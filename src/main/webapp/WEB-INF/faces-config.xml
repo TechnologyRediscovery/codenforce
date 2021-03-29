@@ -794,6 +794,12 @@
         </navigation-case>
         
         <navigation-case>
+            <from-outcome>propertySearchProfile</from-outcome>
+            <to-view-id>/restricted/cogstaff/prop/propertySearchProfile.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
             <from-outcome>propertyUnits</from-outcome>
             <to-view-id>/restricted/cogstaff/prop/propertyUnits.xhtml</to-view-id>
             <redirect />
@@ -1275,6 +1281,24 @@
             <from-outcome>ceCaseSearchProfile</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/ceCaseSearchProfile.xhtml</to-view-id>
         </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCaseProfile</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseProfile.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>ceCaseListCustom</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/caseQueryCustomExportTable.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>ceCaseSearch</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/ceCaseSearch.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+        
         <navigation-case>
             <from-outcome>ceCaseWorkflow</from-outcome>
             <to-view-id>/restricted/cogstaff/ce/ceCaseSearchProfile.xhtml</to-view-id>
@@ -2154,6 +2178,9 @@
         <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-    
-    
+    <managed-bean>
+        <managed-bean-name>cECaseListExport</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseListExport</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
 </faces-config>

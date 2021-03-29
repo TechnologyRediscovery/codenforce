@@ -41,6 +41,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     
     private ReportConfigCECase reportCECase;
     private ReportConfigCECaseList reportCECaseList;
+    private ReportConfigCECaseList reportCECaseListCustom;
     
     private Report currentReport;
    
@@ -89,6 +90,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         
         reportCECase = getSessionBean().getReportConfigCECase();
         reportCECaseList = getSessionBean().getReportConfigCECaseList();
+        
         reportConfigOccPermit = getSessionBean().getReportConfigOccPermit();
         reportConfigOccInspection = getSessionBean().getReportConfigInspection();
         
@@ -340,6 +342,20 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
      */
     public void setReportConfigOccPermit(ReportConfigOccPermit reportConfigOccPermit) {
         this.reportConfigOccPermit = reportConfigOccPermit;
+    }
+
+    /**
+     * @return the reportCECaseListCustom
+     */
+    public ReportConfigCECaseList getReportCECaseListCustom() {
+        return reportCECaseListCustom;
+    }
+
+    /**
+     * @param reportCECaseListCustom the reportCECaseListCustom to set
+     */
+    public void setReportCECaseListCustom(ReportConfigCECaseList reportCECaseListCustom) {
+        this.reportCECaseListCustom = reportCECaseListCustom;
     }
 
    

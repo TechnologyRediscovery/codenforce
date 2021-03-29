@@ -42,6 +42,7 @@ import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -232,10 +233,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public void cecase_forceclose(CECaseDataHeavy cse, EventCategory closeEventCat, UserAuthorized ua) throws BObStatusException, IntegrationException, EventException{
         CaseIntegrator ci = getCaseIntegrator();
         EventCoordinator ec = getEventCoordinator();
-        
-        if(cse.getClosingDate() != null){
-            throw new BObStatusException("Cannot force close an already closed case");
+        if(cse == null){
+            throw new BObStatusException("Cannot close a null case");
         }
+//        if(cse.getClosingDate() != null){
+//            throw new BObStatusException("Cannot force close an already closed case");
+//        }
         if(closeEventCat == null){
             throw new BObStatusException("Cannot close case with null closing event");
         }
@@ -253,9 +256,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             }
         }
         
-        cse.setClosingDate(LocalDateTime.now());
+//        cse.setClosingDate(LocalDateTime.now());
         ci.updateCECaseMetadata(cse);
-        events_processClosingEvent(cse, ec.initEvent(cse, closeEventCat));
+        events_processClosingEvent(cse, ec.initEvent(cse, closeEventCat), ua);
         
     }
 
@@ -276,16 +279,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             cse = ci.getCECase(caseID);
             if (cse != null) {
 
+                // Inject all cases with lists of their violations, notices, citations, 
+                // and events, which will be used to determine case phase
                 cse.setNoticeList(nov_getNoticeOfViolationList(ci.novGetList(cse)));
                 Collections.sort(cse.getNoticeList());
                 Collections.reverse(cse.getNoticeList());
 
-                cse.setCitationList(ci.getCitations(cse));
+                cse.setCitationList(citation_getCitationList(cse));
 
                 cse.setViolationList(violation_getCodeViolations(ci.getCodeViolations(cse.getCaseID())));
                 Collections.sort(cse.getViolationList());
                 
                 cse.setEventList(ec.getEventList(cse));
+                Collections.sort(cse.getEventList());
+                Collections.reverse(cse.getEventList());
 
                 cse = cecase_configureCECaseStageAndPhase(cse);
             }
@@ -869,11 +876,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * (opening date, closing date, etc.). If all is well, pass to integrator.
      *
      * @param c the CECaseDataHeavy to be updated
+     * @param ua the user doing the updating
      * @throws BObStatusException
      * @throws IntegrationException
      */
-    public void cecase_updateCECaseMetadata(CECaseDataHeavy c) throws BObStatusException, IntegrationException {
+    public void cecase_updateCECaseMetadata(CECaseDataHeavy c, UserAuthorized ua) throws BObStatusException, IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
+        if(ua == null || c == null) throw new BObStatusException("Cannot update case with null case or user");
+        // the supplied user is the updator
+        c.setLastUpdatedBy(ua);
+        // Logic check for changes to the case closing date
         if (c.getClosingDate() != null) {
             if (c.getClosingDate().isBefore(c.getOriginationDate())) {
                 throw new BObStatusException("You cannot update a case's origination date to be after its closing date");
@@ -981,26 +993,38 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             return null;
         }
         
-        QueryCECase query_opened = sc.initQuery(QueryCECaseEnum.OPENED_30DAYS, ua.getKeyCard());
+        QueryCECase query_opened = sc.initQuery(QueryCECaseEnum.OPENED_INDATERANGE, ua.getKeyCard());
         SearchParamsCECase spcse = query_opened.getPrimaryParams();
         spcse.setDate_startEnd_ctl(true);
         spcse.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATIONTS);
         spcse.setDate_start_val(rpt.getDate_start_val());
         spcse.setDate_end_val(rpt.getDate_end_val());
-        rpt.setCaseListOpened(sc.runQuery(query_opened).getBOBResultList());
-        if(rpt.getCaseListOpened() != null){
-            System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpened().size());
+        rpt.setCaseListOpenedInDateRange(sc.runQuery(query_opened).getBOBResultList());
+        if(rpt.getCaseListOpenedInDateRange() != null){
+            System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpenedInDateRange().size());
         }
         
-        QueryCECase query_active = sc.initQuery(QueryCECaseEnum.OPENCASES, ua.getKeyCard());
-        spcse = query_active.getPrimaryParams();
-        spcse.setDate_startEnd_ctl(false);
+        QueryCECase query_active_asof = sc.initQuery(QueryCECaseEnum.OPEN_ASOFENDDATE, ua.getKeyCard());
+        spcse = query_active_asof.getPrimaryParams();
         spcse.setDate_start_val(rpt.getDate_start_val());
         spcse.setDate_end_val(rpt.getDate_end_val());
-        rpt.setCaseListCurrent(sc.runQuery(query_active).getBOBResultList());
-        if(rpt.getCaseListCurrent() != null){
-            System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListCurrent().size());
+        rpt.setCaseListOpenAsOfDateEnd(sc.runQuery(query_active_asof).getBOBResultList());
+        if(rpt.getCaseListOpenAsOfDateEnd() != null){
+            System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpenAsOfDateEnd().size());
+            // compute average case age for opened as of date list
+            if(!rpt.getCaseListOpenAsOfDateEnd().isEmpty()){
+                long sumOfAges = 0l;
+                for(CECase cse: rpt.getCaseListOpenAsOfDateEnd()){
+                    sumOfAges += cse.getCaseAgeAsOf(rpt.getDate_end_val());
+                }
+                double avg = (double) sumOfAges / (double) rpt.getCaseListOpenAsOfDateEnd().size();
+                rpt.setAverageAgeOfCasesOpenAsOfReportEndDate(avg);
+            }
         }
+        
+        
+        
+        
         
         QueryCECase query_closed = sc.initQuery(QueryCECaseEnum.CLOSED_CASES, ua.getKeyCard());
         spcse = query_closed.getPrimaryParams();
@@ -1008,9 +1032,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         spcse.setDate_startEnd_ctl(true);
         spcse.setDate_start_val(rpt.getDate_start_val());
         spcse.setDate_end_val(rpt.getDate_end_val());
-        rpt.setCaseListClosed(sc.runQuery(query_closed).getBOBResultList());
-        if(rpt.getCaseListClosed() != null){
-            System.out.println("CaseCoordinator.report_buildCECaseListReport: Current List size " + rpt.getCaseListClosed().size());
+        rpt.setCaseListClosedInDateRange(sc.runQuery(query_closed).getBOBResultList());
+        if(rpt.getCaseListClosedInDateRange() != null){
+            System.out.println("CaseCoordinator.report_buildCECaseListReport: Current List size " + rpt.getCaseListClosedInDateRange().size());
         }
         
         QueryEvent query_ev = sc.initQuery(QueryEventEnum.MUNI_MONTHYACTIVITY, ua.getKeyCard());
@@ -1236,7 +1260,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      * @throws BObStatusException
      */
-    private int events_processClosingEvent(CECaseDataHeavy c, EventCnF e) throws IntegrationException, BObStatusException {
+    private int events_processClosingEvent(CECaseDataHeavy c, EventCnF e, UserAuthorized ua) throws IntegrationException, BObStatusException {
         EventIntegrator ei = getEventIntegrator();
 
         CasePhaseEnum closedPhase = CasePhaseEnum.Closed;
@@ -1244,7 +1268,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         if(c.getClosingDate() == null){
             c.setClosingDate(LocalDateTime.now());
-            cecase_updateCECaseMetadata(c);
+            cecase_updateCECaseMetadata(c, ua);
         }
         // now load up the closing event before inserting it
         // we'll probably want to get this text from a resource file instead of
@@ -1380,18 +1404,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         } else {
             throw new BObStatusException("Notice is already locked and queued for sending");
         }
-        EventCnF noticeEvent = evCoord.initEvent(c, evCoord.initEventCategory(Integer.parseInt(getResourceBundle(
-                Constants.EVENT_CATEGORY_BUNDLE).getString("noticeQueued"))));
-        
-        String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
-        
-        noticeEvent.setDescription(queuedNoticeEventNotes);
-        noticeEvent.setUserCreator(ua);
-        
-        ArrayList<Person> persList = new ArrayList();
-        persList.add(nov.getRecipient());
-        noticeEvent.setPersonList(persList);
-        evCoord.addEvent(noticeEvent, c, ua);
+     
+        // Deactivated notice event for lock and queue--only for mailing
+//        EventCnF noticeEvent = evCoord.initEvent(c, evCoord.initEventCategory(Integer.parseInt(getResourceBundle(
+//                Constants.EVENT_CATEGORY_BUNDLE).getString("noticeQueued"))));
+//        
+//        String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
+//        
+//        noticeEvent.setDescription(queuedNoticeEventNotes);
+//        noticeEvent.setUserCreator(ua);
+//        
+//        ArrayList<Person> persList = new ArrayList();
+//        persList.add(nov.getRecipient());
+//        noticeEvent.setPersonList(persList);
+//        evCoord.addEvent(noticeEvent, c, ua);
     }
     
     
@@ -1645,6 +1671,27 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     // *************************************************************************
     // *                     CITATIONS                                         *
     // *************************************************************************
+    
+    /**
+     * Logic container for assembling a list of citations by a CECase
+     * @param cse
+     * @return fully-baked citation objects
+     * @throws IntegrationException 
+     */
+    private List<Citation> citation_getCitationList(CECase cse) throws IntegrationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        List<Citation> citList = new ArrayList<>();
+        if(cse!= null){
+            List<Integer> citIDList = ci.getCitations(cse);
+            if(citIDList != null && !citIDList.isEmpty()){
+                for(Integer i: citIDList){
+                    citList.add(citation_getCitation(i));
+                }
+            }
+        }
+        return citList;
+    }
+    
     /**
      * Getter for Citation objects
      *
@@ -1655,6 +1702,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public Citation citation_getCitation(int citationID) throws IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
         Citation cit = ci.getCitation(citationID);
+        cit.setViolationList(ci.getCodeViolations(ci.getCodeViolations(citationID)));
+        
 
         return cit;
 
@@ -1686,16 +1735,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         cit.setIsActive(true);
         cit.setStatus(citation_getStartingCitationStatus());
         cit.setOrigin_courtentity(getSessionBean().getSessMuni().getCourtEntities().get(0));
-        List<CodeViolation> l = new ArrayList<>();
+        List<CodeViolation> cvlst = new ArrayList<>();
         if (cse.getViolationList() != null && !cse.getViolationList().isEmpty()) {
-
             for (CodeViolation v : cse.getViolationList()) {
                 if (v.getActualComplianceDate() == null) {
-                    l.add(v);
+                    cvlst.add(v);
+                    System.out.println("CaseCoordinator.citation_getCitationSkeleton: Adding ViolID: " + v.getViolationID());
                 }
             }
         }
-        cit.setViolationList(l);
+        cit.setViolationList(cvlst);
 
         return cit;
 
@@ -1765,10 +1814,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      *
      * @param c
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public void citation_updateCitation(Citation c) throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
-        if (c.getStatus() != null && !c.getStatus().isNonStatusEditsForbidden()) {
+        if (c.getStatus() != null) {
             ci.updateCitation(c);
         } else {
             throw new BObStatusException("Cannot update this citation at its current status");
@@ -1785,12 +1835,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      */
     public void citation_removeCitation(Citation c) throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
-        if (c.getStatus() != null && !c.getStatus().isNonStatusEditsForbidden()) {
+        
+        if(c != null){
             c.setIsActive(false);
             ci.updateCitation(c);
-        } else {
-            throw new BObStatusException("Cannot remove this citation at its current status");
         }
+        // Deactivated to allow for any citation to be removed
+        
+
+//        if (c.getStatus() != null && !c.getStatus().isNonStatusEditsForbidden()) {
+//            c.setIsActive(false);
+//            ci.updateCitation(c);
+//        } else {
+//            throw new BObStatusException("Cannot remove this citation at its current status");
+//        }
 
     }
 
@@ -1999,7 +2057,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
     /**
      * Standard coordinator method which calls the integration method after
-     * checking businses rules. ALSO coordinates creating a corresponding
+     * checking business rules. ALSO coordinates creating a corresponding
      * proposal to match the stipulated compliance date on the violation that's
      * added.
      *
@@ -2016,6 +2074,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public int violation_attachViolationToCase(CodeViolation cv, CECaseDataHeavy cse, UserAuthorized ua)
             throws IntegrationException, ViolationException, BObStatusException, EventException, SearchException {
 
+        if(cv == null || cse == null || ua == null) throw new BObStatusException("Cannot attach violation with null viol, case, or user");
+        
+        
         CaseIntegrator ci = getCaseIntegrator();
         EventCoordinator ec = getEventCoordinator();
         UserCoordinator uc = getUserCoordinator();
@@ -2072,12 +2133,19 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         SystemIntegrator si = getSystemIntegrator();
         CaseIntegrator ci = getCaseIntegrator();
         
-        cv.setBlobList(ci.loadViolationPhotoList(cv));
+        // TODO: NADGIT photo stuff
+//        cv.setBlobList(ci.loadViolationPhotoList(cv));
         
         cv.setCitationIDList(ci.getCitations(cv.getViolationID()));
         cv.setNoticeIDList(ci.novGetNOVIDList(cv));
         
-        if (cv.getActualComplianceDate() == null) {
+        // nullification overrides all
+        if(cv.getNullifiedTS() != null){
+                cv.setStatus(ViolationStatusEnum.NULLIFIED);
+                cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
+                        .getString(cv.getStatus().getIconPropertyName()))));
+            
+        } else if (cv.getActualComplianceDate() == null) {
             // violation still within compliance timeframe
             if (cv.getDaysUntilStipulatedComplianceDate() >= 0) {
 
@@ -2117,9 +2185,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws ViolationException
      */
     private void violation_verifyCodeViolationAttributes(CECaseDataHeavy cse, CodeViolation cv) throws ViolationException {
+        if(cse == null || cv == null) throw new ViolationException("Cannot verify code violation attributes with null case or violation");
+        
         if (cse.getStatusBundle().getPhase() == CasePhaseEnum.Closed) {
             throw new ViolationException("Cannot update code violations on closed cases!");
-
         }
         if (cv.getStipulatedComplianceDate().isBefore(cv.getDateOfRecord())) {
             throw new ViolationException("Stipulated compliance date cannot be before the violation's date of record");
@@ -2147,7 +2216,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 // check to make sure that particular ordinance isn't already on the case
                 for (CodeViolation tempCv : vlst) {
                     if(tempCv.getViolatedEnfElement().getCodeSetElementID() == ece.getCodeSetElementID()){
-                        throw new BObStatusException("Violatio of ordiance with ID " + ece.getCodeSetElementID());
+                        throw new BObStatusException("Duplicate Violation of ordiance with ID " + ece.getCodeSetElementID() + "Select a different ordinance, please!");
                     }
                 }
             }
@@ -2315,14 +2384,79 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         // inject appropriate values into CV before updating
         if(cv != null && ua != null){
             // cannot nullify a violation for which compliance has been achieved
-            if(cv.getActualComplianceDate() != null){
+            if(cv.getActualComplianceDate() == null){
                 cv.setNullifiedTS(LocalDateTime.now());
                 cv.setNullifiedUser(ua);
+                System.out.println("CaseCoordinator.violation_NullifyCodeViolation: ready to nullify in integrator");
                 ci.updateCodeViolation(cv);
+            } else {
+                throw new BObStatusException("Cannot nullify a violation that has compliance marked");
+                
             }
+        } else {
+            throw new BObStatusException("Cannot nullify a violation with null CV or User");
+            
         }
+        
 
     }
+    
+    /**
+     * Wires up a given violation's findings to be the default findings for violations
+     * of the given enforcable code element inside the CodeViolation passed in
+     * TODO: Add option of checking that user's permissions and updating all those
+     * muni's code sets as well
+     * 
+     * @param cv
+     * @param ua 
+     * @param cascadeToAuthCodebooks triggers the calling of an internal method for updating 
+     * all code books that are default in any muni in which the UserAuthorized has 
+     * enforcement official permissions (or better)
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public void violation_makeFindingsDefaultInCodebook(CodeViolation cv, UserAuthorized ua, boolean cascadeToAuthCodebooks) throws BObStatusException, IntegrationException{
+       
+       if(cv == null || ua == null) throw new BObStatusException("Cannot update default findings with null violation, codeset, or user");
+       UserCoordinator uc = getUserCoordinator();
+       MunicipalityCoordinator mc = getMuniCoordinator();
+        
+        
+       violation_makeFindingsDefault(cv.getDescription(), cv.getViolatedEnfElement(), ua);
+        
+       
+               
+    } 
+
+    /**
+     * Internal operational code to determine which muni's the user has enforcement official
+     * permissions (or better), and update their codebooks that contain this same
+     * ordinance with default findings
+     * @param cv
+     * @param ua 
+     */
+    private void violation_makeFindingsDefault(String defFindings, EnforcableCodeElement ece, UserAuthorized ua) throws IntegrationException{
+
+        CodeIntegrator ci = getCodeIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+        ece.setDefaultViolationDescription(defFindings); 
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        mbp.setUser(ua);
+        mbp.setExistingContent(ece.getNotes());
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("Default findings changed to: ");
+        sb.append(defFindings);
+        sb.append(" from: ");
+        sb.append(ece.getDefaultViolationDescription());
+        mbp.setNewMessageContent(sb.toString());
+        
+        ece.setNotes(sc.appendNoteBlock(mbp));
+        ci.updateCodeElement(ece);
+        
+        
+    }
+    
+    
 
     /**
      * Logic gateway for updates to a code violation's stipulated compliance date
@@ -2385,8 +2519,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public void violation_recordCompliance(CECaseDataHeavy cse, CodeViolation cv, UserAuthorized u) 
             throws IntegrationException, BObStatusException, ViolationException, EventException {
 
+        if(cse == null || cv == null || u == null ) throw new BObStatusException("Cannot record compliance on null case, viol, or user");
+        if(cv.getActualComplianceDate() == null){
+            throw new ViolationException("Cannot set compliance with null actual compliance date");
+        }
+        
         CaseIntegrator ci = getCaseIntegrator();
-
+        
         // update violation record for compliance
         cv.setComplianceUser(u);
         cv.setLastUpdatedUser(u);

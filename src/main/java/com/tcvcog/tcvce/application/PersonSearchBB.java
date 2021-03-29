@@ -115,6 +115,10 @@ public class PersonSearchBB extends BackingBeanUtils{
     
     }
         
+    
+    /**
+     * Listener method for changes to the query drop down box
+     */
     public void changeQuerySelected(){
         
         if(querySelected != null && querySelected.getPrimaryParams() != null){

@@ -30,11 +30,18 @@ public class ReportConfigCECaseList
     
     private boolean includeExtendedPropertyDetails;
     
-    private List<CECaseDataHeavy> caseListOpened;
-    private List<CECaseDataHeavy> caseListCurrent;
-    private List<CECaseDataHeavy> caseListClosed;
+    private List<CECaseDataHeavy> caseListCustomQueryExport;
+    
+    private List<CECaseDataHeavy> caseListOpenedInDateRange;
+    private List<CECaseDataHeavy> caseListOpenAsOfDateEnd;
+    private List<CECaseDataHeavy> caseListClosedInDateRange;
     
     private List<EventCnFPropUnitCasePeriodHeavy> eventList;
+    
+    // Metrics
+    private double averageAgeOfCasesClosed;
+    private double averageAgeOfCasesOpenAsOfReportEndDate;
+    
 
     /**
      * @return the includeListSummaryFigures
@@ -131,45 +138,45 @@ public class ReportConfigCECaseList
     }
 
     /**
-     * @return the caseListOpened
+     * @return the caseListOpenedInDateRange
      */
-    public List<CECaseDataHeavy> getCaseListOpened() {
-        return caseListOpened;
+    public List<CECaseDataHeavy> getCaseListOpenedInDateRange() {
+        return caseListOpenedInDateRange;
     }
 
     /**
-     * @return the caseListCurrent
+     * @return the caseListOpenAsOfDateEnd
      */
-    public List<CECaseDataHeavy> getCaseListCurrent() {
-        return caseListCurrent;
+    public List<CECaseDataHeavy> getCaseListOpenAsOfDateEnd() {
+        return caseListOpenAsOfDateEnd;
     }
 
     /**
-     * @return the caseListClosed
+     * @return the caseListClosedInDateRange
      */
-    public List<CECaseDataHeavy> getCaseListClosed() {
-        return caseListClosed;
+    public List<CECaseDataHeavy> getCaseListClosedInDateRange() {
+        return caseListClosedInDateRange;
     }
 
     /**
-     * @param caseListOpened the caseListOpened to set
+     * @param caseListOpenedInDateRange the caseListOpenedInDateRange to set
      */
-    public void setCaseListOpened(List<CECaseDataHeavy> caseListOpened) {
-        this.caseListOpened = caseListOpened;
+    public void setCaseListOpenedInDateRange(List<CECaseDataHeavy> caseListOpenedInDateRange) {
+        this.caseListOpenedInDateRange = caseListOpenedInDateRange;
     }
 
     /**
-     * @param caseListCurrent the caseListCurrent to set
+     * @param caseListOpenAsOfDateEnd the caseListOpenAsOfDateEnd to set
      */
-    public void setCaseListCurrent(List<CECaseDataHeavy> caseListCurrent) {
-        this.caseListCurrent = caseListCurrent;
+    public void setCaseListOpenAsOfDateEnd(List<CECaseDataHeavy> caseListOpenAsOfDateEnd) {
+        this.caseListOpenAsOfDateEnd = caseListOpenAsOfDateEnd;
     }
 
     /**
-     * @param caseListClosed the caseListClosed to set
+     * @param caseListClosedInDateRange the caseListClosedInDateRange to set
      */
-    public void setCaseListClosed(List<CECaseDataHeavy> caseListClosed) {
-        this.caseListClosed = caseListClosed;
+    public void setCaseListClosedInDateRange(List<CECaseDataHeavy> caseListClosedInDateRange) {
+        this.caseListClosedInDateRange = caseListClosedInDateRange;
     }
 
     /**
@@ -184,6 +191,48 @@ public class ReportConfigCECaseList
      */
     public void setEventList(List<EventCnFPropUnitCasePeriodHeavy> eventList) {
         this.eventList = eventList;
+    }
+
+    /**
+     * @return the averageAgeOfCasesClosed
+     */
+    public double getAverageAgeOfCasesClosed() {
+        return averageAgeOfCasesClosed;
+    }
+
+    /**
+     * @return the averageAgeOfCasesOpenAsOfReportEndDate
+     */
+    public double getAverageAgeOfCasesOpenAsOfReportEndDate() {
+        return averageAgeOfCasesOpenAsOfReportEndDate;
+    }
+
+    /**
+     * @param averageAgeOfCasesClosed the averageAgeOfCasesClosed to set
+     */
+    public void setAverageAgeOfCasesClosed(double averageAgeOfCasesClosed) {
+        this.averageAgeOfCasesClosed = averageAgeOfCasesClosed;
+    }
+
+    /**
+     * @param averageAgeOfCasesOpenAsOfReportEndDate the averageAgeOfCasesOpenAsOfReportEndDate to set
+     */
+    public void setAverageAgeOfCasesOpenAsOfReportEndDate(double averageAgeOfCasesOpenAsOfReportEndDate) {
+        this.averageAgeOfCasesOpenAsOfReportEndDate = averageAgeOfCasesOpenAsOfReportEndDate;
+    }
+
+    /**
+     * @return the caseListCustomQueryExport
+     */
+    public List<CECaseDataHeavy> getCaseListCustomQueryExport() {
+        return caseListCustomQueryExport;
+    }
+
+    /**
+     * @param caseListCustomQueryExport the caseListCustomQueryExport to set
+     */
+    public void setCaseListCustomQueryExport(List<CECaseDataHeavy> caseListCustomQueryExport) {
+        this.caseListCustomQueryExport = caseListCustomQueryExport;
     }
     
     

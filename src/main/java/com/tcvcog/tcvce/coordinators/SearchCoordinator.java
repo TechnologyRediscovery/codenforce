@@ -52,6 +52,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     private static final int PASTPERIOD_YEAR = 365;
     private static final int PASTPERIOD_TODAY = 0;
     
+    private static final long DAYS_IN_WEEK = 7;
+    private static final long HOURS_IN_DAY = 24;
+    
+    
     
     /**
      * Creates a new instance of SearchCoordinator
@@ -724,6 +728,15 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
              case MUNI_MONTHYACTIVITY:
                  paramsList.add(genParams_event_muniMonthly(params, cred));
                  break;
+             case MUNI_24HR_ACTIVITY:
+                 paramsList.add(genParams_event_muni24HR(params, cred));
+                 break;
+             case MUNI_7DAY_ACTIVITY:
+                 paramsList.add(genParams_event_muni7Day(params, cred));
+                 break;
+             case MUINI_FUTURE_7DAYS:
+                 paramsList.add(genParams_event_future7days(params, cred));
+                 break;
              case OCCPERIOD:
                  paramsList.add(genParams_event_occperid(params, cred));
                  break;
@@ -803,8 +816,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 break;
             case CURRENT_TIMEFRAMES:
                 break;
-            case OPENED_30DAYS:
+            case OPENED_INDATERANGE:
                 paramsList.add(genParams_CECase_openedInDateRange(params, cred));
+                break;
+            case OPEN_ASOFENDDATE:
+                paramsList.add(genParams_ceCase_openAsOf(params, cred));
                 break;
             case CLOSED_CASES:
                 paramsList.add(genParams_CECase_closedInDateRange(params, cred));
@@ -1391,9 +1407,58 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
     public SearchParamsEvent genParams_event_muniMonthly(SearchParamsEvent params, Credential cred ){
         params.setDate_startEnd_ctl(true);
-        params.setDate_field(SearchParamsEventDateFieldsEnum.CREATED_TS);
+        params.setDate_field(SearchParamsEventDateFieldsEnum.TIME_START);
         params.setDate_end_val(LocalDateTime.now());
         params.setDate_start_val(LocalDateTime.now().minusDays(30));
+        params.setLimitResultCount_ctl(false);
+        params.setEventDomain_ctl(true);
+        params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
+        
+        // all other event controls are off by default
+        
+        return params;
+        
+    }
+    
+    
+    public SearchParamsEvent genParams_event_muni24HR(SearchParamsEvent params, Credential cred ){
+        params.setDate_startEnd_ctl(true);
+        params.setDate_field(SearchParamsEventDateFieldsEnum.TIME_START);
+        params.setDate_end_val(LocalDateTime.now());
+        params.setDate_start_val(LocalDateTime.now().minusHours(HOURS_IN_DAY));
+        params.setLimitResultCount_ctl(false);
+        params.setEventDomain_ctl(true);
+        params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
+        
+        // all other event controls are off by default
+        
+        return params;
+        
+    }
+    
+    
+    public SearchParamsEvent genParams_event_muni7Day(SearchParamsEvent params, Credential cred ){
+        params.setDate_startEnd_ctl(true);
+        params.setDate_field(SearchParamsEventDateFieldsEnum.TIME_START);
+        params.setDate_end_val(LocalDateTime.now());
+        params.setDate_start_val(LocalDateTime.now().minusDays(DAYS_IN_WEEK));
+        params.setLimitResultCount_ctl(false);
+        params.setEventDomain_ctl(true);
+        params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
+        
+        // all other event controls are off by default
+        
+        return params;
+        
+    }
+    
+    
+    
+    public SearchParamsEvent genParams_event_future7days(SearchParamsEvent params, Credential cred ){
+        params.setDate_startEnd_ctl(true);
+        params.setDate_field(SearchParamsEventDateFieldsEnum.TIME_START);
+        params.setDate_start_val(LocalDateTime.now());
+        params.setDate_end_val(LocalDateTime.now().plusDays(DAYS_IN_WEEK));
         params.setLimitResultCount_ctl(false);
         params.setEventDomain_ctl(true);
         params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
@@ -1530,6 +1595,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setPropInfoCase_val(false);
         
         // filter CECASE-5
+        // THIS SHOULD PROBABLY BE DEFAULT TO CTL TRUE and VAL FALSE
         params.setPersonInfoCase_ctl(false);
         params.setPersonInfoCase_val(false);
         
@@ -1712,6 +1778,36 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         params.setPropInfoCase_ctl(true);
         params.setPropInfoCase_val(false);
+        
+        return params;
+    }
+    
+    public SearchParamsCECase genParams_ceCase_openAsOf(SearchParamsCECase params, Credential cred){
+        params.setFilterName("Finds cases that were open on a given close date");
+        
+        // STANDARD SWITCHES
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+        params.setPersonInfoCase_ctl(true);
+        params.setPersonInfoCase_val(false);
+        
+        params.setPropInfoCase_ctl(true);
+        params.setPropInfoCase_val(false);
+        
+        // SPECIFIC TO THIS QUERY
+        params.setDate_startEnd_ctl(true);
+        params.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATION_DOFRECORD);
+        params.setDate_relativeDates_ctl(false);
+        
+        // start a long time ago
+        params.setDate_start_val(LocalDateTime.now().minusYears(100));
+        // go up til stop date of query
+        params.setDate_end_val(params.getDate_end_val());
+        
+        // but make sure they are open cases
+        params.setCaseOpen_ctl(true);
+        params.setCaseOpen_val(true);
         
         return params;
     }
