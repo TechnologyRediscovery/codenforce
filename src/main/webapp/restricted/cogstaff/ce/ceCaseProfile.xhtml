@@ -442,7 +442,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                      styleClass="noFill"
                                                                      icon="fa fa-send" 
                                                                      update="cecase-novfollowup-dialog
-                                                                     cecase-novfollowup-dialog-form"
+                                                                     cecase-novfollowup-form:nov-followup-days-innum"
                                                                      oncomplete="PF('cecase-novfollowup-dialog-var').show()"
                                                                      disabled="#{!(empty nov.sentTS) or (empty nov.lockedAndqueuedTS) }"
                                                                      />
@@ -642,7 +642,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </p:column>
 
                                                 <p:column headerText="Description"
-                                                          styleClass="centeredColumnContent">
+                                                          styleClass="centeredColumnContent wrapText">
 
                                                     <h:outputText value="#{eventfuture.description}"/>
 
@@ -748,17 +748,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                 </p:column>
 
-                                                <p:column width="10%">
+                                                <p:column width="10%"
+                                                          styleClass="wrapText">
+                                                    
                                                     <f:facet name="header">
                                                         <h:outputText value="Ordinance" />
                                                     </f:facet>
+                                                    
                                                     <h:outputText  value="&#167;#{v.violatedEnfElement.ordSecNum}:" />
                                                     <h:outputText  value="#{v.violatedEnfElement.ordSecTitle}; " />
                                                     <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
                                                     <h:outputText  value="#{v.violatedEnfElement.ordSubSecTitle}" />
+                                                    
                                                 </p:column>
 
-                                                <p:column width="10%">
+                                                <p:column width="10%"
+                                                          styleClass="wrapText">
                                                     <f:facet name="header">
                                                         <h:outputText value="Date" />
                                                     </f:facet>
@@ -879,11 +884,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <p:dataTable id="cecase-events-table"
                                                          var="event"
-                                                         resizableColumns="true"
                                                          sortMode="multiple"
                                                          value="#{ceCaseSearchProfileBB.currentCase.getEventList(ceCaseSearchProfileBB.eventViewOptionSelected)}"
                                                          tableStyleClass="primeDataTable"
                                                          rowKey="#{event.eventID}"
+                                                         reflow="true"
                                                          >
 
                                                 <p:column headerText="ID"
@@ -915,10 +920,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </p:column>
 
                                                 <p:column headerText="Description"
-                                                          styleClass="centeredColumnContent">
-
+                                                          styleClass="centeredColumnContent wrapText">
+                                                    
                                                     <h:outputText value="#{event.description}"/>
-
+                                                    
                                                 </p:column>
 
                                                 <p:column headerText="Actions"
@@ -2431,24 +2436,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                     <p:dialog     id="cecase-novfollowup-dialog"
-                                  header="Create follow-up event" 
+                                  header="Mark Notice ID #{noticeOfViolationBB.currentNotice.noticeID} as mailed" 
                                   widgetVar="cecase-novfollowup-dialog-var" 
                                   responsive="true" 
                                   resizable="true"
                                   closeOnEscape="true"
                                   closable="true"
-                                  width="300"
+                                  width="400"
                                   modal="true"
-                                  height="250">
+                                  height="450">
                         <h:form id="cecase-novfollowup-form">
 
-                            
+                            <p:outputLabel for="nov-createfollupupevent-sbcb"
+                                           value="Create follow up event" />
                             <p:selectBooleanCheckbox id="nov-createfollupupevent-sbcb"
                                                      value="#{noticeOfViolationBB.nov_createNoticeFollowupEvent}" 
                                                      >
                                 <p:ajax update="nov-followup-days-innum" />
                             </p:selectBooleanCheckbox>
+                            <p:spacer height="5px" />
                             
+                            <p:outputLabel for="nov-followup-days-innum"
+                                           value="Number of days in future:" />
                             <p:inputNumber id="nov-followup-days-innum" 
                                            value="#{noticeOfViolationBB.currentNotice.followupEventDaysRequest}" 
                                            disabled="#{!noticeOfViolationBB.nov_createNoticeFollowupEvent}"
@@ -2469,16 +2478,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 />
 
                             <p:commandButton id="nov-mailednotice-cb"
-                                             ajax="true" 
-                                             actionListener="#{noticeOfViolationBB.markNoticeOfViolationAsSent(nov)}"
+                                             ajax="false" 
+                                             actionListener="#{noticeOfViolationBB.markNoticeOfViolationAsSent}"
                                              value="Mark as mailed!" 
                                              styleClass="noFill"
                                              icon="fa fa-send" 
-                                             update="novstatus-dialog 
-                                             cecase-notices-form
-                                             messages-global-form"
-                                             oncomplete="PF('cecase-novfollowup-dialog-var').hide()"
-                                             disabled="#{!(empty nov.sentTS) or (empty nov.lockedAndqueuedTS) }"
+                                            
+                                             disabled="false"
                                              />
 
                         </h:form>

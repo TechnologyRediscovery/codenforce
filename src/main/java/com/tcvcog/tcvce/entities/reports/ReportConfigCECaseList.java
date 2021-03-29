@@ -30,6 +30,8 @@ public class ReportConfigCECaseList
     
     private boolean includeExtendedPropertyDetails;
     
+    private List<CECaseDataHeavy> caseListCustomQueryExport;
+    
     private List<CECaseDataHeavy> caseListOpenedInDateRange;
     private List<CECaseDataHeavy> caseListOpenAsOfDateEnd;
     private List<CECaseDataHeavy> caseListClosedInDateRange;
@@ -217,6 +219,20 @@ public class ReportConfigCECaseList
      */
     public void setAverageAgeOfCasesOpenAsOfReportEndDate(double averageAgeOfCasesOpenAsOfReportEndDate) {
         this.averageAgeOfCasesOpenAsOfReportEndDate = averageAgeOfCasesOpenAsOfReportEndDate;
+    }
+
+    /**
+     * @return the caseListCustomQueryExport
+     */
+    public List<CECaseDataHeavy> getCaseListCustomQueryExport() {
+        return caseListCustomQueryExport;
+    }
+
+    /**
+     * @param caseListCustomQueryExport the caseListCustomQueryExport to set
+     */
+    public void setCaseListCustomQueryExport(List<CECaseDataHeavy> caseListCustomQueryExport) {
+        this.caseListCustomQueryExport = caseListCustomQueryExport;
     }
     
     

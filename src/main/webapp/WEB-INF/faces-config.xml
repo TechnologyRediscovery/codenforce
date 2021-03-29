@@ -1287,6 +1287,11 @@
             <to-view-id>/restricted/cogstaff/ce/ceCaseProfile.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+        <navigation-case>
+            <from-outcome>ceCaseListCustom</from-outcome>
+            <to-view-id>/restricted/cogstaff/ce/caseQueryCustomExportTable.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
         
         <navigation-case>
             <from-outcome>ceCaseSearch</from-outcome>
@@ -2173,6 +2178,9 @@
         <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-    
-    
+    <managed-bean>
+        <managed-bean-name>cECaseListExport</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseListExport</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
 </faces-config>

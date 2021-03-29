@@ -268,6 +268,7 @@ public class    SessionBean
     
     private ReportConfigCECase reportConfigCECase;
     private ReportConfigCECaseList reportConfigCECaseList;
+    
     private ReportConfigCEEventList reportConfigCEEventList;
     
     private ReportConfigOccInspection reportConfigInspection;
@@ -1581,5 +1582,6 @@ public class    SessionBean
     public void setQueryEventFuture7Days(QueryEvent queryEventFuture7Days) {
         this.queryEventFuture7Days = queryEventFuture7Days;
     }
+
     
 }

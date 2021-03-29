@@ -1,0 +1,239 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+
+        <h:outputStylesheet name="css/dashboards.css"/>
+
+        <title>CodeNForce Dashboard</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view id="missionControlView">
+                    <div class="mainContainer">
+
+
+                        <h:form id="messages-global-form">
+
+                            <p:growl id="messages-global-growl"
+                                     redisplay="false"
+                                     />
+                        </h:form>
+                        <h:form id="dashnumbers-form">
+
+
+                            <div class="ui-g data_container_nested_restrict">
+                             
+
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                <p:panel    id="cecase-query-panel"
+                                            toggleable="true"
+                                            widgetVar="cecase-query-panel-var"
+                                            collapsed="false"
+                                            rendered="#{ceCaseSearchProfileBB.activeLookupMode}"
+                                            header="Case List Builder">
+
+                                    <h:form id="cecase-search-form">
+
+                                        <h:outputLabel styleClass="bold" 
+                                                       value="Select a query:" 
+                                                       for="cecase-query-desc-ot" />
+
+                                        <p:selectOneMenu id="cecase-query-som" 
+                                                         tabindex="1" 
+                                                         value="#{ceCaseSearchProfileBB.querySelected}"
+                                                         disabled="#{ceCaseSearchProfileBB.querySelected.queryExecuted}">
+                                            <f:converter converterId="bOBQueryConverter"/>
+                                            <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                            <f:selectItems id="querylist-si" value="#{ceCaseSearchProfileBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
+                                            <p:ajax listener="#{ceCaseSearchProfileBB.changeQuerySelected}"
+                                                    update="@form
+                                                    messages-global-form" />
+                                        </p:selectOneMenu>
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputLabel styleClass="bold" 
+                                                       value="Description: " 
+                                                       for="cecase-query-desc-ot" />
+                                        <h:outputText id="cecase-query-desc-ot" 
+                                                      value="#{ceCaseSearchProfileBB.querySelected.queryName.desc}" />
+
+                                        <p:spacer height="5px" />
+
+                                        <p:commandButton   id="cecase-executequery-cb" 
+                                                           ajax="true" 
+                                                           actionListener="#{ceCaseSearchProfileBB.executeQuery}"
+                                                           disabled="#{ceCaseSearchProfileBB.querySelected.queryExecuted}"
+                                                           icon="fa fa-flash" 
+                                                           styleClass="button"
+                                                           value="run query" 
+                                                           update="@form
+                                                           cecase-search-results-form
+                                                           cecase-search-log-form"/>
+
+                                        <p:commandButton   id="cecase-search-clear-cb" 
+                                                           ajax="true" 
+                                                           actionListener="#{ceCaseSearchProfileBB.resetQuery}"
+                                                           icon="fa fa-eraser" 
+                                                           styleClass="button inline-button"
+                                                           value="clear query" 
+                                                           disabled="#{!ceCaseSearchProfileBB.querySelected.queryExecuted}"
+                                                           update=" cecase-search-log-form
+                                                           @form"/>
+
+
+                                        <p:selectBooleanButton  id="cecase-search-appendresults-chkbox" 
+                                                                onLabel="Add Results to Existing Case List"
+                                                                onIcon="fa fa-indent"
+                                                                offLabel="Build Fresh Case List On Search"
+                                                                offIcon="fa fa-eraser"
+                                                                value="#{ceCaseSearchProfileBB.appendResultsToList}" 
+                                                                disabled="false" />
+
+                                    </h:form>
+
+                                </p:panel>
+
+                                <p:panel        id="cecase-caselist-panel"
+                                                toggleable="true"
+                                                widgetVar="cecase-caselist-panel-var"
+                                                collapsed="false"
+                                                rendered="true"
+                                                header="Code Enforcement Case List">
+                                    <h:form id="cecase-search-results-form" >
+
+                                        <p:commandButton   id="cecase-search-results-clear-button" 
+                                                           ajax="true" 
+                                                           actionListener="#{ceCaseSearchProfileBB.clearCECaseList}"
+                                                           icon="fa fa-eraser" 
+                                                           styleClass="button"
+                                                           value="clear results list" 
+                                                           update="messages-global-form
+                                                           cecase-search-results-form"/>
+
+                                        <p:commandButton   id="cecase-search-loadhistory-button" 
+                                                           ajax="true" 
+                                                           rendered="false"
+                                                           actionListener="#{ceCaseSearchProfileBB.loadCECaseHistory}"
+                                                           icon="fa fa-clock-o" 
+                                                           styleClass="button"
+                                                           value="load case history" 
+                                                           update="messages-global-form
+                                                           cecase-search-results-form"/>
+                                        
+                                        <p:commandButton   id="cecase-export-excel-button" 
+                                                           ajax="false" 
+                                                           icon="fa fa-file-text-o" 
+                                                           styleClass="button"
+                                                           value="Export CSV" 
+                                                           >
+                                            <p:dataExporter type="csv" 
+                                                            target="cecase-search-results-table"
+                                                            fileName="caseExport" />
+                                        </p:commandButton>
+
+
+                                        <p:commandButton   id="print-case-list-cb" 
+                                                           ajax="true" 
+                                                           actionListener="#{ceCaseSearchProfileBB.prepareReportCECaseList}"
+                                                           icon="fa fa-print" 
+                                                           styleClass="button"
+                                                           oncomplete="PF('cecase-list-report-dialog-var').show()"
+                                                           value="Prepare Case List Report" 
+                                                           update="cecase-list-report-form"/>
+
+
+                                        <p:spacer height="5px" />
+
+                                        <h:outputText value="list contains #{ceCaseSearchProfileBB.caseListSize} code enforcement cases" 
+                                                      styleClass="italic"/>
+                                        <p:spacer height="5px" />
+
+                                        <p:dataTable
+                                            id="cecase-search-results-table"
+                                            var="c"
+                                            filteredValue="#{ceCaseSearchProfileBB.filteredCaseList}"
+                                            rowKey="#{c.caseID}"
+                                            rowExpandMode="multiple"
+                                            widgetVar="ceViewTable"
+                                            value="#{sessionBean.sessCECaseList}"
+                                            tableStyleClass="primeDataTable">
+
+                                            <p:column width="5%" >
+                                                <f:facet name="header">
+                                                    <h:outputText value="ID" />
+                                                </f:facet>
+                                                <h:outputText value="#{c.caseID}"/>
+                                            </p:column>
+                                            <p:column width="10%" sortBy="#{c.originationDate}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Opened" />
+                                                </f:facet>
+                                                <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDateNoTime(c.originationDate)}"/>
+                                                <p:spacer height="2px"/>
+                                                <h:outputText value="Age: #{c.caseAge} days"
+                                                              style="font-style: italic"/>
+
+                                            </p:column>
+                                            <p:column width="12%" sortBy="#{c.property.address}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Property" />
+                                                </f:facet>
+                                                <h:outputText value="#{c.property.address} "/>
+                                                <p:spacer height="2px"/>
+                                                <h:outputText value=" (#{c.property.muni.muniName})"/>
+                                            </p:column>
+                                            <p:column width="10%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Name" />
+                                                </f:facet>
+                                                <h:outputText value="#{c.caseName}"/>
+                                            </p:column>
+                                            <p:column width="8%" sortBy="#{c.statusBundle.phase.caseStage.label}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Stage" />
+                                                </f:facet>
+                                                <div class="#{c.statusBundle.phaseIcon.styleClass}">
+                                                    <i class="material-icons status-display-icon-i"><h:outputText value="#{c.statusBundle.phaseIcon.materialIcon}"/></i>
+                                                </div>
+                                            </p:column>
+                                            <p:column width="8%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Actions" />
+                                                </f:facet>
+                                                <p:commandButton id="cecase-search-view-case"
+                                                                 icon="fa fa-folder-open-o"
+                                                                 value="Details"
+                                                                 action="#{missionControlBB.onViewCECaseButtonChange(c)}"
+                                                                 ajax="false"
+                                                                 />
+                                            </p:column>
+                                        </p:dataTable>
+
+
+                                        <p:spacer height="10px"/>
+
+                                    </h:form>
+
+                                </p:panel>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

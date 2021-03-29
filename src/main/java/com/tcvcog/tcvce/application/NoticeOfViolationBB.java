@@ -183,9 +183,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        
       
-        
+        nov_createNoticeFollowupEvent = true;
         
         
     } // close initbean
@@ -443,12 +442,15 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     public void markNoticeOfViolationAsSentInit(NoticeOfViolation nov){
         currentNotice = nov;
+        currentNotice.setFollowupEventDaysRequest(20);
+        getSessionBean().setSessNotice(currentNotice);
+        System.out.println("NoticeOfViolationBB.markNoticeOfViolationAsSentInit: NOV " + currentNotice.getNoticeID());
     }
     
     
-    public void markNoticeOfViolationAsSent() {
+    public String markNoticeOfViolationAsSent(ActionEvent ev) {
         CaseCoordinator caseCoord = getCaseCoordinator();
-        
+        currentNotice = getSessionBean().getSessNotice();
         try {
             caseCoord.nov_markAsSent(currentCase, currentNotice, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
@@ -471,7 +473,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         if(nov_createNoticeFollowupEvent){
             nov_createFollowupEvent(); 
         }
-
+        return "ceCaseProfile";
+        
     }
     
     
@@ -482,6 +485,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     public void nov_createFollowupEvent(){
         CaseCoordinator cc = getCaseCoordinator();
+        currentCase = getSessionBean().getSessCECase();
+        currentNotice = getSessionBean().getSessNotice();
         try {
             EventCnF even = cc.nov_createFollowupEvent(currentCase, currentNotice, getSessionBean().getSessUser());
             if(even != null){
@@ -495,10 +500,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to generate follow-up event due to an object status, event, or integration error", ""));
         } 
-        
-        
-        
-    
     }
     
     public void onNoticeDetailsButtonChange(NoticeOfViolation nov){

@@ -877,6 +877,8 @@ public class CECaseSearchProfileBB
     }
     
     
+    
+    
     /**
      * Responder to the query button on the UI
      *
@@ -1005,6 +1007,19 @@ public class CECaseSearchProfileBB
         reportCECaseList.setDate_end_val(LocalDateTime.now());
         System.out.println("CaseProfileBB.prepareCaseListReport");
 
+    }
+    
+    
+    /**
+     * Listener for the report initiation process
+     * @return 
+     */
+    public String prepareReportCECaseListCustomQuery() {
+        getSessionBean().setSessCECaseList(caseList);
+        
+//       rpt.setCaseListCustomQueryExport();
+        return "ceCaseListExport";
+        
     }
 
     /**
