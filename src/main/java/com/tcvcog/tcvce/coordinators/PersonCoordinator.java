@@ -101,9 +101,15 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return pList;
     }
     
-    
-    public PersonDataHeavy assemblePersonDataHeavy(Person pers, Credential cred){
-        PersonDataHeavy pdh = new PersonDataHeavy(pers, cred);
+    /**
+     * Builds a data heavy version of a person
+     * @param pers
+     * @param cred
+     * @return
+     * @throws IntegrationException 
+     */
+    public PersonDataHeavy assemblePersonDataHeavy(Person pers, Credential cred) throws IntegrationException{
+        PersonDataHeavy pdh = new PersonDataHeavy(getPerson(pers.getPersonID()), cred);
         SearchCoordinator sc = getSearchCoordinator();
         
         try {
@@ -204,19 +210,26 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param u doing the attaching
      * @param noteToAdd new note text
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public void addNotesToPerson(Person p, UserAuthorized u, String noteToAdd) throws IntegrationException{
+    public void addNotesToPerson(Person p, UserAuthorized u, String noteToAdd) throws IntegrationException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
+        if(p != null && u != null && noteToAdd != null){
 
-        MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("personRecordNotesGeneral"));
-        mbp.setExistingContent(p.getNotes());
-        mbp.setNewMessageContent(noteToAdd);
-        mbp.setUser(u);
-        mbp.setCred(u.getMyCredential());
-        p.setNotes(sc.appendNoteBlock(mbp));
-        pi.updatePerson(p);
+            MessageBuilderParams mbp = new MessageBuilderParams();
+            mbp.setHeader(getResourceBundle(Constants.MESSAGE_TEXT).getString("personRecordNotesGeneral"));
+            mbp.setExistingContent(p.getNotes());
+            mbp.setNewMessageContent(noteToAdd);
+            mbp.setUser(u);
+            mbp.setCred(u.getMyCredential());
+            p.setNotes(sc.appendNoteBlock(mbp));
+            pi.updatePersonNotes(p);
+            System.out.println("PersonCoordinator.addNotesToPerson: person: " + p.getPersonID() + " notes: " + noteToAdd);
+        } else {
+            throw new BObStatusException("cannot append note given a null person, user, or note string");
+            
+        }
         
     }
     
@@ -304,6 +317,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param u doing the connecting
      * @return the database identifier of the sent in Person's very own ghost
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
     public int createChostPerson(Person p, User u) throws IntegrationException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();

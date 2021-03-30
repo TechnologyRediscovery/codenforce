@@ -579,7 +579,11 @@ public class PropertyProfileBB extends BackingBeanUtils implements Serializable 
         PersonCoordinator pc = getPersonCoordinator();
         if (p != null) {
             getSessionBean().getSessPersonList().add(0, p);
-            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(p, getSessionBean().getSessUser().getKeyCard()));
+            try {
+                getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(p, getSessionBean().getSessUser().getKeyCard()));
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
             return "personInfo";
 
         }

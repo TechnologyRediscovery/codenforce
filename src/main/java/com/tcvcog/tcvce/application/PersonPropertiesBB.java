@@ -24,6 +24,8 @@ import com.tcvcog.tcvce.entities.PersonDataHeavy;
 import com.tcvcog.tcvce.entities.Property;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -51,8 +53,12 @@ public class PersonPropertiesBB extends BackingBeanUtils{
        PersonCoordinator pc = getPersonCoordinator();
        
        if(getSessionBean().getSessPersonQueued() != null){
-            currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(), 
-                    getSessionBean().getSessUser().getKeyCard());
+           try {
+               currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(),
+                       getSessionBean().getSessUser().getKeyCard());
+           } catch (IntegrationException ex) {
+               System.out.println(ex);
+           }
              getSessionBean().setSessPerson(currPerson);
             getSessionBean().setSessPersonQueued(null);
        } else {

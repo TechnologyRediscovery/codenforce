@@ -51,8 +51,12 @@ public class PersonEventsBB extends BackingBeanUtils{
        PersonCoordinator pc = getPersonCoordinator();
        
        if(getSessionBean().getSessPersonQueued() != null){
-            currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(), 
-                    getSessionBean().getSessUser().getKeyCard());
+           try {
+               currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(),
+                       getSessionBean().getSessUser().getKeyCard());
+           } catch (IntegrationException ex) {
+               System.out.println(ex);
+           }
             getSessionBean().setSessPerson(currPerson);
             getSessionBean().setSessPersonQueued(null);
        } else {

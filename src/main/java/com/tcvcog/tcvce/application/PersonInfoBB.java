@@ -19,7 +19,9 @@ package com.tcvcog.tcvce.application;
 
 
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
@@ -58,8 +60,12 @@ public class PersonInfoBB extends BackingBeanUtils{
        PersonCoordinator pc = getPersonCoordinator();
        
        if(getSessionBean().getSessPersonQueued() != null){
-            currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(), 
-                    getSessionBean().getSessUser().getKeyCard());
+           try {
+               currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(),
+                       getSessionBean().getSessUser().getKeyCard());
+           } catch (IntegrationException ex) {
+               System.out.println(ex);
+           }
              getSessionBean().setSessPerson(currPerson);
             getSessionBean().setSessPersonQueued(null);
        } else {
@@ -88,6 +94,7 @@ public class PersonInfoBB extends BackingBeanUtils{
      */
     public void personEditCommit(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
 
         try {
             pc.personEdit(workingPerson, getSessionBean().getSessUser());
@@ -98,11 +105,14 @@ public class PersonInfoBB extends BackingBeanUtils{
             pc.addNotesToPerson(workingPerson, getSessionBean().getSessUser(), fieldDump);
             // refresh our current person
             currPerson = pc.assemblePersonDataHeavy(pc.getPerson(workingPerson.getPersonID()), getSessionBean().getSessUser().getMyCredential());
+            sc.logObjectView(getSessionBean().getSessUser(), currPerson);
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                      "Edits failed on person due to a database bug!", ""));
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
         }
     }
     
@@ -124,6 +134,7 @@ public class PersonInfoBB extends BackingBeanUtils{
      */
     public String personCreateCommit(){
         PersonCoordinator pc = getPersonCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
     
         try {
             int freshID = pc.personCreate(workingPerson, getSessionBean().getSessUser());
@@ -142,13 +153,14 @@ public class PersonInfoBB extends BackingBeanUtils{
                         new FacesMessage(FacesMessage.SEVERITY_INFO, 
                                 "Successfully added " + workingPerson.getFirstName() + " to the Database!", ""));
                }
+               sc.logObjectView(getSessionBean().getSessUser(), currPerson);
            } catch (IntegrationException ex) {
                System.out.println(ex.toString());
                   getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                                "Unable to add new person to the database, my apologies!", ""));
            }
-        return "personInfo";
+        return "personSearch";
     }
     
     
@@ -165,6 +177,8 @@ public class PersonInfoBB extends BackingBeanUtils{
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
                     , "Unable to update notes, sorry!"
                     , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+        } catch (BObStatusException ex) {
+            System.out.println();
         }
     }
     

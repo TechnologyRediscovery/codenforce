@@ -3034,7 +3034,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                     <p:dialog   id="nov-personchoose-dialog"
-                                height="600" width="750"
+                                height="700" width="900"
                                 widgetVar="nov-personchoose-dialog-var"
                                 closable="true"
                                 closeOnEscape="true"
@@ -3075,7 +3075,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <p:column width="5%">
                                             <p:rowToggler />
                                         </p:column>
-                                        <p:column width="50%">
+                                        <p:column width="40%">
                                             <f:facet name="header">
                                                 <h:outputText value="Person" />
                                             </f:facet>
@@ -3104,7 +3104,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             </f:facet>
                                             <h:outputText value="#{person.muniName}"/>
                                         </p:column>
-                                        <p:column width="8%">
+                                        <p:column width="15%">
                                             <p:commandButton id="use-person-from-table-cb1"
                                                              rendered="#{noticeOfViolationBB.currentNotice.noticeID!=0}"
                                                              ajax="true"
@@ -3125,6 +3125,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                              update="chosen-recipient-form
                                                              messages-global-form"
                                                              />
+                                            <p:spacer height="3px" />
+                                             <p:commandButton id="edit-person-from-lookup-cb-1"
+                                                         ajax="false"
+                                                         value="View or edit person"
+                                                         action="#{ceCaseSearchProfileBB.onPersonViewButtonChange(person)}" 
+                                                         />
                                         </p:column>
 
                                         <p:rowExpansion>
@@ -3290,6 +3296,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         widgetVar="noticebuilder-pers-ds-var">
 
                                         <h:outputText value="#{per.firstName} #{per.lastName}"/>
+                                        <p:spacer height="5px"/>
+                                         <p:commandButton id="edit-person-from-lookup-cb0"
+                                                         ajax="false"
+                                                         value="View or edit person"
+                                                         action="#{ceCaseSearchProfileBB.onPersonViewButtonChange(per)}" 
+                                                         />
                                         <p:spacer height="5px"/>
                                         <p:commandButton id="use-person-from-lookup-cb1"
                                                          rendered="#{noticeOfViolationBB.currentNotice.noticeID!=0}"
@@ -6140,7 +6152,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
 
-
                                     <div class="restrict-main-contents-io-title" >
                                         <h:outputLabel for="personIDIT" value="Person ID Number: "/>
                                     </div>
@@ -6166,12 +6177,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         widgetVar="noticebuilder-pers-ds-var">
 
                                         <h:outputText value="#{per.firstName} #{per.lastName}"/>
-                                        <p:spacer height="5px"/>
+                                        <p:spacer height="3px"/>
+                                        <h:outputText value="ID: #{per.personID}"/>
+                                        <p:spacer height="3px"/>
+
+                                        <p:commandButton id="edit-person-from-lookup"
+                                                         ajax="false"
+                                                         value="View or edit person"
+                                                         action="#{ceCaseSearchProfileBB.onPersonViewButtonChange(per)}" 
+                                                         />
+                                        <p:spacer height="3px"/>
 
                                         <p:commandButton id="use-person-from-lookup-cb2"
-                                                         rendered="#{ceCaseSearchProfileBB.currentNotice.noticeID==0}"
                                                          ajax="true"
-                                                         value="Select"
+                                                         value="Select for NOV"
                                                          actionListener="#{ceCaseSearchProfileBB.storeRecipient(per)}" 
                                                          oncomplete="PF('event-personchoose-dialog-var').hide()."
                                                          update="event-lookupperson-table

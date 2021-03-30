@@ -19,9 +19,12 @@ package com.tcvcog.tcvce.application;
 
 
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**
@@ -46,8 +49,12 @@ public class PersonOccPeriodsBB extends BackingBeanUtils{
        PersonCoordinator pc = getPersonCoordinator();
        
        if(getSessionBean().getSessPersonQueued() != null){
-            currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(), 
-                    getSessionBean().getSessUser().getKeyCard());
+           try {
+               currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(),
+                       getSessionBean().getSessUser().getKeyCard());
+           } catch (IntegrationException ex) {
+               System.out.println(ex);
+           }
              getSessionBean().setSessPerson(currPerson);
             getSessionBean().setSessPersonQueued(null);
        } else {

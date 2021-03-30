@@ -27,6 +27,8 @@ import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -139,7 +141,11 @@ public class PersonChangesBB
     public String goToPerson(PersonWithChanges person) {
         PersonCoordinator pc = getPersonCoordinator();
 
-        getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(person, getSessionBean().getSessUser().getMyCredential()));
+        try {
+            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(person, getSessionBean().getSessUser().getMyCredential()));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
 
         getSessionBean().getNavStack().pushCurrentPage();
 

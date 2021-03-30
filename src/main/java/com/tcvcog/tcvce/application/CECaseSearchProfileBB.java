@@ -2056,6 +2056,19 @@ public class CECaseSearchProfileBB
     }
     
     /**
+     * Listener for user request to go and view a person in personProfile
+     * @param p
+     * @return 
+     */
+    public String onPersonViewButtonChange(Person p){
+        
+        getSessionBean().setSessPersonQueued(p);
+        getSessionBean().setOnPageLoad_sessionSwitch_viewProfile(true);
+        return "personSearch";
+        
+    }
+    
+    /**
      * Listener for user changes to the selected event type
      */
     public void onEventTypeMenuChange(){

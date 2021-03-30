@@ -1073,6 +1073,13 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
     }
 
+    /**
+     * Writes new value to the given person's note field. It's the Caller's job to 
+     * correctly append new notes to old ones, and in this case the caller 
+     * should always be the PersonCoordinator
+     * @param p
+     * @throws IntegrationException 
+     */
     public void updatePersonNotes(Person p) throws IntegrationException {
         Connection con = getPostgresCon();
         String query = "UPDATE person SET notes = ? WHERE personid = ?;";

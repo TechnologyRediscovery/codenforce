@@ -20,15 +20,23 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
 import com.tcvcog.tcvce.entities.PersonType;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -39,7 +47,10 @@ import javax.faces.event.ActionEvent;
  */
 public class PersonSearchBB extends BackingBeanUtils{
 
-    private PersonDataHeavy currPerson;
+    private PersonDataHeavy currentPerson;
+    
+    private boolean onPageLoad_viewCurrentPersonProfile;
+    private boolean onPageLoad_editCurrentPerson;
     
     private QueryPerson querySelected;
     private List<QueryPerson> queryList;
@@ -49,6 +60,16 @@ public class PersonSearchBB extends BackingBeanUtils{
     private List<Person> personList;
     private List<Person> filteredPersonList;
     private boolean appendResultsToList;
+    
+    // from PersonInfo
+    private boolean connectToActiveProperty;
+    
+    private String fieldDump;
+    
+    private String formNotes;
+    
+    
+    
     
     private PersonType[] personTypes;
     
@@ -64,19 +85,52 @@ public class PersonSearchBB extends BackingBeanUtils{
        PersonCoordinator pc = getPersonCoordinator();
        SearchCoordinator sc = getSearchCoordinator();
        
-       if(getSessionBean().getSessPersonQueued() != null){
-            currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(), 
-                    getSessionBean().getSessUser().getKeyCard());
-             getSessionBean().setSessPerson(currPerson);
-            getSessionBean().setSessPersonQueued(null);
-       } else {
-            currPerson = (getSessionBean().getSessPerson());
+       personList = getSessionBean().getSessPersonList();
+       
+       /*
+        How to choose the currentPerson? This is the priority List implemented here:
+        1. Session's queued person
+        2. Session's person
+        3. First person in the session person list which starts with person history
+        4. The user's internal person
+        */
+       Credential cred = getSessionBean().getSessUser().getKeyCard();
+       
+       try{
+            if(getSessionBean().getSessPersonQueued() != null){
+                    currentPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(),
+                            cred);
+                 getSessionBean().setSessPerson(currentPerson);
+                 getSessionBean().setSessPersonQueued(null);
+            } else if (getSessionBean().getSessPerson() != null){
+                 currentPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPerson(),
+                            cred);
+            } else if(personList != null && !personList.isEmpty()){
+                 currentPerson = pc.assemblePersonDataHeavy(personList.get(0),
+                            cred);
+            } else {
+                currentPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessUser().getPerson(),
+                            cred);
+            }
+       } catch (IntegrationException ex){
+           System.out.println(ex);
        }
        
-       personList = getSessionBean().getSessPersonList();
+       if(currentPerson != null){
+             getFacesContext().addMessage(null,
+            new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                    "Your current person is PersonID: " + currentPerson.getPersonID() + " ("+ currentPerson.getLastName() + ")", ""));
+       }
+       
+       
+       
        personTypes = PersonType.values();
        
        setupQueryInfrastructure();
+       
+       // check session for requests to load profile on page load
+       onPageLoad_viewCurrentPersonProfile = getSessionBean().isOnPageLoad_sessionSwitch_viewProfile();
+       getSessionBean().setOnPageLoad_sessionSwitch_viewProfile(false);
        
     }
     
@@ -176,13 +230,14 @@ public class PersonSearchBB extends BackingBeanUtils{
     /**
      * Action (i.e. navigation) method for jumping into a Person from search
      * @param p
-     * @return 
+     
      */
-    public String explorePerson(Person p){
+    public void explorePerson(Person p){
         SystemIntegrator si = getSystemIntegrator();
         PersonCoordinator pc = getPersonCoordinator();
         try {
             getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(p, getSessionBean().getSessUser().getMyCredential()));
+            currentPerson = pc.assemblePersonDataHeavy(p, getSessionBean().getSessUser().getKeyCard());
             si.logObjectView_OverwriteDate(getSessionBean().getSessUser(), p);
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -190,7 +245,6 @@ public class PersonSearchBB extends BackingBeanUtils{
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                         "Person history logging is broken!",""));
         }
-        return "personInfo";
     }
 
     
@@ -210,18 +264,200 @@ public class PersonSearchBB extends BackingBeanUtils{
         
     }
     
+      
+    public void personEditInit(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        // keep a stashed copy of our oroginal field values to write to notes
+        // on a succesful update
+        fieldDump = pc.dumpPerson(currentPerson);
+        
+        
+    }
+    
     /**
-     * @return the currPerson
+     * Listener method for person updates
+     * Writes field dump to notes
+     *  
+     * @return  
      */
-    public PersonDataHeavy getCurrPerson() {
-        return currPerson;
+    public String personEditCommit(){
+        PersonCoordinator pc = getPersonCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+
+        try {
+            pc.personEdit(currentPerson, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                     "Edits of Person saved to database!", ""));
+            // with a successful update, write field dump of previous values to person notes
+            pc.addNotesToPerson(currentPerson, getSessionBean().getSessUser(), fieldDump);
+            // refresh our current person
+            refreshCurrentPerson();
+            sc.logObjectView(getSessionBean().getSessUser(), currentPerson);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                     "Edits failed on person due to a database bug!", ""));
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                     ex.getMessage(), ""));
+            
+        }
+        onPageLoad_viewCurrentPersonProfile = true;
+        getSessionBean().setOnPageLoad_sessionSwitch_viewProfile(onPageLoad_viewCurrentPersonProfile);
+        return "personSearch";
+    }
+    
+    
+     public String viewPersonAssociatedProperty(Property p){
+         getSessionBean().setSessPropertyQueued(p);
+        return "propertyInfo";
+    }
+    
+    
+    public void personCreateInit(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            currentPerson = pc.assemblePersonDataHeavy(
+                    pc.personCreateMakeSkeleton(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni()),
+                    getSessionBean().getSessUser().getKeyCard());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+    }
+    
+    /**
+     * Action listener for creation of new person objectgs
+     * @return  
+     */
+    public String personCreateCommit(){
+        PersonCoordinator pc = getPersonCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+    
+        try {
+            int freshID = pc.personCreate(currentPerson, getSessionBean().getSessUser());
+            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(pc.getPerson(freshID),getSessionBean().getSessUser().getKeyCard()));
+               if(isConnectToActiveProperty()){
+                   
+                   Property property = getSessionBean().getSessProperty();
+                   pc.connectPersonToProperty(currentPerson, property);
+                   getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                            "Successfully added " + currentPerson.getFirstName() + " to the Database!" 
+                                + " and connected to " + property.getAddress(), ""));
+               } else {
+
+                   getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                                "Successfully added " + currentPerson.getFirstName() + " to the Database!", ""));
+               }
+               sc.logObjectView(getSessionBean().getSessUser(), currentPerson);
+           } catch (IntegrationException ex) {
+               System.out.println(ex.toString());
+                  getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                               "Unable to add new person to the database, my apologies!", ""));
+           }
+        return "personSearch";
+    }
+    
+    public void refreshCurrentPerson(){
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            currentPerson = pc.assemblePersonDataHeavy(currentPerson, getSessionBean().getSessUser().getKeyCard());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+    }
+    
+    
+    /**
+     * listener for user requests to add new note to a person
+     * @param ev 
+     */
+    public void onNoteInit(ActionEvent ev){
+        formNotes = "";
+        
+    }
+    
+    /**
+     * Listener for user requests to complete the note writing process and 
+     * attach note to currentPerson
+     * @return  nav page
+     */
+    public String onNoteCommit(){
+        PersonCoordinator pc = getPersonCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+
+        try {
+            pc.addNotesToPerson(currentPerson, getSessionBean().getSessUser(), formNotes);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO
+                    , "Done: Notes added to person ID:" + currentPerson.getPersonID(),"" ));
+            sc.logObjectView(getSessionBean().getSessUser(), currentPerson);
+//            refreshCurrentPerson();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
+                    , "Unable to update notes, sorry!"
+                    , getResourceBundle(Constants.MESSAGE_TEXT).getString("systemLevelError")));
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
+                    , ex.getMessage()
+                    , ""));
+            
+        }
+        onPageLoad_viewCurrentPersonProfile = true;
+        getSessionBean().setOnPageLoad_sessionSwitch_viewProfile(onPageLoad_viewCurrentPersonProfile);
+        return "personSearch";
+        
+    }
+    
+    
+    public String deletePerson(){
+        System.out.println("PersonBB.deletePerson | in method");
+        PersonCoordinator pc = getPersonCoordinator();
+        
+        try {
+            pc.personNuke(currentPerson, getSessionBean().getSessUser().getMyCredential());
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        currentPerson.getFirstName() + " has been permanently deleted; Goodbye " 
+                                + currentPerson.getFirstName() 
+                                + ". Search results have been cleared.", ""));
+            
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Cannot delete person." + ex.toString(), "Best not to delete folks anyway..."));
+            return "";
+            
+        } catch (AuthorizationException ex) {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        ex.getLocalizedMessage(),""));
+            return "";
+            
+        }
+        return "personSearch";
+    }
+    
+    
+    /**
+     * @return the currentPerson
+     */
+    public PersonDataHeavy getCurrentPerson() {
+        return currentPerson;
     }
 
     /**
-     * @param currPerson the currPerson to set
+     * @param currentPerson the currentPerson to set
      */
-    public void setCurrPerson(PersonDataHeavy currPerson) {
-        this.currPerson = currPerson;
+    public void setCurrentPerson(PersonDataHeavy currentPerson) {
+        this.currentPerson = currentPerson;
     }
 
     /**
@@ -335,6 +571,77 @@ public class PersonSearchBB extends BackingBeanUtils{
      */
     public void setQueryLog(String queryLog) {
         this.queryLog = queryLog;
+    }
+
+    
+    /**
+     * @return the connectToActiveProperty
+     */
+    public boolean isConnectToActiveProperty() {
+        return connectToActiveProperty;
+    }
+
+    /**
+     * @return the fieldDump
+     */
+    public String getFieldDump() {
+        return fieldDump;
+    }
+
+    /**
+     * @return the formNotes
+     */
+    public String getFormNotes() {
+        return formNotes;
+    }
+
+    /**
+     * @param connectToActiveProperty the connectToActiveProperty to set
+     */
+    public void setConnectToActiveProperty(boolean connectToActiveProperty) {
+        this.connectToActiveProperty = connectToActiveProperty;
+    }
+
+    /**
+     * @param fieldDump the fieldDump to set
+     */
+    public void setFieldDump(String fieldDump) {
+        this.fieldDump = fieldDump;
+    }
+
+    /**
+     * @param formNotes the formNotes to set
+     */
+    public void setFormNotes(String formNotes) {
+        this.formNotes = formNotes;
+    }
+
+    /**
+     * @return the onPageLoad_viewCurrentPersonProfile
+     */
+    public boolean isOnPageLoad_viewCurrentPersonProfile() {
+        return onPageLoad_viewCurrentPersonProfile;
+    }
+
+    /**
+     * @return the onPageLoad_editCurrentPerson
+     */
+    public boolean isOnPageLoad_editCurrentPerson() {
+        return onPageLoad_editCurrentPerson;
+    }
+
+    /**
+     * @param onPageLoad_viewCurrentPersonProfile the onPageLoad_viewCurrentPersonProfile to set
+     */
+    public void setOnPageLoad_viewCurrentPersonProfile(boolean onPageLoad_viewCurrentPersonProfile) {
+        this.onPageLoad_viewCurrentPersonProfile = onPageLoad_viewCurrentPersonProfile;
+    }
+
+    /**
+     * @param onPageLoad_editCurrentPerson the onPageLoad_editCurrentPerson to set
+     */
+    public void setOnPageLoad_editCurrentPerson(boolean onPageLoad_editCurrentPerson) {
+        this.onPageLoad_editCurrentPerson = onPageLoad_editCurrentPerson;
     }
     
     

@@ -137,6 +137,7 @@ public class    SessionBean
     private PersonDataHeavy sessPerson;
     private Person sessPersonQueued;
     private List<Person> sessPersonList;
+    private boolean onPageLoad_sessionSwitch_viewProfile;
     
     
     /* >>> QUERY PERSON <<< */
@@ -1581,6 +1582,20 @@ public class    SessionBean
      */
     public void setQueryEventFuture7Days(QueryEvent queryEventFuture7Days) {
         this.queryEventFuture7Days = queryEventFuture7Days;
+    }
+
+    /**
+     * @return the onPageLoad_sessionSwitch_viewProfile
+     */
+    public boolean isOnPageLoad_sessionSwitch_viewProfile() {
+        return onPageLoad_sessionSwitch_viewProfile;
+    }
+
+    /**
+     * @param onPageLoad_sessionSwitch_viewProfile the onPageLoad_sessionSwitch_viewProfile to set
+     */
+    public void setOnPageLoad_sessionSwitch_viewProfile(boolean onPageLoad_sessionSwitch_viewProfile) {
+        this.onPageLoad_sessionSwitch_viewProfile = onPageLoad_sessionSwitch_viewProfile;
     }
 
     
