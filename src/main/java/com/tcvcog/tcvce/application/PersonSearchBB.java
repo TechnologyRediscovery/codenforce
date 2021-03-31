@@ -313,11 +313,16 @@ public class PersonSearchBB extends BackingBeanUtils{
     
     
      public String viewPersonAssociatedProperty(Property p){
-         getSessionBean().setSessPropertyQueued(p);
+         getSessionBean().setSessProperty(p);
         return "propertyInfo";
     }
     
     
+     /**
+      * Listener for user requests to start the person creation process
+      * Builds a skeleton person
+      * @param ev 
+      */
     public void personCreateInit(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
         try {

@@ -73,7 +73,7 @@ public class PersonPropertiesBB extends BackingBeanUtils{
     }
     
     public String exploreProperty(Property pr){
-        getSessionBean().setSessPropertyQueued(pr);
+        getSessionBean().setSessProperty(pr);
         return "propertyInfo";
     }
     

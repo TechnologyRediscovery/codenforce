@@ -85,7 +85,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      *
      * @param prop
      * @param ua
-     * @return
+     * @return the data heavy subclass
      * @throws IntegrationException
      * @throws BObStatusException
      * @throws com.tcvcog.tcvce.domain.SearchException
@@ -95,50 +95,59 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyDataHeavy pdh = null;
+        
+        if(prop != null && ua != null){
+            // if we've been given a skeleton, just inject it into data heavy subclass
+            if(prop.getPropertyID() == 0){
+                pdh = new PropertyDataHeavy(prop);
+            } else {
 
-        PropertyDataHeavy pdh = new PropertyDataHeavy(getProperty(prop.getPropertyID()));
+               pdh = new PropertyDataHeavy(getProperty(prop.getPropertyID()));
 
-        try {
-            // CECase list
-            QueryCECase qcse = sc.initQuery(QueryCECaseEnum.PROPERTY, ua.getKeyCard());
-            qcse.getPrimaryParams().setProperty_val(prop);
-            pdh.setCeCaseList(sc.runQuery(qcse).getResults());
+               try {
+                   // CECase list
+                   QueryCECase qcse = sc.initQuery(QueryCECaseEnum.PROPERTY, ua.getKeyCard());
+                   qcse.getPrimaryParams().setProperty_val(prop);
+                   pdh.setCeCaseList(sc.runQuery(qcse).getResults());
 
-            // Property info cases
-            qcse = sc.initQuery(QueryCECaseEnum.PROPINFOCASES, ua.getKeyCard());
-            qcse.getPrimaryParams().setProperty_val(prop);
-            pdh.setPropInfoCaseList(cc.cecase_assembleCECaseDataHeavyList(sc.runQuery(qcse).getBOBResultList(), ua));
+                   // Property info cases
+                   qcse = sc.initQuery(QueryCECaseEnum.PROPINFOCASES, ua.getKeyCard());
+                   qcse.getPrimaryParams().setProperty_val(prop);
+                   pdh.setPropInfoCaseList(cc.cecase_assembleCECaseDataHeavyList(sc.runQuery(qcse).getBOBResultList(), ua));
 
-            // check list and see if it's emtpy; 
-            if (pdh.getPropInfoCaseList() == null) {
-                pdh.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
+                   // check list and see if it's emtpy; 
+                   if (pdh.getPropInfoCaseList() == null) {
+                       pdh.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
+                   }
+
+                   if (pdh.getPropInfoCaseList().isEmpty()) {
+                       pdh.getPropInfoCaseList().add(createPropertyInfoCase(pdh, ua));
+                   }
+
+                   // UnitDataHeavy list
+                   // remember that units data heavy contain all our occ periods, inspections, and PropertyUnitChangeOrders
+                   if (pdh.getUnitList() != null && !pdh.getUnitList().isEmpty()) {
+                       pdh.setUnitWithListsList(getPropertyUnitWithListsList(pdh.getUnitList(), ua));
+                   }
+
+                   // Person list
+                   QueryPerson qp = sc.initQuery(QueryPersonEnum.PROPERTY_PERSONS, ua.getKeyCard());
+                   qp.getPrimaryParams().setProperty_val(prop);
+                   pdh.setPersonList(sc.runQuery(qp).getBOBResultList());
+                   System.out.println("PropertyCoordinator.assemblePropertyDH: personlist size: " + pdh.getPersonList().size());
+
+                   // wait on blobs
+                   //pdh.setBlobList(new ArrayList<Integer>());
+                   // external data
+                   pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getPropertyID())));
+
+               } catch (EventException | AuthorizationException ex) {
+                   System.out.println(ex);
+                   System.out.println();
+               }
             }
-
-            if (pdh.getPropInfoCaseList().isEmpty()) {
-                pdh.getPropInfoCaseList().add(createPropertyInfoCase(pdh, ua));
-            }
-
-            // UnitDataHeavy list
-            // remember that units data heavy contain all our occ periods, inspections, and PropertyUnitChangeOrders
-            if (pdh.getUnitList() != null && !pdh.getUnitList().isEmpty()) {
-                pdh.setUnitWithListsList(getPropertyUnitWithListsList(pdh.getUnitList(), ua));
-            }
-
-            // Person list
-            QueryPerson qp = sc.initQuery(QueryPersonEnum.PROPERTY_PERSONS, ua.getKeyCard());
-            qp.getPrimaryParams().setProperty_val(prop);
-            pdh.setPersonList(sc.runQuery(qp).getBOBResultList());
-            System.out.println("PropertyCoordinator.assemblePropertyDH: personlist size: " + pdh.getPersonList().size());
-
-            // wait on blobs
-            //pdh.setBlobList(new ArrayList<Integer>());
-            // external data
-            pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getPropertyID())));
-
-        } catch (EventException | AuthorizationException ex) {
-            System.out.println(ex);
-            System.out.println();
-        }
+        } 
         return pdh;
     }
 
@@ -682,26 +691,20 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     public PropertyCoordinator() {
     }
 
-    public Property initProperty(Municipality muni) {
+    
+    /**
+     * Generator method for Property objects
+     * @param muni
+     * @return the skelton property object with only muni set and ID of 0
+     */
+    public Property generatePropertySkeleton(Municipality muni) {
         Property prop = new Property();
+        prop.setPropertyID(0);
         prop.setMuni(muni);
         return prop;
     }
 
-    /**
-     * Creates a skeleton of a property
-     *
-     * @param muni
-     * @return whose ID is 0
-     */
-    public PropertyDataHeavy initPropertyDataHeavy(Municipality muni) {
-        Property prop = new Property();
-        PropertyDataHeavy pdh = new PropertyDataHeavy(prop);
-
-        prop.setMuni(muni);
-        return pdh;
-    }
-
+    
     /**
      * This method generates a skeleton PropertyUnit with logical, preset
      * defaults, including empty lists.

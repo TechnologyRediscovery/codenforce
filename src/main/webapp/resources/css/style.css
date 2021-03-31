@@ -240,7 +240,7 @@ i.material-icons{
 }
 
 .icon-box-centered .material-icons{
-    font-size: 250%;
+    font-size: 150%;
 }
 
 /* PrimeFaces icon reset */
@@ -1323,6 +1323,18 @@ gridTd-bignum{
 
 
 
+/* -------------------- DIALOGS ----------------------- */
+
+.object-metadata{
+    font-style: italic;
+    margin-top: 3px;
+}
+
+
+/* -------------------- CLOSE DIALOGS ----------------------- */
+
+
+
 /* -------------------- PROPOSALS AND CHOICES ----------------------- */
 
 .proposal-choice-button{
@@ -1364,7 +1376,7 @@ gridTd-bignum{
     clear: both;
 }
 
-/* ****************** PROPOSALS AND CHOICES ********************/
+/* ****************** END PROPOSALS AND CHOICES ********************/
 
 
 
@@ -2729,8 +2741,9 @@ input{
 }
 
 .restrict-main-contents-io-link{
+    color:blue;
     display: inline-block; 
-    float: next;
+/*    float: next;*/
     /*text-decoration: underline;*/
     font-weight: 200;
     /*border-bottom: 1px solid #6C6D70;*/
@@ -2741,7 +2754,20 @@ input{
 }
 
 .restrict-main-contents-io-link a{
-    color: #6C6D70;
+    /*color: #6C6D70;*/
+    color:blue;
+    
+}
+.restrict-main-contents-io-link a:hover{
+    /*color: #6C6D70;*/
+    color:lightskyblue;
+    
+}
+
+.restrict-main-contents-io-link a:disabled{
+    /*color: #6C6D70;*/
+    color:darkgray;
+    
 }
 
 .restrict-main-contents-io-content{

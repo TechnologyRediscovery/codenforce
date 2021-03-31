@@ -103,35 +103,46 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Builds a data heavy version of a person
+     * Implements logic depending on if the person is a skeleton or not
      * @param pers
      * @param cred
      * @return
      * @throws IntegrationException 
      */
     public PersonDataHeavy assemblePersonDataHeavy(Person pers, Credential cred) throws IntegrationException{
-        PersonDataHeavy pdh = new PersonDataHeavy(getPerson(pers.getPersonID()), cred);
-        SearchCoordinator sc = getSearchCoordinator();
-        
-        try {
-            QueryCECase qcse = sc.initQuery(QueryCECaseEnum.PERSINFOCASES, cred);
-            qcse.getPrimaryParams().setPersonInfoCaseID_val(pers);
-            pdh.setCaseList(sc.runQuery(qcse).getResults());
-        
-//            QueryOccPeriod qop = sc.initQuery(QueryOccPeriodEnum.PERSONS, cred);
-//            qop.getPrimaryParams().setPerson_val(pers);
-//            pdh.setPeriodList(sc.runQuery(qop).getBOBResultList());
+        PersonDataHeavy pdh = null;
+        if(pers != null && cred != null){
+            // if we have a skeleton person, don't try to get a person from the DB, since there's no ID
+            if(pers.getPersonID() == 0){
+                pdh = new PersonDataHeavy(pers, cred);
+                
+            } else {
 
-//            TURNED OFF TO MIGRATE TO HUMANIZATION
-//            QueryProperty qprop = sc.initQuery(QueryPropertyEnum.PERSONS, cred);
-//            qprop.getPrimaryParams().setPerson_val(pers);
-//            pdh.setPropertyList(sc.runQuery(qprop).getBOBResultList());
-            
-//            QueryEvent qe = sc.initQuery(QueryEventEnum.PERSONS, cred);
-//            qe.getPrimaryParams().setPerson_val(pers);
-//            pdh.setEventList(sc.runQuery(qe).getBOBResultList());
-        
-        } catch (SearchException ex) {
-            System.out.println(ex);
+               pdh = new PersonDataHeavy(getPerson(pers.getPersonID()), cred);
+               SearchCoordinator sc = getSearchCoordinator();
+
+               try {
+                   QueryCECase qcse = sc.initQuery(QueryCECaseEnum.PERSINFOCASES, cred);
+                   qcse.getPrimaryParams().setPersonInfoCaseID_val(pers);
+                   pdh.setCaseList(sc.runQuery(qcse).getResults());
+
+       //            QueryOccPeriod qop = sc.initQuery(QueryOccPeriodEnum.PERSONS, cred);
+       //            qop.getPrimaryParams().setPerson_val(pers);
+       //            pdh.setPeriodList(sc.runQuery(qop).getBOBResultList());
+
+       //            TURNED OFF TO MIGRATE TO HUMANIZATION
+       //            QueryProperty qprop = sc.initQuery(QueryPropertyEnum.PERSONS, cred);
+       //            qprop.getPrimaryParams().setPerson_val(pers);
+       //            pdh.setPropertyList(sc.runQuery(qprop).getBOBResultList());
+
+       //            QueryEvent qe = sc.initQuery(QueryEventEnum.PERSONS, cred);
+       //            qe.getPrimaryParams().setPerson_val(pers);
+       //            pdh.setEventList(sc.runQuery(qe).getBOBResultList());
+
+               } catch (SearchException ex) {
+                   System.out.println(ex);
+               }
+            }
         }
         
         return pdh;
@@ -168,6 +179,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      */
     public Person personCreateMakeSkeleton(Municipality m){
         Person newP = new Person();
+        newP.setPersonID(0);
         newP.setPersonType(PersonType.Public);
         newP.setActive(true);
         newP.setPersonID(0);

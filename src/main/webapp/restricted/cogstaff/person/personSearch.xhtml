@@ -246,7 +246,8 @@
                                         <p:commandButton    id="new-person-cb"
                                                             ajax="true" actionListener="#{personSearchBB.personCreateInit}"
                                                             oncomplete="PF('person-add-dialog-var').show()"
-                                                            update="person-addupdate-form"
+                                                            update="person-add-form
+                                                            person-add-dialog"
                                                             value="Create new Person"
                                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                             icon="fa fa-plus"
@@ -402,7 +403,7 @@
                                 >
 
 
-                        <h:form id="person-addupdate-form">
+                        <h:form id="person-add-form">
 
                             
                             <h:panelGrid columns="1"

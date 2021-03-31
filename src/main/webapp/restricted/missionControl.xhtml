@@ -34,9 +34,12 @@
 
 
                                     <div class="icon-box-centered" style="font-size:5em;">
-                                         <i class="material-icons">
-                                             <h:outputText value="home"/>
-                                         </i>
+                                        <a href="#prop-search-query-panel">
+                                            
+                                            <i class="material-icons">
+                                                 <h:outputText value="home"/>
+                                             </i>
+                                        </a> 
                                     </div>
                                     <div style="font-size: 5em;">
                                         <h:outputText  id="prop-count-num-ot"
@@ -59,6 +62,13 @@
                                 </div>
                                 <div class="ui-g-6 ui-md-4 ui-lg-2 restrict-data-field-vertical">
 
+                                    <div class="icon-box-centered" style="font-size:5em;">
+                                        <a href="#event-search-panel">
+                                            <i class="material-icons">
+                                                 <h:outputText value="directions_run"/>
+                                             </i>
+                                        </a> 
+                                    </div>
                                     <div style="font-size: 5em;">
                                         <h:outputText  id="event-activity-num-ot"
                                                        rendered="#{eventsBB.querySelected.queryExecuted}"
@@ -66,15 +76,26 @@
 
                                     </div>
                                     <div style="font-style: italic;">
-                                        <h:outputText  id="event-activity-num-descr"
-                                                       rendered="#{eventsBB.querySelected.queryExecuted}"
-                                                       value="events logged in the past month" />
+                                        <div class="restrict-main-contents-io-link">
+                                            
+                                            <a href="#event-search-panel">
+                                                <h:outputText  id="event-activity-num-descr"
+                                                               rendered="#{eventsBB.querySelected.queryExecuted}"
+                                                               value="events logged in the past month" />
+                                            </a>
+                                        </div>
 
                                     </div>
 
                                 </div>
 
                                 <div class="ui-g-6 ui-md-4 ui-lg-2 restrict-data-field-vertical">
+                                    
+                                    <div class="icon-box-centered" style="font-size:5em;">
+                                         <i class="material-icons">
+                                             <h:outputText value="more_time"/>
+                                         </i>
+                                    </div>
                                     <div style="font-size: 5em;">
                                         <h:outputText  id="event-activity-mins-ot"
                                                        rendered="#{eventsBB.querySelected.queryExecuted}"
@@ -93,6 +114,14 @@
                                 </div>
 
                                 <div class="ui-g-6 ui-md-4 ui-lg-2 restrict-data-field-vertical">
+                                    
+                                    <div class="icon-box-centered" style="font-size:5em;">
+                                        <a href="#cecase-query-panel">
+                                            <i class="material-icons">
+                                                <h:outputText value="gavel"/>
+                                            </i>
+                                        </a>
+                                    </div>
 
                                     <div style="font-size: 5em;">
                                         <h:outputText  id="case-count-num-ot"
@@ -116,6 +145,14 @@
                                 </div>
 
                                 <div class="ui-g-6 ui-md-4 ui-lg-2 restrict-data-field-vertical">
+                                    
+                                    <div class="icon-box-centered" style="font-size:5em;">
+                                        <a href="#dashpanel-ce-cears">
+                                            <i class="material-icons">
+                                                <h:outputText value="notification_important"/>
+                                            </i>
+                                        </a>
+                                    </div>
                                     <div style="font-size: 5em;">
                                         <h:outputText  id="cear-count-num-ot"
                                                        rendered="#{!(empty sessionBean.sessCEARList)}"
@@ -141,6 +178,13 @@
 
                                 <div class="ui-g-6 ui-md-4 ui-lg-2 restrict-data-field-vertical">
 
+                                    <div class="icon-box-centered" style="font-size:5em;">
+                                        <a href="#event-future-list-panel">
+                                            <i class="material-icons">
+                                                <h:outputText value="alarm"/>
+                                            </i>
+                                        </a>
+                                    </div>
                                     <div style="font-size: 5em;">
                                         <h:outputText  id="events-future-num-ot"
                                                        rendered="#{sessionBean.queryEventFuture7Days.queryExecuted}"
@@ -506,7 +550,7 @@
                                                     <div class="restrict-main-contents-io-link">
                                                         <p:commandLink id="prop-search-advanced-button"
                                                                        ajax="true"
-                                                                       actionListener="#{propertyProfileBB.onAdvancedSearchButtonChange}"
+                                                                       actionListener="#{propertySearchBB.onAdvancedSearchButtonChange}"
                                                                        oncomplete="PF('prop-search-advanced-var').show()"
                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                                        value="Advanced search"
@@ -613,7 +657,7 @@
                                          collapsed="false"
                                          style="width:100%;"
                                          header="Property Search Results"
-                                         rendered="#{propertyProfileBB.activeLookupMode}">
+                                         rendered="true">
 
 
                                     <h:form id="prop-search-results-form">
@@ -695,7 +739,7 @@
                                           collapsed="true"
                                           style="width:100%;"
                                           header="Property Query log"
-                                          rendered="#{propertyProfileBB.activeLookupMode}">
+                                          rendered="true">
 
                                     <h:form id="prop-search-log-form">
                                         <div class='search-query-desc'>
@@ -834,7 +878,7 @@
 
                                         <p:spacer height="5px" />
 
-                                        <h:outputText value="list contains #{ceCaseSearchProfileBB.caseListSize} code enforcement cases" 
+                                        <h:outputText value="listing #{ceCaseSearchProfileBB.caseListSize} cases" 
                                                       styleClass="italic"/>
                                         <p:spacer height="5px" />
 
@@ -848,7 +892,7 @@
                                             value="#{ceCaseSearchProfileBB.caseList}"
                                             tableStyleClass="primeDataTable">
 
-                                            <p:column width="5%" >
+                                            <p:column width="5%" sortBy="#{c.caseID}">
                                                 <f:facet name="header">
                                                     <h:outputText value="ID" />
                                                 </f:facet>
@@ -890,12 +934,15 @@
                                                 <f:facet name="header">
                                                     <h:outputText value="Actions" />
                                                 </f:facet>
-                                                <p:commandButton id="cecase-search-view-case"
-                                                                 icon="fa fa-folder-open-o"
-                                                                 value="Details"
-                                                                 action="#{missionControlBB.onViewCECaseButtonChange(c)}"
-                                                                 ajax="false"
-                                                                 />
+                                                
+                                                <div class="restrict-main-contents-io-link">
+
+                                                        <p:commandLink  id="cecase-search-view-case"
+                                                                        value="view"
+                                                                        action="#{missionControlBB.onViewCECaseButtonChange(c)}"
+                                                                        ajax="false"/>
+
+                                                </div>
                                             </p:column>
                                         </p:dataTable>
 

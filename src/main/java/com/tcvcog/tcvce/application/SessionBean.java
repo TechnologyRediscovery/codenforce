@@ -87,7 +87,6 @@ public class    SessionBean
     /* >>>                   III Property                                 <<< */
     /* >>> -------------------------------------------------------------- <<< */
     private PropertyDataHeavy sessProperty;
-    private Property sessPropertyQueued;
     private List<Property> sessPropertyList;
     
     private PropertyUnit sessPropertyUnit;
@@ -109,7 +108,12 @@ public class    SessionBean
         if(propID == 0){
             throw new BObStatusException("Prop ID cannot be 0");
         }
-        pc.getProperty(propID);
+        Property pr = pc.getProperty(propID);
+        try {
+            sessProperty = pc.assemblePropertyDataHeavy(pr, sessUser);
+        } catch (SearchException ex) {
+            System.out.println(ex);
+        }
     }
     
     /**
@@ -1328,19 +1332,7 @@ public class    SessionBean
         this.sessMuniQueued = sessMuniQueued;
     }
 
-    /**
-     * @return the sessPropertyQueued
-     */
-    public Property getSessPropertyQueued() {
-        return sessPropertyQueued;
-    }
-
-    /**
-     * @param sessPropertyQueued the sessPropertyQueued to set
-     */
-    public void setSessPropertyQueued(Property sessPropertyQueued) {
-        this.sessPropertyQueued = sessPropertyQueued;
-    }
+  
 
     /**
      * @return the sessEvent

@@ -28,22 +28,7 @@
                                 <!-- LIST DATA CONTAINER --> 
                                 <div class="ui-g-12 ui-md-4 ui-lg-4 list-data-container">
 
-                                    <!-- MODE SELECTION --> 
-                                    <h:form id="mode-form">
-                                        <div class="restrict-main-list-mode-button">
-                                            <p:selectOneButton  value="#{propertyProfileBB.currentMode}"
-                                                                unselectable="false"
-                                                                tabindex="1"
-                                                                style="width: 100%"
-                                                                >
-                                                <f:selectItems value="#{propertyProfileBB.pageModes}"
-                                                               var="pmo"
-                                                               itemLabel="#{pmo.title}"
-                                                               itemDisabled="#{!propertyProfileBB.currentPropertySelected and pmo.objectSelectRequiredToEnable}"/>
-                                                <f:ajax render="@all"/>
-                                            </p:selectOneButton>
-                                        </div>
-                                    </h:form>
+
 
                                     <!-- PANEL CONTAINER -->
                                     <p:panel id="prop-search-query-panel"
@@ -52,7 +37,7 @@
                                              collapsed="false"
                                              style="width:100%;"
                                              header="Property Search"
-                                             rendered="#{propertyProfileBB.activeLookupMode}">
+                                             rendered="true">
 
                                         <!--MESSAGES -->
                                         <h:form id="prop-search-messages-form">
@@ -115,7 +100,7 @@
                                                         <div class="restrict-main-contents-io-link">
                                                             <p:commandLink id="prop-search-advanced-button"
                                                                            ajax="true"
-                                                                           actionListener="#{propertyProfileBB.onAdvancedSearchButtonChange}"
+                                                                           actionListener="#{propertySearchBB.onAdvancedSearchButtonChange}"
                                                                            oncomplete="PF('prop-search-advanced-var').show()"
                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                                            value="Advanced search"
@@ -223,7 +208,7 @@
                                              collapsed="false"
                                              style="width:100%;"
                                              header="Search Results"
-                                             rendered="#{propertyProfileBB.activeLookupMode}">
+                                             rendered="true">
 
 
                                         <h:form id="prop-search-results-form">
@@ -288,14 +273,12 @@
                                                         <p:commandButton id="prop-search-loadprop-button"
                                                                          icon="fa fa-folder-open-o"
                                                                          value="Load"
-                                                                         style="#{prop.parID == propertyProfileBB.currentProperty.propertyID ? 'background-color: #dee461; color:black;':''}"
-                                                                         action="#{propertyProfileBB.onExplorePropertyButtonChange(prop)}"
+                                                                         style="#{prop.parID == propertySearchBB.currentProperty.propertyID ? 'background-color: #dee461; color:black;':''}"
+                                                                         action="#{propertySearchBB.exploreProperty(prop)}"
                                                                          ajax="true"
                                                                          update="
                                                                          form-messages-global
                                                                          propinfo-panel-info
-                                                                         propinfo-panel-addupdate
-                                                                         prop-remove-panel
                                                                          prop-workflow-panel
                                                                          prop-events-panel
                                                                          prop-persons-panel
@@ -318,7 +301,7 @@
                                               collapsed="true"
                                               style="width:100%;"
                                               header="Query log"
-                                              rendered="#{propertyProfileBB.activeLookupMode}">
+                                              rendered="true">
 
                                         <h:form id="prop-search-log-form">
                                             <div class='search-query-desc'>
@@ -334,31 +317,57 @@
                                 <!-- OBJECT DATA CONTAINER --> 
                                 <div class="ui-g-12 ui-md-8 ui-lg-8 object-data-container">
 
-                                    <!-- OBJECT DATA TITLE --> 
-                                    <div class="restrict-main-object-title">
-
-                                        <h:form id="prop-info-header-form">
-                                            <h:outputText id="header-ot" styleClass="dataText" value="#{propertyProfileBB.currentProperty.address}" />
-                                            <h:outputText value=" (" />
-                                            <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}" />
-                                            <h:outputText value=") " />
-                                        </h:form>
-
-                                    </div>
 
                                     <p:outputPanel id = "prop-lists-outpanel" >
+                                        <p:panel id="property-tools-panel"
+                                                 toggleable="true"
+                                                 collapsed="false"
+                                                 header="Property tools: #{propertySearchBB.currentProperty.muni.muniName}"
+                                                 rendered="true"
+                                                 >
+                                            
+                                            <h:form id="property-tools-form">
+                                                
+                                                <p:commandButton id="prop-add-init-cb"
+                                                                 ajax="true"
+                                                                 value="Add new property"
+                                                                 icon="fa fa-plus"
+                                                                 actionListener="#{propertySearchBB.onPropertyAddInit}"
+                                                                 oncomplete="PF('prop-addupdate-dialog-var').show();"
+                                                                 update="prop-addupdate-dialog
+                                                                 prop-addupdate-form" />
+                                                
+                                                
+                                            </h:form>
+                                        </p:panel>
 
                                         <!-- OBJECT DATA PANEL--> 
                                         <p:panel id="propinfo-panel-info"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="Property Record ID:#{propertyProfileBB.currentProperty.propertyID} (Created: #{propertyProfileBB.getPrettyDate(propertyProfileBB.currentProperty.creationTS)} | Last udpated:#{propertyProfileBB.getPrettyDate(propertyProfileBB.currentProperty.lastUpdatedTS)})"
-                                                 rendered="#{propertyProfileBB.getActiveViewMode() }"
+                                                 header="#{propertySearchBB.currentProperty.address} (#{propertySearchBB.currentProperty.muni.muniName})"
+                                                 rendered="#{propertySearchBB.currentPropertySelected}"
                                                  >
-
-                                            <p:spacer height="10px"/>
-
                                             <h:form id="evruleconfig-panel-info-form">
+                                                
+                                                <div class="object-metadata">
+                                                    <h:outputText value="ID: #{propertySearchBB.currentProperty.propertyID} "/>
+                                                    <h:outputText value="Created: #{propertySearchBB.getPrettyDate(propertySearchBB.currentProperty.creationTS)} "/>
+                                                    <h:outputText value="Last udpated:#{propertySearchBB.getPrettyDate(propertySearchBB.currentProperty.lastUpdatedTS)}" />
+                                                
+                                                </div>
+                                            
+   
+                                                <p:commandButton id="prop-update-init-cb"
+                                                                 ajax="true"
+                                                                 value="Update property"
+                                                                 icon="fa fa-edit"
+                                                                 actionListener="#{propertySearchBB.onPropertyUpdateInit}"
+                                                                 oncomplete="PF('prop-addupdate-dialog-var').show();"
+                                                                 update="prop-addupdate-dialog
+                                                                 prop-addupdate-form" />
+                                                
+                                                
 
                                                 <!-- NESTED DATA CONTAINER -->
                                                 <div class="ui-g data_container_nested_restrict">
@@ -373,13 +382,13 @@
                                                         <!--NESTED DATA VALUE INLINE -->
                                                         <div class="restrict-data-field-value-inline" >
 
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.address}" />
+                                                            <h:outputText value="#{propertySearchBB.currentProperty.address}" />
                                                             <br/>
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.address_city}" />
+                                                            <h:outputText value="#{propertySearchBB.currentProperty.address_city}" />
                                                             <h:outputText value=", " />
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.address_state}" />
+                                                            <h:outputText value="#{propertySearchBB.currentProperty.address_state}" />
                                                             <h:outputText value=" " />
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.address_zip}" />
+                                                            <h:outputText value="#{propertySearchBB.currentProperty.address_zip}" />
                                                         </div>
                                                     </div>
 
@@ -391,7 +400,7 @@
                                                         </div>
                                                         <!--NESTED DATA VALUE INLINE -->
                                                         <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.countyCode}" />
+                                                            <h:outputText value="#{propertySearchBB.currentProperty.countyCode}" />
 
                                                         </div>
                                                     </div>
@@ -404,7 +413,7 @@
                                                         </div>
                                                         <!--NESTED DATA VALUE INLINE -->
                                                         <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.useGroup}" />
+                                                            <h:outputText value="#{propertySearchBB.currentProperty.useGroup}" />
 
                                                         </div>
                                                     </div>
@@ -417,8 +426,8 @@
                                                         </div>
                                                         <!--NESTED DATA VALUE INLINE -->
                                                         <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{!(empty propertyProfileBB.currentProperty.landBankProspect)
-                                                                                   ? propertyProfileBB.currentProperty.landBankProspect.title : ' '}" />
+                                                            <h:outputText value="#{!(empty propertySearchBB.currentProperty.landBankProspect)
+                                                                                   ? propertySearchBB.currentProperty.landBankProspect.title : ' '}" />
 
                                                         </div>
                                                     </div>
@@ -431,8 +440,8 @@
                                                         </div>
                                                         <!--NESTED DATA VALUE INLINE -->
                                                         <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName}
-                                                                          (ID:#{propertyProfileBB.currentProperty.muni.muniCode})" />
+                                                            <h:outputText value="#{propertySearchBB.currentProperty.muni.muniName}
+                                                                          (ID:#{propertySearchBB.currentProperty.muni.muniCode})" />
 
                                                         </div>
                                                     </div>
@@ -445,7 +454,7 @@
                                                         </div>
                                                         <!--NESTED DATA VALUE INLINE -->
                                                         <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.constructionType}" />
+                                                            <h:outputText value="#{propertySearchBB.currentProperty.constructionType}" />
 
                                                         </div>
                                                     </div>
@@ -458,7 +467,7 @@
                                                         </div>
                                                         <!--NESTED DATA VALUE INLINE -->
                                                         <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.landBankHeld}" />
+                                                            <h:outputText value="#{propertySearchBB.currentProperty.landBankHeld}" />
 
                                                         </div>
                                                     </div>
@@ -471,7 +480,7 @@
                                                         </div>
                                                         <!--NESTED DATA VALUE INLINE -->
                                                         <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.parID}" />
+                                                            <h:outputText value="#{propertySearchBB.currentProperty.parID}" />
 
                                                         </div>
                                                     </div>
@@ -483,8 +492,8 @@
                                                         </div>
                                                         <!--NESTED DATA VALUE INLINE -->
                                                         <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{!(empty propertyProfileBB.currentProperty.condition)
-                                                                                   ? propertyProfileBB.currentProperty.condition.title
+                                                            <h:outputText value="#{!(empty propertySearchBB.currentProperty.condition)
+                                                                                   ? propertySearchBB.currentProperty.condition.title
                                                                                    : ''}" />
 
                                                         </div>
@@ -497,7 +506,7 @@
                                                         </div>
                                                         <!--NESTED DATA VALUE INLINE -->
                                                         <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.nonAddressable}" />
+                                                            <h:outputText value="#{propertySearchBB.currentProperty.nonAddressable}" />
 
                                                         </div>
                                                     </div>
@@ -509,7 +518,7 @@
                                                         </div>
                                                         <!--NESTED DATA VALUE INLINE -->
                                                         <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.lotAndBlock}"  />
+                                                            <h:outputText value="#{propertySearchBB.currentProperty.lotAndBlock}"  />
 
                                                         </div>
                                                     </div>
@@ -521,8 +530,8 @@
                                                         </div>
                                                         <!--NESTED DATA VALUE INLINE -->
                                                         <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{!(empty propertyProfileBB.currentProperty.bobSource)
-                                                                                   ? propertyProfileBB.currentProperty.bobSource.title : ''}"  />
+                                                            <h:outputText value="#{!(empty propertySearchBB.currentProperty.bobSource)
+                                                                                   ? propertySearchBB.currentProperty.bobSource.title : ''}"  />
 
                                                         </div>
                                                     </div>
@@ -534,7 +543,7 @@
                                                         </div>
                                                         <!--NESTED DATA VALUE INLINE -->
                                                         <div class="restrict-data-field-value-inline" >
-                                                            <h:outputText value="#{propertyProfileBB.currentProperty.active}" />
+                                                            <h:outputText value="#{propertySearchBB.currentProperty.active}" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -568,12 +577,12 @@
                                                         <!--NESTED DATA VALUE VERTICAL -->
                                                         <div class="restrict-data-field-value-vertical" >
                                                             <h:outputText id="propinfo-ot-unfitstart-1"
-                                                                          value="#{!(empty propertyProfileBB.currentProperty.unfitDateStart) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.unfitDateStart) : ''}" />
+                                                                          value="#{!(empty propertySearchBB.currentProperty.unfitDateStart) ? propertySearchBB.getPrettyDateNoTime(propertySearchBB.currentProperty.unfitDateStart) : ''}" />
                                                         </div>
                                                         <!--NESTED DATA VALUE VERTICAL -->
                                                         <div class="restrict-data-field-value-vertical" >
                                                             <h:outputText id="propinfo-ot-unfitstop-1"
-                                                                          value="#{!(empty propertyProfileBB.currentProperty.unfitDateStop) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.unfitDateStop) : ''}" />
+                                                                          value="#{!(empty propertySearchBB.currentProperty.unfitDateStop) ? propertySearchBB.getPrettyDateNoTime(propertySearchBB.currentProperty.unfitDateStop) : ''}" />
                                                         </div>
 
                                                     </div>
@@ -588,13 +597,13 @@
                                                         <div class="restrict-data-field-value-vertical" >
 
                                                             <h:outputText id="propinfo-ot-vacantstart-1"
-                                                                          value="#{!(empty propertyProfileBB.currentProperty.vacantDateStart) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.vacantDateStart) : ''}" />
+                                                                          value="#{!(empty propertySearchBB.currentProperty.vacantDateStart) ? propertySearchBB.getPrettyDateNoTime(propertySearchBB.currentProperty.vacantDateStart) : ''}" />
 
                                                         </div>
                                                         <!--NESTED DATA VALUE VERTICAL -->
                                                         <div class="restrict-data-field-value-vertical" >
                                                             <h:outputText id="propinfo-ot-vacantstop-1"
-                                                                          value="#{!(empty propertyProfileBB.currentProperty.vacantDateStop) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.vacantDateStop) : ''}" />
+                                                                          value="#{!(empty propertySearchBB.currentProperty.vacantDateStop) ? propertySearchBB.getPrettyDateNoTime(propertySearchBB.currentProperty.vacantDateStop) : ''}" />
                                                         </div>
 
                                                     </div>
@@ -608,13 +617,13 @@
                                                         <!--NESTED DATA VALUE VERTICAL -->
                                                         <div class="restrict-data-field-value-vertical" >
                                                             <h:outputText id="propinfo-ot-abandonedstart-1"
-                                                                          value="#{!(empty propertyProfileBB.currentProperty.abandonedDateStart) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.abandonedDateStart) : ''}" />
+                                                                          value="#{!(empty propertySearchBB.currentProperty.abandonedDateStart) ? propertySearchBB.getPrettyDateNoTime(propertySearchBB.currentProperty.abandonedDateStart) : ''}" />
 
                                                         </div>
                                                         <!--NESTED DATA VALUE VERTICAL -->
                                                         <div class="restrict-data-field-value-vertical" >
                                                             <h:outputText id="propinfo-ot-abandonedstop-1"
-                                                                          value="#{!(empty propertyProfileBB.currentProperty.abandonedDateStop) ? propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentProperty.abandonedDateStop) : ''}" />
+                                                                          value="#{!(empty propertySearchBB.currentProperty.abandonedDateStop) ? propertySearchBB.getPrettyDateNoTime(propertySearchBB.currentProperty.abandonedDateStop) : ''}" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -622,392 +631,18 @@
 
                                         </p:panel>
 
-                                        <!--Insert Table-->
-                                        <p:panel id="propinfo-panel-addupdate"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="#{propertyProfileBB.currentProperty.propertyID == 0 ? 'New property record':'Update property record'}"
-                                                 rendered="#{propertyProfileBB.getActiveInsertUpdateMode() }"
-                                                 >
-
-                                            <h:form id="prop-add-form">
-
-
-                                                <p:commandButton    id="prop-add-addnew-commit-button-1"
-                                                                    icon="fa fa-thmubs-o-up"
-                                                                    ajax="false"
-                                                                    action="#{propertyProfileBB.onInsertButtonChange()}"
-                                                                    value="Commit record"
-                                                                    rendered="#{propertyProfileBB.currentProperty.propertyID == 0}"
-                                                                    />
-
-                                                <p:commandButton    id="prop-add-update-commit-button-1"
-                                                                    icon="fa fa-edit"
-                                                                    ajax="false"
-                                                                    action="#{propertyProfileBB.onUpdateButtonChange()}"
-                                                                    value="Commit updates"
-                                                                    rendered="#{propertyProfileBB.currentProperty.propertyID != 0}"
-                                                                    />
-
-                                                <p:commandButton    id="prop-add-discard-button-1"
-                                                                    icon="fa fa-trash-o"
-                                                                    ajax="false"
-                                                                    action="#{propertyProfileBB.onDiscardNewPropertyDataButtonChange}"
-                                                                    value="Discard new record"
-                                                                    rendered="#{propertyProfileBB.currentProperty.propertyID == 0}"
-                                                                    />
-
-                                                <div    id="prop-add-container-div"
-                                                        class="ui-g data-container">
-
-                                                    <div    id="prop-add-muni-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel  value="Municipality"
-                                                                        for="prop-add-muni-som"/>
-
-                                                        <h:selectOneMenu id="prop-add-muni-som"
-                                                                         value="#{propertyProfileBB.currentProperty.muni}" style="width:175px;height:25px">
-                                                            <f:converter converterId="muniConverter"/>
-                                                            <f:selectItems id="propinfoedit-muninamelist"
-                                                                           value="#{sessionBean.sessUser.authMuniList}"
-                                                                           var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
-
-                                                        </h:selectOneMenu>
-                                                    </div>
-                                                    <div    id="prop-add-address-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-                                                        <p:outputLabel value="Street Address"/>
-                                                        <p:spacer width="3px"/>
-                                                        <p:inputText    id="prop-add-address-it"
-                                                                        value="#{propertyProfileBB.currentProperty.address}"
-                                                                        />
-                                                    </div>
-
-                                                    <div    id="prop-add-cit-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-                                                        <p:outputLabel      id="prop-add-cit-ol"
-                                                                            value="City"
-                                                                            for="prop-add-cit-it"
-                                                                            styleClass="data_field_label"/>
-
-                                                        <p:inputText    id="prop-add-cit-it"
-                                                                        value="#{propertyProfileBB.currentProperty.address_city}"
-                                                                        />
-
-                                                    </div>
-
-                                                    <div    id="prop-add-state-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="State"
-                                                                       for="prop-add-state-it"
-                                                                       />
-
-                                                        <p:inputText    id="prop-add-state-it"
-                                                                        value="#{propertyProfileBB.currentProperty.address_state}"
-                                                                        />
-
-                                                    </div>
-
-                                                    <div    id="prop-add-zip-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Zip Code"
-                                                                       for="prop-add-zip-it"
-                                                                       />
-
-                                                        <p:inputText    id="prop-add-zip-it"
-                                                                        value="#{propertyProfileBB.currentProperty.address_zip}"
-                                                                        />
-                                                    </div>
-
-
-                                                    <div    id="prop-add-lab-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel  value="Lot and Block"
-                                                                        for="prop-add-lab-it"/>
-
-                                                        <p:inputText    id="prop-add-lab-it"
-                                                                        value="#{propertyProfileBB.currentProperty.lotAndBlock}"
-                                                                        />
-
-                                                    </div>
-
-                                                    <div    id="prop-add-parid-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="ParcelID"
-                                                                       for="prop-add-parid-it"/>
-
-                                                        <p:inputText    id="prop-add-parid-it"
-                                                                        value="#{propertyProfileBB.currentProperty.parID}"/>
-                                                    </div>
-
-                                                    <div    id="prop-add-usegroup-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Use Group"
-                                                                       for="prop-add-usegroup-it"/>
-
-                                                        <p:inputText    id="prop-add-usegroup-it"
-                                                                        value="#{propertyProfileBB.currentProperty.useGroup}"/>
-                                                    </div>
-
-
-                                                    <div    id="prop-add-const-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Construction type"
-                                                                       for="prop-add-const-it"/>
-
-                                                        <p:inputText    id="prop-add-const-it"
-                                                                        value="#{propertyProfileBB.currentProperty.constructionType}"/>
-                                                    </div>
-
-
-                                                    <ui:remove>
-                                                        
-
-                                                    <div    id="prop-add-cond-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel  value="Condition"
-                                                                        for="prop-add-condition-som"/>
-
-                                                        <h:selectOneMenu id="prop-add-condition-som"
-                                                                         value="#{propertyProfileBB.currentProperty.condition}" style="width:175px;height:25px">
-                                                            <f:converter converterId="intensityClassConverter"/>
-                                                            <f:selectItem itemLabel="select a muni..." noSelectionOption="true" />
-                                                            <f:selectItems id="propinfoedit-condition-selitems"
-                                                                           value="#{propertyProfileBB.conditionIntensityList}"
-                                                                           var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
-
-                                                        </h:selectOneMenu>
-                                                    </div>
-
-                                                    <div    id="prop-add-landprospect-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel  value="Land Bank Prospect"
-                                                                        for="prop-add-landprospect-som"/>
-
-                                                        <h:selectOneMenu id="prop-add-landprospect-som"
-                                                                         value="#{propertyProfileBB.currentProperty.landBankProspect}" style="width:175px;height:25px">
-                                                            <f:converter converterId="intensityClassConverter"/>
-                                                            <f:selectItem itemLabel="select a muni..." noSelectionOption="true" />
-                                                            <f:selectItems id="propinfoedit-landprospect-selitems"
-                                                                           value="#{propertyProfileBB.landBankProspectIntensityList}"
-                                                                           var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
-
-                                                        </h:selectOneMenu>
-                                                    </div>
-
-                                                    <div    id="prop-add-source-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel  value="Object Source"
-                                                                        for="prop-add-source-som"/>
-
-                                                        <h:selectOneMenu id="prop-add-source-som"
-                                                                         value="#{propertyProfileBB.currentProperty.bobSource}" style="width:175px;height:25px">
-                                                            <f:converter converterId="bobSourceConverter"/>
-                                                            <f:selectItem itemLabel="select a source..." noSelectionOption="true" />
-                                                            <f:selectItems id="propinfoedit-sourcess-elitems"
-                                                                           value="#{propertyProfileBB.sourceList}"
-                                                                           var="bs" itemValue="#{bs}" itemLabel="#{bs.title}"/>
-
-                                                        </h:selectOneMenu>
-                                                    </div>
-
-                                                    </ui:remove>
-
-                                                    <div    id="prop-add-unfit-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Unfit Start Date"
-                                                                       for="prop-add-unfit-start-cal"/>
-
-                                                        <p:calendar id="prop-add-unfit-start-cal"
-                                                                    value="#{propertyProfileBB.currentProperty.unfitDateUtilStart}"
-                                                                    mode="popup"
-                                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                    navigator="true"
-                                                                    tabindex="16"
-                                                                    timeInput="true"
-                                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                                    showButtonPanel="true"
-                                                                    showTodayButton="true"
-                                                                    maxdate="#{propertyProfileBB.currentProperty.unfitDateUtilStop}">
-                                                        </p:calendar>
-                                                    </div>
-
-                                                    <div    id="prop-add-unfit-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Unfit End Date"
-                                                                       for="prop-add-unfit-end-cal"/>
-                                                        <p:spacer height="3px"/>
-                                                        <p:calendar id="prop-add-unfit-end-cal"
-                                                                    value="#{propertyProfileBB.currentProperty.unfitDateUtilStop}"
-                                                                    mode="popup"
-                                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                    navigator="true"
-                                                                    tabindex="16"
-                                                                    timeInput="true"
-                                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                                    showButtonPanel="true"
-                                                                    showTodayButton="true"
-                                                                    mindate="#{propertyProfileBB.currentProperty.unfitDateUtilStart}">
-                                                        </p:calendar>
-
-                                                    </div>
-
-                                                    <div    id="prop-add-vacant-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel  value="Vacant Start Date"
-                                                                        for="prop-add-vacant-start-cal"/>
-
-                                                        <p:calendar id="prop-add-vacant-start-cal"
-                                                                    value="#{propertyProfileBB.currentProperty.vacantDateUtilStart}"
-                                                                    mode="popup"
-                                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                    navigator="true"
-                                                                    tabindex="16"
-                                                                    timeInput="true"
-                                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                                    showButtonPanel="true"
-                                                                    showTodayButton="true"
-                                                                    maxdate="#{propertyProfileBB.currentProperty.vacantDateUtilStop}">
-                                                        </p:calendar>
-                                                    </div>
-
-                                                    <div    id="prop-add-vacant-stop-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Vacant Stop Date"
-                                                                       for="prop-add-vacant-stop-cal"/>
-
-                                                        <p:calendar id="prop-add-vacant-stop-cal"
-                                                                    value="#{propertyProfileBB.currentProperty.vacantDateUtilStop}"
-                                                                    mode="popup"
-                                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                    navigator="true"
-                                                                    tabindex="16"
-                                                                    timeInput="true"
-                                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                                    showButtonPanel="true"
-                                                                    showTodayButton="true"
-                                                                    mindate="#{propertyProfileBB.currentProperty.vacantDateUtilStart}">
-                                                        </p:calendar>
-                                                    </div>
-
-                                                    <div    id="prop-add-abandoned-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Abandoned Start Date"
-                                                                       for="prop-add-abandoned-start-cal"/>
-
-                                                        <p:calendar id="prop-add-abandoned-start-cal"
-                                                                    value="#{propertyProfileBB.currentProperty.abandonedDateUtilStart}"
-                                                                    mode="popup"
-                                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                    navigator="true"
-                                                                    tabindex="16"
-                                                                    timeInput="true"
-                                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                                    showButtonPanel="true"
-                                                                    showTodayButton="true"
-                                                                    maxdate="#{propertyProfileBB.currentProperty.abandonedDateUtilStop}">
-                                                        </p:calendar>
-                                                    </div>
-
-                                                    <div    id="prop-add-abandoned-stop-div"
-                                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                                                        <p:outputLabel value="Abandoned Stop Date"
-                                                                       for="prop-add-abandoned-stop-cal"/>
-
-                                                        <p:calendar id="prop-add-abandoned-stop-cal"
-                                                                    value="#{propertyProfileBB.currentProperty.abandonedDateUtilStop}"
-                                                                    mode="popup"
-                                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                                    navigator="true"
-                                                                    tabindex="16"
-                                                                    timeInput="true"
-                                                                    showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                                    showButtonPanel="true"
-                                                                    showTodayButton="true"
-                                                                    mindate="#{propertyProfileBB.currentProperty.abandonedDateUtilStart}">
-                                                        </p:calendar>
-                                                    </div>
-
-
-
-
-                                                    <p:commandButton    id="prop-add-addnew-commit-button-2"
-                                                                        icon="fa fa-thmubs-o-up"
-                                                                        ajax="false"
-                                                                        action="#{propertyProfileBB.onInsertButtonChange()}"
-                                                                        value="Commit record"
-                                                                        rendered="#{propertyProfileBB.currentProperty.propertyID == 0}"
-                                                                        />
-
-                                                    <p:commandButton    id="prop-add-update-commit-button-2"
-                                                                        icon="fa fa-edit"
-                                                                        ajax="false"
-                                                                        action="#{propertyProfileBB.onUpdateButtonChange()}"
-                                                                        value="Commit updates"
-                                                                        rendered="#{propertyProfileBB.currentProperty.propertyID != 0}"
-                                                                        />
-
-                                                    <p:commandButton    id="prop-add-discard-button-2"
-                                                                        icon="fa fa-trash-o"
-                                                                        ajax="true"
-                                                                        action="#{propertyProfileBB.onDiscardNewPropertyDataButtonChange}"
-                                                                        value="Discard new record"
-                                                                        rendered="#{propertyProfileBB.currentProperty.propertyID == 0}"
-                                                                        />
-                                                </div>
-                                            </h:form>
-                                        </p:panel>
-
-
-                                        <p:panel id="prop-remove-panel"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="Remove property"
-                                                 rendered="#{propertyProfileBB.getActiveRemoveMode() }"
-                                                 >
-
-
-                                            <h:form id="propinfo-remove-form">
-
-                                                <p>Caution: This action is like 'delete'; we have to dig the record back out by
-                                                    hand if you goof.</p>
-                                                <p:commandButton icon="fa fa-stop"
-                                                                 ajax="false"
-                                                                 action="#{propertyProfileBB.onRemoveButtonChange()}"
-                                                                 value="Permanently remove property ID:#{propertyProfileBB.currentProperty.propertyID}"
-                                                                 />
-
-                                            </h:form>
-
-                                        </p:panel>
 
                                         <p:panel    id="prop-cases-panel"
                                                     toggleable="true"
                                                     widgetVar="prop-cases-panel-var"
                                                     collapsed="false"
                                                     header="Code Enforcement Cases"
-                                                    rendered="#{propertyProfileBB.getActiveViewMode() }">
+                                                    rendered="#{propertySearchBB.currentPropertySelected}">
                                             <h:form id="prop-cases-panel-form">
 
                                                 <p:commandButton   id="prop-cases-newcase-button"
                                                                    ajax="fase"
-                                                                   action="#{propertyProfileBB.onCreateNewCaseButtonChange}"
+                                                                   action="#{propertySearchBB.onCreateNewCaseButtonChange}"
                                                                    oncomplete="PF('prop-persons-manage-var').show()"
                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                                    value="Create New Code Enforcement Case"
@@ -1018,7 +653,7 @@
 
                                                 <p:dataTable id="prop-cases-table"
                                                              var="cse"
-                                                             value="#{propertyProfileBB.currentProperty.ceCaseList}"
+                                                             value="#{propertySearchBB.currentProperty.ceCaseList}"
                                                              tableStyleClass="primeDataTable"
                                                              rowKey="#{cse.caseID}"
                                                              >
@@ -1027,7 +662,7 @@
                                                               styleClass="centeredColumnContent"
                                                               sortBy="#{cse.originationDate}">
 
-                                                        <h:outputText value="#{!(empty cse.originationDate) ? propertyProfileBB.getPrettyDate(cse.originationDate) : ''}"/>
+                                                        <h:outputText value="#{!(empty cse.originationDate) ? propertySearchBB.getPrettyDate(cse.originationDate) : ''}"/>
 
                                                     </p:column>
 
@@ -1064,7 +699,7 @@
                                                         <p:commandButton    id="prop-person-viewcase-button"
                                                                             ajax="false"
                                                                             styleClass="noFill button-size-small"
-                                                                            action="#{propertyProfileBB.onViewCaseButtonChange(cse)}"
+                                                                            action="#{propertySearchBB.onViewCaseButtonChange(cse)}"
                                                                             icon="fa fa-folder-open-o"
                                                                             value="View"
                                                                             />
@@ -1081,7 +716,7 @@
                                                     widgetVar="prop-events-panel-var"
                                                     collapsed="false"
                                                     header="Units"
-                                                    rendered="#{propertyProfileBB.getActiveViewMode() }">
+                                                    rendered="#{propertySearchBB.currentPropertySelected}">
                                             <h:form id="prop-units-panel-form">
 
 
@@ -1089,7 +724,7 @@
                                                                     ajax="false"
                                                                     value="Configure Units"
                                                                     styleClass="noFill button-size-small"
-                                                                    action="#{propertyProfileBB.onPropUnitExploreButtonChange}"
+                                                                    action="#{propertySearchBB.onPropUnitExploreButtonChange}"
                                                                     icon="fa fa-hotel"
                                                                     />
 
@@ -1097,7 +732,7 @@
 
                                                 <p:dataTable id="prop-units-table"
                                                              var="unit"
-                                                             value="#{propertyProfileBB.currentProperty.unitWithListsList}"
+                                                             value="#{propertySearchBB.currentProperty.unitWithListsList}"
                                                              tableStyleClass="primeDataTable"
                                                              rowKey="#{unit.unitID}"
                                                              >
@@ -1120,21 +755,21 @@
                                                     <p:column headerText="Rent start"
                                                               styleClass="centeredColumnContent">
 
-                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.rentalIntentDateStart)}"/>
+                                                        <h:outputText value="#{propertySearchBB.getPrettyDateNoTime(unit.rentalIntentDateStart)}"/>
 
                                                     </p:column>
 
                                                     <p:column headerText="Rent stop"
                                                               styleClass="centeredColumnContent">
 
-                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.rentalIntentDateStart)}"/>
+                                                        <h:outputText value="#{propertySearchBB.getPrettyDateNoTime(unit.rentalIntentDateStart)}"/>
 
                                                     </p:column>
 
                                                     <p:column headerText="Last updated"
                                                               styleClass="centeredColumnContent">
 
-                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.lastUpdatedTS)}"/>
+                                                        <h:outputText value="#{propertySearchBB.getPrettyDateNoTime(unit.lastUpdatedTS)}"/>
 
                                                     </p:column>
 
@@ -1172,11 +807,11 @@
                                                  widgetVar="prop-workflow-panel-var"
                                                  collapsed="false"
                                                  header="Proposals"
-                                                 rendered="#{propertyProfileBB.getActiveViewMode() }">
+                                                 rendered="false">
                                             <h:form id="prop-workflow-form">
 
                                                 <p:selectOneMenu id="prop-workflow-viewoptions-som"
-                                                                 value="#{propertyProfileBB.selectedPropViewOption}"
+                                                                 value="#{propertySearchBB.selectedPropViewOption}"
                                                                  tabindex="10">
 
                                                     <f:selectItems  id="prop-workflow-viewoptions-selitems"
@@ -1191,7 +826,7 @@
                                                 <p:dataScroller id="proposals-proposalscroller"
                                                                 var="proposal"
                                                                 widgetVar="proposals-proposalscroller-var"
-                                                                value="#{propertyProfileBB.currentProperty.assembleProposalList(propertyProfileBB.selectedPropViewOption)}"
+                                                                value="#{propertySearchBB.currentProperty.assembleProposalList(propertySearchBB.selectedPropViewOption)}"
                                                                 rowIndexVar="#{proposal.proposalID}">
 
                                                     <div class="outlinedBox">
@@ -1273,21 +908,21 @@
                                                     widgetVar="prop-events-panel-var"
                                                     collapsed="false"
                                                     header="Events"
-                                                    rendered="#{propertyProfileBB.getActiveViewMode() }">
+                                                    rendered="#{propertySearchBB.currentPropertySelected}">
 
                                             <h:form id="prop-events-panel-form">
 
 
                                                 <p:selectOneMenu style="width: 300px;" 
                                                                  id="prop-viewoptionsevents-solb" 
-                                                                 value="#{propertyProfileBB.eventViewOptionSelected}" 
+                                                                 value="#{propertySearchBB.eventViewOptionSelected}" 
                                                                  tabindex="10">
 
                                                     <p:ajax update="prop-events-datatable"                                                           
                                                             immediate="true"/>
 
                                                     <f:selectItems  id="prop-events-selitems" 
-                                                                    value="#{propertyProfileBB.eventViewOptions}" 
+                                                                    value="#{propertySearchBB.eventViewOptions}" 
                                                                     var="evo" 
                                                                     itemValue="#{evo}" 
                                                                     itemLabel="#{evo.label}"/>
@@ -1297,7 +932,7 @@
 
                                                 <p:dataTable id="prop-events-datatable"
                                                              var="event"
-                                                             value="#{propertyProfileBB.currentProperty.completeEventList}"
+                                                             value="#{propertySearchBB.currentProperty.completeEventList}"
                                                              tableStyleClass="primeDataTable"
                                                              rowKey="#{event.eventID}"
                                                              >
@@ -1328,7 +963,7 @@
                                                         <p:commandButton    id="prop-events-open-button"
                                                                             ajax="false"
                                                                             styleClass="noFill button-size-small"
-                                                                            action="#{propertyProfileBB.onViewEventButtonChange(event)}"
+                                                                            action="#{propertySearchBB.onViewEventButtonChange(event)}"
                                                                             value="View Event"
                                                                             icon="fa fa-folder-open-o"
                                                                             />
@@ -1347,12 +982,12 @@
                                                     widgetVar="prop-events-panel-var"
                                                     collapsed="false"
                                                     header="Persons"
-                                                    rendered="#{propertyProfileBB.getActiveViewMode() }">
+                                                    rendered="#{propertySearchBB.currentPropertySelected}">
                                             <h:form id="prop-persons-panel-form">
 
                                                 <p:commandButton   id="prop-persons-manage-button"
                                                                    ajax="true"
-                                                                   actionListener="#{propertyProfileBB.onPersonConnectInitButtonChange}"
+                                                                   actionListener="#{propertySearchBB.onPersonConnectInitButtonChange}"
                                                                    oncomplete="PF('prop-persons-manage-var').show()"
                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                                    value="Link Person to Property"
@@ -1363,7 +998,7 @@
 
                                                 <p:dataTable id="prop-persons-table"
                                                              var="person"
-                                                             value="#{propertyProfileBB.currentProperty.personList}"
+                                                             value="#{propertySearchBB.currentProperty.personList}"
                                                              tableStyleClass="primeDataTable"
                                                              rowKey="#{person.personID}"
                                                              >
@@ -1395,7 +1030,7 @@
 
                                                     <p:column headerText="Person Last updated"
                                                               styleClass="centeredColumnContent">
-                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(person.lastUpdated)}" />
+                                                        <h:outputText value="#{propertySearchBB.getPrettyDateNoTime(person.lastUpdated)}" />
 
 
                                                     </p:column>
@@ -1413,7 +1048,7 @@
                                                         <p:commandButton    id="prop-person-removepersonlink-button"
                                                                             ajax="false"
                                                                             styleClass="noFill button-size-small"
-                                                                            action="#{propertyProfileBB.onPersonConnectRemoveButtonChange(person)}"
+                                                                            action="#{propertySearchBB.onPersonConnectRemoveButtonChange(person)}"
                                                                             icon="fa fa-trash"
                                                                             value="Remove Link"
                                                                             disabled="#{!systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
@@ -1423,7 +1058,7 @@
                                                         <p:commandButton    id="prop-person-exploreperson-button"
                                                                             ajax="false"
                                                                             styleClass="noFill button-size-small"
-                                                                            action="#{propertyProfileBB.onViewPersonProfileButtonChange(person)}"
+                                                                            action="#{propertySearchBB.onViewPersonProfileButtonChange(person)}"
                                                                             icon="fa fa-folder-open-o"
                                                                             value="View Person"
                                                                             />
@@ -1443,12 +1078,12 @@
                                                     widgetVar="prop-info-var"
                                                     collapsed="false"
                                                     header="External Data Records"
-                                                    rendered="#{propertyProfileBB.getActiveViewMode() }">
+                                                    rendered="#{propertySearchBB.currentPropertySelected}">
 
                                             <h:form id="prop-extinfo-panel-form">
                                                 <p:dataTable id="prop-extinfo-table"
                                                              var="record"
-                                                             value="#{propertyProfileBB.currentProperty.extDataList}"
+                                                             value="#{propertySearchBB.currentProperty.extDataList}"
                                                              tableStyleClass="primeDataTable"
                                                              rowKey="#{record.extdataid}"
                                                              >
@@ -1456,7 +1091,7 @@
                                                     <p:column headerText="Date"
                                                               styleClass="centeredColumnContent">
 
-                                                        <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(cord.lastUpdatedTS)}"/>
+                                                        <h:outputText value="#{propertySearchBB.getPrettyDateNoTime(cord.lastUpdatedTS)}"/>
 
                                                     </p:column>
 
@@ -1488,7 +1123,7 @@
                                                  toggleable="true"
                                                  collapsed="false"
                                                  header="Property Notes"
-                                                 rendered="#{propertyProfileBB.activeLookupMode }"
+                                                 rendered="#{propertySearchBB.currentPropertySelected}"
                                                  > 
                                             <h:form id="propinfo-notes-form">
                                                 <h:messages id="propinfo-notes-messages"
@@ -1501,7 +1136,7 @@
                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                                                        value="Add new note"  
                                                                        icon="fa fa-sticky-note-o"
-                                                                       actionListener="#{propertyProfileBB.onNoteInitButtonChange}"
+                                                                       actionListener="#{propertySearchBB.onNoteInitButtonChange}"
                                                                        oncomplete="PF('propinfo-notes-dialog-var').show()"
                                                                        update="propinfo-note-create-form"/>
                                                     <p:spacer height="5px" />
@@ -1514,7 +1149,7 @@
 
                                                         <h:outputText   id="propinfo-ot-notes"
                                                                         styleClass="data_field_value"
-                                                                        value="#{propertyProfileBB.currentProperty.notes}"
+                                                                        value="#{propertySearchBB.currentProperty.notes}"
                                                                         escape="false"/>
                                                     </div>
                                                 </div>
@@ -1533,6 +1168,399 @@
                         </div>
 
                     </p:outputPanel>
+                    
+                    <p:dialog id="prop-addupdate-dialog"
+                              header="#{propertySearchBB.currentProperty.propertyID == 0 ? 'New property record':propertySearchBB.currentProperty.address}"
+                              modal="true"
+                              height="800" 
+                              width="550"
+                              widgetVar="prop-addupdate-dialog-var"
+                              closable="true"
+                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                              >
+
+                        <h:form id="prop-addupdate-form">
+
+
+                            <div class="object-metadata">
+                                <h:outputText value="ID: #{propertySearchBB.currentProperty.propertyID} "/>
+                                <h:outputText value="Created: #{propertySearchBB.getPrettyDate(propertySearchBB.currentProperty.creationTS)} "/>
+                                <h:outputText value="Last udpated:#{propertySearchBB.getPrettyDate(propertySearchBB.currentProperty.lastUpdatedTS)}" />
+
+                            </div>
+                                            
+
+
+                            <p:commandButton    id="prop-add-addnew-commit-button-1"
+                                                icon="fa fa-plus"
+                                                ajax="false"
+                                                action="#{propertySearchBB.onPropertyAddCommit}"
+                                                value="Create record"
+                                                rendered="#{propertySearchBB.currentProperty.propertyID == 0}"
+                                                />
+
+                            <p:commandButton    id="prop-add-update-commit-button-1"
+                                                icon="fa fa-edit"
+                                                ajax="false"
+                                                action="#{propertySearchBB.onPropertyUpdateCommit}"
+                                                value="Save updates"
+                                                rendered="#{propertySearchBB.currentProperty.propertyID != 0}"
+                                                />
+                            <div class="restrict-main-contents-io-button gray_button">
+                                
+                                <p:commandButton    id="prop-add-discard-button-1"
+                                                    icon="fa fa-trash-o"
+                                                    ajax="false"
+                                                    action="#{propertySearchBB.onDiscardNewPropertyDataButtonChange}"
+                                                    value="Discard new record"
+                                                    rendered="#{propertySearchBB.currentProperty.propertyID == 0}"
+                                                    />
+                            </div>
+
+                            <div    id="prop-add-container-div"
+                                    class="ui-g data-container">
+
+                                <div    id="prop-add-muni-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel  value="Municipality"
+                                                    for="prop-add-muni-som"/>
+
+                                    <h:selectOneMenu id="prop-add-muni-som"
+                                                     value="#{propertySearchBB.currentProperty.muni}" style="width:175px;height:25px">
+                                        <f:converter converterId="muniConverter"/>
+                                        <f:selectItems id="propinfoedit-muninamelist"
+                                                       value="#{sessionBean.sessUser.authMuniList}"
+                                                       var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
+
+                                    </h:selectOneMenu>
+                                </div>
+                                <div    id="prop-add-address-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+                                    <p:outputLabel value="Street Address"/>
+                                    <p:spacer width="3px"/>
+                                    <p:inputText    id="prop-add-address-it"
+                                                    value="#{propertySearchBB.currentProperty.address}"
+                                                    />
+                                </div>
+
+                                <div    id="prop-add-cit-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+                                    <p:outputLabel      id="prop-add-cit-ol"
+                                                        value="City"
+                                                        for="prop-add-cit-it"
+                                                        styleClass="data_field_label"/>
+
+                                    <p:inputText    id="prop-add-cit-it"
+                                                    value="#{propertySearchBB.currentProperty.address_city}"
+                                                    />
+
+                                </div>
+
+                                <div    id="prop-add-state-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel value="State"
+                                                   for="prop-add-state-it"
+                                                   />
+
+                                    <p:inputText    id="prop-add-state-it"
+                                                    value="#{propertySearchBB.currentProperty.address_state}"
+                                                    />
+
+                                </div>
+
+                                <div    id="prop-add-zip-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel value="Zip Code"
+                                                   for="prop-add-zip-it"
+                                                   />
+
+                                    <p:inputText    id="prop-add-zip-it"
+                                                    value="#{propertySearchBB.currentProperty.address_zip}"
+                                                    />
+                                </div>
+
+
+                                <div    id="prop-add-lab-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel  value="Lot and Block"
+                                                    for="prop-add-lab-it"/>
+
+                                    <p:inputText    id="prop-add-lab-it"
+                                                    value="#{propertySearchBB.currentProperty.lotAndBlock}"
+                                                    />
+
+                                </div>
+
+                                <div    id="prop-add-parid-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel value="ParcelID"
+                                                   for="prop-add-parid-it"/>
+
+                                    <p:inputText    id="prop-add-parid-it"
+                                                    value="#{propertySearchBB.currentProperty.parID}"/>
+                                </div>
+
+                                <div    id="prop-add-usegroup-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel value="Use Group"
+                                                   for="prop-add-usegroup-it"/>
+
+                                    <p:inputText    id="prop-add-usegroup-it"
+                                                    value="#{propertySearchBB.currentProperty.useGroup}"/>
+                                </div>
+
+
+                                <div    id="prop-add-const-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel value="Construction type"
+                                                   for="prop-add-const-it"/>
+
+                                    <p:inputText    id="prop-add-const-it"
+                                                    value="#{propertySearchBB.currentProperty.constructionType}"/>
+                                </div>
+
+
+                                <ui:remove>
+
+
+                                    <div    id="prop-add-cond-div"
+                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                        <p:outputLabel  value="Condition"
+                                                        for="prop-add-condition-som"/>
+
+                                        <h:selectOneMenu id="prop-add-condition-som"
+                                                         value="#{propertySearchBB.currentProperty.condition}" style="width:175px;height:25px">
+                                            <f:converter converterId="intensityClassConverter"/>
+                                            <f:selectItem itemLabel="select a muni..." noSelectionOption="true" />
+                                            <f:selectItems id="propinfoedit-condition-selitems"
+                                                           value="#{propertySearchBB.conditionIntensityList}"
+                                                           var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
+
+                                        </h:selectOneMenu>
+                                    </div>
+
+                                    <div    id="prop-add-landprospect-div"
+                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                        <p:outputLabel  value="Land Bank Prospect"
+                                                        for="prop-add-landprospect-som"/>
+
+                                        <h:selectOneMenu id="prop-add-landprospect-som"
+                                                         value="#{propertySearchBB.currentProperty.landBankProspect}" style="width:175px;height:25px">
+                                            <f:converter converterId="intensityClassConverter"/>
+                                            <f:selectItem itemLabel="select a muni..." noSelectionOption="true" />
+                                            <f:selectItems id="propinfoedit-landprospect-selitems"
+                                                           value="#{propertySearchBB.landBankProspectIntensityList}"
+                                                           var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
+
+                                        </h:selectOneMenu>
+                                    </div>
+
+                                    <div    id="prop-add-source-div"
+                                            class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                        <p:outputLabel  value="Object Source"
+                                                        for="prop-add-source-som"/>
+
+                                        <h:selectOneMenu id="prop-add-source-som"
+                                                         value="#{propertySearchBB.currentProperty.bobSource}" style="width:175px;height:25px">
+                                            <f:converter converterId="bobSourceConverter"/>
+                                            <f:selectItem itemLabel="select a source..." noSelectionOption="true" />
+                                            <f:selectItems id="propinfoedit-sourcess-elitems"
+                                                           value="#{propertySearchBB.sourceList}"
+                                                           var="bs" itemValue="#{bs}" itemLabel="#{bs.title}"/>
+
+                                        </h:selectOneMenu>
+                                    </div>
+
+                                </ui:remove>
+
+                                <div    id="prop-add-unfit-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel value="Unfit Start Date"
+                                                   for="prop-add-unfit-start-cal"/>
+
+                                    <p:calendar id="prop-add-unfit-start-cal"
+                                                value="#{propertySearchBB.currentProperty.unfitDateUtilStart}"
+                                                mode="popup"
+                                                pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                navigator="true"
+                                                tabindex="16"
+                                                timeInput="true"
+                                                showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                showButtonPanel="true"
+                                                showTodayButton="true"
+                                                maxdate="#{propertySearchBB.currentProperty.unfitDateUtilStop}">
+                                    </p:calendar>
+                                </div>
+
+                                <div    id="prop-add-unfit-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel value="Unfit End Date"
+                                                   for="prop-add-unfit-end-cal"/>
+                                    <p:spacer height="3px"/>
+                                    <p:calendar id="prop-add-unfit-end-cal"
+                                                value="#{propertySearchBB.currentProperty.unfitDateUtilStop}"
+                                                mode="popup"
+                                                pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                navigator="true"
+                                                tabindex="16"
+                                                timeInput="true"
+                                                showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                showButtonPanel="true"
+                                                showTodayButton="true"
+                                                mindate="#{propertySearchBB.currentProperty.unfitDateUtilStart}">
+                                    </p:calendar>
+
+                                </div>
+
+                                <div    id="prop-add-vacant-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel  value="Vacant Start Date"
+                                                    for="prop-add-vacant-start-cal"/>
+
+                                    <p:calendar id="prop-add-vacant-start-cal"
+                                                value="#{propertySearchBB.currentProperty.vacantDateUtilStart}"
+                                                mode="popup"
+                                                pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                navigator="true"
+                                                tabindex="16"
+                                                timeInput="true"
+                                                showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                showButtonPanel="true"
+                                                showTodayButton="true"
+                                                maxdate="#{propertySearchBB.currentProperty.vacantDateUtilStop}">
+                                    </p:calendar>
+                                </div>
+
+                                <div    id="prop-add-vacant-stop-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel value="Vacant Stop Date"
+                                                   for="prop-add-vacant-stop-cal"/>
+
+                                    <p:calendar id="prop-add-vacant-stop-cal"
+                                                value="#{propertySearchBB.currentProperty.vacantDateUtilStop}"
+                                                mode="popup"
+                                                pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                navigator="true"
+                                                tabindex="16"
+                                                timeInput="true"
+                                                showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                showButtonPanel="true"
+                                                showTodayButton="true"
+                                                mindate="#{propertySearchBB.currentProperty.vacantDateUtilStart}">
+                                    </p:calendar>
+                                </div>
+
+                                <div    id="prop-add-abandoned-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel value="Abandoned Start Date"
+                                                   for="prop-add-abandoned-start-cal"/>
+
+                                    <p:calendar id="prop-add-abandoned-start-cal"
+                                                value="#{propertySearchBB.currentProperty.abandonedDateUtilStart}"
+                                                mode="popup"
+                                                pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                navigator="true"
+                                                tabindex="16"
+                                                timeInput="true"
+                                                showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                showButtonPanel="true"
+                                                showTodayButton="true"
+                                                maxdate="#{propertySearchBB.currentProperty.abandonedDateUtilStop}">
+                                    </p:calendar>
+                                </div>
+
+                                <div    id="prop-add-abandoned-stop-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel value="Abandoned Stop Date"
+                                                   for="prop-add-abandoned-stop-cal"/>
+
+                                    <p:calendar id="prop-add-abandoned-stop-cal"
+                                                value="#{propertySearchBB.currentProperty.abandonedDateUtilStop}"
+                                                mode="popup"
+                                                pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                navigator="true"
+                                                tabindex="16"
+                                                timeInput="true"
+                                                showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                showButtonPanel="true"
+                                                showTodayButton="true"
+                                                mindate="#{propertySearchBB.currentProperty.abandonedDateUtilStart}">
+                                    </p:calendar>
+                                </div>
+
+
+
+
+                                <p:commandButton    id="prop-add-addnew-commit-button-2"
+                                                    icon="fa fa-plus"
+                                                    ajax="false"
+                                                    action="#{propertySearchBB.onPropertyAddCommit}"
+                                                    value="Save record"
+                                                    rendered="#{propertySearchBB.currentProperty.propertyID == 0}"
+                                                    />
+
+                                <p:commandButton    id="prop-add-update-commit-button-2"
+                                                    icon="fa fa-edit"
+                                                    ajax="false"
+                                                    action="#{propertySearchBB.onPropertyUpdateCommit}"
+                                                    value="Save updates"
+                                                    rendered="#{propertySearchBB.currentProperty.propertyID != 0}"
+                                                    />
+                                <div class="restrict-main-contents-io-button gray_button">
+                                    
+                                    <p:commandButton    id="prop-add-discard-button-2"
+                                                        icon="fa fa-trash-o"
+                                                        ajax="true"
+                                                        action="#{propertySearchBB.onDiscardNewPropertyDataButtonChange}"
+                                                        value="Discard new record"
+                                                        rendered="#{propertySearchBB.currentProperty.propertyID == 0}"
+                                                        />
+                                </div>
+                            </div>
+                        </h:form>
+                    </p:dialog>
+
+
+
+
+                    <p:dialog id="prop-remove-dialog"
+                              modal="true"
+                              height="300" 
+                              width="550"
+                              widgetVar="prop-remove-dialog-var"
+                              closable="true"
+                              header="Remove property #{propertySearchBB.currentProperty.address}"
+                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                              >
+
+                        <h:form id="propinfo-remove-form">
+
+                            <p>Caution: This action is like 'delete'; we have to dig the record back out by
+                                hand if you goof.</p>
+                            <p:commandButton icon="fa fa-stop"
+                                             ajax="false"
+                                             action="#{propertySearchBB.onRemoveButtonChange()}"
+                                             value="Permanently remove property ID:#{propertySearchBB.currentProperty.propertyID}"
+                                             />
+
+                        </h:form>
+                    </p:dialog>
 
 
                     <p:dialog id="prop-persons-manage-dialog"
@@ -1568,7 +1596,7 @@
                                                            onLabel="Link from Person List" 
                                                            offLabel="Link by Manual Person ID Entry"
                                                            styleClass="selectButton" 
-                                                           value="#{propertyProfileBB.personLinkUseID}"
+                                                           value="#{propertySearchBB.personLinkUseID}"
                                                            >
                                         <p:ajax update="prop-person-som-userpersons
                                                 prop-person-addpersonbyid-it" />
@@ -1587,8 +1615,8 @@
 
                                     <p:selectOneMenu id="prop-person-som-userpersons" 
                                                      required="false" 
-                                                     disabled="#{propertyProfileBB.personLinkUseID}"
-                                                     value="#{propertyProfileBB.personSelected}"
+                                                     disabled="#{propertySearchBB.personLinkUseID}"
+                                                     value="#{propertySearchBB.personSelected}"
                                                      styleClass="data_field_value">
 
                                         <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
@@ -1614,8 +1642,8 @@
                                                     styleClass="data_field_label"/>
 
                                     <p:inputText id="prop-person-addpersonbyid-it" 
-                                                 disabled="#{!propertyProfileBB.personLinkUseID}"
-                                                 value="#{propertyProfileBB.personIDToLink}" 
+                                                 disabled="#{!propertySearchBB.personLinkUseID}"
+                                                 value="#{propertySearchBB.personIDToLink}" 
                                                  style="width: 50px;" 
                                                  tabindex="3" 
                                                  type="number"
@@ -1644,7 +1672,7 @@
                                              icon="fa fa-user-circle-o"
                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasDeveloperPermissions}"
                                              disabled="false"
-                                             action="#{propertyProfileBB.onPersonConnectCommitButtonChange}"
+                                             action="#{propertySearchBB.onPersonConnectCommitButtonChange}"
                                              />
 
 
@@ -2077,7 +2105,7 @@
 
                                 </div>
 
-                                
+
                                 <!--NESTED DATA FIELD -->
                                 <div class="ui-g-12 ui-md-4 ui-lg-4 restrict-data-field">
 
@@ -2263,7 +2291,7 @@
                                 <h:panelGroup>
                                     <h:outputText styleClass="ui-label" value="Note text: "/>
                                     <p:editor   id="propinfo-notes-editor"
-                                                value="#{propertyProfileBB.formNoteText}"
+                                                value="#{propertySearchBB.formNoteText}"
                                                 controls="bold italic underline strikethrough font size style color
                                                 bullets numbering center undo redo rule link removeformat"
                                                 width="400" required="false"
@@ -2281,7 +2309,7 @@
 
                                     <p:commandButton   id="propinfo-dialog-notes-button-addnote"
                                                        ajax="true" 
-                                                       actionListener="#{propertyProfileBB.onNoteCommitButtonChange}"
+                                                       actionListener="#{propertySearchBB.onNoteCommitButtonChange}"
                                                        oncomplete="PF('propinfo-notes-dialog-var').hide()"
                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
                                                        value="Attach Note"  

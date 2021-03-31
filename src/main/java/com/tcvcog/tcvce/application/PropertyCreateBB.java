@@ -67,7 +67,7 @@ public class PropertyCreateBB
     
     public void initiatePropertyCreation(ActionEvent ev){
         PropertyCoordinator pc = getPropertyCoordinator();
-        prop = pc.initProperty(getSessionBean().getSessMuni());
+        prop = pc.generatePropertySkeleton(getSessionBean().getSessMuni());
     }
     
     

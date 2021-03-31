@@ -176,7 +176,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             p.setAddress_city(rs.getString("addr_city"));
             
             p.setAddress_state(rs.getString("addr_state"));
-            p.setAddress_state(rs.getString("addr_zip"));
+            p.setAddress_zip(rs.getString("addr_zip"));
             p.setOwnerCode(rs.getString("ownercode"));  // for legacy compat
             p.setPropclass(rs.getString("propclass"));
             

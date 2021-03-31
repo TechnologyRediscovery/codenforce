@@ -77,7 +77,7 @@ public  class       PropertyDataHeavy
         this.notes = prop.getNotes();
         this.address_city = prop.getAddress_city();
         this.address_state = prop.getAddress_state();
-        this.address_zip = prop.address_zip;
+        this.address_zip = prop.getAddress_zip();
 
         this.ownerCode = prop.getOwnerCode();
         this.propclass = prop.getPropclass();
@@ -127,7 +127,7 @@ public  class       PropertyDataHeavy
         this.notes = prop.getNotes();
         this.address_city = prop.getAddress_city();
         this.address_state = prop.getAddress_state();
-        this.address_zip = prop.address_zip;
+        this.address_zip = prop.getAddress_zip();
 
         this.ownerCode = prop.getOwnerCode();
         this.propclass = prop.getPropclass();

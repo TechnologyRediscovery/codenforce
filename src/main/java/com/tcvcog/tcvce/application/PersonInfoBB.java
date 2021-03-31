@@ -35,7 +35,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
 /**
- *
+ * Backing bean for person info page -- TO BE REMOVED
+ * @deprecated replaced when fields collapsed into PersonSearchBB
  * @author Ellen Bascomb
  */
 public class PersonInfoBB extends BackingBeanUtils{
@@ -118,7 +119,7 @@ public class PersonInfoBB extends BackingBeanUtils{
     
     
      public String viewPersonAssociatedProperty(Property p){
-         getSessionBean().setSessPropertyQueued(p);
+         getSessionBean().setSessProperty(p);
         return "propertyInfo";
     }
     
