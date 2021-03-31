@@ -1333,6 +1333,16 @@ gridTd-bignum{
 
 /* -------------------- CLOSE DIALOGS ----------------------- */
 
+/* -------------------- ACTIVE BOBS ----------------------- */
+.activebob-container{
+    display: inline-block;
+    float: left;
+    width: 16.6%;
+    
+    
+}
+/* -------------------- CLOSE ACTIVE BOBS ----------------------- */
+
 
 
 /* -------------------- PROPOSALS AND CHOICES ----------------------- */

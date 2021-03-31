@@ -23,6 +23,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
+import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 
 /**
  *
@@ -31,7 +32,8 @@ import java.util.Objects;
 public  class       EventCnF 
         extends     BOb
         implements  Comparable<EventCnF>,
-                    IFace_Loggable{
+                    IFace_Loggable,
+                    IFace_ActivatableBOB{
     
     protected int eventID;
     protected EventCategory category;

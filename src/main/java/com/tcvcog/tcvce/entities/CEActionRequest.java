@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 
 /**
  * Models the entity: code enforcement action request.This object blends data from several database tables to create
@@ -34,7 +35,9 @@ import java.util.Objects;
  to an CEActionRequest to do with as they please (print, etc.)
  * @author Eric Darsow
  */
-public class CEActionRequest extends BOb implements Serializable{
+public class CEActionRequest 
+        extends BOb 
+        implements Serializable, IFace_ActivatableBOB{
 
     /**
      * @return the blobIDList

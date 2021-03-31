@@ -19,7 +19,9 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -33,6 +35,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
+import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.domain.EventException;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 
 /**
  * Stores member vars of pretty much all our custom types
@@ -77,6 +83,7 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     private CodeSet sessCodeSet;
+    
     private CodeSource sessCodeSource;
     private CodeElementGuideEntry activeCodeElementGuideEntry;
     private EnforcableCodeElement selectedEnfCodeElement;
@@ -87,7 +94,10 @@ public class    SessionBean
     /* >>>                   III Property                                 <<< */
     /* >>> -------------------------------------------------------------- <<< */
     private PropertyDataHeavy sessProperty;
+    private ActivatableRouteEnum sessPropertyRoute;
+    
     private List<Property> sessPropertyList;
+    private ActivatableRouteEnum sessPropertyListRoute;
     
     private PropertyUnit sessPropertyUnit;
     
@@ -139,8 +149,11 @@ public class    SessionBean
     
     
     private PersonDataHeavy sessPerson;
+    private ActivatableRouteEnum sessPersonRoute;
+    
     private Person sessPersonQueued;
     private List<Person> sessPersonList;
+    private ActivatableRouteEnum sessPersonListRoute;
     private boolean onPageLoad_sessionSwitch_viewProfile;
     
     
@@ -162,8 +175,11 @@ public class    SessionBean
      */
     private PageModeEnum sessEventsPagePageModeRequest;
     private EventDomainEnum sessEventsPageEventDomainRequest;
-    private List<EventCnFPropUnitCasePeriodHeavy> sessEventList;
+    
     private EventCnF sessEvent;
+    private ActivatableRouteEnum sessEventRoute;
+    private List<EventCnFPropUnitCasePeriodHeavy> sessEventList;
+    private ActivatableRouteEnum sessEventListRoute;
     
     
     /* >>> QUERY EVENT <<< */
@@ -178,7 +194,9 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     private OccPeriodDataHeavy sessOccPeriod;
+    private ActivatableRouteEnum sessOccPeriodRoute;
     private OccPeriod sessOccPeriodQueued;
+    private ActivatableRouteEnum sessOccPeriodListRoute;
     private List<OccPeriod> sessOccPeriodList;
     
     private OccPermit sessOccPermit;
@@ -194,7 +212,9 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     private CECaseDataHeavy sessCECase;
+    private ActivatableRouteEnum sessCECaseRoute;
     private CECase sessCECaseQueued;
+    private ActivatableRouteEnum sessCECaseListRoute;
     private List<CECasePropertyUnitHeavy> sessCECaseList;
     
     private PageModeEnum ceCaseSearchProfilePageModeRequest;
@@ -220,8 +240,10 @@ public class    SessionBean
     /* >>>              VIII CEActionRequest                              <<< */
     /* >>> -------------------------------------------------------------- <<< */
     
-    private List<CEActionRequest> sessCEARList;
     private CEActionRequest sessCEAR;
+    private ActivatableRouteEnum sessCEARRoute;
+    private List<CEActionRequest> sessCEARList;
+    private ActivatableRouteEnum sessCEARRListoute;
     
     /* *** Code Enf Action Request Session Shelves ***  */
     private Person personForCEActionRequestSubmission;
@@ -312,9 +334,169 @@ public class    SessionBean
     /* >>>                  SESSION SERVICES                              <<< */
     /* >>> -------------------------------------------------------------- <<< */
     
+    
+    /**
+     * Primary entrance point for ALL requests to make a given Business Object
+     * the session active one. This means all other session active objects 
+     * must be synchronized against the requesting BOB, and in some cases 
+     * loading appropriate supporting objects. 
+     * 
+     * For example, choosing to make a case active will require checking the
+     * current property to make sure it's the host of the case, if not, 
+     * the current property will be updated to be compatible with the session 
+     * active one
+     * 
+     * @param bob reqested object to become the session active one. This will
+     * get flagged with a marker enum indicating that's it's the user chosen
+     * object
+     * @param ua
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public void activateSessionObject(IFace_ActivatableBOB bob, UserAuthorized ua) throws BObStatusException{
+        PropertyCoordinator pc = getPropertyCoordinator();
+        PersonCoordinator perc = getPersonCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        EventCoordinator ec = getEventCoordinator();
+        
+        try {
+
+            /*
+            ********** BEGIN CASCADING LOGIC FOR COORDINATING SESSION OBJECTS ******
+            */
+            
+            if(bob instanceof Property){
+                Property prop = (Property) bob;
+                PropertyDataHeavy pdh = pc.assemblePropertyDataHeavy(prop, ua);
+                sessProperty = pdh;
+                sessPropertyRoute = ActivatableRouteEnum.USER_CHOSEN;
+                
+                // PERSONS
+                sessPersonList = pdh.getPersonList();
+                if(sessPersonList != null && !sessPersonList.isEmpty()){
+                    sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
+                    sessPersonRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
+                    sessPersonListRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
+                } else {
+                    sessPersonRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
+                    sessPersonListRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
+                }
+                
+              
+                
+                // CASES 
+                sessCECaseList = pdh.getCeCaseList();
+                if(sessCECaseList != null && !sessCECaseList.isEmpty()){
+                    sessCECase = cc.cecase_assembleCECaseDataHeavy(sessCECaseList.get(0), ua);
+                    sessEventList = ec.assembleEventCnFPropUnitCasePeriodHeavyList(
+                            sessCECase.getEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN));
+                    sessCEARList = sessCECase.getCeActionRequestList();
+                    
+                    sessCECaseRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
+                    sessCECaseListRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
+                    
+                } else {
+                    sessCECaseRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
+                    sessCECaseListRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
+                }
+                
+                // OCC PERIODS
+                sessOccPeriodList = pdh.getCompletePeriodList();
+                if(sessOccPeriodList != null && !sessOccPeriodList.isEmpty()){
+                    sessOccPeriod = oc.assembleOccPeriodDataHeavy(sessOccPeriodList.get(0), ua.getKeyCard());
+                    sessOccPeriodRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
+                    sessOccPeriodListRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
+                } else {
+                    sessOccPeriodRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
+                    sessOccPeriodListRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
+                }
+                
+                 
+                // EVENTS
+                if(sessEventList != null && !sessEventList.isEmpty()){
+                    sessEvent = sessEventList.get(0);
+                    sessEventRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
+                    sessEventListRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
+                } else {
+                    sessEventRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
+                    sessEventListRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
+                }
+                
+                // CEARS
+                if(sessCEARList != null && sessCEARList.isEmpty()){
+                    sessCEAR = sessCEARList.get(0);
+                    sessCEARRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
+                    sessCEARRListoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
+                } else {
+                    sessCEARRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
+                    sessCEARRListoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
+                    
+                }
+                
+                
+
+            } else if(bob instanceof Person) {
+                Person pers = (Person) bob;
+                PersonDataHeavy persdh = perc.assemblePersonDataHeavy(pers, ua.getKeyCard());
+                
+                
+            } else if(bob instanceof CECase){
+                CECase cse = (CECase) bob;
+                CECaseDataHeavy csedh = cc.cecase_assembleCECaseDataHeavy(cse, ua);
+                // make sure property is the one hosting the case
+                sessCECase = csedh;
+                
+                sessProperty = pc.assemblePropertyDataHeavy(pc.getProperty(cse.getPropertyID()), ua);
+                sessPropertyList = pc.assemblePropertyHistoryList(ua.getKeyCard());
+                
+                sessCECaseList = sessProperty.getCeCaseList();
+                
+                sessPersonList = sessProperty.getPersonList();
+                if(sessPersonList != null && !sessPersonList.isEmpty()){
+                    sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
+                }
+                
+                sessOccPeriodList = sessProperty.getCompletePeriodList();
+                if(sessOccPeriodList != null && !sessOccPeriodList.isEmpty()){
+                    sessOccPeriod = oc.assembleOccPeriodDataHeavy(sessOccPeriodList.get(0), ua.getKeyCard());
+                }
+                
+                
+                
+            } else if(bob instanceof OccPeriod){
+                OccPeriod per = (OccPeriod) bob;
+                OccPeriodDataHeavy opdh = oc.assembleOccPeriodDataHeavy(per, ua.getKeyCard());
+                
+                
+            } else if(bob instanceof EventCnF){
+                EventCnF ev = (EventCnF) bob;
+                
+            } else if(bob instanceof CEActionRequest){
+                CEActionRequest cear = (CEActionRequest) bob;
+            }
+            
+            else {
+                throw new BObStatusException("Unsupported instance of ActivatableBOB sent with call to setSessionActiveObject");
+            }
+
+        } catch (BObStatusException | IntegrationException | SearchException ex) {
+            System.out.println(ex);
+            
+        } catch (EventException ex) {
+            Logger.getLogger(SessionBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+    }
+    
+    
+    
+    /**
+     * checks page modes against permissions approved ones
+     * @return  
+     */
     public List<PageModeEnum> assemblePermittedPageModes(){
-        
-        
     // Load possible page modes
         // Thank you to Chen&Chen for designing this system
         List<PageModeEnum> pageModeOptions = new ArrayList<>();

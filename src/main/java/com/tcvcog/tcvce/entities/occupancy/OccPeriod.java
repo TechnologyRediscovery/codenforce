@@ -14,6 +14,7 @@ import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 
 /**
  * Primary Business Object BOB for holding data about Occupancy Periods
@@ -24,7 +25,8 @@ public  class       OccPeriod
         extends     OccPeriodPublic  
         implements  IFace_Loggable,
                     IFace_EventHolder,
-                    Comparable<OccPeriod>{
+                    Comparable<OccPeriod>,
+                    IFace_ActivatableBOB{
     
     protected int periodID;
     protected int propertyUnitID;

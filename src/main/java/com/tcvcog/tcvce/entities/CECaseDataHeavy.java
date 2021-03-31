@@ -11,6 +11,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
+import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 
 /**
  *  Listified CECase object 
@@ -22,7 +23,8 @@ public class CECaseDataHeavy
         implements Cloneable,
         IFace_EventRuleGoverned,
         IFace_CredentialSigned,
-        IFace_Loggable {
+        IFace_Loggable,
+        IFace_ActivatableBOB{
 
     // accessed through methods specified in the interfaces
     private Property property;

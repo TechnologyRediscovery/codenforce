@@ -9,6 +9,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import java.time.LocalDateTime;
 import java.util.List;
+import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 
 /**
  * Foundational entity for the system: Property
@@ -17,7 +18,7 @@ import java.util.List;
 
 public class    Property 
         extends PropertyPublic 
-        implements IFace_Loggable{
+        implements IFace_Loggable, IFace_ActivatableBOB{
     
     protected List<PropertyUnit> unitList;
     

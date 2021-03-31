@@ -100,38 +100,6 @@
                             <!-- TOP NAVIGATION BAR -->
                             <h:form>
                                 <div class="navbar" id="navbar_id" >
-
-                                    <div class="activebob-container">
-                                        <h:outputText value="Property" />
-
-                                    </div>
-
-                                    <div class="activebob-container">
-                                        <h:outputText value="Person" />
-
-                                    </div>
-
-                                    <div class="activebob-container">
-                                        <h:outputText value="CE Case" />
-
-                                    </div>
-
-                                    <div class="activebob-container">
-                                        <h:outputText value="CE Act.Req" />
-
-                                    </div>
-
-                                    <div class="activebob-container">
-                                        <h:outputText value="Event" />
-
-                                    </div>
-
-                                    <div class="activebob-container">
-                                        <h:outputText value="Occ Periods" />
-
-                                    </div>
-
-
                                     <ui:repeat value="#{navigationBB.getNavList()}"
                                                var="navitem">
                                         <div class="nav_containner">
@@ -170,7 +138,6 @@
                                         <i class="fa fa-list" onclick="onClickNavbarTogglerButton()"/>
                                     </div>
                                 </div>
-                                
                                 <div class="subnav_containner_stable 
                                      #{navigationBB.getCurrentPageNavItemValue() eq navitem.value or view.viewId eq navitem.searchpageurl? 'nav_display' : 'nav_hide'} 
                                      ">
