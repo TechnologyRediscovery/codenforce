@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.NavigationItem;
@@ -28,6 +29,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -190,6 +193,21 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
 
     public void setSideBarNavList(List<NavigationItem> sideBarNavList) {
         this.sideBarNavList = sideBarNavList;
+    }
+    
+    
+    public String onPropertyListItemSelect(Property prop){
+        String navTo = null;
+        try {
+            navTo = getSessionBean().activateSessionObject(prop);
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            "Unable to load selected property",
+                            ""));
+        }
+        return navTo;
     }
 
     //Eric

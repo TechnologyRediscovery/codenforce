@@ -239,6 +239,12 @@ i.material-icons{
     width: 100%;
 }
 
+.inline-icon{
+    display: inline-block;
+    float: left;
+    clear: none;
+}
+
 .icon-box-centered .material-icons{
     font-size: 150%;
 }

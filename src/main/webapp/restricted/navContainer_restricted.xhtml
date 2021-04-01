@@ -101,9 +101,50 @@
                             <h:form>
                                 <div class="navbar" id="navbar_id" >
 
-                                    <div class="activebob-container">
+                                    <div class="activebob-container"
+                                         id="activbob-property">
+                                        <div class="inline-icon">
+                                            
+                                            <i class="material-icons">
+                                                <h:outputText value="home"/>
+                                            </i>
+                                        </div>
+                                              
                                         <h:outputText value="Property" />
-
+                                        <p:spacer height="2px" />
+                                        <p:commandLink id="activebob-property-view-cl"
+                                                       ajax="false"
+                                                       action="propertySearch">
+                                                           
+                                            <h:outputText value="#{sessionBean.sessProperty.address}" />
+                                        </p:commandLink>
+                                        <p:spacer height="2px" />
+                                        <div class="gray_button">
+                                            
+                                            <p:commandButton id="activebob-proplist-cb"
+                                                             value="Property List (#{sessionBean.sessPropertyList.size()})"
+                                                             icon="fa fa-list"
+                                                             oncomplete="PF('activebob-proplist-overlay-var').show();" />
+                                        </div>
+                                        <p:overlayPanel id="activebob-proplist-overlay"
+                                                        widgetVar="activebob-proplist-overlay-var"
+                                                        appendTo="activebob-property"
+                                                        dismissable="true"
+                                                        >
+                                                            
+                                            
+                                            <ui:repeat id="activebob-proplist-repeat"
+                                                       value="#{sessionBean.sessPropertyList}"
+                                                       var="sprop">
+                                                <p:commandLink id="activebob-proplist-prop-explore-cl"
+                                                               action="#{navigationBB.onPropertyListItemSelect(prop)}">
+                                                    <h:outputText value="#{sprop.address}" />
+                                                </p:commandLink>
+                                                
+                                                
+                                                <p:spacer height="2px" />
+                                            </ui:repeat>
+                                        </p:overlayPanel>
                                     </div>
 
                                     <div class="activebob-container">
@@ -131,41 +172,43 @@
 
                                     </div>
 
-
-                                    <ui:repeat value="#{navigationBB.getNavList()}"
-                                               var="navitem">
-                                        <div class="nav_containner">
-                                            <div class="nav_content 
-                                                 #{navigationBB.getCurrentPageNavItemValue() eq navitem.value or view.viewId eq navitem.searchpageurl ? 'nav_active' : ''}"
-                                                 >
-                                                <div class="nav_font">
-                                                    <i class="#{navitem.icon} "/>
-                                                    <p:commandLink
-                                                        style="color: inherit; text-decoration: none"
-                                                        action="#{navitem.getSearchpageurl()}"
-                                                        value="#{navitem.value}" 
-                                                        ajax="false" 
-                                                        />
+                                    <div style="clear:left;">
+                                        
+                                        <ui:repeat value="#{navigationBB.getNavList()}"
+                                                   var="navitem">
+                                            <div class="nav_containner">
+                                                <div class="nav_content 
+                                                     #{navigationBB.getCurrentPageNavItemValue() eq navitem.value or view.viewId eq navitem.searchpageurl ? 'nav_active' : ''}"
+                                                     >
+                                                    <div class="nav_font">
+                                                        <i class="#{navitem.icon} "/>
+                                                        <p:commandLink
+                                                            style="color: inherit; text-decoration: none"
+                                                            action="#{navitem.getSearchpageurl()}"
+                                                            value="#{navitem.value}" 
+                                                            ajax="false" 
+                                                            />
+                                                    </div>
+                                                </div>
+                                                <div class="subnav_containner">
+                                                    <ui:repeat value="#{navitem.subNavitem}" 
+                                                               var="subnavitem">
+                                                        <div class="subnav_content">
+                                                            <div class="nav_font">
+                                                                <i class="#{subnavitem.getIcon()}"/>
+                                                                <p:commandLink
+                                                                    style="color: inherit; text-decoration: none"
+                                                                    action="#{subnavitem.getPagePath()}"
+                                                                    value="#{subnavitem.value}" 
+                                                                    ajax="false" 
+                                                                    />
+                                                            </div>
+                                                        </div>
+                                                    </ui:repeat> 
                                                 </div>
                                             </div>
-                                            <div class="subnav_containner">
-                                                <ui:repeat value="#{navitem.subNavitem}" 
-                                                           var="subnavitem">
-                                                    <div class="subnav_content">
-                                                        <div class="nav_font">
-                                                            <i class="#{subnavitem.getIcon()}"/>
-                                                            <p:commandLink
-                                                                style="color: inherit; text-decoration: none"
-                                                                action="#{subnavitem.getPagePath()}"
-                                                                value="#{subnavitem.value}" 
-                                                                ajax="false" 
-                                                                />
-                                                        </div>
-                                                    </div>
-                                                </ui:repeat> 
-                                            </div>
-                                        </div>
-                                    </ui:repeat>
+                                        </ui:repeat>
+                                    </div>
                                     <div class="navbar_toggler_button" id="navbar_toggler_button_id">
                                         <i class="fa fa-list" onclick="onClickNavbarTogglerButton()"/>
                                     </div>
@@ -196,7 +239,7 @@
                                                                 icon="fa fa-gear"/>
                                     </div>
                                     <div class="nav_button">
-                                        <h:outputText value="Hi, #{systemServicesBB.bbSessionUser.person.firstName}" />
+                                        <h:outputText value="Good Morning, #{systemServicesBB.bbSessionUser.person.firstName}" />
                                     </div>
                                 </div>
                             </h:form>

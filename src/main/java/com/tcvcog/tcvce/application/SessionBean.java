@@ -349,10 +349,10 @@ public class    SessionBean
      * @param bob reqested object to become the session active one. This will
      * get flagged with a marker enum indicating that's it's the user chosen
      * object
-     * @param ua
+     * @return the page to navigate to
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public void activateSessionObject(IFace_ActivatableBOB bob, UserAuthorized ua) throws BObStatusException{
+    public String activateSessionObject(IFace_ActivatableBOB bob) throws BObStatusException{
         PropertyCoordinator pc = getPropertyCoordinator();
         PersonCoordinator perc = getPersonCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
@@ -360,6 +360,8 @@ public class    SessionBean
         SystemCoordinator sc = getSystemCoordinator();
         EventCoordinator ec = getEventCoordinator();
         
+        UserAuthorized ua = sessUser;
+        Credential cred = sessUser.getKeyCard();
         try {
 
             /*
@@ -434,6 +436,7 @@ public class    SessionBean
                     
                 }
                 
+                return "propertySearch";
                 
 
             } else if(bob instanceof Person) {
@@ -487,6 +490,7 @@ public class    SessionBean
             Logger.getLogger(SessionBean.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+        return "";
         
     }
     
