@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 
@@ -359,6 +360,7 @@ public class    SessionBean
         OccupancyCoordinator oc = getOccupancyCoordinator();
         SystemCoordinator sc = getSystemCoordinator();
         EventCoordinator ec = getEventCoordinator();
+        SearchCoordinator searchC = getSearchCoordinator();
         
         UserAuthorized ua = sessUser;
         Credential cred = sessUser.getKeyCard();
@@ -368,7 +370,7 @@ public class    SessionBean
             ********** BEGIN CASCADING LOGIC FOR COORDINATING SESSION OBJECTS ******
             */
             
-            if(bob instanceof Property){
+            if(bob instanceof Property || bob instanceof PropertyDataHeavy){
                 Property prop = (Property) bob;
                 PropertyDataHeavy pdh = pc.assemblePropertyDataHeavy(prop, ua);
                 sessProperty = pdh;
@@ -436,15 +438,42 @@ public class    SessionBean
                     
                 }
                 
-                return "propertySearch";
+                return "propertySearchProfile";
+                
                 
 
-            } else if(bob instanceof Person) {
+            } else if(bob instanceof Person || bob instanceof PersonDataHeavy) {
                 Person pers = (Person) bob;
                 PersonDataHeavy persdh = perc.assemblePersonDataHeavy(pers, ua.getKeyCard());
+                sessPerson = persdh;
+                
+                // check to see if our session Person is connected to the session property. If so, do nothing
+                // if not, figure out a property to associate with this Person and make it the sessionProperty
+                if(sessProperty != null && sessProperty.getPersonList() != null && !sessProperty.getPersonList().isEmpty()){
+                    if(!sessProperty.getPersonList().contains(sessPerson)){
+                        QueryProperty qp = searchC.initQuery(QueryPropertyEnum.PERSONS, sessUser.getKeyCard());
+                        if(qp.getParamsList() != null && !qp.getParamsList().isEmpty()){
+                            qp.getParamsList().get(0).setPerson_ctl(true);
+                            qp.getParamsList().get(0).setPerson_val(pers);
+                            searchC.runQuery(qp);
+                            sessPropertyList = qp.getBOBResultList();
+                            if(sessPropertyList != null && !sessPropertyList.isEmpty()){
+                                sessProperty = pc.assemblePropertyDataHeavy(sessPropertyList.get(0),sessUser);
+                            }
+                            
+                        }
+                    }
+                } // close property and property list configuration
+                
+                if(sessProperty != null && sessProperty.getCeCaseList() != null && !sessProperty.getCeCaseList().isEmpty()){
+                    sessCECase = cc.cecase_assembleCECaseDataHeavy(sessProperty.getCeCaseList().get(0), sessUser);
+                    sessCECaseList = sessProperty.getCeCaseList();
+                }
+                return "personSearchProfile";
                 
                 
-            } else if(bob instanceof CECase){
+                
+            } else if(bob instanceof CECase || bob instanceof CECaseDataHeavy){
                 CECase cse = (CECase) bob;
                 CECaseDataHeavy csedh = cc.cecase_assembleCECaseDataHeavy(cse, ua);
                 // make sure property is the one hosting the case
@@ -464,6 +493,8 @@ public class    SessionBean
                 if(sessOccPeriodList != null && !sessOccPeriodList.isEmpty()){
                     sessOccPeriod = oc.assembleOccPeriodDataHeavy(sessOccPeriodList.get(0), ua.getKeyCard());
                 }
+                return "ceCaseProfile";
+                
                 
                 
                 
@@ -483,12 +514,10 @@ public class    SessionBean
                 throw new BObStatusException("Unsupported instance of ActivatableBOB sent with call to setSessionActiveObject");
             }
 
-        } catch (BObStatusException | IntegrationException | SearchException ex) {
+        } catch (BObStatusException | IntegrationException | SearchException | EventException ex) {
             System.out.println(ex);
             
-        } catch (EventException ex) {
-            Logger.getLogger(SessionBean.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
         
         return "";
         

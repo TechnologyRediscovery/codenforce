@@ -225,6 +225,17 @@
                                     <h:form id="event-search-form">
                                         <div class="ui-g data_container_nested_restrict">
 
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
+                                                
+                                                <div class="help-link">
+
+                                                    <div class="restrict-main-contents-io-link">
+
+                                                      
+                                                    </div>
+                                                </div>
+                                                
+                                            </div>
                                             <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field" >
 
 
@@ -311,7 +322,6 @@
                                                 <p:spacer height="2px" />
                                                 <h:outputText value="#{e.eventID}"/>
                                             </p:column>
-
 
                                             <p:column width="20%" sortBy="#{e.category.eventType.label}"
                                                       >
@@ -763,8 +773,16 @@
                                             widgetVar="cecase-query-panel-var"
                                             collapsed="false"
                                             rendered="#{ceCaseSearchProfileBB.activeLookupMode}"
-                                            header="Case List Builder">
+                                            header="Code Enforcement Cases">
 
+                                    <h:form id="cecase-help-form">
+                                        <div class="restrict-main-contents-help-link">
+                                            <a href="https://technologyrediscovery.github.io/codenforce/dashboard/caselistbuilder"
+                                               target="_blank">
+                                               <i class="material-icons status-display-icon-i">help_outline</i>
+                                            </a>
+                                        </div>
+                                    </h:form>
                                     <h:form id="cecase-search-form">
 
                                         <h:outputLabel styleClass="bold" 
@@ -825,14 +843,6 @@
 
                                     </h:form>
 
-                                </p:panel>
-
-                                <p:panel        id="cecase-caselist-panel"
-                                                toggleable="true"
-                                                widgetVar="cecase-caselist-panel-var"
-                                                collapsed="false"
-                                                rendered="true"
-                                                header="Code Enforcement Case List">
                                     <h:form id="cecase-search-results-form" >
 
                                         <p:commandButton   id="cecase-search-results-clear-button" 
@@ -939,7 +949,7 @@
 
                                                         <p:commandLink  id="cecase-search-view-case"
                                                                         value="view"
-                                                                        action="#{missionControlBB.onViewCECaseButtonChange(c)}"
+                                                                        action="#{navigationBB.onCECaseListItemSelect(c)}"
                                                                         ajax="false"/>
 
                                                 </div>

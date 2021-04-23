@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.util.Constants;
@@ -25,7 +26,8 @@ public class        CECase
                     IFace_Loggable,
                     IFace_EventHolder,
                     IFace_StatusLogHolder,
-                    Comparable<CECase>{
+                    Comparable<CECase>,
+                    IFace_ActivatableBOB{
     
     protected int caseID;
     protected int publicControlCode;

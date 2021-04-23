@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.NavigationItem;
@@ -197,7 +198,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     
     
     public String onPropertyListItemSelect(Property prop){
-        String navTo = null;
+        String navTo = "";
         try {
             navTo = getSessionBean().activateSessionObject(prop);
         } catch (BObStatusException ex) {
@@ -209,6 +210,28 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
         }
         return navTo;
     }
+    
+    /**
+     * Listener for user requests to view a cecase from the active object box navlist
+     * @param cse
+     * @return 
+     */
+    public String onCECaseListItemSelect(CECase cse){
+        String navTo = "";
+        try {
+            navTo = getSessionBean().activateSessionObject(cse);
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            "Unable to load selected property",
+                            ""));
+        }
+        return navTo;
+        
+    }
+    
+    
 
     //Eric
     public String gotoPropertyProfile() {
@@ -237,16 +260,18 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
 
     }
 
-    public String gotoPersonProfile() {
-        if (getSessionBean().getSessPerson()!= null) {
-            return "personProfile";
-        } else {
+    public String onViewPersonListItemSelect(Person pers) {
+       String navTo = "";
+        try {
+            navTo = getSessionBean().activateSessionObject(pers);
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_WARN,
-                            "No active case! Please select a case from the list below and re-attempt navigation",
+                            "Unable to load selected person",
                             ""));
-            return "personSearch";
         }
+        return navTo;
     }
 
     /**

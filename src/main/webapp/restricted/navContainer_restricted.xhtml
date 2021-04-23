@@ -137,7 +137,8 @@
                                                        value="#{sessionBean.sessPropertyList}"
                                                        var="sprop">
                                                 <p:commandLink id="activebob-proplist-prop-explore-cl"
-                                                               action="#{navigationBB.onPropertyListItemSelect(prop)}">
+                                                               action="#{navigationBB.onPropertyListItemSelect(prop)}"
+                                                               ajax="false">
                                                     <h:outputText value="#{sprop.address}" />
                                                 </p:commandLink>
                                                 
@@ -146,31 +147,103 @@
                                             </ui:repeat>
                                         </p:overlayPanel>
                                     </div>
-
-                                    <div class="activebob-container">
+                                    
+                                     <div class="activebob-container"
+                                         id="activbob-person">
+                                         
+                                        <div class="inline-icon">
+                                            <i class="material-icons">
+                                                <h:outputText value="person"/>
+                                            </i>
+                                        </div>
+                                              
                                         <h:outputText value="Person" />
-
+                                        <p:spacer height="2px" />
+                                        <p:commandLink id="activebob-person-view-cl"
+                                                       ajax="false"
+                                                       action="personSearchProfile">
+                                                           
+                                            <h:outputText value="#{sessionBean.sessPerson.firstName} #{sessionBean.sessPerson.lastName} (ID:#{sessionBean.sessPerson.personID})" />
+                                        </p:commandLink>
+                                        <p:spacer height="2px" />
+                                        <div class="gray_button">
+                                            
+                                            <p:commandButton id="activebob-perslist-cb"
+                                                             value="Person List (#{sessionBean.sessPersonList.size()})"
+                                                             icon="fa fa-list"
+                                                             oncomplete="PF('activebob-perslist-overlay-var').show();" />
+                                        </div>
+                                        <p:overlayPanel id="activebob-perslist-overlay"
+                                                        widgetVar="activebob-perslist-overlay-var"
+                                                        appendTo="activebob-person"
+                                                        dismissable="true"
+                                                        >
+                                                            
+                                            
+                                            <ui:repeat id="activebob-perslist-repeat"
+                                                       value="#{sessionBean.sessPersonList}"
+                                                       var="spers">
+                                                <p:commandLink id="activebob-proplist-prop-explore-cl"
+                                                               action="#{navigationBB.onViewPersonListItemSelect(spers)}"
+                                                               ajax="false">
+                                                    <h:outputText value="#{spers.firstName} #{spers.lastName}: #{spers.personType.label} (ID:#{spers.personID})" />
+                                                </p:commandLink>
+                                                
+                                                
+                                                <p:spacer height="2px" />
+                                            </ui:repeat>
+                                        </p:overlayPanel>
                                     </div>
-
-                                    <div class="activebob-container">
+                                    
+                                     <div class="activebob-container"
+                                         id="activbob-cecase">
+                                        <div class="inline-icon">
+                                            
+                                            <i class="material-icons">
+                                                <h:outputText value="gavel"/>
+                                            </i>
+                                        </div>
+                                              
                                         <h:outputText value="CE Case" />
-
+                                        <p:spacer height="2px" />
+                                        <p:commandLink id="activebob-cecase-view-cl"
+                                                       ajax="false"
+                                                       action="ceCaseSearchProfile">
+                                                           
+                                            <h:outputText value="#{sessionBean.sessCECase.caseName} (ID:#{sessionBean.sessCECase.caseID})" />
+                                        </p:commandLink>
+                                        <p:spacer height="2px" />
+                                        <div class="gray_button">
+                                            
+                                            <p:commandButton id="activebob-cecaselist-cb"
+                                                             value="CE Case List (#{sessionBean.sessCECaseList.size()})"
+                                                             icon="fa fa-list"
+                                                             oncomplete="PF('activebob-cecaselist-overlay-var').show();" />
+                                        </div>
+                                        <p:overlayPanel id="activebob-cecaselist-overlay"
+                                                        widgetVar="activebob-cecaselist-overlay-var"
+                                                        appendTo="activebob-cecase"
+                                                        dismissable="true"
+                                                        >
+                                                            
+                                            
+                                            <ui:repeat id="activebob-cecaselist-repeat"
+                                                       value="#{sessionBean.sessCECaseList}"
+                                                       var="cse">
+                                                <p:commandLink id="activebob-proplist-prop-explore-cl"
+                                                               ajax="false"
+                                                               action="#{navigationBB.onCECaseListItemSelect(cse)}">
+                                                    <h:outputText value="#{cse.caseName} at #{cse.property.address} (ID:#{cse.caseID})" />
+                                                </p:commandLink>
+                                                
+                                                
+                                                <p:spacer height="2px" />
+                                            </ui:repeat>
+                                        </p:overlayPanel>
                                     </div>
 
-                                    <div class="activebob-container">
-                                        <h:outputText value="CE Act.Req" />
 
-                                    </div>
-
-                                    <div class="activebob-container">
-                                        <h:outputText value="Event" />
-
-                                    </div>
-
-                                    <div class="activebob-container">
-                                        <h:outputText value="Occ Periods" />
-
-                                    </div>
+                                   
 
                                     <div style="clear:left;">
                                         

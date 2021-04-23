@@ -522,7 +522,7 @@ public  class       SessionInitializer
             } else {
 //                sessBean.setSessProperty(pc.assemblePropertyDataHeavy(sessBean.getSessPropertyList().get(0), cred));
             }
-        
+            sessBean.setSessPropertyList(pc.assemblePropertyHistoryList(ua.getKeyCard()));
             sessBean.setQueryPropertyList(sc.buildQueryPropertyList(ua.getKeyCard()));
             
             if(!sessBean.getQueryPropertyList().isEmpty()){
