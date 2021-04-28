@@ -49,7 +49,8 @@ public class UploadBlobBB extends BackingBeanUtils implements Serializable {
 
         try {
             blob = blobc.getNewBlob();  //init new blob
-            blob.setBytes(ev.getFile().getContents());  // set bytes 
+// TODO pf migrtation https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
+//            blob.setBytes(ev.getFile().getContents());  // set bytes 
 
             // set filename
             blob.setFilename(ev.getFile().getFileName());

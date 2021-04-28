@@ -123,10 +123,12 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
                 } else {
                     switch (blob.getType()) {
                         case PHOTO:
-                            sc = new DefaultStreamedContent(new ByteArrayInputStream(bi.getBlobBytes(blob.getBytesID())));
+                            // TODO: Update to new UI:
+                            // https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
+//                            sc = new DefaultStreamedContent.builder().new ByteArrayInputStream(bi.getBlobBytes(blob.getBytesID())));
                             break;
                         case PDF:
-                            sc = new DefaultStreamedContent(new FileInputStream(new File("/home/noah/Documents/COG Project/codeconnect/src/main/webapp/images/pdf-icon.png")));
+//                            sc = new DefaultStreamedContent(new FileInputStream(new File("/home/noah/Documents/COG Project/codeconnect/src/main/webapp/images/pdf-icon.png")));
                             break;
                         default:
                             throw new BlobTypeException("Attempted to display incompatible BLOB type. ");

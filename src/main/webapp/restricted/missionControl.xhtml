@@ -1173,12 +1173,10 @@
 
                         <h:form id="cecase-list-report-form">
 
-                            <h:panelGrid columns="2" border="0" 
-                                         cellpadding="5" columnClasses="gridTd, gridTd"
-                                         footerClass="gridFooter">
-
-                                <f:facet name="header">
-
+                            <div class="ui-g data_container_nested_restrict">
+                            
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                    
 
                                     <h:outputLabel for="report-caselist-profile-title-it" value="Report title"/>
 
@@ -1193,12 +1191,6 @@
                                     <h:outputLabel class="bold" value="Include case names" for="report-caselist-casename-chkbox" />
                                     <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeCaseNames}" />
 
-                                    <p:spacer height="5px"/>
-
-                                    <h:panelGrid    columns="1" 
-                                                    cellpadding="10" 
-                                                    columnClasses="gridTd">
-                                        <h:panelGroup>
 
                                             <p:outputLabel for="cecase-list-report-date-start-cal" 
                                                            value="start date"/>
@@ -1220,9 +1212,6 @@
                                                         required="true"/>
 
 
-                                        </h:panelGroup>
-
-                                        <h:panelGroup>
 
                                             <p:outputLabel for="cecase-list-report-date-end-cal" 
                                                            value="end date"/>
@@ -1244,16 +1233,14 @@
                                                         required="true"/>
 
 
-                                        </h:panelGroup>
-                                    </h:panelGrid>
 
                                     <h:outputLabel for="report-caselist-notes-ita" value="Notes"/>
                                     <p:spacer height="5px"/>
                                     <p:inputText id="report-caselist-notes-ita" style="width: 300px; height: 100px;" value="#{ceCaseSearchProfileBB.reportCECaseList.notes}"/>
-                                    <p:spacer height="5px"/>
-                                </f:facet>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                    
 
-                                <h:panelGroup>
                                     <h3>Additional case list report options</h3>
 
                                     <h:outputLabel class="bold" value="Include full owner contact info: " for="report-caselist-ownercontact-chkbox" />
@@ -1275,10 +1262,7 @@
                                     <p:selectBooleanCheckbox id="report-caselist-propertyinfo" value="#{ceCaseSearchProfileBB.reportCECaseList.includeExtendedPropertyDetails}" />
 
 
-                                </h:panelGroup>
-
-                            </h:panelGrid>
-                            <div class="ui-g data_container_nested_restrict">
+                                </div>
 
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
                                     <div class="restrict-main-contents-io-link">

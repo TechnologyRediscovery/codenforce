@@ -1102,7 +1102,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             Blob blob = null;
             try {
                 blob = blobc.getNewBlob();  //init new blob
-                blob.setBytes(ev.getFile().getContents());  // set bytes  
+                // TODO Upgrade on PF https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
+//                blob.setBytes(ev.getFile().getContents());  // set bytes  
                 blob.setType(BlobType.PHOTO);
                 blob.setFilename(ev.getFile().getFileName());
                 

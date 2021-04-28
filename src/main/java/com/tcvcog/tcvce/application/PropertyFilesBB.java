@@ -71,7 +71,9 @@ public class PropertyFilesBB
         
         try{
         Blob blob = getBlobCoordinator().getNewBlob();
-        blob.setBytes(ev.getFile().getContents());
+        // TODO: Upgrade with PF 10.0.0 https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
+        
+//        blob.setBytes(ev.getFile().getContents());
         blob.setType(BlobType.PHOTO); // TODO: BAD CHANGE THIS SOON
          // DO nothing because I'm moving on to other issues,
         // need to be able to compile before I can do much in the way of testing

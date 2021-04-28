@@ -47,8 +47,9 @@ public class ImageServices extends BackingBeanUtils implements Serializable{
             return sc;
         } else {
             int photoID = Integer.parseInt(context.getExternalContext().getRequestParameterMap().get("photoID"));
-            
-            sc = new DefaultStreamedContent(new ByteArrayInputStream(getPhotograph(photoID).getPhotoBytes()), "image/png", Integer.toString(photoID));
+// TODO: PF Upgrade
+// https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
+           //  sc = new DefaultStreamedContent(new ByteArrayInputStream(getP//hotograph(photoID).getPhotoBytes()), "image/png", Integer.toString(photoID));
             return sc;
         }
     }

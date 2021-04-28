@@ -25,18 +25,6 @@ public class NavMenuBean extends BackingBeanUtils implements Serializable{
     public NavMenuBean() {
         
     }
-    
-    private Submenu getUniversalSubmenu(){
-        DefaultSubMenu uniSub = new DefaultSubMenu("Java birthed me!");
-
-        DefaultMenuItem item = new DefaultMenuItem("Help");
-        item.setOutcome("help");
-        uniSub.addElement(item);
-        
-        item.setDisabled(true);
-        return uniSub;
-    }
-    
    
     
 }

@@ -575,7 +575,6 @@ public class    SessionBean
         
     }
     
-
    
     /**
      * @return the sessNotice
