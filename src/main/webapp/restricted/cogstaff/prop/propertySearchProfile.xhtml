@@ -838,7 +838,6 @@
 
                                                                 <p:overlayPanel id="proposal-overlaypanel-proposaldescription"
                                                                                 for="proposal-button-showdescription"
-                                                                                hideEffect="fade"
                                                                                 dynamic="true"
                                                                                 showCloseIcon="true"
                                                                                 style="width:300px"
@@ -2290,11 +2289,10 @@
 
                                 <h:panelGroup>
                                     <h:outputText styleClass="ui-label" value="Note text: "/>
-                                    <p:editor   id="propinfo-notes-editor"
+                                    <p:textEditor   id="propinfo-notes-editor"
                                                 value="#{propertySearchBB.formNoteText}"
-                                                controls="bold italic underline strikethrough font size style color
-                                                bullets numbering center undo redo rule link removeformat"
-                                                width="400" required="false"
+                                                secure="false"
+                                                required="false"
                                                 height="200"/>
 
 

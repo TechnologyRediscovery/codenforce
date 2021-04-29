@@ -537,7 +537,7 @@ div.printer-friendly-report .ui-widget-content{
     flex-grow: 1;
     flex-basis: 100%;
     flex-shrink: 1;
-    height: 100px;
+    
     background-color: #2F2F2F;
 }
 
@@ -1015,6 +1015,16 @@ img.headerImg{
 
 }
 
+/*these make the up and down circles on time input down and up buttons orange and green respectively*/
+
+body .ui-datepicker .ui-picker-up{
+    background-color: orange;
+}
+
+body .ui-datepicker .ui-picker-down{
+    background-color: green;
+}
+
 /* ****************** END Primefaces Overrides ***********************/
 
 
@@ -1310,8 +1320,6 @@ gridTd-bignum{
 
 .link-button{
     display: inline-block;
-    background-color:  #007ad9;
-    color: white;
     padding: 5px;
     
 }
@@ -1347,6 +1355,9 @@ gridTd-bignum{
     width: 16.6%;
     color:black;
     background-color: white;
+    padding: 10px;
+    border: solid black;
+    margin: 5px;
     
     
 }
@@ -2784,7 +2795,7 @@ input{
     display: inline-block; 
 /*    float: next;*/
     /*text-decoration: underline;*/
-    font-weight: 200;
+    font-weight: bold;
     /*border-bottom: 1px solid #6C6D70;*/
     margin-left:10px;
     
@@ -2795,17 +2806,20 @@ input{
 .restrict-main-contents-io-link a{
     /*color: #6C6D70;*/
     color:blue;
+    font-weight: bold;
     
 }
 .restrict-main-contents-io-link a:hover{
     /*color: #6C6D70;*/
     color:lightskyblue;
+    font-weight: bold;
     
 }
 
 .restrict-main-contents-io-link a:disabled{
     /*color: #6C6D70;*/
     color:darkgray;
+    
     
 }
 

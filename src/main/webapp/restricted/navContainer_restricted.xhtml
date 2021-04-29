@@ -16,6 +16,7 @@
         <title>codeNforce</title>
     </h:head>
     <h:body>
+        <h:outputScript name="/js/navcontainer.js" target="body"/>
 
         <div class="flex-box-container">
             <ui:insert name="top">
@@ -28,7 +29,7 @@
         </div>
 
         <div class="flex-box-container">
-            
+
             <div class="flexing-box-interior">
 
                 <div class="flex-box-container-interior">
@@ -37,9 +38,9 @@
 
                         <div id="maincontent">
 
-                            
+
                             <!-- SIDE NAVIGATION BAR -->
-                            <h:form>
+                            <h:form id="sidebar-form">
                                 <div class="toolsidebarcontainer">
                                     <div id="toolSidebar" class="sidebar">
                                         <div class="toolSidebarCollapse" id="toolSidebarCollapseId">
@@ -86,7 +87,7 @@
                                                 </div>
                                             </div>                                
                                         </ui:repeat>
-                                         <p:commandButton    id="navcontres-button-logout"
+                                        <p:commandButton    id="navcontres-button-logout"
                                                             action="#{systemServicesBB.logout}" 
                                                             value=""
                                                             title="Logout"
@@ -98,224 +99,349 @@
                             </h:form>
 
                             <!-- TOP NAVIGATION BAR -->
-                            <h:form>
-                                <div class="navbar" id="navbar_id" >
-
+                            <div class="ui-g data_container_nested_restrict" style="background-color: gray;">
+                                <h:form id="topnavbar">
                                     <div class="activebob-container"
-                                         id="activbob-property">
-                                        <div class="inline-icon">
-                                            
-                                            <i class="material-icons">
-                                                <h:outputText value="home"/>
-                                            </i>
-                                        </div>
-                                              
-                                        <h:outputText value="Property" />
-                                        <p:spacer height="2px" />
-                                        <p:commandLink id="activebob-property-view-cl"
-                                                       ajax="false"
-                                                       action="propertySearch">
-                                                           
-                                            <h:outputText value="#{sessionBean.sessProperty.address}" />
-                                        </p:commandLink>
-                                        <p:spacer height="2px" />
-                                        <div class="gray_button">
-                                            
-                                            <p:commandButton id="activebob-proplist-cb"
-                                                             value="Property List (#{sessionBean.sessPropertyList.size()})"
-                                                             icon="fa fa-list"
-                                                             oncomplete="PF('activebob-proplist-overlay-var').show();" />
-                                        </div>
-                                        <p:overlayPanel id="activebob-proplist-overlay"
-                                                        widgetVar="activebob-proplist-overlay-var"
-                                                        appendTo="activebob-property"
-                                                        dismissable="true"
-                                                        >
-                                                            
-                                            
-                                            <ui:repeat id="activebob-proplist-repeat"
-                                                       value="#{sessionBean.sessPropertyList}"
-                                                       var="sprop">
-                                                <p:commandLink id="activebob-proplist-prop-explore-cl"
-                                                               action="#{navigationBB.onPropertyListItemSelect(prop)}"
-                                                               ajax="false">
-                                                    <h:outputText value="#{sprop.address}" />
-                                                </p:commandLink>
-                                                
-                                                
-                                                <p:spacer height="2px" />
-                                            </ui:repeat>
-                                        </p:overlayPanel>
-                                    </div>
-                                    
-                                     <div class="activebob-container"
-                                         id="activbob-person">
-                                         
-                                        <div class="inline-icon">
-                                            <i class="material-icons">
-                                                <h:outputText value="person"/>
-                                            </i>
-                                        </div>
-                                              
-                                        <h:outputText value="Person" />
-                                        <p:spacer height="2px" />
-                                        <p:commandLink id="activebob-person-view-cl"
-                                                       ajax="false"
-                                                       action="personSearchProfile">
-                                                           
-                                            <h:outputText value="#{sessionBean.sessPerson.firstName} #{sessionBean.sessPerson.lastName} (ID:#{sessionBean.sessPerson.personID})" />
-                                        </p:commandLink>
-                                        <p:spacer height="2px" />
-                                        <div class="gray_button">
-                                            
-                                            <p:commandButton id="activebob-perslist-cb"
-                                                             value="Person List (#{sessionBean.sessPersonList.size()})"
-                                                             icon="fa fa-list"
-                                                             oncomplete="PF('activebob-perslist-overlay-var').show();" />
-                                        </div>
-                                        <p:overlayPanel id="activebob-perslist-overlay"
-                                                        widgetVar="activebob-perslist-overlay-var"
-                                                        appendTo="activebob-person"
-                                                        dismissable="true"
-                                                        >
-                                                            
-                                            
-                                            <ui:repeat id="activebob-perslist-repeat"
-                                                       value="#{sessionBean.sessPersonList}"
-                                                       var="spers">
-                                                <p:commandLink id="activebob-proplist-prop-explore-cl"
-                                                               action="#{navigationBB.onViewPersonListItemSelect(spers)}"
-                                                               ajax="false">
-                                                    <h:outputText value="#{spers.firstName} #{spers.lastName}: #{spers.personType.label} (ID:#{spers.personID})" />
-                                                </p:commandLink>
-                                                
-                                                
-                                                <p:spacer height="2px" />
-                                            </ui:repeat>
-                                        </p:overlayPanel>
-                                    </div>
-                                    
-                                     <div class="activebob-container"
-                                         id="activbob-cecase">
-                                        <div class="inline-icon">
-                                            
-                                            <i class="material-icons">
-                                                <h:outputText value="gavel"/>
-                                            </i>
-                                        </div>
-                                              
-                                        <h:outputText value="CE Case" />
-                                        <p:spacer height="2px" />
-                                        <p:commandLink id="activebob-cecase-view-cl"
-                                                       ajax="false"
-                                                       action="ceCaseSearchProfile">
-                                                           
-                                            <h:outputText value="#{sessionBean.sessCECase.caseName} (ID:#{sessionBean.sessCECase.caseID})" />
-                                        </p:commandLink>
-                                        <p:spacer height="2px" />
-                                        <div class="gray_button">
-                                            
-                                            <p:commandButton id="activebob-cecaselist-cb"
-                                                             value="CE Case List (#{sessionBean.sessCECaseList.size()})"
-                                                             icon="fa fa-list"
-                                                             oncomplete="PF('activebob-cecaselist-overlay-var').show();" />
-                                        </div>
-                                        <p:overlayPanel id="activebob-cecaselist-overlay"
-                                                        widgetVar="activebob-cecaselist-overlay-var"
-                                                        appendTo="activebob-cecase"
-                                                        dismissable="true"
-                                                        >
-                                                            
-                                            
-                                            <ui:repeat id="activebob-cecaselist-repeat"
-                                                       value="#{sessionBean.sessCECaseList}"
-                                                       var="cse">
-                                                <p:commandLink id="activebob-proplist-prop-explore-cl"
-                                                               ajax="false"
-                                                               action="#{navigationBB.onCECaseListItemSelect(cse)}">
-                                                    <h:outputText value="#{cse.caseName} at #{cse.property.address} (ID:#{cse.caseID})" />
-                                                </p:commandLink>
-                                                
-                                                
-                                                <p:spacer height="2px" />
-                                            </ui:repeat>
-                                        </p:overlayPanel>
-                                    </div>
+                                         id="activbob-muni">
 
+                                        <div class="ui-g data_container_nested_restrict">
 
-                                   
+                                            <!--NESTED DATA FIELD VERTICAL-->
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
 
-                                    <div style="clear:left;">
-                                        
-                                        <ui:repeat value="#{navigationBB.getNavList()}"
-                                                   var="navitem">
-                                            <div class="nav_containner">
-                                                <div class="nav_content 
-                                                     #{navigationBB.getCurrentPageNavItemValue() eq navitem.value or view.viewId eq navitem.searchpageurl ? 'nav_active' : ''}"
-                                                     >
-                                                    <div class="nav_font">
-                                                        <i class="#{navitem.icon} "/>
-                                                        <p:commandLink
-                                                            style="color: inherit; text-decoration: none"
-                                                            action="#{navitem.getSearchpageurl()}"
-                                                            value="#{navitem.value}" 
-                                                            ajax="false" 
-                                                            />
+                                                <div class="aob-container aob-container-iconifiedheader">
+
+                                                    <div class="inline-icon">
+
+                                                        <i class="material-icons">
+                                                            <h:outputText value="location_city"/>
+                                                        </i>
                                                     </div>
+
+                                                    <h:outputText value="Municipality" />
                                                 </div>
-                                                <div class="subnav_containner">
-                                                    <ui:repeat value="#{navitem.subNavitem}" 
-                                                               var="subnavitem">
-                                                        <div class="subnav_content">
-                                                            <div class="nav_font">
-                                                                <i class="#{subnavitem.getIcon()}"/>
-                                                                <p:commandLink
-                                                                    style="color: inherit; text-decoration: none"
-                                                                    action="#{subnavitem.getPagePath()}"
-                                                                    value="#{subnavitem.value}" 
-                                                                    ajax="false" 
-                                                                    />
-                                                            </div>
-                                                        </div>
-                                                    </ui:repeat> 
+                                                <div class="aob-container aob-container-objectstring">
+
+                                                    <h:outputText value="#{sessionBean.sessMuni.muniName}"/>
+
+                                                </div>
+                                                <div class="aob-container aob-container-actions">
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink    id="aob-muni-dash-cl" 
+                                                                          value="dashboard"
+                                                                          action="missionControl"
+                                                                          ajax="false"/>
+                                                    </div>
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink    id="aob-muni-change-cl" 
+                                                                          value="change"
+                                                                          ajax="false"/>
+                                                    </div>
+
+                                                </div>
+                                                <div class="aob-container aob-container-iconifiedheader">
+
+                                                    <div class="inline-icon">
+
+                                                        <i class="material-icons">
+                                                            <h:outputText value="gavel"/>
+                                                        </i>
+                                                    </div>
+
+                                                    <h:outputText value="Code Book" />
+                                                </div>
+                                                <div class="aob-container aob-container-objectstring">
+                                                    <h:outputText value="#{sessionBean.sessMuni.codeSet.codeSetName}"/>
+
+                                                </div>
+
+                                                <div class="aob-container aob-container-actions">
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink    id="navcontres-button-ordinances" 
+                                                                          value="ordinances"
+                                                                          ajax="false"/>
+                                                    </div>
+
+
                                                 </div>
                                             </div>
-                                        </ui:repeat>
+                                        </div>
                                     </div>
-                                    <div class="navbar_toggler_button" id="navbar_toggler_button_id">
-                                        <i class="fa fa-list" onclick="onClickNavbarTogglerButton()"/>
+
+
+                                    <div class="activebob-container"
+                                         id="aob-property">
+
+                                        <div class="ui-g data_container_nested_restrict">
+
+                                            <!--NESTED DATA FIELD VERTICAL-->
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
+
+                                                <div class="aob-container aob-container-iconifiedheader">
+
+                                                    <div class="inline-icon">
+
+                                                        <i class="material-icons">
+                                                            <h:outputText value="home"/>
+                                                        </i>
+                                                    </div>
+
+                                                    <h:outputText value="Property" />
+                                                </div>
+                                                <div class="aob-container aob-container-objectstring">
+
+
+                                                    <h:outputText value="#{sessionBean.sessProperty.address}" />
+
+                                                </div>
+                                                <div class="aob-container aob-container-actions">
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+                                                        <p:commandLink id="activebob-proplist-prop-explore-cl"
+                                                                       action="#{navigationBB.onPropertyListItemSelect(prop)}"
+                                                                       value="view"
+                                                                       ajax="false"/>
+                                                    </div>
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink id="activebob-proplist-cb"
+                                                                       value="change"
+                                                                       oncomplete="PF('activebob-proplist-overlay-var').show();" />
+                                                    </div>
+
+                                                    <p:overlayPanel id="activebob-proplist-overlay"
+                                                                    widgetVar="activebob-proplist-overlay-var"
+                                                                    appendTo="activebob-property"
+                                                                    dismissable="true"
+                                                                    >
+                                                        <h:outputText value="#{sessionBean.sessPropertyList.size()} properties:" />
+
+                                                        <ui:repeat id="activebob-proplist-repeat"
+                                                                   value="#{sessionBean.sessPropertyList}"
+                                                                   var="sprop">
+
+                                                            <h:outputText value="#{sprop.address}" />
+
+                                                            <div class="restrict-main-contents-io-link link-button">
+                                                                <p:commandLink id="activebob-proplist-prop-explore-cl"
+                                                                               action="#{navigationBB.onPropertyListItemSelect(prop)}"
+                                                                               value="view"
+                                                                               ajax="false">
+                                                                </p:commandLink>
+                                                            </div>
+
+                                                        </ui:repeat>
+
+                                                        <p:commandLink id="activebob-property-view-cl"
+                                                                       ajax="false"
+                                                                       action="propertySearch"/>
+                                                    </p:overlayPanel>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <div class="subnav_containner_stable 
-                                     #{navigationBB.getCurrentPageNavItemValue() eq navitem.value or view.viewId eq navitem.searchpageurl? 'nav_display' : 'nav_hide'} 
-                                     ">
-                                    <div class="currentinfo">
-                                        <p:outputLabel value="#{navigationBB.navCurrentInfoMap().get(navitem.value)}"/>
+
+
+                                    <div class="activebob-container"
+                                         id="aob-person">
+
+                                        <div class="ui-g data_container_nested_restrict">
+
+                                            <!--NESTED DATA FIELD VERTICAL-->
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
+
+                                                <div class="aob-container aob-container-iconifiedheader">
+
+                                                    <div class="inline-icon">
+
+                                                        <i class="material-icons">
+                                                            <h:outputText value="person"/>
+                                                        </i>
+                                                    </div>
+
+                                                    <h:outputText value="Person" />
+                                                </div>
+                                                <div class="aob-container aob-container-objectstring">
+
+                                                    <h:outputText value="#{sessionBean.sessPerson.firstName} #{sessionBean.sessPerson.lastName} (ID:#{sessionBean.sessPerson.personID})" />
+
+
+                                                </div>
+                                                <div class="aob-container aob-container-actions">
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+
+
+                                                        <p:commandLink id="activebob-person-view-cl"
+                                                                       ajax="false"
+                                                                       value="view"
+                                                                       action="personSearchProfile">
+
+                                                        </p:commandLink>
+                                                    </div>
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink  id="activebob-perslist-cb"
+                                                                        value="change"
+                                                                        oncomplete="PF('activebob-perslist-overlay-var').show();" />
+                                                    </div>
+
+
+                                                </div>
+
+                                            </div>
+                                            <p:overlayPanel id="activebob-perslist-overlay"
+                                                            widgetVar="activebob-perslist-overlay-var"
+                                                            appendTo="activebob-person"
+                                                            dismissable="true"
+                                                            >
+
+                                                <h:outputText value="#{sessionBean.sessPersonList.size()} persons" />
+
+                                                <ui:repeat id="activebob-perslist-repeat"
+                                                           value="#{sessionBean.sessPersonList}"
+                                                           var="spers">
+                                                    <p:commandLink id="activebob-proplist-prop-explore-cl"
+                                                                   action="#{navigationBB.onViewPersonListItemSelect(spers)}"
+                                                                   ajax="false">
+                                                        <h:outputText value="#{spers.firstName} #{spers.lastName}: #{spers.personType.label} (ID:#{spers.personID})" />
+                                                    </p:commandLink>
+
+
+                                                </ui:repeat>
+                                            </p:overlayPanel>
+
+                                        </div>
                                     </div>
-                                    <div class="nav_button">
-                                        <p:commandButton    id="navcontres-button-logout"
-                                                            action="#{systemServicesBB.logout}" 
-                                                            value="Logout"
-                                                            icon="fa fa-sign-out"
-                                                            ajax="false"/>
+
+                                    <div class="activebob-container"
+                                         id="aob-cecase">
+
+                                        <div class="ui-g data_container_nested_restrict">
+
+                                            <!--NESTED DATA FIELD VERTICAL-->
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
+
+                                                <div class="aob-container aob-container-iconifiedheader">
+
+                                                    <div class="inline-icon">
+
+                                                        <i class="material-icons">
+                                                            <h:outputText value="gavel"/>
+                                                        </i>
+                                                    </div>
+
+                                                    <h:outputText value="CE Case" />
+                                                </div>
+                                                <div class="aob-container aob-container-objectstring">
+
+                                                    <h:outputText value="#{sessionBean.sessCECase.caseName} (#{sessionBean.sessCECase.caseID})" />
+
+                                                </div>
+                                                <div class="aob-container aob-container-actions">
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+                                                        <p:commandLink id="activebob-cecase-view-cl"
+                                                                       value="view"
+                                                                       ajax="false"
+                                                                       action="ceCaseSearchProfile" />
+                                                    </div>
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink  id="activebob-cecaselist-cb"
+                                                                        value="CE Case List ()"
+                                                                        oncomplete="PF('activebob-cecaselist-overlay-var').show();" />
+                                                    </div>
+
+
+                                                </div>
+
+                                            </div>
+                                            <p:overlayPanel id="activebob-cecaselist-overlay"
+                                                            widgetVar="activebob-cecaselist-overlay-var"
+                                                            appendTo="activebob-cecase"
+                                                            dismissable="true"
+                                                            >
+                                                <h:outputText value="#{sessionBean.sessCECaseList.size()}"/>
+
+                                                <ui:repeat id="activebob-cecaselist-repeat"
+                                                           value="#{sessionBean.sessCECaseList}"
+                                                           var="cse">
+                                                    <p:commandLink id="activebob-proplist-prop-explore-cl"
+                                                                   ajax="false"
+                                                                   action="#{navigationBB.onCECaseListItemSelect(cse)}">
+                                                        <h:outputText value="#{cse.caseName} at #{cse.property.address} (ID:#{cse.caseID})" />
+                                                    </p:commandLink>
+
+
+                                                    <p:spacer height="2px" />
+                                                </ui:repeat>
+                                            </p:overlayPanel>
+                                        </div>
                                     </div>
-                                    <div class="nav_button gray_button">
-                                        <p:commandButton        id="navbar-button-usersettings"
-                                                                ajax="true" 
-                                                                actionListener="#{userBB.initiateUserUpdates}"
-                                                                rendered="true"
-                                                                disabled="false"
-                                                                oncomplete="PF('navcontainer-dialog-usersettings').show()"
-                                                                value="Settings" 
-                                                                update="usersettings-form"
-                                                                icon="fa fa-gear"/>
+
+                                    <div class="activebob-container"
+                                         id="aob-tools">
+
+                                        <div class="ui-g data_container_nested_restrict">
+
+                                            <!--NESTED DATA FIELD VERTICAL-->
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
+
+                                                <div class="aob-container aob-container-iconifiedheader">
+
+                                                    <div class="inline-icon">
+
+                                                        <i class="material-icons">
+                                                            <h:outputText value="gavel"/>
+                                                        </i>
+                                                    </div>
+                                                    <h:outputText value="Tools" />
+                                                </div>
+                                                <div class="aob-container aob-container-objectstring">
+
+                                                    <h:outputText value="#{systemServicesBB.bbSessionUser.person.firstName} #{systemServicesBB.bbSessionUser.person.lastName} ( #{systemServicesBB.bbSessionUser.username})"/>
+
+
+                                                </div>
+                                                <div class="aob-container aob-container-actions">
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+                                                        <p:commandLink        id="navbar-button-usersettings2"
+                                                                              ajax="true" 
+                                                                              actionListener="#{userBB.initiateUserUpdates}"
+                                                                              rendered="true"
+                                                                              disabled="false"
+                                                                              oncomplete="PF('navcontainer-dialog-usersettings').show()"
+                                                                              value="user settings" 
+                                                                              update="usersettings-form"/>
+                                                    </div>
+
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink    id="navcontres-button-logout2"
+                                                                          action="#{systemServicesBB.logout}" 
+                                                                          value="logout"
+                                                                          ajax="false"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="nav_button">
-                                        <h:outputText value="Good Morning, #{systemServicesBB.bbSessionUser.person.firstName}" />
-                                    </div>
-                                </div>
-                            </h:form>
+                                </h:form>
+                            </div>
 
 
                             <p:dialog header="User settings" 
@@ -343,200 +469,176 @@
                                     <h:outputText value=")" />
                                 </h2>
 
-                                <h:panelGrid
-                                    columns="2"
-                                    id="usersettings-grid-outer-twocol">
-                                    <h:panelGroup>
+                                <div class="ui-g data-container">
+
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
 
-                                        <p:panelGrid
-                                            columns="1"
-                                            id="usersettings-grid-innerleft"
-                                            layout="grid">
+                                        <h:outputText value="#{userBB.currentUser.role.label}" />
+                                        <h:outputText value=":" />
+                                        <h:outputText value="rnk" 
+                                                      class="dtype-label"/>
+                                        <h:outputText value=":" />
+                                        <h:outputText value="#{userBB.currentUser.role.rank}" />
 
-                                            <p:row>
-                                                <p:column>
-                                                    <h:outputText value="#{userBB.currentUser.role.label}" />
-                                                    <h:outputText value=":" />
-                                                    <h:outputText value="rnk" 
-                                                                  class="dtype-label"/>
-                                                    <h:outputText value=":" />
-                                                    <h:outputText value="#{userBB.currentUser.role.rank}" />
-                                                </p:column>
-                                            </p:row>
+                                        <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.muni.muniName}" />
+                                        <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.muni.muniName}" />
+                                        <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.userMuniAuthPeriodID}" />
+                                        <h:outputText value=" | " />
+                                        <h:outputText value="Period created TS:: #{userBB.getPrettyDate(userBB.currentUser.keyCard.governingAuthPeriod.createdTS)}" />
+                                        <h:outputText value=" | " />
+                                        <h:outputText value="Assignment priority:: #{userBB.currentUser.keyCard.governingAuthPeriod.assignmentRelativeOrder} " />
 
-                                            <p:row>
-                                                <p:column>
-                                                    <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.muni.muniName}" />
-                                                    <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.muni.muniName}" />
-                                                    <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.userMuniAuthPeriodID}" />
-                                                    <h:outputText value=" | " />
-                                                    <h:outputText value="Period created TS:: #{userBB.getPrettyDate(userBB.currentUser.keyCard.governingAuthPeriod.createdTS)}" />
-                                                    <h:outputText value=" | " />
-                                                    <h:outputText value="Assignment priority:: #{userBB.currentUser.keyCard.governingAuthPeriod.assignmentRelativeOrder} " />
-                                                </p:column>
-                                            </p:row>
-                                            <p:row>
+                                        <h:form id="usersettings-messages-form-username">
+                                            <h:messages id="usersettings-messages-username"
+                                                        globalOnly="true" showDetail="true" showSummary="true"
+                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                            </h:messages>
+                                        </h:form>
 
-                                                <p:column>
-                                                    <h:form id="usersettings-messages-form-username">
-                                                        <h:messages id="usersettings-messages-username"
-                                                                    globalOnly="true" showDetail="true" showSummary="true"
-                                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                                        </h:messages>
-                                                    </h:form>
-                                                    
-                                                    <h:form id="usersettings-form"
-                                                            rendered="false">
+                                        <h:form id="usersettings-form"
+                                                rendered="false">
 
-                                                        <p:outputLabel for="usersettings-it-username">
-                                                            <h:outputText value="User name"/>
-                                                        </p:outputLabel>
-                                                        <p:inputText id="usersettings-it-username" value="#{userBB.currentUser.username}" 
-                                                                     size="12"
-                                                                     maxlength="20"
-                                                                     tabindex="3" 
-                                                                     required="true" 
-                                                                     disabled="true"
-                                                                     validatorMessage="Length must be between 5 and 20 characters"
-                                                                     styleClass="inputText">
-                                                            <f:validateLength minimum="4" maximum="50" />
-                                                        </p:inputText>
-                                                        <h:message for="usersettings-it-username" showDetail="false" showSummary="true" 
-                                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            <p:outputLabel for="usersettings-it-username">
+                                                <h:outputText value="User name"/>
+                                            </p:outputLabel>
+                                            <p:inputText id="usersettings-it-username" value="#{userBB.currentUser.username}" 
+                                                         size="12"
+                                                         maxlength="20"
+                                                         tabindex="3" 
+                                                         required="true" 
+                                                         disabled="true"
+                                                         validatorMessage="Length must be between 5 and 20 characters"
+                                                         styleClass="inputText">
+                                                <f:validateLength minimum="4" maximum="50" />
+                                            </p:inputText>
+                                            <h:message for="usersettings-it-username" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-                                                        <p:commandButton    id="usersettings-button-updateusername"
-                                                                            ajax="true"
-                                                                            actionListener="#{userBB.commitUsernameUpdates}"
-                                                                            icon="fa fa-thumbs-o-up"
-                                                                            update="    usersettings-it-username
-                                                                            usersettings-messages-form-username
-                                                                            usersettings-notes-form"
-                                                                            value="Update username" 
-                                                                            rendered="false"
-                                                                            tabindex="3"/>
-                                                    </h:form>
-                                                </p:column>
-                                            </p:row>
+                                            <p:commandButton    id="usersettings-button-updateusername"
+                                                                ajax="true"
+                                                                actionListener="#{userBB.commitUsernameUpdates}"
+                                                                icon="fa fa-thumbs-o-up"
+                                                                update="    usersettings-it-username
+                                                                usersettings-messages-form-username
+                                                                usersettings-notes-form"
+                                                                value="Update username" 
+                                                                rendered="false"
+                                                                tabindex="3"/>
+                                        </h:form>
 
-                                            <p:row>
-                                                <p:column>
-                                                    <h:form id="usersettings-messages-form-personlink">
-                                                        <h:messages id="usersettings-messages-personlink"
-                                                                    globalOnly="true" showDetail="true" showSummary="true"
-                                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                                        </h:messages>
-                                                    </h:form>
-
-                                                    <h:form id="usersettings-form-userpersonlink">
-
-                                                        <h:outputText value="Your user is currently mapped to: " />
-                                                        <p:spacer height="5px" />
-                                                        <h:outputText value="#{userBB.currentUser.person.firstName}" />
-                                                        <h:outputText value=" " />
-                                                        <h:outputText value="#{userBB.currentUser.person.lastName}" />
-                                                        <h:outputText value=" (ID: #{userBB.currentUser.person.personID})" />
-                                                        <h:outputText value=" " />
+                                        <h:form id="usersettings-messages-form-personlink">
+                                            <h:messages id="usersettings-messages-personlink"
+                                                        globalOnly="true" showDetail="true" showSummary="true"
+                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                            </h:messages>
+                                        </h:form>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
 
-                                                        <p:spacer height="5px" />
+                                        <h:form id="usersettings-form-userpersonlink">
 
-                                                        <p:outputLabel  for="usersettings-som-userpersons" value="Available User-type persons:"/>
-                                                        <p:selectOneMenu id="usersettings-som-userpersons" 
-                                                                         required="true" 
-                                                                         value="#{userBB.formSelectedUserPerson}">
-                                                            <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
-                                                            <f:selectItems value="#{userBB.userPersonList}"  var="p" itemValue="#{p}" 
-                                                                           itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
-                                                            <f:converter converterId="personConverter"/>
-                                                        </p:selectOneMenu>
-                                                        <h:message for="usersettings-som-userpersons" showDetail="false" showSummary="true" 
-                                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            <h:outputText value="Your user is currently mapped to: " />
+                                            <p:spacer height="5px" />
+                                            <h:outputText value="#{userBB.currentUser.person.firstName}" />
+                                            <h:outputText value=" " />
+                                            <h:outputText value="#{userBB.currentUser.person.lastName}" />
+                                            <h:outputText value=" (ID: #{userBB.currentUser.person.personID})" />
+                                            <h:outputText value=" " />
 
 
-                                                        <p:commandButton    id="usersettings-button-genuserpersonlist"
-                                                                            ajax="true"
-                                                                            actionListener="#{userBB.generateUserPersonList}"
-                                                                            update="usersettings-som-userpersons"
-                                                                            icon="fa fa-thumbs-0-up"
-                                                                            value="Gemerate person list" 
-                                                                            tabindex="3"/>
+                                            <p:spacer height="5px" />
 
-                                                        <p:commandButton    id="usersettings-button-updatepersonlink"
-                                                                            ajax="true"
-                                                                            actionListener="#{userBB.commitUserPersonUpdates}"
-                                                                            update="usersettings-messages-form-personlink
-                                                                            usersettings-form-userpersonlink
-                                                                            usersettings-notes-form"
-                                                                            icon="fa fa-thumbs-0-up"
-                                                                            value="Update person link" 
-                                                                            tabindex="4"/>
-                                                    </h:form>
-                                                </p:column>
-                                            </p:row>
-
-                                            <p:row>
-                                                <p:column>
-                                                    <h:form id="usersettings-messages-form-updatepassword">
-                                                        <h:messages id="usersettings-messages-updategepassword"
-                                                                    globalOnly="true" showDetail="true" showSummary="true"
-                                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                                        </h:messages>
-                                                    </h:form>
+                                            <p:outputLabel  for="usersettings-som-userpersons" value="Available User-type persons:"/>
+                                            <p:selectOneMenu id="usersettings-som-userpersons" 
+                                                             required="true" 
+                                                             value="#{userBB.formSelectedUserPerson}">
+                                                <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                                <f:selectItems value="#{userBB.userPersonList}"  var="p" itemValue="#{p}" 
+                                                               itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                                                <f:converter converterId="personConverter"/>
+                                            </p:selectOneMenu>
+                                            <h:message for="usersettings-som-userpersons" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
 
-                                                    <h:form id="usersettings-form-updatepassword">
-                                                        <p:outputLabel for="usersettings-it-password">
-                                                            <h:outputText value="New password (use letters and numbers; at least 8 chars please! "/>
-                                                        </p:outputLabel>
-                                                        <p:password id="usersettings-it-password" value="#{userBB.formPassword}" 
-                                                                     style="width: 150px;"
-                                                                     maxlength="80"
-                                                                     tabindex="3" 
-                                                                     required="true" 
-                                                                     validatorMessage="Length must be between 8 and 50 characters"
-                                                                     feedback="true"
-                                                                     styleClass="inputText">
-                                                            <f:validateLength minimum="8" maximum="50" />
-                                                        </p:password>
-                                                        
-                                                        <p:spacer height="5px" />
-                                                        
-                                                        <p:outputLabel for="usersettings-it-password">
-                                                            <h:outputText value="Re-enter password"/>
-                                                        </p:outputLabel>
-                                                        
-                                                        <p:password id="usersettings-it-password-reentry" value="#{userBB.formPasswordReentry}" 
-                                                                     style="width: 150px;"
-                                                                     maxlength="80"
-                                                                     tabindex="3" 
-                                                                     required="true" 
-                                                                     validatorMessage="Length must be between 8 and 50 characters"
-                                                                     feedback="true"
-                                                                     styleClass="inputText">
-                                                            <f:validateLength minimum="8" maximum="50" />
-                                                        </p:password>
-                                                        
-                                                        <h:message for="usersettings-it-password" showDetail="false" showSummary="true" 
-                                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                        <p:commandButton    id="usersettings-button-updatepassword"
-                                                                            ajax="true"
-                                                                            actionListener="#{userBB.commitPasswordUpdates}"
-                                                                            update="usersettings-messages-form-updatepassword
-                                                                            usersettings-form-updatepassword
-                                                                            usersettings-notes-form"
-                                                                            icon="fa fa-lock"
-                                                                            value="Update password" 
-                                                                            tabindex="3"/>
-                                                    </h:form>
+                                            <p:commandButton    id="usersettings-button-genuserpersonlist"
+                                                                ajax="true"
+                                                                actionListener="#{userBB.generateUserPersonList}"
+                                                                update="usersettings-som-userpersons"
+                                                                icon="fa fa-thumbs-0-up"
+                                                                value="Gemerate person list" 
+                                                                tabindex="3"/>
 
-                                                </p:column>
-                                            </p:row>
+                                            <p:commandButton    id="usersettings-button-updatepersonlink"
+                                                                ajax="true"
+                                                                actionListener="#{userBB.commitUserPersonUpdates}"
+                                                                update="usersettings-messages-form-personlink
+                                                                usersettings-form-userpersonlink
+                                                                usersettings-notes-form"
+                                                                icon="fa fa-thumbs-0-up"
+                                                                value="Update person link" 
+                                                                tabindex="4"/>
+                                        </h:form>
 
-                                        </p:panelGrid>
+                                        <h:form id="usersettings-messages-form-updatepassword">
+                                            <h:messages id="usersettings-messages-updategepassword"
+                                                        globalOnly="true" showDetail="true" showSummary="true"
+                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                            </h:messages>
+                                        </h:form>
 
-                                    </h:panelGroup>
-                                    <h:panelGroup>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+
+
+                                        <h:form id="usersettings-form-updatepassword">
+                                            <p:outputLabel for="usersettings-it-password">
+                                                <h:outputText value="New password (use letters and numbers; at least 8 chars please! "/>
+                                            </p:outputLabel>
+                                            <p:password id="usersettings-it-password" value="#{userBB.formPassword}" 
+                                                        style="width: 150px;"
+                                                        maxlength="80"
+                                                        tabindex="3" 
+                                                        required="true" 
+                                                        validatorMessage="Length must be between 8 and 50 characters"
+                                                        feedback="true"
+                                                        styleClass="inputText">
+                                                <f:validateLength minimum="8" maximum="50" />
+                                            </p:password>
+
+                                            <p:spacer height="5px" />
+
+                                            <p:outputLabel for="usersettings-it-password">
+                                                <h:outputText value="Re-enter password"/>
+                                            </p:outputLabel>
+
+                                            <p:password id="usersettings-it-password-reentry" value="#{userBB.formPasswordReentry}" 
+                                                        style="width: 150px;"
+                                                        maxlength="80"
+                                                        tabindex="3" 
+                                                        required="true" 
+                                                        validatorMessage="Length must be between 8 and 50 characters"
+                                                        feedback="true"
+                                                        styleClass="inputText">
+                                                <f:validateLength minimum="8" maximum="50" />
+                                            </p:password>
+
+                                            <h:message for="usersettings-it-password" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            <p:commandButton    id="usersettings-button-updatepassword"
+                                                                ajax="true"
+                                                                actionListener="#{userBB.commitPasswordUpdates}"
+                                                                update="usersettings-messages-form-updatepassword
+                                                                usersettings-form-updatepassword
+                                                                usersettings-notes-form"
+                                                                icon="fa fa-lock"
+                                                                value="Update password" 
+                                                                tabindex="3"/>
+                                        </h:form>
+
 
 
                                         <h:form id="usersettings-notes-form">
@@ -548,22 +650,18 @@
                                                             escape="false" />
                                         </h:form>
 
-                                    </h:panelGroup>
 
+                                    </div>
 
+                                    <h:form id="usersettings-umaps-messages-form">
+                                        <h:messages id="usersettings-umaps-messages"
+                                                    globalOnly="true" showDetail="true" showSummary="true"
+                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                        </h:messages>
+                                    </h:form>
 
-
-
-                                    <f:facet name="footer">
-
-                                        <h:form id="usersettings-umaps-messages-form">
-                                            <h:messages id="usersettings-umaps-messages"
-                                                        globalOnly="true" showDetail="true" showSummary="true"
-                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                            </h:messages>
-                                        </h:form>
-
-                                        <h:form id="usersettings-umaps-table-form">
+                                    <h:form id="usersettings-umaps-table-form">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
                                             <p:dataTable
                                                 id="usersettings-umaps-table"
@@ -645,105 +743,89 @@
                                                 <p:rowExpansion>
                                                     <div class="outlinedBox">
 
-                                                        <h:panelGrid columns="2" border="0" 
-                                                                     cellpadding="5" columnClasses="gridTd, gridTd"
-                                                                     footerClass="gridFooter">
-                                                            <h:panelGroup>
-
-                                                                <h:outputLabel value="Created by: " />
-                                                                <p:spacer height="0px" />
-                                                                <h:outputLabel value="user id: " />
-                                                                <h:outputText value="#{period.createdByUserID}" />
-
-                                                            </h:panelGroup>
-
-                                                            <h:panelGroup>
-                                                                <h:outputLabel value="Created TS:" />
-                                                                <h:outputText value="#{systemServicesBB.getPrettyDate(period.createdTS)}"/>
-                                                            </h:panelGroup>
-                                                            <h:panelGroup>
-
-                                                                <h:outputLabel value="Notes" />
-                                                                <h:outputText value="#{period.notes}" escape="false"/>
-                                                            </h:panelGroup>
-
-                                                            <f:facet name="footer">
-
-                                                                <h4>Log entries associated with this authorization period</h4>
 
 
-                                                                <p:scrollPanel id="usersettings-umaps-log-scrollpanel"
-                                                                               style="height: 200px;">
+                                                        <h:outputLabel value="Created by: " />
+                                                        <p:spacer height="0px" />
+                                                        <h:outputLabel value="user id: " />
+                                                        <h:outputText value="#{period.createdByUserID}" />
 
-                                                                    <p:dataTable
-                                                                        id="usersettings-umaps-log-table"
-                                                                        var="entry"
-                                                                        value="#{period.periodActivityLogBook}"
-                                                                        rowKey="#{entry.logBookEntryID}"
-                                                                        tableStyleClass="primeDataTable">
 
-                                                                        <p:column>
-                                                                            <f:facet name="header">
-                                                                                <h:outputText value="Log entry ID" />
-                                                                            </f:facet>
-                                                                            <h:outputText value="#{entry.logBookEntryID}"/>
-                                                                        </p:column>
-                                                                        <p:column>
-                                                                            <f:facet name="header">
-                                                                                <h:outputText value="AuthPerID" />
-                                                                            </f:facet>
-                                                                            <h:outputText value="#{entry.userMuniAuthPeriodID}"/>
-                                                                        </p:column>
-                                                                        <p:column>
-                                                                            <f:facet name="header">
-                                                                                <h:outputText value="Cat" />
-                                                                            </f:facet>
-                                                                            <h:outputText value="#{entry.category}"/>
-                                                                        </p:column>
-                                                                        <p:column>
-                                                                            <f:facet name="header">
-                                                                                <h:outputText value="TS" />
-                                                                            </f:facet>
-                                                                            <h:outputText value="#{entry.entryTS}"/>
-                                                                        </p:column>
-                                                                        <p:column>
-                                                                            <f:facet name="header">
-                                                                                <h:outputText value="Client address" />
-                                                                            </f:facet>
-                                                                            <h:outputText value="#{entry.header_remoteaddr}"/>
-                                                                        </p:column>
-                                                                    </p:dataTable>
-                                                                </p:scrollPanel>
+                                                        <h:outputLabel value="Created TS:" />
+                                                        <h:outputText value="#{systemServicesBB.getPrettyDate(period.createdTS)}"/>
 
-                                                            </f:facet>
-                                                        </h:panelGrid>
+                                                        <h:outputLabel value="Notes" />
+                                                        <h:outputText value="#{period.notes}" escape="false"/>
+
+                                                        <h4>Log entries associated with this authorization period</h4>
+
+
+                                                        <p:scrollPanel id="usersettings-umaps-log-scrollpanel"
+                                                                       style="height: 200px;">
+
+                                                            <p:dataTable
+                                                                id="usersettings-umaps-log-table"
+                                                                var="entry"
+                                                                value="#{period.periodActivityLogBook}"
+                                                                rowKey="#{entry.logBookEntryID}"
+                                                                tableStyleClass="primeDataTable">
+
+                                                                <p:column>
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Log entry ID" />
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{entry.logBookEntryID}"/>
+                                                                </p:column>
+                                                                <p:column>
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="AuthPerID" />
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{entry.userMuniAuthPeriodID}"/>
+                                                                </p:column>
+                                                                <p:column>
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Cat" />
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{entry.category}"/>
+                                                                </p:column>
+                                                                <p:column>
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="TS" />
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{entry.entryTS}"/>
+                                                                </p:column>
+                                                                <p:column>
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Client address" />
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{entry.header_remoteaddr}"/>
+                                                                </p:column>
+                                                            </p:dataTable>
+                                                        </p:scrollPanel>
+
                                                     </div>
                                                 </p:rowExpansion>
                                             </p:dataTable>
+                                        </div>
 
-                                        </h:form>
+                                    </h:form>
 
-                                    </f:facet>
-                                </h:panelGrid>
+                                    <h:form id="usersettings-form-close">                             
 
-
-
-                                <h:form id="usersettings-form-close">                             
-
-                                    <p:commandButton ajax="true" 
-                                                     value="Cancel" icon="fa fa-stop" 
-                                                     onclick="PF('navcontainer-dialog-usersettings').hide()"
-                                                     tabindex="4"/>
+                                        <p:commandButton ajax="true" 
+                                                         value="Cancel" icon="fa fa-stop" 
+                                                         onclick="PF('navcontainer-dialog-usersettings').hide()"
+                                                         tabindex="4"/>
 
 
-                                    <p:commandButton ajax="true" 
-                                                     value="Done!" icon="fa thumbs-up" 
-                                                     onclick="PF('navcontainer-dialog-usersettings').hide()"
-                                                     tabindex="4"/>
-                                </h:form>
+                                        <p:commandButton ajax="true" 
+                                                         value="Done!" icon="fa thumbs-up" 
+                                                         onclick="PF('navcontainer-dialog-usersettings').hide()"
+                                                         tabindex="4"/>
+                                    </h:form>
+                                </div>
 
                             </p:dialog>
-
                             <p:spacer height="0px;"/>
 
                             <div class="flexing-box-pagecontent">
@@ -755,100 +837,9 @@
                     </f:view>
                 </div>
             </div>
-
-
-            <ui:remove>
-
-                <div class="flex-box-container">
-                    <div class="flexing-box-footer">
-                        <ui:insert name="bottom">
-                            <div class="footer">
-                                <f:view id="footerView">
-                                    <p>This database application is maintained and updated by the Turtle Creek Valley Council of Governments.</p>
-                                </f:view>
-                            </div>
-                        </ui:insert>
-                    </div>
-                </div>
-            </ui:remove>
         </div>
 
-        <!--For top nav bar - responsive toggler button-->
-        <script type="text/javascript">
-            function onClickNavbarTogglerButton() {
-                var x = document.getElementById("navbar_id");
-                if (x.className === "navbar") {
-                    x.className += " responsive";
-                } else {
-                    x.className = "navbar";
-                }
-            }
-        </script>
-
-        <!--For side navigation bar dropdown-->
-        <script type="text/javascript">
-            var dropdown = document.getElementsByClassName("sidebar_firstmenu_item");
-            for (var i = 0; i &lt; dropdown.length; i++) {
-                var n = dropdown[i];
-                n.addEventListener("click", function() {
-                    this.classList.toggle("sidebar_firstmenu_font_active");
-                    var dropdownContent = this.nextElementSibling;
-                    if (dropdownContent.style.display === "block") {
-                        dropdownContent.style.display = "none";
-                    } else {
-                        dropdownContent.style.display = "block";
-                        openSideBar();
-                    }
-                });
-            }
-        </script>
-
-        <!--For side navigation bar expansion-->
-        <script type="text/javascript">
-            
-            function openSideBar() {
-                document.getElementById("toolSidebar").style.width = "250px";
-                document.getElementById("maincontent").style.marginLeft = "255px";
-                document.getElementById("toolSidebarCollapseId").style.display = "none";
-                document.getElementById("toolSidebarExpansionId").style.display = "flex";
-                var fm = document.getElementsByClassName("sidebar_firstmenu_font");
-                for (var i = 0; i &lt; fm.length; i++) {
-                    fm[i].style.display = "inline";
-                }
-                var sm = document.getElementsByClassName("sidebar_secondmenu_font");
-                for (var i = 0; i &lt; sm.length; i++) {
-                    sm[i].style.display = "inline";
-                }
-            }
-
-            function closeSideBar() {
-                document.getElementById("toolSidebar").style.width = "35px";
-                document.getElementById("maincontent").style.marginLeft = "40px";
-                document.getElementById("toolSidebarCollapseId").style.display = "flex";
-                document.getElementById("toolSidebarExpansionId").style.display = "none";
-                var fm = document.getElementsByClassName("sidebar_firstmenu_font");
-                for (var i = 0; i &lt; fm.length; i++) {
-                    fm[i].style.display = "none";
-                }
-                var sm = document.getElementsByClassName("sidebar_secondmenu_font");
-                for (var i = 0; i &lt; sm.length; i++) {
-                    sm[i].style.display = "none";
-                }
-            }
-
-            function initSideBar(){
-                var smi = document.getElementsByClassName("sidebar_secondmenu");
-                for (var i = 0; i &lt; smi.length; i++) {
-                    smi[i].style.display = "none";
-                }
-            }
-
-            document.getElementById("toolSidebarExpansionButtonIcon").addEventListener("click", openSideBar);
-            document.getElementById("toolSidebarCollapseButtonIcon").addEventListener("click", closeSideBar);
-            document.getElementById("toolSidebarExpansionButtonIcon").addEventListener("click", initSideBar);
-            document.getElementById("toolSidebarCollapseButtonIcon").addEventListener("click", initSideBar);
-            
-        </script>
+  
 
     </h:body>
 </html>

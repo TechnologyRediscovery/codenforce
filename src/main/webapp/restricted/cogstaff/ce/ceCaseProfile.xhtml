@@ -116,15 +116,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:outputLabel for="case-name-ot">
                                                             <h:outputText value="Name "/>
                                                         </p:outputLabel>
-                                                        <div class="restrict-main-contents-io-link">
+                                                        <div class="restrict-main-contents-io-link link-button">
 
-                                                        <p:commandLink      id="case-rename-cb" 
-                                                                            ajax="true" 
-                                                                            actionListener="#{ceCaseSearchProfileBB.onCaseRenameInitButtonChange}"
-                                                                            oncomplete="PF('case-rename-dialog-var').show()"
-                                                                            style="color:blue;"
-                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                            value="edit" />
+                                                            <p:commandLink      id="case-rename-cb" 
+                                                                                ajax="true" 
+                                                                                actionListener="#{ceCaseSearchProfileBB.onCaseRenameInitButtonChange}"
+                                                                                oncomplete="PF('case-rename-dialog-var').show()"
+                                                                                style="color:blue;"
+                                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                                value="edit" />
 
 
                                                         </div>
@@ -136,7 +136,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                        value="#{ceCaseSearchProfileBB.currentCase.caseName}" />
                                                     </div>
                                                 </div>
-                                
+
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                                                     <div class="restrict-data-field-label-inline" >
                                                         <p:outputLabel for="case-status-ot">
@@ -171,7 +171,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:outputLabel for="case-manager-ot">
                                                             <h:outputText value="Manager"/>
                                                         </p:outputLabel>
-                                                        <div class="restrict-main-contents-io-link">
+                                                        <div class="restrict-main-contents-io-link link-button">
 
                                                             <p:commandLink      id="case-update-manager-cb" 
                                                                                 ajax="true" 
@@ -195,7 +195,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                       value="(#{ceCaseSearchProfileBB.currentCase.caseManager.username})" />
                                                     </div>
                                                 </div>
-                                                
+
                                             </div>
 
                                             <div class="ui-g data_container_nested_restrict">
@@ -214,7 +214,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="restrict-data-field-value-vertical" style="font-weight: 700;">
                                                         Details:
                                                     </div>
-                                                   
+
 
                                                 </div>
 
@@ -223,7 +223,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <!--NESTED DATA LABEL VERTICAL -->
                                                     <div class="restrict-data-field-label-vertical" >
                                                         <h:outputLabel value="Opening date"/>
-                                                        <div class="restrict-main-contents-io-link">
+                                                        <div class="restrict-main-contents-io-link link-button">
 
                                                             <p:commandLink      id="case-updatedor-init-cb" 
                                                                                 ajax="true" 
@@ -244,7 +244,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                       value=" (#{ceCaseSearchProfileBB.currentCase.caseAge} days ago)" 
                                                                       rendered="#{empty ceCaseSearchProfileBB.currentCase.closingDate}"/>
                                                     </div>
-                                                 
+
                                                 </div>
 
                                                 <!--NESTED DATA FIELD VERTICAL-->
@@ -252,7 +252,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <!--NESTED DATA LABEL VERTICAL -->
                                                     <div class="restrict-data-field-label-vertical" >
                                                         <h:outputLabel value="Closing date"/>
-                                                        <div class="restrict-main-contents-io-link">
+                                                        <div class="restrict-main-contents-io-link link-button">
 
                                                             <p:commandLink      id="cecase-forceclose-init-cb" 
                                                                                 ajax="true" 
@@ -270,7 +270,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <h:outputText value="&nbsp;"/>
                                                         <h:outputText id="selcase-cdate-it" value="#{ceCaseSearchProfileBB.currentCase.closingDatePretty}"/>
                                                     </div>
-                                                   
+
                                                 </div>
                                             </div>
 
@@ -299,11 +299,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                                         <p:commandButton      id="refresh-case-cb" 
-                                                                            ajax="false" 
-                                                                            icon="fa fa-refresh"
-                                                                            action="#{ceCaseSearchProfileBB.refreshCurrentCase}"
-                                                                            value="reload case" 
-                                                                            />
+                                                                              ajax="false" 
+                                                                              icon="fa fa-refresh"
+                                                                              action="#{ceCaseSearchProfileBB.refreshCurrentCase}"
+                                                                              value="reload case" 
+                                                                              />
 
                                                     </div>
                                                 </div>
@@ -312,12 +312,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="restrict-main-contents-io-button gray_button">
 
                                                         <p:commandButton      id="case-settings-cb" 
-                                                                            ajax="true" 
-                                                                            icon="fa fa-gears"
-                                                                            actionListener="#{ceCaseSearchProfileBB.onCaseSettingsInitButtonChnage}"
-                                                                            oncomplete="PF('case-update-dialog-var').show()"
-                                                                            disabled="false"
-                                                                            value="case settings" />
+                                                                              ajax="true" 
+                                                                              icon="fa fa-gears"
+                                                                              actionListener="#{ceCaseSearchProfileBB.onCaseSettingsInitButtonChnage}"
+                                                                              oncomplete="PF('case-update-dialog-var').show()"
+                                                                              disabled="false"
+                                                                              value="case settings" />
 
                                                     </div>
                                                 </div>
@@ -330,7 +330,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:commandButton   id="print-case-cb" 
                                                                            ajax="true" actionListener="#{ceCaseSearchProfileBB.prepareReportCECase}"
                                                                            icon="fa fa-print"
-                                                                           
+
                                                                            oncomplete="PF('report-case-profile-diaglog-var').show()"
                                                                            value="print case profile" 
                                                                            update="report-case-profile-form"/>
@@ -405,8 +405,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                     <p:spacer height="3px" />
 
-                                                    <div class="restrict-main-contents-io-link">
-                                                        
+                                                    <div class="restrict-main-contents-io-link link-button">
+
                                                         <p:commandLink   id="nov-queuenotice-cb"
                                                                          ajax="true" 
                                                                          actionListener="#{noticeOfViolationBB.lockNoticeAndQueueForMailing(nov)}"
@@ -417,11 +417,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                          messages-global-form"
                                                                          disabled="#{!(empty nov.lockedAndqueuedTS)}"
                                                                          />
-                                                    
+
                                                     </div>
-                                                    <div class="restrict-main-contents-io-link">
-                                                        
-                                                    
+
+                                                    <h:outputText value="&nbsp;&nbsp;|" />
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+
+
                                                         <p:commandLink   id="nov-mailednotice-init-cb"
                                                                          ajax="true" 
                                                                          actionListener="#{noticeOfViolationBB.markNoticeOfViolationAsSentInit(nov)}"
@@ -448,8 +451,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                         styleClass="link-button"/>
                                                     </div>
                                                     <p:spacer height="3px" />
-                                                    <div class="restrict-main-contents-io-link">
-                                                        
+                                                    <div class="restrict-main-contents-io-link link-button">
+
                                                         <p:commandLink      id="cecase-notices-view-button"
                                                                             ajax="true" 
                                                                             value="details"
@@ -458,16 +461,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             update="novstatus-dialog"
                                                                             oncomplete="PF('novstatus-dialog-var').show()"/>
                                                     </div>
-                                                    <div class="restrict-main-contents-io-link">
-                                                        
-                                                    <p:commandLink      id="cecase-notices-edit-button"
-                                                                        ajax="true" 
-                                                                        value="edit"
-                                                                        action="#{noticeOfViolationBB.onObjectViewButtonChange(nov)}"
-                                                                        rendered="true"
-                                                                        disabled="#{!(empty nov.lockedAndqueuedTS)}"
-                                                                        update="novstatus-dialog"
-                                                                        oncomplete="PF('nov-add-edit-dialog-var').show()"/>
+                                                    <h:outputText value="&nbsp;&nbsp;|" />
+                                                    <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink      id="cecase-notices-edit-button"
+                                                                            ajax="true" 
+                                                                            value="edit"
+                                                                            action="#{noticeOfViolationBB.onObjectViewButtonChange(nov)}"
+                                                                            rendered="true"
+                                                                            disabled="#{!(empty nov.lockedAndqueuedTS)}"
+                                                                            update="novstatus-dialog"
+                                                                            oncomplete="PF('nov-add-edit-dialog-var').show()"/>
                                                     </div>
                                                 </p:column>
 
@@ -496,13 +500,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 enctype="multipart/form-data">
                                             <h4>Upload new header image for this NOV style</h4>
 
-                                            <p:fileUpload fileUploadListener="#{noticeOfViolationBB.onHeaderUploadRequest}"
-                                                          mode="advanced" 
-                                                          multiple="true"
-                                                          fileLimit="3" 
-                                                          sizeLimit="900000000" 
-                                                          allowTypes="/(\.|\/)(jpe?g|png)$/"
-                                                          />    
+                                            <p:fileUpload 
+                                                mode="advanced" 
+                                                multiple="true"
+                                                fileLimit="3" 
+                                                sizeLimit="900000000" 
+                                                allowTypes="/(\.|\/)(jpe?g|png)$/"
+                                                />    
                                         </h:form>
 
                                     </p:panel>
@@ -526,7 +530,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 icon="fa fa-gavel"
                                                                 update="citation-add-dialog
                                                                 citation-add-form"
-                                                                
+
                                                                 />
 
                                             <p:spacer height="5px" />
@@ -546,7 +550,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </f:facet>
                                                     <h:outputText value="#{citation.citationNo}"/>
                                                 </p:column>
-                                                
+
                                                 <p:column width="10%">
                                                     <f:facet name="header">
                                                         <h:outputText value="Date of record" />
@@ -564,7 +568,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <f:facet name="edit">
                                                         <h:outputText value="Actions" />
                                                     </f:facet>
-                                                      <div class="restrict-main-contents-io-link">
+                                                    <div class="restrict-main-contents-io-link">
 
                                                         <p:commandLink      id="citation-profile-init-cb" 
                                                                             ajax="true" 
@@ -641,53 +645,62 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <p:column headerText="Actions"
                                                           styleClass="centeredColumnContent">
 
-                                                    <p:commandButton    id="event-open0-button"
-                                                                        ajax="true"
-                                                                        styleClass="noFill button-size-small"
-                                                                        action="#{ceCaseSearchProfileBB.onEventViewButtonChange(eventfuture)}"
-                                                                        value="View"
-                                                                        icon="fa fa-folder-open-o"
-                                                                        oncomplete="PF('event-profile-dialog-var').show()"
-                                                                        update="event-profile-dialog
-                                                                        event-profile-form"
-                                                                        />
 
-                                                    <p:spacer height="2px" />
 
-                                                    <p:commandButton    id="event-update0-button"
-                                                                        ajax="true"
-                                                                        styleClass="noFill button-size-small"
-                                                                        action="#{ceCaseSearchProfileBB.onEventViewButtonChange(eventfuture)}"
-                                                                        value="Update"
-                                                                        icon="fa fa-folder-open-o"
-                                                                        oncomplete="PF('event-update-dialog-var').show()"
-                                                                        update="event-profile-dialog
-                                                                        event-profile-form"
-                                                                        />
-                                                    <p:spacer height="2px" />
 
-                                                    <p:commandButton    id="event-dismiss0-button"
-                                                                        ajax="true"
-                                                                        styleClass="noFill button-size-small"
-                                                                        action="#{ceCaseSearchProfileBB.onEventViewButtonChange(eventfuture)}"
-                                                                        value="Dismiss and deactivate"
-                                                                        icon="fa fa-folder-open-o"
-                                                                        oncomplete="PF('event-deactivate-dialog-var').show()"
-                                                                        update="event-profile-dialog
-                                                                        event-profile-form"
-                                                                        />
-                                                    <p:spacer height="2px" />
+                                                    <div class="restrict-main-contents-io-link link-button">
+                                                        <p:commandLink      id="event-open0-button"
+                                                                            ajax="true"
+                                                                            styleClass="noFill button-size-small"
+                                                                            action="#{ceCaseSearchProfileBB.onEventViewButtonChange(eventfuture)}"
+                                                                            value="View"
+                                                                            oncomplete="PF('event-profile-dialog-var').show()"
+                                                                            update="event-profile-dialog
+                                                                            event-profile-form"
+                                                                            />
 
-                                                    <p:commandButton    id="event-shiftpast-button"
-                                                                        ajax="true"
-                                                                        styleClass="noFill button-size-small"
-                                                                        action="#{ceCaseSearchProfileBB.onEventViewButtonChange(eventfuture)}"
-                                                                        value="Shift to past"
-                                                                        icon="fa fa-edit"
-                                                                        oncomplete="PF('event-shiftpast-dialog-var').show()"
-                                                                        update="event-update-dialog
-                                                                        event-update-form"
-                                                                        />
+                                                    </div>
+
+                                                    <h:outputText value="&nbsp;&nbsp;|" />
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink      id="event-update0-button"
+                                                                            ajax="true"
+                                                                            styleClass="noFill button-size-small"
+                                                                            action="#{ceCaseSearchProfileBB.onEventViewButtonChange(eventfuture)}"
+                                                                            value="Update"
+                                                                            oncomplete="PF('event-update-dialog-var').show()"
+                                                                            update="event-profile-dialog
+                                                                            event-profile-form"
+                                                                            />
+                                                    </div>
+                                                    <p:spacer height="3px" />
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+                                                        <p:commandLink      id="event-dismiss0-button"
+                                                                            ajax="true"
+                                                                            styleClass="noFill button-size-small"
+                                                                            action="#{ceCaseSearchProfileBB.onEventViewButtonChange(eventfuture)}"
+                                                                            value="Dismiss and deactivate"
+                                                                            oncomplete="PF('event-deactivate-dialog-var').show()"
+                                                                            update="event-profile-dialog
+                                                                            event-profile-form"
+                                                                            />
+                                                    </div>
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink    id="event-shiftpast-button"
+                                                                          ajax="true"
+                                                                          styleClass="noFill button-size-small"
+                                                                          action="#{ceCaseSearchProfileBB.onEventViewButtonChange(eventfuture)}"
+                                                                          value="Shift to past"
+                                                                          oncomplete="PF('event-shiftpast-dialog-var').show()"
+                                                                          update="event-update-dialog
+                                                                          event-update-form"
+                                                                          />
+                                                    </div>
                                                 </p:column>
                                             </p:dataTable>
 
@@ -715,8 +728,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 />
 
                                             <p:spacer height="5px" />
-                                            
-                                           
+
+
 
                                             <p:dataTable
                                                 id="cecase-violations-table"
@@ -742,16 +755,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                 <p:column width="10%"
                                                           styleClass="wrapText">
-                                                    
+
                                                     <f:facet name="header">
                                                         <h:outputText value="Ordinance" />
                                                     </f:facet>
-                                                    
+
                                                     <h:outputText  value="&#167;#{v.violatedEnfElement.ordSecNum}:" />
                                                     <h:outputText  value="#{v.violatedEnfElement.ordSecTitle}; " />
                                                     <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
                                                     <h:outputText  value="#{v.violatedEnfElement.ordSubSecTitle}" />
-                                                    
+
                                                 </p:column>
 
                                                 <p:column width="10%"
@@ -799,36 +812,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                     <p:spacer height="5px" />
 
-                                                         <div class="restrict-main-contents-io-link">
+                                                    <div class="restrict-main-contents-io-link link-button">
 
-                                                            <p:commandLink  id="violation-update-init-cb"
-                                                                            ajax="true" 
-                                                                            value="edit"
-                                                                            actionListener="#{ceCaseSearchProfileBB.onViolationUpdateInitButtonChange(v)}"
-                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                            update="violation-details-dialog
-                                                                            violation-details-form"
-                                                                            oncomplete="PF('violation-details-dialog-var').show()"/>
-
-
-                                                        </div>
-                                                        
- 
-                                                    <h:outputText value="&nbsp;&nbsp;&nbsp;&nbsp;|" />
-
-                                                         <div class="restrict-main-contents-io-link">
-
-                                                            <p:commandLink  id="violation-notes-init-cb"
-                                                                            ajax="true" 
-                                                                            value="notes"
-                                                                            actionListener="#{ceCaseSearchProfileBB.onViolationNotesInitButtonChange(v)}"
-                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                            update="violation-notes-dialog
-                                                                            violation-notes-form"
-                                                                            oncomplete="PF('violation-notes-dialog-var').show()"/>
+                                                        <p:commandLink  id="violation-update-init-cb"
+                                                                        ajax="true" 
+                                                                        value="edit"
+                                                                        actionListener="#{ceCaseSearchProfileBB.onViolationUpdateInitButtonChange(v)}"
+                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                        update="violation-details-dialog
+                                                                        violation-details-form"
+                                                                        oncomplete="PF('violation-details-dialog-var').show()"/>
 
 
-                                                        </div>
+                                                    </div>
+
+
+                                                    <h:outputText value="&nbsp;&nbsp;|" 
+                                                                  styleClass="link-button"/>
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink  id="violation-notes-init-cb"
+                                                                        ajax="true" 
+                                                                        value="notes"
+                                                                        actionListener="#{ceCaseSearchProfileBB.onViolationNotesInitButtonChange(v)}"
+                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                        update="violation-notes-dialog
+                                                                        violation-notes-form"
+                                                                        oncomplete="PF('violation-notes-dialog-var').show()"/>
+
+
+                                                    </div>
                                                 </p:column>
 
                                             </p:dataTable>
@@ -858,6 +872,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 value="Add Event"
                                                                 icon="fa fa-plus"
                                                                 oncomplete="PF('event-add-dialog-var').show()"
+                                                                update="event-add-dialog
+                                                                event-add-form"
                                                                 />
 
                                             <p:spacer height="5px" />
@@ -919,28 +935,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                 <p:column headerText="Description"
                                                           styleClass="centeredColumnContent wrapText">
-                                                    
+
                                                     <h:outputText value="#{event.description}"/>
-                                                    
+
                                                 </p:column>
 
                                                 <p:column headerText="Actions"
                                                           styleClass="centeredColumnContent">
-                                                    <div class="restrict-main-contents-io-link">
-                                                        
+                                                    <div class="restrict-main-contents-io-link link-button">
+
                                                         <p:commandLink    id="event-open-button"
-                                                                            ajax="true"
-                                                                            styleClass="noFill button-size-small"
-                                                                            action="#{ceCaseSearchProfileBB.onEventViewButtonChange(event)}"
-                                                                            value="view"
-                                                                            oncomplete="PF('event-profile-dialog-var').show()"
-                                                                            update="event-profile-dialog
-                                                                            event-profile-form"
-                                                                            />
+                                                                          ajax="true"
+                                                                          styleClass="noFill button-size-small"
+                                                                          action="#{ceCaseSearchProfileBB.onEventViewButtonChange(event)}"
+                                                                          value="view"
+                                                                          oncomplete="PF('event-profile-dialog-var').show()"
+                                                                          update="event-profile-dialog
+                                                                          event-profile-form"
+                                                                          />
                                                     </div>
-                                                    <h:outputText value="&nbsp;&nbsp;&nbsp;&nbsp;|" />
-                                                    <div class="restrict-main-contents-io-link">
-                                                        
+                                                    <h:outputText value="&nbsp;&nbsp;|" />
+                                                    <div class="restrict-main-contents-io-link link-button">
+
                                                         <p:commandLink      id="event-update-button"
                                                                             ajax="true"
                                                                             styleClass="noFill button-size-small"
@@ -1079,13 +1095,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <p:commandLink value="#{blob.filename}" 
                                                                    action="#{manageBlobBB.downloadBlob(blob)}"/>
                                                 </p:column>
-
-
                                             </p:dataTable>
-
-
                                         </h:form>
-
                                     </p:panel>
 
                                     <p:panel id="cecase-payments-fees-panel"
@@ -1156,74 +1167,55 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <p:rowExpansion>
                                                     <div class="outlinedBox">
                                                         <h2>Full fee listing for fee <h:outputText value="#{fee.fee.occupancyInspectionFeeID}"/> </h2>
-                                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
-                                                                     columnClasses="gridTd, gridTd, gridTd, gridTd">
 
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Notes"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{fee.fee.notes}"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Notes"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{fee.fee.notes}"/>
+                                                        </div>
 
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Assigned By"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{fee.assignedBy.person.firstName} #{fee.assignedBy.person.lastName} (ID: #{fee.assignedBy.userID})"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Assigned By"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{fee.assignedBy.person.firstName} #{fee.assignedBy.person.lastName} (ID: #{fee.assignedBy.userID})"/>
+                                                        </div>
 
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Last Modified"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{fee.lastModified}"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Last Modified"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{fee.lastModified}"/>
+                                                        </div>
 
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Other notes"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{fee.notes}"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Other notes"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{fee.notes}"/>
+                                                        </div>
 
-                                                            <h:panelGroup rendered="#{not empty fee.reducedByUser}">
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Amount Reduced By"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="$ #{fee.reducedBy}"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Amount Reduced By"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="$ #{fee.reducedBy}"/>
+                                                        </div>
 
-                                                            <h:panelGroup rendered="#{not empty fee.reducedByUser}">
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Reduced By"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{fee.reducedByUser.person.firstName} #{fee.reducedByUser.person.lastName} (ID: #{fee.reducedByUser.userID}"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Reduced By"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{fee.reducedByUser.person.firstName} #{fee.reducedByUser.person.lastName} (ID: #{fee.reducedByUser.userID}"/>
+                                                        </div>
 
-                                                            <h:panelGroup rendered="#{not empty fee.waivedBy}">
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Waived By"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{fee.waivedBy.person.firstName} #{fee.waivedBy.person.lastName} (ID: #{fee.waivedBy.userID}"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Waived By"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{fee.waivedBy.person.firstName} #{fee.waivedBy.person.lastName} (ID: #{fee.waivedBy.userID}"/>
+                                                        </div>
 
-                                                            <ui:remove>
-                                                                <h:panelGroup>
-                                                                    <p:spacer height="15px"/>
-                                                                    <div class="rowExpansion">
-                                                                        <p:commandButton value="Edit this payment" action="#{cECasePaymentsBB.editOnePayment(payment)}"/>
-                                                                    </div>
-                                                                </h:panelGroup>
-                                                            </ui:remove>
-                                                        </h:panelGrid>
+                                                        <ui:remove>
+                                                            <p:spacer height="15px"/>
+                                                            <div class="rowExpansion">
+                                                                <p:commandButton value="Edit this payment" action="#{cECasePaymentsBB.editOnePayment(payment)}"/>
+                                                            </div>
+                                                        </ui:remove>
                                                     </div>
                                                 </p:rowExpansion>
 
@@ -1309,114 +1301,85 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <p:rowExpansion>
                                                     <div class="outlinedBox">
                                                         <h2>Full payment listing for payment <h:outputText value="#{payment.paymentID}"/> </h2>
-                                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
-                                                                     columnClasses="gridTd, gridTd, gridTd, gridTd">
 
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Assigned Fee ID"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{payment.assignedFeeID} (#{payment.domain})"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Assigned Fee ID"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{payment.assignedFeeID} (#{payment.domain})"/>
+                                                        </div>
 
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Payment Type"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{payment.paymentType.paymentTypeTitle}"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Payment Type"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{payment.paymentType.paymentTypeTitle}"/>
+                                                        </div>
 
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Date Received"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{payment.dateReceived}"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Date Received"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{payment.dateReceived}"/>
+                                                        </div>
 
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Date Deposited"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{payment.dateDeposited}"/>
-                                                                </div>
-                                                            </h:panelGroup>
 
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Amount"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="$#{payment.amount}"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Date Deposited"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{payment.dateDeposited}"/>
+                                                        </div>
 
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Payer ID"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{payment.payer.personID} (#{payment.payer.firstName} #{payment.payer.lastName})"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Amount"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="$#{payment.amount}"/>
+                                                        </div>
 
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Reference Number"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <p:spacer height="5px"/>
-                                                                    <h:outputText value="#{payment.referenceNum}"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Payer ID"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{payment.payer.personID} (#{payment.payer.firstName} #{payment.payer.lastName})"/>
+                                                        </div>
 
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Check Number"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{payment.checkNum}"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Reference Number"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <p:spacer height="5px"/>
+                                                            <h:outputText value="#{payment.referenceNum}"/>
+                                                        </div>
 
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Cleared?"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{payment.cleared}"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Check Number"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{payment.checkNum}"/>
+                                                        </div>
 
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Notes"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{payment.notes}"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Cleared?"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{payment.cleared}"/>
+                                                        </div>
 
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Recorded By"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="User ID: #{payment.recordedBy.userID} Name: #{payment.recordedBy.person.firstName} #{payment.recordedBy.person.lastName}"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Notes"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{payment.notes}"/>
+                                                        </div>
 
-                                                            <h:panelGroup>
-                                                                <h:outputLabel styleClass="ui-label-inline" value="Entry Timestamp"/>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <h:outputText value="#{payment.entryTimestamp}"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Recorded By"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="User ID: #{payment.recordedBy.userID} Name: #{payment.recordedBy.person.firstName} #{payment.recordedBy.person.lastName}"/>
+                                                        </div>
 
-                                                            <h:panelGroup>
-                                                                <p:spacer height="15px"/>
-                                                                <div class="rowExpansion">
-                                                                    <p:commandButton value="Edit this payment" action="#{cECasePaymentsBB.editOnePayment(payment)}"/>
-                                                                </div>
-                                                            </h:panelGroup>
+                                                        <h:outputLabel styleClass="ui-label-inline" value="Entry Timestamp"/>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <h:outputText value="#{payment.entryTimestamp}"/>
+                                                        </div>
 
-                                                        </h:panelGrid>
+                                                        <p:spacer height="15px"/>
+                                                        <div class="rowExpansion">
+                                                            <p:commandButton value="Edit this payment" action="#{cECasePaymentsBB.editOnePayment(payment)}"/>
+                                                        </div>
                                                     </div>
                                                 </p:rowExpansion>
 
@@ -1485,7 +1448,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                             <p:overlayPanel id="proposal-overlaypanel-proposaldescription"
                                                                             for="proposal-button-showdescription"
-                                                                            hideEffect="fade" 
                                                                             dynamic="true" 
                                                                             showCloseIcon="true"
                                                                             style="width:300px" 
@@ -1507,22 +1469,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             <h:outputText value="#{proposal.directive.title}" />
                                                         </div>
                                                         <p:spacer height="5px" />
-                                                        <h:panelGrid   id="cecase-proposals-panelgrid-propinfo" 
-                                                                       columns="1" 
-                                                                       style="clear:both;"
-                                                                       columnClasses="gridTd" 
-                                                                       rendered="true">
-                                                            <h:panelGroup>
-                                                                <h:outputText styleClass="ui-label-inline" 
-                                                                              value="Intended for: "  />
-                                                                <h:outputText styleClass="data-text" 
-                                                                              value="#{proposal.responderIntended.person.firstName}" />
-                                                                <h:outputText styleClass="data-text" 
-                                                                              value=" " />
-                                                                <h:outputText styleClass="data-text" 
-                                                                              value="#{proposal.responderIntended.person.lastName}" />
-                                                            </h:panelGroup>
-                                                        </h:panelGrid>
+
+                                                        <h:outputText styleClass="ui-label-inline" 
+                                                                      value="Intended for: "  />
+                                                        <h:outputText styleClass="data-text" 
+                                                                      value="#{proposal.responderIntended.person.firstName}" />
+                                                        <h:outputText styleClass="data-text" 
+                                                                      value=" " />
+                                                        <h:outputText styleClass="data-text" 
+                                                                      value="#{proposal.responderIntended.person.lastName}" />
                                                     </div>
 
                                                     <p:dataScroller id="proposals-choicescroller"
@@ -1700,39 +1655,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                         <h:form id="cecase-note-create-form">
 
-
-                            <h:panelGrid columns="1"
-                                         columnClasses="gridTd, gridTd">
-
-                                <h:panelGroup>
-                                    <h:outputText styleClass="ui-label" value="Note text: (name and time automatically inserted) "/>
-                                    <p:editor   id="cecase-notes-editor"
-                                                value="#{ceCaseSearchProfileBB.formNoteText}"
-                                                controls="bold italic underline strikethrough font size style color
-                                                bullets numbering center undo redo rule link removeformat"
-                                                width="400" required="false"
-                                                height="200"/>
+                            <h:outputText styleClass="ui-label" value="Note text: (name and time automatically inserted) "/>
+                            <p:textEditor   id="cecase-notes-editor"
+                                            value="#{ceCaseSearchProfileBB.formNoteText}"
+                                            required="false"
+                                            secure="false"
+                                            height="200"/>
 
 
-                                    <p:spacer height="5px" />
-                                    <p:commandButton    id="cecase-updatemetadata-button-cancel"
-                                                        ajax="true"  tabindex="27"
-                                                        value="Cancel"
-                                                        icon="fa fa-stop"
-                                                        process="@none"
-                                                        immediate="true"
-                                                        onclick="PF('cecase-note-dialog-var').hide()"
-                                                        />
+                            <p:spacer height="5px" />
+                            <p:commandButton    id="cecase-updatemetadata-button-cancel"
+                                                ajax="true"  tabindex="27"
+                                                value="Cancel"
+                                                icon="fa fa-stop"
+                                                process="@none"
+                                                immediate="true"
+                                                onclick="PF('cecase-note-dialog-var').hide()"
+                                                />
 
-                                    <p:commandButton   id="cecase-dialog-notes-button-addnote"
-                                                       ajax="false" 
-                                                       action="#{ceCaseSearchProfileBB.onCaseNoteCommitButtonChange}"
-                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
-                                                       value="Attach Note"  
-                                                       styleClass="inline-button"
-                                                       icon="fa fa-sticky-note-o"/>
-                                </h:panelGroup>
-                            </h:panelGrid>
+                            <p:commandButton   id="cecase-dialog-notes-button-addnote"
+                                               ajax="false" 
+                                               action="#{ceCaseSearchProfileBB.onCaseNoteCommitButtonChange}"
+                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
+                                               value="Attach Note"  
+                                               styleClass="inline-button"
+                                               icon="fa fa-sticky-note-o"/>
                         </h:form>
                     </p:dialog>
 
@@ -2456,7 +2403,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 <p:ajax update="nov-followup-days-innum" />
                             </p:selectBooleanCheckbox>
                             <p:spacer height="5px" />
-                            
+
                             <p:outputLabel for="nov-followup-days-innum"
                                            value="Number of days in future:" />
                             <p:inputNumber id="nov-followup-days-innum" 
@@ -2484,7 +2431,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                              value="Mark as mailed!" 
                                              styleClass="noFill"
                                              icon="fa fa-send" 
-                                            
+
                                              disabled="false"
                                              />
 
@@ -2504,94 +2451,82 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                         <h:form id="report-case-profile-form">
 
-                            <h:panelGrid columns="2" border="0" 
-                                         cellpadding="5" columnClasses="gridTd, gridTd"
-                                         footerClass="gridFooter">
 
-                                <f:facet name="header">
+                            <h:outputLabel for="report-case-profile-title-it" value="Report title"/>
+
+                            <p:spacer height="5px"/>
+
+                            <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{ceCaseSearchProfileBB.reportCECase.title}"/>
+                            <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
+
+                            <p:spacer height="5px"/>
+
+                            <h:outputLabel class="bold" value="Include case name" for="report-case-profile-casename-chkbox" />
+                            <p:selectBooleanCheckbox id="report-case-profile-casename-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeCaseName}" />
+
+                            <p:spacer height="5px"/>
+
+                            <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
+                            <p:spacer height="5px"/>
+                            <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{ceCaseSearchProfileBB.reportCECase.notes}"/>
+                            <p:spacer height="5px"/>
+
+                            <h3>Case event history report options</h3>
+
+                            <h:outputLabel class="bold" value="Include hidden events: " for="report-case-profile-hidden-chkbox" />
+                            <p:selectBooleanCheckbox id="report-case-profile-hidden-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeHiddenEvents}" />
+
+                            <p:spacer height="5px"/>
+
+                            <h:outputLabel class="bold" value="Include inactive events: " for="report-case-profile-inactive-chkbox" />
+                            <p:selectBooleanCheckbox id="report-case-profile-inactive-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeInactiveEvents}" />
+
+                            <p:spacer height="5px"/>
+
+                            <h:outputLabel class="bold" value="Include event notes: " for="report-case-profile-eventnotes-chkbox" />
+                            <p:selectBooleanCheckbox id="report-case-profile-eventnotes-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeEventNotes}" />
+
+                            <p:spacer height="5px"/>
+
+                            <h:outputLabel class="bold" value="Include requested action fields: " for="report-case-profile-eventrequests-chkbox" />
+                            <p:selectBooleanCheckbox id="report-case-profile-eventrequests-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeRequestedActionFields}" />
+
+                            <p:spacer height="5px"/>
+
+                            <h:outputLabel class="bold" value="Include non-public, muni-only events " for="report-case-profile-events-muni-chkbox" />
+                            <p:selectBooleanCheckbox id="report-case-profile-events-muni-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeMunicipalityDiclosedEvents}" />
+
+                            <p:spacer height="5px"/>
+
+                            <h:outputLabel class="bold" value="Include code officer only events " for="report-case-profile-events-ceo-chkbox" />
+                            <p:selectBooleanCheckbox id="report-case-profile-events-ceo-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeOfficerOnlyEvents}" />
+
+                            <p:spacer height="5px"/>
+
+                            <h:outputLabel class="bold" value="Include event access and metadata" for="report-case-profile-events-meta-chkbox" />
+                            <p:selectBooleanCheckbox id="report-case-profile-events-meta-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeEventMetadata}" />
 
 
-                                    <h:outputLabel for="report-case-profile-title-it" value="Report title"/>
+                            <h3>Other options</h3>
 
-                                    <p:spacer height="5px"/>
+                            <h:outputLabel class="bold" value="Include full letter text of notices of violation: " for="report-case-profile-noticetext-chkbox" />
+                            <p:selectBooleanCheckbox id="report-case-profile-noticetext-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeNoticeFullText}" />
 
-                                    <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{ceCaseSearchProfileBB.reportCECase.title}"/>
-                                    <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
+                            <p:spacer height="5px"/>
 
-                                    <p:spacer height="5px"/>
+                            <h:outputLabel class="bold" value="Include returned notices of violation: " for="report-case-profile-allnotices-chkbox" />
+                            <p:selectBooleanCheckbox id="report-case-profile-allnotices-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeAllNotices}" />
 
-                                    <h:outputLabel class="bold" value="Include case name" for="report-case-profile-casename-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-casename-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeCaseName}" />
+                            <p:spacer height="5px"/>
 
-                                    <p:spacer height="5px"/>
+                            <h:outputLabel class="bold" value="Include full text of violated ordinances: " for="report-case-profile-ordtext-chkbox" />
+                            <p:selectBooleanCheckbox id="report-case-profile-ordtext-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeFullOrdinanceText}" />
 
-                                    <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
-                                    <p:spacer height="5px"/>
-                                    <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{ceCaseSearchProfileBB.reportCECase.notes}"/>
-                                    <p:spacer height="5px"/>
-                                </f:facet>
+                            <p:spacer height="5px"/>
 
-                                <h:panelGroup>
-                                    <h3>Case event history report options</h3>
+                            <h:outputLabel class="bold" value="Include photos of violations" for="report-case-profile-photo-chkbox" />
+                            <p:selectBooleanCheckbox id="report-case-profile-photo-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeViolationPhotos}" />
 
-                                    <h:outputLabel class="bold" value="Include hidden events: " for="report-case-profile-hidden-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-hidden-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeHiddenEvents}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include inactive events: " for="report-case-profile-inactive-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-inactive-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeInactiveEvents}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include event notes: " for="report-case-profile-eventnotes-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-eventnotes-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeEventNotes}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include requested action fields: " for="report-case-profile-eventrequests-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-eventrequests-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeRequestedActionFields}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include non-public, muni-only events " for="report-case-profile-events-muni-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-events-muni-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeMunicipalityDiclosedEvents}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include code officer only events " for="report-case-profile-events-ceo-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-events-ceo-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeOfficerOnlyEvents}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include event access and metadata" for="report-case-profile-events-meta-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-events-meta-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeEventMetadata}" />
-
-                                </h:panelGroup>
-                                <h:panelGroup>
-
-                                    <h3>Other options</h3>
-
-                                    <h:outputLabel class="bold" value="Include full letter text of notices of violation: " for="report-case-profile-noticetext-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-noticetext-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeNoticeFullText}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include returned notices of violation: " for="report-case-profile-allnotices-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-allnotices-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeAllNotices}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include full text of violated ordinances: " for="report-case-profile-ordtext-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-ordtext-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeFullOrdinanceText}" />
-
-                                    <p:spacer height="5px"/>
-
-                                    <h:outputLabel class="bold" value="Include photos of violations" for="report-case-profile-photo-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-case-profile-photo-chkbox" value="#{ceCaseSearchProfileBB.reportCECase.includeViolationPhotos}" />
-
-                                </h:panelGroup>
-                            </h:panelGrid>
 
                             <p:commandButton ajax="true" 
                                              value="Cancel" icon="fa fa-stop" 
@@ -2804,14 +2739,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                             <p:spacer height="3px" />
                             <h4>Letter text before violations</h4>
-                            <p:editor value="#{noticeOfViolationBB.currentNotice.noticeTextBeforeViolations}"
-                                      controls="bold italic underline strikethrough font size style color 
-                                      bullets numbering center undo redo rule link removeformat outdent 
-                                      indent link unlink copy cut paste rule alignleft center alignright"
-                                      width="800"
-                                      height="400"
-                                      disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
-                                      />
+                            <p:textEditor value="#{noticeOfViolationBB.currentNotice.noticeTextBeforeViolations}"
+                                          height="400"
+                                          secure="false"
+                                          disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
+                                          />
                         </h:form>
 
                         <h2>Code violations</h2>
@@ -2981,14 +2913,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         <h:form id="nov-preview-textafter-form">
                             <p:spacer height="10px" />
                             <h4>Letter text after violations</h4>
-                            <p:editor value="#{noticeOfViolationBB.currentNotice.noticeTextAfterViolations}"
-                                      controls="bold italic underline strikethrough font size style color 
-                                      bullets numbering center undo redo rule link removeformat outdent 
-                                      indent link unlink copy cut paste rule alignleft center alignright"
-                                      width="800"
-                                      height="400"
-                                      disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
-                                      />
+                            <p:textEditor value="#{noticeOfViolationBB.currentNotice.noticeTextAfterViolations}"
+                                          height="400"
+                                          secure="false"
+                                          disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
+                                          />
                         </h:form>
 
 
@@ -3127,106 +3056,86 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                              messages-global-form"
                                                              />
                                             <p:spacer height="3px" />
-                                             <p:commandButton id="edit-person-from-lookup-cb-1"
-                                                         ajax="false"
-                                                         value="View or edit person"
-                                                         action="#{ceCaseSearchProfileBB.onPersonViewButtonChange(person)}" 
-                                                         />
+                                            <p:commandButton id="edit-person-from-lookup-cb-1"
+                                                             ajax="false"
+                                                             value="View or edit person"
+                                                             action="#{ceCaseSearchProfileBB.onPersonViewButtonChange(person)}" 
+                                                             />
                                         </p:column>
 
                                         <p:rowExpansion>
                                             <div class="outlinedBox">
                                                 <h2><h:outputText value="#{person.firstName} #{person.lastName}"/>, Person ID:<h:outputText value="#{person.personID}"/> </h2>
-                                                <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                                             columnClasses="gridTd, gridTd, gridTd, gridTd">
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Person Type: "/>
-                                                        <h:outputText value="#{person.personType.label}"/>
 
-                                                        <p:spacer height="5px"/>
+                                                <h:outputLabel styleClass="bold" value="Person Type: "/>
+                                                <h:outputText value="#{person.personType.label}"/>
 
-                                                        <h:outputLabel styleClass="bold" value="Job Title: "/>
-                                                        <h:outputText value="#{person.jobTitle}"/>
+                                                <p:spacer height="5px"/>
 
-                                                        <p:spacer height="5px"/>
+                                                <h:outputLabel styleClass="bold" value="Job Title: "/>
+                                                <h:outputText value="#{person.jobTitle}"/>
 
-                                                        <h:outputLabel styleClass="bold" value="Email: "/>
-                                                        <h:outputText value="#{person.email}"/>
-                                                    </h:panelGroup>
+                                                <p:spacer height="5px"/>
 
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Last Updated: "/>
-                                                        <h:outputText value="#{person.lastUpdatedPretty}"/>
-                                                    </h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Email: "/>
+                                                <h:outputText value="#{person.email}"/>
 
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Address: "/>
-                                                        <p:spacer height="5px"/>
-                                                        <h:outputText escape="false" value="#{person.addressStreet}"/>
-                                                        <p:spacer height="5px"/>
-                                                        <h:outputText value="#{person.addressCity}, #{person.addressState} #{person.addressZip}"/>
-                                                    </h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Last Updated: "/>
+                                                <h:outputText value="#{person.lastUpdatedPretty}"/>
 
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Use separate mailing address?"/>
-                                                        <h:outputText value="#{person.useSeparateMailingAddress ? 'Yes':'No'}"/>
-                                                        <p:spacer height="5px"/>
-                                                        <h:outputText escape="false" value="#{person.mailingAddressStreet}"/>
-                                                        <p:spacer height="5px"/>
-                                                        <h:outputText value="#{person.mailingAddressCity}, #{person.mailingAddressState} #{person.mailingAddressZip}"/>
-                                                    </h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Address: "/>
+                                                <p:spacer height="5px"/>
+                                                <h:outputText escape="false" value="#{person.addressStreet}"/>
+                                                <p:spacer height="5px"/>
+                                                <h:outputText value="#{person.addressCity}, #{person.addressState} #{person.addressZip}"/>
 
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Under 18? "/>
-                                                        <h:outputText value="#{person.under18 ? 'Yes':'No'}"/>
+                                                <h:outputLabel styleClass="bold" value="Use separate mailing address?"/>
+                                                <h:outputText value="#{person.useSeparateMailingAddress ? 'Yes':'No'}"/>
+                                                <p:spacer height="5px"/>
+                                                <h:outputText escape="false" value="#{person.mailingAddressStreet}"/>
+                                                <p:spacer height="5px"/>
+                                                <h:outputText value="#{person.mailingAddressCity}, #{person.mailingAddressState} #{person.mailingAddressZip}"/>
 
-                                                        <p:spacer height="5px"/>
+                                                <h:outputLabel styleClass="bold" value="Under 18? "/>
+                                                <h:outputText value="#{person.under18 ? 'Yes':'No'}"/>
 
-                                                        <h:outputLabel styleClass="bold" value="Active? "/>
-                                                        <h:outputText value="#{person.active ? 'Yes':'No'}"/>
+                                                <p:spacer height="5px"/>
 
-                                                        <p:spacer height="5px"/>
+                                                <h:outputLabel styleClass="bold" value="Active? "/>
+                                                <h:outputText value="#{person.active ? 'Yes':'No'}"/>
 
-                                                        <h:outputLabel styleClass="bold" value="Composite last name? "/>
-                                                        <h:outputText value="#{person.compositeLastName? 'Yes':'No'}"/>
-                                                    </h:panelGroup>
+                                                <p:spacer height="5px"/>
 
+                                                <h:outputLabel styleClass="bold" value="Composite last name? "/>
+                                                <h:outputText value="#{person.compositeLastName? 'Yes':'No'}"/>
 
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Allowed to expire? "/>
-                                                        <h:outputText value="#{person.canExpire ? 'Yes':'No'}"/>
-                                                        <p:spacer height="5px"/>
+                                                <h:outputLabel styleClass="bold" value="Allowed to expire? "/>
+                                                <h:outputText value="#{person.canExpire ? 'Yes':'No'}"/>
+                                                <p:spacer height="5px"/>
 
-                                                        <h:outputLabel styleClass="bold" value="Expires: "/>
-                                                        <h:outputText value="#{person.expireString}"/>
+                                                <h:outputLabel styleClass="bold" value="Expires: "/>
+                                                <h:outputText value="#{person.expireString}"/>
 
-                                                        <p:spacer height="5px"/>
-                                                        <h:outputLabel styleClass="bold" value="Expiry Notes: "/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{person.expiryNotes}"/>
-                                                        </div>
+                                                <p:spacer height="5px"/>
+                                                <h:outputLabel styleClass="bold" value="Expiry Notes: "/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{person.expiryNotes}"/>
+                                                </div>
 
-                                                    </h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Phone(h): "/>
+                                                <h:outputText value="#{person.phoneHome}"/>
+                                                <p:spacer height="5px"/>
 
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Phone(h): "/>
-                                                        <h:outputText value="#{person.phoneHome}"/>
-                                                        <p:spacer height="5px"/>
+                                                <h:outputLabel styleClass="bold" value="Phone(w): "/>
+                                                <h:outputText value="#{person.phoneWork}"/>
+                                                <p:spacer height="5px"/>
 
-                                                        <h:outputLabel styleClass="bold" value="Phone(w): "/>
-                                                        <h:outputText value="#{person.phoneWork}"/>
-                                                        <p:spacer height="5px"/>
+                                                <h:outputLabel styleClass="bold" value="Phone(m): "/>
+                                                <h:outputText value="#{person.phoneCell}"/>
+                                                <h:outputLabel styleClass="bold" value="Linked to user? "/>
+                                                <h:outputText value="#{person.linkedUserID == 0 ? 'No':'Yes'}"/>
+                                                <p:spacer height="5px"/>
 
-                                                        <h:outputLabel styleClass="bold" value="Phone(m): "/>
-                                                        <h:outputText value="#{person.phoneCell}"/>
-                                                    </h:panelGroup>
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Linked to user? "/>
-                                                        <h:outputText value="#{person.linkedUserID == 0 ? 'No':'Yes'}"/>
-                                                        <p:spacer height="5px"/>
-
-                                                    </h:panelGroup>
-                                                </h:panelGrid>
                                             </div>
                                         </p:rowExpansion>
                                     </p:dataTable>
@@ -3298,7 +3207,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                         <h:outputText value="#{per.firstName} #{per.lastName}"/>
                                         <p:spacer height="5px"/>
-                                         <p:commandButton id="edit-person-from-lookup-cb0"
+                                        <p:commandButton id="edit-person-from-lookup-cb0"
                                                          ajax="false"
                                                          value="View or edit person"
                                                          action="#{ceCaseSearchProfileBB.onPersonViewButtonChange(per)}" 
@@ -3452,13 +3361,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 Include the following where you want the violations: ***VIOLATIONS*** 
                             </p>
 
-                            <p:editor  id="nov-template-editor"  
-                                       value="#{noticeOfViolationBB.formTemplateBlockText}" 
-                                       controls="bold italic underline strikethrough font size style color 
-                                       bullets numbering center undo redo rule link removeformat outdent 
-                                       indent link unlink copy cut paste rule alignleft center alignright"
-                                       width="800" 
-                                       height="700"/>
+                            <p:textEditor  id="nov-template-editor"  
+                                           value="#{noticeOfViolationBB.formTemplateBlockText}" 
+                                           secure="false"
+                                           height="700"/>
 
 
                             <p:commandButton 
@@ -4986,14 +4892,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         <h:form id="violationPhotosUploadForm" enctype="multipart/form-data">
                             <h2>Photos of this violation (3 max)</h2>
                             <p>You must insert violation and re-enter this violation page, then select the violation and click "Update" mode to add photos.</p>
-                            <p:fileUpload fileUploadListener="#{ceCaseSearchProfileBB.handlePhotoUpload}"
-                                          mode="advanced" 
-                                          update="violation-photos-form:photoTable"
-                                          multiple="true"
-                                          fileLimit="3"
-                                          sizeLimit="99999999999" 
-                                          allowTypes="/(\.|\/)(jpe?g|png)$/"
-                                          rendered="#{ceCaseSearchProfileBB.activeUpdateMode}"/>    
+                            <p:fileUpload 
+                                mode="advanced" 
+                                update="violation-photos-form:photoTable"
+                                multiple="true"
+                                fileLimit="3"
+                                sizeLimit="99999999999" 
+                                allowTypes="/(\.|\/)(jpe?g|png)$/"
+                                rendered="#{ceCaseSearchProfileBB.activeUpdateMode}"/>    
                         </h:form>
 
                         <h:form id="violation-photos-form">
@@ -5074,41 +4980,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                         <h:form id="violation-notes-form">
 
-
-                            <h:panelGrid columns="1"
-                                         columnClasses="gridTd, gridTd">
-
-                                <h:panelGroup>
-                                    <h:outputText styleClass="ui-label" value="Note text: "/>
-                                    <p:editor   id="violation-notes-editor"
-                                                value="#{ceCaseSearchProfileBB.formNoteText}"
-                                                controls="bold italic underline strikethrough font size style color
-                                                bullets numbering center undo redo rule link removeformat"
-                                                width="400" required="false"
-                                                height="200"/>
+                            <h:outputText styleClass="ui-label" value="Note text: "/>
+                            <p:textEditor   id="violation-notes-editor"
+                                            value="#{ceCaseSearchProfileBB.formNoteText}"
+                                            required="false"
+                                            secure="false"
+                                            height="200"/>
 
 
-                                    <p:spacer height="5px" />
-                                    <p:commandButton    id="violation-note-button-cancel"
-                                                        ajax="true"  tabindex="27"
-                                                        value="Cancel"
-                                                        process="@none"
-                                                        icon="fa fa-stop"
-                                                        immediate="true"
-                                                        onclick="PF('violation-notes-dialog-var').hide()"
-                                                        />
+                            <p:spacer height="5px" />
+                            <p:commandButton    id="violation-note-button-cancel"
+                                                ajax="true"  tabindex="27"
+                                                value="Cancel"
+                                                process="@none"
+                                                icon="fa fa-stop"
+                                                immediate="true"
+                                                onclick="PF('violation-notes-dialog-var').hide()"
+                                                />
 
-                                    <p:commandButton   id="violation-dialog-notes-button-addnote"
-                                                       ajax="true" 
-                                                       actionListener="#{ceCaseSearchProfileBB.onViolationNoteCommitButtonChange}"
-                                                       oncomplete="PF('violation-notes-dialog-var').hide()"
-                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
-                                                       value="Attach Note"  
-                                                       styleClass="inline-button"
-                                                       icon="fa fa-sticky-note-o"
-                                                       update="violation-notes-form"/>
-                                </h:panelGroup>
-                            </h:panelGrid>
+                            <p:commandButton   id="violation-dialog-notes-button-addnote"
+                                               ajax="true" 
+                                               actionListener="#{ceCaseSearchProfileBB.onViolationNoteCommitButtonChange}"
+                                               oncomplete="PF('violation-notes-dialog-var').hide()"
+                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
+                                               value="Attach Note"  
+                                               styleClass="inline-button"
+                                               icon="fa fa-sticky-note-o"
+                                               update="violation-notes-form"/>
 
                             <p:spacer height="5px" />
                             <h2>
@@ -5252,65 +5150,47 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputText escape="false" value="Code element ID: #{cse.elementID}"/>
 
                                         <h2>Enforceability Info</h2>
-                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
-                                                     columnClasses="gridTd, gridTd">
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Munimum Penalty"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText escape="false" value="$#{cse.minPenalty}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                        <h:outputLabel styleClass="bold" value="Munimum Penalty"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="$#{cse.minPenalty}"/>
+                                        </div>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Norm Penalty"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText escape="false" value="$#{cse.normPenalty}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                        <h:outputLabel styleClass="bold" value="Norm Penalty"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="$#{cse.normPenalty}"/>
+                                        </div>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Maximum Penalty"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText escape="false" value="$#{cse.maxPenalty}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                        <h:outputLabel styleClass="bold" value="Maximum Penalty"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="$#{cse.maxPenalty}"/>
+                                        </div>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Penalty Notes"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText escape="false" value="#{cse.penaltyNotes}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                        <h:outputLabel styleClass="bold" value="Penalty Notes"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{cse.penaltyNotes}"/>
+                                        </div>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Default days to comply"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText escape="false" value="#{cse.normDaysToComply}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                        <h:outputLabel styleClass="bold" value="Default days to comply"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{cse.normDaysToComply}"/>
+                                        </div>
 
-                                            <h:panelGroup>
-                                                <h:outputLabel styleClass="bold" value="Compliance timeframe Notes"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText escape="false" value="#{cse.daysToComplyNotes}"/>
-                                                </div>
-                                            </h:panelGroup>
+                                        <h:outputLabel styleClass="bold" value="Compliance timeframe Notes"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{cse.daysToComplyNotes}"/>
+                                        </div>
 
-                                            <f:facet name="footer">
-                                                <h:outputLabel styleClass="bold" value="Municipality specific implementation notes"/>
-                                                <p:spacer height="15px"/>
-                                                <div class="rowExpansion">
-                                                    <h:outputText escape="false" value="#{cse.muniSpecificNotes}"/>
-                                                </div>
-                                            </f:facet>
-
-                                        </h:panelGrid>
+                                        <h:outputLabel styleClass="bold" value="Municipality specific implementation notes"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{cse.muniSpecificNotes}"/>
+                                        </div>
                                     </div>
 
                                     <div class="outlinedBox">
@@ -5622,12 +5502,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                         <h:form id="event-note-form">
                             <h:outputText styleClass="ui-label" value="Note text: "/>
-                            <p:editor   id="event-notes-editor"
-                                        value="#{ceCaseSearchProfileBB.formNoteText}"
-                                        controls="bold italic underline strikethrough font size style color
-                                        bullets numbering center undo redo rule link removeformat"
-                                        width="400" required="false"
-                                        height="200"/>
+                            <p:textEditor   id="event-notes-editor"
+                                            value="#{ceCaseSearchProfileBB.formNoteText}"
+                                            required="false"
+                                            secure="false"
+                                            height="200"/>
 
 
 
@@ -5769,17 +5648,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                     <div class="restrict-main-contents-io-content" >
                                         <p:growl for="event-add-time-start-cal" />
-                                      
+
                                         <p:datePicker 
-                                                    value="#{ceCaseSearchProfileBB.currentEvent.timeStartUtilDate}" 
-                                                    id="event-add-time-start-cal"
-                                                    autocomplete="false"
-                                                    monthNavigator="true"
-                                                    yearNavigator="true"
-                                                    showTime="true"
-                                                    pattern="dd MMM, yyyy HH:mm"
-                                                    tabindex="16" 
-                                                    required="true">
+                                            value="#{ceCaseSearchProfileBB.currentEvent.timeStartUtilDate}" 
+                                            rendered="#{!empty ceCaseSearchProfileBB.currentEvent}"
+                                            id="event-add-time-start-cal"
+                                            autocomplete="false"
+                                            monthNavigator="true"
+                                            yearNavigator="true"
+                                            showTime="true"
+                                            pattern="dd MMM, yyyy HH:mm"
+                                            tabindex="16" 
+                                            required="true">
                                             <p:ajax update="event-add-time-end-cal" 
                                                     listener="#{ceCaseSearchProfileBB.onTimeStartChange}"
                                                     />
@@ -6031,7 +5911,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                     <p:dialog   id="event-deactivate-dialog"
-                                height="600" width="400"
+                                height="300" width="400"
                                 widgetVar="event-deactivate-dialog-var"
                                 responsive="true"
                                 resizable="trie"
@@ -6064,7 +5944,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             value="Cancel" 
                                                             process="@none" 
                                                             immediate="true" 
-                                                            oncomplete="PF('event-nuke-dialog-var').hide()"
+                                                            oncomplete="PF('event-deactivate-dialog-var').hide()"
                                                             actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}" 
                                                             icon="fa fa-stop" />
                                     </div>
@@ -6254,96 +6134,77 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <p:rowExpansion>
                                             <div class="outlinedBox">
                                                 <h2><h:outputText value="#{person.firstName} #{person.lastName}"/>, Person ID:<h:outputText value="#{person.personID}"/> </h2>
-                                                <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                                             columnClasses="gridTd, gridTd, gridTd, gridTd">
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Person Type: "/>
-                                                        <h:outputText value="#{person.personType.label}"/>
 
-                                                        <p:spacer height="5px"/>
+                                                <h:outputLabel styleClass="bold" value="Person Type: "/>
+                                                <h:outputText value="#{person.personType.label}"/>
 
-                                                        <h:outputLabel styleClass="bold" value="Job Title: "/>
-                                                        <h:outputText value="#{person.jobTitle}"/>
+                                                <p:spacer height="5px"/>
 
-                                                        <p:spacer height="5px"/>
+                                                <h:outputLabel styleClass="bold" value="Job Title: "/>
+                                                <h:outputText value="#{person.jobTitle}"/>
 
-                                                        <h:outputLabel styleClass="bold" value="Email: "/>
-                                                        <h:outputText value="#{person.email}"/>
-                                                    </h:panelGroup>
+                                                <p:spacer height="5px"/>
 
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Last Updated: "/>
-                                                        <h:outputText value="#{person.lastUpdatedPretty}"/>
-                                                    </h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Email: "/>
+                                                <h:outputText value="#{person.email}"/>
 
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Address: "/>
-                                                        <p:spacer height="5px"/>
-                                                        <h:outputText escape="false" value="#{person.addressStreet}"/>
-                                                        <p:spacer height="5px"/>
-                                                        <h:outputText value="#{person.addressCity}, #{person.addressState} #{person.addressZip}"/>
-                                                    </h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Last Updated: "/>
+                                                <h:outputText value="#{person.lastUpdatedPretty}"/>
 
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Use separate mailing address?"/>
-                                                        <h:outputText value="#{person.useSeparateMailingAddress ? 'Yes':'No'}"/>
-                                                        <p:spacer height="5px"/>
-                                                        <h:outputText escape="false" value="#{person.mailingAddressStreet}"/>
-                                                        <p:spacer height="5px"/>
-                                                        <h:outputText value="#{person.mailingAddressCity}, #{person.mailingAddressState} #{person.mailingAddressZip}"/>
-                                                    </h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Address: "/>
+                                                <p:spacer height="5px"/>
+                                                <h:outputText escape="false" value="#{person.addressStreet}"/>
+                                                <p:spacer height="5px"/>
+                                                <h:outputText value="#{person.addressCity}, #{person.addressState} #{person.addressZip}"/>
 
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Under 18? "/>
-                                                        <h:outputText value="#{person.under18 ? 'Yes':'No'}"/>
+                                                <h:outputLabel styleClass="bold" value="Use separate mailing address?"/>
+                                                <h:outputText value="#{person.useSeparateMailingAddress ? 'Yes':'No'}"/>
+                                                <p:spacer height="5px"/>
+                                                <h:outputText escape="false" value="#{person.mailingAddressStreet}"/>
+                                                <p:spacer height="5px"/>
+                                                <h:outputText value="#{person.mailingAddressCity}, #{person.mailingAddressState} #{person.mailingAddressZip}"/>
 
-                                                        <p:spacer height="5px"/>
+                                                <h:outputLabel styleClass="bold" value="Under 18? "/>
+                                                <h:outputText value="#{person.under18 ? 'Yes':'No'}"/>
 
-                                                        <h:outputLabel styleClass="bold" value="Active? "/>
-                                                        <h:outputText value="#{person.active ? 'Yes':'No'}"/>
+                                                <p:spacer height="5px"/>
 
-                                                        <p:spacer height="5px"/>
+                                                <h:outputLabel styleClass="bold" value="Active? "/>
+                                                <h:outputText value="#{person.active ? 'Yes':'No'}"/>
 
-                                                        <h:outputLabel styleClass="bold" value="Composite last name? "/>
-                                                        <h:outputText value="#{person.compositeLastName? 'Yes':'No'}"/>
-                                                    </h:panelGroup>
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputLabel styleClass="bold" value="Composite last name? "/>
+                                                <h:outputText value="#{person.compositeLastName? 'Yes':'No'}"/>
 
 
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Allowed to expire? "/>
-                                                        <h:outputText value="#{person.canExpire ? 'Yes':'No'}"/>
-                                                        <p:spacer height="5px"/>
+                                                <h:outputLabel styleClass="bold" value="Allowed to expire? "/>
+                                                <h:outputText value="#{person.canExpire ? 'Yes':'No'}"/>
+                                                <p:spacer height="5px"/>
 
-                                                        <h:outputLabel styleClass="bold" value="Expires: "/>
-                                                        <h:outputText value="#{person.expireString}"/>
+                                                <h:outputLabel styleClass="bold" value="Expires: "/>
+                                                <h:outputText value="#{person.expireString}"/>
 
-                                                        <p:spacer height="5px"/>
-                                                        <h:outputLabel styleClass="bold" value="Expiry Notes: "/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{person.expiryNotes}"/>
-                                                        </div>
+                                                <p:spacer height="5px"/>
+                                                <h:outputLabel styleClass="bold" value="Expiry Notes: "/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{person.expiryNotes}"/>
+                                                </div>
 
-                                                    </h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Phone(h): "/>
+                                                <h:outputText value="#{person.phoneHome}"/>
+                                                <p:spacer height="5px"/>
 
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Phone(h): "/>
-                                                        <h:outputText value="#{person.phoneHome}"/>
-                                                        <p:spacer height="5px"/>
+                                                <h:outputLabel styleClass="bold" value="Phone(w): "/>
+                                                <h:outputText value="#{person.phoneWork}"/>
+                                                <p:spacer height="5px"/>
 
-                                                        <h:outputLabel styleClass="bold" value="Phone(w): "/>
-                                                        <h:outputText value="#{person.phoneWork}"/>
-                                                        <p:spacer height="5px"/>
+                                                <h:outputLabel styleClass="bold" value="Phone(m): "/>
+                                                <h:outputText value="#{person.phoneCell}"/>
+                                                <h:outputLabel styleClass="bold" value="Linked to user? "/>
+                                                <h:outputText value="#{person.linkedUserID == 0 ? 'No':'Yes'}"/>
+                                                <p:spacer height="5px"/>
 
-                                                        <h:outputLabel styleClass="bold" value="Phone(m): "/>
-                                                        <h:outputText value="#{person.phoneCell}"/>
-                                                    </h:panelGroup>
-                                                    <h:panelGroup>
-                                                        <h:outputLabel styleClass="bold" value="Linked to user? "/>
-                                                        <h:outputText value="#{person.linkedUserID == 0 ? 'No':'Yes'}"/>
-                                                        <p:spacer height="5px"/>
-
-                                                    </h:panelGroup>
-                                                </h:panelGrid>
                                             </div>
                                         </p:rowExpansion>
                                     </p:dataTable>
@@ -6754,22 +6615,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:outputLabel for="citation-status-ot"
                                                    styleClass="data_field_label">
                                         <h:outputText value="Status"/>
-                                        
+
                                         <div class="restrict-main-contents-io-link">
 
-                                                        <p:commandLink      id="citation-update-status-cb" 
-                                                                            ajax="true" 
-                                                                            actionListener="#{ceCaseSearchProfileBB.onCitationUpdateStatusInitButtonChange}"
-                                                                            oncomplete="PF('citation-update-status-dialog-var').show()"
-                                                                            style="color:blue;"
-                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                            update="citation-update-status-dialog
-                                                                            citation-update-status-form"
-                                                                            value="edit" />
+                                            <p:commandLink      id="citation-update-status-cb" 
+                                                                ajax="true" 
+                                                                actionListener="#{ceCaseSearchProfileBB.onCitationUpdateStatusInitButtonChange}"
+                                                                oncomplete="PF('citation-update-status-dialog-var').show()"
+                                                                style="color:blue;"
+                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                update="citation-update-status-dialog
+                                                                citation-update-status-form"
+                                                                value="edit" />
 
 
                                         </div>
-                                        
+
                                     </p:outputLabel>
 
                                     <h:outputText    id="citation-status-ot"
@@ -6783,18 +6644,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:outputLabel for="citation-dor-ot"
                                                    styleClass="data_field_label">
                                         <h:outputText value="Date of Issuance"/>
-                                        
+
                                         <div class="restrict-main-contents-io-link">
 
-                                                        <p:commandLink      id="citation-update-cb" 
-                                                                            ajax="true" 
-                                                                            actionListener="#{ceCaseSearchProfileBB.onCitationUpdateInitButtonChange}"
-                                                                            oncomplete="PF('citation-update-dialog-var').show()"
-                                                                            style="color:blue;"
-                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                            update="citation-update-dialog
-                                                                            citation-update-form"
-                                                                            value="edit" />
+                                            <p:commandLink      id="citation-update-cb" 
+                                                                ajax="true" 
+                                                                actionListener="#{ceCaseSearchProfileBB.onCitationUpdateInitButtonChange}"
+                                                                oncomplete="PF('citation-update-dialog-var').show()"
+                                                                style="color:blue;"
+                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                update="citation-update-dialog
+                                                                citation-update-form"
+                                                                value="edit" />
 
 
                                         </div>
@@ -6822,10 +6683,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                         <h:outputText  value="Ch. #{v.violatedEnfElement.ordchapterNo}:" />
                                         <h:outputText  value="#{v.violatedEnfElement.ordchapterTitle} | " />
-                                         <h:outputText  value="&#167;#{v.violatedEnfElement.ordSecNum}:" />
-                                                    <h:outputText  value="#{v.violatedEnfElement.ordSecTitle} |  " />
-                                                    <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
-                                                    <h:outputText  value="#{v.violatedEnfElement.ordSubSecTitle} " />
+                                        <h:outputText  value="&#167;#{v.violatedEnfElement.ordSecNum}:" />
+                                        <h:outputText  value="#{v.violatedEnfElement.ordSecTitle} |  " />
+                                        <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
+                                        <h:outputText  value="#{v.violatedEnfElement.ordSubSecTitle} " />
                                         <h:outputText id="v-source-name-compactlist-ot" value="(#{citvv.violatedEnfElement.source.sourceName}" />
                                         <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
                                         <h:outputText id="v-source-year-compactlist-ot" value="#{citvv.violatedEnfElement.source.sourceYear}) | "/>
@@ -6840,18 +6701,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:outputLabel for="citation-court-ot"
                                                    styleClass="data_field_label">
                                         <h:outputText value="Court Entity of Origin"/>
-                                        
+
                                         <div class="restrict-main-contents-io-link">
 
-                                                        <p:commandLink      id="citation-update-cb-2" 
-                                                                            ajax="true" 
-                                                                            actionListener="#{ceCaseSearchProfileBB.onCitationUpdateInitButtonChange}"
-                                                                            oncomplete="PF('citation-update-dialog-var').show()"
-                                                                            style="color:blue;"
-                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                            update="citation-update-dialog
-                                                                            citation-update-form"
-                                                                            value="edit" />
+                                            <p:commandLink      id="citation-update-cb-2" 
+                                                                ajax="true" 
+                                                                actionListener="#{ceCaseSearchProfileBB.onCitationUpdateInitButtonChange}"
+                                                                oncomplete="PF('citation-update-dialog-var').show()"
+                                                                style="color:blue;"
+                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                update="citation-update-dialog
+                                                                citation-update-form"
+                                                                value="edit" />
 
 
                                         </div>
@@ -6869,18 +6730,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:outputLabel for="citation-creator-ot"
                                                    styleClass="data_field_label">
                                         <h:outputText value="Issuing Officer"/>
-                                        
+
                                         <div class="restrict-main-contents-io-link">
 
-                                                        <p:commandLink      id="citation-update-cb-3" 
-                                                                            ajax="true" 
-                                                                            actionListener="#{ceCaseSearchProfileBB.onCitationUpdateInitButtonChange}"
-                                                                            oncomplete="PF('citation-update-dialog-var').show()"
-                                                                            style="color:blue;"
-                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                            update="citation-update-dialog
-                                                                            citation-update-form"
-                                                                            value="edit" />
+                                            <p:commandLink      id="citation-update-cb-3" 
+                                                                ajax="true" 
+                                                                actionListener="#{ceCaseSearchProfileBB.onCitationUpdateInitButtonChange}"
+                                                                oncomplete="PF('citation-update-dialog-var').show()"
+                                                                style="color:blue;"
+                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                update="citation-update-dialog
+                                                                citation-update-form"
+                                                                value="edit" />
 
 
                                         </div>
@@ -6897,18 +6758,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:outputLabel for="citation-text-ot"
                                                    styleClass="data_field_label">
                                         <h:outputText value="Official Text: "/>
-                                        
+
                                     </p:outputLabel>
-                                    
-                                                        <p:commandLink      id="citation-update-cb-4" 
-                                                                            ajax="true" 
-                                                                            actionListener="#{ceCaseSearchProfileBB.onCitationUpdateInitButtonChange}"
-                                                                            oncomplete="PF('citation-update-dialog-var').show()"
-                                                                            style="color:blue;"
-                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                            update="citation-update-dialog
-                                                                            citation-update-form"
-                                                                            value="edit" />
+
+                                    <p:commandLink      id="citation-update-cb-4" 
+                                                        ajax="true" 
+                                                        actionListener="#{ceCaseSearchProfileBB.onCitationUpdateInitButtonChange}"
+                                                        oncomplete="PF('citation-update-dialog-var').show()"
+                                                        style="color:blue;"
+                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                        update="citation-update-dialog
+                                                        citation-update-form"
+                                                        value="edit" />
 
                                     <h:outputText    id="citation-text-ot"
                                                      styleClass="data_field_value"
@@ -6922,18 +6783,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:outputLabel for="citation-active-ot"
                                                    styleClass="data_field_label">
                                         <h:outputText value="Active"/>
-                                        
+
                                         <div class="restrict-main-contents-io-link">
 
-                                                        <p:commandLink      id="citation-remove-init-cb" 
-                                                                            ajax="true" 
-                                                                            actionListener="#{ceCaseSearchProfileBB.onCitationUpdateInitButtonChange}"
-                                                                            oncomplete="PF('citation-remove-dialog-var').show()"
-                                                                            style="color:blue;"
-                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                            update="citation-remove-dialog
-                                                                                    citation-update-form"
-                                                                            value="remove citation" />
+                                            <p:commandLink      id="citation-remove-init-cb" 
+                                                                ajax="true" 
+                                                                actionListener="#{ceCaseSearchProfileBB.onCitationUpdateInitButtonChange}"
+                                                                oncomplete="PF('citation-remove-dialog-var').show()"
+                                                                style="color:blue;"
+                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                update="citation-remove-dialog
+                                                                citation-update-form"
+                                                                value="remove citation" />
 
 
                                         </div>
@@ -7035,7 +6896,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 </p:column>
                             </p:dataTable> 
 
-                         
+
                             <h2>Citation form fields</h2>
 
                             <div    id="citation-profile-container-div"
@@ -7121,11 +6982,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                showDetail="false" 
                                                showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                             
+
                                 </div>
 
 
-                            
+
 
 
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
@@ -7337,7 +7198,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 </div>
 
 
-                            
+
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
 
                                     <div class="restrict-main-contents-io-button gray_button">
@@ -7363,7 +7224,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                     </div>
                                 </div>
-                            
+
 
                             </div>
                         </h:form>
@@ -7384,11 +7245,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                         <h:form id="citation-remove-form">
                             <div class="ui-g data_container_nested_restrict">
-                                
+
                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
                                     <p>Removing a citation will deactivate the record. Removed citations can only be resurrected by a system admin.</p>
-                                    
-                                    
+
+
                                 </div>
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
 
@@ -7407,16 +7268,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
                                     <div class="restrict-main-contents-io-button red_button">
 
-                                    <p:commandButton 
-                                        icon="fa fa-trash"
-                                        ajax="false"
-                                        action="#{ceCaseSearchProfileBB.onCitationRemoveCommitButtonChange}"
-                                        value="Remove Citation ID:#{ceCaseSearchProfileBB.currentCitation.citationNo}"
-                                        />
-                                                         
+                                        <p:commandButton 
+                                            icon="fa fa-trash"
+                                            ajax="false"
+                                            action="#{ceCaseSearchProfileBB.onCitationRemoveCommitButtonChange}"
+                                            value="Remove Citation ID:#{ceCaseSearchProfileBB.currentCitation.citationNo}"
+                                            />
+
                                     </div>
                                 </div>
-                            
+
                             </div>
 
                         </h:form>
@@ -7443,12 +7304,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                 <h:panelGroup>
                                     <h:outputText styleClass="ui-label" value="Note text: "/>
-                                    <p:editor   id="citation-notes-editor"
-                                                value="#{ceCaseSearchProfileBB.formNoteText}"
-                                                controls="bold italic underline strikethrough font size style color
-                                                bullets numbering center undo redo rule link removeformat"
-                                                width="400" required="false"
-                                                height="200"/>
+                                    <p:textEditor   id="citation-notes-editor"
+                                                    value="#{ceCaseSearchProfileBB.formNoteText}"
+                                                    required="false"
+                                                    secure="false"
+                                                    height="200"/>
 
 
                                     <p:spacer height="5px" />

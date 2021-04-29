@@ -165,7 +165,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <h:form id="cearManage-form-lookup">
 
-                                                <p:panelGrid columns="4" 
+                                                <h:panelGrid columns="4" 
                                                              layout="grid"
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
@@ -316,7 +316,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                      form-messages-global"/>
 
 
-                                                </p:panelGrid>
+                                                </h:panelGrid>
 
                                             </h:form>
 
@@ -335,7 +335,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <h:form id="cearManage-form-actions">
 
-                                                <p:panelGrid columns="4" 
+                                                <h:panelGrid columns="4" 
                                                              layout="grid"
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
@@ -529,7 +529,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         />
                                                     -->
 
-                                                </p:panelGrid>
+                                                </h:panelGrid>
 
                                                 <p:spacer height="10px" />
 
@@ -551,7 +551,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <h:form id="cearManage-form-objects">
 
-                                                <p:panelGrid columns="4" 
+                                                <h:panelGrid columns="4" 
                                                              layout="grid"
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
@@ -598,7 +598,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
-                                                </p:panelGrid>
+                                                </h:panelGrid>
 
                                                 <h3>Attached photos:</h3>
 
@@ -644,7 +644,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <h:form id="cearManage-form-notes">
 
-                                                <p:panelGrid columns="4" 
+                                                <h:panelGrid columns="4" 
                                                              layout="grid"
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
@@ -691,7 +691,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}" />
                                                     </h:panelGroup>
 
-                                                </p:panelGrid>
+                                                </h:panelGrid>
 
                                                 <p:spacer height="10px" />
 
@@ -842,7 +842,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 <f:selectItems id="muniNameList" value="#{systemServicesBB.bbSessionUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                             </p:selectOneMenu>
 
-                            <p:panelGrid columns="3" layout="grid">
+                            <h:panelGrid columns="3" layout="grid">
 
                                 <h:panelGroup>
                                     <p:outputLabel for="propSearchHouseNumIT">
@@ -873,7 +873,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         update=    "change-property-form"/>
                                 </h:panelGroup>
 
-                            </p:panelGrid> 
+                            </h:panelGrid> 
 
                             <h3>Search Results:</h3>
                             <p>Click to select the desired property or try your search again</p>
