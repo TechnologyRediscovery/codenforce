@@ -55,6 +55,16 @@ import org.primefaces.model.DashboardModel;
 import org.primefaces.model.DashboardColumn;
 import org.primefaces.model.DefaultDashboardColumn;
 import org.primefaces.model.DefaultDashboardModel;
+import org.primefaces.model.charts.ChartData;
+import org.primefaces.model.charts.axes.cartesian.CartesianScales;
+import org.primefaces.model.charts.axes.cartesian.linear.CartesianLinearAxes;
+import org.primefaces.model.charts.bar.BarChartDataSet;
+import org.primefaces.model.charts.bar.BarChartModel;
+import org.primefaces.model.charts.bar.BarChartOptions;
+import org.primefaces.model.charts.optionconfig.title.Title;
+import org.primefaces.model.charts.optionconfig.tooltip.Tooltip;
+import org.primefaces.model.charts.pie.PieChartDataSet;
+import org.primefaces.model.charts.pie.PieChartModel;
 
 /**
  *
@@ -77,8 +87,12 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     private List<ProposalCECase> ceProposalList;
     private List<ProposalOccPeriod> occProposalList;
     
-      private List<CECasePropertyUnitHeavy> filteredCaseList;
+    private List<CECasePropertyUnitHeavy> filteredCaseList;
     
+    private PieChartModel pieProperty;
+    private PieChartModel pieCasePhase;
+    private PieChartModel pieEvents;
+    private BarChartModel barViolations;
     /**
      * Creates a new instance of InitiateSessionBB
      */
@@ -118,7 +132,209 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         filteredCaseList = null;
 
         generateMainDash();
+        initPieProperty();
+        initPieCasePhase();
+        initPieEvents();
+        initBarViolations();
     }
+    
+      private void initPieProperty(){
+        setPieProperty(new PieChartModel());
+        ChartData pieData = new ChartData();
+        
+        PieChartDataSet dataSet = new PieChartDataSet();
+        List<Number> propValues = new ArrayList<>();
+        
+        propValues.add(344);
+        propValues.add(23);
+        propValues.add(103);
+        
+        dataSet.setData(propValues);
+        
+        List<String> pieColors = new ArrayList<>();
+        pieColors.add("rgb(200,100,33)");
+        pieColors.add("rgb(100,0,33)");
+        pieColors.add("rgb(20,40,233)");
+        dataSet.setBackgroundColor(pieColors);
+        
+        pieData.addChartDataSet(dataSet);
+        List<String> labels = new ArrayList<>();
+        labels.add("Rentals");
+        labels.add("Commercial");
+        labels.add("Owner-occupied");
+        
+        pieData.setLabels(labels);
+        getPieProperty().setData(pieData);
+    }
+    
+      private void initPieCasePhase(){
+         pieCasePhase = new PieChartModel();
+        
+        ChartData pieData = new ChartData();
+        
+        PieChartDataSet dataSet = new PieChartDataSet();
+        List<Number> propValues = new ArrayList<>();
+        
+        propValues.add(8);
+        propValues.add(56);
+        propValues.add(21);
+        propValues.add(30);
+        
+        dataSet.setData(propValues);
+        
+        List<String> pieColors = new ArrayList<>();
+        pieColors.add("rgb(200,100,33)");
+        pieColors.add("rgb(100,0,33)");
+        pieColors.add("rgb(20,40,233)");
+        pieColors.add("rgb(80,50,133)");
+        dataSet.setBackgroundColor(pieColors);
+        
+        pieData.addChartDataSet(dataSet);
+        List<String> labels = new ArrayList<>();
+        labels.add("Investigation");
+        labels.add("Enforcement");
+        labels.add("Citation");
+        labels.add("Closed");
+        
+        pieData.setLabels(labels);
+        pieCasePhase.setData(pieData);
+    }
+    
+      private void initPieEvents(){
+        pieEvents = new PieChartModel();
+        
+        ChartData pieData = new ChartData();
+        
+        PieChartDataSet dataSet = new PieChartDataSet();
+        List<Number> propValues = new ArrayList<>();
+        
+        propValues.add(8);
+        propValues.add(12);
+        propValues.add(15);
+        propValues.add(18);
+        propValues.add(30);
+        propValues.add(50);
+        propValues.add(55);
+        
+        dataSet.setData(propValues);
+        
+        List<String> pieColors = new ArrayList<>();
+        pieColors.add("rgb(200,100,33)");
+        pieColors.add("rgb(100,0,33)");
+        pieColors.add("rgb(20,40,233)");
+        pieColors.add("rgb(80,50,133)");
+        pieColors.add("rgb(10,60,123)");
+        pieColors.add("rgb(20,50,153)");
+        pieColors.add("rgb(30,40,163)");
+        dataSet.setBackgroundColor(pieColors);
+        
+        pieData.addChartDataSet(dataSet);
+        List<String> labels = new ArrayList<>();
+        labels.add("Field inspection");
+        labels.add("Case management");
+        labels.add("Violation Compliance");
+        labels.add("Citation");
+        labels.add("Communication");
+        labels.add("Meeting");
+        labels.add("Citation");
+        
+        pieData.setLabels(labels);
+        pieEvents.setData(pieData);
+    }
+      
+      private void initBarViolations(){
+          
+          barViolations = new BarChartModel();
+          ChartData barData = new ChartData();
+          
+          BarChartDataSet dsNewViols = new BarChartDataSet();
+          dsNewViols.setLabel("New Violations");
+          dsNewViols.setBackgroundColor("rgb(255,9,122)");
+          List<Number> dsNewViolsVals = new ArrayList<>();
+          dsNewViolsVals.add(12);
+          dsNewViolsVals.add(18);
+          dsNewViolsVals.add(23);
+          dsNewViolsVals.add(20);
+          dsNewViolsVals.add(15);
+          dsNewViolsVals.add(12);
+          dsNewViols.setData(dsNewViolsVals);
+          
+          BarChartDataSet dsCompliance = new BarChartDataSet();
+          dsCompliance.setLabel("Compliance");
+          dsCompliance.setBackgroundColor("rgb(60,9,122)");
+          List<Number> dsComplianceVals = new ArrayList<>();
+          dsComplianceVals.add(12);
+          dsComplianceVals.add(33);
+          dsComplianceVals.add(36);
+          dsComplianceVals.add(40);
+          dsComplianceVals.add(50);
+          dsComplianceVals.add(53);
+          dsCompliance.setData(dsComplianceVals);
+          
+          BarChartDataSet dsCited = new BarChartDataSet();
+          dsCited.setLabel("Citation");
+          dsCited.setBackgroundColor("rgb(255,9,3)");
+          List<Number> dsCitedVals = new ArrayList<>();
+          dsCitedVals.add(3);
+          dsCitedVals.add(4);
+          dsCitedVals.add(8);
+          dsCitedVals.add(12);
+          dsCitedVals.add(8);
+          dsCitedVals.add(12);
+          dsCited.setData(dsCitedVals);
+          
+          BarChartDataSet dsNull = new BarChartDataSet();
+          dsNull.setLabel("Nullified");
+          dsNull.setBackgroundColor("rgb(4,9,34)");
+          List<Number> dsNullifiedVals = new ArrayList<>();
+          dsNullifiedVals.add(3);
+          dsNullifiedVals.add(4);
+          dsNullifiedVals.add(5);
+          dsNullifiedVals.add(3);
+          dsNullifiedVals.add(4);
+          dsNullifiedVals.add(3);
+          dsNull.setData(dsNullifiedVals);
+          
+          
+          barData.addChartDataSet(dsNewViols);
+          barData.addChartDataSet(dsCompliance);
+          barData.addChartDataSet(dsCited);
+          barData.addChartDataSet(dsNull);
+          
+          List<String> labels = new ArrayList<>();
+          labels.add("Nov 2020");
+          labels.add("Dec 2020");
+          labels.add("Jan 2021");
+          labels.add("Feb 2021");
+          labels.add("Mar 2021");
+          labels.add("Apr 2021");
+          barData.setLabels(labels);
+          
+          barViolations.setData(barData);
+          
+        BarChartOptions options = new BarChartOptions();
+        CartesianScales cScales = new CartesianScales();
+        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
+        linearAxes.setStacked(true);    
+        cScales.addXAxesData(linearAxes);
+        cScales.addYAxesData(linearAxes);
+        options.setScales(cScales);
+        
+        Title title = new Title();
+        title.setDisplay(true);
+        title.setText("Violations month over month");
+        options.setTitle(title);
+        
+        Tooltip tooltip = new Tooltip();
+        tooltip.setMode("index");
+        tooltip.setIntersect(false);
+        options.setTooltip(tooltip);  
+        
+        barViolations.setOptions(options);
+          
+          
+          
+      }
     
     /**
      * @deprecated  with move to flex panels
@@ -421,6 +637,41 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      */
     public void setFilteredCaseList(List<CECasePropertyUnitHeavy> filteredCaseList) {
         this.filteredCaseList = filteredCaseList;
+    }
+
+    /**
+     * @return the pieProperty
+     */
+    public PieChartModel getPieProperty() {
+        return pieProperty;
+    }
+
+    /**
+     * @param pieProperty the pieProperty to set
+     */
+    public void setPieProperty(PieChartModel pieProperty) {
+        this.pieProperty = pieProperty;
+    }
+
+    /**
+     * @return the pieCasePhase
+     */
+    public PieChartModel getPieCasePhase() {
+        return pieCasePhase;
+    }
+
+    /**
+     * @return the pieEvents
+     */
+    public PieChartModel getPieEvents() {
+        return pieEvents;
+    }
+
+    /**
+     * @return the barViolations
+     */
+    public BarChartModel getBarViolations() {
+        return barViolations;
     }
 
     

@@ -18,194 +18,11 @@
                 <f:view id="missionControlView">
                     <div class="mainContainer">
 
-
                         <h:form id="messages-global-form">
 
                             <p:growl id="messages-global-growl"
                                      redisplay="false"
                                      />
-                        </h:form>
-                        <h:form id="dashnumbers-form">
-
-
-                            <div class="ui-g data_container_nested_restrict">
-                                
-                                <div class="ui-g-6 ui-md-4 ui-lg-2 restrict-data-field-vertical">
-
-
-                                    <div class="icon-box-centered" style="font-size:5em;">
-                                        <a href="#prop-search-query-panel">
-                                            
-                                            <i class="material-icons">
-                                                 <h:outputText value="home"/>
-                                             </i>
-                                        </a> 
-                                    </div>
-                                    <div style="font-size: 5em;">
-                                        <h:outputText  id="prop-count-num-ot"
-                                                       rendered="true"
-                                                       value="#{sessionBean.sessMuni.propertyCount}" />
-
-                                    </div>
-                                    <div style="font-style: italic;">
-                                        <div class="restrict-main-contents-io-link">
-                                            <a href="#prop-search-query-panel">
-                                                
-                                                <h:outputText  id="prop-count-label"
-                                                               rendered="#{!(empty sessionBean.sessCECaseList)}"
-                                                               value="total properties" />
-                                            </a>
-                                        </div>
-
-                                    </div>
-
-                                </div>
-                                <div class="ui-g-6 ui-md-4 ui-lg-2 restrict-data-field-vertical">
-
-                                    <div class="icon-box-centered" style="font-size:5em;">
-                                        <a href="#event-search-panel">
-                                            <i class="material-icons">
-                                                 <h:outputText value="directions_run"/>
-                                             </i>
-                                        </a> 
-                                    </div>
-                                    <div style="font-size: 5em;">
-                                        <h:outputText  id="event-activity-num-ot"
-                                                       rendered="#{eventsBB.querySelected.queryExecuted}"
-                                                       value="#{eventsBB.querySelected.BOBResultList.size()}" />
-
-                                    </div>
-                                    <div style="font-style: italic;">
-                                        <div class="restrict-main-contents-io-link">
-                                            
-                                            <a href="#event-search-panel">
-                                                <h:outputText  id="event-activity-num-descr"
-                                                               rendered="#{eventsBB.querySelected.queryExecuted}"
-                                                               value="events logged in the past month" />
-                                            </a>
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                                <div class="ui-g-6 ui-md-4 ui-lg-2 restrict-data-field-vertical">
-                                    
-                                    <div class="icon-box-centered" style="font-size:5em;">
-                                         <i class="material-icons">
-                                             <h:outputText value="more_time"/>
-                                         </i>
-                                    </div>
-                                    <div style="font-size: 5em;">
-                                        <h:outputText  id="event-activity-mins-ot"
-                                                       rendered="#{eventsBB.querySelected.queryExecuted}"
-                                                       value="#{eventsBB.querySelected.computeTotalEventDurationsInResults()}" />
-
-                                    </div>
-                                    <div style="font-style: italic;">
-                                        <h:outputText  id="event-activity-mins-descr"
-                                                       rendered="#{eventsBB.querySelected.queryExecuted}"
-                                                       value="total minutes logged" />
-
-                                    </div>
-
-
-
-                                </div>
-
-                                <div class="ui-g-6 ui-md-4 ui-lg-2 restrict-data-field-vertical">
-                                    
-                                    <div class="icon-box-centered" style="font-size:5em;">
-                                        <a href="#cecase-query-panel">
-                                            <i class="material-icons">
-                                                <h:outputText value="gavel"/>
-                                            </i>
-                                        </a>
-                                    </div>
-
-                                    <div style="font-size: 5em;">
-                                        <h:outputText  id="case-count-num-ot"
-                                                       rendered="#{!(empty sessionBean.sessCECaseList)}"
-                                                       value="#{sessionBean.sessCECaseList.size()}" />
-
-                                    </div>
-                                    <div style="font-style: italic;">
-                                        <div class="restrict-main-contents-io-link">
-                                            <a href="#cecase-query-panel">
-                                                
-                                                <h:outputText  id="case-count-label"
-                                                               rendered="#{!(empty sessionBean.sessCECaseList)}"
-                                                               value="total open code enf cases" />
-                                            </a>
-                                        </div>
-
-                                    </div>
-
-
-                                </div>
-
-                                <div class="ui-g-6 ui-md-4 ui-lg-2 restrict-data-field-vertical">
-                                    
-                                    <div class="icon-box-centered" style="font-size:5em;">
-                                        <a href="#dashpanel-ce-cears">
-                                            <i class="material-icons">
-                                                <h:outputText value="notification_important"/>
-                                            </i>
-                                        </a>
-                                    </div>
-                                    <div style="font-size: 5em;">
-                                        <h:outputText  id="cear-count-num-ot"
-                                                       rendered="#{!(empty sessionBean.sessCEARList)}"
-                                                       value="#{sessionBean.sessCEARList.size()}" />
-
-                                    </div>
-                                    <div style="font-style: italic;">
-                                        <div class="restrict-main-contents-io-link">
-                                            <a href="#dashpanel-ce-cears">
-
-                                                <h:outputText  id="cear-count-label"
-                                                               rendered="#{!(empty sessionBean.sessCEARList)}"
-                                                               value="pending action requests" />
-
-                                            </a>
-                                        </div>
-                                    </div>
-
-
-
-                                </div>
-
-
-                                <div class="ui-g-6 ui-md-4 ui-lg-2 restrict-data-field-vertical">
-
-                                    <div class="icon-box-centered" style="font-size:5em;">
-                                        <a href="#event-future-list-panel">
-                                            <i class="material-icons">
-                                                <h:outputText value="alarm"/>
-                                            </i>
-                                        </a>
-                                    </div>
-                                    <div style="font-size: 5em;">
-                                        <h:outputText  id="events-future-num-ot"
-                                                       rendered="#{sessionBean.queryEventFuture7Days.queryExecuted}"
-                                                       value="#{sessionBean.queryEventFuture7Days.BOBResultList.size()}" />
-
-                                    </div>
-                                    <div style="font-style: italic;">
-                                        <div class="restrict-main-contents-io-link">
-                                            <a href="#event-future-list-panel">
-
-                                                <h:outputText  id="events-future-count-label"
-                                                               rendered="#{!(empty sessionBean.sessCEARList)}"
-                                                               value="upcoming events" />
-
-                                            </a>
-                                        </div>
-                                    </div>
-
-
-                                </div>
-                            </div>
                         </h:form>
 
                         <div class="ui-g data_container_nested_restrict">
@@ -221,7 +38,12 @@
                                             collapsed="true"
                                             rendered="true"
                                             header="Activity in #{sessionBean.sessMuni.muniName}" >
-
+                                    <h:form id="event-bar-form">
+                                        
+                                        <p:pieChart id="event-bar"
+                                                    model="#{missionControlBB.pieEvents}" />
+                                    </h:form>
+                                    
                                     <h:form id="event-search-form">
                                         <div class="ui-g data_container_nested_restrict">
 
@@ -484,8 +306,6 @@
 
                                             </p:column>
 
-
-
                                         </p:dataTable>
                                     </h:form>
                                 
@@ -502,6 +322,12 @@
                                     <!--MESSAGES -->
                                     <h:form id="prop-search-messages-form">
                                         <p:growl id="prop-search-messages" showDetail="false"/>
+                                    </h:form>
+                                    
+                                    <h:form id="prop-pie-form">
+                                        
+                                        <p:pieChart id="pie-property"
+                                                    model="#{missionControlBB.pieProperty}" />
                                     </h:form>
 
                                     <h:form id="prop-search-query-form">
@@ -782,6 +608,19 @@
                                                <i class="material-icons status-display-icon-i">help_outline</i>
                                             </a>
                                         </div>
+                                    </h:form>
+                                    <p:divider />
+                                    
+                                    <h:form id="cecase-pie-status-form">
+                                        <p:pieChart id="cecase-pie-status"
+                                                    model="#{missionControlBB.pieCasePhase}" />
+                                        
+                                    </h:form>
+                                    
+                                    <h:form id="cecase-bar-violations-form">
+                                        <p:barChart id="cecase-bar-violations"
+                                                    model="#{missionControlBB.barViolations}" />
+                                        
                                     </h:form>
                                     <h:form id="cecase-search-form">
 

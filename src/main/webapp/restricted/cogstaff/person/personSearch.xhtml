@@ -1229,11 +1229,10 @@
 
                                 <h:panelGroup>
                                     <h:outputText styleClass="ui-label" value="Note text: "/>
-                                    <p:editor   id="person-notes-editor"
+                                    <p:textEditor   id="person-notes-editor"
                                                 value="#{personSearchBB.formNotes}"
-                                                controls="bold italic underline strikethrough font size style color
-                                                bullets numbering center undo redo rule link removeformat"
-                                                width="400" required="false"
+                                                secure="false"
+                                                required="false"
                                                 height="200"/>
 
 

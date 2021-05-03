@@ -10,7 +10,9 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -21,6 +23,9 @@ import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.BarChartModel;
 import org.primefaces.model.chart.ChartSeries;
 import org.primefaces.model.chart.HorizontalBarChartModel;
+import org.primefaces.model.charts.pie.PieChartModel;
+import org.primefaces.model.charts.ChartData;
+import org.primefaces.model.charts.pie.PieChartDataSet;
 
 /**
  *
@@ -30,6 +35,7 @@ public class DashboardDataBB extends BackingBeanUtils implements Serializable{
 
     private BarChartModel caseCountByPhase;
     private BarChartModel caseClosings;
+    private PieChartModel pieProperty;
     
     private BarChartModel barModel;
     private HorizontalBarChartModel horizontalBarModel;
@@ -37,6 +43,38 @@ public class DashboardDataBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void init() {
         createBarModels();
+        initPieModel();
+    }
+    
+    private void initPieModel(){
+        pieProperty = new PieChartModel();
+        ChartData pieData = new ChartData();
+        
+        PieChartDataSet dataSet = new PieChartDataSet();
+        List<Number> propValues = new ArrayList<>();
+        
+        propValues.add(344);
+        propValues.add(23);
+        propValues.add(103);
+        
+        dataSet.setData(propValues);
+        
+        List<String> pieColors = new ArrayList<>();
+        pieColors.add("rgb(200,100,33)");
+        pieColors.add("rgb(100,0,33)");
+        pieColors.add("rgb(20,40,233)");
+        dataSet.setBackgroundColor(pieColors);
+        
+        pieData.addChartDataSet(dataSet);
+        List<String> labels = new ArrayList<>();
+        labels.add("Rentals");
+        labels.add("Commercial");
+        labels.add("Owner-occupied");
+        
+        pieData.setLabels(labels);
+        pieProperty.setData(pieData);
+        
+        
     }
  
     public BarChartModel getBarModel() {
@@ -166,6 +204,13 @@ public class DashboardDataBB extends BackingBeanUtils implements Serializable{
      */
     public void setCaseClosings(BarChartModel caseClosings) {
         this.caseClosings = caseClosings;
+    }
+
+    /**
+     * @return the pieProperty
+     */
+    public PieChartModel getPieProperty() {
+        return pieProperty;
     }
     
     
