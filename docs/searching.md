@@ -9,3 +9,4 @@ To use the search utility:
 3. Usually this will be used on page load to build a starting list for display
 3. Wire the backing bean properties to the various parameters on your search object so the user can tinker with them
 4. Use the `SearchParams` object to shuttle revisions on the initial query to the integrator.
+
