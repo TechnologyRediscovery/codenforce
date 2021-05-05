@@ -10,8 +10,14 @@ INSERT INTO public.icon(
     VALUES (32, 'nullified', 'violation-nullified', 'fa fa-window-close-o', 'close');
 
 
--- RUN ON LOCAL BRAIN UP TO HERE
+
+
 -- RUN ON REMOTE UP TO HERE
+
+ALTER TABLE public.codeviolation ADD COLUMN bobsource_sourceid INTEGER CONSTRAINT codeviolation_bobsource_fk REFERENCES bobsource (sourceid);
+
+-- RUN ON LOCAL BRAIN UP TO HERE`
+
 
 --IF datepublished IS NULL the patch is still open and receiving changes
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)

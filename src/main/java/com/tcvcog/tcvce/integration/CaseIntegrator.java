@@ -42,6 +42,7 @@ import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
 import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.search.SearchParamsCodeViolation;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -63,7 +64,7 @@ import javax.faces.application.FacesMessage;
  */
 public class CaseIntegrator extends BackingBeanUtils implements Serializable{
     
-    final String ACTIVE_FIELD = "cecase.active";
+    final String CECASE_ACTIVE_FIELD = "cecase.active";
     /**
      * Creates a new instance of CaseIntegrator
      */
@@ -99,10 +100,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             //*******************************
             // **   MUNI,DATES,USER,ACTIVE  **
             // *******************************
-            params = (SearchParamsCECase) sc.assembleBObSearchSQL_muniDatesUserActive(
-                                                                params, 
+            params = (SearchParamsCECase) sc.assembleBObSearchSQL_muniDatesUserActive(params, 
                                                                 SearchParamsCECase.MUNI_DBFIELD,
-                                                                ACTIVE_FIELD);
+                                                                CECASE_ACTIVE_FIELD);
             
             // *******************************
             // **       1:OPEN/CLOSED       **
@@ -257,6 +257,222 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Cannot search for code enf cases, sorry!", ex);
+            
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return cseidlst;
+        
+    }
+    
+    
+    /**
+     * Single focal point of serach method for Code Enforcement case using a SearchParam
+     * subclass. Outsiders will use runQueryCECase or runQueryCECase
+     * @param params
+     * @return a list of CECase IDs
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public List<Integer> searchForCodeViolations(SearchParamsCodeViolation params) throws IntegrationException, BObStatusException{
+        SearchCoordinator sc = getSearchCoordinator();
+        List<Integer> cseidlst = new ArrayList<>();
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        
+        params.appendSQL("SELECT DISTINCT violationid");
+        params.appendSQL("FROM public.codeviolation ");
+        params.appendSQL("INNER JOIN public.cecase ON (cecase.caseid = codeviolation.cecase_caseid)");
+        params.appendSQL("INNER JOIN public.property ON (cecase.property_propertyid = property.propertyid)");
+        params.appendSQL("LEFT OUTER JOIN ");
+        params.appendSQL("(	SELECT codeviolation_violationid, citation.citationid, citation.dateofrecord ");
+        params.appendSQL("FROM public.citationviolation ");
+        params.appendSQL("INNER JOIN public.citation ON (citationviolation.citation_citationid = citation.citationid)");
+        params.appendSQL("INNER JOIN public.citationstatus on (citationstatus.statusid = citation.status_statusid)");
+        params.appendSQL("WHERE citationstatus.editsforbidden = TRUE	");
+        params.appendSQL(") AS citv ON (codeviolation.violationid = citv.codeviolation_violationid)");
+        params.appendSQL("LEFT OUTER JOIN ");
+        params.appendSQL("(");
+        params.appendSQL("SELECT codeviolation_violationid, sentdate");
+        params.appendSQL("FROM noticeofviolationcodeviolation");
+        params.appendSQL("INNER JOIN public.noticeofviolation ON (noticeofviolationcodeviolation.noticeofviolation_noticeid = noticeofviolation.noticeid)");
+        params.appendSQL("WHERE noticeofviolation.sentdate IS NOT NULL");
+        params.appendSQL(") AS novcv ON (codeviolation.violationid = novcv.codeviolation_violationid)");
+        params.appendSQL("WHERE violationid IS NOT NULL	");
+        
+        // *******************************
+        // **         BOb ID            **
+        // *******************************
+         if (!params.isBobID_ctl()) {
+
+            //*******************************
+            // **   MUNI,DATES,USER,ACTIVE  **
+            // *******************************
+            params = (SearchParamsCodeViolation) sc.assembleBObSearchSQL_muniDatesUserActive(params, 
+                                                                SearchParamsCodeViolation.DBFIELD_MUNI,
+                                                                SearchParamsCodeViolation.DBFIELD_ACTIVE);
+            
+            
+            // *******************************
+            // **     1.PROPERTY          **
+            // *******************************
+             if (params.isProperty_ctl()) {
+                if(params.getProperty_val() != null){
+                    params.appendSQL("AND property.propertyid=? ");
+                } else {
+                    params.setProperty_ctl(false);
+                    params.appendToParamLog("PROPERTY PARAM: no property given; filter disabled");
+                }
+            }
+            
+            // *******************************
+            // **     2.CECASE              **
+            // *******************************
+             if (params.isCecase_ctl()) {
+                if(params.getCecase_val()!= null){
+                    params.appendSQL("AND cecase.caseid=? ");
+                } else {
+                    params.setCecase_ctl(false);
+                    params.appendToParamLog("CECASE: no case source object; case filter disabled");
+                }
+            }
+             
+            
+            
+            // *******************************
+            // **     3. CITED              **
+            // *******************************
+             if (params.isCited_ctl()) {
+                if(params.isCited_val()){
+                    params.appendSQL("AND citv.citationid IS NOT NULL ");
+                } else {
+                    // nothing to do for boolean false
+                }
+            }
+            
+            // *******************************
+            // **     4.LEGACY IMPORT       **
+            // *******************************
+             if (params.isLegacyImport_ctl()) {
+                if(params.isLegacyImport_val()){
+                    params.appendSQL("AND legacyimport=TRUE ");
+                } else {
+                   // nothing to do for boolean false
+                }
+            }
+            
+            // *******************************
+            // **     5.SEVERITY            **
+            // *******************************
+             if (params.isSeverity_ctl()) {
+                if(params.getSeverity_val() != null){
+                    params.appendSQL("AND severity_classid=? ");
+                } else {
+                     params.setSeverity_ctl(false);
+                    params.appendToParamLog("SEVERITY: no severity/intensity source object; severity filter disabled");
+                }
+            }
+            
+            // *******************************
+            // **     6.BOb SOURCE          **
+            // *******************************
+             if (params.isSource_ctl()) {
+                if(params.getSource_val() != null){
+                    params.appendSQL("AND bobsource_sourceid=? ");
+                } else {
+                    params.setSource_ctl(false);
+                    params.appendToParamLog("SOURCE: no BOb source object; source filter disabled");
+                }
+            }
+             
+            // *******************************
+            // **     7.BOb SOURCE          **
+            // *******************************
+             if (params.isNoticeMailed_ctl()) {
+                if(params.isNoticeMailed_val()){
+                    params.appendSQL("AND novcv.sentdate IS NOT NULL ");
+                } else {
+                    // nothing to do
+                }
+            }
+           
+            
+            
+        } else {
+            params.appendSQL("violationid = ? "); // will be param 1 with ID search
+        }
+
+        int paramCounter = 0;
+            
+        try {
+            stmt = con.prepareStatement(params.extractRawSQL());
+
+            if (!params.isBobID_ctl()) {
+                if (params.isMuni_ctl()) {
+                     stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
+                }
+                
+                if(params.isDate_startEnd_ctl()){
+                    stmt.setTimestamp(++paramCounter, params.getDateStart_val_sql());
+                    stmt.setTimestamp(++paramCounter, params.getDateEnd_val_sql());
+                 }
+                
+                if (params.isUser_ctl()) {
+                   stmt.setInt(++paramCounter, params.getUser_val().getUserID());
+                }
+                // Violation set 1
+                if (params.isProperty_ctl()) {
+                    stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
+                }
+                
+                // violation set 2
+                if (params.isCecase_ctl()) {
+                    stmt.setInt(++paramCounter, params.getCecase_val().getCaseID());
+                }
+                // violation set 3
+//                 if (params.isCited_ctl()) {
+//                    stmt.setBoolean(++paramCounter, params.isCited_val());
+//                }
+                // violation set 4
+//                if(params.isLegacyImport_ctl()){
+//                    stmt.setBoolean(++paramCounter, params.isLegacyImport_val());
+//                }
+                
+                // violation set 5
+                if(params.isSeverity_ctl()){
+                    stmt.setInt(++paramCounter, params.getSeverity_val().getClassID());
+                }
+                
+                // violation set 6
+                if(params.isSource_ctl()){
+                    stmt.setInt(++paramCounter, params.getSource_val().getSourceid());
+                }
+
+            } else {
+                stmt.setInt(++paramCounter, params.getBobID_val());
+            }
+            
+            rs = stmt.executeQuery();
+
+            int counter = 0;
+            int maxResults;
+            if (params.isLimitResultCount_ctl()) {
+                maxResults = params.getLimitResultCount_val();
+            } else {
+                maxResults = Integer.MAX_VALUE;
+            }
+            while (rs.next() && counter < maxResults) {
+                cseidlst.add(rs.getInt("violationid"));
+                counter++;
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot search for violations, sorry!", ex);
             
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
