@@ -130,7 +130,7 @@
     </build>
     <repositories>
         <repository>
-            <url>http://repository.primefaces.org/</url>
+            <url>https://repository.primefaces.org/</url>
             <id>PrimeFaces-maven-lib</id>
             <layout>default</layout>
             <name>Repository for library PrimeFaces-maven-lib</name>
