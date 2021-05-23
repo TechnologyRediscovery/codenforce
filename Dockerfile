@@ -1,7 +1,7 @@
 FROM jboss/wildfly:14.0.1.Final
 
 # server configuration
-COPY codeconnect/server/standalone-full.xml /opt/jboss/wildfly/standalone/configuration/standalone.xml
+COPY codeconnect/server/standalone-full-docker.xml /opt/jboss/wildfly/standalone/configuration/standalone.xml
 
 # copy compiled codenforce war file
 ADD target/codenforce-0.9.war /opt/jboss/wildfly/standalone/deployments/
@@ -15,3 +15,4 @@ COPY codeconnect/server/module.xml /opt/jboss/wildfly/modules/system/layers/base
 
 EXPOSE 8080
 EXPOSE 9990
+EXPOSE 8787
