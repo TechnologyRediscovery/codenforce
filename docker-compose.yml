@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+    db:
+      image: postgres:11
+      ports:
+        - "5432"
+      environment:
+        - POSTGRES_DB=cogdb
+        - POSTGRES_USER=changeme
+        - POSTGRES_PASSWORD=changeme
+    wildfly:
+        build: .
+        ports:
+          - "8080:8080"
+          - "9990:9990"
+          - "8787:8787"
+        depends_on:
+          - db
