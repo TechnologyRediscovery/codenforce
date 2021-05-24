@@ -67,6 +67,27 @@ h1{
 
 }
 
+.title-container{
+    
+}
+
+.page-title{
+    
+       font-family: 'Heebo', sans-serif;
+    font-size: 1.5em;
+    color: #5a5754;
+    font-weight: normal;
+    display: inline-block;
+    clear:none;
+    float: left;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    border-bottom: 3px solid #5a5754;
+
+    margin-bottom: 20px;
+}
+
 h2{
     font-size: 1.4em;
     /* color: #00b5ec;  sky blue*/
@@ -2772,9 +2793,11 @@ input{
 
 .restrict-main-contents-help-link{
     color:blue;
-    display: inline-block; 
-    float: right;
+    /*display: inline-block;*/ 
+    float: left;
+    display: inline-block;
     text-decoration: none;
+    clear: none;
     
 /*    float: next;*/
     /*text-decoration: underline;*/

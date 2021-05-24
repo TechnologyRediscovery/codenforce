@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -33,11 +34,14 @@ import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.CodeViolationPropCECaseHeavy;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.PageModeEnum;
+import com.tcvcog.tcvce.entities.search.QueryCodeViolation;
+import com.tcvcog.tcvce.entities.search.QueryCodeViolationEnum;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -57,15 +61,21 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.charts.ChartData;
+import org.primefaces.model.charts.axes.cartesian.CartesianScales;
+import org.primefaces.model.charts.axes.cartesian.linear.CartesianLinearAxes;
+import org.primefaces.model.charts.bar.BarChartDataSet;
+import org.primefaces.model.charts.bar.BarChartModel;
+import org.primefaces.model.charts.bar.BarChartOptions;
+import org.primefaces.model.charts.hbar.HorizontalBarChartModel;
+import org.primefaces.model.charts.optionconfig.title.Title;
+import org.primefaces.model.charts.optionconfig.tooltip.Tooltip;
 
 /**
  *
  * @author ellen bascomb of apt 31y
  */
 public class ViolationBB extends BackingBeanUtils implements Serializable {
-
-    private PageModeEnum currentMode;
-    private List<PageModeEnum> pageModes;
 
     private CodeViolation currentViolation;
     private CECaseDataHeavy currentCase;
@@ -83,6 +93,16 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
     private boolean extendStipCompUsingDate;
     private java.util.Date extendedStipCompDate;
     private int extendedStipCompDaysFromToday;
+    
+    // METRICS
+    private BarChartModel barViolationsTimeSeries;
+    private HorizontalBarChartModel barViolationsPast30;
+    
+    private List<CodeViolationPropCECaseHeavy> violationsLoggedNoNOVPast30;
+    private List<CodeViolationPropCECaseHeavy> violationsLoggedNOVPast30;
+    private List<CodeViolationPropCECaseHeavy> violationsLoggedCompliancePast30;
+    private List<CodeViolationPropCECaseHeavy> violationsCitedPast30;
+    
 
     /**
      * Creates a new instance of ViolationAdd
@@ -120,88 +140,241 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         extendStipCompUsingDate = true;
         currentCodeSet = getSessionBean().getSessCodeSet();
 
-        pageModes = new ArrayList<>();
-        pageModes.add(PageModeEnum.LOOKUP);
-        pageModes.add(PageModeEnum.INSERT);
-        pageModes.add(PageModeEnum.UPDATE);
-        pageModes.add(PageModeEnum.REMOVE);
-        if (getSessionBean().getCeCaseViolationsPageModeRequest() != null) {
-            setCurrentMode(getSessionBean().getCeCaseViolationsPageModeRequest());
-        } else {
-            setCurrentMode(PageModeEnum.LOOKUP);
-        }
         viewOptionList = Arrays.asList(ViewOptionsActiveListsEnum.values());
         selectedViewOption = ViewOptionsActiveListsEnum.VIEW_ACTIVE;
         
         System.out.println("ViolationBB.initBean()");
+        
+        initBarViolationsTimeSeries();
+        initBarViolationsPastMonth();
+
     }
-
-    /**
-     * Responds to the user clicking one of the page modes: LOOKUP, ADD, UPDATE,
-     * REMOVE
-     *
-     * @param mode
-     */
-    public void setCurrentMode(PageModeEnum mode) {
-
-        //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
-        PageModeEnum tempCurMode = this.currentMode;
-        //reset default setting every time the Mode has been selected 
-//        loadDefaultPageConfig();
-        //check the currentMode == null or not
-        if (mode == null) {
-            this.currentMode = tempCurMode;
-        } else {
-            this.currentMode = mode;
-            switch (currentMode) {
-                case LOOKUP:
-                    onModeLookupInit();
-                    break;
-                case INSERT:
-                    onModeInsertInit();
-                    break;
-                case UPDATE:
-                    onModeUpdateInit();
-                    break;
-                case REMOVE:
-                    onModeRemoveInit();
-                    break;
-                default:
-                    break;
-
-            }
+    
+    
+    private void gatherViolationData(){
+        
+        SearchCoordinator sc = getSearchCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            QueryCodeViolation ccv = sc.initQuery(QueryCodeViolationEnum.LOGGED_NO_NOV_PAST30, getSessionBean().getSessUser().getKeyCard());
+            violationsLoggedNoNOVPast30 = sc.runQuery(ccv).getResults();
+            System.out.println("ViolationBB.gatherViolationData: " + ccv.getQueryTitle());
+            System.out.println("ViolationBB.gatherViolationData: " + ccv.getQueryLog());
+            
+            ccv = sc.initQuery(QueryCodeViolationEnum.LOGGED_PAST30_NOV_CITMAYBE, getSessionBean().getSessUser().getKeyCard());
+            violationsLoggedNOVPast30 = sc.runQuery(ccv).getResults();
+            System.out.println("ViolationBB.gatherViolationData: " + ccv.getQueryTitle());
+            System.out.println("ViolationBB.gatherViolationData: " + ccv.getQueryLog());
+            
+            ccv = sc.initQuery(QueryCodeViolationEnum.CITED_PAST30, getSessionBean().getSessUser().getKeyCard());
+            violationsCitedPast30 = sc.runQuery(ccv).getResults();
+            System.out.println("ViolationBB.gatherViolationData: " + ccv.getQueryTitle());
+            System.out.println("ViolationBB.gatherViolationData: " + ccv.getQueryLog());
+            
+            ccv = sc.initQuery(QueryCodeViolationEnum.COMP_PAST30, getSessionBean().getSessUser().getKeyCard());
+            violationsLoggedCompliancePast30 = sc.runQuery(ccv).getResults();
+            System.out.println("ViolationBB.gatherViolationData: " + ccv.getQueryTitle());
+            System.out.println("ViolationBB.gatherViolationData: " + ccv.getQueryLog());
+            
+            
+            
+        } catch (SearchException ex) {
+            System.out.println(ex);
         }
     }
 
-    //check if current mode == Lookup
-    public boolean getActiveLookupMode() {
-        // hard-wired on since there's always a property loaded
-        return PageModeEnum.LOOKUP.equals(currentMode);
-    }
+      private void initBarViolationsPastMonth(){
+          
+          gatherViolationData();
+          
+          barViolationsPast30 = new HorizontalBarChartModel();
+          ChartData barData = new ChartData();
+          
+          BarChartDataSet dsNewViols = new BarChartDataSet();
+          dsNewViols.setLabel("New Violations");
+          dsNewViols.setBackgroundColor("rgb(255,9,122)");
+          List<Number> dsNewViolsVals = new ArrayList<>();
+          dsNewViolsVals.add(12);
+          dsNewViolsVals.add(18);
+          dsNewViolsVals.add(23);
+          dsNewViolsVals.add(20);
+          dsNewViolsVals.add(15);
+          dsNewViolsVals.add(12);
+          dsNewViols.setData(dsNewViolsVals);
+          
+          BarChartDataSet dsCompliance = new BarChartDataSet();
+          dsCompliance.setLabel("Compliance");
+          dsCompliance.setBackgroundColor("rgb(60,9,122)");
+          List<Number> dsComplianceVals = new ArrayList<>();
+          dsComplianceVals.add(12);
+          dsComplianceVals.add(33);
+          dsComplianceVals.add(36);
+          dsComplianceVals.add(40);
+          dsComplianceVals.add(50);
+          dsComplianceVals.add(53);
+          dsCompliance.setData(dsComplianceVals);
+          
+          BarChartDataSet dsCited = new BarChartDataSet();
+          dsCited.setLabel("Citation");
+          dsCited.setBackgroundColor("rgb(255,9,3)");
+          List<Number> dsCitedVals = new ArrayList<>();
+          dsCitedVals.add(3);
+          dsCitedVals.add(4);
+          dsCitedVals.add(8);
+          dsCitedVals.add(12);
+          dsCitedVals.add(8);
+          dsCitedVals.add(12);
+          dsCited.setData(dsCitedVals);
+          
+          BarChartDataSet dsNull = new BarChartDataSet();
+          dsNull.setLabel("Nullified");
+          dsNull.setBackgroundColor("rgb(4,9,34)");
+          List<Number> dsNullifiedVals = new ArrayList<>();
+          dsNullifiedVals.add(3);
+          dsNullifiedVals.add(4);
+          dsNullifiedVals.add(5);
+          dsNullifiedVals.add(3);
+          dsNullifiedVals.add(4);
+          dsNullifiedVals.add(3);
+          dsNull.setData(dsNullifiedVals);
+          
+          
+          barData.addChartDataSet(dsNewViols);
+          barData.addChartDataSet(dsCompliance);
+          barData.addChartDataSet(dsCited);
+          barData.addChartDataSet(dsNull);
+          
+          List<String> labels = new ArrayList<>();
+          labels.add("Nov 2020");
+          labels.add("Dec 2020");
+          labels.add("Jan 2021");
+          labels.add("Feb 2021");
+          labels.add("Mar 2021");
+          labels.add("Apr 2021");
+          barData.setLabels(labels);
+          
+          getBarViolationsTimeSeries().setData(barData);
+          
+        BarChartOptions options = new BarChartOptions();
+        CartesianScales cScales = new CartesianScales();
+        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
+        linearAxes.setStacked(true);    
+        cScales.addXAxesData(linearAxes);
+        cScales.addYAxesData(linearAxes);
+        options.setScales(cScales);
+        
+        Title title = new Title();
+        title.setDisplay(true);
+        title.setText("Violations: Past 30 days");
+        options.setTitle(title);
+        
+        Tooltip tooltip = new Tooltip();
+        tooltip.setMode("index");
+        tooltip.setIntersect(false);
+        options.setTooltip(tooltip);  
+        
+         barViolationsPast30.setOptions(options);
+          
+          
+          
+      }
 
-    /**
-     * Provide UI elements a boolean true if the mode is UPDATE
-     *
-     * @return
-     */
-    public boolean getActiveUpdateMode() {
-        return PageModeEnum.UPDATE.equals(currentMode);
-    }
-
-    //check if current mode == Insert
-    public boolean getActiveInsertUpdateMode() {
-        return PageModeEnum.INSERT.equals(currentMode) || PageModeEnum.UPDATE.equals(currentMode);
-    }
-
-    //check if current mode == Insert
-    public boolean getActiveInsertMode() {
-        return PageModeEnum.INSERT.equals(currentMode);
-    }
-
-    //check if current mode == Remove
-    public boolean getActiveRemoveMode() {
-        return PageModeEnum.REMOVE.equals(currentMode);
-    }
+    
+      private void initBarViolationsTimeSeries(){
+          
+          barViolationsTimeSeries = new BarChartModel();
+          ChartData barData = new ChartData();
+          
+          BarChartDataSet dsNewViols = new BarChartDataSet();
+          dsNewViols.setLabel("New Violations");
+          dsNewViols.setBackgroundColor("rgb(255,9,122)");
+          List<Number> dsNewViolsVals = new ArrayList<>();
+          dsNewViolsVals.add(12);
+          dsNewViolsVals.add(18);
+          dsNewViolsVals.add(23);
+          dsNewViolsVals.add(20);
+          dsNewViolsVals.add(15);
+          dsNewViolsVals.add(12);
+          dsNewViols.setData(dsNewViolsVals);
+          
+          BarChartDataSet dsCompliance = new BarChartDataSet();
+          dsCompliance.setLabel("Compliance");
+          dsCompliance.setBackgroundColor("rgb(60,9,122)");
+          List<Number> dsComplianceVals = new ArrayList<>();
+          dsComplianceVals.add(12);
+          dsComplianceVals.add(33);
+          dsComplianceVals.add(36);
+          dsComplianceVals.add(40);
+          dsComplianceVals.add(50);
+          dsComplianceVals.add(53);
+          dsCompliance.setData(dsComplianceVals);
+          
+          BarChartDataSet dsCited = new BarChartDataSet();
+          dsCited.setLabel("Citation");
+          dsCited.setBackgroundColor("rgb(255,9,3)");
+          List<Number> dsCitedVals = new ArrayList<>();
+          dsCitedVals.add(3);
+          dsCitedVals.add(4);
+          dsCitedVals.add(8);
+          dsCitedVals.add(12);
+          dsCitedVals.add(8);
+          dsCitedVals.add(12);
+          dsCited.setData(dsCitedVals);
+          
+          BarChartDataSet dsNull = new BarChartDataSet();
+          dsNull.setLabel("Nullified");
+          dsNull.setBackgroundColor("rgb(4,9,34)");
+          List<Number> dsNullifiedVals = new ArrayList<>();
+          dsNullifiedVals.add(3);
+          dsNullifiedVals.add(4);
+          dsNullifiedVals.add(5);
+          dsNullifiedVals.add(3);
+          dsNullifiedVals.add(4);
+          dsNullifiedVals.add(3);
+          dsNull.setData(dsNullifiedVals);
+          
+          
+          barData.addChartDataSet(dsNewViols);
+          barData.addChartDataSet(dsCompliance);
+          barData.addChartDataSet(dsCited);
+          barData.addChartDataSet(dsNull);
+          
+          List<String> labels = new ArrayList<>();
+          labels.add("Nov 2020");
+          labels.add("Dec 2020");
+          labels.add("Jan 2021");
+          labels.add("Feb 2021");
+          labels.add("Mar 2021");
+          labels.add("Apr 2021");
+          barData.setLabels(labels);
+          
+          getBarViolationsTimeSeries().setData(barData);
+          
+        BarChartOptions options = new BarChartOptions();
+        CartesianScales cScales = new CartesianScales();
+        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
+        linearAxes.setStacked(true);    
+        cScales.addXAxesData(linearAxes);
+        cScales.addYAxesData(linearAxes);
+        options.setScales(cScales);
+        
+        Title title = new Title();
+        title.setDisplay(true);
+        title.setText("Violations month over month");
+        options.setTitle(title);
+        
+        Tooltip tooltip = new Tooltip();
+        tooltip.setMode("index");
+        tooltip.setIntersect(false);
+        options.setTooltip(tooltip);  
+        
+        getBarViolationsTimeSeries().setOptions(options);
+          
+          
+          
+      }
+    
+   
 
     /**
      * Primary listener method which copies a reference to the selected user
@@ -219,11 +392,6 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
 
     }
 
-    /**
-     * Internal logic container for changes to page mode: Lookup
-     */
-    private void onModeLookupInit() {
-    }
 
     /**
      * Internal logic container for beginning the user creation change process
@@ -708,27 +876,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         this.currentCase = currentCase;
     }
 
-    /**
-     * @return the currentMode
-     */
-    public PageModeEnum getCurrentMode() {
-        return currentMode;
-    }
-
-    /**
-     * @return the pageModes
-     */
-    public List<PageModeEnum> getPageModes() {
-        return pageModes;
-    }
-
-    /**
-     * @param pageModes the pageModes to set
-     */
-    public void setPageModes(List<PageModeEnum> pageModes) {
-        this.pageModes = pageModes;
-    }
-
+   
     /**
      * @return the formNoteText
      */
@@ -856,6 +1004,83 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
      */
     public void setViewOptionList(List<ViewOptionsActiveListsEnum> viewOptionList) {
         this.viewOptionList = viewOptionList;
+    }
+
+    /**
+     * @return the barViolationsTimeSeries
+     */
+    public BarChartModel getBarViolationsTimeSeries() {
+        return barViolationsTimeSeries;
+    }
+
+    /**
+     * @return the barViolationsPast30
+     */
+    public BarChartModel getBarViolationsPast30() {
+        return barViolationsPast30;
+    }
+
+    /**
+     * @param barViolationsPast30 the barViolationsPast30 to set
+     */
+    public void setBarViolationsPast30(HorizontalBarChartModel barViolationsPast30) {
+        this.barViolationsPast30 = barViolationsPast30;
+    }
+
+    /**
+     * @return the violationsLoggedNoNOVPast30
+     */
+    public List<CodeViolationPropCECaseHeavy> getViolationsLoggedNoNOVPast30() {
+        return violationsLoggedNoNOVPast30;
+    }
+
+    /**
+     * @return the violationsLoggedCompliancePast30
+     */
+    public List<CodeViolationPropCECaseHeavy> getViolationsLoggedCompliancePast30() {
+        return violationsLoggedCompliancePast30;
+    }
+
+    /**
+     * @return the violationsCitedPast30
+     */
+    public List<CodeViolationPropCECaseHeavy> getViolationsCitedPast30() {
+        return violationsCitedPast30;
+    }
+
+    /**
+     * @param violationsLoggedNoNOVPast30 the violationsLoggedNoNOVPast30 to set
+     */
+    public void setViolationsLoggedNoNOVPast30(List<CodeViolationPropCECaseHeavy> violationsLoggedNoNOVPast30) {
+        this.violationsLoggedNoNOVPast30 = violationsLoggedNoNOVPast30;
+    }
+
+    /**
+     * @param violationsLoggedCompliancePast30 the violationsLoggedCompliancePast30 to set
+     */
+    public void setViolationsLoggedCompliancePast30(List<CodeViolationPropCECaseHeavy> violationsLoggedCompliancePast30) {
+        this.violationsLoggedCompliancePast30 = violationsLoggedCompliancePast30;
+    }
+
+    /**
+     * @param violationsCitedPast30 the violationsCitedPast30 to set
+     */
+    public void setViolationsCitedPast30(List<CodeViolationPropCECaseHeavy> violationsCitedPast30) {
+        this.violationsCitedPast30 = violationsCitedPast30;
+    }
+
+    /**
+     * @return the violationsLoggedNOVPast30
+     */
+    public List<CodeViolationPropCECaseHeavy> getViolationsLoggedNOVPast30() {
+        return violationsLoggedNOVPast30;
+    }
+
+    /**
+     * @param violationsLoggedNOVPast30 the violationsLoggedNOVPast30 to set
+     */
+    public void setViolationsLoggedNOVPast30(List<CodeViolationPropCECaseHeavy> violationsLoggedNOVPast30) {
+        this.violationsLoggedNOVPast30 = violationsLoggedNOVPast30;
     }
 
 }

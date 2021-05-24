@@ -26,7 +26,21 @@
                                      />
                         </h:form>
 
-                        <h1>Ordinances</h1>
+                        <div class="title-container">
+                            
+                            <h1>Ordinances</h1>
+                            
+                            
+                            <h:form id="cecase-help-form">
+                                <div class="restrict-main-contents-help-link">
+                                    <a href="https://technologyrediscovery.github.io/codenforce/code/ordinances"
+                                       target="_blank">
+                                       help
+                                    </a>
+                                </div>
+                            </h:form>
+                           
+                        </div>
 
                         <div class="mainContainer">
                             <div class="ui-g data-container">
@@ -737,11 +751,10 @@
 
 
                             <h:outputText styleClass="ui-label" value="Note text: "/>
-                            <p:editor   id="ord-notes-editor"
+                            <p:textEditor   id="ord-notes-editor"
                                         value="#{codeElementBB.formNoteText}"
-                                        controls="bold italic underline strikethrough font size style color
-                                        bullets numbering center undo redo rule link removeformat"
-                                        width="400" required="false"
+                                        required="false"
+                                        secure="false"
                                         height="200"/>
 
 

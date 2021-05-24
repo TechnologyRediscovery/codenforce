@@ -211,6 +211,11 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
         return navTo;
     }
     
+    public String onPropertyViewButtonChange(){
+        return "propertySearchProfile";
+        
+    }
+    
     /**
      * Listener for user requests to view a cecase from the active object box navlist
      * @param cse
@@ -272,6 +277,15 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
                             ""));
         }
         return navTo;
+    }
+    
+    public String onOrdinancesLinkClick(){
+        return "codeElementManage";
+    }
+    
+    public String onCodebookLinkClick(){
+        return "codeSetManage";
+        
     }
 
     /**

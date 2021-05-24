@@ -15,10 +15,27 @@
 
                     <div class="mainContainer">
 
-                        <h1>Manage Code Books</h1>
+                       <div class="title-container">
+                            
+                            <h1>Code Books</h1>
+                            
+                            
+                            <h:form id="cecase-help-form">
+                                <div class="restrict-main-contents-help-link">
+                                    <a href="https://technologyrediscovery.github.io/codenforce/code/codebooks"
+                                       target="_blank">
+                                       help
+                                    </a>
+                                </div>
+                            </h:form>
+                           
+                        </div>
 
                         <h:form id="form-messages-global">
-                            <p:growl id="sets-messages-growl" />
+                            <p:growl id="sets-messages-growl"
+                                     life="3000"
+                                     keepAlive="true"
+                                     globalOnly="false"/>
                         </h:form>
 
                         <div class ="two-column-page-flex-container">
@@ -751,11 +768,10 @@
                                     </h:panelGroup>
 
                                     <h:panelGroup>
-                                        <p:editor   id="formMuniSpecificNotesEditor"  value="#{codeSetBB.currentEnforcableCodeElement.muniSpecificNotes}" 
-                                                    controls="bold italic underline strikethrough font size style color 
-                                                    bullets numbering center undo redo rule link removeformat outdent 
-                                                    indent link unlink copy cut paste rule alignleft center alignright"
-                                                    width="1000" required="false"
+                                        <p:textEditor   id="formMuniSpecificNotesEditor"  
+                                                        value="#{codeSetBB.currentEnforcableCodeElement.muniSpecificNotes}" 
+                                                    required="false"
+                                                    secure="false"
                                                     height="200"/>
                                         <h:message for="formMuniSpecificNotesEditor" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -981,7 +997,7 @@
                                 icon="fa fa-bolt"
                                 value="Add Selected Elements To Current Code Book"
                                 action="#{codeSetBB.onAddSelectedElementsToCodeSetCommitButtonChange}"
-
+                                update="form-messages-global"
 
                                 />
                             <p:spacer height="5px"/>

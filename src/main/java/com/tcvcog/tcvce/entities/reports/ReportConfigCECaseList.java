@@ -6,12 +6,15 @@
 package com.tcvcog.tcvce.entities.reports;
 
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.CodeViolationPropCECaseHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryBacked;
 import java.io.Serializable;
 import java.util.List;
+import org.primefaces.model.charts.hbar.HorizontalBarChartModel;
+import org.primefaces.model.charts.pie.PieChartModel;
 
 /**
  *
@@ -38,6 +41,14 @@ public class ReportConfigCECaseList
     
     private List<EventCnFPropUnitCasePeriodHeavy> eventList;
     
+    // VIOLATIONS
+    
+    private List<CodeViolationPropCECaseHeavy> violationsLoggedNOVDateRange;
+    private List<CodeViolationPropCECaseHeavy> violationsLoggedComplianceDateRange;
+    private List<CodeViolationPropCECaseHeavy> violationsCitedDateRange;
+    private HorizontalBarChartModel barViolationsReport;
+    
+    private PieChartModel pieViol;
     // Metrics
     private double averageAgeOfCasesClosed;
     private double averageAgeOfCasesOpenAsOfReportEndDate;
@@ -233,6 +244,76 @@ public class ReportConfigCECaseList
      */
     public void setCaseListCustomQueryExport(List<CECaseDataHeavy> caseListCustomQueryExport) {
         this.caseListCustomQueryExport = caseListCustomQueryExport;
+    }
+
+    /**
+     * @return the violationsCitedDateRange
+     */
+    public List<CodeViolationPropCECaseHeavy> getViolationsCitedDateRange() {
+        return violationsCitedDateRange;
+    }
+
+    /**
+     * @param violationsCitedDateRange the violationsCitedDateRange to set
+     */
+    public void setViolationsCitedDateRange(List<CodeViolationPropCECaseHeavy> violationsCitedDateRange) {
+        this.violationsCitedDateRange = violationsCitedDateRange;
+    }
+
+    /**
+     * @return the violationsLoggedNOVDateRange
+     */
+    public List<CodeViolationPropCECaseHeavy> getViolationsLoggedNOVDateRange() {
+        return violationsLoggedNOVDateRange;
+    }
+
+    /**
+     * @return the violationsLoggedComplianceDateRange
+     */
+    public List<CodeViolationPropCECaseHeavy> getViolationsLoggedComplianceDateRange() {
+        return violationsLoggedComplianceDateRange;
+    }
+
+    /**
+     * @param violationsLoggedNOVDateRange the violationsLoggedNOVDateRange to set
+     */
+    public void setViolationsLoggedNOVDateRange(List<CodeViolationPropCECaseHeavy> violationsLoggedNOVDateRange) {
+        this.violationsLoggedNOVDateRange = violationsLoggedNOVDateRange;
+    }
+
+    /**
+     * @param violationsLoggedComplianceDateRange the violationsLoggedComplianceDateRange to set
+     */
+    public void setViolationsLoggedComplianceDateRange(List<CodeViolationPropCECaseHeavy> violationsLoggedComplianceDateRange) {
+        this.violationsLoggedComplianceDateRange = violationsLoggedComplianceDateRange;
+    }
+
+    /**
+     * @return the barViolationsReport
+     */
+    public HorizontalBarChartModel getBarViolationsReport() {
+        return barViolationsReport;
+    }
+
+    /**
+     * @param barViolationsReport the barViolationsReport to set
+     */
+    public void setBarViolationsReport(HorizontalBarChartModel barViolationsReport) {
+        this.barViolationsReport = barViolationsReport;
+    }
+
+    /**
+     * @return the pieViol
+     */
+    public PieChartModel getPieViol() {
+        return pieViol;
+    }
+
+    /**
+     * @param pieViol the pieViol to set
+     */
+    public void setPieViol(PieChartModel pieViol) {
+        this.pieViol = pieViol;
     }
     
     

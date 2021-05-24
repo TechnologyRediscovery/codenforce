@@ -42,6 +42,7 @@ import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
 import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.CodeViolationPropCECaseHeavy;
 import com.tcvcog.tcvce.entities.search.SearchParamsCodeViolation;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -277,32 +278,35 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException
      * @throws BObStatusException 
      */
-    public List<Integer> searchForCodeViolations(SearchParamsCodeViolation params) throws IntegrationException, BObStatusException{
+    public List<CodeViolationPropCECaseHeavy> searchForCodeViolations(SearchParamsCodeViolation params) throws IntegrationException, BObStatusException{
         SearchCoordinator sc = getSearchCoordinator();
-        List<Integer> cseidlst = new ArrayList<>();
+        CaseCoordinator cc = getCaseCoordinator();
+        List<CodeViolationPropCECaseHeavy> cvpcehl = new ArrayList<>();
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
         
-        params.appendSQL("SELECT DISTINCT violationid");
-        params.appendSQL("FROM public.codeviolation ");
-        params.appendSQL("INNER JOIN public.cecase ON (cecase.caseid = codeviolation.cecase_caseid)");
-        params.appendSQL("INNER JOIN public.property ON (cecase.property_propertyid = property.propertyid)");
-        params.appendSQL("LEFT OUTER JOIN ");
-        params.appendSQL("(	SELECT codeviolation_violationid, citation.citationid, citation.dateofrecord ");
-        params.appendSQL("FROM public.citationviolation ");
-        params.appendSQL("INNER JOIN public.citation ON (citationviolation.citation_citationid = citation.citationid)");
-        params.appendSQL("INNER JOIN public.citationstatus on (citationstatus.statusid = citation.status_statusid)");
-        params.appendSQL("WHERE citationstatus.editsforbidden = TRUE	");
-        params.appendSQL(") AS citv ON (codeviolation.violationid = citv.codeviolation_violationid)");
-        params.appendSQL("LEFT OUTER JOIN ");
-        params.appendSQL("(");
-        params.appendSQL("SELECT codeviolation_violationid, sentdate");
-        params.appendSQL("FROM noticeofviolationcodeviolation");
-        params.appendSQL("INNER JOIN public.noticeofviolation ON (noticeofviolationcodeviolation.noticeofviolation_noticeid = noticeofviolation.noticeid)");
-        params.appendSQL("WHERE noticeofviolation.sentdate IS NOT NULL");
-        params.appendSQL(") AS novcv ON (codeviolation.violationid = novcv.codeviolation_violationid)");
-        params.appendSQL("WHERE violationid IS NOT NULL	");
+      
+params.appendSQL("SELECT DISTINCT codeviolation.violationid, cecase.caseid, cecase.casename, property.propertyid, property.address, municipality.municode, municipality.muniname ");
+params.appendSQL("FROM public.codeviolation  ");
+params.appendSQL("INNER JOIN public.cecase ON (cecase.caseid = codeviolation.cecase_caseid) ");
+params.appendSQL("INNER JOIN public.property ON (cecase.property_propertyid = property.propertyid) ");
+params.appendSQL("INNER JOIN public.municipality ON (property.municipality_municode = municipality.municode) ");
+params.appendSQL("LEFT OUTER JOIN  ");
+params.appendSQL("(	SELECT codeviolation_violationid, citation.citationid, citation.dateofrecord ");
+params.appendSQL("FROM public.citationviolation  ");
+params.appendSQL("INNER JOIN public.citation ON (citationviolation.citation_citationid = citation.citationid) ");
+params.appendSQL("INNER JOIN public.citationstatus on (citationstatus.statusid = citation.status_statusid) ");
+params.appendSQL("WHERE citationstatus.editsforbidden = TRUE	 ");
+params.appendSQL(") AS citv ON (codeviolation.violationid = citv.codeviolation_violationid) ");
+params.appendSQL("LEFT OUTER JOIN  ");
+params.appendSQL("( ");
+params.appendSQL("SELECT codeviolation_violationid, sentdate ");
+params.appendSQL("FROM noticeofviolationcodeviolation ");
+params.appendSQL("INNER JOIN public.noticeofviolation ON (noticeofviolationcodeviolation.noticeofviolation_noticeid = noticeofviolation.noticeid) ");
+params.appendSQL("WHERE noticeofviolation.sentdate IS NOT NULL ");
+params.appendSQL(") AS novcv ON (codeviolation.violationid = novcv.codeviolation_violationid) ");
+params.appendSQL("WHERE violationid IS NOT NULL ");
         
         // *******************************
         // **         BOb ID            **
@@ -350,7 +354,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 if(params.isCited_val()){
                     params.appendSQL("AND citv.citationid IS NOT NULL ");
                 } else {
-                    // nothing to do for boolean false
+                    params.appendSQL("AND citv.citationid IS NULL ");
                 }
             }
             
@@ -361,7 +365,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 if(params.isLegacyImport_val()){
                     params.appendSQL("AND legacyimport=TRUE ");
                 } else {
-                   // nothing to do for boolean false
+                    params.appendSQL("AND legacyimport=FALSE ");
+                   
                 }
             }
             
@@ -396,7 +401,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 if(params.isNoticeMailed_val()){
                     params.appendSQL("AND novcv.sentdate IS NOT NULL ");
                 } else {
-                    // nothing to do
+                    params.appendSQL("AND novcv.sentdate IS NULL ");
                 }
             }
            
@@ -466,7 +471,16 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 maxResults = Integer.MAX_VALUE;
             }
             while (rs.next() && counter < maxResults) {
-                cseidlst.add(rs.getInt("violationid"));
+                CodeViolationPropCECaseHeavy cvpch = new CodeViolationPropCECaseHeavy(cc.violation_getCodeViolation(rs.getInt("violationid")));
+                cvpch.setCeCaseName(rs.getString("casename"));
+                cvpch.setPropertyAddress(rs.getString("address"));
+                cvpch.setPropertyID(rs.getInt("propertyid"));
+                cvpch.setMuniCode(rs.getInt("municode"));
+                cvpch.setMuniName(rs.getString("muniname"));
+                
+                
+                cvpcehl.add(cvpch);
+                
                 counter++;
             }
             
@@ -480,7 +494,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
-        return cseidlst;
+        return cvpcehl;
         
     }
     

@@ -21,16 +21,32 @@ public  enum QueryCodeViolationEnum
                             RoleType.MuniStaff,
                             true),
     
-    LOGGED_PAST30_NOV_CITMAYBE    ("Logged on any case in past 30 days",
+    LOGGED_PAST30_NOV_CITMAYBE    ("Logged on any case with NOV in past 30 days",
                             "",
                             RoleType.MuniStaff,
                             true),
     
     
-    LOGGED_PAST7_NOV_CITMAYBE    ("Logged on any case in past 7 days",
+    LOGGED_PAST7_NOV_CITMAYBE ("Logged on any case with NOV in past 7 days",
                             "",
                             RoleType.MuniStaff,
                             true),
+    
+    
+    // IMPLEMENT ME
+    COMPLIANCE_DUE_WIHTIN   ("Currently within compliance date",
+                            "",
+                            RoleType.MuniStaff,
+                            true),
+    
+    
+    // IMPLEMENT ME
+    COMPLIANCE_DUE_EXPIRED  ("Expired compliance timeframe",
+                            "",
+                            RoleType.MuniStaff,
+                            true),
+    
+    
     
     COMP_PAST30             ("Compliance achieved in past 30 days",
                             "",
@@ -41,6 +57,7 @@ public  enum QueryCodeViolationEnum
                             "",
                             RoleType.MuniStaff,
                             true),
+    
     STIP_NEXT7              ("Compliance stipulated in upcoming 7 days",
                             "",
                             RoleType.MuniStaff,
@@ -50,7 +67,6 @@ public  enum QueryCodeViolationEnum
                             "",
                             RoleType.MuniStaff,
                             true),
-    
     
     CITED_PAST30            ("Cited in past 30 days",
                             "",
@@ -62,19 +78,27 @@ public  enum QueryCodeViolationEnum
                             RoleType.MuniStaff,
                             true),
     
-    LOGGED_NO_NOV_EVER           ("Attached to a case but not included in a notice EVER",
+    LOGGED_NO_NOV_EVER      ("Attached to a case but not included in a notice EVER",
+                            "Potentially violations attached to a case from a property inspection; there's a window",
+                            RoleType.MuniStaff,
+                            true),
+    
+    LOGGED_NO_NOV_PAST30    ("Attached to a case but not included in a notice in the past 30 days",
                             "",
                             RoleType.MuniStaff,
                             true),
-    LOGGED_NO_NOV_PAST30    ("Attached to a case but not included in a violation in the past 30 days",
+    
+    LOGGED_NO_NOV_PAST7     ("Attached to a case but not included in a notice in the past 7 days",
                             "",
                             RoleType.MuniStaff,
                             true),
-    LOGGED_NO_NOV_PAST7     ("Attached to a case but not included in a violation in the past 7 days",
+    
+    LOGGED_CITED_NONOV      ("AUDIT: Attached to a case and cited without a notice",
                             "",
                             RoleType.MuniStaff,
                             true),
-    LOGGED_CITED_NONOV           ("Attached to a case and cited without a registered notice",
+    
+    ALL_OUTSTANDING         ("All Unresolved Violations",
                             "",
                             RoleType.MuniStaff,
                             true)

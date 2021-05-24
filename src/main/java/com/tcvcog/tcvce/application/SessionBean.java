@@ -428,7 +428,7 @@ public class    SessionBean
                 }
                 
                 // CEARS
-                if(sessCEARList != null && sessCEARList.isEmpty()){
+                if(sessCEARList != null && !sessCEARList.isEmpty()){
                     sessCEAR = sessCEARList.get(0);
                     sessCEARRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
                     sessCEARRListoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;

@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.entities.search;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.CodeViolationPropCECaseHeavy;
 import com.tcvcog.tcvce.entities.Credential;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class QueryCodeViolation
     
     private QueryCodeViolationEnum queryName;
     private List<SearchParamsCodeViolation> searchParamsList; 
-    private List<CodeViolation> results;
+    private List<CodeViolationPropCECaseHeavy> results;
     
     public QueryCodeViolation( QueryCodeViolationEnum qName, 
                         List<SearchParamsCodeViolation> params,
@@ -37,7 +38,7 @@ public class QueryCodeViolation
         results = new ArrayList<>();
     }
     
-    public void addToResults(List<CodeViolation> list){
+    public void addToResults(List<CodeViolationPropCECaseHeavy> list){
         results.addAll(list);
     }
     
@@ -99,14 +100,14 @@ public class QueryCodeViolation
     /**
      * @return the results
      */
-    public List<CodeViolation> getResults() {
+    public List<CodeViolationPropCECaseHeavy> getResults() {
         return results;
     }
 
     /**
      * @param results the results to set
      */
-    public void setResults(List<CodeViolation> results) {
+    public void setResults(List<CodeViolationPropCECaseHeavy> results) {
         this.results = results;
     }
 

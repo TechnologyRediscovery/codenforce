@@ -99,8 +99,9 @@
                             </h:form>
 
                             <!-- TOP NAVIGATION BAR -->
-                            <div class="ui-g data_container_nested_restrict" style="background-color: gray;">
+                            <div class="ui-g data_container_nested_restrict" style="background-color: gray; margin-bottom: 0px;">
                                 <h:form id="topnavbar">
+                                    
                                     <div class="activebob-container"
                                          id="activbob-muni">
 
@@ -139,10 +140,22 @@
 
                                                         <p:commandLink    id="aob-muni-change-cl" 
                                                                           value="change"
+                                                                          action="#{missionControlBB.reauthenticate}" 
                                                                           ajax="false"/>
                                                     </div>
-
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="activebob-container "
+                                         id="activbob-code">
+
+                                        <div class="ui-g data_container_nested_restrict">
+                                            <!--NESTED DATA FIELD VERTICAL-->
+                                            <div class="ui-g-10 ui-md-10 ui-lg-10">
+                                               
+                                             
                                                 <div class="aob-container aob-container-iconifiedheader">
 
                                                     <div class="inline-icon">
@@ -154,6 +167,10 @@
 
                                                     <h:outputText value="Code Book" />
                                                 </div>
+                                            </div>    
+                                        
+                                           
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
                                                 <div class="aob-container aob-container-objectstring">
                                                     <h:outputText value="#{sessionBean.sessMuni.codeSet.codeSetName}"/>
 
@@ -165,10 +182,22 @@
 
                                                         <p:commandLink    id="navcontres-button-ordinances" 
                                                                           value="ordinances"
+                                                                          action="#{navigationBB.onOrdinancesLinkClick}"
                                                                           ajax="false"/>
+                                                        <br/>
+
+                                                        <p:commandLink    id="navcontres-button-codebook" 
+                                                                          value="code book"
+                                                                          action="#{navigationBB.onCodebookLinkClick}"
+                                                                          ajax="false"/>
+                                                        <br/>
+
+                                                        
+                                                        <a href="https://technologyrediscovery.github.io/codenforce/code/code"
+                                                           target="_blank">
+                                                           help
+                                                        </a>
                                                     </div>
-
-
                                                 </div>
                                             </div>
                                         </div>
@@ -204,7 +233,7 @@
 
                                                     <div class="restrict-main-contents-io-link link-button">
                                                         <p:commandLink id="activebob-proplist-prop-explore-cl"
-                                                                       action="#{navigationBB.onPropertyListItemSelect(prop)}"
+                                                                       action="#{navigationBB.onPropertyViewButtonChange()}"
                                                                        value="view"
                                                                        ajax="false"/>
                                                     </div>
@@ -231,7 +260,7 @@
 
                                                             <div class="restrict-main-contents-io-link link-button">
                                                                 <p:commandLink id="activebob-proplist-prop-explore-cl"
-                                                                               action="#{navigationBB.onPropertyListItemSelect(prop)}"
+                                                                               action="#{navigationBB.onPropertyListItemSelect(sprop)}"
                                                                                value="view"
                                                                                ajax="false">
                                                                 </p:commandLink>
@@ -315,6 +344,7 @@
                                                                    action="#{navigationBB.onViewPersonListItemSelect(spers)}"
                                                                    ajax="false">
                                                         <h:outputText value="#{spers.firstName} #{spers.lastName}: #{spers.personType.label} (ID:#{spers.personID})" />
+                                                        <p:spacer height="3px" />
                                                     </p:commandLink>
 
 
@@ -391,33 +421,15 @@
                                         </div>
                                     </div>
 
-                                    <div class="activebob-container"
-                                         id="aob-tools">
+                                    
+                                </h:form>
+                            </div>
+                            <div style="float:right;">
+                                <h:form id="userform">
 
-                                        <div class="ui-g data_container_nested_restrict">
-
-                                            <!--NESTED DATA FIELD VERTICAL-->
-                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
-
-                                                <div class="aob-container aob-container-iconifiedheader">
-
-                                                    <div class="inline-icon">
-
-                                                        <i class="material-icons">
-                                                            <h:outputText value="gavel"/>
-                                                        </i>
-                                                    </div>
-                                                    <h:outputText value="Tools" />
-                                                </div>
-                                                <div class="aob-container aob-container-objectstring">
-
-                                                    <h:outputText value="#{systemServicesBB.bbSessionUser.person.firstName} #{systemServicesBB.bbSessionUser.person.lastName} ( #{systemServicesBB.bbSessionUser.username})"/>
-
-
-                                                </div>
-                                                <div class="aob-container aob-container-actions">
-
-                                                    <div class="restrict-main-contents-io-link link-button">
+                                        <h:outputText value="#{systemServicesBB.bbSessionUser.person.firstName} #{systemServicesBB.bbSessionUser.person.lastName} ( #{systemServicesBB.bbSessionUser.username})"/>
+                                    
+                                  <div class="restrict-main-contents-io-link link-button">
                                                         <p:commandLink        id="navbar-button-usersettings2"
                                                                               ajax="true" 
                                                                               actionListener="#{userBB.initiateUserUpdates}"
@@ -436,10 +448,6 @@
                                                                           value="logout"
                                                                           ajax="false"/>
                                                     </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </h:form>
                             </div>
 

@@ -13,6 +13,7 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.CodeViolationPropCECaseHeavy;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
@@ -47,10 +48,10 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     private static final int RESULT_COUNT_LIMIT_DEFAULT = 100;
     private static final int FILTER_OFF_DEFVALUE_INT = 0;
     
-    private static final int PASTPERIOD_RECENT = 30;
-    private static final int PASTPERIOD_WEEK = 7;
-    private static final int PASTPERIOD_MONTH = 30;
-    private static final int PASTPERIOD_YEAR = 365;
+    private static final int PASTPERIOD_RECENT = -30;
+    private static final int PASTPERIOD_WEEK = -7;
+    private static final int PASTPERIOD_MONTH = -30;
+    private static final int PASTPERIOD_YEAR = -365;
     private static final int PASTPERIOD_TODAY = 0;
     
     private static final long DAYS_IN_WEEK = 7;
@@ -320,10 +321,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return q;
      }
      
-     
     
      /**
-      * Single point of entry for queries against the CECase table
+      * Single point of entry for queries against the Violation table
       * @param q search params with the credential set
       * @return a Query subclass with results accessible via q.getResults
       * @throws SearchException 
@@ -337,18 +337,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         prepareQueryForRun(q);
 
         List<SearchParamsCodeViolation> paramsList = q.getParamsList();
-        List<CodeViolation> vList = new ArrayList<>();
+        List<CodeViolationPropCECaseHeavy> vList = new ArrayList<>();
         
         for(SearchParamsCodeViolation params: paramsList){
             vList.clear();
             try {
-            // the integrator will only look at the single muni val, 
-            // so we'll call searchForXXX once for each muni
-            for(Integer i: ci.searchForCodeViolations(params)){
-                CodeViolation v = cc.violation_getCodeViolation(i);
-                
-                    vList.add(v);
-            }
+                vList.addAll(ci.searchForCodeViolations(params));
                 q.addToResults(vList);
             } catch (IntegrationException | BObStatusException ex) {
                 throw new SearchException("Exception during search: " + ex.toString());
@@ -914,55 +908,59 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          
          switch(qName){
             case MUNI_ALL:
-                 genParams_cv_muniall(params, cred);
+                 paramsList.add(genParams_cv_muniall(params, cred));
                 break;
             case CITED_PAST30:
-                 genParams_cv_cited30(params, cred);
+                 paramsList.add(genParams_cv_cited30(params, cred));
                 
                 break;
             case CITED_PAST7:
-                genParams_cv_cited7(params, cred);
+                paramsList.add(genParams_cv_cited7(params, cred));
                 break;
             case COMP_PAST30:
-                genParams_cv_comp30(params, cred);
+                paramsList.add(genParams_cv_comp30(params, cred));
                 
                 break;
             case COMP_PAST7:
-                genParams_cv_comp7(params, cred);
+                paramsList.add(genParams_cv_comp7(params, cred));
                 
                 break;
             case LOGGED_PAST30_NOV_CITMAYBE:
-                genParams_cv_loggednov30(params, cred);
+               paramsList.add(genParams_cv_loggednov30(params, cred));
                 
                 break;
             case LOGGED_PAST7_NOV_CITMAYBE:
-                genParams_cv_loggednov7(params, cred);
+                paramsList.add(genParams_cv_loggednov7(params, cred));
                  
                 break;
             case LOGGED_CITED_NONOV:
-                genParams_cv_loggedcitednonov_audit(params, cred);
+                paramsList.add(genParams_cv_loggedcitednonov_audit(params, cred));
                 
                 break;
             case LOGGED_NO_NOV_EVER:
-                genParams_cv_loggedNOnovEVER(params, cred);
+                paramsList.add(genParams_cv_loggedNOnovEVER(params, cred));
                 
                 break;
                 
             case LOGGED_NO_NOV_PAST30:
-                genParams_cv_loggednov30(params, cred);
+                paramsList.add(genParams_cv_loggedNOnov30(params, cred));
                 
                 break;
             case LOGGED_NO_NOV_PAST7:
-                genParams_cv_loggednov7(params, cred);
+                paramsList.add(genParams_cv_loggednov7(params, cred));
                 
                 break;
                 
             case STIP_NEXT30:
-                genParams_cv_stip30(params, cred);
+                paramsList.add(genParams_cv_stip30(params, cred));
                 
                 break;
             case STIP_NEXT7:
-                genParams_cv_stip7(params, cred);
+                paramsList.add(genParams_cv_stip7(params, cred));
+                
+                break;
+            case ALL_OUTSTANDING:
+                paramsList.add(genParams_cv_allOutstanding(params, cred));
                 
                 break;
             default:
@@ -1931,7 +1929,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     public SearchParamsCECase genParams_ceCase_openAsOf(SearchParamsCECase params, Credential cred){
-        params.setFilterName("Finds cases that were open on a given close date");
+        params.setFilterName("Finds cases that were open on a given report end date");
         
         // STANDARD SWITCHES
         params.setActive_ctl(true);
@@ -1961,7 +1959,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     /* --------------------------------------------
-                  VIII. CEActionRequest
+                  VIOLATION
        -------------------------------------------- */
     
     
@@ -1974,6 +1972,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
        private SearchParamsCodeViolation genParams_codeViolation_initParams(Credential cred){
         SearchParamsCodeViolation params = new SearchParamsCodeViolation();
         params = (SearchParamsCodeViolation) genParams_initParams(params, cred);
+        
+        params.setLimitResultCount_ctl(false);
         
         // CV Param set 1
         params.setProperty_ctl(false);
@@ -1988,7 +1988,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setCecase_val(null);
         
         // CV Param set 4
-        params.setLegacyImport_ctl(false);
+        params.setLegacyImport_ctl(true);
         params.setLegacyImport_val(false);
         
         // CV Param set 5
@@ -2032,7 +2032,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public SearchParamsCodeViolation genParams_cv_cited30(SearchParamsCodeViolation params, Credential cred){
         params.setFilterName("cited in past 30 days");
         
+        params.setDate_startEnd_ctl(true);
         params.setDate_relativeDates_ctl(true);
+        params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.CITATIONDOR);
         params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
         params.setDate_relativeDates_start_val(PASTPERIOD_MONTH);
         
@@ -2052,8 +2054,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * into the Integrator for case list retrieval
      */
     public SearchParamsCodeViolation genParams_cv_cited7(SearchParamsCodeViolation params, Credential cred){
-        params.setFilterName("cited in past 70 days");
+        params.setFilterName("cited in past 30 days");
         
+        params.setDate_startEnd_ctl(true);
         params.setDate_relativeDates_ctl(true);
         params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.CITATIONDOR);
         params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
@@ -2077,12 +2080,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public SearchParamsCodeViolation genParams_cv_comp30(SearchParamsCodeViolation params, Credential cred){
         params.setFilterName("compliance achived in past 30 days");
         
+        params.setDate_startEnd_ctl(true);
         params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.COMPLIANCEDOR);
         params.setDate_relativeDates_ctl(true);
         params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
         params.setDate_relativeDates_start_val(PASTPERIOD_MONTH);
-        
-        
         
         return params;
     }
@@ -2099,6 +2101,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public SearchParamsCodeViolation genParams_cv_comp7(SearchParamsCodeViolation params, Credential cred){
         params.setFilterName("Compliance achieved in the past week");
 
+        params.setDate_startEnd_ctl(true);
         params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.COMPLIANCEDOR);
         params.setDate_relativeDates_ctl(true);
         params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
@@ -2121,10 +2124,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public SearchParamsCodeViolation genParams_cv_loggednov30(SearchParamsCodeViolation params, Credential cred){
         params.setFilterName("Attached to case with nov in past 30");
 
+        params.setDate_startEnd_ctl(true);
         params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.CASE_ATTACHMENTDOR);
         params.setDate_relativeDates_ctl(true);
-        params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
         params.setDate_relativeDates_start_val(PASTPERIOD_MONTH);
+        params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
         
         params.setNoticeMailed_ctl(true);
         params.setNoticeMailed_val(true);
@@ -2145,6 +2149,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public SearchParamsCodeViolation genParams_cv_loggednov7(SearchParamsCodeViolation params, Credential cred){
         params.setFilterName("Attached to case with nov in past 7 days");
 
+        params.setDate_startEnd_ctl(true);
         params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.CASE_ATTACHMENTDOR);
         params.setDate_relativeDates_ctl(true);
         params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
@@ -2210,13 +2215,14 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public SearchParamsCodeViolation genParams_cv_loggedNOnov30(SearchParamsCodeViolation params, Credential cred){
         params.setFilterName("Logged in the past 30 days but no NOV");
 
+        params.setDate_startEnd_ctl(true);
         params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.CASE_ATTACHMENTDOR);
         params.setDate_relativeDates_ctl(true);
         params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
         params.setDate_relativeDates_start_val(PASTPERIOD_MONTH);
         
         params.setNoticeMailed_ctl(true);
-        params.setNoticeMailed_val(true);
+        params.setNoticeMailed_val(false);
         
         return params;
     }
@@ -2232,6 +2238,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public SearchParamsCodeViolation genParams_cv_loggedNOnov7(SearchParamsCodeViolation params, Credential cred){
         params.setFilterName("Logged in the past 7 days but no NOV");
 
+        params.setDate_startEnd_ctl(true);
         params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.CASE_ATTACHMENTDOR);
         params.setDate_relativeDates_ctl(true);
         params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
@@ -2258,6 +2265,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public SearchParamsCodeViolation genParams_cv_stip30(SearchParamsCodeViolation params, Credential cred){
         params.setFilterName("Stipulated compliance date within the upcoming 30 days");
 
+        params.setDate_startEnd_ctl(true);
         params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.STIP);
         params.setDate_relativeDates_ctl(true);
         params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
@@ -2277,10 +2285,30 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public SearchParamsCodeViolation genParams_cv_stip7(SearchParamsCodeViolation params, Credential cred){
         params.setFilterName("Stipulated compliance date within the upcoming 7 days");
 
+        params.setDate_startEnd_ctl(true);
         params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.STIP);
         params.setDate_relativeDates_ctl(true);
         params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
         params.setDate_relativeDates_start_val(PASTPERIOD_WEEK);
+        
+        return params;
+    }
+    
+    /**
+     * Returns a SearchParams subclass for retrieving code violations
+     * that meet the desired criteria
+     * @param params
+     * @param cred
+     * @return a SearchParams subclass with mem vars ready to send
+     * into the Integrator for case list retrieval
+     */
+    public SearchParamsCodeViolation genParams_cv_allOutstanding(SearchParamsCodeViolation params, Credential cred){
+        params.setFilterName("All outstanding violations");
+
+        params.setDate_startEnd_ctl(false);
+        
+        
+        
         
         return params;
     }

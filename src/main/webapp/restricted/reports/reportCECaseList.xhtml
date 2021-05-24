@@ -67,7 +67,7 @@
                                 <!--NESTED DATA LABEL INLINE -->
                                 <div class="restrict-data-field-label-inline" >
                                     <h:outputLabel value="Total cases open as of "/>
-                                    <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)}:" />
+                                    <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.generationTimestamp)}:" />
                                 </div>
                                 <!--NESTED DATA VALUE INLINE -->
                                 <div class="restrict-data-field-value-inline"
@@ -75,19 +75,25 @@
                                     <h:outputText value="#{reportingBB.reportCECaseList.caseListOpenAsOfDateEnd.size()}" />
                                 </div>
                             </div>
-                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+                            
+                            <ui:remove>
+                                
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
 
-                                <!--NESTED DATA LABEL INLINE -->
-                                <div class="restrict-data-field-label-inline" 
-                                     >
-                                    <h:outputLabel value="Total cases closed during reporting period: "/>
+                                    <!--NESTED DATA LABEL INLINE -->
+                                    <div class="restrict-data-field-label-inline" 
+                                         >
+                                        <h:outputLabel value="Total cases closed during reporting period: "/>
+                                    </div>
+                                    <!--NESTED DATA VALUE INLINE -->
+                                    <div class="restrict-data-field-value-inline"
+                                         style="color:black;" >
+                                        <h:outputText value="#{reportingBB.reportCECaseList.caseListClosedInDateRange.size()}" />
+                                    </div>
                                 </div>
-                                <!--NESTED DATA VALUE INLINE -->
-                                <div class="restrict-data-field-value-inline"
-                                     style="color:black;" >
-                                    <h:outputText value="#{reportingBB.reportCECaseList.caseListClosedInDateRange.size()}" />
-                                </div>
-                            </div>
+
+                            </ui:remove>
+                            
                             <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
 
                                 <!--NESTED DATA LABEL INLINE -->
@@ -102,12 +108,69 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        
+                        
+                        <h2>Code Violation Summary</h2>
+                          <div class="ui-g data_container_nested_restrict_report">
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
 
 
-                        <hr />
+                              <h:form id="cselistreport-bar-violations-form">
+                                  <p:pieChart id="pie-violations"
+                                              model="#{reportingBB.reportCECaseList.pieViol}" />
+                                        
+                                    </h:form>
+                                
+                            </div>
+                          </div>
+                          <div class="ui-g data_container_nested_restrict_report">
+                            <!--NESTED DATA FIELD -->
+                            
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-report" >
+
+                                <h3>New Violations <h:outputText value="(#{reportingBB.reportCECaseList.violationsLoggedNOVDateRange.size()})"/> </h3>
+                                 <ui:repeat id="viol-logged"
+                                            value="#{reportingBB.reportCECaseList.violationsLoggedNOVDateRange}"
+                                            var="vlogged">
+                                     <h:outputText value="#{vlogged.codeViolated.ordchapterTitle}: #{vlogged.codeViolated.ordSecTitle}, #{vlogged.codeViolated.ordSubSecTitle} (VID: #{vlogged.violationID}) " />
+                                     <p:spacer height="2px" />
+                                     <h:outputText value="&nbsp;&nbsp;&nbsp;&nbsp; @ #{vlogged.propertyAddress} (CaseID: #{vlogged.ceCaseID})" />
+                                     <p:spacer height="4px" />
+                                 </ui:repeat>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-report" >
+                                <h3>Compliance Achieved <h:outputText value="(#{reportingBB.reportCECaseList.violationsLoggedComplianceDateRange.size()})"/></h3>
+                                 <ui:repeat id="viol-comp"
+                                            value="#{reportingBB.reportCECaseList.violationsLoggedComplianceDateRange}"
+                                            var="vcomp">
+                                     <h:outputText value="#{vcomp.codeViolated.ordchapterTitle}: #{vcomp.codeViolated.ordSecTitle}, #{vcomp.codeViolated.ordSubSecTitle} (VID: #{vcomp.violationID}) " />
+                                     <p:spacer height="2px" />
+                                     <h:outputText value="&nbsp;&nbsp;&nbsp;&nbsp; @ #{vcomp.propertyAddress} (CaseID: #{vcomp.ceCaseID})" />
+                                     <p:spacer height="4px" />
+                                 </ui:repeat>
+                                
+
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4  restrict-data-field-report" >
+                                <h3>Cited Violations <h:outputText value="(#{reportingBB.reportCECaseList.violationsCitedDateRange.size()})"/></h3>
+                                 <ui:repeat id="viol-cit"
+                                            value="#{reportingBB.reportCECaseList.violationsCitedDateRange}"
+                                            var="vcit">
+                                     <h:outputText value="#{vcit.codeViolated.ordchapterTitle}: #{vcit.codeViolated.ordSecTitle}, #{vcit.codeViolated.ordSubSecTitle} (VID: #{vcit.violationID}) " />
+                                     <p:spacer height="2px" />
+                                     <h:outputText value="&nbsp;&nbsp;&nbsp;&nbsp; @ #{vcit.propertyAddress} (CaseID: #{vcit.ceCaseID})" />
+                                     <p:spacer height="4px" />
+                                 </ui:repeat>
+                                
+                                
+
+                            </div>
+                          </div>
+                        
 
                         <h2 style="text-decoration: underline;">Open Cases as of
-                            <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)}" />
+                            <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.generationTimestamp)}" />
                             <h:outputText value=" (#{reportingBB.reportCECaseList.caseListOpenAsOfDateEnd.size()})" />
 
                         </h2>
@@ -138,7 +201,7 @@
                                     </div>
                                     <!--NESTED DATA VALUE INLINE -->
                                     <div class="restrict-data-field-value-inline" >
-                                        <h:outputText id="selcase-status-it" 
+                                        <h:outputText id="selcase-o-status-it" 
                                                       value="#{cse.statusBundle.phase.label}"/>
                                     </div>
                                 </div>
@@ -151,7 +214,7 @@
                                     </div>
                                     <!--NESTED DATA VALUE INLINE -->
                                     <div class="restrict-data-field-value-inline" >
-                                        <h:outputText id="selcase-status-it" 
+                                        <h:outputText id="selcase-o-age-it" 
                                                       value="#{cse.caseAge} days"/>
                                     </div>
                                 </div>
@@ -164,7 +227,7 @@
                                     </div>
                                     <!--NESTED DATA VALUE INLINE -->
                                     <div class="restrict-data-field-value-inline" >
-                                        <h:outputText id="selcase-odate-it" 
+                                        <h:outputText id="selcase-o-odate-it" 
                                                       value="#{cse.originiationDatePretty}"/>
                                     </div>
                                 </div>
@@ -209,7 +272,8 @@
                                     <div class="restrict-data-field-value-inline" >
                                         <p:dataScroller id="violations-scroller"
                                                         value="#{cse.violationList}"
-                                                        var="viol">
+                                                        var="viol"
+                                                         style="font-family: sans-serif;">
 
                                             <h:outputText value="#{!(empty viol.status) ? viol.status.label : ''}"
                                                           style="font-weight: bold;"/>
@@ -249,7 +313,8 @@
                                     <div class="restrict-data-field-value-inline" >
                                         <p:dataScroller id="case-nov-scroller"
                                                         value="#{cse.noticeList}"
-                                                        var="nov">
+                                                        var="nov"
+                                                         style="font-family: sans-serif;">
 
                                             <h:outputText value="Mailed on: " 
                                                           rendered="#{!(empty nov.sentTS)}"/>
@@ -270,7 +335,8 @@
                                     <div class="restrict-data-field-value-inline" >
                                         <p:dataScroller id="case-citations-scroller"
                                                         value="#{cse.citationList}"
-                                                        var="cit">
+                                                        var="cit"
+                                                         style="font-family: sans-serif;">
 
                                             <h:outputText value="Date: " />
                                             <h:outputText value="#{cit.dateOfRecordPretty}" />
@@ -306,7 +372,7 @@
                         </h2>
 
                         <p:dataScroller
-                            id="caselist-report-cases-open-datascroller"
+                            id="caselist-report-cases-new-datascroller"
                             value="#{reportingBB.reportCECaseList.caseListOpenedInDateRange}"
                             var="cse">
 
@@ -341,7 +407,7 @@
                                     </div>
                                     <!--NESTED DATA VALUE INLINE -->
                                     <div class="restrict-data-field-value-inline" >
-                                        <h:outputText id="selcase-status-it" 
+                                        <h:outputText id="selcase-age-it" 
                                                       value="#{cse.caseAge} days"/>
                                     </div>
                                 </div>
@@ -399,7 +465,8 @@
                                     <div class="restrict-data-field-value-inline" >
                                         <p:dataScroller id="violations-scroller"
                                                         value="#{cse.violationList}"
-                                                        var="viol">
+                                                        var="viol"
+                                                         style="font-family: sans-serif;">
                                             
                                             <h:outputText value="#{!(empty viol.status) ? viol.status.label : ''}"
                                                           style="font-weight: bold;"/>
@@ -439,7 +506,8 @@
                                     <div class="restrict-data-field-value-inline" >
                                         <p:dataScroller id="case-nov-scroller"
                                                         value="#{cse.noticeList}"
-                                                        var="nov">
+                                                        var="nov"
+                                                         style="font-family: sans-serif;">
 
                                             <h:outputText value="Mailed on: " 
                                                           rendered="#{!(empty nov.sentTS)}"/>
@@ -460,7 +528,8 @@
                                     <div class="restrict-data-field-value-inline" >
                                         <p:dataScroller id="case-citations-scroller"
                                                         value="#{cse.citationList}"
-                                                        var="cit">
+                                                        var="cit"
+                                                         style="font-family: sans-serif;">
 
                                             <h:outputText value="Date: " />
                                             <h:outputText value="#{cit.dateOfRecordPretty}" />
@@ -487,9 +556,13 @@
 
                             <p:spacer height="10px" />
                         </p:dataScroller>
-                        <hr />
+                        <ui:remove>
+                        
+                            <hr />
 
 
+                            
+                        
 
                         <h2 style="text-decoration: underline;">Cases closed during period  
                             <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_start_val)}" />
@@ -498,9 +571,10 @@
                             <h:outputText value=" (#{reportingBB.reportCECaseList.caseListClosedInDateRange.size()})" />
                         </h2>
                         <p:dataScroller
-                            id="caselist-report-cases-open-datascroller"
+                            id="caselist-report-cases-closed-datascroller"
                             value="#{reportingBB.reportCECaseList.caseListClosedInDateRange}"
-                            var="cse">
+                            var="cse"
+                            style="font-family: sans-serif;">
 
                             <h2>
                                 <h:outputText id="header-addr-ot" value="#{cse.property.address} "/>  
@@ -520,7 +594,7 @@
                                     </div>
                                     <!--NESTED DATA VALUE INLINE -->
                                     <div class="restrict-data-field-value-inline" >
-                                        <h:outputText id="selcase-status-it" 
+                                        <h:outputText id="selcase-c-status-it" 
                                                       value="#{cse.statusBundle.phase.label}"/>
                                     </div>
                                 </div>
@@ -533,7 +607,7 @@
                                     </div>
                                     <!--NESTED DATA VALUE INLINE -->
                                     <div class="restrict-data-field-value-inline" >
-                                        <h:outputText id="selcase-status-it" 
+                                        <h:outputText id="selcase-c-age-it" 
                                                       value="#{cse.caseAge} days"/>
                                     </div>
                                 </div>
@@ -546,7 +620,7 @@
                                     </div>
                                     <!--NESTED DATA VALUE INLINE -->
                                     <div class="restrict-data-field-value-inline" >
-                                        <h:outputText id="selcase-odate-it" 
+                                        <h:outputText id="selcase-c-odate-it" 
                                                       value="#{cse.originiationDatePretty}"/>
                                     </div>
                                 </div>
@@ -560,7 +634,7 @@
                                     </div>
                                     <!--NESTED DATA VALUE INLINE -->
                                     <div class="restrict-data-field-value-inline" >
-                                        <h:outputText id="selcase-cdate-it" 
+                                        <h:outputText id="selcase-c-cdate-it" 
                                                       value="#{cse.closingDatePretty}"/>
                                     </div>
                                 </div>
@@ -572,7 +646,7 @@
                                     </div>
                                     <!--NESTED DATA VALUE INLINE -->
                                     <div class="restrict-data-field-value-inline" >
-                                        <h:outputText id="selcase-manager-it" 
+                                        <h:outputText id="selcase-c-manager-it" 
                                                       value="#{cse.caseManager.person.firstName} 
                                                       #{cse.caseManager.person.lastName} "/>  
                                     </div>
@@ -591,7 +665,8 @@
                                     <div class="restrict-data-field-value-inline" >
                                         <p:dataScroller id="violations-scroller"
                                                         value="#{cse.violationList}"
-                                                        var="viol">
+                                                        var="viol"
+                                                         style="font-family: sans-serif;">
 
                                               <h:outputText value="#{!(empty viol.status) ? viol.status.label : ''}"
                                                           style="font-weight: bold;"/>
@@ -632,7 +707,8 @@
                                     <div class="restrict-data-field-value-inline" >
                                         <p:dataScroller id="case-nov-scroller"
                                                         value="#{cse.noticeList}"
-                                                        var="nov">
+                                                        var="nov"
+                                                         style="font-family: sans-serif;">
 
                                             <h:outputText value="Mailed on: " 
                                                           rendered="#{!(empty nov.sentTS)}"/>
@@ -653,7 +729,8 @@
                                     <div class="restrict-data-field-value-inline" >
                                         <p:dataScroller id="case-citations-scroller"
                                                         value="#{cse.citationList}"
-                                                        var="cit">
+                                                        var="cit"
+                                                         style="font-family: sans-serif;">
 
                                             <h:outputText value="Date: " />
                                             <h:outputText value="#{cit.dateOfRecordPretty}" />
@@ -681,6 +758,9 @@
 
                             <p:spacer height="10px" />
                         </p:dataScroller>
+                            
+                                                    </ui:remove>
+
                     </h:form>
                 </div>
             </ui:define>

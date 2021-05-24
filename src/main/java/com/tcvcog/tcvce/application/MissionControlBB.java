@@ -92,7 +92,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     private PieChartModel pieProperty;
     private PieChartModel pieCasePhase;
     private PieChartModel pieEvents;
-    private BarChartModel barViolations;
+
     /**
      * Creates a new instance of InitiateSessionBB
      */
@@ -135,7 +135,6 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         initPieProperty();
         initPieCasePhase();
         initPieEvents();
-        initBarViolations();
     }
     
       private void initPieProperty(){
@@ -242,99 +241,6 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         pieEvents.setData(pieData);
     }
       
-      private void initBarViolations(){
-          
-          barViolations = new BarChartModel();
-          ChartData barData = new ChartData();
-          
-          BarChartDataSet dsNewViols = new BarChartDataSet();
-          dsNewViols.setLabel("New Violations");
-          dsNewViols.setBackgroundColor("rgb(255,9,122)");
-          List<Number> dsNewViolsVals = new ArrayList<>();
-          dsNewViolsVals.add(12);
-          dsNewViolsVals.add(18);
-          dsNewViolsVals.add(23);
-          dsNewViolsVals.add(20);
-          dsNewViolsVals.add(15);
-          dsNewViolsVals.add(12);
-          dsNewViols.setData(dsNewViolsVals);
-          
-          BarChartDataSet dsCompliance = new BarChartDataSet();
-          dsCompliance.setLabel("Compliance");
-          dsCompliance.setBackgroundColor("rgb(60,9,122)");
-          List<Number> dsComplianceVals = new ArrayList<>();
-          dsComplianceVals.add(12);
-          dsComplianceVals.add(33);
-          dsComplianceVals.add(36);
-          dsComplianceVals.add(40);
-          dsComplianceVals.add(50);
-          dsComplianceVals.add(53);
-          dsCompliance.setData(dsComplianceVals);
-          
-          BarChartDataSet dsCited = new BarChartDataSet();
-          dsCited.setLabel("Citation");
-          dsCited.setBackgroundColor("rgb(255,9,3)");
-          List<Number> dsCitedVals = new ArrayList<>();
-          dsCitedVals.add(3);
-          dsCitedVals.add(4);
-          dsCitedVals.add(8);
-          dsCitedVals.add(12);
-          dsCitedVals.add(8);
-          dsCitedVals.add(12);
-          dsCited.setData(dsCitedVals);
-          
-          BarChartDataSet dsNull = new BarChartDataSet();
-          dsNull.setLabel("Nullified");
-          dsNull.setBackgroundColor("rgb(4,9,34)");
-          List<Number> dsNullifiedVals = new ArrayList<>();
-          dsNullifiedVals.add(3);
-          dsNullifiedVals.add(4);
-          dsNullifiedVals.add(5);
-          dsNullifiedVals.add(3);
-          dsNullifiedVals.add(4);
-          dsNullifiedVals.add(3);
-          dsNull.setData(dsNullifiedVals);
-          
-          
-          barData.addChartDataSet(dsNewViols);
-          barData.addChartDataSet(dsCompliance);
-          barData.addChartDataSet(dsCited);
-          barData.addChartDataSet(dsNull);
-          
-          List<String> labels = new ArrayList<>();
-          labels.add("Nov 2020");
-          labels.add("Dec 2020");
-          labels.add("Jan 2021");
-          labels.add("Feb 2021");
-          labels.add("Mar 2021");
-          labels.add("Apr 2021");
-          barData.setLabels(labels);
-          
-          barViolations.setData(barData);
-          
-        BarChartOptions options = new BarChartOptions();
-        CartesianScales cScales = new CartesianScales();
-        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
-        linearAxes.setStacked(true);    
-        cScales.addXAxesData(linearAxes);
-        cScales.addYAxesData(linearAxes);
-        options.setScales(cScales);
-        
-        Title title = new Title();
-        title.setDisplay(true);
-        title.setText("Violations month over month");
-        options.setTitle(title);
-        
-        Tooltip tooltip = new Tooltip();
-        tooltip.setMode("index");
-        tooltip.setIntersect(false);
-        options.setTooltip(tooltip);  
-        
-        barViolations.setOptions(options);
-          
-          
-          
-      }
     
     /**
      * @deprecated  with move to flex panels
@@ -667,16 +573,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         return pieEvents;
     }
 
-    /**
-     * @return the barViolations
-     */
-    public BarChartModel getBarViolations() {
-        return barViolations;
-    }
 
-    
-
-   
     
 
    

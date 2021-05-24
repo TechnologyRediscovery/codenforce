@@ -35,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 /**
@@ -321,7 +322,7 @@ public class CodeSetBB
                 } catch (IntegrationException | BObStatusException ex) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-                    return "codeSetManage";
+                    return "";
                 }
                 
             } // close for over elements to add
@@ -329,13 +330,16 @@ public class CodeSetBB
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Success! Added " 
                             + selectedElementsToAddToSet.size() + " elements to code set: " 
                             + currentCodeSet.getCodeSetName(), ""));
+            // Workaround for messages not getting displayed after page redirect
+            // https://www.javaer101.com/en/article/84784117.html
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().setKeepMessages(true);
             return "codeSetManage";
             
         } else {
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Please select at least one element from this source to add to the current code set", ""));
-            return "codeSetManage";
+            return "";
         }
     }
     

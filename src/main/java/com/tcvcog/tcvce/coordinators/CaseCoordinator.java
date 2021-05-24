@@ -34,10 +34,13 @@ import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
+import com.tcvcog.tcvce.entities.search.QueryCodeViolation;
+import com.tcvcog.tcvce.entities.search.QueryCodeViolationEnum;
 import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECaseDateFieldsEnum;
+import com.tcvcog.tcvce.entities.search.SearchParamsCodeViolation;
 import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
@@ -62,6 +65,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import org.primefaces.model.charts.ChartData;
+import org.primefaces.model.charts.axes.cartesian.CartesianScales;
+import org.primefaces.model.charts.axes.cartesian.linear.CartesianLinearAxes;
+import org.primefaces.model.charts.bar.BarChartDataSet;
+import org.primefaces.model.charts.bar.BarChartOptions;
+import org.primefaces.model.charts.hbar.HorizontalBarChartModel;
+import org.primefaces.model.charts.optionconfig.title.Title;
+import org.primefaces.model.charts.optionconfig.tooltip.Tooltip;
+import org.primefaces.model.charts.pie.PieChartDataSet;
+import org.primefaces.model.charts.pie.PieChartModel;
 
 /**
  *
@@ -993,6 +1006,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             return null;
         }
         
+        
+        
         QueryCECase query_opened = sc.initQuery(QueryCECaseEnum.OPENED_INDATERANGE, ua.getKeyCard());
         SearchParamsCECase spcse = query_opened.getPrimaryParams();
         spcse.setDate_startEnd_ctl(true);
@@ -1004,7 +1019,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpenedInDateRange().size());
         }
         
-        QueryCECase query_active_asof = sc.initQuery(QueryCECaseEnum.OPEN_ASOFENDDATE, ua.getKeyCard());
+        QueryCECase query_active_asof = sc.initQuery(QueryCECaseEnum.OPENCASES, ua.getKeyCard());
+//        QueryCECase query_active_asof = sc.initQuery(QueryCECaseEnum.OPEN_ASOFENDDATE, ua.getKeyCard());
         spcse = query_active_asof.getPrimaryParams();
         spcse.setDate_start_val(rpt.getDate_start_val());
         spcse.setDate_end_val(rpt.getDate_end_val());
@@ -1021,10 +1037,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 rpt.setAverageAgeOfCasesOpenAsOfReportEndDate(avg);
             }
         }
-        
-        
-        
-        
         
         QueryCECase query_closed = sc.initQuery(QueryCECaseEnum.CLOSED_CASES, ua.getKeyCard());
         spcse = query_closed.getPrimaryParams();
@@ -1044,9 +1056,130 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         spev.setDate_end_val(rpt.getDate_end_val());
         rpt.setEventList(sc.runQuery(query_ev).getBOBResultList());
         
+        QueryCodeViolation qcv = sc.initQuery(QueryCodeViolationEnum.LOGGED_PAST30_NOV_CITMAYBE, ua.getKeyCard());
+        SearchParamsCodeViolation params = qcv.getPrimaryParams();
+        params.setDate_relativeDates_ctl(false);
+        params.setDate_start_val(rpt.getDate_start_val());
+        params.setDate_end_val(rpt.getDate_end_val());
+        rpt.setViolationsLoggedNOVDateRange(sc.runQuery(qcv).getResults());
+        
+        qcv = sc.initQuery(QueryCodeViolationEnum.COMP_PAST30, ua.getKeyCard());
+        params = qcv.getPrimaryParams();
+        params.setDate_relativeDates_ctl(false);
+        params.setDate_start_val(rpt.getDate_start_val());
+        params.setDate_end_val(rpt.getDate_end_val());
+        rpt.setViolationsLoggedComplianceDateRange(sc.runQuery(qcv).getResults());
+        
+        qcv = sc.initQuery(QueryCodeViolationEnum.CITED_PAST30, ua.getKeyCard());
+        params = qcv.getPrimaryParams();
+        params.setDate_relativeDates_ctl(false);
+        params.setDate_start_val(rpt.getDate_start_val());
+        params.setDate_end_val(rpt.getDate_end_val());
+        rpt.setViolationsCitedDateRange(sc.runQuery(qcv).getResults());
+        
+//        initBarViolationsPastMonth(rpt);
+        initPieViols(rpt);
+        
         return rpt;
         
     }
+    
+    
+      private void initPieViols(ReportConfigCECaseList rpt){
+        rpt.setPieViol(new PieChartModel());
+        ChartData pieData = new ChartData();
+        
+        PieChartDataSet dataSet = new PieChartDataSet();
+        List<Number> propValues = new ArrayList<>();
+        
+        propValues.add(rpt.getViolationsLoggedNOVDateRange().size());
+        propValues.add(rpt.getViolationsLoggedComplianceDateRange().size());
+        propValues.add(rpt.getViolationsCitedDateRange().size());
+        
+        dataSet.setData(propValues);
+        
+        List<String> pieColors = new ArrayList<>();
+        pieColors.add("rgb(200,100,33)");
+        pieColors.add("rgb(100,0,33)");
+        pieColors.add("rgb(20,40,233)");
+        dataSet.setBackgroundColor(pieColors);
+        
+        pieData.addChartDataSet(dataSet);
+        List<String> labels = new ArrayList<>();
+        labels.add("New Violations");
+        labels.add("Compliance");
+        labels.add("Cited");
+        
+        pieData.setLabels(labels);
+        rpt.getPieViol().setData(pieData);
+    }
+    
+    
+      private void initBarViolationsPastMonth(ReportConfigCECaseList rpt){
+          
+          
+          HorizontalBarChartModel hbcm = new HorizontalBarChartModel();
+          ChartData barData = new ChartData();
+          
+          BarChartDataSet dsNewViols = new BarChartDataSet();
+          
+          dsNewViols.setLabel("New Violations");
+          dsNewViols.setBackgroundColor("rgb(255,9,122)");
+          List<Number> dsNewViolsVals = new ArrayList<>();
+//          dsNewViolsVals.add(rpt.getViolationsLoggedNOVDateRange().size());
+          dsNewViolsVals.add(6);
+          dsNewViols.setData(dsNewViolsVals);
+          
+          BarChartDataSet dsCompliance = new BarChartDataSet();
+          dsCompliance.setLabel("Compliance");
+          dsCompliance.setBackgroundColor("rgb(60,9,122)");
+          List<Number> dsComplianceVals = new ArrayList<>();
+//          dsComplianceVals.add(rpt.getViolationsLoggedComplianceDateRange().size());
+          dsComplianceVals.add(3);
+          dsCompliance.setData(dsComplianceVals);
+          
+          BarChartDataSet dsCited = new BarChartDataSet();
+          dsCited.setLabel("Citation");
+          dsCited.setBackgroundColor("rgb(255,9,3)");
+          List<Number> dsCitedVals = new ArrayList<>();
+//          dsCitedVals.add(rpt.getViolationsCitedDateRange().size());
+          dsCitedVals.add(12);
+          dsCited.setData(dsCitedVals);
+          
+          barData.addChartDataSet(dsNewViols);
+          barData.addChartDataSet(dsCompliance);
+          barData.addChartDataSet(dsCited);
+          
+          List<String> labels = new ArrayList<>();
+          labels.add("Reporting Period");
+          barData.setLabels(labels);
+          
+          hbcm.setData(barData);
+          
+        BarChartOptions options = new BarChartOptions();
+        CartesianScales cScales = new CartesianScales();
+        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
+        linearAxes.setStacked(true);    
+        cScales.addXAxesData(linearAxes);
+        cScales.addYAxesData(linearAxes);
+        options.setScales(cScales);
+        
+        Title title = new Title();
+        title.setDisplay(true);
+        title.setText("Violation Statistics");
+        options.setTitle(title);
+        
+        Tooltip tooltip = new Tooltip();
+        tooltip.setMode("index");
+        tooltip.setIntersect(false);
+        options.setTooltip(tooltip);  
+        
+        hbcm.setOptions(options);
+        
+        rpt.setBarViolationsReport(hbcm);
+          
+          
+      }
 
     /**
      * Primary configuration mechanism for customizing report data from the
@@ -2119,6 +2252,25 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         CodeViolation cv = ci.getCodeViolation(vid);
         return violation_configureCodeViolation(cv);
     }
+    
+    
+    
+    public CodeViolationPropCECaseHeavy violation_getCodeViolationPropCECaseHeavy(int vid) throws ViolationException, IntegrationException, SearchException{
+        PropertyCoordinator pc = getPropertyCoordinator();
+        CodeViolationPropCECaseHeavy cvpcdh = null;
+        if(vid != 0){
+            CodeViolation cv = violation_getCodeViolation(vid);
+            cvpcdh = new CodeViolationPropCECaseHeavy(cv);
+            
+        } else {
+            throw new ViolationException("Cannot construct a CodeViolationPropCECaseHeavy with violation ID of 0");
+        }
+        
+        return cvpcdh;
+        
+    }
+    
+    
 
     /**
      * Uses date fields on the populated CodeViolation to determine a status

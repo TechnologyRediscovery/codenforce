@@ -581,31 +581,12 @@
             <to-view-id>/restricted/cogstaff/code/codeGuideEntryAdd.xhtml</to-view-id>
             <redirect />
         </navigation-case>   
-
-        <navigation-case>
-            <from-outcome>codeSourceAddUpdate</from-outcome>
-            <to-view-id>/restricted/cogstaff/code/codeSourceAddUpdate.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-        
-        <navigation-case>
-            <from-outcome>codeElementList</from-outcome>
-            <to-view-id>/restricted/cogstaff/code/codeElementList.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>   
-        
-        <navigation-case>
-            <from-outcome>codeSourceManage</from-outcome>
-            <to-view-id>/restricted/cogstaff/code/codeSourceManage.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>   
         
         <navigation-case>
             <from-outcome>codeSetManage</from-outcome>
             <to-view-id>/restricted/cogstaff/code/codeSetManage.xhtml</to-view-id>
             <redirect />
         </navigation-case>
-        
         
         <navigation-case>
             <from-outcome>codeSetElementList</from-outcome>
@@ -614,30 +595,14 @@
         </navigation-case>
         
         <navigation-case>
-            <from-outcome>codeElementAdd</from-outcome>
-            <to-view-id>/restricted/cogstaff/code/codeElementAdd.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-        
-        
-        <navigation-case>
-            <from-outcome>codeElementUpdate</from-outcome>
-            <to-view-id>/restricted/cogstaff/code/codeElementUpdate.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-        
-        <navigation-case>
             <from-outcome>codeGuideLink</from-outcome>
             <to-view-id>/restricted/cogstaff/code/codeGuideLink.xhtml</to-view-id>
         </navigation-case>
-        
         
         <navigation-case>
             <from-outcome>codeElementManage</from-outcome>
             <to-view-id>/restricted/cogstaff/code/codeElementManage.xhtml</to-view-id>
         </navigation-case>
-        
-        
         
     </navigation-rule>    
 

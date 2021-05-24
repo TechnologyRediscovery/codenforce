@@ -433,7 +433,7 @@ public  class       CodeViolation
     
     protected String getStrElement(){
         StringBuilder sb = new StringBuilder();
-        sb.append("Done use toString()!");
+        sb.append("Dont use toString()!");
         return sb.toString();
         
     }
