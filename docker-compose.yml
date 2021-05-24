@@ -1,14 +1,14 @@
 version: "3.9"
 services:
-    db:
-      build: db
-      ports:
-        - "5432"
-    wildfly:
-        build: .
-        ports:
-          - "8080:8080"
-          - "9990:9990"
-          - "8787:8787"
-        depends_on:
-          - db
+  db:
+    build: db
+    ports:
+      - "5432:5432"
+  wildfly:
+    build: .
+    ports:
+      - "8080:8080"
+      - "9990:9990"
+      - "8787:8787"
+    depends_on:
+      - db
