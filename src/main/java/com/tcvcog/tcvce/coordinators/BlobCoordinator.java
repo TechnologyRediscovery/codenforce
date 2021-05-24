@@ -68,8 +68,10 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 /**
- *
- * @author noah
+ * Business logic and coordination tools for photos and docs, called BLOBS, 
+ * binary large objects
+ * 
+ * @author NADGIT
  */
 public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
@@ -125,7 +127,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
                         case PHOTO:
                             // TODO: Update to new UI:
                             // https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
-//                            sc = new DefaultStreamedContent.builder().new ByteArrayInputStream(bi.getBlobBytes(blob.getBytesID())));
+//                            sc = new DefaultStreamedContent.builder().new ByteArrayInputStream(bi.getBlobBytes(blob.getBytesID()));
                             break;
                         case PDF:
 //                            sc = new DefaultStreamedContent(new FileInputStream(new File("/home/noah/Documents/COG Project/codeconnect/src/main/webapp/images/pdf-icon.png")));
