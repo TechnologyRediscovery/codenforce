@@ -12,9 +12,29 @@ INSERT INTO public.icon(
 
 
 
--- RUN ON REMOTE UP TO HERE
 
 ALTER TABLE public.codeviolation ADD COLUMN bobsource_sourceid INTEGER CONSTRAINT codeviolation_bobsource_fk REFERENCES bobsource (sourceid);
+
+
+-- RUN ON REMOTE UP TO HERE
+
+CREATE TABLE public.cecasephotodoc
+(
+  photodoc_photodocid integer NOT NULL,
+  cecase_caseid integer NOT NULL,
+  CONSTRAINT cecasephotodoc_pk PRIMARY KEY ( photodoc_photodocid, cecase_caseid),
+  CONSTRAINT cecaseiolationphotodoc_cv_fk FOREIGN KEY (cecase_caseid)
+      REFERENCES public.cecase (caseid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cecasephotodoc_phdoc_fk FOREIGN KEY (photodoc_photodocid)
+      REFERENCES public.photodoc (photodocid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.codeviolationphotodoc
+  OWNER TO sylvia;
 
 -- RUN ON LOCAL BRAIN UP TO HERE`
 

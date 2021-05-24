@@ -1342,6 +1342,7 @@ gridTd-bignum{
 .link-button{
     display: inline-block;
     padding: 5px;
+    text-decoration: none;
     
 }
 

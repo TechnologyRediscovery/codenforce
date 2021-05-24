@@ -39,7 +39,7 @@ public class CECaseDataHeavy
     private List<MoneyCECaseFeeAssigned> feeList;
     private List<MoneyCECaseFeePayment> paymentList;
     
-    private List<Integer> blobIDList;
+    private List<BlobLight> blobList;
     
    
     public CECaseDataHeavy(CECase cse){
@@ -351,19 +351,7 @@ public class CECaseDataHeavy
         this.property = property;
     }
 
-    /**
-     * @return the blobIDList
-     */
-    public List<Integer> getBlobIDList() {
-        return blobIDList;
-    }
-
-    /**
-     * @param blobIDList the blobIDList to set
-     */
-    public void setBlobIDList(List<Integer> blobIDList) {
-        this.blobIDList = blobIDList;
-    }
+   
 
     @Override
     public boolean isOpen() {
@@ -379,6 +367,20 @@ public class CECaseDataHeavy
      */
     public List<CEActionRequest> getCeActionRequestList() {
         return ceActionRequestList;
+    }
+
+    /**
+     * @return the blobList
+     */
+    public List<BlobLight> getBlobList() {
+        return blobList;
+    }
+
+    /**
+     * @param blobList the blobList to set
+     */
+    public void setBlobList(List<BlobLight> blobList) {
+        this.blobList = blobList;
     }
 
 }

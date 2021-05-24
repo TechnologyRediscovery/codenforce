@@ -54,47 +54,70 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                         <div class="mainContainer">
                             <div class="page-links">
-                                <a href="#cecase-profile-panel">case profile</a>
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#cecase-profile-panel">case profile</a>
+                                </div>
                                 <h:outputText value=" | " />
-                                <a href="#cecase-violations-panel">
-                                    <h:outputText value="violations (#{ceCaseSearchProfileBB.currentCase.violationList.size()})" />
-                                </a>
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#cecase-violations-panel">
+                                        <h:outputText value="violations (#{ceCaseSearchProfileBB.currentCase.violationList.size()})" />
+                                    </a>
+                                </div>
                                 <h:outputText value=" | " />
-                                <a href="#cecase-notices-panel">
-                                    <h:outputText value="notices (#{ceCaseSearchProfileBB.currentCase.noticeList.size()})" />
-                                </a>
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#cecase-notices-panel">
+                                        <h:outputText value="notices (#{ceCaseSearchProfileBB.currentCase.noticeList.size()})" />
+                                    </a>
+                                </div>
                                 <h:outputText value=" | " />
-                                <a href="#cecase-citations-panel">
-                                    <h:outputText value="citations (#{ceCaseSearchProfileBB.currentCase.citationList.size()})" />
-                                </a>
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#cecase-citations-panel">
+                                        <h:outputText value="citations (#{ceCaseSearchProfileBB.currentCase.citationList.size()})" />
+                                    </a>
+                                </div>
                                 <h:outputText value=" | " />
-                                <a href="#cecase-events-panel">
-                                    <h:outputText value="events (#{ceCaseSearchProfileBB.currentCase.eventList.size()})" />
-                                </a>
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#cecase-events-panel">
+                                        <h:outputText value="events (#{ceCaseSearchProfileBB.currentCase.eventList.size()})" />
+                                    </a>
+                                </div>
                                 <h:outputText value=" | " />
-                                <a href="#cecase-cears-panel">
-                                    <h:outputText value="action requests (#{ceCaseSearchProfileBB.currentCase.ceActionRequestList.size()})" />
-                                </a>
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#cecase-cears-panel">
+                                        <h:outputText value="action requests (#{ceCaseSearchProfileBB.currentCase.ceActionRequestList.size()})" />
+                                    </a>
+                                </div>
                                 <h:outputText value=" | " />
-                                <a href="#cecase-blobs-panel">
-                                    <h:outputText value="photos &amp; blobs" />
-                                </a>
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#cecase-blobs-panel">
+                                        <h:outputText value="photos &amp; blobs" />
+                                    </a>
+                                </div>
                                 <h:outputText value=" | " />
-                                <a href="#cecase-fees-panel">
-                                    <h:outputText value="fees" />
-                                </a>
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#cecase-fees-panel">
+                                        <h:outputText value="fees" />
+                                    </a>
+                                </div>
                                 <h:outputText value=" | " />
-                                <a href="#cecase-payments-panel">
-                                    <h:outputText value="payments" />
-                                </a>
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#cecase-payments-panel">
+                                        <h:outputText value="payments" />
+                                    </a>
+                                </div>
                                 <h:outputText value=" | " />
-                                <a href="#cecase-notes-panel">
-                                    <h:outputText value="notes" />
-                                </a>
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#cecase-notes-panel">
+                                        <h:outputText value="notes" />
+                                    </a>
+                                </div>
                                 <h:outputText value=" | " />
-                                <a href="#cecase-public-panel">
-                                    <h:outputText value="public access" />
-                                </a>
+                                <div class="restrict-main-contents-io-link link-button">
+
+                                    <a href="#cecase-public-panel">
+                                        <h:outputText value="public access" />
+                                    </a>
+                                </div>
                             </div>
 
                             <div class="ui-g data_container_nested_restrict">
@@ -1032,22 +1055,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                              toggleable="true"
                                              collapsed="false"
                                              header="Files and Photos"
-                                             rendered="false"
+                                             rendered="true"
                                              >
 
                                         <h:form id="cecase-blobs-form">
 
-
                                             <p:commandButton    id="cecase-blob-add-button"
                                                                 ajax="false"
                                                                 styleClass="noFill button-size-small"
-                                                                action="#{ceCaseSearchProfileBB.onCitationAddButtonChange}"
+                                                                actionListener="#{ceCaseSearchProfileBB.onBlobAddButtonChange}"
+                                                                oncomplete="PF('case-blobs-dialog-var').show()"
                                                                 value="Add Photo or Doc"
                                                                 icon="fa fa-upload"
                                                                 />
 
                                             <p:spacer height="5px" />
-
 
                                             <p:dataTable
                                                 id="cecase-blobs-table"
@@ -4943,6 +4965,96 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 for="photo-updatedescr-button" />
 
                                     <p:commandButton   id="photo-updatedescr-button"
+                                                       rendered="true"
+                                                       value="Update Desc"  
+                                                       icon="fa fa-edit"
+                                                       ajax="true"
+                                                       update="messages-global-form"
+                                                       actionListener="#{ceCaseSearchProfileBB.onPhotoUpdateDescription(photo)}"
+                                                       />
+
+                                </p:column>
+
+                            </p:dataTable>
+
+                            <p:spacer height="10px"/>
+
+
+                        </h:form>
+
+                    </p:dialog>
+
+
+
+
+                    <p:dialog   id="case-blobs-dialog"
+                                height="800" width="1600"
+                                widgetVar="case-blobs-dialog-var"
+                                responsive="true"
+                                modal="true"
+                                resizable="trie"
+                                closable="true"
+                                closeOnEscape="true"
+                                header="Violation Photos"
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                > 
+
+                        <h:form id="case-blobs-start-form" enctype="multipart/form-data">
+                            <h2>Photos/Docs of this Case (3 max)</h2>
+                            
+                            <p:fileUpload 
+                                mode="advanced" 
+                                update="case-blobs-list-form:case-blobs-table"
+                                listener="#{ceCaseSearchProfileBB.handlePhotoUpload}"
+                                multiple="true"
+                                fileLimit="3"
+                                sizeLimit="99999999999" 
+                                allowTypes="/(\.|\/)(jpe?g|png|pdf|PDF)$/"
+                                rendered="true"/>    
+                        </h:form>
+
+                        <h:form id="case-blobs-list-form">
+                            <p:spacer height="10px"/>
+
+                            <h2>Review and describe uploaded photos</h2>
+                            <p:dataTable
+                                id="case-blobs-table"
+                                var="blob"
+                                value="#{ceCaseSearchProfileBB.currentViolation.blobList}"
+                                rowKey="#{blob.blobID}"
+                                tableStyleClass="primeDataTable"
+                                draggableRows="false" tabindex="6">
+                                <p:column width="70%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Photo/Doc"/>
+                                    </f:facet>
+                                    <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                        <f:param name="blobID" value="#{blob.blobID}"/>
+                                    </p:graphicImage>
+
+                                    <p:commandButton   id="case-blobs-delete-cb"
+                                                       rendered="true"
+                                                       value="Delete Photo"  
+                                                       icon="fa fa-eraser"
+                                                       ajax="true"
+                                                       update="messages-global-form"
+                                                       actionListener="#{ceCaseSearchProfileBB.onPhotoRemoveButtonChange(blob.blobID)}"
+                                                       />
+
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Description"/>
+                                    </f:facet>
+                                    <p:inputTextarea id="case-blob-desc" 
+                                                     value="#{blob.description}"
+                                                     style="width: 100%;" tabindex="5" required="true" styleClass="inputText">
+                                        <p:ajax />
+                                    </p:inputTextarea>
+                                    <p:growl    id="case-blobs-desc-growl"
+                                                for="photo-updatedescr-button" />
+
+                                    <p:commandButton   id="case-blobs-updatedescr-button"
                                                        rendered="true"
                                                        value="Update Desc"  
                                                        icon="fa fa-edit"

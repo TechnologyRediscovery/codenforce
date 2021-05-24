@@ -803,10 +803,14 @@ public class CECaseSearchProfileBB
         return "blobs";
         
     }
-    
-    public String onBlobAddButtonChange(){
-        
-        return "blobs";
+
+    /**
+     * Listener for user requests to start a file upload
+     * @param ev
+     */
+    public void onBlobAddButtonChange(ActionEvent ev){
+        // nothing to do here yet
+
     }
     
 

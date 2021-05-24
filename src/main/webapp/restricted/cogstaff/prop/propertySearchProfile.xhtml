@@ -22,13 +22,70 @@
 
                         <div class="mainContainer">
 
+                            
+                             <div class="page-links">
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#propinfo-panel-info">property info</a>
+                                </div>
+                                <h:outputText value=" | " />
+                                
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#prop-cases-panel">
+                                        <h:outputText value="code enf cases (#{propertySearchBB.currentProperty.ceCaseList.size()})" />
+                                    </a>
+                                </div>
+                                <h:outputText value=" | " />
+                                
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#prop-units-panel">
+                                        <h:outputText value="units (#{propertySearchBB.currentProperty.unitWithListsList.size()})" />
+                                    </a>
+                                </div>
+                                <h:outputText value=" | " />
+                                
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#prop-persons-panel">
+                                        <h:outputText value="persons (#{propertySearchBB.currentProperty.personList.size()})" />
+                                    </a>
+                                </div>
+                               
+                                <h:outputText value=" | " />
+                                
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#prop-events-panel">
+                                        <h:outputText value="events (#{propertySearchBB.currentProperty.completeEventList.size()})" />
+                                    </a>
+                                </div>
+                                <h:outputText value=" | " />
+                                
+                                
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#propinfo-notes-panel">notes</a>
+                                </div>
+                                <h:outputText value=" | " />
+                                
+                                
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#prop-blobs-panel">docs and photos</a>
+                                </div>
+                                <h:outputText value=" | " />
+                                
+                                
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#prop-extinfo-panel">external data</a>
+                                </div>
+                                
+                                
+                                
+                               
+                            </div>
+                            
+                            
                             <!-- DATA CONTAINER -->
                             <div class="ui-g data-container">
 
                                 <!-- LIST DATA CONTAINER --> 
-                                <div class="ui-g-12 ui-md-4 ui-lg-4 list-data-container">
-
-
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 list-data-container">
 
                                     <!-- PANEL CONTAINER -->
                                     <p:panel id="prop-search-query-panel"
@@ -315,7 +372,7 @@
                                 </div>
 
                                 <!-- OBJECT DATA CONTAINER --> 
-                                <div class="ui-g-12 ui-md-8 ui-lg-8 object-data-container">
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 object-data-container">
 
 
                                     <p:outputPanel id = "prop-lists-outpanel" >
@@ -801,6 +858,19 @@
 
                                         </p:panel>
 
+
+                                        <p:panel id="prop-blobs-panel"
+                                                 toggleable="true"
+                                                 widgetVar="prop-blobs-panel-var"
+                                                 collapsed="false"
+                                                 header="Docs and Photos"
+                                                 rendered="true">
+                                            <h:form id="prop-blobs-form">
+                                                
+                                                
+                                                
+                                            </h:form>
+                                        </p:panel>
 
                                         <p:panel id="prop-workflow-panel"
                                                  toggleable="true"

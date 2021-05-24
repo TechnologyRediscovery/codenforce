@@ -499,6 +499,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      * @return the blobID of the newly stored meta
      * @throws com.tcvcog.tcvce.domain.BlobTypeException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @deprecated 
      */
     public Blob storePDFBlob(Blob blob) throws IntegrationException, BlobTypeException{
         
@@ -1916,6 +1917,38 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Error inserting blob-CodeViolation link. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    /**
+     * Connects a blob to a CECase
+     * 
+     * @param blobID the ID of the blob to be linked
+     * @param target the ID of the violation the blob will be linked to.
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void linkBlobToCECase(int blobID, int target) throws IntegrationException {
+        
+        Connection con = getPostgresCon();
+        String query =  " INSERT INTO public.cecase(photodoc_photodocid, cecase_caseid)\n" +
+                        "    VALUES (?, ?);";
+        
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setInt(1, blobID);
+            stmt.setInt(2, target);
+            
+            System.out.println("BlobIntegrator.linkBlobToCECase| Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error inserting blob-cecase link. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
