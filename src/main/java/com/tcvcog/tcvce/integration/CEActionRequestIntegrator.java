@@ -298,12 +298,12 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         actionRequest.setPublicExternalNotes(rs.getString("publicexternalnotes"));
         actionRequest.setActive(rs.getBoolean("active"));
         
-        try{
-            List<Integer> blobIDs = bi.photosAttachedToRequest(actionRequest.getRequestID());
-            actionRequest.setBlobList(bc.getPhotoBlobLightList(blobIDs));
-        } catch(BlobException ex){
-            throw new IntegrationException("An error occurred while trying to retrieve blobs for a CEActionRequest", ex);
-        }
+//        try{
+//            List<Integer> blobIDs = bi.photosAttachedToRequest(actionRequest.getRequestID());
+//            actionRequest.setBlobList(bc.getPhotoBlobLightList(blobIDs));
+//        } catch(BlobException ex){
+//            throw new IntegrationException("An error occurred while trying to retrieve blobs for a CEActionRequest", ex);
+//        }
         return actionRequest;
     }
 
