@@ -17,7 +17,7 @@
 package com.tcvcog.tcvce.entities;
 
 /**
- *
+ * A fee that has been assigned to an OccPeriod
  * @author Nathan Dietz
  */
 public class MoneyOccPeriodFeeAssigned extends FeeAssigned {
@@ -35,7 +35,6 @@ public class MoneyOccPeriodFeeAssigned extends FeeAssigned {
         this.assignedFeeID = fee.assignedFeeID;
         this.domain = EventDomainEnum.OCCUPANCY;
         this.paymentList = fee.paymentList;
-        this.moneyFeeAssigned = fee.moneyFeeAssigned;
         this.assignedBy = fee.assignedBy;
         this.assigned = fee.assigned;
         this.waivedBy = fee.waivedBy;

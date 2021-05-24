@@ -144,7 +144,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="gray_button">
 
                                                         <p:commandButton ajax="true" 
-                                                                         actionListener="#{violationBB.onObjetViewButtonChange(violation)}"
+                                                                         actionListener="#{violationBB.onObjectViewButtonChange(violation)}"
                                                                          icon="#{violation.violationID == violationBB.currentViolation.violationID ? 'fa fa-hand-o-right':'fa fa-gavel'}"
                                                                          style="#{violation.violationID == violationBB.currentViolation.violationID ? 'background-color: #dee461; color:black; border:none;':''}"
                                                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
@@ -167,7 +167,341 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                 <div class="ui-g-12 ui-md-8 ui-lg-8 object-data-container">
                                 </div>
+<<<<<<< HEAD
                                    
+=======
+                            </div>
+                        </div>
+
+                    </p:outputPanel>
+
+
+                    <p:dialog   id="violation-choose-dialog"
+                                height="800" width="1600"
+                                widgetVar="violation-choose-dialog-var"
+                                responsive="true"
+                                resizable="trie"
+                                closable="true"
+                                closeOnEscape="true"
+                                header="Choose Violation"
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                > 
+
+                        <h:form id="violation-choose-form">
+
+                            <p:dataTable
+                                id="enforcableCodeSetElementTable"
+                                var="cse"
+                                value="#{violationBB.currentCodeSet.enfCodeElementList}"
+                                rowKey="#{cse.codeSetElementID}"
+                                tableStyleClass="primeDataTable"
+                                scrollable="true"
+                                resizableColumns="true"
+                                draggableColumns="true"
+                                rowExpandMode="single"
+                                filteredValue="#{violationBB.filteredElementList}"
+                                expandedRow="false"
+                                widgetVar="codeSetElementListTable">
+
+                                <p:column width="3%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Exp"/>
+                                    </f:facet>
+                                    <p:rowToggler/>
+                                </p:column>
+
+
+
+                                <p:column width="10%" sortBy="#{cse.source.sourceName}"
+                                          filterBy="#{cse.source.sourceName}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Source" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.source.sourceName}(#{cse.source.sourceYear})"/>
+                                </p:column>
+
+                                <p:column width="5%" 
+                                          sortBy="#{cse.ordchapterNo}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Chap#"/>
+                                    </f:facet>
+                                    <h:outputText value="#{cse.ordchapterNo}"/>
+                                </p:column>
+
+                                <p:column width="15%" sortBy="#{cse.ordchapterTitle}"
+                                          filterBy="#{cse.ordchapterTitle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Chapter"/>
+                                    </f:facet>
+                                    <h:outputText value="#{cse.ordchapterTitle}"/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{cse.ordSecNum}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sec#" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.ordSecNum}"/>
+                                </p:column>
+
+                                <p:column width="15%" sortBy="#{cse.ordSecTitle}"
+                                          filterBy="#{cse.ordSecTitle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Section" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.ordSecTitle}"/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{cse.ordSubSecNum}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sub#" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.ordSubSecNum}"/>
+                                </p:column>
+
+                                <p:column sortBy="#{cse.ordSubSecTitle}" 
+                                          filterBy="#{cse.ordSubSecTitle}"
+                                          width="15%">
+                                    <f:facet name="header">
+                                        <h:outputText value="SubSec. Title" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.ordSubSecTitle}"/>
+                                </p:column>
+
+                                <p:column width="10%" sortBy="#{cse.guideEntry.category}"
+                                          filterBy="#{cse.guideEntry.category}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.guideEntry.category}"/>
+                                </p:column>
+
+
+
+                                <p:column width="10%" sortBy="#{cse.guideEntry.subCategory}"
+                                          filterBy="#{cse.guideEntry.subCategory}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Action" />
+                                    </f:facet>
+
+
+
+
+                                    <p:commandButton   id="violation-select-button"
+                                                       ajax="true"
+                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                       value="Select"  
+                                                       icon="fa fa-sticky-note-o"
+                                                       actionListener="#{violationBB.onViolationSelectElementButtonChange(cse)}"
+                                                       oncomplete="PF('violation-choose-dialog-var').hide()"
+                                                       update="violation-add-form"/>
+
+
+                                </p:column>
+
+
+                                <p:rowExpansion>
+                                    <div class="outlinedBox">
+
+
+                                        <h2>Details</h2>
+                                        <h:outputText escape="false" value="Code element ID: #{cse.elementID}"/>
+
+                                        <h2>Enforceability Info</h2>
+                                        <h:panelGrid columns="4" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd, gridTd">
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Munimum Penalty"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="$#{cse.minPenalty}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Norm Penalty"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="$#{cse.normPenalty}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Maximum Penalty"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="$#{cse.maxPenalty}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Penalty Notes"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{cse.penaltyNotes}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Default days to comply"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{cse.normDaysToComply}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Compliance timeframe Notes"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{cse.daysToComplyNotes}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <f:facet name="footer">
+                                                <h:outputLabel styleClass="bold" value="Municipality specific implementation notes"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{cse.muniSpecificNotes}"/>
+                                                </div>
+                                            </f:facet>
+
+                                        </h:panelGrid>
+                                    </div>
+
+                                    <div class="outlinedBox">
+                                        <h2>Code Element Content</h2>
+
+                                        <h:outputLabel styleClass="bold" value="Technical Text"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{cse.ordTechnicalText}"/>
+                                        </div>
+
+                                        <p:spacer height="15px"/>
+
+                                        <h:outputLabel styleClass="bold" value="Human friendly text"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{cse.ordHumanFriendlyText}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+                                        <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{cse.guideEntry.enforcementGuidelines}"/>
+                                        </div>
+
+                                        <p:spacer height="15px"/>
+
+                                        <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{cse.guideEntry.inspectionGuidelines}"/>
+                                        </div>
+                                    </div>
+                                </p:rowExpansion>
+                            </p:dataTable>
+                        </h:form>
+
+                    </p:dialog>
+
+
+                    <p:dialog   id="violation-note-dialog"
+                                height="300" width="750"
+                                widgetVar="violation-note-dialog-var"
+                                closable="true"
+                                header="Note Builder"
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                >
+
+                        <h:form id="violation-note-form">
+
+
+                            <h:panelGrid columns="1"
+                                         columnClasses="gridTd, gridTd">
+
+                                <h:panelGroup>
+                                    <h:outputText styleClass="ui-label" value="Note text: "/>
+                                    <p:editor   id="violation-notes-editor"
+                                                value="#{violationBB.formNoteText}"
+                                                controls="bold italic underline strikethrough font size style color
+                                                bullets numbering center undo redo rule link removeformat"
+                                                width="400" required="false"
+                                                height="200"/>
+
+
+                                    <p:spacer height="5px" />
+                                    <p:commandButton    id="violation-note-button-cancel"
+                                                        ajax="true"  tabindex="27"
+                                                        value="Cancel"
+                                                        icon="fa fa-stop"
+                                                        immediate="true"
+                                                        onclick="PF('violation-note-dialog-var').hide()"
+                                                        />
+
+                                    <p:commandButton   id="violation-dialog-notes-button-addnote"
+                                                       ajax="false" 
+                                                       actionListener="#{violationBB.onNoteCommitButtonChange}"
+                                                       oncomplete="PF('violation-note-dialog-var').hide()"
+                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
+                                                       value="Attach Note"  
+                                                       styleClass="inline-button"
+                                                       icon="fa fa-sticky-note-o"
+                                                       update="violation-notes-form"/>
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+
+
+                    <p:confirmDialog message="Photos attached to violation #{violationBB.currentViolation.violationID}" 
+                                     severity="alert" widgetVar="photo-dialog"
+                                     closable="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}">
+
+                        <h:form id="photo-form">
+                            <p:scrollPanel style="width:1000px; height:400px" mode="native">
+                                <p:dataTable
+                                    id="photoTable"
+                                    var="blob"
+                                    value="#{violationBB.violationBlobList}"
+                                    rowKey="#{blob.blobID}"
+                                    tableStyleClass="primeDataTable"
+                                    draggableRows="false" tabindex="6">
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Manage"/>
+                                        </f:facet>
+                                        <p:commandButton ajax="true" 
+                                                         actionListener="#{violationBB.onPhotoRemoveButtonChange(blob.blobID)}"
+                                                         value="Delete" 
+                                                         icon="fa fa-bomb"
+                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                                         update=":photo-form:photoTable"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Photo"/>
+                                        </f:facet>
+                                        <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                            <f:param name="blobID" value="#{blob.blobID}"/>
+                                        </p:graphicImage>
+                                    </p:column>
+                                    <p:column width="20%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Description"/>
+                                        </f:facet>
+                                        <h:outputText escape="false" value="#{blob.description}"/>
+                                              
+                                    </p:column>
+                                </p:dataTable>
+                            </p:scrollPanel>
+                            <p:spacer height="15px"/>
+                            <p:commandButton ajax="true" 
+                                             value="Continue" 
+                                             update="violation-photos-form"
+                                             onclick="PF('photo-dialog').hide()"/>
+                        </h:form>
+                    </p:confirmDialog>
+
+>>>>>>> a01039519cc9dcdb19b4e1d3c77d944f30f6bf5c
 
                 </f:view>
             </ui:define>

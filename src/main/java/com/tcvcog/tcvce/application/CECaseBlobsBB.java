@@ -73,9 +73,7 @@ public  class       CECaseBlobsBB
                 | AuthorizationException
                 | BObStatusException
                 | BlobException
-                | ClassNotFoundException
                 | EventException
-                | IOException
                 | ViolationException ex) {
             System.out.println(ex);
         }

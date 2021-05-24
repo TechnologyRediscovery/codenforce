@@ -20,11 +20,11 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
- *
+ * A fee template that may be applied to an entity
  * @author Nathan Dietz
  */
 public class Fee extends BOb {
-    private int occupancyInspectionFeeID;
+    private int feeID;
     private Municipality muni;
 
     private String name;
@@ -40,17 +40,17 @@ public class Fee extends BOb {
     }
     
     /**
-     * @return the occupancyInspectionFeeID
+     * @return the feeID
      */
-    public int getOccupancyInspectionFeeID() {
-        return occupancyInspectionFeeID;
+    public int getFeeID() {
+        return feeID;
     }
 
     /**
-     * @param occupancyInspectionFeeID the occupancyInspectionFeeID to set
+     * @param feeID the feeID to set
      */
-    public void setOccupancyInspectionFeeID(int occupancyInspectionFeeID) {
-        this.occupancyInspectionFeeID = occupancyInspectionFeeID;
+    public void setFeeID(int feeID) {
+        this.feeID = feeID;
     }
 
     /**

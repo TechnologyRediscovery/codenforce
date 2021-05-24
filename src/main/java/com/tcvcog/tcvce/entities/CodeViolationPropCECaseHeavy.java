@@ -68,9 +68,10 @@ public  class       CodeViolationPropCECaseHeavy
     this.nullifiedTS = cv.nullifiedTS;
     this.nullifiedUser = cv.nullifiedUser;
     this.leagacyImport = cv.leagacyImport;
-    this.photoList = cv.photoList;
-    this.blobIDList = cv.blobIDList;
-    this.photoIDList = cv.photoIDList;
+    // TODO: address from NADGIT
+//    this.photoList = cv.photoList;
+//    this.blobIDList = cv.blobIDList;
+//    this.photoIDList = cv.photoIDList;
     this.blobList = cv.blobList;
     this.complianceTFExpiryPropID = cv.complianceTFExpiryPropID;
     this.complianceTFExpiryProp = cv.complianceTFExpiryProp;

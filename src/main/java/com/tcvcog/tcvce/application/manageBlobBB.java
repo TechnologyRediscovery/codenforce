@@ -49,7 +49,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
@@ -62,7 +61,7 @@ import javax.faces.context.FacesContext;
 public class manageBlobBB extends BackingBeanUtils implements Serializable{
     
     private static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
-     
+    
     private String currentMode;
      
     private List<BlobLight> blobList;
@@ -85,7 +84,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     private List<OccPeriod> connectedPeriods;
     private List<Property> connectedProperties;
     
-    private List<MetadataUI> metaList;
+    private List<MetadataUI> metaList; //A list of metadata tags for users to view
     
     //Files for updating blobs.
     private String newFilename;
@@ -111,7 +110,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
                 for (int idnum : blobIDs) {
                     blobList.add(bc.getPhotoBlobLight(idnum));
                 }
-        } catch (IntegrationException | ClassNotFoundException | IOException | NoSuchElementException | BlobTypeException ex) {
+        } catch (IntegrationException | BlobException ex) {
             System.out.println("manageBlobBB.initBean | ERROR: " + ex);
         }
     }
@@ -264,12 +263,11 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             switch (selectedBlob.getType()) {
                 case PDF:
                     externalContext.setResponseContentType("application/pdf");
-                    //PDF downloads not yet supported
-                    //blob = bc.getPDFBlob(selectedBlob.getBlobID())
+                    blob = bc.getPDFBlob(selectedBlob.getBlobID());
                     break;
 
                 case PHOTO:
-                    externalContext.setResponseContentType("image/" + bc.getFileExtension(selectedBlob.getFilename()));
+                    externalContext.setResponseContentType("image/" + BlobCoordinator.getFileExtension(selectedBlob.getFilename()));
                     blob = bc.getPhotoBlob(selectedBlob.getBlobID());
                     break;
 
@@ -279,7 +277,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             }
 
             if (blob != null) {
-                // Open file.
+                // Open file and prepare the response
                 input = new BufferedInputStream(new ByteArrayInputStream(blob.getBytes()));
 
                 externalContext.setResponseContentLength(blob.getBytes().length);
@@ -300,7 +298,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             } else {
                 throw new BlobException("BlobType not yet supported for download or blob failed to load.");
             }
-        } catch (IOException | ClassNotFoundException | IntegrationException | BlobException ex) {
+        } catch (IOException | IntegrationException | BlobException ex) {
             System.out.println("manageBlobBB.downloadSelectedBlob | " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -311,7 +309,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             if (input != null){  try { input.close(); } catch (IOException ex) { /* Ignore */ } }
         }
 
-        // Inform JSF that it doesn't need to handle response.
+        // Inform JSF that we are done using the response.
         facesContext.responseComplete();
     }
 
@@ -325,7 +323,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Found " + blobList.size() + " files matching your criteria!", ""));
-        } catch(ClassNotFoundException | IOException | IntegrationException | BlobTypeException ex){
+        } catch(IntegrationException | BlobException ex){
             System.out.println("manageBlobBB.executeQuery() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -336,11 +334,13 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     public void deleteSelectedBlob() {
 
         BlobCoordinator bc = getBlobCoordinator();
-        
-        if (selectedBlob.getType() == BlobType.PHOTO) {
             try {
 
-                bc.deletePhotoBlob(selectedBlob);
+                if (selectedBlob.getType() == BlobType.PHOTO) {
+                    bc.deletePhotoBlob(selectedBlob);
+                } else if (selectedBlob.getType() == BlobType.PDF) {
+                    bc.deletePDFBlob(selectedBlob);
+                }
 
                 //Setting blobID to 0 tells the reloadBlobs() method
                 //not to search for the blob after reloading.
@@ -365,11 +365,6 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
                                     + "Make sure that the file is not connected to any "
                                     + "other objects in the system before trying to delete it", ""));
             }
-        } else if (selectedBlob.getType() == BlobType.PDF) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Deleting PDFs is not yet supported", ""));
-        }
     }
     
     public void updateBlobFilename(){
@@ -388,7 +383,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully updated filename!", ""));
-        } catch(ClassNotFoundException | IOException | IntegrationException ex){
+        } catch(IOException | IntegrationException | BlobException  ex){
             //Rollback the filename
             selectedBlob.setFilename(originalName);
             System.out.println("manageBlobBB.updateBlobFilename() | ERROR: " + ex);
@@ -402,7 +397,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please end the file name with the file extension [" +
-                            bc.getFileExtension(originalName) +"]", ""));
+                            BlobCoordinator.getFileExtension(originalName) +"]", ""));
         }
         
     }
@@ -474,7 +469,8 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * Set the OccPeriod associated with the selected OccInspectedSpaceElement on the session bean and go to 
+     * Set the OccPeriod associated with the selected OccInspectedSpaceElement 
+     * on the session bean and go to occPeriodInspections.xhtml
      * @param input
      * @return 
      */
@@ -615,6 +611,26 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occurred while trying to remove the link!", ""));
+        }
+        
+    }
+    
+    /**
+     * Primefaces can't compare enums in EL. So, this translates the type to
+     * an integer value so it can make sure to render the correct elements.
+     * @return 
+     */
+    public int getSelectedBlobType(){
+        switch(selectedBlob.getType()){
+            case PHOTO:
+                return 0;  
+            
+            case PDF:
+                return 1;
+            
+            default:
+                //Invalid type
+                return -1;
         }
         
     }

@@ -20,7 +20,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 /**
- *
+ * A wrapper class that stores a CodeViolation that is stripped of all sensitive
+ * information.
+ * Look at the JavaDocs of the PublicInfoBundle Class for more information.
+ * 
  * @author Nathan Dietz
  */
 public class PublicInfoBundleCodeViolation extends PublicInfoBundle {
@@ -38,6 +41,11 @@ public class PublicInfoBundleCodeViolation extends PublicInfoBundle {
         return bundledViolation;
     }
 
+    /**
+     * Remove all sensitive data from the CodeViolation and set it in the
+     * bundledViolation field.
+     * @param input 
+     */
     public void setBundledViolation(CodeViolation input) {
         
         input.setNotes("*****");

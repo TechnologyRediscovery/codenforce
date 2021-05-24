@@ -100,6 +100,11 @@ public class PublicInfoBB extends BackingBeanUtils implements Serializable {
 
     }
 
+    /**
+     * Find all of the BObs associated with a given PACC, put them into
+     * PublicInfoBundles, and place them in the list for viewing.
+     * @return 
+     */
     public String submitPACC() {
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
         try {

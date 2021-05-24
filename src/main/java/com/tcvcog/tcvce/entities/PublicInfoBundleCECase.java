@@ -1,7 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) Technology Rediscovery LLC. 2020
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.tcvcog.tcvce.entities;
 
@@ -11,17 +22,17 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * An experimental structure that only exposes setters on the publicly released
- * members on a CEActionRequest object. The actual member variables don't exist:
- * only the getters that access the data in the actionRequest memvar;
+ * A wrapper class that stores a CECase that is stripped of all sensitive
+ * information.
+ * Look at the JavaDocs of the PublicInfoBundle Class for more information.
  *
- * @author sylvia
+ * @author Nathan Dietz
  */
 public class PublicInfoBundleCECase extends PublicInfoBundle{
 
     private CECase bundledCase;
-    private boolean paccEnabled;
 
+    //Stores lists of anonymized objects
     private List<PublicInfoBundleEventCnF> publicEventList;
     private List<PublicInfoBundleCodeViolation> violationList;
 
@@ -42,7 +53,6 @@ public class PublicInfoBundleCECase extends PublicInfoBundle{
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 89 * hash + (this.paccEnabled ? 1 : 0);
         hash = 89 * hash + Objects.hashCode(this.bundledCase);
         hash = 89 * hash + Objects.hashCode(this.mostRecentLoggedEvent);
         hash = 89 * hash + this.countNoticeLetters;
@@ -64,9 +74,6 @@ public class PublicInfoBundleCECase extends PublicInfoBundle{
         }
         final PublicInfoBundleCECase other = (PublicInfoBundleCECase) obj;
         if (this.bundledCase.equals(other.bundledCase)) {
-            return false;
-        }
-        if (this.paccEnabled != other.paccEnabled) {
             return false;
         }
         if (this.countNoticeLetters != other.countNoticeLetters) {
@@ -91,6 +98,11 @@ public class PublicInfoBundleCECase extends PublicInfoBundle{
         return bundledCase;
     }
 
+    /**
+     * Remove all sensitive data from the CECase and set it in the
+     * bundledCase field.
+     * @param input 
+     */
     public void setBundledCase(CECase input) {
 
         input.setPropertyID(0);
@@ -100,6 +112,8 @@ public class PublicInfoBundleCECase extends PublicInfoBundle{
 
         setPacc(input.getPublicControlCode());
 
+        //Also, count all the attached objects
+        
         if (input.getViolationList() != null) {
             countViolations = input.getViolationList().size();
         }
@@ -177,21 +191,6 @@ public class PublicInfoBundleCECase extends PublicInfoBundle{
     //************************************************
     //*******Code Enforcement case public data********
     //************************************************
-    /**
-     * @return the paccEnabled
-     */
-    @Override
-    public boolean isPaccEnabled() {
-        return paccEnabled;
-    }
-
-    /**
-     * @param paccEnabled the paccEnabled to set
-     */
-    @Override
-    public void setPaccEnabled(boolean paccEnabled) {
-        this.paccEnabled = paccEnabled;
-    }
 
     /**
      * @return the publicEventList

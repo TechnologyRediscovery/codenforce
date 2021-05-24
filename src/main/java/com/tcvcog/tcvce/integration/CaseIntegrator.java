@@ -23,9 +23,9 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECase;
@@ -44,6 +44,7 @@ import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CodeViolationPropCECaseHeavy;
 import com.tcvcog.tcvce.entities.search.SearchParamsCodeViolation;
+import com.tcvcog.tcvce.entities.BlobLight;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -51,7 +52,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.ZoneId;
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1314,14 +1314,19 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @param rs
      * @return
      * @throws SQLException
-     * @throws IntegrationException ////////////////////////////
+     * @throws IntegrationException
      */
-    private CodeViolation generateCodeViolationFromRS(ResultSet rs) throws SQLException, IntegrationException {
+    private CodeViolation generateCodeViolationFromRS(ResultSet rs) 
+            throws SQLException, 
+            IntegrationException
+            {
 
         CodeViolation v = new CodeViolation();
         CodeIntegrator ci = getCodeIntegrator();
         UserIntegrator ui = getUserIntegrator();
         WorkflowCoordinator wc = getWorkflowCoordinator();
+        BlobIntegrator bi = getBlobIntegrator();
+        BlobCoordinator bc = getBlobCoordinator();
         
         v.setViolationID(rs.getInt("violationid"));
         v.setViolatedEnfElement(ci.getEnforcableCodeElement(rs.getInt("codesetelement_elementid")));
@@ -1382,6 +1387,16 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             v.setNullifiedUser(ui.getUser(rs.getInt("nullifiedby")));
         } 
         
+        List<BlobLight> blobList = new ArrayList<>();
+        try {
+            for(int id : bi.photosAttachedToViolation(v.getViolationID())){
+                blobList.add(bc.getPhotoBlobLight(id));
+            }
+        } catch (BlobException ex){
+            throw new IntegrationException("An error occurred while retrieving blobs for a Code Violation", ex);
+        }
+        v.setBlobList(blobList);
+        
         return v;
     }
 
@@ -1389,9 +1404,10 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * Primary getter method for CodeViolation objects
      * @param violationID
      * @return
-     * @throws IntegrationException 
+     * @throws IntegrationException
      */
-    public CodeViolation getCodeViolation(int violationID) throws IntegrationException {
+    public CodeViolation getCodeViolation(int violationID) 
+            throws IntegrationException {
         String query = "SELECT violationid, codesetelement_elementid, cecase_caseid, dateofrecord, \n" +
                         "       entrytimestamp, stipulatedcompliancedate, actualcompliancedate, \n" +
                         "       penalty, description, notes, legacyimport, compliancetimestamp, \n" +
@@ -1472,6 +1488,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
     }
     
     /**
+<<<<<<< HEAD
      * TODO: NADGIT Fix the BlobList References
      * @param cv
      * @return
@@ -1511,8 +1528,9 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         return vBlobList;
     }
        /**
+=======
+>>>>>>> a01039519cc9dcdb19b4e1d3c77d944f30f6bf5c
      * Updates only the notes field on codeviolation table
-     
      * 
      * @param viol
      * @throws IntegrationException
@@ -1970,9 +1988,9 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
     }
     
-     public void novUpdateHeaderImage(PrintStyle ps, Blob blob) throws BObStatusException, IntegrationException{
-         if(ps == null || blob == null){
-             throw new BObStatusException("Cannot update header image with null print or blob");
+     public void novUpdateHeaderImage(PrintStyle ps) throws BObStatusException, IntegrationException{
+         if(ps == null || ps.getHeader_img_id() == 0){
+             throw new BObStatusException("Cannot update header image with null print or header_img_id == 0");
                      
          }
          
@@ -1987,7 +2005,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, blob.getBlobID());
+            stmt.setInt(1, ps.getHeader_img_id());
             stmt.setInt(2, ps.getStyleID());
             
             stmt.execute();
@@ -2006,9 +2024,10 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * Primary getter for the NOV object
      * @param noticeID
      * @return
-     * @throws IntegrationException 
+     * @throws IntegrationException
      */
-    public NoticeOfViolation novGet(int noticeID) throws IntegrationException {
+    public NoticeOfViolation novGet(int noticeID) 
+            throws IntegrationException{
         String query =  "SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
                         "       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
                         "       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
@@ -2117,9 +2136,11 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @param rs
      * @return
      * @throws SQLException
-     * @throws IntegrationException 
+     * @throws IntegrationException
      */
-    private NoticeOfViolation novGenerate(ResultSet rs) throws SQLException, IntegrationException {
+    private NoticeOfViolation novGenerate(ResultSet rs) 
+            throws SQLException, 
+            IntegrationException {
 //SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, 
 //       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, 
 //       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, 
@@ -2174,13 +2195,14 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
     }
     
     /**
-     * Looks up all of the CodeViolations assocaited with a given NOV
+     * Looks up all of the CodeViolations associated with a given NOV
      * and extracts their display properties stored in the linking DB's linking table
      * @param nov
      * @return
-     * @throws IntegrationException 
+     * @throws IntegrationException
      */
-    private NoticeOfViolation populateCodeViolations(NoticeOfViolation nov) throws IntegrationException{
+    private NoticeOfViolation populateCodeViolations(NoticeOfViolation nov) 
+            throws IntegrationException{
         String query =  "  SELECT noticeofviolation_noticeid, codeviolation_violationid, includeordtext, \n" +
                         "       includehumanfriendlyordtext, includeviolationphoto\n" +
                         "  FROM public.noticeofviolationcodeviolation WHERE noticeofviolation_noticeid = ?;";
@@ -2321,7 +2343,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      
     /**
      * Extracts all text blocks by a given category
-     * @param categoryID
+     * @param catID
      * @return
      * @throws IntegrationException 
      */
@@ -2396,7 +2418,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
          return ll;
      }
      
-       /**
+     /**
       * Extracts all text blocks associated with a given Muni
       * @param m
       * @return

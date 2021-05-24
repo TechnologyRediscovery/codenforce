@@ -305,7 +305,7 @@
                                                         var="o"
                                                         selectionMode="single"
                                                         selection="#{feeManagementBB.selectedAssignedFee.fee}"
-                                                        rowKey="#{o.occupancyInspectionFeeID}"
+                                                        rowKey="#{o.feeID}"
                                                         value="#{feeManagementBB.feeList}"
                                                         tableStyleClass="primeDataTable"
                                                         filteredValue="#{feeManagementBB.filteredFeeList}">
@@ -314,7 +314,7 @@
                                                             <f:facet name="header">
                                                                 <h:outputText value="ID" />
                                                             </f:facet>
-                                                            <h:outputText value="#{o.occupancyInspectionFeeID}"/>
+                                                            <h:outputText value="#{o.feeID}"/>
                                                         </p:column>
 
                                                         <p:column width="25%">
@@ -529,7 +529,7 @@
                                                         var="o"
                                                         selectionMode="single"
                                                         selection="#{feeManagementBB.selectedAssignedFee.fee}"
-                                                        rowKey="#{o.occupancyInspectionFeeID}"
+                                                        rowKey="#{o.feeID}"
                                                         value="#{feeManagementBB.feeList}"
                                                         tableStyleClass="primeDataTable"
                                                         filteredValue="#{feeManagementBB.filteredFeeList}">
@@ -538,7 +538,7 @@
                                                             <f:facet name="header">
                                                                 <h:outputText value="ID" />
                                                             </f:facet>
-                                                            <h:outputText value="#{o.occupancyInspectionFeeID}"/>
+                                                            <h:outputText value="#{o.feeID}"/>
                                                         </p:column>
 
                                                         <p:column width="25%">

@@ -21,7 +21,7 @@
 package com.tcvcog.tcvce.entities;
 
 /**
- *
+ * A fee that has been assigned to a CECase.
  * @author Nathan Dietz
  */
 public class MoneyCECaseFeeAssigned extends FeeAssigned{
@@ -39,7 +39,6 @@ public class MoneyCECaseFeeAssigned extends FeeAssigned{
         this.assignedFeeID = fee.assignedFeeID;
         this.domain = EventDomainEnum.CODE_ENFORCEMENT;
         this.paymentList = fee.paymentList;
-        this.moneyFeeAssigned = fee.moneyFeeAssigned;
         this.assignedBy = fee.assignedBy;
         this.assigned = fee.assigned;
         this.waivedBy = fee.waivedBy;

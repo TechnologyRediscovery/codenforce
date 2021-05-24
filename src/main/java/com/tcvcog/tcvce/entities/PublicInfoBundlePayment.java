@@ -19,13 +19,16 @@ package com.tcvcog.tcvce.entities;
 import java.time.LocalDateTime;
 
 /**
+ * A wrapper class that stores a Payment that is stripped of all sensitive
+ * information.
+ * Look at the JavaDocs of the PublicInfoBundle Class for more information.
  *
  * @author Nathan Dietz
  */
 public class PublicInfoBundlePayment extends PublicInfoBundle {
     
     private Payment bundledPayment;
-    private PublicInfoBundlePerson payer;
+    private PublicInfoBundlePerson payer; //Anonymized copy of the payer
     
     @Override
     public String toString(){
@@ -38,6 +41,11 @@ public class PublicInfoBundlePayment extends PublicInfoBundle {
         return bundledPayment;
     }
     
+    /**
+     * Remove all sensitive data from the Payment and set it in the
+     * bundledPayment field.
+     * @param input 
+     */
     public void setBundledPayment(Payment input) {
 
         input.setPayer(new Person());       

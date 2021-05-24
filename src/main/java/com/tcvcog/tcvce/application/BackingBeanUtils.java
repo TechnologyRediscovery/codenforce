@@ -57,6 +57,7 @@ import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.PDFCoordinator;
 import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -128,6 +129,7 @@ public class        BackingBeanUtils
     
     private BlobCoordinator blobCoordinator;
     private BlobIntegrator blobIntegrator;
+    private PDFCoordinator pdfCoordinator;
     
     // system 
     private SystemIntegrator systemIntegrator;
@@ -531,7 +533,7 @@ public class        BackingBeanUtils
      * @param input
      * @return
      */
-    public java.util.Date convertDate(LocalDateTime input){
+    public static java.util.Date convertDate(LocalDateTime input){
         Date utilDate = null;
         if(input != null){
            utilDate = Date.from(input.atZone(ZoneId.systemDefault()).toInstant());
@@ -545,7 +547,7 @@ public class        BackingBeanUtils
      * @param input
      * @return 
      */
-    public LocalDateTime convertDate(java.util.Date input){
+    public static LocalDateTime convertDate(java.util.Date input){
         LocalDateTime dateTime = null;
         if(input != null){
         dateTime = input.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -897,6 +899,24 @@ public class        BackingBeanUtils
         this.blobIntegrator = blobIntegrator;
     }
 
+    /**
+     * @return the pdfCoordinator
+     */
+    public PDFCoordinator getPDFCoordinator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{pdfCoordinator}", PDFCoordinator.class);
+        pdfCoordinator = (PDFCoordinator) ve.getValue(context.getELContext());
+        return pdfCoordinator;
+    }
+
+    /**
+     * @param pdfCoordinator the pdfCoordinator to set
+     */
+    public void setPDFCoordinator(PDFCoordinator pdfCoordinator) {
+        this.pdfCoordinator = pdfCoordinator;
+    }
+    
     /**
      * @return the muniCoordinator
      */

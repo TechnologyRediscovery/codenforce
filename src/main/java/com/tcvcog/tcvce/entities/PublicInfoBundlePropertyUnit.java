@@ -20,6 +20,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
+ * A wrapper class that stores a PropertyUnit that is stripped of all sensitive
+ * information.
+ * Look at the JavaDocs of the PublicInfoBundle Class for more information.
  *
  * @author Nathan Dietz
  */
@@ -37,7 +40,12 @@ public class PublicInfoBundlePropertyUnit extends PublicInfoBundle {
         return bundledUnit;
     }
     
-        public void setBundledUnit(PropertyUnit input) {
+    /**
+     * Remove all sensitive data from the PropertyUnit and set it in the
+     * bundledUnit field.
+     * @param input 
+     */
+    public void setBundledUnit(PropertyUnit input) {
         
         input.setRentalNotes("*****");
         input.setConditionIntensityClassID(0);

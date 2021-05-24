@@ -59,12 +59,9 @@ import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
-import com.tcvcog.tcvce.entities.search.QueryCECase;
-import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
@@ -984,7 +981,11 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      * @throws SearchException
      * @throws BObStatusException
      */
-    public EventCnFPropUnitCasePeriodHeavy export(PublicInfoBundleEventCnF input) throws IntegrationException, EventException, SearchException, BObStatusException {
+    public EventCnFPropUnitCasePeriodHeavy export(PublicInfoBundleEventCnF input) 
+            throws IntegrationException, 
+            EventException, 
+            SearchException, 
+            BObStatusException{
 
         EventCoordinator ec = getEventCoordinator();
         EventCnF unbundled = input.getBundledEvent();

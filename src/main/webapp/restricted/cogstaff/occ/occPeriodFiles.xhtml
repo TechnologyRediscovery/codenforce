@@ -29,9 +29,9 @@
                             <p:scrollPanel style="width:1000px; height:400px" mode="native">
                                 <p:dataTable
                                     id="photoTable"
-                                    var="photoid"
+                                    var="blob"
                                     value="#{occInspectionBB.currentInSpcEl.blobList}"
-                                    rowKey="#{photoid}"
+                                    rowKey="#{blob.blobID}"
                                     tableStyleClass="primeDataTable"
                                     draggableRows="false" tabindex="6">
                                     <p:column width="10%">
@@ -39,7 +39,7 @@
                                             <h:outputText value="Manage"/>
                                         </f:facet>
                                         <p:commandButton ajax="true"
-                                                         actionListener="#{caseProfileBB.deletePhoto(photoid)}"
+                                                         actionListener="#{caseProfileBB.deletePhoto(blob.blobID)}"
                                                          value="Delete"
                                                          icon="fa fa-bomb"
                                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
@@ -49,15 +49,15 @@
                                         <f:facet name="header">
                                             <h:outputText value="Photo"/>
                                         </f:facet>
-                                        <p:graphicImage width="100%" value="#{imageServices.image}">
-                                            <f:param name="photoID" value="#{photoid}"/>
+                                        <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                            <f:param name="blobID" value="#{blob.blobID}"/>
                                         </p:graphicImage>
                                     </p:column>
                                     <p:column width="20%">
                                         <f:facet name="header">
                                             <h:outputText value="Description"/>
                                         </f:facet>
-                                        <h:outputText escape="false" value="#{imageServices.getPhotograph(photoid).description}"/>
+                                        <h:outputText escape="false" value="#{blob.description}"/>
                                     </p:column>
                                 </p:dataTable>
                             </p:scrollPanel>

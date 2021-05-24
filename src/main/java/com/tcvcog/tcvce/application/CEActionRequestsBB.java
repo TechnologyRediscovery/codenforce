@@ -35,7 +35,6 @@ import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
-import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -801,26 +800,25 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
     }
 
     public void deletePhoto(int blobID) {
-        for (Integer bid : this.selectedRequest.getBlobIDList()) {
-            if (bid.compareTo(blobID) == 0) {
-                this.selectedRequest.getBlobIDList().remove(bid);
+        for (BlobLight blob : this.selectedRequest.getBlobList()) {
+            if (blobID == blob.getBlobID()) {
+                this.selectedRequest.getBlobList().remove(blob);
+
+                try {
+                    getBlobCoordinator().deletePhotoBlob(blob);
+                } catch (IntegrationException
+                        | AuthorizationException
+                        | BObStatusException
+                        | BlobException
+                        | EventException
+                        | ViolationException ex) {
+                    System.out.println(ex);
+                }
                 break;
+
             }
         }
-        
-        try {
-            BlobLight target = getBlobIntegrator().getPhotoBlobLight(blobID);
-            getBlobCoordinator().deletePhotoBlob(target);
-        } catch (IntegrationException 
-                | AuthorizationException 
-                | BObStatusException 
-                | BlobException 
-                | ClassNotFoundException 
-                | EventException 
-                | IOException 
-                | ViolationException ex) {
-            System.out.println(ex);
-        }
+
     }
 
     public void manageActionRequest(CEActionRequest req) {

@@ -465,11 +465,11 @@
                                                             widgetVar="datatable"
                                                             var="fee"
                                                             value="#{feeManagementBB.workingFeeList}"
-                                                            rowKey="#{fee.occupancyInspectionFeeID}"
+                                                            rowKey="#{fee.feeID}"
                                                             scrollable="true">                                         
 
                                                             <p:column headerText="Fee ID:">
-                                                                <h:outputText value="#{fee.occupancyInspectionFeeID}" />
+                                                                <h:outputText value="#{fee.feeID}"/>
                                                             </p:column>
 
                                                             <p:column headerText="Name:">
@@ -520,14 +520,14 @@
                                                             value="#{feeManagementBB.workingFeeList}"
                                                             selectionMode="single" tabindex="1"
                                                             selection="#{feeManagementBB.selectedWorkingFee}"
-                                                            rowKey="#{fee.occupancyInspectionFeeID}"
-                                                            editable="true" 
+                                                            rowKey="#{fee.feeID}"
+                                                            editable="true"
                                                             scrollable="true">                                         
 
                                                             <p:column headerText="Fee ID">
                                                                 <p:cellEditor>
-                                                                    <f:facet name="output"><h:outputText value="#{fee.occupancyInspectionFeeID}" /></f:facet>
-                                                                    <f:facet name="input"><h:outputText value="#{fee.occupancyInspectionFeeID}" /></f:facet>
+                                                                    <f:facet name="output"><h:outputText value="#{fee.feeID}" /></f:facet>
+                                                                    <f:facet name="input"><h:outputText value="#{fee.feeID}" /></f:facet>
                                                                 </p:cellEditor>
                                                             </p:column>
 
@@ -596,7 +596,7 @@
                                                             selectionMode="single"
                                                             selection="#{feeManagementBB.selectedFee}"
                                                             rowKey="#{o.occupancyInspectionFeeID}"
-                                                            value="#{feeManagementBB.allFees}"
+                                                            value="#feeID}"
                                                             tableStyleClass="primeDataTable"
                                                             filteredValue="#{feeManagementBB.filteredFeeList}"
                                                             scrollable="true">
@@ -605,7 +605,7 @@
                                                                 <h:outputText value="#{o.occupancyInspectionFeeID}"/>
                                                             </p:column>
 
-                                                            <p:column headerText="Municipality">
+            feeID                        <p:column headerText="Municipality">
                                                                 <h:outputText value="#{o.muni.muniName}"/>
                                                             </p:column>
 

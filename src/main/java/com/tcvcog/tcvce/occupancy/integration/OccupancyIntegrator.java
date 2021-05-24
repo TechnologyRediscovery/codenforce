@@ -522,39 +522,6 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
 
     /**
-     * Gets an Integer-coded list of blobs
-     *
-     * @param period
-     * @return
-     * @throws IntegrationException
-     */
-    public List<Integer> getBlobList(OccPeriod period) throws IntegrationException {
-        List<Integer> blobIDList = new ArrayList<>();
-        String query = "SELECT photodoc_photodocid, occperiod_periodid\n"
-                + "  FROM public.occperiodphotodoc WHERE occperiod_periodid=?;";
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, period.getPeriodID());
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                blobIDList.add(rs.getInt("photodoc_photodocid"));
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to build occ permit list", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        return blobIDList;
-
-    }
-
-    /**
      * TODO: Finish me!
      * @param opt
      * @throws IntegrationException 

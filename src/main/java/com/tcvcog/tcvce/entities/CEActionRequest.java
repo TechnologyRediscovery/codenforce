@@ -35,23 +35,8 @@ import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
  to an CEActionRequest to do with as they please (print, etc.)
  * @author Eric Darsow
  */
-public class CEActionRequest 
-        extends BOb 
-        implements Serializable, IFace_ActivatableBOB{
 
-    /**
-     * @return the blobIDList
-     */
-    public List<Integer> getBlobIDList() {
-        return blobIDList;
-    }
-
-    /**
-     * @param blobIDList the blobIDList to set
-     */
-    public void setBlobIDList(List<Integer> blobIDList) {
-        this.blobIDList = blobIDList;
-    }
+public class CEActionRequest extends BOb implements Serializable, IFace_BlobHolder{
     
     // requests no longer have a status--remove when fully updated
     // for the full case model
@@ -104,7 +89,7 @@ public class CEActionRequest
     // tables with the String values are selected
     
     // list of blob id's associated with this request
-    private List<Integer> blobIDList;
+    private List<BlobLight> blobList; //Replace with list of BlobLights 
     
     /**
      * Creates a new instance of ActionRequest
@@ -126,6 +111,21 @@ public class CEActionRequest
         this.requestID = requestID;
     }
 
+    /**
+     * @return the blobList
+     */
+    @Override
+    public List<BlobLight> getBlobList() {
+        return blobList;
+    }
+
+    /**
+     * @param blobList the blobList to set
+     */
+    @Override
+    public void setBlobList(List<BlobLight> blobList) {
+        this.blobList = blobList;
+    }
 
     /**
      * @return the addressOfConcern

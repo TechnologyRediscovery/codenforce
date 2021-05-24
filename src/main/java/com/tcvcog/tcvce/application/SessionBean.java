@@ -32,6 +32,7 @@ import com.tcvcog.tcvce.entities.occupancy.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -270,6 +271,7 @@ public class    SessionBean
     private List<PublicInfoBundlePerson> occPermitAttachedPersons;
     private PublicInfoBundlePerson occPermitApplicant;
     private PublicInfoBundlePerson occPermitPreferredContact;
+    private Map<String,PublicInfoBundlePropertyUnit> occPermitAlreadyApplied;
     
     //Fields only used internally
     private boolean unitDetermined;
@@ -1181,6 +1183,14 @@ public class    SessionBean
         this.occPermitAppActivePropUnit = occPermitAppActivePropUnit;
     }
 
+    public Map<String, PublicInfoBundlePropertyUnit> getOccPermitAlreadyApplied() {
+        return occPermitAlreadyApplied;
+    }
+
+    public void setOccPermitAlreadyApplied(Map<String, PublicInfoBundlePropertyUnit> occPermitAlreadyApplied) {
+        this.occPermitAlreadyApplied = occPermitAlreadyApplied;
+    }
+    
     /**
      * @return the occPermitAppActivePersonType
      */

@@ -1756,13 +1756,17 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    
-    
-    
     <managed-bean>
         <managed-bean-name>blobCoordinator</managed-bean-name>
         <description>Utility application-scoped bean for handling blob upload and download	</description>
         <managed-bean-class>com.tcvcog.tcvce.coordinators.BlobCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>pdfCoordinator</managed-bean-name>
+        <description>Utility application-scoped bean for assembling and reading PDFs</description>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.PDFCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
     

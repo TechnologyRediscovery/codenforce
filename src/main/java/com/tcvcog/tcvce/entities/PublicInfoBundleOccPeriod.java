@@ -21,6 +21,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
+ * A wrapper class that stores an OccPeriod that is stripped of all sensitive
+ * information.
+ * Look at the JavaDocs of the PublicInfoBundle Class for more information.
  *
  * @author Nathan Dietz
  */
@@ -28,6 +31,11 @@ public class PublicInfoBundleOccPeriod extends PublicInfoBundle {
 
     
     private OccPeriod bundledPeriod;
+    
+    //Below are some lists of anonymized objects attached to the OccPeriod
+    //As it has so many lists, PublicInfoBundleOccPeriod is a tad closer
+    //to an OccPeriodDataHeavy than an OccPeriod
+    
     private List<PublicInfoBundlePerson> personList;
     private List<PublicInfoBundleOccInspection> inspectionList;
     private List<PublicInfoBundleFeeAssigned> feeList;
@@ -43,6 +51,11 @@ public class PublicInfoBundleOccPeriod extends PublicInfoBundle {
         return bundledPeriod;
     }
     
+    /**
+     * Remove all sensitive data from the OccPeriod and set it in the
+     * bundledPeriod field.
+     * @param input 
+     */
     public void setBundledPeriod(OccPeriod input) {
         
         setCaseManager(input.getManager());

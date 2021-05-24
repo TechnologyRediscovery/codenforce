@@ -1714,18 +1714,21 @@ public class CECaseSearchProfileBB
      */
     public String onPhotoRemoveButtonChange(int photoid) {
         CaseCoordinator cc = getCaseCoordinator();
-        try {
-            cc.violation_removeLinkBlobToCodeViolation(getCurrentViolation(), photoid);
+//        try {
+//      TODO: Fix from NADGIT and PF10
+//            cc.violation_removeLinkBlobToCodeViolation(getCurrentViolation(), photoid);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Blob removed with ID " + photoid, ""));
-        } catch (BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Cannot remove photo yet: unsupported operation", ""));
-            
-        } 
+//        }
+//        
+//        catch (BObStatusException ex) {
+//            System.out.println(ex);
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                            "Cannot remove photo yet: unsupported operation", ""));
+//            
+//        } 
 
         // do something here
         return "ceCaseProfile";
@@ -1750,7 +1753,7 @@ public class CECaseSearchProfileBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Cannot update photo description", ""));
             
-        } catch (IOException | BlobTypeException | ClassNotFoundException ex) {
+        } catch (IOException | BlobTypeException | BlobException  ex) {
             System.out.println(ex);
         } 
         
