@@ -1,0 +1,1030 @@
+! [activeobjects] active objects WIP; pause for chart test
+ ! [aftercovid] Merge pull request #108 from TechnologyRediscovery/eventoverhaul
+  ! [authfinalpart] user WIP; pause for rebase testing
+   ! [authfinalpart_bak] user WIP; pause for rebase testing
+    ! [authfinalpart_bak2] user WIP; pause for rebase testing
+     ! [betawip_branchreorg] search WIP; DNB; but SearchCoord error free
+      ! [braddockdemo] rental registry public form building:
+       ! [casefinal] accidental events work on recovered
+        ! [cefacelift] stable CE facelift! Builds!
+         ! [charts] violation search stable
+          ! [elementupdate] element update complete: working codeelement and codebook manage pages!
+           ! [events] wrapping up events with wrap tweak
+            ! [finally-base] Merge branch 'authfinalpart' into postcorrupt-test
+             ! [frontend] prep for branch integration
+              ! [humanization] database overhaul WIP
+               ! [launch] citation working; violation WIP; pause for push to remote
+                ! [master] updated documentation links and user login working
+                 ! [novcollapse] wrap up of updates to NOV
+                  ! [novevents] NOV-based events WIP; pause for humanization
+                   ! [pagesep] build wrap up WIP; before marosco merge
+                    ! [personcollapse] collapsed property search profile working!
+                     ! [postcorrupt] initial commit after recovery from corruption sep2019
+                      ! [postcorrupt-test] Merge branch 'authfinalpart' into postcorrupt-test
+                       ! [postcorrupt-test-bakbeforeauthmerge] Fixed the problem activating and deactivating fee joins
+                        ! [ppmergetest] merged publicInfoUpgrade with eventOverhaul via recovered
+-------------------------
+         +                [charts] violation search stable
+         +                [charts^] violation search WIP: coordinator done!
+         +                [charts~2] aobs still buggy, pausing for violation search
+         +                [charts~3] active objects navbar ALPHA complete
+         +                [charts~4] starting panelgrid replacement with pf 10.0.0
++        +                [activeobjects] active objects WIP; pause for chart test
++        +                [activeobjects^] active objects wip
++        +                [activeobjects~2] active object UI overhaul WIP
++        +          +     [personcollapse] collapsed property search profile working!
++        +          +     [personcollapse^] personcollapse WIP--final debugging
+-        -          -     [personcollapse~2] Merge branch 'events' into recovered
++        + +        +     [events] wrapping up events with wrap tweak
++        + +        +     [events^] push for joanne
++        + +        +     [events~2] events migrated to dashboard and cecase profile
++        + +        +     [events~3] event migration to cecase complete--final testing needed with notifications
++        + +        +     [events~4] report stable
++       ++ +        +     [cefacelift] stable CE facelift! Builds!
++       ++ +        +     [cefacelift^] working CE facelift, some last bugs to weak on CECaseListLoad
++       ++ +        +     [cefacelift~2] cecase profile to single page WIP
++       ++ +        +     [cefacelift~3] dashboard upgrade and new CECase profile seach severance WIP
++        +          +     [personcollapse~3] internal howto WIP; pause for continued work on page collapse
++        +          +     [personcollapse~4] person resurrection for sean
++       ++++        +     [elementupdate] element update complete: working codeelement and codebook manage pages!
++       ++++        +     [elementupdate^] Builds--must run THROUGH PATCH 33.sql
++       ++++        +     [elementupdate~2] NADGIT blob  integration WIP
+-       ----        -     [elementupdate~3] Merge pull request #180 from TechnologyRediscovery/blobManagement
+-       ----        -     [elementupdate~3^2] Merge branch 'recovered' into blobManagement
++       ++++        +     [elementupdate~4] massive overhaul of enf code ele almost done: major functionality in place!
++       ++++        +     [elementupdate~5] Replaced CodeElement member on ECEs with references to its superclass: 330 replacements
++       ++++        +     [elementupdate~6] element add and update complete; starting in on default violation findings
++       ++++        +     [elementupdate~7] element consolidation WIP; need to wire integrator
++       ++++        +     [elementupdate~3^2^] Debugged manageBlob.xhtml. First iteration of blob management complete!
++       ++++        +     [elementupdate~3^2~2] Finished debugging the view and connections panels
++       ++++        +     [elementupdate~3^2~3] Finished debugging Info pane, added MetadataUI class for displaying metadata with fewer bugs.
++       ++++        +     [elementupdate~3^2~4] Debugging blob search. Added code to strip metadata of images that are already in the db.
++       ++++        +     [elementupdate~3^2~5] Debugging public blob issues
++       ++++        +     [elementupdate~3^2~6] Completed finishing touches on the manageBlob page: page filters blobs by muni and allows redirection to all connected BObs. Moving onto debugging.
++       ++++        +     [elementupdate~3^2~7] Finished the code for updating blob descriptors and the first pass for the XHTML. Working on finishing touches
++       ++++        +     [elementupdate~3^2~8] Finished functionality for removing all blob links and deleting photo blobs
++       ++++        +     [elementupdate~3^2~9] Completed integrator methods for removing links between photodocs and objects, finished BB methods for going to those objects.
++       ++++        +     [elementupdate~3^2~10] Added code to gather objects attached to a photodoc
++       ++++        +     [elementupdate~3^2~11] Finished the Info and Viewing panels for manageBlob.xhtml. Also implemented image downloads.
++       ++++        +     [elementupdate~3^2~12] Completed temporary blob search methods.
++       ++++        +     [elementupdate~3^2~13] Added method to convert between java.util.Date and LocalDateTime. Implemented across codebase
++       ++++        +     [elementupdate~3^2~14] Began work on blob management page
++       ++++        +     [elementupdate~3^2~15] Debugged Blob storage and display. Now metadata is stripped from Blobs and saved in a bytes field. Next is Blob Management page.
++       ++++        +     [elementupdate~3^2~16] Wrote code to extract and strip metadata from uploaded files. Stripping metadata is now broken, will debug.
++       ++++        +     [elementupdate~3^2~17] Finished most work on the integrator and coordinator. Blob validation is now centralized.
++       ++++        +     [elementupdate~3^2~18] Added blob metadata class and table
++       ++++        +     [elementupdate~3^2~19] Finished up using BlobLight in the integrator and coordinator, wrote SQL for blobbytes table
++       ++++        +     [elementupdate~3^2~20] Revamping BlobIntegrator to newer standards and to use BlobLight
++       ++++        +     [elementupdate~3^2~21] Started making the BlobLight object and implementing it in the codebase. Committing so I can view another branch
++       ++++        +     [elementupdate~3^2~22] Committing so I can move over to another branch
+              +           [humanization] database overhaul WIP
+              +           [humanization^] humanization WIP; linking table and roles WIP; dnb!
+              +           [humanization~2] humanization WIP; integration methods WIP; dnb!
+              +           [humanization~3] Humanization WIP; finished linking classes; starting integration methods
+              +           [humanization~4] humanization WIP: human integration WIP
++       ++++  +   + +     [novevents] NOV-based events WIP; pause for humanization
++       ++++  +   + +     [novevents^] pausing events to do NOV bug fix
++     + ++++  +   + +     [braddockdemo] rental registry public form building:
+-     - ----  -   - -     [braddockdemo^] Merge branch 'novcollapse' into recovered
++     + ++++  +  ++ +     [novcollapse] wrap up of updates to NOV
++     + ++++  +  ++ +     [novcollapse^] NOV upgrade complete
++     + ++++  +  ++ +     [novcollapse~2] nov update WIP
++     + ++++  +  ++ +     [novcollapse~3] working cecase report
++     + ++++  +  ++ +     [novcollapse~4] db patch33 WIP
++     + ++++  +  ++ +     [novcollapse~5] NOV WIP
++     + ++++  +  ++ +     [novcollapse~6] NOV tweaks with Sean on Fri
++     + ++++  +  ++ +     [novcollapse~7] code management overhaul WIP
+-     - ----  -   - -     [braddockdemo~2] merge conflict fix on eventBB conflict
++     + ++++  +   + +     [braddockdemo~2^2] externaldata rework
+-     - ----  -   - -     [braddockdemo~2^2^] Merge pull request #179 from TechnologyRediscovery/PACCInterface
+-     - ----  -   - -     [braddockdemo~2^2^^2] Merge branch 'recovered' into PACCInterface
++     + ++++  +   + +     [braddockdemo~2^2^^2^] Added fitting descriptions to public message events.
++     + ++++  +   + +     [braddockdemo~2^2^^2~2] Events are now created when a public user adds a message to a PublicInfoBundle. Might need to add notes to these events and make new category for them
++     + ++++  +   + +     [braddockdemo~2^2^^2~3] Debugged property search and now muni codes are attached to PACCs
++     + ++++  +   + +     [braddockdemo~2^2^^2~4] Finished occPaccView.xhtml and debugged the issue where CEARs wouldn't show up and public users could only search for properties in COG Land
++     + ++++  +   + +     [braddockdemo~2^2^^2~5] Working OccInspection PACC View
++     + ++++  +   + +     [braddockdemo~2^2^^2~6] Finished debugging. Awaiting occPaccView.xhtml OccInspection tab completion.
++     + ++++  +   + +     [braddockdemo~2^2^^2~7] Debugging PACC Interfaces
++     + ++++  +   + +     [braddockdemo~2^2^^2~8] Moving into the debugging and touch up stage of cePaccView.xhtml and occPaccView.xhtml
++     + ++++  +   + +     [braddockdemo~2^2^^2~9] Nearly finished the cePaccView, just need to filter out private events and then it's done.
++     + ++++  +   + +     [braddockdemo~2^2^^2~10] Finished Events List and did some debugging.
++     + ++++  +   + +     [braddockdemo~2^2^^2~11] Began work on the cePaccView interface
++     + ++++  +   + +     [braddockdemo~2^2^^2~12] preparing for dedicated PACC viewing pages
++     + ++++  +   + +     [braddockdemo~2^2^^2~13] created the PACC page for applications
+-     - ----  -   - -     [braddockdemo~2^2^^2~14] Merging OccApplication PACC changes
++     + ++++  +   + +     [braddockdemo~2^2^^2~14^2] Finished up work on OccPermitApplication PublicInfoBundles
++     + ++++  +   + +     [braddockdemo~2^2^^2~14^2^] Creating PublicInfo infrastructure for OccPermitApplications
++     + ++++  +   + +     [braddockdemo~2^2^^2~14^2~2] Adding the necessary fields to the OccPermitApplication for public access. Also added code that prevents duplicate PACCs
++     + ++++  +   + +     [braddockdemo~2^2^^2~15] Fixed issue #140. Committing so I can merge in another PACC branch.
++     + ++++  +  ++ +     [braddockdemo~3] incremental changes with Sean; early oct
++     + ++++  +  ++ +     [braddockdemo~4] working CE flow!
+-     - ----  -  -- -     [braddockdemo~5] merge conflicts changed after work on wrong branch
++     ++++++  +  ++ +     [casefinal] accidental events work on recovered
++     ++++++  +  ++ +     [casefinal^] published DB patch 31
+-     ------  -  -- -     [casefinal~2] Merge branch 'recovered' of https://github.com/TechnologyRediscovery/codenforce into recovered
+-     ------  -  -- -     [casefinal~2^2] Merge pull request #178 from TechnologyRediscovery/not_in_records_6
++     ++++++  +  ++ +     [casefinal~2^2^2] Questioned Tally's effectiveness.
++     ++++++  +  ++ +     [casefinal~2^2^2^] Refactored away underscores
++     ++++++  +  ++ +     [casefinal~2^2^2~2] Pickler -> anytype
++     ++++++  +  ++ +     [casefinal~2^2^2~3] Mocks hadn't been properly committed.
++     ++++++  +  ++ +     [casefinal~2^2^2~4] Pickler added to_json
+-     ------  -  -- -     [casefinal~2^2^2~5] Merge branch 'recovered' into not_in_records3
++     ++++++  +  ++ +     [casefinal~2^2^2~6] Fixed crash on test municipality
++     ++++++  +  ++ +     [casefinal~2^2^2~7] Wording
++     ++++++  +  ++ +     [casefinal~2^2^2~8] Clarified unit creation "if" statement
++     ++++++  +  ++ +     [casefinal~2^2^2~9] Added tests for parcel_not_in_wprdc_data
++     ++++++  +  ++ +     [casefinal~2^2^2~10] Grammar Fixes (Squash me)
++     ++++++  +  ++ +     [casefinal~2^2^2~11] New script API
++     ++++++  +  ++ +     [casefinal~2^2^2~12] Municipality.from_raw created
++     ++++++  +  ++ +     [casefinal~2^2^2~13] (WIP) constants.py -> common.py Municipality.
++     ++++++  +  ++ +     [casefinal~2^2^2~14] (WIP) Scraped raw muni
++     ++++++  +  ++ +     [casefinal~2^2^2~15] Dynamically mocks classes using ExitStack()
++     ++++++  +  ++ +     [casefinal~2^2^2~16] validate_county_response
++     ++++++  +  ++ +     [casefinal~2^2^2~17] (WIP) all_parids
++     ++++++  +  ++ +     [casefinal~2^2^2~18] Fixed name
+-     ------  -  -- -     [casefinal~2^2^2~19] Merge branch 'recovered' into not_in_records2
++     ++++++  +  ++ +     [casefinal~2^2^2~20] (WIP) all_parids
++     ++++++  +  ++ +     [casefinal~2^2^2~21] Refactored event name, got url
++     ++++++  +  ++ +     [casefinal~2^2^2~22] (WIP) ParcelNotInCountyPortal
++     + ++++  +  ++ +     [braddockdemo~6] events WIP, patch push with Snapper
+-     ------  -  -- -     [braddockdemo~7] merging UI updates and case final
++     ++++++  +  ++ +     [braddockdemo~7^2] events WIP; pause for merging
++     ++++++  +  ++ +     [braddockdemo~7^2^] working event insert
++     ++++++  +  ++ +     [braddockdemo~7^2~2] events WIP
++     ++++++  +  ++ +     [braddockdemo~7^2~3] working noticesgit add . wahoogit add .!
++     ++++++  +  ++ +     [braddockdemo~7^2~4] working NOV page!
++     ++++++  +  ++ +     [braddockdemo~7^2~5] pushed for Drew build process:
++     ++++++  +  ++ +     [braddockdemo~7^2~6] NOV upgrade WIP
++     ++++++  +  ++ +     [braddockdemo~7^2~7] Stable Violationsgit add .! wahooogit add .
++     ++++++  +  ++ +     [braddockdemo~7^2~8] violations overhaul quite nearly done! fancy UI upgrade
+-     ------  -  -- -     [braddockdemo~7^2~9] Merge branch 'recovered' into casefinal
++     ++++++  +  ++ +     [braddockdemo~7^2~10] tweaks
+-     ------  -  -- -     [braddockdemo~8] Merge remote-tracking branch 'origin/recovered' into recovered
+-     ------  -  -- -     [casefinal~2^2^] Merge pull request #177 from TechnologyRediscovery/UIUpdate20200829
++     ++++++  +  ++ +     [casefinal~2^2^^2] Finishing the confirmation dialog. Had some other issues to fix too.
++     ++++++  +  ++ +     [casefinal~2^2^^2^] Applying final polish, confirmation dialog still doesn't work.
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~16] No longer displays time in seconds
+-     ------  -  -- -     [braddockdemo~2^2^^2~17] Merge branch 'recovered' of https://github.com/TechnologyRediscovery/codenforce into recovered
+-     ------  -  -- -     [braddockdemo~2^2^^2~17^2] Merge pull request #173 from TechnologyRediscovery/UIUpdate20200829
++     ++++++  +  ++ +     [casefinal~2^2^^2~2] UI Update From TrailBlaze
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~18] Echo port number
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~19] Fixed fatal error (passing unit_id instead of prop_id)
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~20] General Python changes (#170)
+-     ------  -  -- -     [braddockdemo~2^2^^2~21] Merge pull request #167 from TechnologyRediscovery/changeOrdersQuickFixes
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~21^2] Solved issues where duplicate persons and units were being inserted, as well as an issue where duplicate change orders were being inserted.
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~21^2^] Fixed issue where unit rental notes where being wiped from the unit changes. Began work on fixing issue where units are inserted every time you apply for occupancy at the same prop
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~21^2~2] Fixed issues I found during the walkthrough, but found one with recording the rental notes of unit change orders. Will be fixed next commit
+-     ------  -  -- -     [braddockdemo~2^2^^2~22] Merge pull request #168 from TechnologyRediscovery/UIUpdateForMutilineData
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~22^2] Update UI for multi-line data
+-     ------  -  -- -     [braddockdemo~2^2^^2~23] Merge pull request #163 from TechnologyRediscovery/unittest_6
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~23^2] Deleted needless mock
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~23^2^] REGEX fix script
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~23^2~2] (WIP) "Changes" deprecated, now just details.old and details.new, set by details.unpack Changes.name instead found in subclasses of ParcelChangedEvent.brief_description Better typing, better comments Colorama statements exist in a single print statement instead of two.
+-     ------  -  -- -     [braddockdemo~2^2^^2~23^2~3] Merge remote-tracking branch 'refs/remotes/origin/recovered' into recovered
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~23^2~4] test_commit
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~23^2~5] Deleted _utils
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~23^2~6] Fixed merge
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~23^2~7] Reads from __version__
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~23^2~8] Reads from __version__
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~23^2~9] DifferentOwner event now shows the cleaned name instead of the result straight from the database. The method _clean_raw_name is no longer a protected method of the class OwnerName
+-     ------  -  -- -     [braddockdemo~2^2^^2~23^2~10] Merge branch 'fetch_id_or_create' into recovered
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~23^2~10^2] Dropped legacy errorcode files
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~23^2~10^2^] (WIP)  Just need to add the event category sql
+-     ------  -  -- -     [braddockdemo~2^2^^2~23^2~11] Merge branch 'recovered' of https://github.com/TechnologyRediscovery/codenforce into recovered
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~23^2~12] (WIP) ParcelNotInRecentRecords
++     ++++++  +  ++ +     [braddockdemo~2^2^^2~23^2~13] re-references pyparcel
++     ++++++  +  ++ +     [braddockdemo~9] fixed open case bug
+-     ------  -  -- -     [braddockdemo~10] merging in NADGIT's change orders
++     ++++++  +  ++ +     [braddockdemo~10^2] Fixed all the issues when submitting an occ permit application AND finished the person changes page
++     ++++++  +  ++ +     [braddockdemo~10^2^] Debugging the code that inserts person-occpermit links
++     ++++++  +  ++ +     [braddockdemo~10^2~2] Completed the person changes xhtml, still working on backend.
++     ++++++  +  ++ +     [braddockdemo~10^2~3] Completed the propertyUnitChanges.xhtml page.
++     ++++++  +  ++ +     [braddockdemo~10^2~4] Finishing AJAX and loading all the property unit changes on page startup
++     ++++++  +  ++ +     [braddockdemo~10^2~5] All elements added to propertyUnitChanges.xhtml, next step is Java and AJAX
++     ++++++  +  ++ +     [braddockdemo~10^2~6] Began work on property unit change orders page
+-     ------  -  -- -     [braddockdemo~11] Merge branch 'casefinal' into recovered
++     ++++++  +  ++ +     [braddockdemo~7^2~11] working cecase phase logic and help panels
++     ++++++  +  ++ +     [braddockdemo~7^2~12] cecase phase overhaul wip
+-     ------  -  -- -     [braddockdemo~7^2~13] fixed css conflicts on merge
++     ++++++  +  ++ +     [braddockdemo~7^2~14] Violations WIP
++     ++++++  +  ++ +     [braddockdemo~12] EventTriggers passing
+-     ------  -  -- -     [braddockdemo~13] Merge pull request #161 from TechnologyRediscovery/UIupdateFromTra
++     ++++++  +  ++ +     [braddockdemo~13^2] UI Update From Trailblaze
++     ++++++  +  ++ +     [braddockdemo~14] More tests, missing files recovered (#160)
++     ++++++  +  ++ +     [braddockdemo~15] mop up of external data java
++     ++++++  +  ++ +     [braddockdemo~16] RELEASE 29: Must run through dbpatch29.sql to run this version
++     ++++++  +  ++ +     [braddockdemo~17] final tweaks of cear stuff to reflect changes in case coordinator
+-     ------  -  -- -     [braddockdemo~18] completed merge conflict
++     ++++++  ++ ++ +     [launch] citation working; violation WIP; pause for push to remote
++     ++++++  ++ ++ +     [launch^] working citation page!
++     ++++++  ++ ++ +     [launch~2] working cecasesearchProfile.xhtml!
++     ++++++  ++ ++ +     [launch~3] cecase consolidation WIP; does not build
++     ++++++  ++ ++ +     [launch~4] stable property profile with person linking and unlinking; beg ce overhaul to chen&chen
+-     ------  -  -- -     [braddockdemo~19] Merge pull request #155 from TechnologyRediscovery/readme
++     ++++++  +  ++ +     [braddockdemo~19^2] Trimmed README
+-     ------  -  -- -     [braddockdemo~20] Merge pull request #157 from TechnologyRediscovery/backButtonFixes
++     ++++++  +  ++ +     [braddockdemo~10^2~7] Real quick fix to allow users to hit back even if they didn't fill anything out in the form
++     ++++++  +  ++ +     [braddockdemo~10^2~8] Public service back button implemented with some fixes, including issue #147.
+-     ------  -  -- -     [braddockdemo~21] Merge remote-tracking branch 'refs/remotes/origin/recovered' into recovered
+-     ------  -  -- -     [braddockdemo~10^2~9] Merge pull request #154 from TechnologyRediscovery/publicPageUIUpgrade
+-     ------  -  -- -     [braddockdemo~10^2~9^2] Merge branch 'recovered' into publicPageUIUpgrade
+-     ------  -  -- -     [braddockdemo~10^2~10] Merge pull request #152 from TechnologyRediscovery/cearOccRequestBackendUpgrades
+-     ------  -  -- -     [braddockdemo~10^2~10^2] Merge branch 'recovered' into cearOccRequestBackendUpgrades
+-     ------  -  -- -     [braddockdemo~10^2~11] Merge pull request #153 from TechnologyRediscovery/pyparcel
++     ++++++  +  ++ +     [braddockdemo~10^2~10^2^] OccPermitApplication person editing complete. Also finished notes panel - the whole occPermitApplications.xhtml page is complete!
++     ++++++  +  ++ +     [braddockdemo~10^2~10^2~2] Working on detecting changes in OccPermitApplication-Person links
++     ++++++  +  ++ +     [braddockdemo~10^2~10^2~3] added more backing code and debugged it
++     ++++++  +  ++ +     [braddockdemo~10^2~10^2~4] Nearly done debugging occPermitApplicationUnitList and started work on occApplicationChangePeople
++     ++++++  +  ++ +     [braddockdemo~10^2~10^2~5] Working on the Connections panel for Occ Permit Applications
++     ++++++  +  ++ +     [braddockdemo~10^2~10^2~6] Navstack quickfix and also renamed OccPermitManageBB to OccPermitApplicationManageBB to be more accurate
++     ++++++  +  ++ +     [braddockdemo~10^2~10^2~7] OccPermitApplications paths complete!
++     ++++++  +  ++ +     [braddockdemo~10^2~10^2~8] Created code to accept a permit and attach it to an occ Period, and added the occpermitapplicationpersons table
++     ++++++  +  ++ +     [braddockdemo~10^2~10^2~9] Completed work on invalidating and rejecting applications
++     ++++++  +  ++ +     [braddockdemo~10^2~10^2~10] Completing the search panel for occPermitApplications and fixing the public pages a little
++     ++++++  +  ++ +     [braddockdemo~10^2~10^2~11] Finishing up code for the side panel of the OccPermitApplications page
++     ++++++  +  ++ +     [braddockdemo~10^2~10^2~12] Setting stage for occupancy permit management
++     ++++++  +  ++ +     [braddockdemo~10^2~9^2^] Upgrade Public Page UI
+-     ------  -  -- -     [braddockdemo~22] parcelupdate renamed to PyParcel amended pipfile
++     ++++++  +  ++ +     [braddockdemo~10^2~11^2] Renamed to PyParcel
+-     ------  -  -- -     [braddockdemo~23] Merge pull request #151 from TechnologyRediscovery/tempbranch
+-     ------  -  -- -     [braddockdemo~23^2] Merge branch 'recovered' of https://github.com/TechnologyRediscovery/codenforce into recovered
+-     ------  -  -- -     [braddockdemo~24] Merge branch 'recovered' of https://github.com/TechnologyRediscovery/codenforce into recovered
++     ++++++  ++ ++ +     [braddockdemo~25] prop profile WIP; builds!
++     ++++++  ++ ++ +     [braddockdemo~26] working user updates; about to remove username change ability
++     ++++++  ++ ++ +     [braddockdemo~27] pushed patch 28 for SNAPPERS
++     ++++++  ++ ++ +     [braddockdemo~28] user updates WIP
++     ++++++  ++ ++ +     [braddockdemo~29] upgraded property search and info; builds!
++     ++++++  ++ ++ +     [braddockdemo~30] userConfig.xhtml loads
++     ++++++  ++ ++ +     [braddockdemo~31] beg debug of session load error
++     ++++++  ++ ++ +     [braddockdemo~32] userConfig.xhtml WIP; does NOT build;
++     ++++++  ++ ++ +     [braddockdemo~33] User auth overhaul WIP; about to make map methods
+-     ------  -- -- -     [braddockdemo~34] Merge branch 'recovered' into launch
++     ++++++  ++ ++ +     [braddockdemo~35] WIP: userConfig.xhtml; pause for new chen&chen
++     ++++++  ++ ++ +     [braddockdemo~36] bug quashing for server push 23-JUL-20 workingroup mtng
+-     ------  -- -- -     [braddockdemo~37] Merge branch 'recovered' into launch
++     ++++++  ++ ++ +     [braddockdemo~38] minor tweak to Prop Coor; getting bearings
++     ++++++  +  ++ +     [braddockdemo~23^2^] Skip tests if db connection could not be established.
++     ++++++  +  ++ +     [braddockdemo~23^2~2] Unittest (#150)
+-     ------  -- -- -     [braddockdemo~23^2~3] Merge pull request #145 from TechnologyRediscovery/UIUpgradeForCERequestPage
++     ++++++  ++ ++ +     [braddockdemo~23^2~3^2] UI Upgrade For Request Code Enforcement Action Page
+-     ------  -- -- -     [braddockdemo~23^2~4] Merge pull request #142 from TechnologyRediscovery/wkflfrontend
+-     ------  -- -- -     [braddockdemo~23^2~4^2] Merge branch 'recovered' into wkflfrontend
+-     ------  -- -- -     [braddockdemo~23^2~5] Merge pull request #138 from TechnologyRediscovery/tax_status
++     ++++++  ++ ++ +     [braddockdemo~23^2~5^2] Taxes now properly submit to database.
++     ++++++  ++ ++ +     [braddockdemo~23^2~5^2^] `taxstatus` table added, relevant files modified.
+-     ------  -- -- -     [braddockdemo~23^2~6] Merge pull request #139 from TechnologyRediscovery/cearOccRequestBackendUpgrades
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~13] Completed UI overhaul of ceActionRequests.xhtml
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~14] Finishing up work on CEActionRequests.xhtml. Search doesn't break but doesn't filter the results
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~15] Working on searches. Not really functional but builds.
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~16] Can now search requests, add new cases, attach to existing cases.
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~17] Began work on the CEAR backend
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~18] Got some CECase pages to load
+-     ------  -- -- -     [braddockdemo~23^2~7] Merge pull request #135 from TechnologyRediscovery/anti_db_cursor
++     ++++++  ++ ++ +     [braddockdemo~23^2~7^2] Removed deprecated files from __all__. Added __author/email__, still unused.
++     ++++++  ++ ++ +     [braddockdemo~23^2~7^2^] Updated README Todo: Look into Sphinx.
++     ++++++  ++ ++ +     [braddockdemo~23^2~7^2~2] Reverted custom db_cursor objects to regular db_connections and cursors.
+-     ------  -- -- -     [braddockdemo~23^2~8] Merge pull request #134 from TechnologyRediscovery/event_cleanup
+-     ------  -- -- -     [braddockdemo~23^2~8^2] Merge branch 'recovered' into event_cleanup
+-     ------  -- -- -     [braddockdemo~23^2~9] Merge pull request #133 from TechnologyRediscovery/scripts
++     ++++++  ++ ++ +     [braddockdemo~23^2~9^2] Launch day patch. Function reset sequences added.
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2^] CECase Sequence and ReadMe
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2~2] Events Refactoring
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2~3] (WIP) Event attributes no longer mirror columns
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2~4] (WIP) EventFlags -> EventDetails
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2~5] Refactored Property into its own file. __version__ added, but not used yet. _insert import changed to match other imports
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2~6] Changed parid and prop_id into attributes of Property
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2~7] Added an explanation of Parcel Changes to the readme.
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2~8] ParcelFlags -> Property, Flag -> Changes
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2~9] Commented out
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2~10] Refactored unused variable
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2~11] Refactored internal files with underscore.
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2~12] Readme pipenv and spelling
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2~13] Launch day patch. Function reset sequences added.
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2~14] Refactored insert map creation into _create.py (and added underscore to _create.py)
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2~15] Deleted todos
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2~16] Events refactored. Corresponding documentation improved.
++     ++++++  ++ ++ +     [braddockdemo~23^2~8^2~17] Moving to a new IDE.
++     ++++++  ++ ++ +     [braddockdemo~23^2~10] Delete .gitmodules
+-     ------  -- -- -     [braddockdemo~23^2~11] Merge pull request #130 from TechnologyRediscovery/script_fix
++     ++++++  ++ ++ +     [braddockdemo~23^2~11^2] Added launch day files
++     ++++++  ++ ++ +     [braddockdemo~23^2~11^2^] Deleted old files
++     ++++++  ++ ++ +     [braddockdemo~23^2~12] Restructured project to better fit in the CodeNForce system. Refactoring scripts into larger project
+-     ------  -- -- -     [braddockdemo~23^2~13] Merge pull request #126 from TechnologyRediscovery/CERequestCSSMessFix
++     ++++++  ++ ++ +     [braddockdemo~23^2~13^2] Just a quick fix to pretty up the CE Action Request interface
+-     ------  -- -- -     [braddockdemo~23^2~14] Merge pull request #127 from TechnologyRediscovery/snapper
++     ++++++  ++ ++ +     [braddockdemo~23^2~14^2] Integrating scripts git submodule into project
+-     ------  -- -- -     [braddockdemo~23^2~15] Merge pull request #125 from TechnologyRediscovery/publicPortalUpgradePhaseTwo
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~19] OccPermitApplication Workflow complete! Moving onto backend workflow
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~20] Almost done debugging the occPermitApplication flow. Confirmed that property unit backend works fine
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~21] Almost done debugging workflow.
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~22] More work on the OccApplication workflow, as well as a major upgrade to the ChangeOrder infrastructure. DOES NOT BUILD
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~23] Began debugging OccPermitApplication workflow
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~24] Completed the refactoring of the OccPermitApplication workflow. Builds and should work.
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~25] PublicInfoBundle overhaul on OccPermitApplicationBB.
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~26] Completing the CE Action Request workflow upgrade.
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~27] Completed converting most pages of the CE Action Request workflow to the new UI
+-     ------  -- -- -     [braddockdemo~10^2~10^2~28] Merge branch 'recovered' into publicPortalUpgradePhaseTwo Reconciling this branch with recovered to keep it up to date.
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~29] The old request code enforcment interface is up and running again!
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~30] Improving and trying to fix the photoUpload page
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~31] Fixing the describeConcern and chooseProperty pages
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~32] Initial streamlining of CEAR workflow
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~33] Implemented Eric's public user solution on the PublicInfoCoordinator
+-     ------  -- -- -     [braddockdemo~10^2~10^2~34] Merge branch 'recovered' into publicPortalUpgradePhaseTwo Updating this branch with Eric's public user fixes
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~35] Beginning fixes on the old public pages.
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~36] A bunch of quick fixes after reviewing my stuff from yesterday. And two nifty new methods on the PublicInfoBundle superclass!
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~37] Completed bundles for EventCnFs and CECases. Also made some JavaDocs to facelift the PublicInfoCoordinator
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~38] Finished everything but export method for PublicInfoBundlePropertyUnit
++     ++++++  ++ ++ +     [braddockdemo~23^2~4^2^] mop up from overhaul
++     ++++++  ++ ++ +     [braddockdemo~23^2~4^2~2] Builds after major user overhaul for UA-only rule
++     ++++++  ++ ++ +     [braddockdemo~23^2~4^2~3] UserAuth inheritance disaster start
++     ++++++  ++ ++ +     [braddockdemo~23^2~4^2~4] prop info page loads!
++     ++++++  ++ ++ +     [braddockdemo~23^2~4^2~5] prop page overhaul WIP
++     ++++++  ++ ++ +     [braddockdemo~23^2~4^2~6] beginning propInfo.xhtml to chen&cyhen
++     ++++++  ++ ++ +     [braddockdemo~39] EventRuleConfig debugging WIP; fixed event load errors; Session Builds!
+-     ------  -- -- -     [braddockdemo~40] merging in changes to create public user
++     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~34^2] DBPATCH RELEASE 27; public user creation infrastructure
++     ++++++  ++ ++ +     [braddockdemo~41] workflow pages WIP; pause for public user
+-     ------  -- -- -   - [ppmergetest] merged publicInfoUpgrade with eventOverhaul via recovered
++     ++++++  ++ ++ +   + [ppmergetest^2] Quick fix to paymentIntegrator to generate correct type of feeAssigned.
++     ++++++  ++ ++ +   + [ppmergetest^2^] Finalizing my work on the PublicInfoCoordinator thus far
++     ++++++  ++ ++ +   + [ppmergetest^2~2] Making a bundle for inspections, and all of its inner fields that need bundling
++     ++++++  ++ ++ +   + [ppmergetest^2~3] Fixes from code review
+-     ------  -- -- -   - [ppmergetest^2~4] Merge branch 'recovered' into publicPortalUpgrade
++     ++++++  ++ ++ +   + [ppmergetest^2~5] Finished work on PublicInfoBundleProperty and did what I could on PublicInfoBundleOccPeriod
++     ++++++  ++ ++ +   + [ppmergetest^2~6] Large strides in public info stuff. Changed some bundles and added two new ones. Property bundle is only just created though
++     ++++++  ++ ++ +   + [ppmergetest^2~7] Began work on Issue #98. Also remediated oversights from last commit
++     ++++++  ++ ++ +   + [ppmergetest^2~8] Finishing up work on issue #73. CECasePropertyUnitHeavy now has the proper fields and the coordinators have been updated to work with them.
++     ++++++  ++ ++ +   + [ppmergetest^] DBPATCH26 RELEASE; must run through dbpatch26.sql; session init success
+--    ------  -- -- -   - [aftercovid] Merge pull request #108 from TechnologyRediscovery/eventoverhaul
+--    ------  -- -- -   - [aftercovid^2] Merge branch 'recovered' into eventoverhaul
+--    ------  -- -- -   - [aftercovid^] Merge pull request #99 from TechnologyRediscovery/DataLabelUI
+++    ++++++  ++ ++ +   + [aftercovid^^2] UI Pattern For Data Label
+--    ------  -- -- -   - [aftercovid~2] Merge pull request #92 from TechnologyRediscovery/unitQuickFixes
+++    ++++++  ++ ++ +   + [aftercovid~2^2] Finished debugging the property unit interface.
+++    ++++++  ++ ++ +   + [aftercovid~2^2^] Debugging the PropertyUnit changes
+++    ++++++  ++ ++ +   + [aftercovid~2^2~2] Completed most changes to property units, pending debugging
+++    ++++++  ++ ++ +   + [aftercovid~2^2~3] Beginning work to fix up units stuff
+--    ------  -- -- -   - [aftercovid~3] Merge pull request #94 from TechnologyRediscovery/external_data
+++    ++++++  ++ ++ +   + [aftercovid~3^2] Deprecated files removed
+--    ------  -- -- -   - [aftercovid~4] Merge branch 'recovered' of https://github.com/TechnologyRediscovery/codenforce into recovered
+--    ------  -- -- -   - [aftercovid~4^2] Merge pull request #87 from TechnologyRediscovery/paymentsBackendUpdate
+--    ------  -- -- -   - [aftercovid~4^2^2] Merge branch 'recovered' into paymentsBackendUpdate
+--    ------  -- -- -   - [aftercovid~4^2^] Merge pull request #86 from TechnologyRediscovery/paymentsUIUpdate
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2^] Whoops! Forgot a few tweaks. It's all good now. Ready for pull request!
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~2] Completed FeeManagementBB. Both payment BBs use coordinator methods and DataHeavy objects now
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~3] Continued work on FeeManagementBB, corrected mistakes on PaymentCoordinator
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~4] Began migration of integration code from FeeManagementBB to various coordinators
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~5] Finished migrating integration code from PaymentBB to PaymentCoordinator
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~6] beginning work on Issue #43. PaymentsBB now uses OccPeriodDataHeavy and refreshFeeAssignedList has been updated
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~7] Migrated feeTypeManage.xhtml to the new UI, debugging and all. Issue #33 complete!
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~8] Finished paymentTypeManage.xhtml
+--    ------  -- -- -   - [aftercovid~4^2^2~9] Merge branch 'recovered' of https://github.com/TechnologyRediscovery/codenforce into paymentsUIUpdate
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~10] Finished feePermissions.xhtml, including debugging
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~11] Began work on feePermissions.xhtml. Finished sidebar
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~12] Finished debugging paymentManage.xhtml
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~13] Forgot to debug the CE Cases side of feeManage.xhtml. It's done now though!
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~14] Finished debugging feeManage.xhtml
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~15] Debugging feeManage.xhtml
+--    ------  -- -- -   - [aftercovid~4^2^2~16] Resolving conflicts between local branch and latest recovered commit
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~17] Completed converting paymentManage.xhtml to new UI
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~18] Beginning the UI Update for paymentManage.xhtml
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~19] completed converting feeManage.xhtml to the new UI
+--    ------  -- -- -   - [aftercovid~4^2^2~20] Fixing conflicts for the mid-fix of the paymentsPostRecovery merge
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~21] Little bits of debugging BB and marking methods for cannibalization
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~22] Inserted all the necessary elements into FeeManageTemp.xhtml
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~23] beginning UI update for feeManage.xhtml
+--    ------  -- -- -   - [aftercovid~4^2^2~24] Merge remote-tracking branch 'origin/recovered' into paymentsUIUpdate
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~25] EventDomainEnum.java needed to be committed when I made this branch, I don't know why
+++    ++++++  ++ ++ +   + [aftercovid~5] Complete refactoring of snapper's_scripts into scripts
+++    ++++++  ++ ++ +   + [aftercovid~6] Update script now checks if previous data was different and creates an event if it is. unitzero changed to default unit. new eventcategory added to db patches
+++    ++++++  ++ ++ +   + [aftercovid~7] write_data_to_propertyexternaldata finished get_db_and_cursor (formally get_cursor) fixed: previous version didn't allow you to commit to the database. with get_db_and_cursor called in main, rather than repeatedly in individual functions drop_property_and_persons updated to reflect inserts into propertyexternaldata
+++    ++++++  ++ ++ +   + [aftercovid~8] get_county_property_assessment now returns 3 pages' html. create_insertmap_from_html has been both updated and refactored to reflect this change. _create_insertmap created to dramatically cut down code reuse. get_county_property_assesment has been moved from scraping_and_parsing to update_script. scraping_and_parsing is now just parsing.
+++    ++++++  ++ ++ +   + [aftercovid~9] extract_info_from_html Auxiliary now called Util
+++    ++++++  ++ ++ +   + [aftercovid~10] extract_owner_name copied over Exceptions given own package
+++    ++++++  ++ ++ +   + [aftercovid~11] get_county_property_assessment copied and refactored ask_database_for_parcelids now correctly returns both a property_id and a parcel_id
+++    ++++++  ++ ++ +   + [aftercovid~12] Auxiliary function/context manager get_cursor() created. ask_database_for_parcelids() implmented. Functions in the skeleton of update_script.py fleshed out to be filled in later.
+++    ++++++  ++ ++ +   + [aftercovid~13] create_ce_case added to insertPropDataFromCntyUsingParid.py cecase deletion to drop_property_and_persons.sql Began first draft of update_script.py
+++    ++++++  ++ ++ +   + [aftercovid~14] Creation of snapper's_scripts for maintaing a more organized workflow.
+++    ++++++  ++ ++ +   + [aftercovid~15] Needless raising of exception removed
+++    ++++++  ++ ++ +   + [aftercovid~16] Deletion script typo fixed.
+++    ++++++  ++ ++ +   + [aftercovid~17] The script now fetches IDs using the "RETURNING" SQL statement. Updated droppropdata.sql accordingly
+++    ++++++  ++ ++ +   + [aftercovid~18] Automatic propertyid_seq used. Refactored extract_and_insert_property into a function.
+++    ++++++  ++ ++ +   + [aftercovid~19] Context Manager moved to inside insert_property_basetableinfo instead of main.
+++    ++++++  ++ ++ +   + [aftercovid~20] Doesn't get db_connection multiple times. Why did it do this before? I don't understand.
+++    ++++++  ++ ++ +   + [aftercovid~21] Created sequence sql
+++    ++++++  ++ ++ +   + [aftercovid~22] Added SQL codes to create error tables.
+++    ++++++  ++ ++ +   + [aftercovid~23] Better commenting. Blacked.
+++    ++++++  ++ ++ +   + [aftercovid~24] Refactored MalformedAddressError
+++    ++++++  ++ ++ +   + [aftercovid~25] Basic error codes and error code validation added
+++    ++++++  ++ ++ +   + [aftercovid~26] Fixed exception docstrings
+++    ++++++  ++ ++ +   + [aftercovid~27] log_error
+++    ++++++  ++ ++ +   + [aftercovid~28] Fixed super() usage error
+++    ++++++  ++ ++ +   + [aftercovid~29] Working logging functionality? TODO: Move logging into error creation rather than main script.
+++    ++++++  ++ ++ +   + [aftercovid~30] Formatted with Black As we are on Python 3.5, the code is copied and pasted into an online Black formatter. Black formatting will likely not be kept up to date.
+++    ++++++  ++ ++ +   + [aftercovid~31] Encapsulated the main work loop of insert_prop_basetable_info with a custom exception class.
+++    ++++++  ++ ++ +   + [aftercovid~32] Created _exceptions.py Replaced a single except Exception, more to come later
+++    ++++++  ++ ++ +   + [aftercovid~33] Refactored Global variable initialization into separate function.
+++    ++++++  ++ ++ +   + [aftercovid~34] Temporary Commit in case everything breaks later. Did GitIgnore work properly?
+++    ++++++  ++ ++ +   + [aftercovid^2^] patch26 release; session loads, not much else
+++    ++++++  ++ ++ +   + [aftercovid^2~2] Session loads after eventoverhaul; going to merge
+++    ++++++  ++ ++ +   + [aftercovid^2~3] event overhaul WIP; DOES build; starting in on xhtml
+++    ++++++  ++ ++ +   + [aftercovid^2~4] Tightened up WorkflowIntegrator and WorkflowCoordindator; DNBuild
+++    ++++++  ++ ++ +   + [aftercovid^2~5] collapsed ViolationIntegrator and CitationIntegrator into CaseIntegrator
+++    ++++++  ++ ++ +   + [aftercovid^2~6] Unified event coordinator processing chain WIP; DNB
+++    ++++++  ++ ++ +   + [aftercovid^2~7] workflow overhaul WIP; DNBld
+++    ++++++  ++ ++ +   + [aftercovid^2~8] events overhaul WIP; event deltas in dbpatch26; DNBld
+++    ++++++  ++ ++ +   + [aftercovid^2~9] tweaked munimanageBB to match abbrev of getSsessionXXX() to getSessXXX()
+--    ------  -- -- -   - [aftercovid^2~10] Merge branch 'recovered' into aftercovid
+--    ------  -- -- -   - [aftercovid~4^2~2] Merge branch 'recovered' of https://github.com/TechnologyRediscovery/codenforce into recovered
+--    ------  -- -- -   - [aftercovid^^2^] Merge pull request #50 from TechnologyRediscovery/muniUI
+--    ------  -- -- -   - [aftercovid^^2^^2] Merge branch 'recovered' into muniUI
+--    ------  -- -- -   - [aftercovid^^2~2] Merge pull request #85 from TechnologyRediscovery/newNavBar
+++    ++++++  ++ ++ +   + [aftercovid^^2~2^2] fix navigation bar issue
+++    ++++++  ++ ++ +   + [aftercovid^^2^^2^] Remove Hardcode and Create Structure in MunicipalityCoordinator
+++    ++++++  ++ ++ +   + [aftercovid~4^2~3] tweaked patch 26 to include eventcat for ext data
+++    ++++++  ++ ++ +   + [aftercovid^2~11] events WIP; stashish for merging NADGITs PR
+++    ++++++  ++ ++ +   + [aftercovid^2~12] occ workflow working; prior to event page unification
+++    ++++++  ++ ++ +   + [aftercovid^2~13] beta prep WIP
+++    ++++++  ++ ++ +   + [aftercovid^2~14] added NADGIT's payment changes to dbpatch26
+++    ++++++  ++ ++ +   + [aftercovid^2~15] BUILDS; new UI and payments integrated
+++    ++++++  ++ ++ +   + [aftercovid^2~16] BUILDS; post COVID mess
+++    ++++++  ++ ++ +   + [aftercovid^2~17] workflow WIP; NADGIT conference
+--    ------  -- -- -   - [aftercovid^2~18] messy merge of NADGIT's fee stuff beg of summer; still have debugging left; DoesNOTbuild
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2] NavigationStack implementation
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2^] Finishing up autoassignment and making waive fee button
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~2] Completing fee autoassignment
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~3] Finishing up testing and beginnin work on autoassigning fees
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~4] Debugging assigned fee deletion
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~5] Debugged issue with loading violationList fees. Now debugging the whole interface
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~6] Payment insertion complete. Now beginning to test and debug the whole Fee-Payment life cycle
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~7] getting CE Case Payments to load
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~8] Beginning preliminary work on the backing bean
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~9] Completing Fee Permissions, now moving on to payments
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~10] Completed debugging the feePermissions page and did some reformatting
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~11] feePermissions debugging: fixing broken column references.
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~12] Finished code for editing CECase fee permissions + code cleanup
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~13] Beginning work on fee permissions so I can finish my work on code violations
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~14] Editing UI and updating backing bean methods for inserting and editing fees. CodeSetElement was deleted because it's equivalent to EnforceableCodeElement
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~15] Backend work for occ-ce assigned fee compatibility
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~16] Added a page where a user can view a CE Case's fees and payments, then redirect them to the management pages
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~17] Payment interface has been restored to its former glory, with the addition of FeeAssigned polymorphism!
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~18] MoneyOccperiodFeeAssigneds can now wrap too!
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~19] Implemented wrapping for FeeAssigned generation, updated CECaseFeeAssigned integration. Can't compile
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~20] Apparently I edited a file. Pretty much nothing changed and I must commit before checkout so
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~21] Cleaning up after debugging
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~22] Removing the now unnecessary occ inspection ID field from the payment object
+++    ++++++  ++ ++ +   + [aftercovid^2~18^2~23] Initial fixes to Payment Integrator
+--    ------  -- -- -   - [aftercovid^2~19] resolving css conflicts from pull from origin
+--    ------  -- -- -   - [aftercovid^2~19^2] Merge pull request #22 from TechnologyRediscovery/loginpage
+++    ++++++  ++ ++ +   + [aftercovid^2~19^2^2] login page upgrade
+--    ------  -- -- -   - [aftercovid^2~20] merge in of muniUI from Xiaohong and Sitian
+++    ++++++  ++ ++ +   + [aftercovid^^2^^2~2] muniUI
+--    ------  -- -- -   - [aftercovid^2~21] Merge branch 'recovered' of https://github.com/TechnologyRediscovery/codenforce into recovered
+--    ------  -- -- -   - [aftercovid~35] Merge pull request #25 from TechnologyRediscovery/propinfo
+++    ++++++  ++ ++ +   + [aftercovid~35^2] front end mostly done for prop info- still need to get updating working for external data
+++    ++++++  ++ ++ +   + [aftercovid~35^2^] got most of the property info stuff working.  now on to the external data integrator stuff
+++    ++++++ +++ ++ +   + [frontend] prep for branch integration
+++    ++++++ +++ ++ +   + [frontend^] proposalEventRule reorg WIP
+++    ++++++ +++ ++ +   + [frontend~2] event final pass WIP
+++    ++++++ +++ ++ +   + [frontend~3] event search WIP
+++    ++++++ +++ ++ +   + [frontend~4] working person search and occ search
+++    ++++++ +++ ++ +   + [frontend~5] working occ period search
+++    ++++++ +++ ++ +   + [frontend~6] occ period search WIP; before active fix
+++    ++++++ +++ ++ +   + [frontend~7] solidified occ period workflow page
+++    ++++++ +++ ++ +   + [frontend~8] property unit add and display bug fixed
+++    ++++++ +++ ++ +   + [frontend~9] updated property search with reset buttons; still have bugs in query switching
+++    ++++++ +++ ++ +   + [frontend~10] backup demo on python 2
+++    ++++++ +++ ++ +   + [frontend~11] person search page loads, with bugs
+++    ++++++ +++ ++ +   + [frontend~12] person reorg WIP; dnb
+++    ++++++ +++ ++ +   + [frontend~13] faces-config overhaul and session into sess
+++    ++++++ +++ ++ +   + [aftercovid~36] front end WIP
+++    ++++++ +++ ++ +   + [aftercovid~37] fixed concurrent mod ex
+++    ++++++ +++ ++ +   + [aftercovid~38] patch tracking inserts
+--    ------ --- -- -   - [aftercovid~39] Merge pull request #21 from TechnologyRediscovery/navigationbarissue
+--    ------ --- -- -   - [aftercovid~39^2] Merge branch 'recovered' into navigationbarissue
+++    ++++++ +++ ++ +   + [aftercovid~40] switch user WIP, ready for patch 24 and 25
+++    ++++++ +++ ++ +   + [aftercovid~41] all property sub-pages load, persons not coming up, insert not tested
+++    ++++++ +++ ++ +   + [aftercovid~42] functional property search
+--    ------ --- -- -   - [aftercovid~43] Merge branch 'recovered' of https://github.com/TechnologyRediscovery/codenforce into tminus13
+--    ------ --- -- -   - [aftercovid~43^2] Merge pull request #20 from TechnologyRediscovery/navigationbarissue
+++    ++++++ +++ ++ +   + [aftercovid~44] builds-all subsystems loading
+++    ++++++ +++ ++ +   + [aftercovid~45] search params final pass WIP
+++    ++++++ +++ ++ +   + [aftercovid~46] done with integrator search method revision; ready for faces
+++    ++++++ +++ ++ +   + [aftercovid~47] search final pass WIP
+++    ++++++ +++ ++ +   + [aftercovid~48] integration search method final draft WIP
+++    ++++++ +++ ++ +   + [aftercovid~49] Query standardization complete; cear WIP
+--    ------ --- -- -   - [aftercovid~50] fix merge conflict in propcoor
+++    ++++++ +++ ++ +   + [aftercovid~50^2] after a wonderful night of coding with ed
+++    ++++++ +++ ++ +   + [aftercovid~50^2^] default message for quick committing with alias
+--    ------ --- -- -   - [aftercovid~50^2~2] Merge branch 'tminus13' of https://github.com/TechnologyRediscovery/codenforce into t-16
+++    ++++++ +++ ++ +   + [aftercovid~50^2~3] before another pull
+--    ------ --- -- -   - [aftercovid~50^2~4] hopefully merged?
+++    ++++++ +++ ++ +   + [aftercovid~50^2~5] going to pull
+++    ++++++ +++ ++ +   + [aftercovid~50^2~6] property updating now works for a few fields.  time to add datefield updating
+++    ++++++ +++ ++ +   + [aftercovid~51] umap listing at session start WIP; pause to merge in marosco collab work
+++    ++++++ +++ ++ +   + [aftercovid~52] patch 24 update
+++    ++++++ +++ ++ +   + [aftercovid~53] builds; working property search
+++    ++++++ +++ ++ +   + [aftercovid~54] builds; successful test of query cycle on properties
+++    ++++++ +++ ++ +   + [aftercovid~55] propertySearch.xhtml WIP; dnb
+++    ++++++ +++ ++ +   + [aftercovid~56] property search WIP; dnb
+++    ++++++ +++ ++ +   + [aftercovid~57] tminus06h29; final bits of prop search structure
+++    ++++++ +++ ++ +   + [aftercovid~58] DNB, property reorg WIP
+++    ++++++ +++ ++ +   + [aftercovid~59] SB-Successfully builds - wahoo
+++    ++++++ +++ ++++   + [pagesep] build wrap up WIP; before marosco merge
+++    ++++++ +++ ++++   + [pagesep^] before CECase object hierarchy restruc--hold on
+++    ++++++ +++ ++++   + [pagesep~2] subsys init process divided into methods: done; DNB
+++    ++++++ +++ ++++   + [pagesep~3] changed all Eric C. Darsow refs to ellen bascomb
+++    ++++++ +++ ++++   + [pagesep~4] session init WIP; DNB-does not build
+++    ++++++ +++ ++++   + [pagesep~5] SessionBean organization draft 1; DNB-DoesNotBuild
+++    ++++++ +++ ++++   + [pagesep~6] session final pass WIP; does not build DNB
+--    ------ --- ----   - [pagesep~7] Completed merge of beta wip1
+++   +++++++ +++ ++++   + [betawip_branchreorg] search WIP; DNB; but SearchCoord error free
+++   +++++++ +++ ++++   + [betawip_branchreorg^] coordinators WIP
+++   +++++++ +++ ++++   + [betawip_branchreorg~2] GER WIP
+++   +++++++ +++ ++++   + [betawip_branchreorg~3] GER WIP; coordinator review, org, and overhaul, standardizing interfaces
+++   +++++++ +++ ++++   + [betawip_branchreorg~4] GER WIP again
+++   +++++++ +++ ++++   + [betawip_branchreorg~5] GER WIP
+++   +++++++ +++ ++++   + [betawip_branchreorg~6] beta WIP; DNB; file and class overhaul QIP; even consol
+++   +++++++ +++ ++++   + [betawip_branchreorg~7] beta WIP; OccPeriodSearch WIP; DNC
+++   +++++++ +++ ++++   + [betawip_branchreorg~8] beta WIP; massive page overhaul WIP; builds but just barely
+++   +++++++ +++ ++++   + [betawip_branchreorg~9] beta WIP; massive cecase overhaul WIP; Does not build (DNB)
+--    ------ --- ----   - [pagesep~8] Merge pull request #17 from TechnologyRediscovery/props
+++    ++++++ +++ ++++   + [aftercovid~50^2~7] for pushing so ED can work his magic
+++    ++++++ +++ ++++   + [aftercovid~50^2~8] just experimenting
+++    ++++++ +++ ++++   + [aftercovid~50^2~9] working on changing the layout of the dialogs for editing units
+++    ++++++ +++ ++++   + [aftercovid~50^2~10] working on the dialogs for editing properties
+++    ++++++ +++ ++++   + [aftercovid~50^2~11] saving before switching prop info edit to form
+++    ++++++ +++ ++++   + [aftercovid~50^2~12] working on the dialog for property info edits
+--    ------ --- ----   - [pagesep~9] Merge pull request #14 from TechnologyRediscovery/navigationbarissue
+++    ++++++ +++ ++ +   + [aftercovid~39^2^] update UI for header and color
+++    ++++++ +++ ++ +   + [aftercovid~39^2~2] updatetheme
+++    ++++++ +++ ++ +   + [aftercovid~39^2~3] navtheme
+++    ++++++ +++ ++ +   + [aftercovid~39^2~4] navtheme
+++    ++++++ +++ ++++   + [aftercovid~39^2~5] fix the navigation bar
+++   +++++++ +++ ++++   + [pagesep~10] beta WIP; DNC; prior to major XHTML page reorg
+++   +++++++ +++ ++++   + [pagesep~11] BOb overhaul WIP; beg Credential parameter unification
+++   +++++++ +++ ++++   + [pagesep~12] beta WIP; overhaul of BOb hierarchy WIP
+++   +++++++ +++ ++++   + [pagesep~13] beta WIP; pushed for Wilkins
+++   +++++++ +++ ++++   + [pagesep~14] beta WIP; prior to MaRoScos prop work
+--   ------- --- ----   - [pagesep~15] Merge remote-tracking branch 'origin/paymentsPostRecovery' into recovered
+++   +++++++ +++ ++++   + [pagesep~15^2] Transferring missing changes from the old Payment branches
+++   +++++++ +++ ++++   + [pagesep~16] recovery WIP; NADGIT small changes baking in
+++   +++++++ +++ ++++   + [pagesep~17] beta launch WIP; start of NADGTI debugging
+++   +++++++ +++ ++++   + [pagesep~18] added my java to the recovered git repo.  couldn't get it to run locally.  needs tested
+++   +++++++ +++ ++++   + [pagesep~19] beta WIP; inspection.xhtml finally loaded! integration error
+++   +++++++ +++ ++++   + [pagesep~20] beta WIP; re-engineered inspections.xhtml after recovery disaster
+++   +++++++ +++ ++++   + [pagesep~21] xiaohong updates committed and debugged!
+--   ------- --- ----   - [pagesep~22] Merge remote-tracking branch 'origin/newnav' into recovered
+++   +++++++ +++ ++++   + [pagesep~22^2] codeElementBB update
+--   ------- --- ----   - [pagesep~23] Merge remote-tracking branch 'origin/newnav' into recovered
+++   +++++++ +++ ++++   + [pagesep~22^2^] codeSetBBupdate
+++   +++++++ +++ ++++   + [pagesep~24] beta WIP; activated Xiahong UI!
+--   ------- --- ----   - [pagesep~25] Merge remote-tracking branch 'origin/newnav' Xiaohong into recovered
+++   +++++++ +++ ++++   + [pagesep~22^2~2] migrate nav to SystemCoordinator
+++   +++++++ +++ ++++   + [pagesep~26] beta WIP; pause for xiaohong integration; middle of opdh
+++   +++++++ +++ ++++   + [pagesep~27] beta launch WIP; pushed for Xiaohong; does not compile
+++   +++++++ +++ ++++   + [pagesep~28] beta launch WIP; before creation of OccPeriodDataHeavy
+++   +++++++ +++ ++++   + [pagesep~29] recovery complete; xiahong nav container tabled; replaced with old; db loads
+++   +++++++ +++ ++++   + [pagesep~30] recovery WIP; builds, no init;  xiaohong UI int comp
+++   +++++++ +++ ++++   + [pagesep~31] recovery WIP; baked in Xiaohong's work
+--   ------- --- ----   - [pagesep~32] Merge remote-tracking branch 'origin/newnav' into recovered
+++   +++++++ +++ ++++   + [pagesep~32^2] newnav and codeset and code source
+++   +++++++ +++ ++++   + [pagesep~33] recovery WIP; tinkering with loggin; pause for xiaohong
+++   +++++++ +++ ++++   + [pagesep~34] recovery WIP; compiles and authenticates, but jams at init page
+++   +++++++ +++ ++++   + [pagesep~35] recovery WIP; all compiles, attempting build
+++   +++++++ +++ ++++   + [pagesep~36] recovery WIP; for MaRoSco
+++   +++++++ +++ ++++   + [pagesep~37] recovery WIP; transplated 1900+ line EventIntegrator
+++   +++++++ +++ ++++   + [pagesep~38] manual cleaup of ~postcorrupt-test files WIP
+++   +++++++ +++ ++++   + [pagesep~39] recovery WIP
+--   ------- --- ----   - [pagesep~40] Merge branch 'authfinalpart_bak' into recovered; ready to roll
++++  +++++++ +++ ++++   + [authfinalpart] user WIP; pause for rebase testing
++++  +++++++ +++ ++++   + [authfinalpart^] user overhaul WIP before renewed GIT battle
++++  +++++++ +++ ++++   + [authfinalpart~2] usersettings dialog upgrade WIP; notes on right, designed id schema
++++  +++++++ +++ ++++   + [authfinalpart~3] user upgrades WIP:tinkering with auth period config UI
++++  +++++++ +++ ++++   + [authfinalpart~4] bug fixes on userConfig.xhtml
++++  +++++++ +++ ++++   + [authfinalpart~5] debugging of userConfig.xhtml wip
++++  +++++++ +++ ++++   + [authfinalpart~6] updated documentation links and user login working
++++  +++++++ +++ ++++   + [authfinalpart~7] user revamp WIP: log entries load on userConfig.xhtml, but muni change is buggy
++++  +++++++ +++ ++++   + [authfinalpart~8] keycard access now through systemServicesBB system wide
++++  +++++++ +++ ++++   + [authfinalpart~9] system level object consolidation to SystemServicesBB
++++  +++++++ +++ ++++   + [authfinalpart~10] cotinue work on debugging load of whole new auth system
++++  +++++++ +++ ++++   + [authfinalpart~11] auth WIP; no login, big mess before the final moments
++++  +++++++ +++ ++++   + [authfinalpart~12] user overhaul WIP; finishing proofing of UserIntegrator methods
++++  +++++++ +++ ++++   + [authfinalpart~13] Major user overhaul WIP; prior to merging in littlered and nadgit
++++  +++++++ +++ ++++   + [authfinalpart~14] user edits WIP
++++  +++++++ +++ ++++   + [authfinalpart~15] userauth overhaul WIP
+            -         -   [finally-base] Merge branch 'authfinalpart' into postcorrupt-test
+++ +++++++++++++ ++++ + + [authfinalpart_bak] user WIP; pause for rebase testing
+++ +++++++++++++ ++++ + + [authfinalpart_bak^] user overhaul WIP before renewed GIT battle
+++ +++++++++++++ ++++ + + [authfinalpart_bak~2] usersettings dialog upgrade WIP; notes on right, designed id schema
+++ +++++++++++++ ++++ + + [authfinalpart_bak~3] user upgrades WIP:tinkering with auth period config UI
+++ +++++++++++++ ++++ + + [authfinalpart_bak~4] bug fixes on userConfig.xhtml
+++ +++++++++++++ ++++ + + [authfinalpart_bak~5] debugging of userConfig.xhtml wip
+++ ++++++++++++++++++ + + [master] updated documentation links and user login working
+++ ++++++++++++++++++ + + [master^] user revamp WIP: log entries load on userConfig.xhtml, but muni change is buggy
+++ ++++++++++++++++++ + + [master~2] keycard access now through systemServicesBB system wide
+++ ++++++++++++++++++ + + [master~3] system level object consolidation to SystemServicesBB
+++ ++++++++++++++++++ + + [master~4] cotinue work on debugging load of whole new auth system
+++ ++++++++++++++++++ + + [master~5] auth WIP; no login, big mess before the final moments
+++ ++++++++++++++++++ + + [master~6] user overhaul WIP; finishing proofing of UserIntegrator methods
+++ ++++++++++++++++++ + + [master~7] Major user overhaul WIP; prior to merging in littlered and nadgit
+++ ++++++++++++++++++ + + [master~8] user edits WIP
+++ ++++++++++++++++++ + + [master~9] userauth overhaul WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge] Fixed the problem activating and deactivating fee joins
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge^] Finishing up all of the fee permissions UI.
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~2] Doing most of the work on the permitted fees UI
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~3] Making assignedTo enum, SQL Patch for autoassign, and beginning work on permissions UI
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~4] Final touches on connecting fees and occperiods. Onto making UI for permitted and default fees!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~5] Finished up debugging fees, connected the Fees and Payments so a person can now assign fees and payments
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~6] More debugging of Fee stuff
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~7] Debugging various issues on the feeManage.xhtml
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~8] feeManage.xhtml debugging and creation of integrator methods
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~9] Finished insertand add fee methods
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~10] Added new methods to the integrator and fee BB, as well as edits to feeManage.xhtml
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~11] Created and began work on the feeManage page itself, fixed some problems on the backend (will need to continue)
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~12] Beginning work on Fee Pane, mostly backend stuff
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~13] Fixed issues with a few missing xhtml elements
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~14] Fixing merge conflict on inspection! Oops!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~15] Payments pane for occperiod management page completed but mostly untested, moving on to fee management page
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~16] tweaked inspection UI after tim in wilkins
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~17] creating link between paymentManage.xhtml and inspection.xhtml so the payment list can be viewed and edited
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~18] fixed eventcategory
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~19] xiaohong stubs
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~20] removed access data
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~21] commit before merge from updated occbeta
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~22] db patch 22 published
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~23] revised configure user permissions
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~24] beta functional occperiod and inspection!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~25] Beginning work on the inspections page, fixing all references to deprecated fields
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~26] most rudimentary draft of inspection report success!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~27] Debugging so I can login to the backend
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~28] occbeta WIP: compiles!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~29] payment next steps for NADGIT WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~30] occ proposals and checklist ajax WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~31] db patch 21, occevents WIP; compiles
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~32] OccEvents load! wahoo!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~33] occ period authorization pathways WIP; first draft done, needs testing
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~34] working inspection element filteringgit status
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~35] occinspection buttons WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~36] inspections events and upgrage
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~37] occ events WIP; major refactoring of method names across many files
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~38] after recovery from hard reset; don't switch occupancy to occ
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~39] occ period - OccLocationDescriptor infr. WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~40] Added dialog to payment type and refactored fee management. Pages moved back to their proper place. Ready for merge!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~41] Finished PaymentManage dialog
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~42] occ period page emerging from inspection page; does NOT compile
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~43] More updates to validation and refactoring for Fee management
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~44] occ permit is alive------------>>>>>
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~45] occpermitreport WIP; bits in a mess; DOES NOT COMPILE
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~46] dashboard WIP; proposalchoice WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~47] Fixed up the fee page to use a dialog for adding or editing a fee type
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~48] inspection UI WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~49] nearly complete inspection ui loads; debugging integrators
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~50] working inspectedspaceelement adding on inspections.xhtml!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~51] checklist WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~52] Getting the page to appear and display fees
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~53] A few minor debugs and changes to prepare for improvements
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~54] inspected items are created and displayed in UI; no inspected elements yet
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~55] checklist template loads with all composed objectsgit add .git add .git add .!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~56] Initial edits and fixes before waiting for Occbeta updates
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~57] does not compile! inspection WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~58] working internal unit editing on property.xhtml
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~59] properties load; unit edit WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~60] Preparing for merge and push, the page has been moved back to backend
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~61] Debugging complete, the page is now fully functionality!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~62] Functionality for adding and editing classes, adding schemas implemented. Awaits debugging
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~63] Finished Intensity update interface
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~64] coordinator overhaul WIP-eventrules
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~65] dashboard loads!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~66] Beginning debugging intensity, fixed some XHTML problems
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~67] occbeta WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~68] compiles and produces muni; profile loading WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~69] occbeta cleanup WIP; just sorted out getSessionUser() mess (merged to undo cherry-pick, which didn't help the code compile)
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~70] municipalities load with Path19! (This was cherry picked so that I may compile my code. Eric's code will be prioritized in the imminent merge conflict -Nathan)
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~71] copied public occapp behind resricted to create a beta internal version minus anonymizing madness
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~72] CEAR submission complete! No login functionality yet
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~73] occbeta cleanup WIP; just sorted out getSessionUser() mess
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~74] municipalities load with Path19!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~75] fixed save issue in DB patches
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~76] patch debugging
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~77] Changes solely for debugging connection leak
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~78] muni cycles WIP and release of db patch 19
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~79] major renaming and org of SessionBean -- lots of files impacted
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~80] Some debugging of database issues.
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~81] SessionInitializer WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~82] useraccess record WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~83] integrator refactoring WIP; does not compile
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~84] Wrote integrator methods
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~85] COMPILES! but not much else with completed property search
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~86] Page Prototype created
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~87] occbeta WIP: finished OccPeriod integration methods, onto Props
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~88] Initial preparation for Intensity backend
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~89] dbpatch 19 sealed: released
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~90] occupancy cleanup continued - removed MalformedBOBException
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~91] rough cut inspectionintegrator; revising OccupancyIntegrator; before noah merge
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~92] checklist overhaul WIP; table tightening on dbpatch_beta19.sql
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~93] wrapped up ChoiceIntegrator updates
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~94] moved occ entities into a subpackage of tcvcog.entities
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~95] Completed debugging for payment management pages. They now work and are up to speed with the rest of the pages!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~96] EventIntegrator: completed EventRule family! Very cool inheritance tree
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~97] cleaned up faces-config by removing referenced by deleted beans
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~98] compiles and builds, but nothing else
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~99] partway into occbeta integration; choice, directive, proposal WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~100] ch- ch- ch- changes!  And also some bug fixes.
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~101] okay i really added it now
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~102] added manageBlob page and bean.  Implemented past-month-uploads loaded in by default.
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~103] added default pdf image and worked out kinks of pdf uploads
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~104] occupancy overhaul WIP; right before nathan money merge
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~105] Finishing work on the new money tables and additions to the payment integrator
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~106] Beginning work with money and fees by making the various entities
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~107] revision to payment in patch beta17
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~108] patch 16 updates
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~109] patch 13 revision
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~110] money tables update
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~111] occupancy WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~112] occ overhaul WIP; just changed cecaseevent to eventcecase
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~113] uploading the sql patch for the propertyunitchange table
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~114] major occ and event overhaul WIP; entities almost done, then integrators
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~115] occBetaWIP - cleanup before merging in NADGIT occapp work
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~116] occ beta database script beta release
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~117] creating eventproposal separate ob and choices
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~118] Finishing integration of occupancy permit back end. This push marks the beginning of beta testing
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~119] occ wip; beginning occperiod table integration and basic management
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~120] Unit Changes can now be viewed in both a list and on a detail page
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~121] completed unit change list backend
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~122] occ WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~123] loads after proposal overhaul--but Pause for Occ!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~124] fixed minor things to prepare for unit change backend
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~125] Finishing up occupancy pages
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~126] implemented changes so the propertyUnitChange table can be populated
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~127] proposal wip
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~128] updating occ permit application progress on pages
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~129] event proposal WIP; big mess; inside integrator
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~130] insert, update, and get methods in property integrator for propertyUnitChange
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~131] main dash wip
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~132] Ironed out most bugs with the blob upload and linking process.  Next step is to resolve issues with links not working on first dialog display.
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~133] finished debugging linkBlobBB issuse related to how JSF handles method params
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~134] escaped ampersand to resolve servelet exception
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~135] Finsished blob upload and linking pages. Extremely untested. Likley riddled with bugs. Pushing up but probably shouldnt be merged untill it's tested and ironed out.
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~136] began work on propertyunitchange integration
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~137] begin work on main dashboard
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~138] Finished method that checks for unit list changes
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~139] Actually added files for tracking, whoops
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~140] Created PropertyUnitChange class, preparing to implement it in occpermit backing bean
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~141] Integrated select unit for application list page
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~142] Completed the attach persons form
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~143] added uploadBlob page. unfinished
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~144] integrator changes for blob-violation linking
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~145] Finished table interactions on personsRequirementManaga.xhtml
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~146] Setting up the backing bean for updating the tables on the person management page
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~147] Initial commit in this branch, see time sheets for the two week period beginning on 5/27 for changes - Nathan
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~148] photos printing on NOVs! need selection options
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~149] removed caseUpdateBB by consolidating to CaseProfileBB
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~150] clean-up after merge
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~151] pre merge push
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~152] turned dbpatch 13 into dominic's occ updates
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~153] event cats not displaying
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~154] fixed requested action
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~155] working...
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~156] work in progress
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~157] fixed event button bug; ready for camp!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~158] working event query last bug fix WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~159] event named queries working: massive replace of <br/> with <br />
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~160] working images on requests, moving to cecases
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~161] Working CEAR reports + debugged cear image upload issue
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~162] created report entities package, Query and Report WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~163] working overhaul of Query:CEAR only - still WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~164] query unification WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~165] ifaces Reportable and Searchable WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~166] before creation of BOB
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~167] just after making Query abstract
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~168] CEAR Query object prototype WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~169] demo donut: by violation
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~170] tied up lose ends on violation remove
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~171] lovely working event list report: nice and compact!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~172] event list report WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~173] Fixed column name for humanfriendlydescription
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~174] working event hide and inactive switch!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~175] Occupancy permit applications WIP/project handoff
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~176] action requests working! NOV updates done!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~177] overhaul of ceactionrequests again WIP; simplifygit status
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~178] query work in progress
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~179] cecases functionality full-spin-up WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~180] diagrams
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~181] objects modelled, needs wired up.  Very much an in progress.
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~182] begin query buttons on cecases.xhtml
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~183] working CasePhaseChangeRule logic for 1 test
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~184] mostly working NOV and WHERE clause Person bug quashed
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~185] success: NOV printing w/header img + styling info in db
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~186] Created method to anonymize Person data
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~187] Edited methods to carry out public person search
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~188] Completed methods to carry out public person search
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~189] Created skeleton methods to carry out public person search, refactored SearchParamsPersons
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~190] Fixed bugs regarding PersonsRequirement
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~191] inc. upload limit, tweaked ghost function post pitcairn
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~192] Working NOV upgrade; persistent person table weirdness
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~193] CasePhaseChangeRule infrastructure WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~194] nov overhaul wip
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~195] NOV overhaul WIP; integration refactoring
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~196] NOV overhaul WIP; just deleted ViolationCoordinator; moved methods to CaseCoord
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~197] NOV overhaul WIP and doc updates
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~198] mis-committed NOV overhaul changes--should be on ghostandclone branch
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~199] owner alter removed
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~200] adding db patch 12 with functions
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~201] working persons.xhtml page
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~202] small commit before pdf feature work begins
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~203] integration WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~204] integration methods in place
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~205] WIP on methods to interact with redesigned occupancy permit applications
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~206] Added import statement, refactored java.util.Date to Date
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~207] Created database patch to update tables relevant to occpermitapplication persons
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~208] pre-new-branch commit for major person overhaul x2
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~209] Add skeletons w/ TODOs to begin person search implementation phase of occupancy permit applications
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~210] Added hashCode() to complete converter
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~211] working caselist report; phase change WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~212] working caselist reportgit status report charts WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~213] before casephasechangerule overhaul
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~214] casephasechangerule WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~215] working updated violation table
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~216] reports WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~217] oops--alom stuff on wrong branch
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~218] case profile report work in progress
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~219] dom rebuild wip2
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~220] dom rebuild wip
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~221] working draft of case profile report!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~222] reports WIP 2
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~223] reporting WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~224] full event searching functionality WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~225] complete: debugging of cycling mess; begin casephase
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~226] userauthmunismess recovery WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~227] citation resurrection WIP 2
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~228] citation resurrection WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~229] code violation lifecycle wip
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~230] functioning action request event listings; buttons WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~231] up and running after event and case refactoring!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~232] working event with requests search; before major refactor of eventlinkedata
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~233] system loads after transition to requested case actions on events--more bugs to quash
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~234] directly before refactoring viewconf to requiresaction
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~235] broken mess --halfway through migration to action requests instead of view conf
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~236] creating requestedAction infrastructure
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~237] icons and case searching WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~238] vieiwing photos on violations from cECases.xhtml is now operational! (Deletes are superficial and temporary, that's next on the docket))
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~239] NOV builder WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~240] fixed broken dialog box when viewing photos from reqest manage page
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~241] case events facelift WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~242] continued event WIP before major work
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~243] updated public facing ceactionrequest photo upload page to simplified structure as used succesfully in violationAdd.  Also fixed NullPointerException being thrown if action request was submitted without uploading photos.
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~244] finished properties add/edit
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~245] mostly functional propertyAdd and propertyEdit.
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~246] updated propertyIntegrator.insertProperty.  Switched properties page from input switches to checkboxes (did not resolve issue)
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~247] event and case search WIP; db patch 7
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~248] property integrator updates
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~249] case searching mostly working!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~250] case searching WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~251] cleaning up ceCases.xhtml for merge with master
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~252] case search wip
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~253] person and event overhaul WIP: big mess!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~254] user contact in persons WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~255] event explorer WIP: rudimentary datascroller display
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~256] propertyUpdate code updated. Boolean values not working currently, disabled for now.
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~257] event browsing WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~258] finally fixed navigation configs
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~259] occupancy manager skeltons for Sir. Dom
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~260] object history list and session restructuring WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~261] events master explorer WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~262] timeframe expiry event generation with violations
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~263] working page overlay event add and compliance
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~264] navigation to propertyUpdate still failing, comments in PropertUpdateBB
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~265] okay its actually fixed now
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~266] Fixed bad navigation rules for properties update page
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~267] property updates in progress
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~268] case events wip
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~269] working NOV mailing buttons!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~270] working person add and update
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~271] V1 of occupancy permit application feature
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~272] typo fix3
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~273] typo fix2
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~274] typo fix
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~275] Update PersonType with owner, futureowner
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~276] db patch 4 and ongoing Persons wip
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~277] finished image uploads to code violations
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~278] changed photo deletion permissions to sys admin only
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~279] action requestphoto tweaking
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~280] removed fileuploader from missioncontrol
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~281] image management added to request manager page
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~282] ceaction request flow tweaking
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~283] more person WIP:
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~284] action requets WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~285] Filled in occupancy permit application reason methods
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~286] Change parameter name
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~287] prep for photo support merge
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~288] Created methods relevant to occupancy permit inspection applications
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~289] finished ceActionRequest Image uploading and description editing
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~290] Created generateOccPermitApplication and getOccPermitAppicationReason methods
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~291] second DB patch; WIP on final updates
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~292] Add member variables
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~293] working adv search prototype on persons.xhtml
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~294] Functional person list history on page load
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~295] persons.xhtml WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~296] added uploadPhoto page to ceActionRequestFlow
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~297] cleanup db patch beta1
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~298] working image upload
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~299] database patch no.beta1 plus mapping WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~300] working function call from fileupload component, however file is still null
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~301] Added getters and setters for OccPermitApplicationReason object
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~302] tidying up before Jan 17 demo
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~303] properties.xhtml up and running--finally!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~304] FIRST NOTICE PRINTINGgit statusgit status!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~305] Updated column names in queries to match database column names
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~306] Fixed a typo in insertSpaceMetaData method
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~307] Fixed typo in javadoc
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~308] Fixed typo in updateSpaceMetaData method
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~309] NOV WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~310] halfway through event searching; over to clean up notices
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~311] Update/add documentation to user-municipality mapping feature (#7)
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~312] search building WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~313] message bundle updates
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~314] overhaul in progress; known jquery bug not fixed yet
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~315] sidebar: dead; enter: menubar
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~316] Merge v2 of user-municipality mapping feature (#5)
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~317] working skeleton of CECases two-col page
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~318] property unit project for noah
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~319] Working person insert on CEActionRequests!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~320] undefined changes in person process -- working mater
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~321] working persons?
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~322] image testing in docs
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~323] docs3
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~324] docs2
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~325] docs
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~326] documentation2
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~327] documentation
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~328] doc update WIP4
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~329] doc update WIP3
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~330] doc update WIP2
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~331] doc update WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~332] trailing doc update
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~333] Person debbing WIP and doc update
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~334] update to build instructions
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~335] db config file
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~336] updated for wildfly build instructions
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~337] in the middle of cear mess before showing
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~338] functional wildfly migration--cleanup for showing t-2hrs!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~339] big mess with person search! gotta spin up wildfly! Yike! t = tlaunch - 12 hours!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~340] person search: start of testing
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~341] done: person table update documentation
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~342] Set theme jekyll-theme-midnight
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~343] cleanup
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~344] Person revisions wip; doc updates
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~345] photos WIP
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~346] cecase origination events--including custom for cears
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~347] basically functional ceaction requests page with dialogs, etc.
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~348] action request wip
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~349] dropped footer -- too much CSS goop
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~350] Stragglers after wildfly success
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~351] Success! Working WildFly pg connection management--after 12 f****g hours!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~352] stripped out pg classes; during wildfly conversion mess
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~353] removed gf config files; jboss defaults were auto-generated
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~354] added target dir to gitignore
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~355] renamed gfresources xml before trying port from laptop
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~356] functional gf-managed pool with BBUtils cnxn acquisition
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~357] intermediate tweaks before moving back to gf4.1 and trying gf jdbc pools
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~358] db access;fail on session init;wandering for bugs
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~359] stuck stage: working public portal DB access, no restricted entry; gf4.1
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~360] working glassfish connection pool; cannot get into dashboard or anything internal; nearly lost hope
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~361] minor connection pool changes before new branch
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~362] done tinkering with doc
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~363] References page in progress
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~364] Set theme jekyll-theme-slate
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~365] Set theme jekyll-theme-hacker
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~366] skeleton build steps page
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~367] need .md?
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~368] Set theme jekyll-theme-slate
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~369] trying pages more
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~370] wrestling with pages
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~371] first pages file
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~372] Incremental commit to get pages working
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~373] updated fixed value tables for documentation
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~374] working intermediate revisions on ceactionrequestmanage
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~375] temporary working update for Emily test
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~376] broken missionControlBeforeSplitup
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~377] Working ceactionrequests!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~378] broken CE request flow, incomplete manage request page; show amanda search
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~379] working CEActionRequest searching prototype!
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~380] Working public portal with messaging
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~381] intermediate updates for adam and Noah
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~382] Working prototype of pacc access and sortable by elementid
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~383] primitive access control; in-process CEActionRequests
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~384] loose ends after showing amanda, before occ
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~385] working chart and updated ce case operations before showing to amanda
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~386] back to psql jdbc v. 3
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~387] updated postgres driver dependency XML entry in pom.xml
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~388] intermediate work on steel rivers prep
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~389] before major authorization changes
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~390] serialized all entities; revised property search page
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~391] added auxilary files from old repo
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~392] event system overhaul in progress
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~393] event view confirmation in process
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~394] overhaul of caseprofile in progress
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~395] initial commit
++++  +++++++++++ ++++ +++ [postcorrupt-test-bakbeforeauthmerge~396] Initial commit
++++++++++++++++++++++++++ [postcorrupt] initial commit after recovery from corruption sep2019

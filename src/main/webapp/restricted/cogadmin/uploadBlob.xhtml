@@ -25,12 +25,6 @@
                         
                         <h:form id="uploadBlobFileUploadForm" enctype="multipart/form-data">
                             <h2>Choose a file and upload</h2>
-                            <p:fileUpload fileUploadListener="#{uploadBlobBB.handleBlobUpload}"
-                                mode="advanced" 
-                                update=":uploadBlobReviewBlobsForm:blobTable"
-                                multiple="true"
-                                sizeLimit="900000000" 
-                                allowTypes="/(\.|\/)(jpe?g|png|pdf)$/"/>    
                         </h:form>
                         
                         <p:spacer height="5px"/>
