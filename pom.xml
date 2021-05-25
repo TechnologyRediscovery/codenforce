@@ -98,6 +98,7 @@
                 <version>2.3</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <outputDirectory>${project.build.directory}/war/</outputDirectory>
                 </configuration>
             </plugin>
             <plugin>
