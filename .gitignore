@@ -3,6 +3,7 @@
 
 # build files
 target/
+*.NavData
 
 # Log file
 *.log
