@@ -4,7 +4,7 @@ Municipal government code enforcement and occupancy permitting web-app system
 
 ## Build
 ### Requirements:
-Java 8 w/ Java FX and Java EE
+- Java 8 w/ Java FX and Java EE
 
 Build system is maven—`mvn package` should do it.
 
