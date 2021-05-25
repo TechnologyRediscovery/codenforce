@@ -12,5 +12,7 @@ services:
       - "8080:8080"
       - "9990:9990"
       - "8787:8787"
+    volumes:
+      - ./target:/opt/jboss/wildfly/standalone/deployments/
     depends_on:
       - db
