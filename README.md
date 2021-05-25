@@ -19,4 +19,4 @@ Stop containers: `docker-compose down`
 
 Instructions on setting up the database with backed up data can be found in `db/README.md`
 
-A pretty good build/run command is `mvn package && docker-compose build && docker-compose up && docker-compose down`
+After running `docker-compose build` once, `mvn package && docker-compose up && docker-compose down` can be used to build and run all in one command.
