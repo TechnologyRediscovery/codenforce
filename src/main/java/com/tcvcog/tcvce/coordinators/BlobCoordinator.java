@@ -80,7 +80,15 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
     }
 
-    public Blob getNewBlob() throws IntegrationException {
+    
+    /**
+     * Factory method for Blobs--byteless blobs!!! 
+     * The caller will need to find some bytes somewhere and shove 'em on in
+     * 
+     * @return skeleton
+     * @throws IntegrationException 
+     */
+    public Blob generateBlobSkeleton() throws IntegrationException {
         Blob blob = new Blob();
         blob.setBlobMetadata(new Metadata());
         blob.setDescription("No description.");
@@ -293,7 +301,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     public Blob getPhotoBlob(int blobID) throws IntegrationException, BlobException {
         BlobIntegrator bi = getBlobIntegrator();
 
-        Blob blob = new Blob(getPhotoBlobLight(blobID));
+        Blob blob = new Blob(getBlobLight(blobID));
 
         blob.setBytes(bi.getBlobBytes(blob.getBytesID()));
 
@@ -343,43 +351,45 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.BlobException
      */
-    public BlobLight getPhotoBlobLight(int blobID) throws IntegrationException, BlobException {
+    public BlobLight getBlobLight(int blobID) throws IntegrationException, BlobException {
         
         BlobIntegrator bi = getBlobIntegrator();
         
         try {
-        return bi.getPhotoBlobLight(blobID);
+            return bi.getPhotoBlobLight(blobID);
         } catch(MetadataException ex) {
             
-            if(ex.isMapNullError()){
+//            if(ex.isMapNullError()){
                 //The metadata column isn't properly populated.
                 //We'll grab the bytes, strip the metadata from them
                 //And save them in the metadata column before fetching
                 //The blob and returning it.
 
                 //time to operate
-                //grab the BlobLight without metadata so we don't get the same error
-                Blob patient = getBlobFromBlobLight(bi.getPhotoBlobLightWithoutMetadata(blobID));
-                try {
-                patient = stripImageMetadata(patient);
-
-                //Should be all ready, let's update the bytes and the metadata
-
-                bi.updateBlobBytes(patient);
-
-                bi.updateBlobMetadata(patient);
+                // TODO: deal with metadata
                 
-                } catch(IOException | BlobTypeException exTwo){
-                    throw new BlobException(exTwo);
-                }
-            } else {
-                throw new BlobException(ex);
-            }
+                //grab the BlobLight without metadata so we don't get the same error
+//                Blob patient = getBlobFromBlobLight(bi.getPhotoBlobLightWithoutMetadata(blobID));
+//                try {
+//                patient = stripImageMetadata(patient);
+//
+//                //Should be all ready, let's update the bytes and the metadata
+//
+//                bi.updateBlobBytes(patient);
+//
+//                bi.updateBlobMetadata(patient);
+//                
+//                } catch(IOException | BlobTypeException exTwo){
+//                    throw new BlobException(exTwo);
+//                }
+//            } else {
+//                throw new BlobException(ex);
+//            }
             
         }
         
         //We are now clear to return the blob
-        return getPhotoBlobLight(blobID);
+        return getBlobLight(blobID);
     }
     
     /**
@@ -443,7 +453,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         List<BlobLight> blobList = new ArrayList<>();
         
         for(int id : idList){
-            blobList.add(getPhotoBlobLight(id));
+            blobList.add(getBlobLight(id));
         }
         return blobList;
     }
@@ -902,7 +912,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         for(Integer id : idList){
             
-            BlobLight result = getPhotoBlobLight(id);
+            BlobLight result = getBlobLight(id);
             
             if(result != null) {
             

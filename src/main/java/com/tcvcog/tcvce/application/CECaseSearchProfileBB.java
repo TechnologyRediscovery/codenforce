@@ -34,6 +34,7 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
@@ -63,6 +64,7 @@ import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
@@ -205,6 +207,16 @@ public class CECaseSearchProfileBB
     
     private List<CodeViolation> removedViolationList;
     private String citationEditEventDescription;
+    
+    
+    
+    /*******************************************************
+     *              BLOB Jazz
+    /*******************************************************/
+    
+    
+    private List<BlobLight> blobList;
+    
     
     /**
      * Creates a new instance of CECaseSearchBB
@@ -810,8 +822,11 @@ public class CECaseSearchProfileBB
      */
     public void onBlobAddButtonChange(ActionEvent ev){
         // nothing to do here yet
+        System.out.println("CECaseSearchProfileBB.onBlobAddButtonChange");
 
     }
+    
+    
     
 
     /**
@@ -1593,44 +1608,6 @@ public class CECaseSearchProfileBB
   
 
     /**
-     * Listener
-     *
-     * @param ev
-     */
-    public void handlePhotoUpload(FileUploadEvent ev) {
-        // NADGIT TODO
-//        CaseCoordinator cc = getCaseCoordinator();
-//        if (ev == null) {
-//            System.out.println("ViolationAddBB.handlePhotoUpload | event: null");
-//            return;
-//        }
-//        if (this.getCurrentViolation().getBlobIDList() == null) {
-//            this.getCurrentViolation().setBlobIDList(new ArrayList<Integer>());
-//        }
-//        if (this.blobList == null) {
-//            this.blobList = new ArrayList<>();
-//        }
-//        
-//        try {
-//            BlobCoordinator blobc = getBlobCoordinator();
-//            
-//            Blob blob = blobc.getNewBlob();
-//            blob.setBytes(ev.getFile().getContents());
-//            blob.setFilename(ev.getFile().getFileName());
-//            blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
-//            this.getCurrentViolation().getBlobIDList().add(blobc.storeBlob(blob).getBlobID());
-//            this.getBlobList().add(blob);
-//        } catch (IntegrationException | IOException | ClassNotFoundException | NoSuchElementException ex) {
-//            System.out.println("ViolationAddBB.handlePhotoUpload | upload failed! " + ex);
-//        } catch (BlobException ex) {
-//            System.out.println("ViolationAddBB.handlePhotoUpload | upload failed! " + ex);
-//            getFacesContext().addMessage(null,
-//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                            ex.getMessage(), ""));
-//        }
-    }
-
-    /**
      * Responds to user requests to commit a new code violation to the CECase
      *
      * @return
@@ -1709,6 +1686,44 @@ public class CECaseSearchProfileBB
         return "ceCaseProfile";
         
     }
+    
+    
+    /********************************************** /
+    /***********BLOBS****************************** /
+    /********************************************** /
+
+
+
+    /**
+     * Listener
+     *
+     * @param ev
+     */
+    public void onBlobUploadCommitButtonChange(FileUploadEvent ev) {
+        CaseCoordinator cc = getCaseCoordinator();
+        if (this.blobList == null) {
+            this.blobList = new ArrayList<>();
+        }
+        
+        try {
+            BlobCoordinator blobc = getBlobCoordinator();
+            
+            Blob blob = blobc.generateBlobSkeleton();
+            blob.setBytes(ev.getFile().getContent());
+            blob.setFilename(ev.getFile().getFileName());
+            blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
+            Blob freshBlob = blobc.storeBlob(blob);
+            // ship to coordinator for storage
+            if(freshBlob != null){
+                System.out.println("cecaseSearchProfileBB.onBlobUploadCommitButtonChange | fresh blob ID: " + freshBlob.getBlobID());
+            } 
+            
+            this.currentCase.getBlobList().add(freshBlob);
+            this.getBlobList().add(blob);
+        } catch (IntegrationException | IOException | NoSuchElementException | BlobException | BlobTypeException ex) {
+            System.out.println("cecaseSearchProfileBB.onBlobUploadCommitButtonChange | upload failed! " + ex);
+        } 
+    }
 
     /**
      * Listener for user request to remove photo on violation
@@ -1716,7 +1731,7 @@ public class CECaseSearchProfileBB
      * @param photoid
      * @return
      */
-    public String onPhotoRemoveButtonChange(int photoid) {
+    public String onBlobRemoveButtonChange(int photoid) {
         CaseCoordinator cc = getCaseCoordinator();
 //        try {
 //      TODO: Fix from NADGIT and PF10
@@ -1744,7 +1759,7 @@ public class CECaseSearchProfileBB
      * TODO: NADIT review
      * @param blob 
      */
-    public void onPhotoUpdateDescription(Blob blob){
+    public void onBlobUpdateDescription(Blob blob){
         BlobCoordinator bc = getBlobCoordinator();
         try {
             bc.updateBlobFilename(blob);
@@ -1763,28 +1778,26 @@ public class CECaseSearchProfileBB
         
     }
 
-    public String photosConfirm() {
-        /*  TODO: this obviously
+    public String onBlobConfirm() {
         
-        if(this.currentViolation == null){
-            this.currentViolation = getSessionBean().getSessionCodeViolation();
-        }
-        if(this.getPhotoList() == null  ||  this.getPhotoList().isEmpty()){
+      
+        if(currentViolation.getBlobList() == null  ||  currentViolation.getBlobList().isEmpty()){
             getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                                "No uploaded photos to commit.", 
+                                "No uploaded pdfs or photos to commit.", 
                                 "Use the 'Return to case home without commiting photos' button bellow if you have no photos to upload."));
             return "";
         }
         
-        ImageServices is = getImageServices();
+        BlobIntegrator bi = getBlobIntegrator();
         
-        for(Photograph photo : this.getPhotoList()){
+        for(BlobLight photo : currentViolation.getBlobList()){
             
             try { 
                 // commit and link
-                is.commitPhotograph(photo.getPhotoID());
-                is.linkPhotoToCodeViolation(photo.getPhotoID(), currentViolation.getViolationID());
+                
+                bi.commitPhotograph(photo.getBlobID());
+                bi.linkBlobToViolation(photo.getBlobID(), currentViolation.getViolationID());
                 
             } catch (IntegrationException ex) {
                 System.out.println(ex.toString());
@@ -1795,8 +1808,9 @@ public class CECaseSearchProfileBB
                     return "";
             }
         }
-         */
+        
         return "ceCaseProfile";
+
     }
     
     
@@ -3307,6 +3321,20 @@ public class CECaseSearchProfileBB
      */
     public void setCitationEditEventDescription(String citationEditEventDescription) {
         this.citationEditEventDescription = citationEditEventDescription;
+    }
+
+    /**
+     * @return the blobList
+     */
+    public List<BlobLight> getBlobList() {
+        return blobList;
+    }
+
+    /**
+     * @param blobList the blobList to set
+     */
+    public void setBlobList(List<BlobLight> blobList) {
+        this.blobList = blobList;
     }
 
    

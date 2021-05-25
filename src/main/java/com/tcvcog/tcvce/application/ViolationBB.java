@@ -654,7 +654,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             BlobCoordinator blobc = getBlobCoordinator();
             BlobIntegrator bi = getBlobIntegrator();
             
-            Blob blob = blobc.getNewBlob();
+            Blob blob = blobc.generateBlobSkeleton();
             // TODO: PF upgrade: https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
             
             //blob.setBytes(ev.getFile().getContents());

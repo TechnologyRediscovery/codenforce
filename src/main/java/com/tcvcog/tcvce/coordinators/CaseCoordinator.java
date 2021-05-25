@@ -130,6 +130,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         WorkflowCoordinator wc = getWorkflowCoordinator();
         PaymentIntegrator pi = getPaymentIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
+        
 
         // Wrap our base class in the subclass wrapper--an odd design structure, indeed
         CECaseDataHeavy cse = new CECaseDataHeavy(cecase_getCECase(c.getCaseID()));
@@ -151,6 +152,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             qcear.getPrimaryParams().setCecase_val(c);
 
             cse.setCeActionRequestList(sc.runQuery(qcear).getBOBResultList());
+            
+            // BLOB
+            cse.setBlobList();
 
         } catch (SearchException ex) {
             System.out.println(ex);

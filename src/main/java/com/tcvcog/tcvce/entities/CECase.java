@@ -72,6 +72,8 @@ public class        CECase
     protected List<EventCnF> eventList;
     protected List<EventCnF> eventListMaster;
     
+
+    
     public CECase(){
         
     }
@@ -726,5 +728,6 @@ public class        CECase
             statusAssignmentLog = sb.toString();
         }
     }
-    
+
+   
 }

@@ -83,7 +83,7 @@ public class PropertyFilesBB
         BlobCoordinator blobc = getBlobCoordinator();
         Blob blob = null;
         try {
-            blob = blobc.getNewBlob();  //init new blob
+            blob = blobc.generateBlobSkeleton();  //init new blob
 //            blob.setBytes(ev.getFile().getContents());  // set bytes
             blob.setFilename(ev.getFile().getFileName());
             

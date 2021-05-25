@@ -108,7 +108,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
                 blobList = new ArrayList<>();
                 
                 for (int idnum : blobIDs) {
-                    blobList.add(bc.getPhotoBlobLight(idnum));
+                    blobList.add(bc.getBlobLight(idnum));
                 }
         } catch (IntegrationException | BlobException ex) {
             System.out.println("manageBlobBB.initBean | ERROR: " + ex);

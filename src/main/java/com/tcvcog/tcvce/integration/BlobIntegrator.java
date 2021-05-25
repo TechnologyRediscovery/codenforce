@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.domain.MetadataException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobType;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Metadata;
 import com.tcvcog.tcvce.entities.MetadataKey;
 import java.io.ByteArrayInputStream;
@@ -51,28 +52,31 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     /**
      * This method should only be used by the BlobCoordinator.
      * If you need to grab a Blob anywhere else use the coordinator method
-     * @param blobID the blobID of the meta to be retrieved from db
+     * @param photodocid the blobID of the meta to be retrieved from db
      * @return the meta pulled from the db
      * @throws IntegrationException thrown instead of SQLException
      * @throws com.tcvcog.tcvce.domain.MetadataException
      */
-    public BlobLight getPhotoBlobLight(int blobID) throws IntegrationException, MetadataException{
+    public BlobLight getPhotoBlobLight(int photodocid) throws IntegrationException, MetadataException{
+        if(photodocid == 0){
+            throw new IntegrationException("Cannot fetch BlobLight with id = 0!");
+        }
         BlobLight blob = null;
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        String query = "SELECT photodocid, photodocdescription, photodoccommitted, blobbytes_bytesid, muni_municode, \n"
-                + "uploaddate, blobtype_typeid, uploadpersonid, filename, metadatamap\n"
-                + "FROM public.photodoc LEFT JOIN blobbytes on blobbytes_bytesid = bytesid\n"
-                + "WHERE photodocid = ?;";
+        String query = "SELECT photodocid, photodocdescription, photodoccommitted, blobbytes_bytesid, \n" +
+                        "       muni_municode, blobtype_typeid, metadatamap, title, createdby_userid, \n" +
+                        "       createdts\n" +
+                        "  FROM public.photodoc WHERE photodocid = ?;";
         
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
+            stmt.setInt(1, photodocid);
             rs = stmt.executeQuery();
             while(rs.next()){
-                System.out.println("BlobIntegrator.getBlob: | retrieving blobID "  + blobID);
-                blob = generatePhotoBlobLight(rs);
+                System.out.println("BlobIntegrator.getBlob: | retrieving blobID "  + photodocid);
+                blob = generateBlobLight(rs);
             }
             
         } catch (SQLException ex) {
@@ -129,7 +133,16 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
     }
     
-    private BlobLight generatePhotoBlobLight(ResultSet rs) throws SQLException, MetadataException{
+    /**
+     * Generator method for extracting field values from a ResultSet which pulls
+     * all columns from the table: photodoc
+     * 
+     * @param rs
+     * @return
+     * @throws SQLException
+     * @throws MetadataException 
+     */
+    private BlobLight generateBlobLight(ResultSet rs) throws SQLException, MetadataException{
         BlobLight blob = new BlobLight();
         blob.setBlobID(rs.getInt("photodocid"));
         blob.setBytesID(rs.getInt("blobbytes_bytesid"));
@@ -1925,14 +1938,19 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     /**
      * Connects a blob to a CECase
      * 
-     * @param blobID the ID of the blob to be linked
-     * @param target the ID of the violation the blob will be linked to.
+     * @param bl
+     * @param cse
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public void linkBlobToCECase(int blobID, int target) throws IntegrationException {
+    public void linkBlobToCECase(BlobLight bl, CECase cse) throws IntegrationException {
+        
+        if(bl == null || bl.getBlobID() == 0 || cse == null || cse.getCaseID() == 0){
+            throw new IntegrationException("Cannot link null or zero ID'd objects");
+        }
         
         Connection con = getPostgresCon();
-        String query =  " INSERT INTO public.cecase(photodoc_photodocid, cecase_caseid)\n" +
+        String query =  "INSERT INTO public.cecasephotodoc(\n" +
+                        "            photodoc_photodocid, cecase_caseid)\n" +
                         "    VALUES (?, ?);";
         
         PreparedStatement stmt = null;
@@ -1940,8 +1958,8 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         try {
             stmt = con.prepareStatement(query);
             
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, target);
+            stmt.setInt(1, bl.getBlobID());
+            stmt.setInt(2, cse.getCaseID());
             
             System.out.println("BlobIntegrator.linkBlobToCECase| Statement: " + stmt.toString());
             stmt.execute();
@@ -2088,11 +2106,52 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     
     /**
      * Get the IDs of photos attached to a given violation
+     * @param cse
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Integer> getBlobIDs(CECase cse) throws IntegrationException{
+        
+        if(cse == null || cse.getCaseID() == 0){
+            throw new IntegrationException("Cannot fetch blobs by case with null case or id = 0");
+        }
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT photodoc_photodocid FROM public.cecasephotodoc WHERE cecase_caseid = ?;";
+        
+        PreparedStatement stmt = null;
+        
+        List<Integer> idList = new ArrayList<>();
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, cse.getCaseID());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                 idList.add(rs.getInt("photodoc_photodocid"));
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving attached blob IDs. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return idList;
+        
+    }
+    /**
+     * Get the IDs of photos attached to a given violation
      * @param violationID
      * @return
      * @throws IntegrationException 
      */
-    public List<Integer> photosAttachedToViolation(int violationID) throws IntegrationException{
+    public List<Integer> getblobsByViolation(int violationID) throws IntegrationException{
         
         Connection con = getPostgresCon();
         ResultSet rs = null;

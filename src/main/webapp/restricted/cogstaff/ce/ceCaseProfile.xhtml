@@ -1061,11 +1061,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:form id="cecase-blobs-form">
 
                                             <p:commandButton    id="cecase-blob-add-button"
-                                                                ajax="false"
+                                                                ajax="true"
                                                                 styleClass="noFill button-size-small"
                                                                 actionListener="#{ceCaseSearchProfileBB.onBlobAddButtonChange}"
                                                                 oncomplete="PF('case-blobs-dialog-var').show()"
-                                                                value="Add Photo or Doc"
+                                                                value="Add Photo or Document"
                                                                 icon="fa fa-upload"
                                                                 />
 
@@ -4992,11 +4992,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 widgetVar="case-blobs-dialog-var"
                                 responsive="true"
                                 modal="true"
-                                resizable="trie"
+                                resizable="true"
                                 closable="true"
                                 closeOnEscape="true"
                                 header="Violation Photos"
-                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                rendered="true"
                                 > 
 
                         <h:form id="case-blobs-start-form" enctype="multipart/form-data">
@@ -5005,7 +5005,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             <p:fileUpload 
                                 mode="advanced" 
                                 update="case-blobs-list-form:case-blobs-table"
-                                listener="#{ceCaseSearchProfileBB.handlePhotoUpload}"
+                                listener="#{ceCaseSearchProfileBB.onBlobUploadCommitButtonChange}"
                                 multiple="true"
                                 fileLimit="3"
                                 sizeLimit="99999999999" 
