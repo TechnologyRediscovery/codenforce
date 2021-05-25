@@ -4,6 +4,8 @@ services:
     build: db
     ports:
       - "5432:5432"
+    volumes:
+      - ./db/pg-data:/pg-data
   wildfly:
     build: .
     ports:

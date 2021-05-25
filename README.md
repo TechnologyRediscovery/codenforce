@@ -17,5 +17,5 @@ Run containers: `docker-compose up`
 
 Stop containers: `docker-compose down`
 
-To update the database in the container, copy a .sql file into the db folder.
+Instructions on setting up the database with backed up data can be found in `db/README.md`
 
