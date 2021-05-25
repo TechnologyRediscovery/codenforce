@@ -419,7 +419,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     /**
      * Sets a property unit on the SessionBean and the OccPermitApplication,
-     * sends user to occPermitAddReason.xhtml
+     * sends user to occPermit4AddReason.xhtml
      *
      * @param unit
      * @return
@@ -470,7 +470,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     /**
      * Sets the currentApplication on the sessionBean and then sends user to
-     * personsRequirementManage.xhtml
+     * occPermit5PersonsRequirementManage.xhtml
      *
      * @return
      */
@@ -800,7 +800,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             refreshUnitsAndPersons();
 
             //We want to clear until this page
-            clearUntil = "occPermitAddPropertyUnit.xhtml";
+            clearUntil = "occPermit2AddPropertyUnit.xhtml";
 
         }
 
