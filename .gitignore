@@ -1,8 +1,9 @@
-                              # Compiled class file
+# Compiled class file
 *.class
 
 # build files
 target/
+*.NavData
 
 # Log file
 *.log
@@ -21,7 +22,6 @@ target/
 *.zip
 *.tar.gz
 *.rar
-/nbproject/
 
 
 ### Python ###
@@ -100,8 +100,16 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Text editors
-.idea
-
 # Script specific files
 *_parcelids.json
+
+# Docker run files
+db/pg-data
+
+# Netbeans IDE files
+/nbproject/
+nb-configuration.xml
+
+# IntelliJ IDE files
+.idea/
+*.iml
