@@ -18,12 +18,16 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.MetadataException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobType;
+import com.tcvcog.tcvce.entities.BlobTypeEnum;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Metadata;
 import com.tcvcog.tcvce.entities.MetadataKey;
@@ -142,38 +146,51 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      * @throws SQLException
      * @throws MetadataException 
      */
-    private BlobLight generateBlobLight(ResultSet rs) throws SQLException, MetadataException{
+    private BlobLight generateBlobLight(ResultSet rs) throws SQLException, MetadataException, IntegrationException{
+        MunicipalityCoordinator mc = getMuniCoordinator();
         BlobLight blob = new BlobLight();
-        blob.setBlobID(rs.getInt("photodocid"));
-        blob.setBytesID(rs.getInt("blobbytes_bytesid"));
+        UserCoordinator uc = getUserCoordinator();
+        
+        blob.setPhotoDocID(rs.getInt("photodocid"));
         blob.setDescription(rs.getString("photodocdescription"));
+        blob.setCommitted(rs.getBoolean("photodoccommitted"));
+        
+        blob.setBytesID(rs.getInt("blobbytes_bytesid"));
+        blob.setMuni(mc.getMuni(rs.getInt("muni_municode")));
+        blob.setType(getBlobType(rs.getInt("blobtype_typeid")));
+        
+        blob.setBlobMetadata(generateBlobMetadata(rs));
+        blob.setTitle(rs.getString("title"));
+        blob.setCreatedBy(uc.user_getUser(rs.getInt("createdby_userid")));
         
         Timestamp time = rs.getTimestamp("uploaddate");
         if(time != null){
-            blob.setTimestamp(time.toLocalDateTime());
+            blob.setCreatedTS(time.toLocalDateTime());
         }
-        blob.setType(BlobType.blobTypeFromInt(rs.getInt("blobtype_typeid")));
-        blob.setFilename(rs.getString("filename"));
-        blob.setUploadPersonID(rs.getInt("uploadpersonid"));
-        blob.setMunicode(rs.getInt("muni_municode"));
         
-        blob.setBlobMetadata(generateBlobMetadata(rs));
         return blob;
     }
     
+    /**
+     * Unused until metadata is processed
+     * 
+     * @param rs
+     * @return
+     * @throws SQLException 
+     */
     private BlobLight generatePhotoBlobLightWithoutMetadata(ResultSet rs) throws SQLException {
         BlobLight blob = new BlobLight();
-        blob.setBlobID(rs.getInt("photodocid"));
+        blob.setPhotoDocID(rs.getInt("photodocid"));
         blob.setBytesID(rs.getInt("blobbytes_bytesid"));
         blob.setDescription(rs.getString("photodocdescription"));
         Timestamp time = rs.getTimestamp("uploaddate");
         if(time != null){
-            blob.setTimestamp(time.toLocalDateTime());
+            blob.setCreatedTS(time.toLocalDateTime());
         }
-        blob.setType(BlobType.blobTypeFromInt(rs.getInt("blobtype_typeid")));
-        blob.setFilename(rs.getString("filename"));
-        blob.setUploadPersonID(rs.getInt("uploadpersonid"));
-        blob.setMunicode(rs.getInt("muni_municode"));
+//        blob.setType(BlobTypeEnum.blobTypeFromInt(rs.getInt("blobtype_typeid")));
+//        blob.setFilename(rs.getString("filename"));
+//        blob.setUploadPersonID(rs.getInt("uploadpersonid"));
+//        blob.setMunicode(rs.getInt("muni_municode"));
         
         return blob;
     }
@@ -261,47 +278,51 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     
     /**
      * @param rs
+     * 
+     * @deprecated 
      * @return
      * @throws SQLException
      * @throws MetadataException 
      */
     private BlobLight generatePDFBlobLight(ResultSet rs) throws SQLException, MetadataException{
         BlobLight blob = new BlobLight();
-        blob.setBlobID(rs.getInt("pdfdocid"));
+        
+        blob.setPhotoDocID(rs.getInt("photodocid"));
         blob.setBytesID(rs.getInt("blobbytes_bytesid"));
         blob.setDescription(rs.getString("pdfdocdescription"));
         
         Timestamp time = rs.getTimestamp("uploaddate");
         if(time != null){
-            blob.setTimestamp(time.toLocalDateTime());
+            blob.setCreatedTS(time.toLocalDateTime());
         }
-        blob.setType(BlobType.blobTypeFromInt(rs.getInt("blobtype_typeid")));
-        blob.setFilename(rs.getString("filename"));
-        blob.setUploadPersonID(rs.getInt("uploadpersonid"));
-        blob.setMunicode(rs.getInt("muni_municode"));
+//        blob.setType(BlobTypeEnum.blobTypeFromInt(rs.getInt("blobtype_typeid")));
+//        blob.setFilename(rs.getString("filename"));
+//        blob.setUploadPersonID(rs.getInt("uploadpersonid"));
+//        blob.setMunicode(rs.getInt("muni_municode"));
         
         blob.setBlobMetadata(generateBlobMetadata(rs));
         return blob;
     }
     
     /**
+     * @deprecated 
      * @param rs
      * @return
      * @throws SQLException 
      */
     private BlobLight generatePDFBlobLightWithoutMetadata(ResultSet rs) throws SQLException {
         BlobLight blob = new BlobLight();
-        blob.setBlobID(rs.getInt("pdfdocid"));
+        blob.setPhotoDocID(rs.getInt("pdfdocid"));
         blob.setBytesID(rs.getInt("blobbytes_bytesid"));
         blob.setDescription(rs.getString("pdfdocdescription"));
         Timestamp time = rs.getTimestamp("uploaddate");
         if(time != null){
-            blob.setTimestamp(time.toLocalDateTime());
+            blob.setCreatedTS(time.toLocalDateTime());
         }
-        blob.setType(BlobType.blobTypeFromInt(rs.getInt("blobtype_typeid")));
-        blob.setFilename(rs.getString("filename"));
-        blob.setUploadPersonID(rs.getInt("uploadpersonid"));
-        blob.setMunicode(rs.getInt("muni_municode"));
+//        blob.setType(BlobTypeEnum.blobTypeFromInt(rs.getInt("blobtype_typeid")));
+//        blob.setFilename(rs.getString("filename"));
+//        blob.setUploadPersonID(rs.getInt("uploadpersonid"));
+//        blob.setMunicode(rs.getInt("muni_municode"));
         
         return blob;
     }
@@ -343,6 +364,67 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         return blobBytes;
         
     } 
+    
+    public BlobType getBlobType(int typeid) throws IntegrationException{
+        
+        if(typeid == 0){
+            throw new IntegrationException("Cannot retrieve blob type with ID = 0!");
+            
+        }
+        
+          Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT typeid, typetitle, icon_iconid\n" +
+                        "  FROM public.blobtype WHERE typeid=?";
+        
+        PreparedStatement stmt = null;
+        
+        BlobType bt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, typeid);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                bt = generateBlobType(rs);
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving blob type. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        return bt;
+    }
+    
+    
+    /**
+     * Generator for cute little BLOBType objects
+     * @param rs
+     * @return
+     * @throws IntegrationException
+     * @throws SQLException 
+     */
+    private BlobType generateBlobType(ResultSet rs) throws IntegrationException, SQLException{
+        
+        if(rs == null){
+            throw new IntegrationException("Cannot make blob type with null ResultSet");
+        }
+        
+        SystemIntegrator si = getSystemIntegrator();
+        
+        BlobType bt = new BlobType();
+        bt.setTitle(rs.getString("title"));
+        bt.setIcon(si.getIcon(rs.getInt("icon_iconid")));
+        bt.setTypeEnum(BlobTypeEnum.blobTypeFromInt(rs.getInt("typeid")));
+        
+        return bt;
+    }
+    
     /**
      * @param rs
      * @return
@@ -352,7 +434,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     private Metadata generateBlobMetadata(ResultSet rs) throws SQLException, MetadataException{
         Metadata meta = new Metadata();
         meta.setBytesID(rs.getInt("blobbytes_bytesid"));
-        meta.setType(BlobType.blobTypeFromInt(rs.getInt("blobtype_typeid")));
+        meta.setType(BlobTypeEnum.blobTypeFromInt(rs.getInt("blobtype_typeid")));
         
         // We must now convert the byte array to an object
         
@@ -420,31 +502,72 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     
     /**
      * stores this photodoc in the db
+     * 
      * @param blob the meta to be stored
      * @return the blobID of the newly stored meta
      * @throws com.tcvcog.tcvce.domain.BlobTypeException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public Blob storePhotoBlob(Blob blob) throws IntegrationException, BlobTypeException{
+    public Blob storeBlob(Blob blob) throws IntegrationException, BlobTypeException{
+        
+        if(blob == null){
+            throw new IntegrationException("cannot store null blob!");
+        }
         
         Connection con = getPostgresCon();
-        String query =  " INSERT INTO public.photodoc(photodocid, photodocdescription, blobbytes_bytesid, muni_municode)\n" +
-                        "    VALUES (DEFAULT, ?, ?, ?);";
+        String query =  " INSERT INTO public.photodoc(\n" +
+                        "            photodocid, photodocdescription, blobbytes_bytesid, \n" +
+                        "            muni_municode, blobtype_typeid, metadatamap, title, createdby_userid, \n" +
+                        "            createdts)\n" +
+                        "    VALUES (DEFAULT, ?, ?, \n" +
+                        "            ?, ?, ?, ?, ?, \n" +
+                        "            now());";
         
         PreparedStatement stmt = null;
         
         try {
             
             stmt = con.prepareStatement(query);
+            
             stmt.setString(1, blob.getDescription());
             
             int bytesID = storeBlobBytes(blob);
             
             stmt.setInt(2, bytesID);
             
-            stmt.setInt(3, blob.getMunicode());
+            if(blob.getMuni() != null){
+                stmt.setInt(3, blob.getMuni().getMuniCode());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
             
-            System.out.println("BlobIntegrator.storePhotoBlob | Statement: " + stmt.toString());
+            if(blob.getType() != null){
+                stmt.setInt(4, blob.getType().getTypeEnum().getTypeID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            if(blob.getBlobMetadata() != null){
+                // TODO: Finish metadata
+                stmt.setNull(5, java.sql.Types.NULL);
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            
+            if(blob.getTitle() != null){
+                stmt.setString(6, blob.getTitle());
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+            
+            if(blob.getCreatedBy() != null){
+                stmt.setInt(7, blob.getCreatedBy().getUserID());
+                
+            }else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+                    
+            System.out.println("BlobIntegrator.storeBlob | Statement: " + stmt.toString());
             stmt.execute();
             
             String idNumQuery = "SELECT currval('photodoc_photodocid_seq');";
@@ -455,7 +578,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             int lastID = rs.getInt(1);
             
             //set the IDs so after we throw the blob back they can access the blob and bytes
-            blob.setBlobID(lastID);
+            blob.setPhotoDocID(lastID);
             blob.setBytesID(bytesID);
             
         } catch (SQLException | IOException ex) {
@@ -509,6 +632,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     /**
      * stores this pdfdoc in the db
      * @param blob the meta to be stored
+     * @deprecated  replaced by unified doc and photo workflow
      * @return the blobID of the newly stored meta
      * @throws com.tcvcog.tcvce.domain.BlobTypeException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
@@ -531,7 +655,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             
             stmt.setInt(2, bytesID);
             
-            stmt.setInt(3, blob.getMunicode());
+//            stmt.setInt(3, blob.getMunicode());
             
             System.out.println("BlobIntegrator.storePDFBlob | Statement: " + stmt.toString());
             stmt.execute();
@@ -545,7 +669,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             int lastID = rs.getInt(1);
             
             //set the IDs so we can throw the blob back and they can access the blob and bytes
-            blob.setBlobID(lastID);
+            blob.setPhotoDocID(lastID);
             blob.setBytesID(bytesID);
             
         } catch (SQLException | IOException ex) {
@@ -559,22 +683,25 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * Master byte input pathway!!!
      * stores the binary data of a file in the db
+     * 
      * @param blob the meta to be stored
-     * @return the blobID of the newly stored meta
+     * @return the blobID of the newly stored bytes
      * @throws com.tcvcog.tcvce.domain.BlobTypeException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws java.io.IOException
      */
     private int storeBlobBytes(Blob blob) throws BlobTypeException, IntegrationException, IOException{
         
-        if(blob.getType() == null) throw new BlobTypeException("Attempted to store a blob with null type. ");
+        if(blob.getType() == null){
+            throw new BlobTypeException("Attempted to store a blob with null type. ");
+        }
         
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.blobbytes(\n" +
-                        "            bytesid, uploaddate, blobtype_typeid, \n" +
-                        "            blob, uploadpersonid, filename, metadatamap)\n" +
-                        "    VALUES (DEFAULT, ?, ?, ?, ?, ?, ?);";
+                            "            bytesid, createdts, blob, uploadedby_userid, filename)\n" +
+                            "    VALUES (DEFAULT, now(), ?, ?, ?);";
         
         PreparedStatement stmt = null;
 
@@ -587,13 +714,13 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             try {
 
                 stmt = con.prepareStatement(query);
-                stmt.setTimestamp(1, java.sql.Timestamp.from(blob.getTimestamp()
-                        .atZone(ZoneId.systemDefault()).toInstant()));
-                stmt.setInt(2, blob.getType().getTypeID());
-                stmt.setBytes(3, blob.getBytes());
-                stmt.setInt(4, blob.getUploadPersonID());
-                stmt.setString(5, blob.getFilename());
-                stmt.setBytes(6, blob.getBlobMetadata().getMapBytes());
+                stmt.setBytes(1, blob.getBytes());
+                if(blob.getBlobUploadedBy() != null){
+                    stmt.setInt(2, blob.getBlobUploadedBy().getUserID());
+                } else {
+                    stmt.setNull(2, java.sql.Types.NULL);
+                }
+                stmt.setString(3, blob.getFilename());
 
                 System.out.println("BlobIntegrator.storeBlobBytes | Statement: " + stmt.toString());
                 stmt.execute();
@@ -603,9 +730,9 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
                 ResultSet rs;
                 rs = s.executeQuery(idNumQuery);
                 rs.next();
-                blob.setBlobID(rs.getInt(1));
+                blob.setBytesID(rs.getInt(1));
                 
-                return blob.getBlobID();
+                return blob.getBytesID();
 
             } catch (SQLException ex) {
                 System.out.println("BlobIntegrator.storeBlobBytes() | ERROR: " + ex);
@@ -676,7 +803,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             
             stmt = con.prepareStatement(query);
             stmt.setString(1, blob.getDescription());            
-            stmt.setInt(2, blob.getBlobID());
+            stmt.setInt(2, blob.getPhotoDocID());
             
             System.out.println("BlobIntegrator.storeBlob | Statement: " + stmt.toString());
             stmt.execute();
@@ -709,7 +836,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         try {
             
             stmt = con.prepareStatement(query);
-            stmt.setString(1, blob.getFilename());            
+//            stmt.setString(1, blob.getFilename());            
             stmt.setInt(2, blob.getBytesID());
             
             System.out.println("BlobIntegrator.storeBlob | Statement: " + stmt.toString());
@@ -743,7 +870,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             
             stmt = con.prepareStatement(query);
             stmt.setString(1, blob.getDescription());            
-            stmt.setInt(2, blob.getBlobID());
+            stmt.setInt(2, blob.getPhotoDocID());
             
             System.out.println("BlobIntegrator.updatePDFBlobDescription | Statement: " + stmt.toString());
             stmt.execute();
@@ -767,7 +894,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
         Connection con = getPostgresCon();
         String query = "UPDATE public.blobbytes\n"
-                + " SET filename=?, metadatamap=?\n"
+                + " SET filename=? "
                 + " WHERE bytesid=?;";
         
         PreparedStatement stmt = null;
@@ -775,9 +902,9 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         try {
             
             stmt = con.prepareStatement(query);
-            stmt.setString(1, blob.getFilename());
-            stmt.setBytes(2, blob.getBlobMetadata().getMapBytes());
-            stmt.setInt(3, blob.getBytesID());
+//            stmt.setString(1, blob.getFilename());
+            stmt.setBytes(1, blob.getBlobMetadata().getMapBytes());
+            stmt.setInt(2, blob.getBytesID());
             
             System.out.println("BlobIntegrator.storeBlob | Statement: " + stmt.toString());
             stmt.execute();
@@ -1944,7 +2071,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      */
     public void linkBlobToCECase(BlobLight bl, CECase cse) throws IntegrationException {
         
-        if(bl == null || bl.getBlobID() == 0 || cse == null || cse.getCaseID() == 0){
+        if(bl == null || bl.getPhotoDocID() == 0 || cse == null || cse.getCaseID() == 0){
             throw new IntegrationException("Cannot link null or zero ID'd objects");
         }
         
@@ -1958,7 +2085,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         try {
             stmt = con.prepareStatement(query);
             
-            stmt.setInt(1, bl.getBlobID());
+            stmt.setInt(1, bl.getPhotoDocID());
             stmt.setInt(2, cse.getCaseID());
             
             System.out.println("BlobIntegrator.linkBlobToCECase| Statement: " + stmt.toString());

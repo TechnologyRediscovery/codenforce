@@ -1,55 +1,72 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2021 Technology Rediscovery LLC
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.tcvcog.tcvce.entities;
 
 /**
- *
- * @author noah
+ * Represents a type of binary large object, BLOB
+ * 
+ * @author Ellen Bascomb
  */
-public enum BlobType {
-    PHOTO(1),
-    PDF(2);
+public class BlobType {
+   private BlobTypeEnum typeEnum;
+   private String title;
+   private Icon icon;
 
-    private final int typeID;
-    private Icon typeIcon;
-
-    private BlobType(int typeID){
-        this.typeID = typeID;
-    }
-    
-    public static BlobType blobTypeFromInt(int i){
-        switch(i){
-            case 1:
-                return PHOTO;
-            case 2:
-                return PDF;
-        }
-        return null;
-    }
-    
-    
-    
-    public int getTypeID(){
-        return this.typeID;
+    /**
+     * @return the typeEnum
+     */
+    public BlobTypeEnum getTypeEnum() {
+        return typeEnum;
     }
 
     /**
-     * @return the typeIcon
+     * @param typeEnum the typeEnum to set
      */
-    public Icon getTypeIcon() {
-        return typeIcon;
+    public void setTypeEnum(BlobTypeEnum typeEnum) {
+        this.typeEnum = typeEnum;
     }
 
     /**
-     * @param typeIcon the typeIcon to set
+     * @return the title
      */
-    public void setTypeIcon(Icon typeIcon) {
-        this.typeIcon = typeIcon;
+    public String getTitle() {
+        return title;
     }
-    
+
+    /**
+     * @return the icon
+     */
+    public Icon getIcon() {
+        return icon;
+    }
+
+    /**
+     * @param title the title to set
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
+     * @param icon the icon to set
+     */
+    public void setIcon(Icon icon) {
+        this.icon = icon;
+    }
     
     
 }

@@ -28,9 +28,10 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
-import com.tcvcog.tcvce.entities.BlobType;
+import com.tcvcog.tcvce.entities.BlobTypeEnum;
 import com.tcvcog.tcvce.entities.Metadata;
 import com.tcvcog.tcvce.entities.MetadataKey;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
@@ -52,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import javax.imageio.ImageIO;
@@ -85,19 +87,20 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * Factory method for Blobs--byteless blobs!!! 
      * The caller will need to find some bytes somewhere and shove 'em on in
      * 
+     * @param ua
      * @return skeleton
      * @throws IntegrationException 
      */
-    public Blob generateBlobSkeleton() throws IntegrationException {
+    public Blob generateBlobSkeleton(UserAuthorized ua) throws IntegrationException {
         Blob blob = new Blob();
         blob.setBlobMetadata(new Metadata());
         blob.setDescription("No description.");
-        blob.setTimestamp(LocalDateTime.now());
+        blob.setCreatedTS(LocalDateTime.now());
         if (getSessionBean().getSessUser() != null) {
-            blob.setUploadPersonID(getSessionBean().getSessUser().getPersonID());
+            blob.setBlobUploadedBy(ua);
         } else {
             UserCoordinator uc = getUserCoordinator();
-            blob.setUploadPersonID(uc.auth_getPublicUserAuthorized().getUserID());
+            blob.setBlobUploadedBy(uc.auth_getPublicUserAuthorized());
         }
         return blob;
     }
@@ -106,28 +109,29 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * The BlobCoordinator attempts to retrieve an image with a given Blob ID supplied by a JSF parameter. 
      * If something were to go wrong, automatically retrieve the defaultStream for the interface.
      *
+     * @param ctx
+     * @param fctx
      * @return
      * @throws BlobTypeException
      * @throws com.tcvcog.tcvce.domain.BlobException
      */
-    public StreamedContent getImage() throws BlobTypeException, BlobException{
+    public StreamedContent getImage(ExternalContext ctx, FacesContext fctx) throws BlobTypeException, BlobException{
         // should use EL to verify blob type,  but this will check it anyway
-        FacesContext context = FacesContext.getCurrentInstance();
         DefaultStreamedContent sc = null;
 
-        if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
+        if (fctx.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
             sc = defaultStream;
         } else {
             
             //Get the blob ID from the Faces context
-            int blobID = Integer.parseInt(context.getExternalContext().getRequestParameterMap().get("blobID"));
+            int blobID = Integer.parseInt(ctx.getRequestParameterMap().get("blobID"));
             System.out.println("BlobCoordinator.getImage: image ID " + blobID);
             try {
                 Blob blob = getPhotoBlob(blobID);
                 if (null == blob.getType()) {
                     throw new BlobTypeException("BlobType is null.");
                 } else {
-                    switch (blob.getType()) {
+                    switch (blob.getType().getTypeEnum()) {
                         case PHOTO:
                             // TODO: Update to new UI:
                             // https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
@@ -214,6 +218,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             throw new BlobException("You cannot upload a file without a filename.");
         }
         
+        BlobIntegrator bi = getBlobIntegrator();
+        
         //First, let's find out what type of file this is.
         String fileExtension = getFileExtension(blob.getFilename());
 
@@ -231,21 +237,19 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         switch (fileExtension) {
             case "jpg":
+                return configureImageBlob(blob);
             case "jpeg":
+                return configureImageBlob(blob);
             case "gif":
+                return configureImageBlob(blob);
             case "png":
-
-                blob.setType(BlobType.PHOTO);
-
-                blob = stripImageMetadata(blob);
-                return getBlobIntegrator().storePhotoBlob(blob);
-
+                return configureImageBlob(blob);
             case "pdf":
 
-                blob.setType(BlobType.PDF);
+                blob.setType(bi.getBlobType(BlobTypeEnum.PDF.getTypeID()));
 
                 blob = stripPDFMetadata(blob);
-                return getBlobIntegrator().storePDFBlob(blob);
+                return getBlobIntegrator().storeBlob(blob);
 
             default:
                 //Incorrect file type
@@ -255,10 +259,28 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
+     * Configures BLOBs to correspond to image blobs
+     * @param blob
+     * @return 
+     */
+    private Blob configureImageBlob(Blob blob) 
+            throws IntegrationException, IOException, BlobTypeException, BlobException{
+        BlobIntegrator bi = getBlobIntegrator();
+
+        blob.setType(bi.getBlobType(BlobTypeEnum.PHOTO.getTypeID()));
+
+        blob = stripPDFMetadata(blob);
+        return getBlobIntegrator().storeBlob(blob);
+        
+    }
+    
+    /**
      * Updates a blob's filename.
      * Safe for BB use, as this checks the file extension and throws an error
      * if the file extension is wrong.
      * @param blob
+     * @deprecated we'll never update a blob's filename! Change its title/description
+     * on its metadata record in table photodoc
      * @throws IntegrationException
      * @throws IOException
      * @throws BlobTypeException if the supplied file extension is different than what we have in the DB
@@ -275,23 +297,23 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         BlobIntegrator bi = getBlobIntegrator();
         
-        BlobLight originalBlob = bi.getPhotoBlobLightWithoutMetadata(blob.getBlobID());
+        BlobLight originalBlob = bi.getPhotoBlobLightWithoutMetadata(blob.getPhotoDocID());
         
-        String newExtension = getFileExtension(blob.getFilename());
+//        String newExtension = getFileExtension(blob.getFilename());
         
         String originalExtension = "";
         
-        if(originalBlob.getFilename() != null){
-            originalExtension = getFileExtension(originalBlob.getFilename());
-        } else{
-            //The system is probably automatically updating the filename
-            //But let's make sure the extension is the same as the file's type
-            originalExtension = getFileExtension(generateFilename(bi.getBlobBytes(blob.getBytesID())));
-        }
-        
-        if(!newExtension.equals(originalExtension)){
-            throw new BlobTypeException("File extension of new filename is not the same as the file type");
-        }
+//        if(originalBlob.getFilename() != null){
+//            originalExtension = getFileExtension(originalBlob.getFilename());
+//        } else{
+//            //The system is probably automatically updating the filename
+//            //But let's make sure the extension is the same as the file's type
+//            originalExtension = getFileExtension(generateFilename(bi.getBlobBytes(blob.getBytesID())));
+//        }
+//        
+//        if(!newExtension.equals(originalExtension)){
+//            throw new BlobTypeException("File extension of new filename is not the same as the file type");
+//        }
         
         //If we reach here, the file extensions are equal, we may update the filename.
         bi.updateBlobFilename(blob);
@@ -448,7 +470,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      * @throws BlobException 
      */
-    public List<BlobLight> getPhotoBlobLightList(List<Integer> idList) throws IntegrationException, BlobException{
+    public List<BlobLight> getBlobLightList(List<Integer> idList) throws IntegrationException, BlobException{
         
         List<BlobLight> blobList = new ArrayList<>();
         
@@ -488,7 +510,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         }
         
         //The blob isn't attached to anything, let's delete the blob from the photodoc table
-        bi.deletePhotoBlob(blob.getBlobID());
+        bi.deletePhotoBlob(blob.getPhotoDocID());
         
         //Let's see if this blob is still attached to other photodoc rows
         List<Integer> connectedPhotoDocs = bi.getPhotoBlobsFromBytesID(blob.getBytesID());
@@ -621,7 +643,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         }
         
         //The blob isn't attached to anything, let's delete the blob from the photodoc table
-        bi.deletePDFBlob(blob.getBlobID());
+        bi.deletePDFBlob(blob.getPhotoDocID());
         
         //Let's see if this blob is still attached to other photodoc rows
         List<Integer> connectedPDFDocs = bi.getPDFBlobsFromBytesID(blob.getBytesID());
@@ -820,9 +842,9 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
         List<BOb> objectList = new ArrayList<>();
 
-        int blobID = blob.getBlobID();
+        int blobID = blob.getPhotoDocID();
         
-        if (blob.getType() == BlobType.PHOTO) {
+        if (blob.getType().getTypeEnum() == BlobTypeEnum.PHOTO) {
 
             CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
             
@@ -864,7 +886,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
                 
             }
             
-        } else if (blob.getType() == BlobType.PDF){
+        } else if (blob.getType().getTypeEnum() == BlobTypeEnum.PDF){
             
             //No PDF Connections yet
             

@@ -944,7 +944,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
         try{
             List<Integer> idList = bi.photosAttachedToInspectedSpaceElement(inspectedEle.getInspectedSpaceElementID());
-            inspectedEle.setBlobList(bc.getPhotoBlobLightList(idList));
+            inspectedEle.setBlobList(bc.getBlobLightList(idList));
         } catch(BlobException ex){
             throw new IntegrationException("An error occurred while trying to retrieve blobs for a OccInspectedSpaceElement", ex);
         }

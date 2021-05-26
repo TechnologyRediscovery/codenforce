@@ -1695,7 +1695,7 @@ public class CECaseSearchProfileBB
 
 
     /**
-     * Listener
+     * Listener for user requests to upload a file and attach to case
      *
      * @param ev
      */
@@ -1708,14 +1708,14 @@ public class CECaseSearchProfileBB
         try {
             BlobCoordinator blobc = getBlobCoordinator();
             
-            Blob blob = blobc.generateBlobSkeleton();
+            Blob blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());
             blob.setBytes(ev.getFile().getContent());
             blob.setFilename(ev.getFile().getFileName());
-            blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
-            Blob freshBlob = blobc.storeBlob(blob);
+            blob.setMuni(getSessionBean().getSessMuni());
+            Blob freshBlob = cc.blob_ceCase_attachBlob(getSessionBean().getSessUser(), blob, currentCase);
             // ship to coordinator for storage
             if(freshBlob != null){
-                System.out.println("cecaseSearchProfileBB.onBlobUploadCommitButtonChange | fresh blob ID: " + freshBlob.getBlobID());
+                System.out.println("cecaseSearchProfileBB.onBlobUploadCommitButtonChange | fresh blob ID: " + freshBlob.getPhotoDocID());
             } 
             
             this.currentCase.getBlobList().add(freshBlob);
@@ -1796,8 +1796,8 @@ public class CECaseSearchProfileBB
             try { 
                 // commit and link
                 
-                bi.commitPhotograph(photo.getBlobID());
-                bi.linkBlobToViolation(photo.getBlobID(), currentViolation.getViolationID());
+                bi.commitPhotograph(photo.getPhotoDocID());
+                bi.linkBlobToViolation(photo.getPhotoDocID(), currentViolation.getViolationID());
                 
             } catch (IntegrationException ex) {
                 System.out.println(ex.toString());

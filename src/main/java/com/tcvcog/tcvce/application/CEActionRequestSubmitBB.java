@@ -603,7 +603,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
             for (BlobLight blob : currentRequest.getBlobList()) {
                 try {
-                    blobI.linkPhotoBlobToActionRequest(blob.getBlobID(), sb.getSessCEAR().getRequestID());
+                    blobI.linkPhotoBlobToActionRequest(blob.getPhotoDocID(), sb.getSessCEAR().getRequestID());
                 } catch (IntegrationException ex) {
                     System.out.println(ex);
                 }

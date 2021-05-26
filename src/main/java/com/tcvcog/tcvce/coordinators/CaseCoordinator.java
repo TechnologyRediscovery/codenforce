@@ -24,6 +24,8 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
+import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -41,6 +43,7 @@ import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECaseDateFieldsEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsCodeViolation;
 import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
@@ -50,6 +53,7 @@ import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -130,7 +134,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         WorkflowCoordinator wc = getWorkflowCoordinator();
         PaymentIntegrator pi = getPaymentIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
-        
+        BlobIntegrator bi = getBlobIntegrator();
+        BlobCoordinator bc = getBlobCoordinator();
 
         // Wrap our base class in the subclass wrapper--an odd design structure, indeed
         CECaseDataHeavy cse = new CECaseDataHeavy(cecase_getCECase(c.getCaseID()));
@@ -154,9 +159,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             cse.setCeActionRequestList(sc.runQuery(qcear).getBOBResultList());
             
             // BLOB
-            cse.setBlobList();
+            cse.setBlobList(bc.getBlobLightList(bi.getBlobIDs(c)));
 
-        } catch (SearchException ex) {
+        } catch (SearchException | BlobException ex) {
             System.out.println(ex);
         }
 
@@ -1692,7 +1697,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             
         }
 
-        ps.setHeader_img_id(blob.getBlobID());
+        ps.setHeader_img_id(blob.getPhotoDocID());
         ci.novUpdateHeaderImage(ps);
      
         return ps;
@@ -1812,6 +1817,39 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         ci.novUpdateNotes(nov);
     }
 
+    
+    
+    
+    
+    // *************************************************************************
+    // *                     BLOBS                                             *
+    // *************************************************************************
+    
+    /**
+     * Primary pathway for inserting blobs for attachment to a CECase
+     * Liaises with the BlobCoordinator and Integrator as needed
+     * @param ua
+     * @param blob
+     * @param cse
+     * @return
+     * @throws BlobException
+     * @throws IOException
+     * @throws IntegrationException
+     * @throws BlobTypeException 
+     */
+    public Blob blob_ceCase_attachBlob(UserAuthorized ua, Blob blob, CECase cse) 
+            throws BlobException, IOException, IntegrationException, BlobTypeException{
+        BlobCoordinator bc = getBlobCoordinator();
+        BlobIntegrator bi = getBlobIntegrator();
+        
+        Blob freshBlob = bc.storeBlob(blob);
+        bi.linkBlobToCECase(blob, cse);
+        return freshBlob;
+        
+    }
+    
+    
+    
     // *************************************************************************
     // *                     CITATIONS                                         *
     // *************************************************************************

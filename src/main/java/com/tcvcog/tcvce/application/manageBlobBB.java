@@ -28,7 +28,7 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
-import com.tcvcog.tcvce.entities.BlobType;
+import com.tcvcog.tcvce.entities.BlobTypeEnum;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.MetadataKey;
@@ -124,7 +124,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
 
         String tempMode = getCurrentMode();
 
-        int currentBlobID = selectedBlob.getBlobID();
+        int currentBlobID = selectedBlob.getPhotoDocID();
 
         if (searchFilename == null
                 && searchDescription == null
@@ -145,7 +145,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             reloadConnections();
         } else {
             for (BlobLight b : blobList) {
-                if (b.getBlobID() == currentBlobID) {
+                if (b.getPhotoDocID() == currentBlobID) {
                     //This is the blob the user had selected, reload it.
                     selectBlob(b);
                     setCurrentMode(tempMode);
@@ -263,12 +263,12 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             switch (selectedBlob.getType()) {
                 case PDF:
                     externalContext.setResponseContentType("application/pdf");
-                    blob = bc.getPDFBlob(selectedBlob.getBlobID());
+                    blob = bc.getPDFBlob(selectedBlob.getPhotoDocID());
                     break;
 
                 case PHOTO:
                     externalContext.setResponseContentType("image/" + BlobCoordinator.getFileExtension(selectedBlob.getFilename()));
-                    blob = bc.getPhotoBlob(selectedBlob.getBlobID());
+                    blob = bc.getPhotoBlob(selectedBlob.getPhotoDocID());
                     break;
 
                 default:
@@ -336,15 +336,15 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         BlobCoordinator bc = getBlobCoordinator();
             try {
 
-                if (selectedBlob.getType() == BlobType.PHOTO) {
+                if (selectedBlob.getType() == BlobTypeEnum.PHOTO) {
                     bc.deletePhotoBlob(selectedBlob);
-                } else if (selectedBlob.getType() == BlobType.PDF) {
+                } else if (selectedBlob.getType() == BlobTypeEnum.PDF) {
                     bc.deletePDFBlob(selectedBlob);
                 }
 
                 //Setting blobID to 0 tells the reloadBlobs() method
                 //not to search for the blob after reloading.
-                selectedBlob.setBlobID(0);
+                selectedBlob.setPhotoDocID(0);
                 
                 reloadBlobs();
                 
@@ -511,7 +511,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         
         try {
             BlobIntegrator bi = getBlobIntegrator();
-            bi.removePhotoPropertyLink(selectedBlob.getBlobID(), prop.getPropertyID());
+            bi.removePhotoPropertyLink(selectedBlob.getPhotoDocID(), prop.getPropertyID());
             connectedProperties.remove(prop);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -529,7 +529,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         
         try {
             BlobIntegrator bi = getBlobIntegrator();
-            bi.removePhotoCEARLink(selectedBlob.getBlobID(), request.getRequestID());
+            bi.removePhotoCEARLink(selectedBlob.getPhotoDocID(), request.getRequestID());
             connectedRequests.remove(request);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -547,7 +547,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         
         try {
             BlobIntegrator bi = getBlobIntegrator();
-            bi.removePhotoViolationsLink(selectedBlob.getBlobID(), violation.getViolationID());
+            bi.removePhotoViolationsLink(selectedBlob.getPhotoDocID(), violation.getViolationID());
             connectedViolations.remove(violation);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -565,7 +565,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         
         try {
             BlobIntegrator bi = getBlobIntegrator();
-            bi.removePhotoMuniLink(selectedBlob.getBlobID(), muni.getMuniCode());
+            bi.removePhotoMuniLink(selectedBlob.getPhotoDocID(), muni.getMuniCode());
             connectedMunis.remove(muni);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -583,7 +583,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         
         try {
             BlobIntegrator bi = getBlobIntegrator();
-            bi.removePhotoInspectedSpaceElementLink(selectedBlob.getBlobID(), element.getElementID());
+            bi.removePhotoInspectedSpaceElementLink(selectedBlob.getPhotoDocID(), element.getElementID());
             connectedElements.remove(element);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -601,7 +601,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         
         try {
             BlobIntegrator bi = getBlobIntegrator();
-            bi.removePhotoMuniLink(selectedBlob.getBlobID(), period.getPeriodID());
+            bi.removePhotoMuniLink(selectedBlob.getPhotoDocID(), period.getPeriodID());
             connectedPeriods.remove(period);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,

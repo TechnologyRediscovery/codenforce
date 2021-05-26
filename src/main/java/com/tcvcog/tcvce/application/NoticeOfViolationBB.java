@@ -30,7 +30,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.BlobType;
+import com.tcvcog.tcvce.entities.BlobTypeEnum;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CodeViolationDisplayable;
@@ -1130,7 +1130,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             blob = blobc.generateBlobSkeleton();  //init new blob
             // TODO Upgrade on PF https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
 //                blob.setBytes(ev.getFile().getContents());  // set bytes  
-            blob.setType(BlobType.PHOTO);
+            blob.setType(BlobTypeEnum.PHOTO);
             blob.setFilename(ev.getFile().getFileName());
 
 

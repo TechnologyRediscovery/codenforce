@@ -30,7 +30,7 @@
                                 id="blobTable"
                                 var="blob"
                                 value="#{sessionBean.blobList}"
-                                rowKey="#{blob.blobID}"
+                                rowKey="#{blob.photoDocID}"
                                 tableStyleClass="primeDataTable"
                                 draggableRows="false" tabindex="6">
                                 <p:column>
@@ -45,7 +45,7 @@
                                         <h:outputText value="File"/>
                                     </f:facet>
                                     <p:graphicImage width="50%" value="#{blobCoordinator.image}">
-                                        <f:param name="blobID" value="#{blob.blobID}" />
+                                        <f:param name="blobID" value="#{bphotoDocIDobID}" />
                                     </p:graphicImage>
                                 </p:column>
                                 <p:column>
@@ -58,19 +58,19 @@
                                     <f:facet name="header">
                                         <h:outputText value="Link to Code Violation"/>
                                     </f:facet>
-                                    <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.setSelectedBlobID(blob.blobID)}" oncomplete="PF('linkCV-dlg').show()" update=":linkBlobForm:linkCV-dlg"/>
+                                    <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.setSelectedBlobphotoDocIDb.blobID)}" oncomplete="PF('linkCV-dlg').show()" update=":linkBlobForm:linkCV-dlg"/>
                                 </p:column>
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Link to Property"/>
                                     </f:facet>
-                                    <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.setSelectedBlobID(blob.blobID)}" oncomplete="PF('linkProperty-dlg').show()" update=":linkBlobForm:linkProperty-dlg"/>
+                                    <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.setSelectedphotoDocID(blob.blobID)}" oncomplete="PF('linkProperty-dlg').show()" update=":linkBlobForm:linkProperty-dlg"/>
                                 </p:column>
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Link to Person"/>
                                     </f:facet>
-                                    <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.setSelectedBlobID(blob.blobID)}" oncomplete="PF('linkPerson-dlg').show()" update=":linkBlobForm:linkPerson-dlg"/>
+                                    <p:commandButton icon="fa fa-link" actionListener="#{linkBlobBB.setSelephotoDocIDobID(blob.blobID)}" oncomplete="PF('linkPerson-dlg').show()" update=":linkBlobForm:linkPerson-dlg"/>
                                 </p:column>
                             </p:dataTable>
                             

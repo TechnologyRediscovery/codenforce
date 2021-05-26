@@ -233,7 +233,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             //I assume that we are removing a photo connected to the OccPeriod
             //that the OccInspection is connected to. If you need it to delete 
             
-            bi.removePhotoOccPeriodLink(blob.getBlobID(), currentInspection.getOccPeriodID());
+            bi.removePhotoOccPeriodLink(blob.getPhotoDocID(), currentInspection.getOccPeriodID());
             
             linkSevered = true;
             

@@ -801,7 +801,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
     public void deletePhoto(int blobID) {
         for (BlobLight blob : this.selectedRequest.getBlobList()) {
-            if (blobID == blob.getBlobID()) {
+            if (blobID == blob.getPhotoDocID()) {
                 this.selectedRequest.getBlobList().remove(blob);
 
                 try {

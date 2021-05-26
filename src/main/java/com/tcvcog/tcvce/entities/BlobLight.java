@@ -25,28 +25,32 @@ import java.time.LocalDateTime;
  */
 public class BlobLight {
 
-    protected int blobID;
+    protected int photoDocID;
+    protected String description;
+    protected boolean committed;
+    
     protected int bytesID;
     protected BlobType type;
-    protected String description, filename;
-    protected LocalDateTime timestamp;
-    protected int uploadPersonID;
-    protected int municode;
+    protected String title;
+
+    protected Municipality muni;
+    protected LocalDateTime createdTS;
+    protected User createdBy;
     
     protected Metadata blobMetadata;
     
     /**
-     * @return the blobID
+     * @return the photoDocID
      */
-    public int getBlobID() {
-        return blobID;
+    public int getPhotoDocID() {
+        return photoDocID;
     }
 
     /**
-     * @param blobID the blobID to set
+     * @param photoDocID the photoDocID to set
      */
-    public void setBlobID(int blobID) {
-        this.blobID = blobID;
+    public void setPhotoDocID(int photoDocID) {
+        this.photoDocID = photoDocID;
     }
 
     /**
@@ -78,46 +82,20 @@ public class BlobLight {
     }
 
     /**
-     * @return the timestamp
+     * @return the createdTS
      */
-    public LocalDateTime getTimestamp() {
-        return timestamp;
+    public LocalDateTime getCreatedTS() {
+        return createdTS;
     }
 
     /**
-     * @param timestamp the timestamp to set
+     * @param createdTS the createdTS to set
      */
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
+    public void setCreatedTS(LocalDateTime createdTS) {
+        this.createdTS = createdTS;
     }
 
-    /**
-     * @return the uploadPersonID
-     */
-    public int getUploadPersonID() {
-        return uploadPersonID;
-    }
-
-    /**
-     * @param uploadPersonID the uploadPersonID to set
-     */
-    public void setUploadPersonID(int uploadPersonID) {
-        this.uploadPersonID = uploadPersonID;
-    }
-
-    /**
-     * @return the filename
-     */
-    public String getFilename() {
-        return filename;
-    }
-
-    /**
-     * @param filename the filename to set
-     */
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
+   
 
     public int getBytesID() {
         return bytesID;
@@ -135,12 +113,61 @@ public class BlobLight {
         this.blobMetadata = blobMetadata;
     }
 
-    public int getMunicode() {
-        return municode;
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
     }
 
-    public void setMunicode(int municode) {
-        this.municode = municode;
+    /**
+     * @param title the title to set
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
+     * @return the createdBy
+     */
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    /**
+     * @param createdBy the createdBy to set
+     */
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    /**
+     * @return the committed
+     */
+    public boolean isCommitted() {
+        return committed;
+    }
+
+    /**
+     * @param committed the committed to set
+     */
+    public void setCommitted(boolean committed) {
+        this.committed = committed;
+    }
+
+    /**
+     * @return the muni
+     */
+    public Municipality getMuni() {
+        return muni;
+    }
+
+    /**
+     * @param muni the muni to set
+     */
+    public void setMuni(Municipality muni) {
+        this.muni = muni;
     }
     
 }

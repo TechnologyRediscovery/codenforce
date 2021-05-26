@@ -21,7 +21,7 @@ import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.BlobType;
+import com.tcvcog.tcvce.entities.BlobTypeEnum;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import java.io.IOException;
@@ -62,7 +62,7 @@ public class PropertyFilesBB
     public void removePhoto(int blobID){
         try {
             Blob blob = getBlobCoordinator().getPhotoBlob(blobID);
-            if(blob.getType() == BlobType.PHOTO){
+            if(blob.getType() == BlobTypeEnum.PHOTO){
                 getBlobIntegrator().removePhotoPropertyLink(blobID, currProp.getPropertyID());
             }
         }
@@ -107,7 +107,7 @@ public class PropertyFilesBB
             
             BlobIntegrator blobi = getBlobIntegrator();
             
-            blobi.linkBlobToProperty(blob.getBlobID(), currProp.getPropertyID());
+            blobi.linkBlobToProperty(blob.getPhotoDocID(), currProp.getPropertyID());
             
         } catch (IntegrationException | IOException ex) {
             System.out.println("PropertyFilesBB.handleFileUpload | " + ex);

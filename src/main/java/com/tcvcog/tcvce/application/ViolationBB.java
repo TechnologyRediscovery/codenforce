@@ -664,7 +664,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             
             currentViolation.getBlobList().add(blobc.storeBlob(blob));
             
-            bi.linkBlobToViolation(blob.getBlobID(), currentViolation.getViolationID());
+            bi.linkBlobToViolation(blob.getPhotoDocID(), currentViolation.getViolationID());
             
         } catch (IntegrationException | IOException | BlobTypeException ex) {
             System.out.println("ViolationAddBB.handlePhotoUpload | upload failed! " + ex);
@@ -807,8 +807,8 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             try { 
                 // commit and link
                 
-                bi.commitPhotograph(photo.getBlobID());
-                bi.linkBlobToViolation(photo.getBlobID(), currentViolation.getViolationID());
+                bi.commitPhotograph(photo.getPhotoDocID());
+                bi.linkBlobToViolation(photo.getPhotoDocID(), currentViolation.getViolationID());
                 
             } catch (IntegrationException ex) {
                 System.out.println(ex.toString());
