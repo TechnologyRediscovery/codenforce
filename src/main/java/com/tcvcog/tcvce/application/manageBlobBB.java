@@ -99,20 +99,20 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
 
         setCurrentMode("Info");
 
-        try {
-                
-                BlobIntegrator bi = getBlobIntegrator();
-                BlobCoordinator bc = getBlobCoordinator();
-                
-                List<Integer> blobIDs = bi.getRecentPhotoBlobs();
-                blobList = new ArrayList<>();
-                
-                for (int idnum : blobIDs) {
-                    blobList.add(bc.getBlobLight(idnum));
-                }
-        } catch (IntegrationException | BlobException ex) {
-            System.out.println("manageBlobBB.initBean | ERROR: " + ex);
-        }
+//        try {
+//                
+//                BlobIntegrator bi = getBlobIntegrator();
+//                BlobCoordinator bc = getBlobCoordinator();
+//                
+//                List<Integer> blobIDs = bi.getRecentPhotoBlobs();
+//                blobList = new ArrayList<>();
+//                
+//                for (int idnum : blobIDs) {
+//                    blobList.add(bc.getBlobLight(idnum));
+//                }
+//        } catch (IntegrationException | BlobException ex) {
+//            System.out.println("manageBlobBB.initBean | ERROR: " + ex);
+//        }
     }
     
     /**
@@ -242,6 +242,12 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         
     }
     
+    public void downloadBlob(BlobLight blight){
+        selectedBlob = blight;
+        downloadSelectedBlob();
+        
+    }
+    
     public void downloadSelectedBlob(){
 
         // Prepare.
@@ -260,14 +266,14 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             // Init servlet response.
             externalContext.responseReset();
 
-            switch (selectedBlob.getType()) {
+            switch (selectedBlob.getType().getTypeEnum()) {
                 case PDF:
                     externalContext.setResponseContentType("application/pdf");
                     blob = bc.getPDFBlob(selectedBlob.getPhotoDocID());
                     break;
 
                 case PHOTO:
-                    externalContext.setResponseContentType("image/" + BlobCoordinator.getFileExtension(selectedBlob.getFilename()));
+//                    externalContext.setResponseContentType("image/" + BlobCoordinator.getFileExtension(selectedBlob.getFilename()));
                     blob = bc.getPhotoBlob(selectedBlob.getPhotoDocID());
                     break;
 
@@ -295,6 +301,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
 
                 // Finalize task.
                 output.flush();
+                System.out.println("manageBlobBB.downloadSelectedBlob: output.flush() done");
             } else {
                 throw new BlobException("BlobType not yet supported for download or blob failed to load.");
             }
@@ -336,9 +343,9 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         BlobCoordinator bc = getBlobCoordinator();
             try {
 
-                if (selectedBlob.getType() == BlobTypeEnum.PHOTO) {
+                if (selectedBlob.getType().getTypeEnum()== BlobTypeEnum.PHOTO) {
                     bc.deletePhotoBlob(selectedBlob);
-                } else if (selectedBlob.getType() == BlobTypeEnum.PDF) {
+                } else if (selectedBlob.getType().getTypeEnum() == BlobTypeEnum.PDF) {
                     bc.deletePDFBlob(selectedBlob);
                 }
 
@@ -367,38 +374,41 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
             }
     }
     
+    /**
+     * @deprecated we don't update filenames
+     */
     public void updateBlobFilename(){
         
         BlobCoordinator bc = getBlobCoordinator();
         
-        String originalName = selectedBlob.getFilename();
-        
-        try{
-            selectedBlob.setFilename(newFilename);
-            
-            bc.updateBlobFilename(selectedBlob);
-            
-            reloadBlobs();
-            
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully updated filename!", ""));
-        } catch(IOException | IntegrationException | BlobException  ex){
-            //Rollback the filename
-            selectedBlob.setFilename(originalName);
-            System.out.println("manageBlobBB.updateBlobFilename() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occurred while trying to update the filename!", ""));
-        } catch(BlobTypeException ex){
-            //Rollback the filename
-            selectedBlob.setFilename(originalName);
-            System.out.println("manageBlobBB.updateBlobFilename() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please end the file name with the file extension [" +
-                            BlobCoordinator.getFileExtension(originalName) +"]", ""));
-        }
+//        String originalName = selectedBlob.getFilename();
+//        
+//        try{
+//            selectedBlob.setFilename(newFilename);
+//            
+//            bc.updateBlobFilename(selectedBlob);
+//            
+//            reloadBlobs();
+//            
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+//                            "Successfully updated filename!", ""));
+//        } catch(IOException | IntegrationException | BlobException  ex){
+//            //Rollback the filename
+//            selectedBlob.setFilename(originalName);
+//            System.out.println("manageBlobBB.updateBlobFilename() | ERROR: " + ex);
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                            "An error occurred while trying to update the filename!", ""));
+//        } catch(BlobTypeException ex){
+//            //Rollback the filename
+//            selectedBlob.setFilename(originalName);
+//            System.out.println("manageBlobBB.updateBlobFilename() | ERROR: " + ex);
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                            "Please end the file name with the file extension [" +
+//                            BlobCoordinator.getFileExtension(originalName) +"]", ""));
+//        }
         
     }
     
@@ -621,7 +631,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
      * @return 
      */
     public int getSelectedBlobType(){
-        switch(selectedBlob.getType()){
+        switch(selectedBlob.getType().getTypeEnum()){
             case PHOTO:
                 return 0;  
             

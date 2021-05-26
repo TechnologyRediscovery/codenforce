@@ -62,7 +62,7 @@ public class PropertyFilesBB
     public void removePhoto(int blobID){
         try {
             Blob blob = getBlobCoordinator().getPhotoBlob(blobID);
-            if(blob.getType() == BlobTypeEnum.PHOTO){
+            if(blob.getType().getTypeEnum()== BlobTypeEnum.PHOTO){
                 getBlobIntegrator().removePhotoPropertyLink(blobID, currProp.getPropertyID());
             }
         }
@@ -83,7 +83,7 @@ public class PropertyFilesBB
         BlobCoordinator blobc = getBlobCoordinator();
         Blob blob = null;
         try {
-            blob = blobc.generateBlobSkeleton();  //init new blob
+            blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
 //            blob.setBytes(ev.getFile().getContents());  // set bytes
             blob.setFilename(ev.getFile().getFileName());
             
@@ -93,7 +93,7 @@ public class PropertyFilesBB
                 municode = currProp.getMuni().getMuniCode();
             }
             
-            blob.setMunicode(municode);
+            blob.setMuni(getSessionBean().getSessMuni());
             
             if(blob.getDescription() == null || blob.getDescription().isEmpty()){
                 

@@ -654,13 +654,13 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             BlobCoordinator blobc = getBlobCoordinator();
             BlobIntegrator bi = getBlobIntegrator();
             
-            Blob blob = blobc.generateBlobSkeleton();
+            Blob blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());
             // TODO: PF upgrade: https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
             
             //blob.setBytes(ev.getFile().getContents());
             
             blob.setFilename(ev.getFile().getFileName());
-            blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
+            blob.setMuni(getSessionBean().getSessMuni());
             
             currentViolation.getBlobList().add(blobc.storeBlob(blob));
             

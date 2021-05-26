@@ -1388,13 +1388,13 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         } 
         
         List<BlobLight> blobList = new ArrayList<>();
-        try {
-            for(int id : bi.getBlobsByCECase(v.getViolationID())){
-                blobList.add(bc.getBlobLight(id));
-            }
-        } catch (BlobException ex){
-            throw new IntegrationException("An error occurred while retrieving blobs for a Code Violation", ex);
-        }
+//        try {
+//            for(int id : bi.getBlobsByCECase(v.getViolationID())){
+//                blobList.add(bc.getBlobLight(id));
+//            }
+//        } catch (BlobException ex){
+//            throw new IntegrationException("An error occurred while retrieving blobs for a Code Violation", ex);
+//        }
         v.setBlobList(blobList);
         
         return v;

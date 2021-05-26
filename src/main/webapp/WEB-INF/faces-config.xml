@@ -2159,4 +2159,9 @@
         <managed-bean-class>com.tcvcog.tcvce.application.CECaseListExport</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    <managed-bean>
+        <managed-bean-name>blobRetrieveBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.BlobRetrieveBB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
 </faces-config>

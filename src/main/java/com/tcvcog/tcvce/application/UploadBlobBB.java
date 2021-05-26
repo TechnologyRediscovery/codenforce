@@ -49,14 +49,14 @@ public class UploadBlobBB extends BackingBeanUtils implements Serializable {
         Blob blob = null;
 
         try {
-            blob = blobc.generateBlobSkeleton();  //init new blob
+            blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
 // TODO pf migrtation https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
 //            blob.setBytes(ev.getFile().getContents());  // set bytes 
 
             // set filename
             blob.setFilename(ev.getFile().getFileName());
 
-            blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
+            blob.setMuni(getSessionBean().getSessMuni());
             
             blob = blobc.storeBlob(blob);
         } catch (IntegrationException | IOException | NoSuchElementException ex) {

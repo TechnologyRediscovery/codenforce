@@ -509,11 +509,11 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         BlobCoordinator blobc = getBlobCoordinator();
         Blob blob = null;
         try {
-            blob = blobc.generateBlobSkeleton();  //init new blob
+            blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
             // TODO: PF migration https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
 //            blob.setBytes(ev.getFile().getContents());  // set bytes
             blob.setFilename(ev.getFile().getFileName());
-            blob.setMunicode(currentRequest.getMuni().getMuniCode());
+            blob.setMuni(currentRequest.getMuni());
 
             blob = blobc.storeBlob(blob);
         } catch (IntegrationException | IOException | BlobTypeException ex) {

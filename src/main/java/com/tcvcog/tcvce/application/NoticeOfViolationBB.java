@@ -42,6 +42,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.TextBlock;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -1096,13 +1097,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | File: " + ev.getFile().getFileName() + " Type: " + ev.getFile().getContentType());
 
         BlobCoordinator blobc = getBlobCoordinator();
+        BlobIntegrator blobi = getBlobIntegrator();
         try {
-            Blob blob = blobc.generateBlobSkeleton();  //init new blob
+            Blob blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
             
 //            blob.setBytes(ev.getFile().getContents());  // set bytes  
             
             blob.setFilename(ev.getFile().getFileName());
-            blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
+            blob.setMuni(getSessionBean().getSessMuni());
             blob.setDescription("Header image for Notices of Violation in " + getSessionBean().getSessMuni().getMuniName() + " as of " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             // Write to DB
             blob = blobc.storeBlob(blob);
@@ -1127,10 +1129,10 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
         Blob blob = null;
         try {
-            blob = blobc.generateBlobSkeleton();  //init new blob
+            blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
             // TODO Upgrade on PF https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
 //                blob.setBytes(ev.getFile().getContents());  // set bytes  
-            blob.setType(BlobTypeEnum.PHOTO);
+            blob.setType(blobi.getBlobType(BlobTypeEnum.PHOTO.getTypeID()));
             blob.setFilename(ev.getFile().getFileName());
 
 

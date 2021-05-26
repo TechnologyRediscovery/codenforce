@@ -109,13 +109,14 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * The BlobCoordinator attempts to retrieve an image with a given Blob ID supplied by a JSF parameter. 
      * If something were to go wrong, automatically retrieve the defaultStream for the interface.
      *
+     * @param bl
      * @param ctx
      * @param fctx
      * @return
      * @throws BlobTypeException
      * @throws com.tcvcog.tcvce.domain.BlobException
      */
-    public StreamedContent getImage(ExternalContext ctx, FacesContext fctx) throws BlobTypeException, BlobException{
+    public StreamedContent getBlobStream(BlobLight bl, ExternalContext ctx, FacesContext fctx) throws BlobTypeException, BlobException{
         // should use EL to verify blob type,  but this will check it anyway
         DefaultStreamedContent sc = null;
 
@@ -135,7 +136,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
                         case PHOTO:
                             // TODO: Update to new UI:
                             // https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
-//                            sc = new DefaultStreamedContent.builder().new ByteArrayInputStream(bi.getBlobBytes(blob.getBytesID()));
+//                            sc = new DefaultStreamedContent.builder().new ByteArrayInputStream(bi.getBlob(blob.getBytesID()));
                             break;
                         case PDF:
 //                            sc = new DefaultStreamedContent(new FileInputStream(new File("/home/noah/Documents/COG Project/codeconnect/src/main/webapp/images/pdf-icon.png")));
@@ -149,7 +150,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             } 
 //            catch (FileNotFoundException ex) {
 //                System.out.println(ex);
-//                System.out.println("BlobCoordinator.getImage | ERROR: could not find pdf-icon.png ");
+//                System.out.println("BlobCoordinator.getBlobStream | ERROR: could not find pdf-icon.png ");
 //            }
             
         }
@@ -269,7 +270,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
         blob.setType(bi.getBlobType(BlobTypeEnum.PHOTO.getTypeID()));
 
-        blob = stripPDFMetadata(blob);
+//        blob = stripPDFMetadata(blob);
         return getBlobIntegrator().storeBlob(blob);
         
     }
@@ -308,7 +309,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 //        } else{
 //            //The system is probably automatically updating the filename
 //            //But let's make sure the extension is the same as the file's type
-//            originalExtension = getFileExtension(generateFilename(bi.getBlobBytes(blob.getBytesID())));
+//            originalExtension = getFileExtension(generateFilename(bi.getBlob(blob.getBytesID())));
 //        }
 //        
 //        if(!newExtension.equals(originalExtension)){
@@ -325,7 +326,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
         Blob blob = new Blob(getBlobLight(blobID));
 
-        blob.setBytes(bi.getBlobBytes(blob.getBytesID()));
+//        blob.setBytes(bi.getBlobBytes(blob.getBytesID()));
 
         return blob;
     }
@@ -341,9 +342,17 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
         Blob blob = new Blob(getPDFBlobLight(blobID));
 
-        blob.setBytes(bi.getBlobBytes(blob.getBytesID()));
+//        blob.setBytes(bi.getBlobBytes(blob.getBytesID()));
 
         return blob;
+    }
+   
+    public Blob getBlob(BlobLight bl){
+        BlobIntegrator bi = getBlobIntegrator();
+        return bi.getBlob(bl);
+        
+        
+        
     }
     
     /**
@@ -358,7 +367,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
         Blob blob = new Blob(input);
 
-        blob.setBytes(bi.getBlobBytes(input.getBytesID()));
+//        blob.setBytes(bi.getBlobBytes(input.getBytesID()));
 
         return blob;
     }
@@ -378,10 +387,11 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         BlobIntegrator bi = getBlobIntegrator();
         
         try {
-            return bi.getPhotoBlobLight(blobID);
+            return bi.getBlobLight(blobID);
         } catch(MetadataException ex) {
-            
-//            if(ex.isMapNullError()){
+            System.out.println("Metadata Exception!");
+            System.out.println(ex);
+            if(ex.isMapNullError()){
                 //The metadata column isn't properly populated.
                 //We'll grab the bytes, strip the metadata from them
                 //And save them in the metadata column before fetching
@@ -391,22 +401,22 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
                 // TODO: deal with metadata
                 
                 //grab the BlobLight without metadata so we don't get the same error
-//                Blob patient = getBlobFromBlobLight(bi.getPhotoBlobLightWithoutMetadata(blobID));
-//                try {
-//                patient = stripImageMetadata(patient);
-//
-//                //Should be all ready, let's update the bytes and the metadata
-//
-//                bi.updateBlobBytes(patient);
-//
-//                bi.updateBlobMetadata(patient);
-//                
-//                } catch(IOException | BlobTypeException exTwo){
-//                    throw new BlobException(exTwo);
-//                }
-//            } else {
-//                throw new BlobException(ex);
-//            }
+                Blob patient = getBlobFromBlobLight(bi.getPhotoBlobLightWithoutMetadata(blobID));
+                try {
+                patient = stripImageMetadata(patient);
+
+                //Should be all ready, let's update the bytes and the metadata
+
+                bi.updateBlobBytes(patient);
+
+                bi.updateBlobMetadata(patient);
+                
+                } catch(IOException | BlobTypeException exTwo){
+                    throw new BlobException(exTwo);
+                }
+            } else {
+                throw new BlobException(ex);
+            }
             
         }
         

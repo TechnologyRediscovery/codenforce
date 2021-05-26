@@ -56,13 +56,13 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     /**
      * This method should only be used by the BlobCoordinator.
      * If you need to grab a Blob anywhere else use the coordinator method
-     * @param photodocid the blobID of the meta to be retrieved from db
+     * @param blobid the blobID of the meta to be retrieved from db
      * @return the meta pulled from the db
      * @throws IntegrationException thrown instead of SQLException
      * @throws com.tcvcog.tcvce.domain.MetadataException
      */
-    public BlobLight getPhotoBlobLight(int photodocid) throws IntegrationException, MetadataException{
-        if(photodocid == 0){
+    public BlobLight getBlobLight(int blobid) throws IntegrationException, MetadataException{
+        if(blobid == 0){
             throw new IntegrationException("Cannot fetch BlobLight with id = 0!");
         }
         BlobLight blob = null;
@@ -70,16 +70,16 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         ResultSet rs = null;
         String query = "SELECT photodocid, photodocdescription, photodoccommitted, blobbytes_bytesid, \n" +
                         "       muni_municode, blobtype_typeid, metadatamap, title, createdby_userid, \n" +
-                        "       createdts\n" +
+                        "       createdts \n" +
                         "  FROM public.photodoc WHERE photodocid = ?;";
         
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, photodocid);
+            stmt.setInt(1, blobid);
             rs = stmt.executeQuery();
             while(rs.next()){
-                System.out.println("BlobIntegrator.getBlob: | retrieving blobID "  + photodocid);
+                System.out.println("BlobIntegrator.getBlobLight: | retrieving blobID "  + blobid);
                 blob = generateBlobLight(rs);
             }
             
@@ -119,7 +119,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setInt(1, blobID);
             rs = stmt.executeQuery();
             while(rs.next()){
-                System.out.println("BlobIntegrator.getBlob: | retrieving blobID "  + blobID);
+                System.out.println("BlobIntegrator.getPhotoBlobLightWithoutMetadata: | retrieving blobID "  + blobID);
                 blob = generatePhotoBlobLightWithoutMetadata(rs);
             }
             
@@ -159,11 +159,11 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         blob.setMuni(mc.getMuni(rs.getInt("muni_municode")));
         blob.setType(getBlobType(rs.getInt("blobtype_typeid")));
         
-        blob.setBlobMetadata(generateBlobMetadata(rs));
+//        blob.setBlobMetadata(generateBlobMetadata(rs));
         blob.setTitle(rs.getString("title"));
         blob.setCreatedBy(uc.user_getUser(rs.getInt("createdby_userid")));
         
-        Timestamp time = rs.getTimestamp("uploaddate");
+        Timestamp time = rs.getTimestamp("createdts");
         if(time != null){
             blob.setCreatedTS(time.toLocalDateTime());
         }
@@ -300,7 +300,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
 //        blob.setUploadPersonID(rs.getInt("uploadpersonid"));
 //        blob.setMunicode(rs.getInt("muni_municode"));
         
-        blob.setBlobMetadata(generateBlobMetadata(rs));
+//        blob.setBlobMetadata(generateBlobMetadata(rs));
         return blob;
     }
     
@@ -329,41 +329,52 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     
     /**
      * Gets the binary data of a file in the database
+     * @param bl
      * @param bytesID
      * @return
      * @throws IntegrationException 
      */
-    public byte[] getBlobBytes(int bytesID) throws IntegrationException{
+    public Blob getBlob(BlobLight bl) {
         
         Connection con = getPostgresCon();
         ResultSet rs = null;
-        String query = "SELECT blob FROM public.blobbytes WHERE bytesid = ?;";
+        String query = "SELECT bytesid, createdts, blob, uploadedby_userid, filename\n" +
+"  FROM public.blobbytes WHERE bytesid = ?;";
         
         PreparedStatement stmt = null;
         
-        byte[] blobBytes = null;
+        Blob blob = null;
         
         try {
             
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, bytesID);
+            stmt.setInt(1, bl.getBytesID());
             rs = stmt.executeQuery();
             while(rs.next()){
-                blobBytes = rs.getBytes("blob");
+                blob = generateBlob(rs, bl);
             }
             
         } catch (SQLException ex) {
             //System.out.println(ex);
-            throw new IntegrationException("Error retrieving blob bytes. ", ex);
+            System.out.println(ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
         
-        return blobBytes;
+        return blob;
         
     } 
+    
+    private Blob generateBlob(ResultSet rs, BlobLight bl) throws SQLException{
+        Blob blob = new Blob(bl);
+        blob.setFilename(rs.getString("filename"));
+        blob.setBytes(rs.getBytes("blob"));
+        blob.setBytesID(rs.getInt("bytesid"));
+        return blob;
+        
+    }
     
     public BlobType getBlobType(int typeid) throws IntegrationException{
         
@@ -418,7 +429,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         SystemIntegrator si = getSystemIntegrator();
         
         BlobType bt = new BlobType();
-        bt.setTitle(rs.getString("title"));
+        bt.setTitle(rs.getString("typetitle"));
         bt.setIcon(si.getIcon(rs.getInt("icon_iconid")));
         bt.setTypeEnum(BlobTypeEnum.blobTypeFromInt(rs.getInt("typeid")));
         
