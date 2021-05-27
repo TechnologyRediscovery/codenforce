@@ -19,4 +19,4 @@ Running requires a postgres service and webfly server setup. This has been suffi
 
 Instructions on initializing database contents can be found in `db/README.md`
 
-After running `docker-compose build` once, `mvn package && docker-compose up && docker-compose down` can be used to build and run all in one command.
+After the containers are running (using `docker-compose up && docker-compose down`), `mvn package` can be run and the website will be updated without a server restart.
