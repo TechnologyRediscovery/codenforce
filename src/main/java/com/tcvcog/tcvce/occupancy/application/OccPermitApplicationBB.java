@@ -649,26 +649,28 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      * @return 
      */
     public List<String> getPersonRequirementDescription() {
-        //Make description for required people
-        
         StringBuilder description = new StringBuilder("It is required that you have these types of people: ");
-
         List<String> descList = new ArrayList<>();
 
-        for (PersonType type : requiredPersons) {
+        //Make description for required people (if the list is valid)
+        if (requiredPersons != null) {
 
-            description.append(type.getLabel()).append(", ");
+            for (PersonType type : requiredPersons) {
+
+                description.append(type.getLabel()).append(", ");
+
+            }
+
+            //Delete the last comma
+            int lastComma = description.lastIndexOf(",");
+            if (lastComma > -1) {
+                description.deleteCharAt(description.lastIndexOf(","));        
+            }
+
+            descList.add(description.toString());
+            description = new StringBuilder();
 
         }
-
-        //Delete the last comma
-        int lastComma = description.lastIndexOf(",");
-        if (lastComma > -1) {
-            description.deleteCharAt(description.lastIndexOf(","));        
-        }
-
-        descList.add(description.toString());
-        description = new StringBuilder();
 
         //Make description for optional people (if there are any)
         List<PersonType> optional = getSessionBean().getSessOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes();
@@ -681,7 +683,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             }
 
             //Delete the last comma
-            lastComma = description.lastIndexOf(",");
+            int lastComma = description.lastIndexOf(",");
             if (lastComma > -1) {
                 description.deleteCharAt(description.lastIndexOf(","));        
             }
