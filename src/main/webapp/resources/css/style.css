@@ -2151,19 +2151,24 @@ body .ui-inputfield{
     width: 100%;
 }
 
-body .ui-widget:not(.pi), body .ui-widget .ui-widget:not(.pi){
+body .ui-widget:not(.pi), body .ui-widget .ui-widget:not(.pi) {
     font-family: 'heebo';
 }
 
-body .ui-steps .ui-steps-item .ui-menuitem-link .ui-steps-number{
+body .ui-steps .ui-steps-item .ui-menuitem-link .ui-steps-number {
     width: 3.5em;
     height: 3.5em;
-    /*padding-top: 1em;*/
 }
+
+body .ui-steps .ui-steps-item.complete .ui-menuitem-link .ui-steps-number {
+    border: 0;
+}
+
 
 body .ui-steps .ui-steps-item.ui-state-disabled {
     opacity: 1
 }
+
 
 body .ui-calendar.ui-trigger-calendar{
     display: inline-flex;
