@@ -649,9 +649,6 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      * @return 
      */
     public List<String> getPersonRequirementDescription() {
-
-        List<PersonType> optional = getSessionBean().getSessOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes();
-
         //Make description for required people
         
         StringBuilder description = new StringBuilder("It is required that you have these types of people: ");
@@ -665,30 +662,35 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         }
 
         //Delete the last comma
-        description.deleteCharAt(description.lastIndexOf(","));
-
-        descList.add(description.toString());
-
-        //Make description for optional people
-        
-        description = new StringBuilder();
-
-        description.append("You may also add these types of people: ");
-
-        for (PersonType type : optional) {
-
-            description.append(type.getLabel()).append(", ");
-
+        int lastComma = description.lastIndexOf(",");
+        if (lastComma > -1) {
+            description.deleteCharAt(description.lastIndexOf(","));        
         }
 
-        //Delete the last comma
-        description.deleteCharAt(description.lastIndexOf(","));
-
         descList.add(description.toString());
+        description = new StringBuilder();
+
+        //Make description for optional people (if there are any)
+        List<PersonType> optional = getSessionBean().getSessOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes();
+        if (optional.size() > 0) {
+            description.append("You may also add these types of people: ");
+
+            for (PersonType type : optional) {
+                description.append(type.getLabel()).append(", ");
+
+            }
+
+            //Delete the last comma
+            lastComma = description.lastIndexOf(",");
+            if (lastComma > -1) {
+                description.deleteCharAt(description.lastIndexOf(","));        
+            }
+            
+            descList.add(description.toString());
+            description = new StringBuilder();
+        }
 
         //Tell the user how to identify themselves
-        
-        description = new StringBuilder();
 
         description.append("Also, please identify yourself by clicking the \"Set As Applicant\" button in the row with your name.");
 
