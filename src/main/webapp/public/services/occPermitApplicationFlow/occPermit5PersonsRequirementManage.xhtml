@@ -213,6 +213,9 @@
                                                                  rowKey="#{applicationPerson.bundledPerson.personID}"
                                                                  editable="true"
                                                                  styleClass="editTable">  
+                                                        
+                                                         <p:ajax event="rowEdit" update=":personsRequirementManageForm:currentApplicantLabel 
+                                                                                         :personsRequirementManageForm:currentContactLabel"/>
 
                                                         <p:column headerText="Edit" style="width: 30px">
                                                             <p:rowEditor/>
@@ -251,7 +254,8 @@
                                                             <div class="gray_button">
                                                                 <p:commandButton ajax="true" value="Set as applicant" 
                                                                                  action="#{occPermitApplicationBB.setApplicant(applicationPerson)}"
-                                                                                 update="#{currentApplicantLabel} #{currentContactLabel}"
+                                                                                 update=":personsRequirementManageForm:currentApplicantLabel
+                                                                                         :personsRequirementManageForm:currentContactLabel"
                                                                                  /> 
                                                             </div>
                                                         </p:column>
@@ -260,7 +264,7 @@
                                                             <div class="gray_button">
                                                                 <p:commandButton ajax="true" value="Set as preferred contact" 
                                                                                  action="#{occPermitApplicationBB.setContactPerson(applicationPerson)}"
-                                                                                 update="#{currentContactLabel}"
+                                                                                 update=":personsRequirementManageForm:currentContactLabel"
                                                                                  /> 
                                                             </div>
                                                         </p:column>
@@ -269,7 +273,7 @@
                                                             <div class="gray_button">
                                                                 <p:commandButton ajax="true" value="Remove" 
                                                                                  action="#{occPermitApplicationBB.removePersonFromApplication(applicationPerson)}"
-                                                                                 update="#{applicationPersonTable}"
+                                                                                 update="applicationPersonTable"
                                                                                  /> 
                                                             </div>
                                                         </p:column>

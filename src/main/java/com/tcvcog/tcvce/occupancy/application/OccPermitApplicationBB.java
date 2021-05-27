@@ -102,8 +102,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     
     //This field stores a copy of the applicant. The original is in the 
     //attachedPersons list.
-    private PublicInfoBundlePerson applicant;
-    
+    private PublicInfoBundlePerson applicant; 
+   
     //This field stores a copy of the preferred contact. The original is in the 
     //attachedPersons list.
     private PublicInfoBundlePerson contactPerson;
