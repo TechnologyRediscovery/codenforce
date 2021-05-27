@@ -55,22 +55,29 @@
 
                                         <!-- CONTENT IO COMPONENT: INSTRUCTION -->
                                         <div class="public-main-contents-io-title" >
-                                            6. Add People To Application <span style="font-weight: normal"> (#{occPermitApplicationBB.currentApplication.reason.humanFriendlyDescription})</span>
+                                            6. Add People To Application
                                         </div>
 
                                         <!-- CONTENT IO COMPONENT: CONTENT -->
                                         <div class="public-main-contents-io-content" >
 
                                             <p:focus/>
-
+                                            
                                             <p>
-                                                Use filter(s) below. Click "search". In the list that appears, click to attach the desired people. 
-                                                If you can't find the person you are looking for, Click "Add" below to add a person and press the pencil to enter their information.
+                                                #{occPermitApplicationBB.currentApplication.reason.humanFriendlyDescription}
                                             </p>
-
+                                            
+                                            <ul>
+                                                <ui:repeat value="#{occPermitApplicationBB.personRequirementDescription}" var="personRequirementDescription">
+                                                    <li>${personRequirementDescription}</li>
+                                                </ui:repeat>
+                                            </ul>
+                                            
                                             <!-- DATA CONTAINER -->
                                             <div class="ui-g data-container">
-
+                                                <div class="ui-g-12" style="padding: 0;">
+                                                    <p>Use filter(s) below and click "search" to find relevant people in the database. If someone can not be found, add them manually below.</p>
+                                                </div>
                                                 <div class="ui-g-12 ui-md-6 ui-lg-2 ">
                                                     <p:inputText id="last-name-it" 
                                                                  value="#{occPermitApplicationBB.searchPerson.lastName}"
@@ -116,20 +123,11 @@
 
                                                 <div class="ui-g-12 ui-md-6 ui-lg-2 ">
                                                     <div class="gray_button">
-
-                                                        <p:commandButton update="applicationPersonTable" 
-                                                                         value="Add" 
-                                                                         action="#{occPermitApplicationBB.addANewPerson}" 
-                                                                         style="width:48%"
-                                                                         tabindex="7" 
-                                                                         />
-
                                                         <p:commandButton value= "Search" 
                                                                          action="#{occPermitApplicationBB.searchForPersons()}" 
                                                                          update="results-dt" 
                                                                          ajax="true"
-                                                                         tabindex="6" 
-                                                                         style="float: right; width:48%"
+                                                                         tabindex="6"
                                                                          />
                                                     </div>
                                                 </div>
@@ -190,10 +188,19 @@
                                                 </div>
                                             </div>
 
-                                            <p>
-                                                Click the arrow button below the pencil to fill in more of their contact information.(1. #{occPermitApplicationBB.personRequirementDescription.get(0)} 2.#{occPermitApplicationBB.personRequirementDescription.get(1)} 3.#{occPermitApplicationBB.personRequirementDescription.get(2)})
-                                            </p> 
-
+                                            <div style="display: flex">
+                                                <div>
+                                                    Click the arrow to view more details about the added person. Click the pencil to manually edit the added person's details.
+                                                </div>
+                                                <div class="gray_button" style="margin-left: auto; align-self: flex-end">
+                                                    <p:commandButton update="applicationPersonTable" 
+                                                                     value="Add Person Manually" 
+                                                                     action="#{occPermitApplicationBB.addANewPerson}" 
+                                                                     tabindex="7"
+                                                                     />
+                                                </div>
+                                            </div>
+                                            
                                             <!-- DATA CONTAINER -->
                                             <div class="ui-g data-container">
 
@@ -207,7 +214,8 @@
                                                                  editable="true"
                                                                  styleClass="editTable">  
 
-                                                        <p:column headerText="" style="width: 20px">
+                                                        <p:column headerText="Edit" style="width: 30px">
+                                                            <p:rowEditor/>
                                                             <p:rowToggler/>
                                                         </p:column>
 
@@ -237,10 +245,6 @@
                                                             <p:selectOneMenu value="#{applicationPerson.bundledPerson.personType}">
                                                                 <f:selectItems value="#{occPermitApplicationBB.optAndReqPersons}" var="type" itemLabel="#{type.label}" itemValue="#{type}"/>
                                                             </p:selectOneMenu> 
-                                                        </p:column>  
-
-                                                        <p:column headerText="Edit" style="width: 20px; text-align: center">
-                                                            <p:rowEditor/>
                                                         </p:column>
 
                                                         <p:column headerText="Applicant" style="text-align: center">
@@ -424,10 +428,12 @@
                                                     </p:dataTable>
                                                 </div>
                                             </div>
-
-                                            <h:outputText id ="currentApplicantLabel" value="Current Applicant: #{occPermitApplicationBB.applicantName} | "/>
-
-                                            <h:outputText id ="currentContactLabel" value="Preferred Contact: #{occPermitApplicationBB.contactName}"/>
+                                            <div>
+                                                <div style="float: right">
+                                                    <h:outputText id="currentApplicantLabel" value="Current Applicant: #{occPermitApplicationBB.applicantName}"/><br/>
+                                                    <h:outputText id="currentContactLabel" value="Preferred Contact: #{occPermitApplicationBB.contactName}"/>
+                                                </div>
+                                            </div>
 
                                         </div>
                                     </div>
