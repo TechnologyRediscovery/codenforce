@@ -2338,13 +2338,12 @@ body .ui-datatable .ui-datatable-header, body .ui-datatable .ui-datatable-footer
 }
 
 .public-menu-text{
-    bottom:5vh;
+    bottom: 1rem;
     position: absolute;
     display: flex;
     justify-content: center;
     text-align:center;
-    width: 95%;
-    margin: 0 auto;
+    margin: 0 2%;
     color: grey;
 }
 
