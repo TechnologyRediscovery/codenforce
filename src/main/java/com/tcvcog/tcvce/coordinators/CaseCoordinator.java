@@ -159,9 +159,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             cse.setCeActionRequestList(sc.runQuery(qcear).getBOBResultList());
             
             // BLOB
-            cse.setBlobList(bc.getBlobLightList(bi.getBlobIDs(c)));
+            // TODO: Debug endless recursion
+//            cse.setBlobList(bc.getBlobLightList(bi.getBlobIDs(c)));
 
-        } catch (SearchException | BlobException ex) {
+        } catch (SearchException  ex) {
             System.out.println(ex);
         }
 
@@ -1456,9 +1457,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      */
     public NoticeOfViolation nov_getNoticeOfViolation(int noticeID) 
-            throws IntegrationException {
+            throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
-        return ci.novGet(noticeID);
+        NoticeOfViolation nov = ci.novGet(noticeID);
+        if(nov != null){
+            if(nov.getNotifyingOfficer() == null && nov.getCreationBy() != null){
+                nov.setNotifyingOfficer(nov.getCreationBy());
+            } 
+        }
+        
+        return nov;
     }
     
     
@@ -1467,9 +1475,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param idl
      * @return
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public List<NoticeOfViolation> nov_getNoticeOfViolationList(List<Integer> idl) 
-            throws IntegrationException {
+            throws IntegrationException, BObStatusException {
         List<NoticeOfViolation> novl = new ArrayList<>();
         if(idl != null && !idl.isEmpty()){
             for(Integer i: idl){
@@ -1488,17 +1497,18 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      *
      * @param cse
      * @param mdh
+     * @param ua
      * @return
      * @throws AuthorizationException
      */
-    public NoticeOfViolation nov_GetNewNOVSkeleton(CECaseDataHeavy cse, MunicipalityDataHeavy mdh) throws AuthorizationException {
+    public NoticeOfViolation nov_GetNewNOVSkeleton(CECaseDataHeavy cse, MunicipalityDataHeavy mdh, UserAuthorized ua) throws AuthorizationException {
         SystemIntegrator si = getSystemIntegrator();
         NoticeOfViolation nov = new NoticeOfViolation();
         
-        nov.setViolationList(new ArrayList<CodeViolationDisplayable>());
+        nov.setViolationList(new ArrayList<>());
         nov.setDateOfRecord(LocalDateTime.now());
-        nov.setBlocksBeforeViolations(new ArrayList<TextBlock>());
-        nov.setBlocksAfterViolations(new ArrayList<TextBlock>());
+        nov.setBlocksBeforeViolations(new ArrayList<>());
+        nov.setBlocksAfterViolations(new ArrayList<>());
 
         try {
             nov.setStyle(si.getPrintStyle(mdh.getDefaultNOVStyleID()));
@@ -1517,7 +1527,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             cvd.setIncludeViolationPhotos(false);
             nov.getViolationList().add(cvd);
         }
-
+        
+        nov.setCreationBy(ua);
+        nov.setNotifyingOfficer(ua);
+        
+        
+        
         return nov;
 
     }
@@ -1617,7 +1632,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             if(nov.getLockedAndqueuedTS() == null){
                 ci.novUpdateNotice(nov);
             } else {
-                throw new BObStatusException("Cannot update the text of a locked notice.");
+                throw new BObStatusException("Cannot update a locked notice.");
             }
             
         }

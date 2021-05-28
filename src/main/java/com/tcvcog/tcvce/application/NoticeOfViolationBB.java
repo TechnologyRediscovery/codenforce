@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
@@ -42,6 +43,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.TextBlock;
+import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -99,6 +101,9 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
     private List<Person> personCandidateList;
     private List<Person> manualRetrievedPersonList;
+    
+    private List<User> notifyingOfficerCandidateList;
+    private User notifyingOfficerCandidateChosen;
 
     private boolean personLookupUseID;
     private Person retrievedManualLookupPerson;
@@ -192,6 +197,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         }
       
         nov_createNoticeFollowupEvent = true;
+        
+        UserCoordinator uc = getUserCoordinator();
+        try {
+            notifyingOfficerCandidateList = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
+        } catch (AuthorizationException | IntegrationException ex) {
+            System.out.println(ex );
+        } 
+        
         
         
     } // close initbean
@@ -607,6 +620,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
     }
     
+    /**
+     * Listener for user requests to update the NOV's notifying officer
+     * @param usr 
+     */
+    public void changeNotifyingOfficer(){
+        currentNotice.setNotifyingOfficer(notifyingOfficerCandidateChosen);
+        
+    }
 
     /**
      * Internal logic container for beginning the user creation change process
@@ -618,7 +639,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         NoticeOfViolation nov;
         refreshCurrentCase();
         try {
-            nov = cc.nov_GetNewNOVSkeleton(currentCase, getSessionBean().getSessMuni());
+            nov = cc.nov_GetNewNOVSkeleton(currentCase, getSessionBean().getSessMuni(), getSessionBean().getSessUser());
             nov.setCreationBy(getSessionBean().getSessUser());
             currentNotice = nov;
             getSessionBean().setSessNotice(currentNotice);
@@ -1668,6 +1689,34 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setNov_createNoticeFollowupEvent(boolean nov_createNoticeFollowupEvent) {
         this.nov_createNoticeFollowupEvent = nov_createNoticeFollowupEvent;
+    }
+
+    /**
+     * @return the notifyingOfficerCandidateList
+     */
+    public List<User> getNotifyingOfficerCandidateList() {
+        return notifyingOfficerCandidateList;
+    }
+
+    /**
+     * @param notifyingOfficerCandidateList the notifyingOfficerCandidateList to set
+     */
+    public void setNotifyingOfficerCandidateList(List<User> notifyingOfficerCandidateList) {
+        this.notifyingOfficerCandidateList = notifyingOfficerCandidateList;
+    }
+
+    /**
+     * @return the notifyingOfficerCandidateChosen
+     */
+    public User getNotifyingOfficerCandidateChosen() {
+        return notifyingOfficerCandidateChosen;
+    }
+
+    /**
+     * @param notifyingOfficerCandidateChosen the notifyingOfficerCandidateChosen to set
+     */
+    public void setNotifyingOfficerCandidateChosen(User notifyingOfficerCandidateChosen) {
+        this.notifyingOfficerCandidateChosen = notifyingOfficerCandidateChosen;
     }
 
 }

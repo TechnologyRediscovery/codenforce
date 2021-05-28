@@ -1086,7 +1086,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <h:outputText value="#{blob.photoDocID}"/>
                                                     <!-- type icon here -->
                                                 </p:column>
-                                                
+
                                                 <p:column>
                                                     <f:facet name="header">
                                                         <h:outputText value="File Type"/>
@@ -1101,14 +1101,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </f:facet>
                                                     <h:outputText value="#{blob.title}"/>
                                                 </p:column>
-                                             
+
                                                 <p:column>
                                                     <f:facet name="header">
                                                         <h:outputText value="Created"/>
                                                     </f:facet>
                                                     <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDateNoTime(blob.createdTS)}"/>
                                                 </p:column>
-                                             
+
 
                                                 <p:column>
                                                     <f:facet name="header">
@@ -1121,12 +1121,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <f:facet name="header">
                                                         <h:outputText value="View File"/>
                                                     </f:facet>
-                                               <p:commandButton 
-                                                   value="Download" 
-                                                   ajax="true"
-                                                   icon="fa fa-arrow-down" 
-                                                   styleClass="ui-button-outlined">
-                                                   <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blob)}"/>
+                                                    <p:commandButton 
+                                                        value="Download" 
+                                                        ajax="true"
+                                                        icon="fa fa-arrow-down" 
+                                                        styleClass="ui-button-outlined">
+                                                        <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blob)}"/>
                                                     </p:commandButton>
                                                 </p:column>
                                             </p:dataTable>
@@ -2683,72 +2683,135 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                         <p:spacer height="5px" />
 
-                        <h:form id="nov-date-form">
-
-                            <h2>Date of record</h2>
-
-                            <p:calendar value="#{noticeOfViolationBB.currentNotice.dateOfRecordUtilDate}" 
-                                        mode="popup" tabindex="13"
-                                        id="noticeDateOfRecord"
-                                        showOn="button"
-                                        pattern="EEE, dd MMM, yyyy"
-                                        navigator="true"
-                                        showButtonPanel="true"
-                                        showTodayButton="true"
-                                        required="true"/>
-
-                            <h:message for="noticeDateOfRecord" showDetail="true" showSummary="true" 
-                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                        </h:form>
-
-                        <h2>Recipient</h2>
-
-                        <h:form id="chosen-recipient-form">
-
-                            <p:commandButton   id="nov-add-chooseperson-init-button"
-                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                               value="Choose addressee"  
-                                               icon="fa fa-search"
-                                               ajax="true"
-                                               actionListener="#{noticeOfViolationBB.onChoosePersonInitButtonChange}"
-                                               oncomplete="PF('nov-personchoose-dialog-var').show()"
-                                               update="nov-chooseperson-lookup-form
-                                               nov-chooseperson-list-form"/>
 
 
-                            <h3>Chosen notice recipient:</h3>
+                        <div   class="ui-g data-container">
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 data_field">
+                                <h:form id="nov-date-form">
 
-                            <div class="nov-chosen-recipeint">
-                                <h:outputText   id="nov-chosen-recipient-name-ot"
-                                                value="#{noticeOfViolationBB.currentNotice.recipient.firstName} 
-                                                #{noticeOfViolationBB.currentNotice.recipient.lastName}"/>
-                                <p:spacer height="5px"/>
-                                <h:outputText   id="nov-chosen-recipient-addressstreet-ot"
-                                                escape="false" value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
-                                                                        ? noticeOfViolationBB.currentNotice.recipient.mailingAddressStreet 
-                                                                        : noticeOfViolationBB.currentNotice.recipient.addressStreet }"/>
+                                    <h2>Date of record</h2>
 
-                                <p:spacer height="5px"/>
-                                <h:outputText   id="nov-chosen-recipient-city-ot"
-                                                value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
-                                                         ? noticeOfViolationBB.currentNotice.recipient.mailingAddressCity 
-                                                         : noticeOfViolationBB.currentNotice.recipient.addressCity }"/>
-                                <h:outputText value=", " />
-                                <h:outputText   id="nov-chosen-recipient-state-ot"
-                                                value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
-                                                         ? noticeOfViolationBB.currentNotice.recipient.mailingAddressState
-                                                         : noticeOfViolationBB.currentNotice.recipient.addressState}"/>
+                                    <p:calendar value="#{noticeOfViolationBB.currentNotice.dateOfRecordUtilDate}" 
+                                                mode="popup" tabindex="13"
+                                                id="noticeDateOfRecord"
+                                                showOn="button"
+                                                pattern="EEE, dd MMM, yyyy"
+                                                navigator="true"
+                                                showButtonPanel="true"
+                                                showTodayButton="true"
+                                                required="true"/>
 
-                                <h:outputText   id="nov-chosen-recipient-zip-ot"
-                                                value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
-                                                         ? noticeOfViolationBB.currentNotice.recipient.mailingAddressZip
-                                                         : noticeOfViolationBB.currentNotice.recipient.addressZip}"/>
-                                <p:spacer height="5px"/>
+                                    <h:message for="noticeDateOfRecord" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                </h:form>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 data_field">
+
+                                <h2>Recipient</h2>
+
+                                <h:form id="chosen-recipient-form">
+
+                                    <p:commandButton   id="nov-add-chooseperson-init-button"
+                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                       value="Choose addressee"  
+                                                       icon="fa fa-search"
+                                                       ajax="true"
+                                                       actionListener="#{noticeOfViolationBB.onChoosePersonInitButtonChange}"
+                                                       oncomplete="PF('nov-personchoose-dialog-var').show()"
+                                                       update="nov-chooseperson-lookup-form
+                                                       nov-chooseperson-list-form"/>
+
+
+                                    <h3>Chosen notice recipient:</h3>
+
+                                    <div class="nov-chosen-recipeint">
+                                        <h:outputText   id="nov-chosen-recipient-name-ot"
+                                                        value="#{noticeOfViolationBB.currentNotice.recipient.firstName} 
+                                                        #{noticeOfViolationBB.currentNotice.recipient.lastName}"/>
+                                        <p:spacer height="5px"/>
+                                        <h:outputText   id="nov-chosen-recipient-addressstreet-ot"
+                                                        escape="false" value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
+                                                                                ? noticeOfViolationBB.currentNotice.recipient.mailingAddressStreet 
+                                                                                : noticeOfViolationBB.currentNotice.recipient.addressStreet }"/>
+
+                                        <p:spacer height="5px"/>
+                                        <h:outputText   id="nov-chosen-recipient-city-ot"
+                                                        value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
+                                                                 ? noticeOfViolationBB.currentNotice.recipient.mailingAddressCity 
+                                                                 : noticeOfViolationBB.currentNotice.recipient.addressCity }"/>
+                                        <h:outputText value=", " />
+                                        <h:outputText   id="nov-chosen-recipient-state-ot"
+                                                        value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
+                                                                 ? noticeOfViolationBB.currentNotice.recipient.mailingAddressState
+                                                                 : noticeOfViolationBB.currentNotice.recipient.addressState}"/>
+
+                                        <h:outputText   id="nov-chosen-recipient-zip-ot"
+                                                        value="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress 
+                                                                 ? noticeOfViolationBB.currentNotice.recipient.mailingAddressZip
+                                                                 : noticeOfViolationBB.currentNotice.recipient.addressZip}"/>
+                                        <p:spacer height="5px"/>
+                                    </div>
+
+                                </h:form>
                             </div>
 
 
-                        </h:form>
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 data_field">
+                                <h2>Notifying Officer</h2>
+                                
+                                <h:form id="notifyingofficer-form">
+                                    
+
+                                    <p:outputLabel styleClass="data_field_label">
+                                        <h:outputText value="Current Notifying Officer"/>
+                                    </p:outputLabel>
+                                        
+                                        <div class="signature">
+                                            <h:outputText 
+                                                id="notifyingofficer-person-ot"
+                                                value="#{noticeOfViolationBB.currentNotice.notifyingOfficer.person.firstName} 
+                                                          #{noticeOfViolationBB.currentNotice.notifyingOfficer.person.lastName}
+                                                          #{noticeOfViolationBB.currentNotice.notifyingOfficer.person.jobTitle}
+                                                          #{noticeOfViolationBB.currentNotice.notifyingOfficer.person.phoneWork}" />
+                                        </div>
+                                    
+
+                                    <p:outputLabel for="nov-notifyingofficer-som"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Change notifying officer"/>
+                                    </p:outputLabel>
+                                    
+                                    
+                                    <div class="restrict-main-contents-io-content">
+                                        <p:selectOneMenu  id="nov-notifyingofficer-som" 
+                                                          tabindex="1" 
+                                                          value="#{noticeOfViolationBB.notifyingOfficerCandidateChosen}"
+                                                          >
+                                            <f:selectItem itemLabel="select a notifying officer user" 
+                                                          noSelectionOption="true" 
+                                                          itemDisabled="true"/>
+                                            <f:selectItems id="nov-notifyingsender-selitems" 
+                                                           value="#{noticeOfViolationBB.notifyingOfficerCandidateList}" 
+                                                           var="usr" itemValue="#{usr}" itemLabel="#{usr.username}: #{usr.person.firstName} #{usr.person.lastName}; " />
+                                            <f:converter converterId="userConverter" />
+                                        </p:selectOneMenu>
+
+                                    </div>
+                                    
+                                        <p:commandButton icon="fa fa-link"
+                                                         actionListener="#{noticeOfViolationBB.changeNotifyingOfficer}" 
+                                                         ajax="true" 
+                                                         value="change notifying officer"
+                                                         update="notifyingofficer-person-ot"/>                                    
+                                    
+                                </h:form>
+
+                            </div>
+                        </div>
+
                         <h:form id="nov-preview-textbefore-form">
                             <div class="link-button-container">
                                 <p:growl id="noticesave-growl"
@@ -2876,7 +2939,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputText value="re-link" />
                                         <p:commandButton icon="fa fa-link"
                                                          actionListener="#{caseProfileBB.setSelectedViolation(v)}" 
-                                                         ajax="true" oncomplete="PF('linkDialog').show()"/>
+                                                         ajax="true" 
+                                                         oncomplete="PF('linkDialog').show()"/>
 
                                         <h:outputLabel styleClass="bold" value="Violated Element Details: "/>
                                         <h:outputLabel value="#{v.violatedEnfElement.ordchapterTitle}: 
@@ -2959,19 +3023,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         <p:spacer height="15px" />
 
                         <h:form id="nov-submission-form">
+                            <ui:remove>
+                                
                             <h2>signature</h2>
 
-                            <p>
-                                <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.firstName}" />
-                                <h:outputText value=" " />
-                                <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.lastName}" />
-                                <p:spacer height="3px" />
-                                <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.jobTitle}" />
-                                <p:spacer height="3px" />
-                                <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.phoneWork}" />
-                                <h:outputText value=" | " />
-                                <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.email}" />
-                            </p>
+                                <p>
+                                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.firstName}" />
+                                    <h:outputText value=" " />
+                                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.lastName}" />
+                                    <p:spacer height="3px" />
+                                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.jobTitle}" />
+                                    <p:spacer height="3px" />
+                                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.phoneWork}" />
+                                    <h:outputText value=" | " />
+                                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.email}" />
+                                </p>
+                            </ui:remove>
 
                             <div class="link-button-container">
 
@@ -5013,7 +5080,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                         <h:form id="case-blobs-start-form" enctype="multipart/form-data">
                             <h2>Photos/Docs of this Case (3 max)</h2>
-                            
+
                             <p:fileUpload 
                                 mode="advanced" 
                                 update="case-blobs-list-form:case-blobs-table"

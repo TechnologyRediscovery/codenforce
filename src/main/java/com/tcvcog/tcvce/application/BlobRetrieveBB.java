@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import java.io.ByteArrayInputStream;
@@ -41,10 +42,10 @@ public class BlobRetrieveBB extends BackingBeanUtils {
     public BlobRetrieveBB() {
     }
     
-     private StreamedContent blob;
+     private StreamedContent blobStream = null;
 
     public void setupBlob() {
-        blob = DefaultStreamedContent.builder()
+        blobStream = DefaultStreamedContent.builder()
                     .contentType("image/jpeg")
                     .stream(() -> {
                         FacesContext context = FacesContext.getCurrentInstance();
@@ -54,18 +55,32 @@ public class BlobRetrieveBB extends BackingBeanUtils {
                     .build();
     }
 
+    /**
+     * Listener for client requests to stream blob bytes from a given blobLight
+     * @param b
+     * @return 
+     */
     public StreamedContent retrieveBlob(BlobLight b) {
             BlobIntegrator bi = getBlobIntegrator();
             BlobCoordinator bc = getBlobCoordinator();
-            blob = DefaultStreamedContent.builder()
+            Blob blob = bc.getBlob(b);
+            if(blob != null){
+                System.out.println("BobRetrieveBB.retrieveBlob: received BlobLight ID " + b.getPhotoDocID() );
+                System.out.println("BobRetrieveBB.retrieveBlob: extracted blob bytes ID " + blob.getBytesID() + " | bytea size: " + blob.getBytes().length);
+            
+            blobStream = DefaultStreamedContent.builder()
                     .contentType("application/pdf")
-                    .name("file.pdf")
+                    .name(blob.getFilename())
                     .stream(() -> {
-                        return new ByteArrayInputStream(bc.getBlob(b).getBytes());
+                        return new ByteArrayInputStream(blob.getBytes());
                     })
                     .build();
+            } else {
+                System.out.println("BobRetrieveBB.retrieveBlob: extracted null blob from BlobLight ID " + b.getPhotoDocID() );
+                
+            }
     
-        return blob;
+        return blobStream;
     }
     
 }

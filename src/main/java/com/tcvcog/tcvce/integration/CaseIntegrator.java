@@ -1583,11 +1583,11 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                         "            noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
                         "            dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
                         "            lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
-                        "            returnedby, notes, creationby, printstyle_styleid)\n" +
+                        "            returnedby, notes, creationby, printstyle_styleid, notifyingofficer_userid)\n" +
                         "    VALUES (DEFAULT, ?, ?, now(), \n" +
                         "            ?, NULL, NULL, ?, ?, \n" +
                         "            NULL, NULL, NULL, \n" +
-                        "            NULL, ?, ?, ?);";
+                        "            NULL, ?, ?, ?, ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -1608,6 +1608,12 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                 stmt.setInt(8, notice.getStyle().getStyleID());
             } else {
                 stmt.setNull(8, java.sql.Types.NULL);
+            }
+            
+             if(notice.getNotifyingOfficer() != null){
+                stmt.setInt(9, notice.getNotifyingOfficer().getUserID());
+            } else {
+                stmt.setNull(9, java.sql.Types.NULL);
             }
                     
             stmt.execute();
@@ -1893,7 +1899,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         String query = "UPDATE public.noticeofviolation\n"
                 + "   SET lettertextbeforeviolations=?, \n" +
                 "       dateofrecord=?, personid_recipient=?, \n" +
-                "       lettertextafterviolations=?"
+                "       lettertextafterviolations=?, notifyingofficer_userid=?"
                 + " WHERE noticeid=?;";
         // note that original time stamp is not altered on an update
 
@@ -1907,7 +1913,12 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt.setTimestamp(2, java.sql.Timestamp.valueOf(notice.getDateOfRecord()));
             stmt.setInt(3, notice.getRecipient().getPersonID());
             stmt.setString(4, notice.getNoticeTextAfterViolations());
-            stmt.setInt(5, notice.getNoticeID());
+            if(notice.getNotifyingOfficer() != null){
+                stmt.setInt(5, notice.getNotifyingOfficer().getUserID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            stmt.setInt(6, notice.getNoticeID());
 
             stmt.executeUpdate();
             
@@ -2031,7 +2042,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         String query =  "SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
                         "       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
                         "       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
-                        "       returnedby, notes, creationby, printstyle_styleid, active, followupevent_eventid \n" +
+                        "       returnedby, notes, creationby, printstyle_styleid, active, followupevent_eventid, notifyingofficer_userid \n" +
                         "  FROM public.noticeofviolation WHERE noticeid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -2149,6 +2160,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
         PersonIntegrator pi = getPersonIntegrator();
         UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         SystemIntegrator si = getSystemIntegrator();
         EventCoordinator ec = getEventCoordinator();
         
@@ -2164,21 +2176,21 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         notice.setNoticeTextAfterViolations(rs.getString("lettertextafterviolations"));
 
         notice.setCreationTS(rs.getTimestamp("creationtimestamp").toLocalDateTime());
-        notice.setCreationBy(ui.getUser(rs.getInt("creationby")));
+        notice.setCreationBy(uc.user_getUser(rs.getInt("creationby")));
         
         if (rs.getTimestamp("lockedandqueuedformailingdate") != null) {
             notice.setLockedAndqueuedTS(rs.getTimestamp("lockedandqueuedformailingdate").toLocalDateTime());
-            notice.setLockedAndQueuedBy(ui.getUser(rs.getInt("lockedandqueuedformailingby")));
+            notice.setLockedAndQueuedBy(uc.user_getUser(rs.getInt("lockedandqueuedformailingby")));
         }
         
         if (rs.getTimestamp("sentdate") != null) {
             notice.setSentTS(rs.getTimestamp("sentdate").toLocalDateTime());
-            notice.setSentBy(ui.getUser(rs.getInt("sentby")));
+            notice.setSentBy(uc.user_getUser(rs.getInt("sentby")));
         } 
         
         if (rs.getTimestamp("returneddate") != null) {
             notice.setReturnedTS(rs.getTimestamp("returneddate").toLocalDateTime());
-            notice.setReturnedBy(ui.getUser(rs.getInt("returnedby")));
+            notice.setReturnedBy(uc.user_getUser(rs.getInt("returnedby")));
         } 
         
         notice.setStyle(si.getPrintStyle(rs.getInt("printstyle_styleid")));
@@ -2189,6 +2201,10 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         }
         
         notice.setActive(rs.getBoolean("active"));
+        
+        if(rs.getInt("notifyingofficer_userid") != 0){
+            notice.setNotifyingOfficer(uc.user_getUser(rs.getInt("notifyingofficer_userid")));
+        }
 
         return notice;
 
