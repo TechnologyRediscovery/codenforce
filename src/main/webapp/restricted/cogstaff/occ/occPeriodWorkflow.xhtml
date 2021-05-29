@@ -464,7 +464,7 @@
                                         
                                    
 
-
+                                        <!--removed occperiod-form-proposals from update here if its significant-->
                                         <p:commandButton   id="occperiod-refreshperiod-button"
                                                            value="reload current occ period"
                                                            ajax="true"
@@ -472,7 +472,6 @@
                                                            actionListener="#{occPeriodWorkflowBB.reloadCurrentOccPeriodDataHeavy()}"
                                                            icon="fa fa-refresh"
                                                            update="occperiod-dialog-periodpropunit-form
-                                                           occperiod-form-proposals
                                                            form-messages-global"/>
                                     </h:form>
                                 </p:panel>
@@ -681,12 +680,11 @@
 
                                 <h:panelGroup>
                                     <h:outputText styleClass="ui-label" value="Note text: "/>
-                                    <p:editor   id="occperiod-notes-editor"
-                                                value="#{occPeriodWorkflowBB.formNoteText}"
-                                                controls="bold italic underline strikethrough font size style color
-                                                bullets numbering center undo redo rule link removeformat"
-                                                width="400" required="false"
-                                                height="200"/>
+                                    <p:textEditor id="occperiod-notes-editor"
+                                                  value="#{occPeriodWorkflowBB.formNoteText}"
+                                                  required="false"
+                                                  secure="false" 
+                                                  height="200"/>
 
                                
                                     <p:spacer height="5px" />

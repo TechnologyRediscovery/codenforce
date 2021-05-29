@@ -190,22 +190,20 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private void setupUnitMemberVariablesBasedOnCurrentOccPeriod() throws IntegrationException, BObStatusException, SearchException{
         OccupancyCoordinator oc = getOccupancyCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
-        if(currentOccPeriod != null){
-                if(currentOccPeriod.getConfiguredTS() == null){
-                    currentOccPeriod = oc.assembleOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessUser().getMyCredential());
-                }
-                currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
-                currentInspection = currentOccPeriod.getGoverningInspection();
-                // all inspected spaces are visible by default
-                if(currentInspection != null){
-                    currentInspection.setViewSetting(ViewOptionsOccChecklistItemsEnum.ALL_ITEMS);
-                }
+        if (currentOccPeriod != null) {
+            if (currentOccPeriod.getConfiguredTS() == null) {
+                currentOccPeriod = oc.assembleOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessUser().getMyCredential());
             }
-        
-       
-        feeList = currentOccPeriod.getFeeList();
-        paymentList = currentOccPeriod.getPaymentList();
-        
+            currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
+            currentInspection = currentOccPeriod.getGoverningInspection();
+            // all inspected spaces are visible by default
+            if (currentInspection != null) {
+                currentInspection.setViewSetting(ViewOptionsOccChecklistItemsEnum.ALL_ITEMS);
+            }
+
+            feeList = currentOccPeriod.getFeeList();
+            paymentList = currentOccPeriod.getPaymentList();
+        }        
     }
     
     public void loadSpacesInType(){
