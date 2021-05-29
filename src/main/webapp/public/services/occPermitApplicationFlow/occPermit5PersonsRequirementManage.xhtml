@@ -5,8 +5,9 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
-    <h:head>
+    <h:head>  
         <h:outputStylesheet name="css/style.css"/>
+        
         <title>Add People To Application</title>
     </h:head>
     <h:body>
@@ -188,11 +189,11 @@
                                                 </div>
                                             </div>
 
-                                            <div style="display: flex">
+                                            <div class="p-d-flex">
                                                 <div>
                                                     Click the arrow to view more details about the added person. Click the pencil to manually edit the added person's details.
                                                 </div>
-                                                <div class="gray_button" style="margin-left: auto; align-self: flex-end">
+                                                <div class="gray_button p-ml-auto p-as-end">
                                                     <p:commandButton update="applicationPersonTable" 
                                                                      value="Add Person Manually" 
                                                                      action="#{occPermitApplicationBB.addANewPerson}" 
