@@ -105,7 +105,7 @@ public  class   OccPeriodSearchBB
         OccupancyCoordinator oc = getOccupancyCoordinator();
         
         
-          currentOccPeriod = getSessionBean().getSessOccPeriod();
+        currentOccPeriod = getSessionBean().getSessOccPeriod();
         PropertyIntegrator pi = getPropertyIntegrator();
         
         periodEndDateNull = false;

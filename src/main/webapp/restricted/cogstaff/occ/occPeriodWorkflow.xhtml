@@ -12,704 +12,133 @@
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
-                <f:view id="occperiod-status-view">
-                    
-                    <div class="mainContainer">
-                        <h:form id="form-messages-global">
-                            <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
+                <f:view id="occperiod-workflow-view">
+                    <p:outputPanel id="body-panel">
+                        <h:form id="messages-global-form">
+
+                            <p:growl id="messages-global-growl"
+                                     redisplay="true"/>
+
                         </h:form>
 
-                                <h:form id="occperiod-form-address">
-
-                                    <h1>
-                                        <h:outputText value="Manage occupancy period (ID: #{occPeriodWorkflowBB.currentOccPeriod.periodID})" />
-
-                                    </h1>
-
-                                    <div class="occperiod-address-container">
-
-                                        <h:outputText value="Unit #{occPeriodWorkflowBB.currentPropertyUnit.unitNumber} @ "
-                                                      rendered="#{occPeriodWorkflowBB.currentPropertyUnit.unitNumber != '-1'}"
-                                                      styleClass="occperiod-address"/>
-
-                                        <h:outputText value="Primary dwelling @ "
-                                                      rendered="#{occPeriodWorkflowBB.currentPropertyUnit.unitNumber == '-1'}"
-                                                      styleClass="occperiod-address" />
-
-                                        <h:outputText styleClass="occperiod-address"
-                                                      value="#{occPeriodWorkflowBB.currentPropertyUnit.property.address}
-                                                      (#{occPeriodWorkflowBB.currentPropertyUnit.property.muni.muniName})" />
-
-                                        <p:spacer height="3px" />
-                                        
-                                        
-                                        <p:commandButton   id="occperiod-address-button-changepropunit"
-                                                           value="reassign period to different unit"
-                                                           ajax="true"
-                                                           styleClass="noFill button-size-small inline-button"
-                                                           actionListener="#{occPeriodWorkflowBB.initiatePropUnitUpdate}"
-                                                           oncomplete="PF('occperiod-dialog-periodpropunit-var').show()"
-                                                           icon="fa fa-random"
-                                                           update="occperiod-dialog-periodpropunit-form"/>
-
-                                    </div>
-
-                                </h:form>
-
-                        <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
-                                     columnClasses="gridTd, gridTd">
-                            <h:panelGroup>
-
-                                <p:panel id="occperiod-panel-periodmetadata"
-                                         toggleable="true"
-                                         widgetVar="occperiod-panel-periodmetadata-var"
-                                         collapsed="false"
-                                         header="Occupancy period status">
-
-                                    <h:form id="occperiod-form-periodmetadata">
-                                        <h:panelGrid        id="occperiod-panelgrid-periodmetadata"
-                                                            columns="2"
-                                                            columnClasses="gridTd, gridTdg"
-                                                            rendered="true">
-                                            <h:panelGroup>
-                                                <h:outputText value="Period type:"
-                                                              styleClass="ui-label font-smaller"/>
-                                                <div class="field-lock-status-icon-container">
-                                                    <i class="material-icons">
-                                                        <h:outputText id="occperiod-periodmetadata-icon-type"
-                                                                      value="#{empty occPeriodWorkflowBB.currentOccPeriod.periodTypeCertifiedTS ? 'block' : 'verified_user'}"/>
-                                                    </i>
-                                                </div>
-                                                <h:outputText value="#{occPeriodWorkflowBB.currentOccPeriod.type.title}"
-                                                              styleClass="data-text"/>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <f:subview id="occperiod-periodmetadata-subview-typelockinfo">
-                                                    <f:subview id="occperiod-periodmetadata-subview-typelock-unlocked"
-                                                               rendered="#{empty occPeriodWorkflowBB.currentOccPeriod.periodTypeCertifiedTS}">
-                                                        <p:commandButton    id="occperiod-periodmetadata-button-pertype-certify"
-                                                                            ajax="true"
-                                                                            styleClass="noFill"
-                                                                            actionListener="#{occPeriodWorkflowBB.certifyOccPeriodField}"
-                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                            disabled="false"
-                                                                            value="certify period type"
-                                                                            icon="fa fa-shield"
-                                                                            update="occperiod-form-periodmetadata
-                                                                            form-messages-global
-                                                                            occperiod-form-periodmetadata:occperiod-button-changeperiodtype"
-                                                                            title="secure this occupancy period's type">
-                                                            <f:param name="fieldtocertify" value="occperiodtype" />
-                                                            <f:param name="certifymode" value="certify" />
-                                                        </p:commandButton>
-
-
-                                                    </f:subview>
-                                                    <f:subview id="occperiod-periodmetadata-subview-typelock-locked"
-                                                               rendered="#{!empty occPeriodWorkflowBB.currentOccPeriod.periodTypeCertifiedTS}">
-                                                        <h:outputText styleClass="ui-label-inline font-smaller" value="Period type locked: " />
-                                                        <h:outputText styleClass="data-text" value="#{occPeriodWorkflowBB.getPrettyDateNoTime(occPeriodWorkflowBB.currentOccPeriod.periodTypeCertifiedTS)}" />
-                                                        <p:spacer height="0px" />
-                                                        <h:outputText styleClass="ui-label-inline" value="By: " />
-                                                        <h:outputText styleClass="data-text" value="#{occPeriodWorkflowBB.currentOccPeriod.periodTypeCertifiedBy.person.firstName}" />
-                                                        <h:outputText styleClass="data-text" value=" " />
-                                                        <h:outputText styleClass="data-text" value="#{occPeriodWorkflowBB.currentOccPeriod.periodTypeCertifiedBy.person.lastName}" />
-
-                                                        <p:spacer height="5px" />
-
-                                                        <p:commandButton    id="occperiod-periodmetadata-button-pertype-withdraw"
-                                                                            ajax="true"
-                                                                            styleClass="noFill"
-                                                                            actionListener="#{occPeriodWorkflowBB.certifyOccPeriodField}"
-                                                                            rendered="true"
-                                                                            disabled="false"
-                                                                            value="remove type lock"
-                                                                            update="occperiod-form-periodmetadata
-                                                                            form-messages-global
-                                                                            occperiod-form-periodmetadata:occperiod-button-changeperiodtype"
-                                                                            icon="fa fa-unlock"
-                                                                            title="clear a previously existing type authorization">
-                                                            <f:param name="fieldtocertify" value="occperiodtype" />
-                                                            <f:param name="certifymode" value="withdraw" />
-                                                        </p:commandButton>
-                                                    </f:subview>
-                                                </f:subview>
-
-                                                <p:commandButton    id="occperiod-button-changeperiodtype"
-                                                                    ajax="true"
-                                                                    styleClass="noFill button-size-small inline-button"
-                                                                    actionListener="#{occPeriodWorkflowBB.updateOccPeriodInitialize}"
-                                                                    oncomplete="PF('occperiod-dialog-periodmetadata-var').show()"
-                                                                    icon="fa fa-window-restore"
-                                                                    disabled="#{!(empty occPeriodWorkflowBB.currentOccPeriod.periodTypeCertifiedTS)}"
-                                                                    value="change period type"
-                                                                    update="occperiod-dialog-periodmetadata-form
-                                                                    "/>
-                                                
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputText value="Authorization status: "
-                                                              styleClass="ui-label font-smaller"/>
-                                                <div class="field-lock-status-icon-container">
-                                                    <i class="material-icons">
-                                                        <h:outputText id="occperiod-periodmetadata-icon-authstatus"
-                                                                      value="#{empty occPeriodWorkflowBB.currentOccPeriod.authorizedTS? 'block' : 'verified_user'}"/>
-                                                    </i>
-                                                </div>
-
-                                                <h:outputText id="occperiod-form-periodmetadata-auth-ot"
-                                                              value="#{empty occPeriodWorkflowBB.currentOccPeriod.authorizedTS ? 'not authorized' : 'authorized!'}"/>
-
-                                            </h:panelGroup>
-                                            <h:panelGroup>
-                                                <f:subview id="occperiod-periodmetadata-subview-auth-container">
-
-                                                    <f:subview id="occperiod-periodmetadata-subview-auth-notauthorized"
-                                                               rendered="#{empty occPeriodWorkflowBB.currentOccPeriod.authorizedTS}">
-                                                        <p:commandButton    id="occperiod-periodmetadata-subview-auth-button-certify"
-                                                                            ajax="true"
-                                                                            styleClass="noFill"
-                                                                            actionListener="#{occPeriodWorkflowBB.certifyOccPeriodField}"
-                                                                            rendered="true"
-                                                                            disabled="false"
-                                                                            value="authorize period"
-                                                                            icon="fa fa-shield"
-                                                                            update="occperiod-form-periodmetadata
-                                                                            form-messages-global
-                                                                            occperiod-form-periodmetadata:occperiod-button-changemanager"
-                                                                            title="finalize all occupancy period settings which then allows permitting">
-                                                            <f:param name="fieldtocertify" value="authorization" />
-                                                            <f:param name="certifymode" value="certify" />
-                                                        </p:commandButton>
-                                                    </f:subview>
-                                                    <f:subview id="occperiod-periodmetadata-subview-auth-authorized"
-                                                               rendered="#{!(empty occPeriodWorkflowBB.currentOccPeriod.authorizedTS)}">
-
-                                                        <h:outputText styleClass="ui-label-inline" value="Authorized at " />
-                                                        <h:outputText styleClass="data-text" value="#{occPeriodWorkflowBB.getPrettyDateNoTime(occPeriodWorkflowBB.currentOccPeriod.authorizedTS)}" />
-                                                        <p:spacer height="0px" />
-                                                        <h:outputText styleClass="ui-label-inline" value=" By user  " />
-                                                        <h:outputText styleClass="data-text" value="#{occPeriodWorkflowBB.currentOccPeriod.authorizedBy.person.firstName}" />
-                                                        <h:outputText styleClass="data-text" value=" " />
-                                                        <h:outputText styleClass="data-text" value="#{occPeriodWorkflowBB.currentOccPeriod.authorizedBy.person.lastName}" />
-
-                                                        <p:spacer height="5px" />
-
-                                                        <p:commandButton    id="occperiod-periodmetadata-subview-auth-button-withdraw"
-                                                                            ajax="true"
-                                                                            styleClass="noFill"
-                                                                            actionListener="#{occPeriodWorkflowBB.certifyOccPeriodField}"
-                                                                            rendered="true"
-                                                                            disabled="false"
-                                                                            value="withdraw authorization"
-                                                                            icon="fa fa-warning"
-                                                                            update="occperiod-form-periodmetadata
-                                                                            form-messages-global
-                                                                            occperiod-button-changemanager"
-                                                                            title="finalize all occupancy period settings which then allows permitting">
-                                                            <f:param name="fieldtocertify" value="authorization" />
-                                                            <f:param name="certifymode" value="withdraw" />
-                                                        </p:commandButton>
-                                                    </f:subview>
-                                                </f:subview>
-
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputText value="Start date:"
-                                                              styleClass="ui-label font-smaller"/>
-                                                <div class="field-lock-status-icon-container">
-                                                    <i class="material-icons">
-                                                        <h:outputText id="occperiod-periodmetadata-icon-startdate"
-                                                                      value="#{empty occPeriodWorkflowBB.currentOccPeriod.startDateCertifiedTS ? 'block' : 'verified_user'}"/>
-                                                    </i>
-                                                </div>
-                                                <h:outputText value="#{empty occPeriodWorkflowBB.currentOccPeriod.endDate ? 'no start date' : occPeriodWorkflowBB.getPrettyDateNoTime(occPeriodWorkflowBB.currentOccPeriod.startDate)}" />
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <f:subview id="occperiod-periodmetadata-subview-startdate-container">
-
-                                                    <f:subview id="occperiod-periodmetadata-subview-startdate-unlocked"
-                                                               rendered="#{empty occPeriodWorkflowBB.currentOccPeriod.startDateCertifiedTS}">
-
-                                                        <h:outputText value="Edit start date: "
-                                                                      styleClass="ui-label font-smaller"/>
-                                                        <p:calendar     id="occperiod-periodmetadata-cal-startdate"
-                                                                        value="#{occPeriodWorkflowBB.currentOccPeriod.startDateUtilDate}"
-                                                                        mode="popup"
-                                                                        showOn="button" pattern="EEE, dd MMM, yyyy"
-                                                                        navigator="true" tabindex="16" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
-                                                                        showButtonPanel="true" showTodayButton="true"
-                                                                        required="false">
-                                                            <p:ajax />
-                                                        </p:calendar>
-                                                        <p:spacer height="5px" />
-
-                                                        <p:commandButton    id="occperiod-periodmetadata-subview-startdate-button-certify"
-                                                                            ajax="true"
-                                                                            styleClass="noFill"
-                                                                            actionListener="#{occPeriodWorkflowBB.certifyOccPeriodField}"
-                                                                            rendered="true"
-                                                                            disabled="false"
-                                                                            value="lock start date"
-                                                                            icon="fa fa-shield"
-                                                                            update="occperiod-form-periodmetadata
-                                                                            form-messages-global"
-                                                                            title="finalize start date">
-                                                            <f:param name="fieldtocertify" value="startdate" />
-                                                            <f:param name="certifymode" value="certify" />
-                                                        </p:commandButton>
-                                                    </f:subview>
-                                                    
-                                                    <f:subview id="occperiod-periodmetadata-subview-startdate-locked"
-                                                               rendered="#{!empty occPeriodWorkflowBB.currentOccPeriod.startDateCertifiedTS}">
-
-                                                        <h:outputText styleClass="ui-label-inline" value="Start date locked at " />
-                                                        <h:outputText styleClass="data-text" value="#{occPeriodWorkflowBB.getPrettyDateNoTime(occPeriodWorkflowBB.currentOccPeriod.startDateCertifiedTS)}" />
-                                                        <p:spacer height="0px" />
-                                                        <h:outputText styleClass="ui-label-inline" value=" by " />
-                                                        <h:outputText styleClass="data-text" value="#{occPeriodWorkflowBB.currentOccPeriod.startDateCertifiedBy.person.firstName}" />
-                                                        <h:outputText styleClass="data-text" value=" " />
-                                                        <h:outputText styleClass="data-text" value="#{occPeriodWorkflowBB.currentOccPeriod.startDateCertifiedBy.person.lastName}" />
-
-                                                        <p:spacer height="5px" />
-
-                                                        <p:commandButton    id="occperiod-periodmetadata-subview-startdate-button-withdraw"
-                                                                            ajax="true"
-                                                                            styleClass="noFill"
-                                                                            actionListener="#{occPeriodWorkflowBB.certifyOccPeriodField}"
-                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
-                                                                            disabled="false"
-                                                                            value="remove date lock"
-                                                                            icon="fa fa-unlock"
-                                                                            update="occperiod-form-periodmetadata
-                                                                            form-messages-global"
-                                                                            title="remove the lock on the period start date">
-                                                            <f:param name="fieldtocertify" value="startdate" />
-                                                            <f:param name="certifymode" value="withdraw" />
-                                                        </p:commandButton>
-                                                    </f:subview>
-                                                </f:subview>
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <h:outputText value="End date:"
-                                                              styleClass="ui-label font-smaller"/>
-                                                <div class="field-lock-status-icon-container">
-                                                    <i class="material-icons">
-                                                        <h:outputText id="occperiod-periodmetadata-icon-enddate"
-                                                                      value="#{empty occPeriodWorkflowBB.currentOccPeriod.endDateCertifiedTS ? 'block' : 'verified_user'}"/>
-                                                    </i>
-                                                </div>
-
-                                                <h:outputText value="#{empty occPeriodWorkflowBB.currentOccPeriod.endDate ? 'no end date' : occPeriodWorkflowBB.getPrettyDateNoTime(occPeriodWorkflowBB.currentOccPeriod.endDate)}" />
-
-                                            </h:panelGroup>
-
-                                            <h:panelGroup>
-                                                <f:subview id="occperiod-periodmetadata-subview-enddate-container">
-
-                                                    <f:subview id="occperiod-periodmetadata-subview-enddate-unlocked"
-                                                               rendered="#{empty occPeriodWorkflowBB.currentOccPeriod.endDateCertifiedTS}">
-
-                                                        <h:outputText value="Edit end date: "
-                                                                      styleClass="ui-label font-smaller"/>
-                                                        <p:calendar    id="occperiod-periodmetadata-cal-enddate"
-                                                                       value="#{occPeriodWorkflowBB.currentOccPeriod.endDateUtilDate}"
-                                                                       mode="popup"
-                                                                       showOn="button" pattern="EEE, dd MMM, yyyy"
-                                                                       navigator="true" tabindex="16" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
-                                                                       showButtonPanel="true" showTodayButton="true"
-                                                                       required="false">
-                                                            <p:ajax />
-                                                        </p:calendar>
-
-                                                        <p:spacer height="5px" />
-
-                                                        <p:commandButton    id="occperiod-periodmetadata-subview-enddate-button-certify"
-                                                                            ajax="true"
-
-                                                                            styleClass="noFill"
-                                                                            actionListener="#{occPeriodWorkflowBB.certifyOccPeriodField}"
-                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                            disabled="false"
-                                                                            value="lock end date"
-                                                                            icon="fa fa-shield"
-                                                                            update="occperiod-form-periodmetadata
-                                                                            form-messages-global"
-                                                                            title="finalize occupancy period end date">
-                                                            <f:param name="fieldtocertify" value="enddate" />
-                                                            <f:param name="certifymode" value="certify" />
-                                                        </p:commandButton>
-                                                    </f:subview>
-
-                                                    <f:subview id="occperiod-periodmetadata-subview-enddate-locked"
-                                                               rendered="#{!empty occPeriodWorkflowBB.currentOccPeriod.endDateCertifiedTS}">
-
-                                                        <h:outputText styleClass="ui-label-inline" value="End date locked at " />
-                                                        <h:outputText styleClass="data-text" value="#{occPeriodWorkflowBB.getPrettyDateNoTime(occPeriodWorkflowBB.currentOccPeriod.endDateCertifiedTS)}" />
-                                                        <p:spacer height="0px" />
-                                                        <h:outputText styleClass="ui-label-inline" value=" by " />
-                                                        <h:outputText styleClass="data-text" value="#{occPeriodWorkflowBB.currentOccPeriod.endDateCertifiedBy.person.firstName}" />
-                                                        <h:outputText styleClass="data-text" value=" " />
-                                                        <h:outputText styleClass="data-text" value="#{occPeriodWorkflowBB.currentOccPeriod.endDateCertifiedBy.person.lastName}" />
-
-                                                        <p:spacer height="5px" />
-
-                                                        <p:commandButton    id="occperiod-periodmetadata-subview-enddate-button-withdraw"
-                                                                            ajax="true"
-                                                                            styleClass="noFill"
-                                                                            actionListener="#{occPeriodWorkflowBB.certifyOccPeriodField}"
-                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
-                                                                            disabled="false"
-                                                                            value="remove date lock"
-                                                                            update="occperiod-form-periodmetadata
-                                                                            form-messages-global"
-                                                                            icon="fa fa-unlock"
-                                                                            title="finalize occupancy period ending date. Note that some period types do not allow empty end dates">
-                                                            <f:param name="fieldtocertify" value="enddate" />
-                                                            <f:param name="certifymode" value="withdraw" />
-                                                        </p:commandButton>
-                                                    </f:subview>
-
-                                                </f:subview>
-                                            </h:panelGroup>
-                                            
-                                            <h:panelGroup>
-                                                <h:outputText value="Period manager: "
-                                                              styleClass="ui-label font-smaller"/>
-                                                <h:outputText value="#{occPeriodWorkflowBB.currentOccPeriod.manager.person.firstName}" 
-                                                              styleClass="data-text"/>
-                                                <h:outputText value=" " 
-                                                              styleClass="data-text" />
-                                                <h:outputText value="#{occPeriodWorkflowBB.currentOccPeriod.manager.person.lastName}" 
-                                                              styleClass="data-text"/>
-                                                <h:outputText value=" (" 
-                                                              styleClass="data-text"/>
-                                                <h:outputText value="#{occPeriodWorkflowBB.currentOccPeriod.manager.username}" 
-                                                              styleClass="data-text"/>
-                                                <h:outputText value="; ID:" 
-                                                              styleClass="data-text"/>
-                                                <h:outputText value="#{occPeriodWorkflowBB.currentOccPeriod.manager.userID}" 
-                                                              styleClass="data-text"/>
-                                                <h:outputText value=")" 
-                                                              styleClass="data-text"/>
-                                                
-                                            </h:panelGroup>
-                                            
-                                            <h:panelGroup>
-                                                <p:commandButton    id="occperiod-button-changemanager"
-                                                                    ajax="true"
-                                                                    styleClass="noFill button-size-small inline-button"
-                                                                    actionListener="#{occPeriodWorkflowBB.updateOccPeriodInitialize}"
-                                                                    oncomplete="PF('occperiod-dialog-periodmetadata-var').show()"
-                                                                    icon="fa fa-window-restore"
-                                                                    disabled="#{!(empty occPeriodWorkflowBB.currentOccPeriod.authorizedTS)}"
-                                                                    value="change manager"
-                                                                    update="occperiod-dialog-periodmetadata-form
-                                                                    "/>
-                                                
-                                            </h:panelGroup>
-                                            
-                                            <h:panelGroup>
-                                                  <h:outputText value="Created by: "
-                                                              styleClass="ui-label font-smaller"/>
-                                                  
-                                                    <h:outputText value="#{occPeriodWorkflowBB.currentOccPeriod.createdBy.person.firstName}" 
-                                                              styleClass="data-text"/>
-                                                    <h:outputText value=" " 
-                                                                  styleClass="data-text" />
-                                                    <h:outputText value="#{occPeriodWorkflowBB.currentOccPeriod.createdBy.person.lastName}" 
-                                                                  styleClass="data-text"/>
-                                                    <h:outputText value=" (" 
-                                                                  styleClass="data-text"/>
-                                                    <h:outputText value="#{occPeriodWorkflowBB.currentOccPeriod.createdBy.username}" 
-                                                                  styleClass="data-text"/>
-                                                    <h:outputText value="; ID:" 
-                                                                  styleClass="data-text"/>
-                                                    <h:outputText value="#{occPeriodWorkflowBB.currentOccPeriod.createdBy.userID}" 
-                                                                  styleClass="data-text"/>
-                                                    <h:outputText value=")" 
-                                                                  styleClass="data-text"/>
-
-                                                
-                                            </h:panelGroup>
-                                            
-                                            <h:panelGroup>
-                                                <h:outputText value=" "/>
-                                            </h:panelGroup>
-                                            
-                                            
-                                            <h:panelGroup>
-                                                  <h:outputText value="Creation date: "
-                                                              styleClass="ui-label font-smaller"/>
-                                                  
-                                                  <h:outputText value="#{occPeriodWorkflowBB.getPrettyDate(occPeriodWorkflowBB.currentOccPeriod.createdTS)}" />
-                                                
-                                            </h:panelGroup>
-                                            
-                                            <h:panelGroup>
-                                                <h:outputText value=" "/>
-                                            </h:panelGroup>
-                                            
-                                            
-                                        </h:panelGrid>
-                                        
-                                        <p:spacer height="5px" />
-                                        
-                                   
-
-                                        <!--removed occperiod-form-proposals from update here if its significant-->
-                                        <p:commandButton   id="occperiod-refreshperiod-button"
-                                                           value="reload current occ period"
-                                                           ajax="true"
-                                                           styleClass="noFill button-size-small inline-button"
-                                                           actionListener="#{occPeriodWorkflowBB.reloadCurrentOccPeriodDataHeavy()}"
-                                                           icon="fa fa-refresh"
-                                                           update="occperiod-dialog-periodpropunit-form
-                                                           form-messages-global"/>
-                                    </h:form>
-                                </p:panel>
-                                
-                                  <p:panel id="occperiod-panel-notes"
-                                         toggleable="true"
-                                         widgetVar="occperiod-panel-notes-var"
-                                         collapsed="false"
-                                        header="Notes">
-                                      <h:form id="occperiod-notes-form">
-                                          
-                                      
-                                      
-                                        <p:commandButton    id="occperiod-button-initiatenewnote"
-                                                            ajax="true"
-                                                            styleClass="noFill button-size-small"
-                                                            actionListener="#{occPeriodWorkflowBB.initiateNoteOnPeriod}"
-                                                            oncomplete="PF('occperiod-dialog-notes-var').show()"
-                                                            icon="fa fa-sticky-note-o"
-                                                            value="create new note"
-                                                            update="occperiod-dialog-note-form
-                                                            "/>
-
-                                        <p:spacer height="5px" />
-                                      
-                                      
-                                      
-                                      <h:outputText value="#{occPeriodWorkflowBB.currentOccPeriod.notes}"
-                                                    escape="false"/>
-                                             
-                                      </h:form>
-                                      
-                                      
-                                  </p:panel>
-                                
-                                
-                                
-
-                            </h:panelGroup>
-
-                        
-                        </h:panelGrid>
-
-
-                    </div>
-
-                    
-                    
-
-                    <p:dialog   id="occperiod-dialog-periodpropunit"
-                                height="650" width="900"
-                                widgetVar="occperiod-dialog-periodpropunit-var"
-                                closable="true"
-                                header="occupancy period property unit"
-                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                >
-                        <h:form id="occperiod-dialog-periodpropunit-form">
-                            <h:messages id="occperiod-dialog-periodpropunit-messages"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-
-                            <h:outputText   value="Property units on current property: #{systemServicesBB.bbSessionProperty.address} (#{systemServicesBB.bbSessionProperty.muni.muniName})"
-                                            styleClass="ui-label font-smaller"/>
-
-                            <p:selectOneMenu id="occperiod-dialog-periodpropunit-candidatepropunit-som" required="true"
-                                             value="#{occPeriodWorkflowBB.selectedPropertyUnit}">
-                                <f:selectItem itemLabel="select a property unit..." noSelectionOption="true" />
-                                <f:selectItems value="#{occPeriodWorkflowBB.propertyUnitCandidateList}"  var="pu" itemValue="#{pu}"
-                                               itemLabel="#{pu.unitNumber} (ID: #{pu.unitID})"/>
-                                <f:converter converterId="propertyUnitConverter"/>
-                            </p:selectOneMenu>
-
-                            <p:spacer height="5px" />
-
-
-                            <p:commandButton    id="occperiod-dialog-periodpropunit-button-cancel"
-                                                ajax="true"  tabindex="27"
-                                                value="Cancel"
-                                                icon="fa fa-stop"
-                                                immediate="true"
-                                                onclick="PF('occperiod-dialog-periodpropunit-var').hide()"
-                                                />
-
-                            <p:commandButton id="occperiod-dialog-periodpropunit-button-submit" 
-                                             ajax="true"
-                                             value="update property unit" 
-                                             action="#{occPeriodWorkflowBB.updatePeriodPropUnit}"
-                                             icon="fa fa-thumbs-o-up" 
-                                             tabindex="28"
-                                             oncomplete="PF('occperiod-dialog-periodpropunit-var').hide()"
-                                             update="occperiod-form-address
-                                                    form-messages-global"
-                                             />
-                        </h:form>
-                    </p:dialog>
-
-                    <p:dialog   id="occperiod-dialog-periodmetadata"
-                                height="400" width="600"
-                                widgetVar="occperiod-dialog-periodmetadata-var"
-                                closable="true"
-                                header="occupancy period settings"
-                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                >
-
-                        <h:form id="occperiod-dialog-periodmetadata-form">
-
-                            <h:messages id="occperiod-dialog-periodmetadata-messages"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
-
-                            <h:panelGrid columns="2"
-                                         columnClasses="gridTd, gridTd">
-
-                                <h:panelGroup>
-                                    <h:outputText value="Choose a new period type:"
-                                                  styleClass="ui-label font-smaller bold"/>
-                                </h:panelGroup>
-                                
-                                <h:panelGroup>
-                                    <p:selectOneMenu
-                                        id="som-occperiodtype" tabindex="1"
-                                        value="#{occPeriodWorkflowBB.selectedOccPeriodType}">
-
-                                        <f:converter converterId="occPeriodTypeConverter"/>
-                                        <f:selectItem itemLabel="Select a period type..." 
-                                                      itemDisabled="true" noSelectionOption="true"/>
-                                        <f:selectItems id="si-typelist"
-                                                       value="#{occPeriodWorkflowBB.occPeriodTypeList}"
-                                                       var ="opt"
-                                                       itemValue="#{opt}"
-                                                       itemLabel="#{opt.title}" />
-                                    </p:selectOneMenu>
-                                </h:panelGroup>
-
-                                <h:panelGroup>
-                                    <h:outputText value="Choose a period manager:"
-                                                  styleClass="ui-label font-smaller bold"/>
-                                </h:panelGroup>
-                                
-                                
-                                <h:panelGroup>
-                                    <p:selectOneMenu
-                                        id="occper-manager-som" tabindex="2"
-                                        value="#{occPeriodWorkflowBB.selectedManager}">
-
-                                        <f:converter converterId="userConverter"/>
-                                        <f:selectItem itemLabel="Select a manager..." 
-                                                      itemDisabled="true" 
-                                                      noSelectionOption="true"/>
-                                        <f:selectItems id="occper-manager-selitems"
-                                                       value="#{occPeriodWorkflowBB.managerInspectorCandidateList}"
-                                                       var ="mngr"
-                                                       itemValue="#{mngr}"
-                                                       itemLabel="#{mngr.person.firstName} #{mngr.person.lastName} (#{mngr.username}, ID #{mngr.userID})" />
-                                    </p:selectOneMenu>
-                                </h:panelGroup>
-                                
-                                <h:panelGroup>
-                                    <h:outputText value=" "
-                                                  styleClass="spacer"/>
-                                </h:panelGroup>
-                                
-                                <h:panelGroup>
-                                    <p:commandButton id="button-updatemetadata" ajax="true"
-                                                     value="update manager"
-                                                     actionListener="#{occPeriodWorkflowBB.updateOccPeriodManager}"
-                                                     icon="fa fa-thumbs-o-up" tabindex="28"
-                                                     oncomplete="PF('occperiod-dialog-periodmetadata-var').hide()"
-                                                     update="
-                                                     occperiod-form-periodmetadata
-                                                     form-messages-global"
-                                                     />
-                                </h:panelGroup>
-                            </h:panelGrid>
-
-                            <p:commandButton    id="occperiod-updatemetadata-button-done"
-                                                ajax="true"  tabindex="27"
-                                                value="Done"
-                                                icon="fa fa-window-close"
-                                                immediate="true"
-                                                onclick="PF('occperiod-dialog-periodmetadata-var').hide()"
-                                                />
+                        <h:form id="occperiod-launcher">
+                            <h1>
+                                Occupancy Period for
+                                <h:outputText id="header-addr-ot" value="Unit #{occPeriodSearchBB.currentPropertyUnit.unitNumber} @"/>
+                                <h:outputText id="header-addr-ot" value="#{occPeriodSearchBB.currentPropertyUnit.property.address} "/>
+                                <h:outputText id="header-muni-ot" value="(#{occPeriodSearchBB.currentPropertyUnit.property.muni.muniName})"/>
+                            </h1>
 
                         </h:form>
-                    </p:dialog>
-                    
-                       <p:dialog   id="occperiod-dialog-notes"
-                                height="300" width="750"
-                                widgetVar="occperiod-dialog-notes-var"
-                                closable="true"
-                                header="notes"
-                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                >
+                        <div class="mainContainer">
+                            <div class="page-links">
+                                <a href="#occperiod-status-panel">occupancy period status</a>
+                            </div>
+                            <div class="ui-g data_container_nested_restrict">
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                                    <p:panel    id="occperiod-status-panel"
+                                                toggleable="true"
+                                                widgetVar="occperiod-status-panel-var"
+                                                collapsed="false"
+                                                rendered="true"
+                                                header="Occupancy Period Status | ID: #{occPeriodSearchBB.currentOccPeriod.periodID}">
 
-                        <h:form id="occperiod-dialog-note-form">
+                                        <h:form id="occperiod-status-form">
+                                            <div class="ui-g data_container_nested_restrict">
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                    <div class="restrict-data-field-label-inline">
+                                                        <p:outputLabel for="occperiod-manager-ot">
+                                                            <h:outputText value="Manager"/>
+                                                        </p:outputLabel>
+                                                        <div class="restrict-main-contents-io-link link-button">
 
-                            <h:messages id="occperiod-dialog-note-messages"
-                                        globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                            </h:messages>
+                                                            <p:commandLink id="occperiod-update-manager-cb"
+                                                                           ajax="true"
+                                                                           actionListener="#{occPeriodSearchBB.updateOccPeriodInitialize}"
+                                                                           style="color:blue;"
+                                                                           oncomplete="PF('occperiod-changemanager-dialog-var').show()"
+                                                                           rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                           value="edit"/>
+                                                        </div>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline">
 
-                            <h:panelGrid columns="1"
-                                         columnClasses="gridTd, gridTd">
+                                                        <h:outputText id="occperiod-manager-ot"
+                                                                      value="#{occPeriodSearchBB.currentOccPeriod.manager.person.firstName}
+                                                                      #{occPeriodSearchBB.currentOccPeriod.manager.person.lastName} "/>
+                                                        <br/>
+                                                        <h:outputText id="occperiod-manager-username"
+                                                                      value="(#{occPeriodSearchBB.currentOccPeriod.manager.username})"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:form>
+                                    </p:panel>
+                                    <p:dialog id="occperiod-changemanager-dialog"
+                                              height="450" width="600"
+                                              header="Change case manager"
+                                              widgetVar="occperiod-changemanager-dialog-var"
+                                              closable="true"
+                                              resizable="true"
+                                              closeOnEscape="true"
+                                              modal="true"
+                                              rendered="true">
 
-                                <h:panelGroup>
-                                    <h:outputText styleClass="ui-label" value="Note text: "/>
-                                    <p:textEditor id="occperiod-notes-editor"
-                                                  value="#{occPeriodWorkflowBB.formNoteText}"
-                                                  required="false"
-                                                  secure="false" 
-                                                  height="200"/>
+                                        <h:form id="occperiod-changemanager-form">
+                                            <div class="ui-g data-container">
 
-                               
-                                    <p:spacer height="5px" />
-                                          <p:commandButton    id="occperiod-updatemetadata-button-cancel"
-                                                ajax="true"  tabindex="27"
-                                                value="Cancel"
-                                                icon="fa fa-stop"
-                                                immediate="true"
-                                                onclick="PF('occperiod-dialog-notes-var').hide()"
-                                                />
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
-                                    <p:commandButton   id="occperiod-dialog-notes-button-addnote"
-                                                       ajax="true" 
-                                                       actionListener="#{occPeriodWorkflowBB.attachNoteToPeriod}"
-                                                       oncomplete="PF('occperiod-dialog-notes-var').hide()"
-                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
-                                                       value="save note"  
-                                                       styleClass="inline-button"
-                                                       icon="fa fa-sticky-note-o"
-                                                       update="form-messages-global
-                                                       occperiod-notes-form"/>
-                                </h:panelGroup>
-                            </h:panelGrid>
-                        </h:form>
-                    </p:dialog>
+                                                    <p:outputLabel for="occperiod-manager-som"
+                                                                   styleClass="data_field_label">
+                                                        <h:outputText value="Choose a new manager user"/>
+                                                    </p:outputLabel>
+                                                    <div class="restrict-main-contents-io-content">
+                                                        <p:selectOneMenu id="occperiod-manager-som"
+                                                                         tabindex="1"
+                                                                         value="#{occPeriodSearchBB.currentOccPeriod.manager}">
+
+                                                            <f:selectItem itemLabel="select a user "
+                                                                          noSelectionOption="true"
+                                                                          itemDisabled="true"/>
+                                                            <f:selectItems id="occperiod-search-user-field-val-items"
+                                                                           value="#{systemServicesBB.userListForSearch}"
+                                                                           var="usr" itemValue="#{usr}" itemLabel="#{usr.person.firstName} #{usr.person.lastName}; username #{usr.username}"/>
+                                                            <f:converter converterId="userConverter"/>
+                                                        </p:selectOneMenu>
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+                                                    <p:commandButton id="occperiod-changemanager-button"
+                                                                     ajax="false"
+                                                                     value="Change manager of period ID #{occPeriodSearchBB.currentOccPeriod.periodID}"
+                                                                     action="#{occPeriodSearchBB.updateOccPeriodInitialize}"
+                                                                     icon="fa fa-user"/>
+
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+
+                                                    <div class="restrict-main-contents-io-button gray_button">
+
+                                                        <p:commandButton id="occperiod-changemanager-abort-button1"
+                                                                         ajax="true"
+                                                                         value="Cancel"
+                                                                         process="@none"
+                                                                         immediate="true"
+                                                                         icon="fa fa-stop"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:form>
+                                    </p:dialog>
+                                </div>
+                            </div>
+                        </div>
+                    </p:outputPanel>
                 </f:view>
             </ui:define>
         </ui:composition>
