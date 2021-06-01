@@ -112,14 +112,12 @@ public  class   OccPeriodSearchBB
         periodStartDateNull = false;
         occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
         
-//        try {
-//            currentPropertyUnit = pc.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
-//            // TODO
-//            propertyUnitCandidateList = getSessionBean().getSessProperty().getUnitList();
-//
-//        } catch (IntegrationException ex) {
-//            System.out.println(ex);
-//        }
+        try {
+            currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
+            propertyUnitCandidateList = getSessionBean().getSessProperty().getUnitList();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
         
         
         search_occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
