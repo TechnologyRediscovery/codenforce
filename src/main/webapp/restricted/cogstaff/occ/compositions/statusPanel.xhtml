@@ -1,0 +1,109 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <div class="ui-g data_container_nested_restrict">
+        <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+            <p:panel    id="occperiod-status-panel"
+                        toggleable="true"
+                        widgetVar="occperiod-status-panel-var"
+                        collapsed="false"
+                        rendered="true"
+                        header="Occupancy Period Status | ID: #{occPeriodSearchBB.currentOccPeriod.periodID}">
+
+                <h:form id="occperiod-status-form">
+                    <div class="ui-g data_container_nested_restrict">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                            <div class="restrict-data-field-label-inline">
+                                <p:outputLabel for="occperiod-manager-ot">
+                                    <h:outputText value="Manager"/>
+                                </p:outputLabel>
+                                <div class="restrict-main-contents-io-link link-button">
+
+                                    <!-- Removed action listener -->
+                                    <p:commandLink id="occperiod-update-manager-cb"
+                                                   ajax="true"
+                                                   style="color:blue;"
+                                                   oncomplete="PF('occperiod-changemanager-dialog-var').show()"
+                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                   value="edit"/>
+                                </div>
+                            </div>
+                            <!--NESTED DATA VALUE INLINE -->
+                            <div class="restrict-data-field-value-inline">
+
+                                <h:outputText id="occperiod-manager-ot"
+                                              value="#{occPeriodSearchBB.currentOccPeriod.manager.person.firstName}
+                                                                      #{occPeriodSearchBB.currentOccPeriod.manager.person.lastName} "/>
+                                <br/>
+                                <h:outputText id="occperiod-manager-username"
+                                              value="(#{occPeriodSearchBB.currentOccPeriod.manager.username})"/>
+                            </div>
+                        </div>
+                    </div>
+                </h:form>
+            </p:panel>
+            <p:dialog id="occperiod-changemanager-dialog"
+                      height="450" width="600"
+                      header="Change case manager"
+                      widgetVar="occperiod-changemanager-dialog-var"
+                      closable="true"
+                      resizable="true"
+                      closeOnEscape="true"
+                      modal="true"
+                      rendered="true">
+
+                <h:form id="occperiod-changemanager-form">
+                    <div class="ui-g data-container">
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                            <p:outputLabel for="occperiod-manager-som"
+                                           styleClass="data_field_label">
+                                <h:outputText value="Choose a new manager user"/>
+                            </p:outputLabel>
+                            <div class="restrict-main-contents-io-content">
+                                <p:selectOneMenu id="occperiod-manager-som"
+                                                 tabindex="1"
+                                                 value="#{occPeriodSearchBB.currentOccPeriod.manager}">
+
+                                    <f:selectItem itemLabel="select a user "
+                                                  noSelectionOption="true"
+                                                  itemDisabled="true"/>
+                                    <f:selectItems id="occperiod-search-user-field-val-items"
+                                                   value="#{systemServicesBB.userListForSearch}"
+                                                   var="usr" itemValue="#{usr}" itemLabel="#{usr.person.firstName} #{usr.person.lastName}; username #{usr.username}"/>
+                                    <f:converter converterId="userConverter"/>
+                                </p:selectOneMenu>
+
+                            </div>
+
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+                            <p:commandButton id="occperiod-changemanager-button"
+                                             ajax="false"
+                                             value="Change manager of period ID #{occPeriodSearchBB.currentOccPeriod.periodID}"
+                                             action="#{occPeriodSearchBB.updateOccPeriodInitialize}"
+                                             icon="fa fa-user"/>
+
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+
+                            <div class="restrict-main-contents-io-button gray_button">
+
+                                <p:commandButton id="occperiod-changemanager-abort-button1"
+                                                 ajax="true"
+                                                 value="Cancel"
+                                                 process="@none"
+                                                 immediate="true"
+                                                 icon="fa fa-stop"/>
+                            </div>
+                        </div>
+                    </div>
+                </h:form>
+            </p:dialog>
+        </div>
+    </div>
+</ui:composition>
