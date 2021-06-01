@@ -2,7 +2,7 @@
 
 Note: This is the second step of the process for adding a new ordinance to the CodeNforce system. If you have not yet entered the details of your ordinance on the Ordinances page, please do that first.
 
-![screenshot of side nav](img/ordinancessidenavwrong.png)
+![screenshot of side nav](img/ordinancestopnav.png)
 
 1. Under the "Existing Code Books" panel, select the code book for your municipality by clicking on the corresponding View icon.
 
