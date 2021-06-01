@@ -1063,7 +1063,7 @@
         </navigation-case>
         
         <navigation-case>
-            <from-outcome>occPeriodWorkflow</from-outcome>
+            <from-outcome>occPeriodSearchBB</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/occPeriodWorkflow.xhtml</to-view-id>
         </navigation-case>
         
