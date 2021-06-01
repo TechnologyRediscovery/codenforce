@@ -1,1 +1,1 @@
-Please log out to activate these changes.
+Thank you for updating your Code Book. Please log out to activate these changes.

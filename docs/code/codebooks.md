@@ -20,4 +20,4 @@ Note: This is the second step of the process for adding a new ordinance to the C
 
 ![screenshot](img/addelements.png)
 
-5. Log out of the CodeNforce system to activate these changes.
+5. Please log out of the CodeNforce system to activate these changes.
