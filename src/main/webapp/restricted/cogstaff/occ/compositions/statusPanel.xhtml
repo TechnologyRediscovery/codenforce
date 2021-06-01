@@ -5,14 +5,15 @@
       xmlns:p="http://primefaces.org/ui">
     <div class="ui-g data_container_nested_restrict">
         <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
-            <p:panel    id="occperiod-status-panel"
-                        toggleable="true"
-                        widgetVar="occperiod-status-panel-var"
-                        collapsed="false"
-                        rendered="true"
-                        header="Occupancy Period Status | ID: #{occPeriodSearchBB.currentOccPeriod.periodID}">
+            <p:panel id="occperiod-status-panel"
+                     toggleable="true"
+                     widgetVar="occperiod-status-panel-var"
+                     collapsed="false"
+                     rendered="true"
+                     header="Occupancy Period Status | ID: #{occPeriodSearchBB.currentOccPeriod.periodID}">
 
                 <h:form id="occperiod-status-form">
+                    <!-- Manager -->
                     <div class="ui-g data_container_nested_restrict">
                         <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                             <div class="restrict-data-field-label-inline">
@@ -30,7 +31,6 @@
                                                    value="edit"/>
                                 </div>
                             </div>
-                            <!--NESTED DATA VALUE INLINE -->
                             <div class="restrict-data-field-value-inline">
 
                                 <h:outputText id="occperiod-manager-ot"
@@ -42,11 +42,81 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Dates -->
+                    <div class="ui-g data_container_nested_restrict">
+
+                        <!-- Just labels -->
+                        <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-vertical">
+                            <div class="restrict-data-field-label-vertical" >
+                                <h:outputLabel value=" "/>
+                            </div>
+                            <div class="restrict-data-field-value-vertical" style="font-weight: 700;">
+                                Date:
+                            </div>
+                            <div class="restrict-data-field-value-vertical" style="font-weight: 700;">
+                                Details:
+                            </div>
+                        </div>
+
+                        <!-- Occupancy start date -->
+                        <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-vertical">
+                            <div class="restrict-data-field-label-vertical" >
+                                <h:outputLabel value="Start date"/>
+                                <div class="restrict-main-contents-io-link link-button">
+
+                                    <!-- removed action listener -->
+                                    <p:commandLink      id="occperiod-editstart-init-cb"
+                                                        ajax="true"
+                                                        oncomplete="PF('occperiod-editstart-dialog-var').show()"
+                                                        disabled="false"
+                                                        style="color:blue;"
+                                                        value="edit" />
+                                </div>
+                            </div>
+                            <div class="restrict-data-field-value-vertical" >
+                                <h:outputText id="seloccperiod-sdate-it" value="#{occPeriodSearchBB.currentOccPeriod.startDatePretty}"/>
+                            </div>
+                            <div class="restrict-data-field-value-vertical" >
+                                <h:outputText id="seloccperiod-age-it"
+                                              value=" (#{occPeriodSearchBB.currentOccPeriod.periodAge} days ago)"
+                                              rendered="#{empty occPeriodSearchBB.currentOccPeriod.endDate}"/>
+                            </div>
+
+                        </div>
+
+                        <!-- Occupancy end date -->
+                        <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-vertical">
+                            <div class="restrict-data-field-label-vertical" >
+                                <h:outputLabel value="End date"/>
+                                <div class="restrict-main-contents-io-link link-button">
+
+                                    <!-- removed action listener -->
+                                    <p:commandLink      id="occperiod-editend-init-cb"
+                                                        ajax="true"
+                                                        oncomplete="PF('occperiod-editend-dialog-var').show()"
+                                                        disabled="false"
+                                                        style="color:blue;"
+                                                        value="edit" />
+
+                                </div>
+
+                            </div>
+                            <div class="restrict-data-field-value-vertical" >
+                                <h:outputText value="&#xA0;"/>
+                                <h:outputText id="seloccperiod-edate-it" value="#{occPeriodSearchBB.currentOccPeriod.endDatePretty}"/>
+                            </div>
+
+                        </div>
+                    </div>
                 </h:form>
             </p:panel>
+
+            <!-- Dialogs -->
+
+            <!-- Change manager dialog -->
             <p:dialog id="occperiod-changemanager-dialog"
                       height="450" width="600"
-                      header="Change case manager"
+                      header="Change occupancy period manager"
                       widgetVar="occperiod-changemanager-dialog-var"
                       closable="true"
                       resizable="true"
@@ -99,6 +169,148 @@
                                                  process="@none"
                                                  immediate="true"
                                                  icon="fa fa-stop"/>
+                            </div>
+                        </div>
+                    </div>
+                </h:form>
+            </p:dialog>
+
+            <!-- Edit occ period start date dialog -->
+            <p:dialog id="occperiod-editstart-dialog"
+                      height="450" width="600"
+                      header="Edit occupancy period start date"
+                      widgetVar="occperiod-editstart-dialog-var"
+                      closable="true"
+                      responsive="true"
+                      resizable="true"
+                      modal="true"
+                      rendered="true">
+
+                <h:form id="occperiod-editstart-form">
+                    <div class="ui-g data-container">
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+
+                            <div id="occperiod-editstart-origination-div"
+                                 class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                <p:outputLabel for="occperiod-date-start-cal"
+                                               styleClass="data_field_label">
+
+                                    <h:outputText value="Start date"/>
+                                </p:outputLabel>
+
+                                <p:calendar value="#{occPeriodSearchBB.currentOccPeriod.startDateUtilDate}"
+                                            mode="popup"
+                                            tabindex="3"
+                                            id="occperiod-date-start-cal"
+                                            showOn="button"
+                                            pattern="EEE, dd MMM, yyyy"
+                                            navigator="true"
+                                            showButtonPanel="true"
+                                            showTodayButton="true"
+                                            required="true"
+                                            styleClass="data_field_value"/>
+
+                                <h:message for="occperiod-date-start-cal" showDetail="false" showSummary="true"
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            </div>
+
+                        </div>
+
+                        <!-- removed action: ceCaseSearchProfileBB.onCaseUpdateDORCommitButtonChange -->
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+                            <p:commandButton id="occperiod-editstart-button"
+                                             ajax="false"
+                                             value="Change start date of occupancy period ID #{occPeriodSearchBB.currentOccPeriod.periodID}"
+                                             icon="fa fa-user"/>
+
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+
+                            <div class="restrict-main-contents-io-button gray_button">
+
+                                <!-- Removed action listener -->
+                                <p:commandButton id="occperiod-editstart-abort-button"
+                                                 ajax="true"
+                                                 value="Cancel"
+                                                 process="@none"
+                                                 immediate="true"
+                                                 icon="fa fa-stop"
+                                                 oncomplete="PF('occperiod-editstart-dialog-var').hide()"/>
+                            </div>
+                        </div>
+                    </div>
+                </h:form>
+            </p:dialog>
+
+            <!-- Edit occ period end date dialog -->
+            <p:dialog id="occperiod-editend-dialog"
+                      height="450" width="600"
+                      header="Edit occupancy period end date"
+                      widgetVar="occperiod-editend-dialog-var"
+                      closable="true"
+                      responsive="true"
+                      resizable="true"
+                      modal="true"
+                      rendered="true">
+
+                <h:form id="occperiod-editend-form">
+                    <div class="ui-g data-container">
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+
+                            <div id="occperiod-editend-origination-div"
+                                 class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                <p:outputLabel for="occperiod-date-end-cal"
+                                               styleClass="data_field_label">
+
+                                    <h:outputText value="End date"/>
+                                </p:outputLabel>
+
+                                <p:calendar value="#{occPeriodSearchBB.currentOccPeriod.endDateUtilDate}"
+                                            mode="popup"
+                                            tabindex="3"
+                                            id="occperiod-date-end-cal"
+                                            showOn="button"
+                                            pattern="EEE, dd MMM, yyyy"
+                                            navigator="true"
+                                            showButtonPanel="true"
+                                            showTodayButton="true"
+                                            required="true"
+                                            styleClass="data_field_value"/>
+
+                                <h:message for="occperiod-date-end-cal" showDetail="false" showSummary="true"
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            </div>
+
+                        </div>
+
+                        <!-- removed action: ceCaseSearchProfileBB.onCaseUpdateDORCommitButtonChange -->
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+                            <p:commandButton id="occperiod-editend-button"
+                                             ajax="false"
+                                             value="Change end date of occupancy period ID #{occPeriodSearchBB.currentOccPeriod.periodID}"
+                                             icon="fa fa-user"/>
+
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+
+                            <div class="restrict-main-contents-io-button gray_button">
+
+                                <!-- Removed action listener -->
+                                <p:commandButton id="occperiod-editend-abort-button"
+                                                 ajax="true"
+                                                 value="Cancel"
+                                                 process="@none"
+                                                 immediate="true"
+                                                 icon="fa fa-stop"
+                                                 oncomplete="PF('occperiod-editend-dialog-var').hide()"/>
                             </div>
                         </div>
                     </div>

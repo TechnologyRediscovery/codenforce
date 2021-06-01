@@ -6,10 +6,7 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
-import com.tcvcog.tcvce.entities.BOBSource;
-import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.IFace_EventHolder;
-import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -77,7 +74,19 @@ public  class       OccPeriod
         return c;
         
     }
-   
+
+    public long getPeriodAge() {
+        if(endDate != null){
+            return EntityUtils.getTimePeriodAsDays(startDate, endDate);
+        } else {
+            return EntityUtils.getTimePeriodAsDays(startDate, LocalDateTime.now());
+        }
+    }
+
+    public long getCaseAgeAsOf(LocalDateTime ageEndTime){
+        return EntityUtils.getTimePeriodAsDays(startDate, ageEndTime);
+
+    }
     
     /**
      * @return the periodID
@@ -164,6 +173,16 @@ public  class       OccPeriod
     }
 
     /**
+     * @return the prettified startdate
+     */
+    public String getStartDatePretty() {
+        if(startDate != null){
+            return EntityUtils.getPrettyDate(startDate);
+        }
+        return null;
+    }
+
+    /**
      * @return the endDate
      */
     public LocalDateTime getEndDate() {
@@ -182,6 +201,16 @@ public  class       OccPeriod
      */
     public User getEndDateCertifiedBy() {
         return endDateCertifiedBy;
+    }
+
+    /**
+     * @return the prettified enddate
+     */
+    public String getEndDatePretty() {
+        if(endDate != null){
+            return EntityUtils.getPrettyDate(endDate);
+        }
+        return null;
     }
 
     /**
