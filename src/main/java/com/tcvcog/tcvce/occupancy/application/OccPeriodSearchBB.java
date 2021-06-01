@@ -57,8 +57,8 @@ public  class   OccPeriodSearchBB
 
     private OccPeriodDataHeavy currentOccPeriod;
     private PropertyUnit currentPropertyUnit;
-    
-//    *******************************
+
+    //    *******************************
 //    ************ WORKFLOW**********
 //    *******************************
       private boolean periodStartDateNull;
@@ -116,7 +116,7 @@ public  class   OccPeriodSearchBB
 //            currentPropertyUnit = pc.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
 //            // TODO
 //            propertyUnitCandidateList = getSessionBean().getSessProperty().getUnitList();
-//            
+//
 //        } catch (IntegrationException ex) {
 //            System.out.println(ex);
 //        }
@@ -461,6 +461,11 @@ public  class   OccPeriodSearchBB
     public OccPeriodDataHeavy getCurrentOccPeriod() {
         return currentOccPeriod;
     }
+
+    /**
+     * @return the currentPropertyUnit
+     */
+    public PropertyUnit getCurrentPropertyUnit() { return currentPropertyUnit; }
 
     /**
      * @return the occPeriodList
