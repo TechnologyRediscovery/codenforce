@@ -84,7 +84,7 @@ public  class       OccPeriod
         }
     }
 
-    public long getCaseAgeAsOf(LocalDateTime ageEndTime){
+    public long getPeriodAgeAsOf(LocalDateTime ageEndTime){
         return DateTimeUtil.getTimePeriodAsDays(startDate, ageEndTime);
 
     }
