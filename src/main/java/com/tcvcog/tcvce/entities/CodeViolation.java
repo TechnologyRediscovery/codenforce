@@ -17,6 +17,8 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
  
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -91,7 +93,7 @@ public  class       CodeViolation
      * @return the daysUntilStipulatedComplianceDate
      */
     public long getDaysUntilStipulatedComplianceDate() {
-        return EntityUtils.getTimePeriodAsDays(LocalDateTime.now(), stipulatedComplianceDate);
+        return DateTimeUtil.getTimePeriodAsDays(LocalDateTime.now(), stipulatedComplianceDate);
     }
     
      @Override
@@ -307,7 +309,7 @@ public  class       CodeViolation
      * @return the dateOfCitationPretty
      */
     public String getDateOfCitationPretty() {
-        String s = EntityUtils.getPrettyDate(dateOfCitation);
+        String s = DateTimeUtil.getPrettyDate(dateOfCitation);
         return s;
     }
 
@@ -315,7 +317,7 @@ public  class       CodeViolation
      * @return the dateOfRecordPretty
      */
     public String getDateOfRecordPretty() {
-        dateOfRecordPretty = EntityUtils.getPrettyDate(dateOfRecord);
+        dateOfRecordPretty = DateTimeUtil.getPrettyDate(dateOfRecord);
         return dateOfRecordPretty;
     }
 
@@ -323,7 +325,7 @@ public  class       CodeViolation
      * @return the creationTSPretty
      */
     public String getCreationTSPretty() {
-        creationTSPretty = EntityUtils.getPrettyDate(creationTS);
+        creationTSPretty = DateTimeUtil.getPrettyDate(creationTS);
         
         return creationTSPretty;
     }
@@ -332,14 +334,14 @@ public  class       CodeViolation
      * @return the stipulatedComplianceDatePretty
      */
     public String getStipulatedComplianceDatePretty() {
-        return EntityUtils.getPrettyDate(stipulatedComplianceDate);
+        return DateTimeUtil.getPrettyDate(stipulatedComplianceDate);
     }
 
     /**
      * @return the actualComplianceDatePretty
      */
     public String getActualComplianceDatePretty() {
-        return EntityUtils.getPrettyDate(actualComplianceDate);
+        return DateTimeUtil.getPrettyDate(actualComplianceDate);
     }
 
 
@@ -541,21 +543,21 @@ public  class       CodeViolation
      * @return the dateOfRecordUtilDate
      */
     public java.util.Date getDateOfRecordUtilDate() {
-        return convertUtilDate(dateOfRecord);
+        return DateTimeUtil.convertUtilDate(dateOfRecord);
     }
 
     /**
      * @return the stipulatedComplianceDateUtilDate
      */
     public java.util.Date getStipulatedComplianceDateUtilDate() {
-        return convertUtilDate(stipulatedComplianceDate);
+        return DateTimeUtil.convertUtilDate(stipulatedComplianceDate);
     }
 
     /**
      * @return the actualComplianceDateUtilDate
      */
     public java.util.Date getActualComplianceDateUtilDate() {
-        return convertUtilDate(actualComplianceDate);
+        return DateTimeUtil.convertUtilDate(actualComplianceDate);
     }
 
     /**
@@ -571,21 +573,21 @@ public  class       CodeViolation
      */
     public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
         this.dateOfRecordUtilDate = dateOfRecordUtilDate;
-        dateOfRecord = convertUtilDate(dateOfRecordUtilDate);
+        dateOfRecord = DateTimeUtil.convertUtilDate(dateOfRecordUtilDate);
     }
 
     /**
      * @param stipulatedComplianceDateUtilDate the stipulatedComplianceDateUtilDate to set
      */
     public void setStipulatedComplianceDateUtilDate(java.util.Date stipulatedComplianceDateUtilDate) {
-        stipulatedComplianceDate = convertUtilDate(stipulatedComplianceDateUtilDate);
+        stipulatedComplianceDate = DateTimeUtil.convertUtilDate(stipulatedComplianceDateUtilDate);
     }
 
     /**
      * @param actualComplianceDateUtilDate the actualComplianceDateUtilDate to set
      */
     public void setActualComplianceDateUtilDate(java.util.Date actualComplianceDateUtilDate) {
-        actualComplianceDate = convertUtilDate(actualComplianceDateUtilDate);
+        actualComplianceDate = DateTimeUtil.convertUtilDate(actualComplianceDateUtilDate);
     }
 
     /**

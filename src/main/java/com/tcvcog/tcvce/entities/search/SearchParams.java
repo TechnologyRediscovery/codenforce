@@ -10,6 +10,8 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -159,28 +161,28 @@ public  class           SearchParams
      * @return the startDate_val_utilDate
      */
     public java.util.Date getStartDate_val_utilDate() {
-        return EntityUtils.convertUtilDate(date_start_val);
+        return DateTimeUtil.convertUtilDate(date_start_val);
     }
 
     /**
      * @param startDate_val_utilDate the startDate_val_utilDate to set
      */
     public void setStartDate_val_utilDate(java.util.Date startDate_val_utilDate) {
-        date_start_val = EntityUtils.convertUtilDate(startDate_val_utilDate);
+        date_start_val = DateTimeUtil.convertUtilDate(startDate_val_utilDate);
     }
 
     /**
      * @return the endDate_val_utilDate
      */
     public java.util.Date getEndDate_val_utilDate() {
-        return EntityUtils.convertUtilDate(date_end_val);
+        return DateTimeUtil.convertUtilDate(date_end_val);
     }
 
     /**
      * @param endDate_val_utilDate the endDate_val_utilDate to set
      */
     public void setEndDate_val_utilDate(java.util.Date endDate_val_utilDate) {
-        date_end_val = EntityUtils.convertUtilDate(endDate_val_utilDate);
+        date_end_val = DateTimeUtil.convertUtilDate(endDate_val_utilDate);
     }
 
     /**
@@ -201,14 +203,14 @@ public  class           SearchParams
      * @return the date_start_val in Util date form.
      */
     public Date getDate_start_val_util() {
-        return EntityUtils.convertUtilDate(date_start_val);
+        return DateTimeUtil.convertUtilDate(date_start_val);
     }
 
     /**
      * @return the date_end_val in Util date form.
      */
     public Date getDate_end_val_util() {
-        return EntityUtils.convertUtilDate(date_end_val);
+        return DateTimeUtil.convertUtilDate(date_end_val);
     }
     
     /**
@@ -229,14 +231,14 @@ public  class           SearchParams
      * @param dateStartUtil the date_start_val to set in Util date form
      */
     public void setDate_start_val_util(Date dateStartUtil) {
-        date_start_val = EntityUtils.convertUtilDate(dateStartUtil);
+        date_start_val = DateTimeUtil.convertUtilDate(dateStartUtil);
     }
 
     /**
      * @param dateEndUtil the date_end_val to set in Util date form
      */
     public void setDate_end_val_util(Date dateEndUtil) {
-        date_end_val = EntityUtils.convertUtilDate(dateEndUtil);
+        date_end_val = DateTimeUtil.convertUtilDate(dateEndUtil);
     }
 
     /**
@@ -419,7 +421,7 @@ public  class           SearchParams
      */
     public String getStartDatePretty() {
         if(date_start_val != null){
-            return EntityUtils.getPrettyDate(date_start_val);
+            return DateTimeUtil.getPrettyDate(date_start_val);
         }
         return null;
     }
@@ -429,7 +431,7 @@ public  class           SearchParams
      */
     public String getEndDatePretty() {
         if(date_end_val != null){
-            return EntityUtils.getPrettyDate(date_end_val);
+            return DateTimeUtil.getPrettyDate(date_end_val);
         }
         return null;
     }

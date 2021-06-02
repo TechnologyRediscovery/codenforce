@@ -17,6 +17,8 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -280,7 +282,7 @@ public class Citation
      * @return the dateOfRecordUtilDate
      */
     public java.util.Date getDateOfRecordUtilDate() {
-        dateOfRecordUtilDate = convertUtilDate(dateOfRecord);
+        dateOfRecordUtilDate = DateTimeUtil.convertUtilDate(dateOfRecord);
         return dateOfRecordUtilDate;
     }
 
@@ -289,14 +291,14 @@ public class Citation
      */
     public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
         this.dateOfRecordUtilDate = dateOfRecordUtilDate;
-        this.dateOfRecord = convertUtilDate(dateOfRecordUtilDate);
+        this.dateOfRecord = DateTimeUtil.convertUtilDate(dateOfRecordUtilDate);
     }
 
     /**
      * @return the dateOfRecordPretty
      */
     public String getDateOfRecordPretty() {
-        dateOfRecordPretty = EntityUtils.getPrettyDate(dateOfRecord);
+        dateOfRecordPretty = DateTimeUtil.getPrettyDate(dateOfRecord);
         return dateOfRecordPretty;
     }
 
@@ -304,7 +306,7 @@ public class Citation
      * @return the timeStampPretty
      */
     public String getTimeStampPretty() {
-        timeStampPretty = EntityUtils.getPrettyDate(timeStamp);
+        timeStampPretty = DateTimeUtil.getPrettyDate(timeStamp);
         return timeStampPretty;
     }
 

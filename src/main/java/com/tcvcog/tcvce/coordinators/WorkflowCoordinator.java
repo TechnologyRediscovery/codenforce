@@ -32,6 +32,7 @@ import java.util.Iterator;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import java.util.ArrayList;
 import java.util.List;
@@ -335,7 +336,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         descBldr.append(" evaluated the proposal titled: '");
         descBldr.append(proposal.getDirective().getTitle());
         descBldr.append("' on ");
-        descBldr.append(getPrettyDateNoTime(proposal.getResponseTS()));
+        descBldr.append(DateTimeUtil.getPrettyDateNoTime(proposal.getResponseTS()));
         descBldr.append(" and selected choice titled:  '");
         descBldr.append(chosen.getTitle());
         descBldr.append("'.");

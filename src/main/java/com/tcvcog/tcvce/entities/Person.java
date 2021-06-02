@@ -18,6 +18,8 @@ package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -659,7 +661,7 @@ public  class       Person
      * @return the expiryDateUtilDate
      */
     public java.util.Date getExpiryDateUtilDate() {
-        expiryDateUtilDate = convertUtilDate(expiryDate);
+        expiryDateUtilDate = DateTimeUtil.convertUtilDate(expiryDate);
         return expiryDateUtilDate;
     }
 
@@ -668,14 +670,14 @@ public  class       Person
      */
     public void setExpiryDateUtilDate(java.util.Date edut) {
         expiryDateUtilDate = edut;
-        expiryDate = convertUtilDate(edut);
+        expiryDate = DateTimeUtil.convertUtilDate(edut);
     }
 
     /**
      * @return the expireString
      */
     public String getExpireString() {
-        expireString = EntityUtils.getPrettyDate(expiryDate);
+        expireString = DateTimeUtil.getPrettyDate(expiryDate);
         return expireString;
         
     }
@@ -691,7 +693,7 @@ public  class       Person
      * @return the lastUpdatedPretty
      */
     public String getLastUpdatedPretty() {
-        lastUpdatedPretty = EntityUtils.getPrettyDate(lastUpdated);
+        lastUpdatedPretty = DateTimeUtil.getPrettyDate(lastUpdated);
         return lastUpdatedPretty;
     }
 

@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -77,14 +78,14 @@ public  class       OccPeriod
 
     public long getPeriodAge() {
         if(endDate != null){
-            return EntityUtils.getTimePeriodAsDays(startDate, endDate);
+            return DateTimeUtil.getTimePeriodAsDays(startDate, endDate);
         } else {
-            return EntityUtils.getTimePeriodAsDays(startDate, LocalDateTime.now());
+            return DateTimeUtil.getTimePeriodAsDays(startDate, LocalDateTime.now());
         }
     }
 
     public long getCaseAgeAsOf(LocalDateTime ageEndTime){
-        return EntityUtils.getTimePeriodAsDays(startDate, ageEndTime);
+        return DateTimeUtil.getTimePeriodAsDays(startDate, ageEndTime);
 
     }
     
@@ -177,7 +178,14 @@ public  class       OccPeriod
      */
     public String getStartDatePretty() {
         if(startDate != null){
-            return EntityUtils.getPrettyDate(startDate);
+            return DateTimeUtil.getPrettyDate(startDate);
+        }
+        return null;
+    }
+
+    public String getStartDatePrettyNoTime() {
+        if(startDate != null){
+            return DateTimeUtil.getPrettyDateNoTime(startDate);
         }
         return null;
     }
@@ -208,7 +216,14 @@ public  class       OccPeriod
      */
     public String getEndDatePretty() {
         if(endDate != null){
-            return EntityUtils.getPrettyDate(endDate);
+            return DateTimeUtil.getPrettyDate(endDate);
+        }
+        return null;
+    }
+
+    public String getEndDatePrettyNoTime() {
+        if(endDate != null){
+            return DateTimeUtil.getPrettyDateNoTime(endDate);
         }
         return null;
     }
@@ -379,7 +394,7 @@ public  class       OccPeriod
      * @return the startDateUtilDate
      */
     public java.util.Date getStartDateUtilDate() {
-        startDateUtilDate = convertUtilDate(startDate);
+        startDateUtilDate = DateTimeUtil.convertUtilDate(startDate);
          return startDateUtilDate;
     }
 
@@ -387,7 +402,7 @@ public  class       OccPeriod
      * @return the endDateUtilDate
      */
     public java.util.Date getEndDateUtilDate() {
-        endDateUtilDate = convertUtilDate(endDate);
+        endDateUtilDate = DateTimeUtil.convertUtilDate(endDate);
         return endDateUtilDate;
     }
 
@@ -396,7 +411,7 @@ public  class       OccPeriod
      */
     public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
         this.startDateUtilDate = startDateUtilDate;
-        startDate = convertUtilDate(startDateUtilDate);
+        startDate = DateTimeUtil.convertUtilDate(startDateUtilDate);
     }
 
     /**
@@ -404,7 +419,7 @@ public  class       OccPeriod
      */
     public void setEndDateUtilDate(java.util.Date endDateUtilDate) {
         this.endDateUtilDate = endDateUtilDate;
-        endDate = convertUtilDate(endDateUtilDate);
+        endDate = DateTimeUtil.convertUtilDate(endDateUtilDate);
     }
 
     /**

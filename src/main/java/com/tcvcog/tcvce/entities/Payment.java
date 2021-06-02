@@ -17,6 +17,8 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 /**
@@ -126,28 +128,28 @@ public class Payment extends BOb {
      * @return the dateDeposited
      */
     public Date getDateDepositedUtilDate() {
-        return convertUtilDate(dateDeposited);
+        return DateTimeUtil.convertUtilDate(dateDeposited);
     }
 
     /**
      * @param dateDeposited the dateDeposited to set
      */
     public void setDateDepositedUtilDate(Date dateDeposited) {
-        this.dateDeposited = convertUtilDate(dateDeposited);
+        this.dateDeposited = DateTimeUtil.convertUtilDate(dateDeposited);
     }
 
     /**
      * @return the dateReceived
      */
     public Date getDateReceivedUtilDate() {
-        return convertUtilDate(dateReceived);
+        return DateTimeUtil.convertUtilDate(dateReceived);
     }
 
     /**
      * @param dateReceived the dateReceived to set
      */
     public void setDateReceivedUtilDate(Date dateReceived) {
-        this.dateReceived = convertUtilDate(dateReceived);
+        this.dateReceived = DateTimeUtil.convertUtilDate(dateReceived);
     }
     
     /**

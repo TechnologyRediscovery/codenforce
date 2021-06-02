@@ -67,6 +67,7 @@ import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
@@ -1204,7 +1205,7 @@ public class CECaseSearchProfileBB
         } 
         getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                    "Stipulated compliance dates is now: " + getPrettyDate(getCurrentViolation().getStipulatedComplianceDate()), ""));
+                                    "Stipulated compliance dates is now: " + DateTimeUtil.getPrettyDate(getCurrentViolation().getStipulatedComplianceDate()), ""));
         return "ceCaseProfile";
 
     }

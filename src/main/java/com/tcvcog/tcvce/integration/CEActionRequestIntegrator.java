@@ -32,6 +32,8 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
 import com.tcvcog.tcvce.entities.search.SearchParamsCEActionRequests;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.sql.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -274,7 +276,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         actionRequest.setSubmittedTimeStamp(rs.getTimestamp("submittedtimestamp").toLocalDateTime());
         actionRequest.setDateOfRecord(rs.getTimestamp("dateofrecord").toLocalDateTime());
-        actionRequest.setFormattedSubmittedTimeStamp(getPrettyDate(actionRequest.getDateOfRecord()));
+        actionRequest.setFormattedSubmittedTimeStamp(DateTimeUtil.getPrettyDate(actionRequest.getDateOfRecord()));
 
         actionRequest.setDaysSinceDateOfRecord(getDaysSince(actionRequest.getDateOfRecord()));
         actionRequest.setAddressOfConcern(rs.getString("addressofconcern"));

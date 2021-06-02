@@ -24,6 +24,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 
 /**
  *
@@ -353,7 +354,7 @@ public  class       EventCnF
      * @return the timeStartUtilDate
      */
     public java.util.Date getTimeStartUtilDate() {
-        return convertUtilDate(timeStart);
+        return DateTimeUtil.convertUtilDate(timeStart);
     }
 
     /**
@@ -368,16 +369,16 @@ public  class       EventCnF
      * @return the timeEndUtilDate
      */
     public java.util.Date getTimeEndUtilDate() {
-        return convertUtilDate(timeEnd);
+        return DateTimeUtil.convertUtilDate(timeEnd);
     }
     
     public String getTimeStartPretty(){
-        return EntityUtils.getPrettyDate(timeStart);
+        return DateTimeUtil.getPrettyDate(timeStart);
         
     }
 
     public String getTimeEndPretty(){
-        return EntityUtils.getPrettyDate(timeEnd);
+        return DateTimeUtil.getPrettyDate(timeEnd);
     }
     
     /**
@@ -391,7 +392,7 @@ public  class       EventCnF
      * @param tsud
      */
     public void setTimeStartUtilDate(java.util.Date tsud) {
-        timeStart = convertUtilDate(tsud);
+        timeStart = DateTimeUtil.convertUtilDate(tsud);
     }
 
     /**
@@ -405,7 +406,7 @@ public  class       EventCnF
      * @param teud
      */
     public void setTimeEndUtilDate(java.util.Date teud) {
-        timeEnd = convertUtilDate(teud);
+        timeEnd = DateTimeUtil.convertUtilDate(teud);
     }
 
     /**
