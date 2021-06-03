@@ -347,6 +347,16 @@ public  class   OccPeriodSearchBB
 
     }
 
+    /**
+     * Listener for requests to reload the current OccPeriodDataHeavy
+     * Concept copied from CECaseSearchProfile
+     * @return
+     */
+    public String refreshCurrentPeriod() {
+        return "occPeriodWorkflow";
+
+    }
+
 
      /**
      * Loads an OccPeriodDataHeavy and injects it into the session bean 
