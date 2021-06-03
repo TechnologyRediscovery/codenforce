@@ -71,6 +71,13 @@
                                                         disabled="false"
                                                         style="color:blue;"
                                                         value="edit" />
+
+                                    <p:commandLink      id="occperiod-lockstart-init-cb"
+                                                        ajax="true"
+                                                        oncomplete="PF('occperiod-editstart-dialog-var').show()"
+                                                        disabled="false"
+                                                        style="color:blue;"
+                                                        value="edit" />
                                 </div>
                             </div>
                             <div class="restrict-data-field-value-vertical" >
@@ -101,6 +108,27 @@
                                 <h:outputText id="seloccperiod-edate-it" value="#{occPeriodSearchBB.currentOccPeriod.endDatePrettyNoTime}"/>
                             </div>
 
+                        </div>
+                    </div>
+
+                    <!-- Buttons at the bottom -->
+                    <div class="ui-g data_container_nested_restrict">
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                            <hr/>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
+                            <div class="restrict-main-contents-io-button gray_button">
+
+                                <p:commandButton id="view-property-cb"
+                                                 ajax="false"
+                                                 icon="fa fa-home"
+                                                 action="#{ceCaseSearchProfileBB.exploreProperty}"
+                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                 value="view property: #{occPeriodSearchBB.currentPropertyUnit.property.address}"/>
+
+
+                            </div>
                         </div>
                     </div>
                 </h:form>

@@ -326,8 +326,28 @@ public  class   OccPeriodSearchBB
          
          
      }
-     
-     
+
+    /**
+     * Listener for requests to go view the property profile of a property associated
+     * with the given case
+     * largely copied from CECaseSearchProfileBB (Maybe this should be in BackingBeanUtils?)
+     * @return
+     */
+    public String exploreProperty(){
+        try {
+            getSessionBean().setSessProperty(currentPropertyUnit.getPropertyID());
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not load property data heavy; reloaded page", ""));
+            return "";
+        }
+        return "propertyInfo";
+
+    }
+
+
      /**
      * Loads an OccPeriodDataHeavy and injects it into the session bean 
      * and sends the user to the Workflow/status page
