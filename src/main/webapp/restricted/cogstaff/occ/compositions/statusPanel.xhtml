@@ -17,13 +17,37 @@
                     <div class="ui-g data_container_nested_restrict">
                         <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                             <div class="restrict-data-field-label-inline">
+                                <p:outputLabel for="occperiod-type-ot">
+                                    <h:outputText value="Period type"/>
+                                </p:outputLabel>
+                                <div class="restrict-main-contents-io-link link-button">
+
+                                    <!-- Removed action listener -->
+                                    <p:commandLink id="occperiod-changetype-cb"
+                                                   ajax="true"
+                                                   style="color:blue;"
+                                                   oncomplete="PF('occperiod-changetype-dialog-var').show()"
+                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                   value="edit"/>
+                                </div>
+                            </div>
+                            <div class="restrict-data-field-value-inline">
+                                <h:outputText id="occperiod-type-ot"
+                                              value="#{occPeriodSearchBB.currentOccPeriod.type.title}"/>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Manager -->
+                    <div class="ui-g data_container_nested_restrict">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                            <div class="restrict-data-field-label-inline">
                                 <p:outputLabel for="occperiod-manager-ot">
                                     <h:outputText value="Manager"/>
                                 </p:outputLabel>
                                 <div class="restrict-main-contents-io-link link-button">
 
                                     <!-- Removed action listener -->
-                                    <p:commandLink id="occperiod-update-manager-cb"
+                                    <p:commandLink id="occperiod-changemanager-cb"
                                                    ajax="true"
                                                    style="color:blue;"
                                                    oncomplete="PF('occperiod-changemanager-dialog-var').show()"
@@ -141,6 +165,67 @@
 
             <!-- Dialogs -->
 
+            <!-- Change period type dialog -->
+            <p:dialog id="occperiod-changetype-dialog"
+                      height="450" width="600"
+                      header="Change occupancy period manager"
+                      widgetVar="occperiod-changetype-dialog-var"
+                      closable="true"
+                      resizable="true"
+                      closeOnEscape="true"
+                      modal="true"
+                      rendered="true">
+
+                <h:form id="occperiod-changetype-form">
+                    <div class="ui-g data-container">
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                            <p:outputLabel for="occperiod-type-som"
+                                           styleClass="data_field_label">
+                                <h:outputText value="Choose a new occupancy period type"/>
+                            </p:outputLabel>
+                            <div class="restrict-main-contents-io-content">
+                                <p:selectOneMenu id="occperiod-type-som"
+                                                 tabindex="1"
+                                                 value="#{occPeriodSearchBB.currentOccPeriod.type}">
+
+                                    <f:selectItem itemLabel="select a type"
+                                                  noSelectionOption="true"
+                                                  itemDisabled="true"/>
+                                    <f:selectItems id="occperiod-search-type-field-val-items"
+                                                   value="#{occPeriodSearchBB.search_occPeriodTypeList}"
+                                                   var ="typ" itemValue="#{typ}" itemLabel="#{typ.title}"/>
+                                    <f:converter converterId="occPeriodTypeConverter"/>
+                                </p:selectOneMenu>
+                            </div>
+
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+                            <!-- removed action occPeriodSearchBB.updateOccPeriodInitialize -->
+                            <p:commandButton id="occperiod-changetype-button"
+                                             ajax="false"
+                                             value="Change type of period ID #{occPeriodSearchBB.currentOccPeriod.periodID}"
+                                             icon="fa fa-user"/>
+
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+
+                            <div class="restrict-main-contents-io-button gray_button">
+
+                                <p:commandButton id="occperiod-changetype-abort-button"
+                                                 ajax="true"
+                                                 value="Cancel"
+                                                 process="@none"
+                                                 immediate="true"
+                                                 icon="fa fa-stop"/>
+                            </div>
+                        </div>
+                    </div>
+                </h:form>
+            </p:dialog>
+
             <!-- Change manager dialog -->
             <p:dialog id="occperiod-changemanager-dialog"
                       height="450" width="600"
@@ -166,7 +251,7 @@
                                                  tabindex="1"
                                                  value="#{occPeriodSearchBB.currentOccPeriod.manager}">
 
-                                    <f:selectItem itemLabel="select a user "
+                                    <f:selectItem itemLabel="select a user"
                                                   noSelectionOption="true"
                                                   itemDisabled="true"/>
                                     <f:selectItems id="occperiod-search-user-field-val-items"
@@ -179,10 +264,10 @@
 
                         </div>
                         <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
+                            <!-- removed action occPeriodSearchBB.updateOccPeriodInitialize -->
                             <p:commandButton id="occperiod-changemanager-button"
                                              ajax="false"
                                              value="Change manager of period ID #{occPeriodSearchBB.currentOccPeriod.periodID}"
-                                             action="#{occPeriodSearchBB.updateOccPeriodInitialize}"
                                              icon="fa fa-user"/>
 
                         </div>
@@ -191,7 +276,7 @@
 
                             <div class="restrict-main-contents-io-button gray_button">
 
-                                <p:commandButton id="occperiod-changemanager-abort-button1"
+                                <p:commandButton id="occperiod-changemanager-abort-button"
                                                  ajax="true"
                                                  value="Cancel"
                                                  process="@none"
