@@ -773,7 +773,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
     public void onPhotoUpdateDescription(Blob blob){
         BlobIntegrator bi = getBlobIntegrator();
         try {
-            bi.updatePhotoBlobDescription(blob);
+            bi.updatePhotoDocMetadata(blob);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully updated photo description", ""));

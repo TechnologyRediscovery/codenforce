@@ -55,8 +55,9 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
 /**
- *
- * @author noah
+ * Backing Bean for Blob Management
+ * 
+ * @author noah, Ellen, and NADGIT
  */
 public class manageBlobBB extends BackingBeanUtils implements Serializable{
     
@@ -213,6 +214,10 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         }
     }
     
+    /**
+     * Listener for user requests to 
+     * @param blob 
+     */
     public void selectBlob(BlobLight blob) {
 
         newFilename = "";
@@ -412,20 +417,20 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void updateBlobDescription(){
+    public void onBlobUpdateCommitButtonChange(){
         
-        BlobIntegrator bi = getBlobIntegrator();
+        BlobCoordinator bc = getBlobCoordinator();
         
         try{
-            selectedBlob.setDescription(newDescription);
+//            selectedBlob.setDescription(newDescription);
             
-            bi.updatePhotoBlobDescription(selectedBlob);
+            bc.updateBlobMetatdata(selectedBlob, getSessionBean().getSessUser());
             
-            reloadBlobs();
+//            reloadBlobs();
             
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully updated description!", ""));
+                            "Successfully updated blob title and description!", ""));
         } catch(IntegrationException ex){
             System.out.println("manageBlobBB.updateBlobDescription() | ERROR: " + ex);
             getFacesContext().addMessage(null,

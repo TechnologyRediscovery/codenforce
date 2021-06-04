@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.integration.BlobIntegrator;
 import java.io.ByteArrayInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -61,7 +62,13 @@ public class BlobRetrieveBB extends BackingBeanUtils {
      * @return 
      */
     public StreamedContent retrieveBlob(BlobLight b) {
-            BlobIntegrator bi = getBlobIntegrator();
+        
+       FacesContext fc = FacesContext.getCurrentInstance();
+       ExternalContext ec = fc.getExternalContext();
+
+       ec.responseReset(); // Some JSF component library or some Filter might have set some headers in the buffer beforehand. We want to get rid of them, else it may collide.
+
+            
             BlobCoordinator bc = getBlobCoordinator();
             Blob blob = bc.getBlob(b);
             if(blob != null){
@@ -79,6 +86,7 @@ public class BlobRetrieveBB extends BackingBeanUtils {
                 System.out.println("BobRetrieveBB.retrieveBlob: extracted null blob from BlobLight ID " + b.getPhotoDocID() );
                 
             }
+        fc.responseComplete(); 
     
         return blobStream;
     }

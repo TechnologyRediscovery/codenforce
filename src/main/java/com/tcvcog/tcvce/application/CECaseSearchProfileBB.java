@@ -214,7 +214,7 @@ public class CECaseSearchProfileBB
      *              BLOB Jazz
     /*******************************************************/
     
-    
+    private BlobLight currentBlob;
     private List<BlobLight> blobList;
     
     
@@ -426,7 +426,7 @@ public class CECaseSearchProfileBB
         
     }
     
-    public void reloadCase(){
+    public void reloadCase(ActionEvent ev){
         CaseCoordinator cc = getCaseCoordinator();
         try {
             currentCase = cc.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
@@ -809,7 +809,29 @@ public class CECaseSearchProfileBB
     
     
     
-  
+    
+    
+    
+    /*******************************************************
+    /*******************************************************
+     **              BLOBS                               **
+    /*******************************************************/
+    /*******************************************************/
+    
+    
+    
+    
+    /**
+     * Listener for user requests to start the blob update process
+     * @param bl 
+     */
+  public void onBlobSelectButtonChange(BlobLight bl){
+      
+      currentBlob = bl;
+      System.out.println("CECaseSearchProfileBB.onBlobSelectButtonChange: current blob: " + currentBlob.getPhotoDocID());
+      
+  }
+    
     
     public String onBlobViewButtonChange(Blob blob){
         return "blobs";
@@ -825,6 +847,62 @@ public class CECaseSearchProfileBB
         System.out.println("CECaseSearchProfileBB.onBlobAddButtonChange");
 
     }
+      /**
+     * Listener for user requests to update the current blob
+     * @param ev
+     */
+    public void onBlobUpdateMetadata(ActionEvent ev){
+          BlobCoordinator bc = getBlobCoordinator();
+        
+        try{
+            bc.updateBlobMetatdata(currentBlob, getSessionBean().getSessUser());
+            reloadCase(ev);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully updated blob title and description!", ""));
+        } catch(IntegrationException ex){
+            System.out.println("manageBlobBB.updateBlobDescription() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to update the description!", ""));
+        }
+    }
+
+    public String onBlobConfirm() {
+        
+      
+        if(currentViolation.getBlobList() == null  ||  currentViolation.getBlobList().isEmpty()){
+            getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                                "No uploaded pdfs or photos to commit.", 
+                                "Use the 'Return to case home without commiting photos' button bellow if you have no photos to upload."));
+            return "";
+        }
+        
+        BlobIntegrator bi = getBlobIntegrator();
+        
+        for(BlobLight photo : currentViolation.getBlobList()){
+            
+            try { 
+                // commit and link
+                
+                bi.commitPhotograph(photo.getPhotoDocID());
+                bi.linkBlobToViolation(photo.getPhotoDocID(), currentViolation.getViolationID());
+                
+            } catch (IntegrationException ex) {
+                System.out.println(ex.toString());
+                    getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                                "INTEGRATION ERROR: Unable write request into the database, our apologies!", 
+                                "Please call your municipal office and report your concern by phone."));
+                    return "";
+            }
+        }
+        
+        return "ceCaseProfile";
+
+    }
+    
     
     
     
@@ -1756,65 +1834,7 @@ public class CECaseSearchProfileBB
     }
     
     
-    /**
-     * TODO: NADIT review
-     * @param blob 
-     */
-    public void onBlobUpdateDescription(Blob blob){
-        BlobCoordinator bc = getBlobCoordinator();
-        try {
-            bc.updateBlobFilename(blob);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully updated photo description", ""));
-            
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Cannot update photo description", ""));
-            
-        } catch (IOException | BlobTypeException | BlobException  ex) {
-            System.out.println(ex);
-        } 
-        
-    }
-
-    public String onBlobConfirm() {
-        
-      
-        if(currentViolation.getBlobList() == null  ||  currentViolation.getBlobList().isEmpty()){
-            getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                                "No uploaded pdfs or photos to commit.", 
-                                "Use the 'Return to case home without commiting photos' button bellow if you have no photos to upload."));
-            return "";
-        }
-        
-        BlobIntegrator bi = getBlobIntegrator();
-        
-        for(BlobLight photo : currentViolation.getBlobList()){
-            
-            try { 
-                // commit and link
-                
-                bi.commitPhotograph(photo.getPhotoDocID());
-                bi.linkBlobToViolation(photo.getPhotoDocID(), currentViolation.getViolationID());
-                
-            } catch (IntegrationException ex) {
-                System.out.println(ex.toString());
-                    getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                                "INTEGRATION ERROR: Unable write request into the database, our apologies!", 
-                                "Please call your municipal office and report your concern by phone."));
-                    return "";
-            }
-        }
-        
-        return "ceCaseProfile";
-
-    }
-    
-    
+  
     
     
     
@@ -3338,6 +3358,21 @@ public class CECaseSearchProfileBB
         this.blobList = blobList;
     }
 
+    /**
+     * @return the currentBlob
+     */
+    public BlobLight getCurrentBlob() {
+        return currentBlob;
+    }
+
+    /**
+     * @param currentBlob the currentBlob to set
+     */
+    public void setCurrentBlob(BlobLight currentBlob) {
+        this.currentBlob = currentBlob;
+    }
+
+   
    
 
    

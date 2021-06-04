@@ -90,7 +90,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 <h:outputText value=" | " />
                                 <div class="restrict-main-contents-io-link link-button">
                                     <a href="#cecase-blobs-panel">
-                                        <h:outputText value="photos &amp; blobs" />
+                                        <h:outputText value="photos &amp; docs (#{ceCaseSearchProfileBB.currentCase.blobList.size()})" />
                                     </a>
                                 </div>
                                 <h:outputText value=" | " />
@@ -1077,17 +1077,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 value="#{ceCaseSearchProfileBB.currentCase.blobList}"
                                                 rowKey="#{blob.blobID}"
                                                 tableStyleClass="primeDataTable"
+                                                resizableColumns="true"
                                                 draggableRows="false" tabindex="6">
 
-                                                <p:column>
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Byte Bridge ID"/>
-                                                    </f:facet>
-                                                    <h:outputText value="#{blob.photoDocID}"/>
-                                                    <!-- type icon here -->
-                                                </p:column>
-
-                                                <p:column>
+                                                <p:column width="15%">
                                                     <f:facet name="header">
                                                         <h:outputText value="File Type"/>
                                                     </f:facet>
@@ -1095,39 +1088,67 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <!-- type icon here -->
                                                 </p:column>
 
-                                                <p:column>
+                                                <p:column width="15%">
                                                     <f:facet name="header">
-                                                        <h:outputText value="Title"/>
+                                                        <h:outputText value="IDs"/>
                                                     </f:facet>
-                                                    <h:outputText value="#{blob.title}"/>
+                                                    <h:outputText value="linkID: #{blob.photoDocID}"/>
+                                                    <br/>
+                                                    <h:outputText value="bytesID: #{blob.bytesID}"/>
+                                                    
                                                 </p:column>
 
-                                                <p:column>
+                                                <p:column width="45%">
                                                     <f:facet name="header">
-                                                        <h:outputText value="Created"/>
+                                                        <h:outputText value="Info"/>
                                                     </f:facet>
-                                                    <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDateNoTime(blob.createdTS)}"/>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="title: #{blob.title}"/>
+                                                        <br/>
+                                                        <h:outputText value="descr: #{blob.description}"/>
+                                                        <br/>
+                                                        <h:outputText value="filename: #{blob.filename}"/>
+                                                        <br/>
+                                                        <h:outputText value="created: #{ceCaseSearchProfileBB.getPrettyDateNoTime(blob.createdTS)}"/>
+                                                    </div>
                                                 </p:column>
 
 
                                                 <p:column>
                                                     <f:facet name="header">
-                                                        <h:outputText value="Description"/>
-                                                    </f:facet>
-                                                    <h:outputText id="desc" value="#{blob.description}"/>
-                                                </p:column>
-
-                                                <p:column>
-                                                    <f:facet name="header">
-                                                        <h:outputText value="View File"/>
+                                                        <h:outputText value="Actions"/>
                                                     </f:facet>
                                                     <p:commandButton 
+                                                        value="View in tab" 
+                                                        ajax="false"
+                                                        icon="fa fa-eye" 
+                                                        styleClass="ui-button-outlined">
+                                                        <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blob)}"
+                                                                        contentDisposition="inline"
+                                                                        />
+                                                    </p:commandButton>
+                                                    <br/>
+                                                    <p:commandButton 
                                                         value="Download" 
-                                                        ajax="true"
+                                                        ajax="false"
                                                         icon="fa fa-arrow-down" 
                                                         styleClass="ui-button-outlined">
-                                                        <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blob)}"/>
+                                                        <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blob)}"
+                                                                        />
                                                     </p:commandButton>
+                                                    <br/>
+                                                     <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink      id="blob-update-button"
+                                                                            ajax="true"
+                                                                            styleClass="noFill button-size-small"
+                                                                            action="#{ceCaseSearchProfileBB.onBlobSelectButtonChange(blob)}"
+                                                                            value="edit"
+                                                                            oncomplete="PF('blob-edit-dialog-var').show()"
+                                                                            update="blob-edit-dialog
+                                                                            blob-edit-form"
+                                                                            />
+                                                    </div>
                                                 </p:column>
                                             </p:dataTable>
                                         </h:form>
@@ -5067,89 +5088,104 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                     <p:dialog   id="case-blobs-dialog"
-                                height="800" width="1600"
+                                height="600" width="800"
                                 widgetVar="case-blobs-dialog-var"
                                 responsive="true"
                                 modal="true"
                                 resizable="true"
                                 closable="true"
                                 closeOnEscape="true"
-                                header="Violation Photos"
+                                header="Photos and Documents on Case: #{ceCaseSearchProfileBB.currentCase.caseName}"
                                 rendered="true"
                                 > 
 
                         <h:form id="case-blobs-start-form" enctype="multipart/form-data">
-                            <h2>Photos/Docs of this Case (3 max)</h2>
+                            <h2>Photos/Docs of this Case (10 max)</h2>
+                            <p>Allowed file types: pdf, jpeg, png, gif</p>
 
                             <p:fileUpload 
                                 mode="advanced" 
-                                update="case-blobs-list-form:case-blobs-table"
+                                update="cecase-blobs-form:cecase-blobs-table"
                                 listener="#{ceCaseSearchProfileBB.onBlobUploadCommitButtonChange}"
                                 multiple="true"
-                                fileLimit="3"
+                                fileLimit="10"
                                 sizeLimit="99999999999" 
-                                allowTypes="/(\.|\/)(jpe?g|png|pdf|PDF)$/"
-                                rendered="true"/>    
+                                allowTypes="/(\.|\/)(jpe?g|JPG|JPE?G|png|PNG|pdf|PDF)$/"
+                                rendered="true"
+                                oncomplete="PF('case-blobs-dialog-var').hide()"/>    
                         </h:form>
 
-                        <h:form id="case-blobs-list-form">
-                            <p:spacer height="10px"/>
 
-                            <h2>Review and describe uploaded photos</h2>
-                            <p:dataTable
-                                id="case-blobs-table"
-                                var="blob"
-                                value="#{ceCaseSearchProfileBB.currentViolation.blobList}"
-                                rowKey="#{blob.blobID}"
-                                tableStyleClass="primeDataTable"
-                                draggableRows="false" tabindex="6">
-                                <p:column width="70%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Photo/Doc"/>
-                                    </f:facet>
-                                    <p:graphicImage width="100%" value="#{blobCoordinator.image}">
-                                        <f:param name="blobID" value="#{blob.blobID}"/>
-                                    </p:graphicImage>
-
-                                    <p:commandButton   id="case-blobs-delete-cb"
-                                                       rendered="true"
-                                                       value="Delete Photo"  
-                                                       icon="fa fa-eraser"
-                                                       ajax="true"
-                                                       update="messages-global-form"
-                                                       actionListener="#{ceCaseSearchProfileBB.onPhotoRemoveButtonChange(blob.blobID)}"
-                                                       />
-
-                                </p:column>
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Description"/>
-                                    </f:facet>
-                                    <p:inputTextarea id="case-blob-desc" 
-                                                     value="#{blob.description}"
-                                                     style="width: 100%;" tabindex="5" required="true" styleClass="inputText">
-                                        <p:ajax />
-                                    </p:inputTextarea>
-                                    <p:growl    id="case-blobs-desc-growl"
-                                                for="photo-updatedescr-button" />
-
-                                    <p:commandButton   id="case-blobs-updatedescr-button"
-                                                       rendered="true"
-                                                       value="Update Desc"  
-                                                       icon="fa fa-edit"
-                                                       ajax="true"
-                                                       update="messages-global-form"
-                                                       actionListener="#{ceCaseSearchProfileBB.onPhotoUpdateDescription(photo)}"
-                                                       />
-
-                                </p:column>
-
-                            </p:dataTable>
-
-                            <p:spacer height="10px"/>
+                    </p:dialog>
 
 
+                    <p:dialog   id="blob-edit-dialog"
+                                height="600" width="800"
+                                widgetVar="blob-edit-dialog-var"
+                                responsive="true"
+                                modal="true"
+                                resizable="true"
+                                closable="true"
+                                closeOnEscape="true"
+                                header="Edit photo/document #{ceCaseSearchProfileBB.currentCase.caseName}"
+                                rendered="true"
+                                > 
+
+                        <h:form id="blob-edit-form" >
+                            
+                            
+                                <div class="ui-g data_container_nested_restrict">
+                                    
+
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                        <div class="restrict-main-contents-io-title" >
+                                            <h:outputLabel for="blob-edit-title-it">
+                                                <h:outputText value="Title"/>
+                                            </h:outputLabel>
+                                        </div>
+
+                                        <div class="restrict-main-contents-io-content" >
+                                            <p:inputText  id="blob-edit-title-it" 
+                                                          value="#{ceCaseSearchProfileBB.currentBlob.title}" 
+                                                          tabindex="1" 
+                                                          required="false" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                        <div class="restrict-main-contents-io-title" >
+                                            <h:outputLabel for="blob-edit-descr-it">
+                                                <h:outputText value="Description"/>
+                                            </h:outputLabel>
+                                        </div>
+
+                                        <div class="restrict-main-contents-io-content" >
+                                            <p:inputText  id="blob-edit-descr-it" 
+                                                          value="#{ceCaseSearchProfileBB.currentBlob.description}" 
+                                                          tabindex="2" 
+                                                          required="false" />
+                                        </div>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                        
+                                        <p:commandButton    id="blob-edit-commit-cb"
+                                                            ajax="true" 
+                                                            actionListener="#{ceCaseSearchProfileBB.onBlobUpdateMetadata}"
+                                                            oncomplete="PF('blob-edit-dialog-var').hide()"
+                                                            value="Save changes"  
+                                                            tabindex="3"
+                                                            styleClass="inline-button"
+                                                            icon="fa fa-floppy-o"
+                                                            update="cecase-blobs-form:cecase-blobs-table
+                                                            messages-global-form"/>
+                                        
+                                    </div>
+
+                                </div>
+                            
+                            
                         </h:form>
+                           
 
                     </p:dialog>
 
@@ -5898,6 +5934,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     required="true"/>
                                     </div>
                                 </div>
+                                
                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                                     <div class="restrict-main-contents-io-title" >
                                         <h:outputLabel for="event-add-descr-it">

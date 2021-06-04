@@ -295,6 +295,8 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         if(time != null){
             blob.setCreatedTS(time.toLocalDateTime());
         }
+        
+        blob.setFilename(rs.getString("filename"));
 //        blob.setType(BlobTypeEnum.blobTypeFromInt(rs.getInt("blobtype_typeid")));
 //        blob.setFilename(rs.getString("filename"));
 //        blob.setUploadPersonID(rs.getInt("uploadpersonid"));
@@ -330,9 +332,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     /**
      * Gets the binary data of a file in the database
      * @param bl
-     * @param bytesID
      * @return
-     * @throws IntegrationException 
      */
     public Blob getBlob(BlobLight bl) {
         
@@ -801,12 +801,12 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      * @param blob the meta to be updated
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public void updatePhotoBlobDescription(BlobLight blob) throws  IntegrationException{
+    public void updatePhotoDocMetadata(BlobLight blob) throws  IntegrationException{
         
         Connection con = getPostgresCon();
         String query = " UPDATE public.photodoc\n"
-                + " SET photodocdescription=?\n"
-                + " WHERE photodocid=?;\n\n";
+                + " SET photodocdescription=?, title=?\n"
+                + " WHERE photodocid=?;";
         
         PreparedStatement stmt = null;
         
@@ -814,9 +814,9 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             
             stmt = con.prepareStatement(query);
             stmt.setString(1, blob.getDescription());            
-            stmt.setInt(2, blob.getPhotoDocID());
-            
-            System.out.println("BlobIntegrator.storeBlob | Statement: " + stmt.toString());
+            stmt.setString(2, blob.getTitle());            
+            stmt.setInt(3, blob.getPhotoDocID());
+            System.out.println("BlobIntegrator.updatePhotoDocMetaData: updating blob pdid: " + blob.getPhotoDocID());
             stmt.execute();
             
         } catch (SQLException ex) {
@@ -896,12 +896,14 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * BROKEN!!!
+     * 
      * Updates the metadata and filename of a blobbytes entry.
      * @param blob the meta to be updated
      * @throws com.tcvcog.tcvce.domain.IntegrationException
-     * @throws java.io.IOException
+    
      */
-    public void updateBlobMetadata(BlobLight blob) throws  IntegrationException, IOException{
+    public void updateBlobMetadata(BlobLight blob) throws  IntegrationException{
         
         Connection con = getPostgresCon();
         String query = "UPDATE public.blobbytes\n"
@@ -920,7 +922,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             System.out.println("BlobIntegrator.storeBlob | Statement: " + stmt.toString());
             stmt.execute();
             
-        } catch (SQLException ex) {
+        } catch (SQLException | IOException ex) {
             System.out.println(ex);
             throw new IntegrationException("Error updating blob. ", ex);
         } finally{

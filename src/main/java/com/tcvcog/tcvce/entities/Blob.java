@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
 public class Blob  extends BlobLight {
     
     private byte[] bytes;
-    private String filename;
     private LocalDateTime blobUploadedTS;
     private User blobUploadedBy;
     
@@ -63,20 +62,12 @@ public class Blob  extends BlobLight {
     public void setBytes(byte[] bytes) {
        this.bytes = bytes;
     }
-
     /**
      * @return the filename
      */
-    public String getFilename() {
-        return filename;
-    }
-
     /**
      * @param filename the filename to set
      */
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
 
     /**
      * @return the blobUploadedTS

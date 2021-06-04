@@ -53,6 +53,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
@@ -274,6 +276,24 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         return getBlobIntegrator().storeBlob(blob);
         
     }
+    
+    
+    /**
+     * Logic container for business rules related to blob metadata updates
+     * @param bl
+     * @param ua 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void updateBlobMetatdata(BlobLight bl, UserAuthorized ua) throws IntegrationException{
+        BlobIntegrator bi = getBlobIntegrator();
+        
+        if(bl != null && ua != null){
+            bi.updatePhotoDocMetadata(bl);
+        }
+        
+    
+    }
+    
     
     /**
      * Updates a blob's filename.

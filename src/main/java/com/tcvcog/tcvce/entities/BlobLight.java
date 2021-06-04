@@ -38,6 +38,7 @@ public class BlobLight {
     protected User createdBy;
     
     protected Metadata blobMetadata;
+    protected String filename;
     
     /**
      * @return the photoDocID
@@ -168,6 +169,20 @@ public class BlobLight {
      */
     public void setMuni(Municipality muni) {
         this.muni = muni;
+    }
+
+    /**
+     * @return the filename
+     */
+    public String getFilename() {
+        return filename;
+    }
+
+    /**
+     * @param filename the filename to set
+     */
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
     
 }

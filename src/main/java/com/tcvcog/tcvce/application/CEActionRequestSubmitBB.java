@@ -414,7 +414,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
             //save the description to the database.
             try {
-                bi.updatePhotoBlobDescription(b);
+                bi.updatePhotoDocMetadata(b);
             } catch (IntegrationException ex) {
                 System.out.println("CEActionRequestSubmitBB.savePhotosAndContinue() | ERROR: " + ex);
             }

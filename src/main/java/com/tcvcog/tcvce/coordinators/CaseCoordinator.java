@@ -160,9 +160,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             
             // BLOB
             // TODO: Debug endless recursion
-//            cse.setBlobList(bc.getBlobLightList(bi.getBlobIDs(c)));
+            cse.setBlobList(bc.getBlobLightList(bi.getBlobIDs(c)));
 
-        } catch (SearchException  ex) {
+        } catch (SearchException | BlobException  ex) {
             System.out.println(ex);
         }
 
