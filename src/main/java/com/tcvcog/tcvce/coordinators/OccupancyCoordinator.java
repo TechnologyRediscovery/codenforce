@@ -197,9 +197,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             opdh.setEventList(ec.downcastEventCnFPropertyUnitHeavy(qe.getBOBResultList()));
 
             // PROPOSAL LIST
+            // Potentially turn off proposal process? if its broken or erroring?
             opdh.setProposalList(chc.getProposalList(opdh, cred));
 
             // EVENT RULE LIST
+            // Potentially turn off this thingy? if its broken or erroring?
             opdh.setEventRuleList(chc.rules_getEventRuleImpList(opdh, cred));
 
             // INSPECTION LIST

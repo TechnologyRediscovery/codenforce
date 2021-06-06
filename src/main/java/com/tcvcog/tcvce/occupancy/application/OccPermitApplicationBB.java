@@ -808,17 +808,16 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         }
 
-        //Clear the navstack until we reach the specified page
-        //If clearUntil is |, we will loop until there are no more pages to clear
-        
-        while (!getSessionBean().getNavStack().peekLastPage().contains(clearUntil)) { 
-                try {
-                    getSessionBean().getNavStack().popLastPage();
-                } catch (NavigationException ex) {
-                    //nothing, we just wanted to clear the stack anyway.
-                }
-            }
-        
+//        //Clear the navstack until we reach the specified page
+//        //If clearUntil is |, we will loop until there are no more pages to clear
+//        while (!getSessionBean().getNavStack().peekLastPage().contains(clearUntil)) {
+//            try {
+//                getSessionBean().getNavStack().popLastPage();
+//            } catch (NavigationException ex) {
+//                //nothing, we just wanted to clear the stack anyway.
+//            }
+//        }
+
         //Mark down that they've already applied for this unit
         alreadyApplied.put(currentApplication.getApplicationPropertyUnit().getUnitNumber(), selectedUnit);
         

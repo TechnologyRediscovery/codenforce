@@ -58,13 +58,13 @@ public  class   OccPeriodSearchBB
     private OccPeriodDataHeavy currentOccPeriod;
     private PropertyUnit currentPropertyUnit;
 
-    //    *******************************
+//    *******************************
 //    ************ WORKFLOW**********
 //    *******************************
-      private boolean periodStartDateNull;
+    private boolean periodStartDateNull;
     private boolean periodEndDateNull;
     
-     private String formNoteText;
+    private String formNoteText;
     
     private List<OccPeriodType> occPeriodTypeList;
     private OccPeriodType selectedOccPeriodType;

@@ -117,8 +117,7 @@ public  class       OccPeriodDataHeavy
 
     /**
      * Pre-credential requiring method for creating detailed subclass
-     * 
-     * @deprecated 
+     *
      * @param opLight 
      */
     public OccPeriodDataHeavy(OccPeriod opLight) {
