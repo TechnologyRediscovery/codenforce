@@ -996,8 +996,8 @@
     </managed-bean>
     
     <managed-bean>
-        <managed-bean-name>occPeriodSearchBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodSearchBB</managed-bean-class>
+        <managed-bean-name>occPeriodSearchWorkflowBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodSearchWorkflowBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
@@ -1063,7 +1063,7 @@
         </navigation-case>
         
         <navigation-case>
-            <from-outcome>occPeriodSearchBB</from-outcome>
+            <from-outcome>occPeriodSearchWorkflowBB</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/occPeriodWorkflow.xhtml</to-view-id>
         </navigation-case>
         

@@ -52,7 +52,7 @@ import javax.faces.event.ActionEvent;
  *
  * @author Ellen Bascomb
  */
-public  class   OccPeriodSearchBB 
+public  class   OccPeriodSearchWorkflowBB
         extends BackingBeanUtils {
 
     private OccPeriodDataHeavy currentOccPeriod;
@@ -95,9 +95,9 @@ public  class   OccPeriodSearchBB
     private SearchParamsOccPeriod searchParamsSelected;
     
     /**
-     * Creates a new instance of OccPeriodsBB
+     * Creates a new instance of OccPeriodSearchWorkflowBB
      */
-    public OccPeriodSearchBB()  {
+    public OccPeriodSearchWorkflowBB()  {
     }
     
     @PostConstruct
@@ -415,7 +415,7 @@ public  class   OccPeriodSearchBB
      * @param ev
      */
     public void executeQuery(ActionEvent ev) {
-        System.out.println("OccPeriodSearchBB.executeQuery");
+        System.out.println("OccPeriodSearchWorkflowBB.executeQuery");
         
         
         executeQuery();

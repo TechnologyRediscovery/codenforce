@@ -8,7 +8,7 @@
              widgetVar="occperiod-status-panel-var"
              collapsed="false"
              rendered="true"
-             header="Occupancy Period Status | ID: #{occPeriodSearchBB.currentOccPeriod.periodID}">
+             header="Occupancy Period Status | ID: #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}">
 
         <h:form id="occperiod-status-form">
             <!-- Manager -->
@@ -31,7 +31,7 @@
                     </div>
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="occperiod-type-ot"
-                                      value="#{occPeriodSearchBB.currentOccPeriod.type.title}"/>
+                                      value="#{occPeriodSearchWorkflowBB.currentOccPeriod.type.title}"/>
                     </div>
                 </div>
             </div>
@@ -56,11 +56,11 @@
                     <div class="restrict-data-field-value-inline">
 
                         <h:outputText id="occperiod-manager-ot"
-                                      value="#{occPeriodSearchBB.currentOccPeriod.manager.person.firstName}
-                                                              #{occPeriodSearchBB.currentOccPeriod.manager.person.lastName} "/>
+                                      value="#{occPeriodSearchWorkflowBB.currentOccPeriod.manager.person.firstName}
+                                                              #{occPeriodSearchWorkflowBB.currentOccPeriod.manager.person.lastName} "/>
                         <br/>
                         <h:outputText id="occperiod-manager-username"
-                                      value="(#{occPeriodSearchBB.currentOccPeriod.manager.username})"/>
+                                      value="(#{occPeriodSearchWorkflowBB.currentOccPeriod.manager.username})"/>
                     </div>
                 </div>
             </div>
@@ -96,7 +96,7 @@
                         </div>
                     </div>
                     <div class="restrict-data-field-value-vertical" >
-                        <h:outputText id="seloccperiod-sdate-it" value="#{occPeriodSearchBB.currentOccPeriod.startDatePrettyNoTime}"/>
+                        <h:outputText id="seloccperiod-sdate-it" value="#{occPeriodSearchWorkflowBB.currentOccPeriod.startDatePrettyNoTime}"/>
                     </div>
 
                 </div>
@@ -120,7 +120,7 @@
                     </div>
                     <div class="restrict-data-field-value-vertical" >
                         <h:outputText value="&#xA0;"/>
-                        <h:outputText id="seloccperiod-edate-it" value="#{occPeriodSearchBB.currentOccPeriod.endDatePrettyNoTime}"/>
+                        <h:outputText id="seloccperiod-edate-it" value="#{occPeriodSearchWorkflowBB.currentOccPeriod.endDatePrettyNoTime}"/>
                     </div>
 
                 </div>
@@ -138,9 +138,9 @@
                         <p:commandButton id="view-property-cb"
                                          ajax="false"
                                          icon="fa fa-home"
-                                         action="#{occPeriodSearchBB.exploreProperty}"
+                                         action="#{occPeriodSearchWorkflowBB.exploreProperty}"
                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                         value="view property: #{occPeriodSearchBB.currentPropertyUnit.property.address}"/>
+                                         value="view property: #{occPeriodSearchWorkflowBB.currentPropertyUnit.property.address}"/>
 
 
                     </div>
@@ -152,7 +152,7 @@
                         <p:commandButton id="refresh-period-cb"
                                          ajax="false"
                                          icon="fa fa-refresh"
-                                         action="#{occPeriodSearchBB.refreshCurrentPeriod}"
+                                         action="#{occPeriodSearchWorkflowBB.refreshCurrentPeriod}"
                                          value="reload period"/>
                     </div>
                 </div>
@@ -186,13 +186,13 @@
                     <div class="restrict-main-contents-io-content">
                         <p:selectOneMenu id="occperiod-type-som"
                                          tabindex="1"
-                                         value="#{occPeriodSearchBB.currentOccPeriod.type}">
+                                         value="#{occPeriodSearchWorkflowBB.currentOccPeriod.type}">
 
                             <f:selectItem itemLabel="select a type"
                                           noSelectionOption="true"
                                           itemDisabled="true"/>
                             <f:selectItems id="occperiod-search-type-field-val-items"
-                                           value="#{occPeriodSearchBB.search_occPeriodTypeList}"
+                                           value="#{occPeriodSearchWorkflowBB.search_occPeriodTypeList}"
                                            var ="typ" itemValue="#{typ}" itemLabel="#{typ.title}"/>
                             <f:converter converterId="occPeriodTypeConverter"/>
                         </p:selectOneMenu>
@@ -200,10 +200,10 @@
 
                 </div>
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
-                    <!-- removed action occPeriodSearchBB.updateOccPeriodInitialize -->
+                    <!-- removed action occPeriodSearchWorkflowBB.updateOccPeriodInitialize -->
                     <p:commandButton id="occperiod-changetype-button"
                                      ajax="false"
-                                     value="Change type of period ID #{occPeriodSearchBB.currentOccPeriod.periodID}"
+                                     value="Change type of period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
                                      icon="fa fa-user"/>
 
                 </div>
@@ -247,7 +247,7 @@
                     <div class="restrict-main-contents-io-content">
                         <p:selectOneMenu id="occperiod-manager-som"
                                          tabindex="1"
-                                         value="#{occPeriodSearchBB.currentOccPeriod.manager}">
+                                         value="#{occPeriodSearchWorkflowBB.currentOccPeriod.manager}">
 
                             <f:selectItem itemLabel="select a user"
                                           noSelectionOption="true"
@@ -262,10 +262,10 @@
 
                 </div>
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
-                    <!-- removed action occPeriodSearchBB.updateOccPeriodInitialize -->
+                    <!-- removed action occPeriodSearchWorkflowBB.updateOccPeriodInitialize -->
                     <p:commandButton id="occperiod-changemanager-button"
                                      ajax="false"
-                                     value="Change manager of period ID #{occPeriodSearchBB.currentOccPeriod.periodID}"
+                                     value="Change manager of period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
                                      icon="fa fa-user"/>
 
                 </div>
@@ -312,7 +312,7 @@
                             <h:outputText value="Start date"/>
                         </p:outputLabel>
 
-                        <p:calendar value="#{occPeriodSearchBB.currentOccPeriod.startDateUtilDate}"
+                        <p:calendar value="#{occPeriodSearchWorkflowBB.currentOccPeriod.startDateUtilDate}"
                                     mode="popup"
                                     tabindex="3"
                                     id="occperiod-date-start-cal"
@@ -334,7 +334,7 @@
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                     <p:commandButton id="occperiod-editstart-button"
                                      ajax="false"
-                                     value="Change start date of occupancy period ID #{occPeriodSearchBB.currentOccPeriod.periodID}"
+                                     value="Change start date of occupancy period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
                                      icon="fa fa-user"/>
 
                 </div>
@@ -383,7 +383,7 @@
                             <h:outputText value="End date"/>
                         </p:outputLabel>
 
-                        <p:calendar value="#{occPeriodSearchBB.currentOccPeriod.endDateUtilDate}"
+                        <p:calendar value="#{occPeriodSearchWorkflowBB.currentOccPeriod.endDateUtilDate}"
                                     mode="popup"
                                     tabindex="3"
                                     id="occperiod-date-end-cal"
@@ -405,7 +405,7 @@
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                     <p:commandButton id="occperiod-editend-button"
                                      ajax="false"
-                                     value="Change end date of occupancy period ID #{occPeriodSearchBB.currentOccPeriod.periodID}"
+                                     value="Change end date of occupancy period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
                                      icon="fa fa-user"/>
 
                 </div>
