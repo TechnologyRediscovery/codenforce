@@ -30,7 +30,11 @@
                             <div class="page-links">
                                 <a href="#occperiod-status-panel">occupancy period status</a>
                             </div>
-                            <ui:include src="compositions/statusPanel.xhtml"/>
+                            <div class="ui-g data_container_nested_restrict">
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                                    <ui:include src="compositions/statusPanel.xhtml"/>
+                                </div>
+                            </div>
                         </div>
                     </p:outputPanel>
                 </f:view>
