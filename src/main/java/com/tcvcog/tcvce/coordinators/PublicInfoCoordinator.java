@@ -1581,9 +1581,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
                 oi.attachMessageToOccPermitApplication(applicationBundle, sb.toString());
                 
-                PropertyIntegrator pi = getPropertyIntegrator();
+                PropertyCoordinator pc = getPropertyCoordinator();
                 
-                currentProp = pi.getProperty(dbApplication.getApplicationPropertyUnit().getPropertyID());
+                currentProp = pc.getProperty(dbApplication.getApplicationPropertyUnit().getPropertyID());
                 
                 objectKind = "Occupancy Permit Application";
                 

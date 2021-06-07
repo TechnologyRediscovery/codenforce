@@ -426,7 +426,7 @@ public class CECaseSearchProfileBB
         
     }
     
-    public void reloadCase(ActionEvent ev){
+    public void reloadCase(){
         CaseCoordinator cc = getCaseCoordinator();
         try {
             currentCase = cc.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
@@ -438,6 +438,10 @@ public class CECaseSearchProfileBB
                 "Could not refresh current case", ""));
         }
         
+    }
+    
+    public void reloadCaseListener(ActionEvent ev){
+        reloadCase();
     }
     
      /**
@@ -856,7 +860,7 @@ public class CECaseSearchProfileBB
         
         try{
             bc.updateBlobMetatdata(currentBlob, getSessionBean().getSessUser());
-            reloadCase(ev);
+            reloadCaseListener(ev);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully updated blob title and description!", ""));
@@ -1806,31 +1810,37 @@ public class CECaseSearchProfileBB
 
     /**
      * Listener for user request to remove photo on violation
-     *
-     * @param photoid
-     * @return
+     *     
+     * @param bl
      */
-    public String onBlobRemoveButtonChange(int photoid) {
-        CaseCoordinator cc = getCaseCoordinator();
-//        try {
-//      TODO: Fix from NADGIT and PF10
-//            cc.violation_removeLinkBlobToCodeViolation(getCurrentViolation(), photoid);
+    public void onBlobRemoveInitButtonChange(BlobLight bl) {
+        currentBlob = bl;
+        
+    }
+    
+    
+    /**
+     * Removes link between blob and cecase
+     * @param ev
+     */
+    public void onBlobRemoveCommitButtonChange(ActionEvent ev){
+        BlobCoordinator bc = getBlobCoordinator();
+        try {
+            bc.removeCECaseBlobRecord(currentBlob, currentCase);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Blob removed with ID " + photoid, ""));
-//        }
-//        
-//        catch (BObStatusException ex) {
-//            System.out.println(ex);
-//            getFacesContext().addMessage(null,
-//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                            "Cannot remove photo yet: unsupported operation", ""));
-//            
-//        } 
+                            "Success! Blob link removed.", ""));
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Operation: Failed! Blob link not removed.", ""));
+            
 
-        // do something here
-        return "ceCaseProfile";
-
+        }
+        
+        reloadCase();
+        
     }
     
     

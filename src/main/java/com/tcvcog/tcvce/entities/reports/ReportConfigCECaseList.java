@@ -12,7 +12,9 @@ import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryBacked;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.primefaces.model.charts.hbar.HorizontalBarChartModel;
 import org.primefaces.model.charts.pie.PieChartModel;
 
@@ -32,6 +34,10 @@ public class ReportConfigCECaseList
     private boolean includeEventSummaryByCase;
     
     private boolean includeExtendedPropertyDetails;
+    
+    private List<ReportCECaseListStreetCECaseContainer> streetContainerList;
+    private Map<String, ReportCECaseListStreetCECaseContainer> streetSCC;
+    
     
     private List<CECaseDataHeavy> caseListCustomQueryExport;
     
@@ -53,6 +59,18 @@ public class ReportConfigCECaseList
     private double averageAgeOfCasesClosed;
     private double averageAgeOfCasesOpenAsOfReportEndDate;
     
+    
+    
+    public void assembleStreetList(){
+        
+        
+        if(streetSCC != null && !streetSCC.isEmpty()){
+            streetContainerList = new ArrayList<>();
+            streetContainerList.addAll(streetSCC.values());
+            streetContainerList.sort(null);
+            
+        }
+    }
 
     /**
      * @return the includeListSummaryFigures
@@ -314,6 +332,34 @@ public class ReportConfigCECaseList
      */
     public void setPieViol(PieChartModel pieViol) {
         this.pieViol = pieViol;
+    }
+
+    /**
+     * @return the streetContainerList
+     */
+    public List<ReportCECaseListStreetCECaseContainer> getStreetContainerList() {
+        return streetContainerList;
+    }
+
+    /**
+     * @param streetContainerList the streetContainerList to set
+     */
+    public void setStreetContainerList(List<ReportCECaseListStreetCECaseContainer> streetContainerList) {
+        this.streetContainerList = streetContainerList;
+    }
+
+    /**
+     * @return the streetSCC
+     */
+    public Map<String, ReportCECaseListStreetCECaseContainer> getStreetSCC() {
+        return streetSCC;
+    }
+
+    /**
+     * @param streetSCC the streetSCC to set
+     */
+    public void setStreetSCC(Map<String, ReportCECaseListStreetCECaseContainer> streetSCC) {
+        this.streetSCC = streetSCC;
     }
     
     

@@ -1148,7 +1148,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             update="blob-edit-dialog
                                                                             blob-edit-form"
                                                                             />
+                                                        
+                                                        
                                                     </div>
+                                                    
+                                                     <h:outputText value="&nbsp;&nbsp;|" />
+                                                     <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink      id="blob-remove-button"
+                                                                            ajax="true"
+                                                                            styleClass="noFill button-size-small"
+                                                                            action="#{ceCaseSearchProfileBB.onBlobRemoveInitButtonChange(blob)}"
+                                                                            value="remove"
+                                                                            oncomplete="PF('blob-remove-dialog-var').show()"
+                                                                            update="blob-remove-dialog
+                                                                            blob-remove-form"
+                                                                            />
+                                                        
+                                                        
+                                                    </div>
+                                                    
+                                                     
+                                                     
                                                 </p:column>
                                             </p:dataTable>
                                         </h:form>
@@ -3962,7 +3983,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 height="600" width="1200"
                                 widgetVar="violation-details-dialog-var"
                                 responsive="true"
-                                resizable="trie"
+                                resizable="true"
                                 closable="true"
                                 modal="true"
                                 closeOnEscape="true"
@@ -4433,7 +4454,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 widgetVar="violation-update-stipdate-dialog-var"
                                 responsive="true"
                                 modal="true"
-                                resizable="trie"
+                                resizable="true"
                                 closable="true"
                                 closeOnEscape="true"
                                 header="Extend compliance timeframe for violation ID: #{ceCaseSearchProfileBB.currentViolation.violationID}"
@@ -4558,7 +4579,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 height="400" width="400"
                                 widgetVar="violation-update-dor-dialog-var"
                                 responsive="true"
-                                resizable="trie"
+                                resizable="true"
                                 modal="true"
                                 closable="true"
                                 closeOnEscape="true"
@@ -4631,7 +4652,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 widgetVar="violation-compliance-dialog-var"
                                 responsive="true"
                                 modal="true"
-                                resizable="trie"
+                                resizable="true"
                                 closable="true"
                                 closeOnEscape="true"
                                 header="Record compliance with violation ID: #{ceCaseSearchProfileBB.currentViolation.violationID}"
@@ -4713,7 +4734,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 widgetVar="violation-update-penaltyseverity-dialog-var"
                                 responsive="true"
                                 modal="true"
-                                resizable="trie"
+                                resizable="true"
                                 closable="true"
                                 closeOnEscape="true"
                                 header="Update penality and severity on violation ID: #{ceCaseSearchProfileBB.currentViolation.violationID}"
@@ -4883,7 +4904,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 widgetVar="violation-remove-dialog-var"
                                 responsive="true"
                                 modal="true"
-                                resizable="trie"
+                                resizable="true"
                                 closable="true"
                                 closeOnEscape="true"
                                 header="Nuke Violation"
@@ -4942,7 +4963,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 height="300" width="600"
                                 widgetVar="violation-nullify-dialog-var"
                                 responsive="true"
-                                resizable="trie"
+                                resizable="true"
                                 closable="true"
                                 modal="true"
                                 closeOnEscape="true"
@@ -5004,7 +5025,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 widgetVar="violation-photos-dialog-var"
                                 responsive="true"
                                 modal="true"
-                                resizable="trie"
+                                resizable="true"
                                 closable="true"
                                 closeOnEscape="true"
                                 header="Violation Photos"
@@ -5192,12 +5213,64 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
+                    <p:dialog   id="blob-remove-dialog"
+                                height="400" width="600"
+                                widgetVar="blob-remove-dialog-var"
+                                responsive="true"
+                                modal="true"
+                                resizable="true"
+                                closable="true"
+                                closeOnEscape="true"
+                                header="Remove photo or document"
+                                > 
+
+                        <h:form id="blob-remove-form">
+
+                            <div class="ui-g data_container_nested_restrict">
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                    <div class="restrict-data-field-label-inline" >
+
+                                        <h:outputLabel  for="blob-remove-button">
+                                            <h:outputText value="This operation removes the link between this blob and this case; the file remains in the DB" />
+                                        </h:outputLabel>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+
+                                    <div class="restrict-main-contents-io-button red_button">
+                                        <p:commandButton 
+                                            id="blob-remove-button"
+                                            icon="fa fa-trash"
+                                            ajax="true"
+                                            actionListener="#{ceCaseSearchProfileBB.onBlobRemoveCommitButtonChange}"
+                                            value="Remove Photo/Doc ID:#{ceCaseSearchProfileBB.currentBlob.photoDocID}"
+                                            update="cecase-blobs-form:cecase-blobs-table
+                                                            messages-global-form"
+                                            oncomplete="PF('blob-remove-dialog-var).hide();"
+                                            />
+                                    </div>
+                                    <div class="restrict-main-contents-io-button gray_button">
+                                        <p:commandButton    id="blob-remove-cancel-button"
+                                                            ajax="true"  
+                                                            tabindex="27"
+                                                            value="Cancel"
+                                                            icon="fa fa-stop"
+                                                            immediate="true"
+                                                            process="@none"
+                                                            onclick="PF('blob-remove-dialog-var').hide()"
+                                                            />
+                                    </div>
+                                </div>
+                            </div>
+                        </h:form>
+                    </p:dialog>
+
 
                     <p:dialog   id="violation-notes-dialog"
                                 height="800" width="1600"
                                 widgetVar="violation-notes-dialog-var"
                                 responsive="true"
-                                resizable="trie"
+                                resizable="true"
                                 closable="true"
                                 closeOnEscape="true"
                                 modal="true"
@@ -5511,7 +5584,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 height="800" width="1600"
                                 widgetVar="event-profile-dialog-var"
                                 responsive="true"
-                                resizable="trie"
+                                resizable="true"
                                 closable="true"
                                 closeOnEscape="true"
                                 modal="true"
@@ -6012,7 +6085,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 height="800" width="1600"
                                 widgetVar="event-update-dialog-var"
                                 responsive="true"
-                                resizable="trie"
+                                resizable="true"
                                 closable="true"
                                 closeOnEscape="true"
                                 modal="true"
@@ -6142,7 +6215,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 height="300" width="400"
                                 widgetVar="event-deactivate-dialog-var"
                                 responsive="true"
-                                resizable="trie"
+                                resizable="true"
                                 closable="true"
                                 closeOnEscape="true"
                                 modal="true"

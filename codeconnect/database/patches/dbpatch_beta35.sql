@@ -44,17 +44,18 @@ CREATE SEQUENCE IF NOT EXISTS blobbytes_seq
 INCREMENT 1
 START 10;
 
+
+
 CREATE TABLE public.blobbytes
 (
   bytesid integer NOT NULL DEFAULT nextval('blobbytes_seq'::regclass),
-  uploaddate timestamp with time zone,
-  blobtype_typeid integer NOT NULL,
+  createdts timestamp with time zone,
   blob bytea,
-  uploadpersonid integer,
+  uploadedby_userid integer,
   filename text,
   CONSTRAINT blobbytes_pk PRIMARY KEY (bytesid),
-  CONSTRAINT blobytes_blobtype_fk FOREIGN KEY (blobtype_typeid)
-      REFERENCES public.blobtype (typeid) MATCH SIMPLE
+  CONSTRAINT blobbytes_uploadedby_fk FOREIGN KEY (uploadedby_userid)
+      REFERENCES public.login (userid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
@@ -62,6 +63,10 @@ WITH (
 );
 ALTER TABLE public.blobbytes
   OWNER TO sylvia;
+
+
+
+
 
 --This statement should copy some of photodoc's columns into blob
 
@@ -398,6 +403,8 @@ ALTER TABLE public.occpermitapplication ADD COLUMN allowuplinkaccess boolean;
 ALTER TABLE public.occpermitapplication ALTER COLUMN allowuplinkaccess SET DEFAULT true;
 
 
+
+ALTER TABLE photodoc DROP CONSTRAINT IF EXISTS photodoc_blobbytes_fk;
 
 
 --IF datepublished IS NULL the patch is still open and receiving changes

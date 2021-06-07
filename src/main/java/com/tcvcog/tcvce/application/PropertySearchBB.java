@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
@@ -25,10 +26,14 @@ import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
+import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.BOBSource;
+import com.tcvcog.tcvce.entities.Blob;
+import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventRuleAbstract;
@@ -43,20 +48,24 @@ import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.search.QueryProperty;
 import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
+import org.primefaces.event.FileUploadEvent;
 
 /**
  * Primary backing bean for the Property Search and profile master
@@ -105,6 +114,12 @@ public class PropertySearchBB extends BackingBeanUtils{
     private int personIDToLink;
 
     private ViewOptionsProposalsEnum selectedPropViewOption;
+    
+    
+    // BLOBS
+    
+    private BlobLight currentBlob;
+    
     
     /**
      * Creates a new instance of SearchBB
@@ -344,7 +359,7 @@ public class PropertySearchBB extends BackingBeanUtils{
         try {
             setCurrentProperty(pc.assemblePropertyDataHeavy(currentProperty, getSessionBean().getSessUser()));
              getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Reloaded property at " + currentProperty.getAddress(), ""));
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
@@ -693,6 +708,137 @@ public class PropertySearchBB extends BackingBeanUtils{
     public void deQueuePersonFromEvent(Person p) {
         // TODO Finish my guts
     }
+    
+    // ********************************************************
+    // *********************BLOBS******************************
+    // ********************************************************
+    
+    
+    /**
+     * Listener for user requests to upload a file and attach to case
+     *
+     * @param ev
+     */
+    public void onBlobUploadCommitButtonChange(FileUploadEvent ev) {
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
+        try {
+            BlobCoordinator blobc = getBlobCoordinator();
+            
+            Blob blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());
+            blob.setBytes(ev.getFile().getContent());
+            blob.setFilename(ev.getFile().getFileName());
+            blob.setMuni(getSessionBean().getSessMuni());
+            Blob freshBlob = pc.blob_property_storeAndAttachBlob(getSessionBean().getSessUser(), blob, currentProperty);
+            // ship to coordinator for storage
+            if(freshBlob != null){
+                System.out.println("cecaseSearchProfileBB.onBlobUploadCommitButtonChange | fresh blob ID: " + freshBlob.getPhotoDocID());
+
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Successfully stored photo/doc with ID " + freshBlob.getPhotoDocID(), ""));
+
+            } 
+            reloadCurrentPropertyDataHeavy();
+        } catch (IntegrationException | IOException | NoSuchElementException | BlobException | BlobTypeException | BObStatusException ex) {
+
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Unable to save photo or doc due to a system error, sorry!", ""));
+            System.out.println("cecaseSearchProfileBB.onBlobUploadCommitButtonChange | upload failed! " + ex);
+            System.out.println(ex);
+        } 
+    }
+
+     
+    /**
+     * Listener for user requests to start the blob update process
+     * @param bl 
+     */
+  public void onBlobSelectButtonChange(BlobLight bl){
+      
+        setCurrentBlob(bl);
+      System.out.println("CECaseSearchProfileBB.onBlobSelectButtonChange: current blob: " + getCurrentBlob().getPhotoDocID());
+      
+  }
+    
+    
+    public String onBlobViewButtonChange(Blob blob){
+        return "blobs";
+        
+    }
+
+    /**
+     * Listener for user requests to start a file upload
+     * @param ev
+     */
+    public void onBlobAddButtonChange(ActionEvent ev){
+        // nothing to do here yet
+        System.out.println("PropertySearchBB.onBlobAddButtonChange");
+
+    }
+      /**
+     * Listener for user requests to update the current blob
+     * @param ev
+     */
+    public void onBlobUpdateMetadata(ActionEvent ev){
+          BlobCoordinator bc = getBlobCoordinator();
+        
+        try{
+            bc.updateBlobMetatdata(getCurrentBlob(), getSessionBean().getSessUser());
+            reloadCurrentPropertyDataHeavy();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully updated blob title and description!", ""));
+        } catch(IntegrationException ex){
+            System.out.println("propertySearchProfile.updateBlobDescription() | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to update the description!", ""));
+        }
+    }
+    
+    
+    
+    /**
+     * Listener for user requests to remove a blob property link
+     * @param bl 
+     */
+    public void onBlobRemoveInitButtonChange(BlobLight bl){
+        currentBlob = bl;
+        
+    }
+    
+    
+    /**
+     * Hands off link removal to coordinator
+     * @param ev 
+     */
+    public void onBlobRemoveCommitButtonChange(ActionEvent ev){
+        BlobCoordinator bc = getBlobCoordinator();
+        
+        try {
+            bc.removePropBlobRecord(currentBlob, currentProperty);
+            
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully removed link between photo and property", ""));
+        } catch (BObStatusException ex) {
+            System.out.println("manageBlobBB.removePropPhotoLink | ERROR: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "An error occurred while trying to remove the link!", ""));
+        }
+        reloadCurrentPropertyDataHeavy();
+        
+    }
+
+    
+
+    
+    
+    
+    
 
     /**
      * @return the searchParamsSelected
@@ -1047,6 +1193,20 @@ public class PropertySearchBB extends BackingBeanUtils{
      */
     public void setSelectedPropViewOption(ViewOptionsProposalsEnum selectedPropViewOption) {
         this.selectedPropViewOption = selectedPropViewOption;
+    }
+
+    /**
+     * @return the currentBlob
+     */
+    public BlobLight getCurrentBlob() {
+        return currentBlob;
+    }
+
+    /**
+     * @param currentBlob the currentBlob to set
+     */
+    public void setCurrentBlob(BlobLight currentBlob) {
+        this.currentBlob = currentBlob;
     }
     
     

@@ -29,8 +29,10 @@ import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobTypeEnum;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Metadata;
 import com.tcvcog.tcvce.entities.MetadataKey;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
@@ -55,6 +57,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
@@ -259,6 +262,22 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
                 throw new BlobException("Incompatible file type, please upload a JPG, JPEG, GIF, PNG, or PDF.");
         }
 
+    }
+    
+    /**
+     * Logic container for linking blobs to properties
+     * 
+     * TODO: Don't duplicate links
+     * @param bl
+     * @param prop
+     * @return
+     * @throws IntegrationException 
+     */
+    public BlobLight linkBlobToProperty(BlobLight bl, Property prop) throws IntegrationException{
+        BlobIntegrator bi = getBlobIntegrator();
+        
+        bi.linkBlobToProperty(bl, prop);
+        return bl;
     }
     
     /**
@@ -540,7 +559,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         }
         
         //The blob isn't attached to anything, let's delete the blob from the photodoc table
-        bi.deletePhotoBlob(blob.getPhotoDocID());
+        bi.deletePhotoBlob(blob);
         
         //Let's see if this blob is still attached to other photodoc rows
         List<Integer> connectedPhotoDocs = bi.getPhotoBlobsFromBytesID(blob.getBytesID());
@@ -551,6 +570,58 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         }
         
     }
+    
+        
+     /**
+      * Logic pass through for removing links
+      * 
+      * @param bl
+      * @param prop 
+      * @throws com.tcvcog.tcvce.domain.BObStatusException 
+      */
+    public void removePropBlobRecord(BlobLight bl, Property prop) throws BObStatusException{
+        if(prop == null){
+            throw new BObStatusException("Cannot remove link with null prop or blob");
+        }
+        
+        try {
+            BlobIntegrator bi = getBlobIntegrator();
+            bi.removePropertyBlobLink(bl, prop);
+            bi.deletePhotoBlob(bl);
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println("manageBlobBB.removePropPhotoLink | ERROR: " + ex);
+        }
+        
+    }
+    
+        
+     /**
+      * Logic pass through for removing links
+      * 
+      * @param bl
+     * @param cse
+      * @throws com.tcvcog.tcvce.domain.BObStatusException 
+      */
+    public void removeCECaseBlobRecord(BlobLight bl, CECase cse) throws BObStatusException{
+        if(cse == null || bl == null){
+            throw new BObStatusException("Cannot remove link with null prop or blob");
+        }
+        
+        try {
+            BlobIntegrator bi = getBlobIntegrator();
+            bi.removeCECaseBlobLink(bl, cse);
+            bi.deletePhotoBlob(bl);
+            
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println("manageBlobBB.removeCECasePhotoLink | ERROR: " + ex);
+        }
+        
+    }
+    
+    
+    
+    
+    
 
     /**
      * A method that removes all metadata from an image blob's bytes and puts

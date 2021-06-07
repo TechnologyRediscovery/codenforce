@@ -1062,6 +1062,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         PersonIntegrator pi = getPersonIntegrator();
         OccupancyIntegrator oi = getOccupancyIntegrator();
         PropertyIntegrator pri = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
 
         List<PersonOccApplication> existingList = pi.getPersonOccApplicationListWithInactive(opa);
 
@@ -1089,7 +1090,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
                     applicationPerson.setPersonType(applicationPerson.getApplicationPersonType());
                     
-                    Property prop = pri.getProperty(opa.getApplicationPropertyUnit().getPropertyID());
+                    Property prop = pc.getProperty(opa.getApplicationPropertyUnit().getPropertyID());
                     
                     applicationPerson.setMuniCode(prop.getMuni().getMuniCode());
                     

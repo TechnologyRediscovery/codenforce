@@ -31,6 +31,8 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.entities.reports.ReportCECaseListCatEnum;
+import com.tcvcog.tcvce.entities.reports.ReportCECaseListStreetCECaseContainer;
 import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
@@ -57,10 +59,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import org.primefaces.model.charts.ChartData;
@@ -1030,7 +1035,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         spcse.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATIONTS);
         spcse.setDate_start_val(rpt.getDate_start_val());
         spcse.setDate_end_val(rpt.getDate_end_val());
-        rpt.setCaseListOpenedInDateRange(sc.runQuery(query_opened).getBOBResultList());
+        rpt.setCaseListOpenedInDateRange(cecase_assembleCECaseDataHeavyList(sc.runQuery(query_opened).getBOBResultList(), ua));
         if(rpt.getCaseListOpenedInDateRange() != null){
             System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpenedInDateRange().size());
         }
@@ -1040,7 +1045,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         spcse = query_active_asof.getPrimaryParams();
         spcse.setDate_start_val(rpt.getDate_start_val());
         spcse.setDate_end_val(rpt.getDate_end_val());
-        rpt.setCaseListOpenAsOfDateEnd(sc.runQuery(query_active_asof).getBOBResultList());
+        rpt.setCaseListOpenAsOfDateEnd(cecase_assembleCECaseDataHeavyList(sc.runQuery(query_active_asof).getBOBResultList(), ua));
         if(rpt.getCaseListOpenAsOfDateEnd() != null){
             System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpenAsOfDateEnd().size());
             // compute average case age for opened as of date list
@@ -1060,10 +1065,18 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         spcse.setDate_startEnd_ctl(true);
         spcse.setDate_start_val(rpt.getDate_start_val());
         spcse.setDate_end_val(rpt.getDate_end_val());
-        rpt.setCaseListClosedInDateRange(sc.runQuery(query_closed).getBOBResultList());
+        rpt.setCaseListClosedInDateRange(cecase_assembleCECaseDataHeavyList(sc.runQuery(query_closed).getBOBResultList(), ua));
         if(rpt.getCaseListClosedInDateRange() != null){
             System.out.println("CaseCoordinator.report_buildCECaseListReport: Current List size " + rpt.getCaseListClosedInDateRange().size());
         }
+        
+        // BUILD BY STREET
+        
+        rpt = organizeByStreet(rpt);
+        
+        
+        
+        // EVENTS
         
         QueryEvent query_ev = sc.initQuery(QueryEventEnum.MUNI_MONTHYACTIVITY, ua.getKeyCard());
         SearchParamsEvent spev = query_ev.getPrimaryParams();
@@ -1072,6 +1085,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         spev.setDate_end_val(rpt.getDate_end_val());
         rpt.setEventList(sc.runQuery(query_ev).getBOBResultList());
         
+        // VIOLATIONS
         QueryCodeViolation qcv = sc.initQuery(QueryCodeViolationEnum.LOGGED_PAST30_NOV_CITMAYBE, ua.getKeyCard());
         SearchParamsCodeViolation params = qcv.getPrimaryParams();
         params.setDate_relativeDates_ctl(false);
@@ -1097,6 +1111,71 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         initPieViols(rpt);
         
         return rpt;
+        
+    }
+    
+    private ReportConfigCECaseList organizeByStreet(ReportConfigCECaseList rptCseList){
+        
+        if(rptCseList != null){
+            Map<String, ReportCECaseListStreetCECaseContainer> streetCaseMap = new HashMap<>();
+            List<ReportCECaseListCatEnum> reportListsList = Arrays.asList(ReportCECaseListCatEnum.values());
+            for(ReportCECaseListCatEnum enm: reportListsList){
+                List<CECaseDataHeavy> cseList = null;
+                switch(enm){
+                    case CLOSED:
+                        cseList = rptCseList.getCaseListClosedInDateRange();
+                        break;
+                    case CONTINUING:
+                        cseList = rptCseList.getCaseListOpenAsOfDateEnd();
+                        break;
+                    case OPENED:
+                        cseList = rptCseList.getCaseListOpenedInDateRange();
+                        break;
+                }
+
+                if(cseList != null && !cseList.isEmpty()){
+                    ReportCECaseListStreetCECaseContainer ssc;
+
+                    for(CECaseDataHeavy cse: cseList){
+                        if(!streetCaseMap.containsKey(cse.getProperty().getAddressStreet())){
+                             ssc = new ReportCECaseListStreetCECaseContainer();
+                             ssc.setStreetName(cse.getProperty().getAddressStreet());
+                            switch(enm){
+                                case CLOSED:
+                                    ssc.getCaseClosedList().add(cse);
+                                    break;
+                                case CONTINUING:
+                                    ssc.getCaseContinuingList().add(cse);
+                                    break;
+                                case OPENED:
+                                    ssc.getCaseOpenedList().add(cse);
+                                    break;
+                            } // close switch
+                        } else {
+                            ssc = streetCaseMap.get(cse.getProperty().getAddressStreet());
+                            switch(enm){
+                                case CLOSED:
+                                    ssc.getCaseClosedList().add(cse);
+                                    break;
+                                case CONTINUING:
+                                    ssc.getCaseContinuingList().add(cse);
+                                    break;
+                                case OPENED:
+                                    ssc.getCaseOpenedList().add(cse);
+                                    break;
+                            } // close switch
+                        } // close if/else
+                        // Write new or updated Street Case continaer to our map
+                        streetCaseMap.put(cse.getProperty().getAddressStreet(), ssc);
+                    } // close for over case list
+                } // close null/emtpy check
+            } // close for over enum vals
+            rptCseList.setStreetSCC(streetCaseMap);
+            rptCseList.assembleStreetList();
+
+        } // close param null check
+        
+        return rptCseList;
         
     }
     

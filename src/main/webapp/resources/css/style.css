@@ -137,20 +137,6 @@ h4{
     color: #00b5ec;
 }
 
-.report-title{
-    font-size: 1.3em;
-    font-weight: bold;
-    color: #cde162;
-
-}
-
-.report-title-sub{
-    font-size: 1.1em;
-    color: #00b5ec;
-    font-style: italic;
-
-}
-
 
 .darkFont{
     color:#163F8A;
@@ -444,6 +430,29 @@ div.headerLink a:before, a:visited{
 
 
 /* ----------- Printing and reports-------- */
+
+
+.cases-report-citations-2cols{
+    width: 50%;
+    border: none;
+    vertical-align: top;
+}
+
+
+.report-title{
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #cde162;
+
+}
+
+.report-title-sub{
+    font-size: 1.1em;
+    color: #00b5ec;
+    font-style: italic;
+
+}
+
 
 .printing-page-break-before{
     page-break-before: always;
@@ -1088,12 +1097,6 @@ body .ui-datepicker .ui-picker-down{
 .td-dense{
     padding: 1px;
     margin: 0px;
-}
-
-.cases-report-citations-2cols{
-    width: 50%;
-    border: none;
-    vertical-align: top;
 }
 
 

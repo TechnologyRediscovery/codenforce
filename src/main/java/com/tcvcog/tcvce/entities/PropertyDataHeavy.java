@@ -42,7 +42,7 @@ public  class       PropertyDataHeavy
     
     private List<CECaseDataHeavy> propInfoCaseList;
     
-    private List<Integer> blobList;
+    private List<BlobLight> blobList;
     
     private String credentialSignature;
     
@@ -290,14 +290,14 @@ public  class       PropertyDataHeavy
     /**
      * @return the blobList
      */
-    public List getBlobList() {
+    public List<BlobLight> getBlobList() {
         return blobList;
     }
 
     /**
      * @param blobList the blobList to set
      */
-    public void setBlobList(List<Integer> blobList) {
+    public void setBlobList(List<BlobLight> blobList) {
         this.blobList = blobList;
     }
 

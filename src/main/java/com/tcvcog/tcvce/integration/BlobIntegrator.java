@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.MetadataException;
@@ -31,6 +32,7 @@ import com.tcvcog.tcvce.entities.BlobTypeEnum;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Metadata;
 import com.tcvcog.tcvce.entities.MetadataKey;
+import com.tcvcog.tcvce.entities.Property;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -70,8 +72,8 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         ResultSet rs = null;
         String query = "SELECT photodocid, photodocdescription, photodoccommitted, blobbytes_bytesid, \n" +
                         "       muni_municode, blobtype_typeid, metadatamap, title, createdby_userid, \n" +
-                        "       createdts \n" +
-                        "  FROM public.photodoc WHERE photodocid = ?;";
+                        "       photodoc.createdts, filename \n" +
+                        "  FROM public.photodoc LEFT JOIN public.blobbytes on photodoc.blobbytes_bytesid = blobbytes.bytesid  WHERE photodocid = ?;";
         
         PreparedStatement stmt = null;
         try {
@@ -120,10 +122,10 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery();
             while(rs.next()){
                 System.out.println("BlobIntegrator.getPhotoBlobLightWithoutMetadata: | retrieving blobID "  + blobID);
-                blob = generatePhotoBlobLightWithoutMetadata(rs);
+                blob = generateBlobLight(rs);
             }
             
-        } catch (SQLException ex) {
+        } catch (SQLException | MetadataException ex) {
             System.out.println(ex);
             //System.out.println(ex);
             throw new IntegrationException("Error retrieving blob. ", ex);
@@ -162,6 +164,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
 //        blob.setBlobMetadata(generateBlobMetadata(rs));
         blob.setTitle(rs.getString("title"));
         blob.setCreatedBy(uc.user_getUser(rs.getInt("createdby_userid")));
+        blob.setFilename(rs.getString("filename"));
         
         Timestamp time = rs.getTimestamp("createdts");
         if(time != null){
@@ -972,11 +975,16 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      * Users must erase each connection manually via the interface.
      * This method should only be used by the coordinator.
      * Use the method on the coordinator to delete blobs, it is safer - checks for connections first.
-     * @param blobID the blob to be removed
+     * @param bl
      * @throws IntegrationException thrown instead of a SQLException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public void deletePhotoBlob(int blobID) throws IntegrationException{
+    public void deletePhotoBlob(BlobLight bl) throws IntegrationException, BObStatusException{
         
+        if(bl == null){
+            throw new BObStatusException("Cannot remove photodoc with null bloblight");
+            
+        }
         //delete the main photodoc entry
         String query = "DELETE FROM public.photodoc WHERE photodocid = ?;";
         
@@ -985,7 +993,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
+            stmt.setInt(1, bl.getPhotoDocID());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println("BlobIntegrator.deletePhotoBlob() | ERROR: "+ ex);
@@ -1046,7 +1054,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, bytesID);
-            stmt.executeUpdate();
+            stmt.execute();
         } catch (SQLException ex) {
             System.out.println("BlobIntegrator.deleteBytes() | ERROR: "+ ex);
             throw new IntegrationException("Error deleting blob. ", ex);
@@ -1180,8 +1188,19 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
     }
     
-    public void removePhotoPropertyLink(int blobID, int propertyID) throws IntegrationException {
+    
+    /**
+     * Removes a link between property and blob, leaving the bytes record intact for later fishing out if needed
+     * 
+     * @param bl
+     * @param prop
+     * @throws IntegrationException 
+     */
+    public void removePropertyBlobLink(BlobLight bl, Property prop) throws IntegrationException, BObStatusException {
 
+        if(bl == null || prop == null){
+            throw new BObStatusException("cannot remove property blob link with null blob or prop!");
+        }
         //property linker table
         String query = "DELETE"
                 + "  FROM public.propertyphotodoc WHERE photodoc_photodocid = ? AND property_propertyid = ?;";
@@ -1191,11 +1210,44 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, propertyID);
+            stmt.setInt(1, bl.getPhotoDocID());
+            stmt.setInt(2, prop.getPropertyID());
             stmt.executeUpdate();
         } catch (SQLException ex) {
-            System.out.println("BlobIntegrator.removePhotoPropertyLink() | ERROR: "+ ex);
+            System.out.println("BlobIntegrator.removePropertyBlobLink() | ERROR: "+ ex);
+            throw new IntegrationException("Error deleting link. Photo-Property", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    /**
+     * Removes a link between case and blob, leaving the bytes record intact for later fishing out if needed
+     * 
+     * @param bl
+     * @param cse
+     * @throws IntegrationException 
+     */
+    public void removeCECaseBlobLink(BlobLight bl, CECase cse) throws IntegrationException, BObStatusException {
+
+        if(bl == null || cse == null){
+            throw new BObStatusException("cannot remove property blob link with null blob or prop!");
+        }
+        //property linker table
+        String query = "DELETE"
+                + "  FROM public.cecasephotodoc WHERE photodoc_photodocid = ? AND cecase_caseid = ?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, bl.getPhotoDocID());
+            stmt.setInt(2, cse.getCaseID());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("BlobIntegrator.removeCECaseBlobLink() | ERROR: "+ ex);
             throw new IntegrationException("Error deleting link. Photo-Property", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
@@ -1216,7 +1268,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt = con.prepareStatement(query);
             stmt.setInt(1, blobID);
             stmt.setInt(2, requestID);
-            stmt.executeUpdate();
+            stmt.execute();
         } catch (SQLException ex) {
             System.out.println("BlobIntegrator.removePhotoCEARLink() | ERROR: "+ ex);
             throw new IntegrationException("Error deleting link. Photo-CEAR", ex);
@@ -1240,7 +1292,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt = con.prepareStatement(query);
             stmt.setInt(1, blobID);
             stmt.setInt(2, violationID);
-            stmt.executeUpdate();
+            stmt.execute();
         } catch (SQLException ex) {
             System.out.println("BlobIntegrator.removePhotoViolationsLink() | ERROR: "+ ex);
             throw new IntegrationException("Error deleting link. Photo-Violation", ex);
@@ -1264,7 +1316,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt = con.prepareStatement(query);
             stmt.setInt(1, blobID);
             stmt.setInt(2, muniCode);
-            stmt.executeUpdate();
+            stmt.execute();
         } catch (SQLException ex) {
             System.out.println("BlobIntegrator.removePhotoMuniLink() | ERROR: "+ ex);
             throw new IntegrationException("Error deleting link. Photo-Muni", ex);
@@ -1288,7 +1340,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt = con.prepareStatement(query);
             stmt.setInt(1, blobID);
             stmt.setInt(2, elementID);
-            stmt.executeUpdate();
+            stmt.execute();
         } catch (SQLException ex) {
             System.out.println("BlobIntegrator.removePhotoInspectedSpaceElementLink() | ERROR: "+ ex);
             throw new IntegrationException("Error deleting link. Photo-Muni", ex);
@@ -1312,7 +1364,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt = con.prepareStatement(query);
             stmt.setInt(1, blobID);
             stmt.setInt(2, periodID);
-            stmt.executeUpdate();
+            stmt.execute();
         } catch (SQLException ex) {
             System.out.println("BlobIntegrator.removePhotoOccPeriodLink() | ERROR: "+ ex);
             throw new IntegrationException("Error deleting link. Photo-Muni", ex);
@@ -1373,7 +1425,12 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
     }
     
-    public void linkPhotoBlobToProperty(int blobID, int propertyID) throws IntegrationException{
+    public void linkBlobToProperty(BlobLight bl, Property prop) throws IntegrationException{
+        if(bl == null || prop == null){
+            throw new IntegrationException("Cannot link blob to property with null prop or blob");
+            
+        }
+        
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.propertyphotodoc(\n" +
                         "            photodoc_photodocid, property_propertyid)\n" +
@@ -1383,8 +1440,8 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         try {
             
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, propertyID);
+            stmt.setInt(1, bl.getPhotoDocID());
+            stmt.setInt(2, prop.getPropertyID());
             stmt.execute();
             System.out.println("BlobIntegrator.linkBlobToProperty | link succesfull. ");
             
@@ -2439,11 +2496,16 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     
     /**
      * Get the IDs of photos attached to a given property
-     * @param propertyID
+     * @param prop
      * @return
      * @throws IntegrationException 
      */
-    public List<Integer> photosAttachedToProperty(int propertyID) throws IntegrationException{
+    public List<Integer> getBlobIDs(Property prop) throws IntegrationException, BObStatusException{
+        
+        if(prop == null){
+            throw new BObStatusException("Cannot get BlobIDs by property with null Prop");
+            
+        }
         
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -2456,7 +2518,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         try {
             
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, propertyID);
+            stmt.setInt(1, prop.getPropertyID());
             rs = stmt.executeQuery();
             while(rs.next()){
                  idList.add(rs.getInt("photodoc_photodocid"));

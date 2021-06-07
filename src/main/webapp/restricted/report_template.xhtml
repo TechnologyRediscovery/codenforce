@@ -14,26 +14,24 @@
     <h:body style="font-family: sans-serif">
          <ui:insert name="report-header">
                 <f:view id="report-header">
-                <div class="flexing-box-topbar">
-                        <div class="logoBox">
-                            <div class="logo-image-wrapper">
-                                <h:graphicImage value="/images/tcvcog_logo_inverted.jpg" height="50"/>
-                            </div>
-                            <div class="logo-title-wrapper">
-                                <div class="report-title">
-                                    <h:outputText id="report-title-ot"  value="#{reportingBB.currentReport.title}"/> 
+                    <div class="flexing-box-topbar">
+                            <div class="logoBox">
+                                <div class="logo-image-wrapper">
+                                    <h:graphicImage value="/images/Logo-N_Font.png" height="50"/>
                                 </div>
-                                <div class="report-title-sub">
-                                    
-                                     <h:outputText id="report-subtitle-ot"  value="#{reportingBB.currentReport.muni.muniName}, #{reportingBB.currentReport.muni.address_state}"/> 
-                                    
+                                <div class="logo-title-wrapper">
+                                    <div class="report-title">
+                                        <h:outputText id="report-title-ot"  value="#{reportingBB.currentReport.title}"/> 
+                                    </div>
+                                    <div class="report-title-sub">
+
+                                         <h:outputText id="report-subtitle-ot"  value="#{reportingBB.currentReport.muni.muniName}, #{reportingBB.currentReport.muni.address_state}"/> 
+
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                </div>
-                        
-                    
-                    </f:view>
+                    </div>
+                </f:view>
         </ui:insert>
         
         <div class="flexing-box-pagecontent" style="font-family: sans-serif;">
@@ -43,8 +41,6 @@
                 
             </ui:insert>
         </div>
-
-
     </h:body>
 </html>
 

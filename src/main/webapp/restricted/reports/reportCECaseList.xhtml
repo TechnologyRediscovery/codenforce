@@ -111,6 +111,47 @@
                         
                         
                         
+                        <h2>Case activity by street</h2>
+                        
+                        <ui:repeat id="cases-by-street-uirpt"
+                                   value="#{reportingBB.reportCECaseList.streetContainerList}"
+                                   var="csc">
+                        
+                            <h3>
+                                <h:outputText value="#{csc.streetName}" />
+                            </h3>
+                            
+                            <h4>New cases</h4>
+                            <ui:repeat id="case-opened-info-uirpt" 
+                                       value="#{csc.caseOpenedList}"
+                                       var="oc">
+                                <h:outputText value="#{oc.caseName} at #{oc.propertyID}" />
+                            
+                            </ui:repeat>
+                            
+                            <h4>Continuing cases</h4>
+                            <ui:repeat id="case-continuing-info-uirpt"
+                                       value="#{csc.caseContinuingList}"
+                                       var="contList">
+                                <h:outputText value="#{contList.caseName} at #{contList.propertyID}" />
+                            
+                            </ui:repeat>
+                            
+                            
+                            
+                            <h4>Closed cases</h4>
+                            <ui:repeat id="case-closed-info-uirpt"
+                                       value="#{csc.caseClosedList}"
+                                       var="clc">
+                                <h:outputText value="#{clc.caseName} at #{clc.propertyID}" />
+                            
+                            </ui:repeat>
+                            
+                            
+                        
+                        </ui:repeat>
+                        
+                        
                         <h2>Code Violation Summary</h2>
                           <div class="ui-g data_container_nested_restrict_report">
                             <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >

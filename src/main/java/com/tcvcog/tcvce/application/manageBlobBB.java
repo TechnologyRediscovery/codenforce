@@ -521,24 +521,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
         
         return "occPeriodWorkflow";
     }
-    
-    public void removePropPhotoLink(Property prop){
-        
-        try {
-            BlobIntegrator bi = getBlobIntegrator();
-            bi.removePhotoPropertyLink(selectedBlob.getPhotoDocID(), prop.getPropertyID());
-            connectedProperties.remove(prop);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully removed link between photo and property", ""));
-        } catch (IntegrationException ex) {
-            System.out.println("manageBlobBB.removePropPhotoLink | ERROR: " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occurred while trying to remove the link!", ""));
-        }
-        
-    }
+   
     
     public void removeCEARPhotoLink(CEActionRequest request){
         

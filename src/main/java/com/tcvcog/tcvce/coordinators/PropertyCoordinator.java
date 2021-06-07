@@ -20,10 +20,13 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
+import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Credential;
@@ -48,6 +51,7 @@ import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -56,6 +60,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -96,13 +102,14 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         CaseCoordinator cc = getCaseCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         PropertyDataHeavy pdh = null;
+        BlobCoordinator bc = getBlobCoordinator();
+        BlobIntegrator bi = getBlobIntegrator();
         
         if(prop != null && ua != null){
             // if we've been given a skeleton, just inject it into data heavy subclass
             if(prop.getPropertyID() == 0){
                 pdh = new PropertyDataHeavy(prop);
             } else {
-        BlobIntegrator bi = getBlobIntegrator();
 
                pdh = new PropertyDataHeavy(getProperty(prop.getPropertyID()));
 
@@ -139,11 +146,11 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                    System.out.println("PropertyCoordinator.assemblePropertyDH: personlist size: " + pdh.getPersonList().size());
 
                    // wait on blobs
-                   //pdh.setBlobList(new ArrayList<Integer>());
+                   pdh.setBlobList(bc.getBlobLightList(bi.getBlobIDs(prop)));
                    // external data
                    pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getPropertyID())));
 
-               } catch (EventException | AuthorizationException ex) {
+               } catch (EventException | AuthorizationException | BObStatusException | BlobException | IntegrationException | SearchException ex) {
                    System.out.println(ex);
                    System.out.println();
                }
@@ -305,13 +312,40 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public Property configureProperty(Property p) {
         if (p.getUnitList() == null) {
-
-            p.setUnitList(new ArrayList<PropertyUnit>());
-
+            p.setUnitList(new ArrayList<>());
         }
+        
+        parseAddress(p);
+        
 
         return p;
     }
+    
+    /**
+     * Extracts the house number and street name from the address field
+     * and injects into separate members on Property
+     * 
+     * @param prop
+     * @return 
+     */
+    private Property parseAddress(Property prop){
+        Pattern patNum = Pattern.compile("\\d+");
+        Pattern patStreet = Pattern.compile("\\s([a-zA-Z0-9][a-zA-Z_\\s.]*)");
+        Matcher matNum = patNum.matcher(prop.getAddress());
+        Matcher matStreet = patStreet.matcher(prop.getAddress());
+        
+        while (matNum.find()){
+            prop.setAddressNum(Integer.parseInt(matNum.group()));
+        }
+        
+        while (matStreet.find()){
+            prop.setAddressStreet(matStreet.group(1));
+        }
+        
+        return prop;
+    }
+    
+    
 
     /**
      * Logic container for checking requests to connect a person to a property
@@ -403,6 +437,34 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return pudh;
 
     }
+    
+   /**
+     * Primary pathway for inserting blobs for attachment to a CECase
+     * Liaises with the BlobCoordinator and Integrator as needed
+     * @param ua
+     * @param blob
+     * @param prop
+     * @return fresh blob
+     * @throws BlobException
+     * @throws IOException
+     * @throws IntegrationException
+     * @throws BlobTypeException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public Blob blob_property_storeAndAttachBlob(UserAuthorized ua, Blob blob, Property prop) 
+            throws BlobException, IOException, IntegrationException, BlobTypeException, BObStatusException{
+        BlobCoordinator bc = getBlobCoordinator();
+        if(ua == null || blob == null || prop == null){
+            throw new BObStatusException("Cannot link blob to property with null prop, blob, or user");
+        }
+        
+        blob.setCreatedBy(ua);
+        Blob freshBlob = bc.storeBlob(blob);
+        bc.linkBlobToProperty(freshBlob, prop);
+        return freshBlob;
+        
+    }
+    
 
     /**
      * Logic container for choosing a property info case
@@ -669,7 +731,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                 while (!propIDList.isEmpty() && propIDList.size() <= Constants.MAX_BOB_HISTORY_SIZE) {
                     // Only developers get a heterogeneous mix of muni in their history
                     if (cred.isHasDeveloperPermissions()) {
-                        propList.add(pi.getProperty(propIDList.remove(0)));
+                        propList.add(getProperty(propIDList.remove(0)));
                     } else {
                         Municipality m = cred.getGoverningAuthPeriod().getMuni();
                         for (Property pr : propList) {
