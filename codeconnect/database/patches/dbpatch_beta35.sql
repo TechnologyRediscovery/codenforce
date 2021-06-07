@@ -16,7 +16,7 @@ INSERT INTO public.icon(
 ALTER TABLE public.codeviolation ADD COLUMN bobsource_sourceid INTEGER CONSTRAINT codeviolation_bobsource_fk REFERENCES bobsource (sourceid);
 
 
--- RUN ON REMOTE UP TO HERE
+
 
 CREATE TABLE public.cecasephotodoc
 (
@@ -364,9 +364,40 @@ ALTER TABLE public.parcelphotodoc
 --   OWNER TO sylvia;
 
 
-
-
 -- RUN ON LOCAL BRAIN UP TO HERE`
+
+
+ALTER TABLE noticeofviolation ADD COLUMN notifyingofficer_userid INTEGER 
+    CONSTRAINT nov_notifyingofficer_fk 
+    REFERENCES login (userid);
+
+-- RUN ON REMOTE UP TO HERE EXCEPT for blob migration
+
+
+
+CREATE OR REPLACE FUNCTION generateRand(low INT, high INT)
+    RETURNS INT AS
+$$
+   BEGIN
+      RETURN floor(random() * (high-low + 1) + low);
+   END
+$$ language 'plpgsql' STRICT;
+
+--Alright, let's get started
+
+ALTER TABLE public.occpermitapplication ADD COLUMN applicationpubliccc integer;
+
+UPDATE public.occpermitapplication SET applicationpubliccc = generateRand(100000,999999) WHERE applicationid > 0;
+
+ALTER TABLE public.occpermitapplication ALTER COLUMN applicationpubliccc SET NOT NULL;
+
+ALTER TABLE public.occpermitapplication ADD COLUMN paccenabled boolean;
+ALTER TABLE public.occpermitapplication ALTER COLUMN paccenabled SET DEFAULT true;
+
+ALTER TABLE public.occpermitapplication ADD COLUMN allowuplinkaccess boolean;
+ALTER TABLE public.occpermitapplication ALTER COLUMN allowuplinkaccess SET DEFAULT true;
+
+
 
 
 --IF datepublished IS NULL the patch is still open and receiving changes
