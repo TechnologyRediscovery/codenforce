@@ -934,10 +934,10 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             } else {
                 stmt.setNull(17, java.sql.Types.NULL);
             }
-            
-            stmt.setInt(18, period.getPeriodID());
-            
-            stmt.setBoolean(19, period.isActive());
+
+            stmt.setBoolean(18, period.isActive());
+
+            stmt.setInt(19, period.getPeriodID());
 
             stmt.executeUpdate();
 

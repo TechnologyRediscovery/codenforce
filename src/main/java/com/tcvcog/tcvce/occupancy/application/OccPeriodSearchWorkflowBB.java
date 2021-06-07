@@ -280,27 +280,26 @@ public  class   OccPeriodSearchWorkflowBB
          
      }
      
-     public void updateOccPeriodCommit(){
+     public void updateOccPeriodCommit() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        if(selectedManager != null){
+        if (selectedManager != null) {
             currentOccPeriod.setManager(selectedManager);
         }
         
-        if(selectedOccPeriodType != null){
+        if(selectedOccPeriodType != null) {
             currentOccPeriod.setType(selectedOccPeriodType);
         }
         
         try {
             oc.editOccPeriod(currentOccPeriod, getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "Update successful on OccPeriod ID: " + currentOccPeriod.getPeriodID(), ""));
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Update successful on OccPeriod ID: " + currentOccPeriod.getPeriodID(), ""));
         } catch (IntegrationException | BObStatusException ex) {
-             getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                ex.getMessage(), ""));
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    ex.getMessage(), ""));
         }
      }
+
      public void updatePeriodPropUnit(){
 //         OccupancyCoordinator oc = getOccupancyCoordinator();
 //        try {

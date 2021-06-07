@@ -200,10 +200,10 @@
 
                 </div>
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
-                    <!-- removed action occPeriodSearchWorkflowBB.updateOccPeriodInitialize -->
                     <p:commandButton id="occperiod-changetype-button"
                                      ajax="false"
                                      value="Change type of period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
+                                     action="#{occPeriodSearchWorkflowBB.updateOccPeriodCommit}"
                                      icon="fa fa-user"/>
 
                 </div>
@@ -262,10 +262,10 @@
 
                 </div>
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
-                    <!-- removed action occPeriodSearchWorkflowBB.updateOccPeriodInitialize -->
                     <p:commandButton id="occperiod-changemanager-button"
                                      ajax="false"
                                      value="Change manager of period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
+                                     action="#{occPeriodSearchWorkflowBB.updateOccPeriodCommit}"
                                      icon="fa fa-user"/>
 
                 </div>
@@ -330,11 +330,11 @@
 
                 </div>
 
-                <!-- removed action: ceCaseSearchProfileBB.onCaseUpdateDORCommitButtonChange -->
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                     <p:commandButton id="occperiod-editstart-button"
                                      ajax="false"
                                      value="Change start date of occupancy period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
+                                     action="#{occPeriodSearchWorkflowBB.updateOccPeriodCommit}"
                                      icon="fa fa-user"/>
 
                 </div>
@@ -401,11 +401,11 @@
 
                 </div>
 
-                <!-- removed action: ceCaseSearchProfileBB.onCaseUpdateDORCommitButtonChange -->
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                     <p:commandButton id="occperiod-editend-button"
                                      ajax="false"
                                      value="Change end date of occupancy period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
+                                     action="#{occPeriodSearchWorkflowBB.updateOccPeriodCommit}"
                                      icon="fa fa-user"/>
 
                 </div>
