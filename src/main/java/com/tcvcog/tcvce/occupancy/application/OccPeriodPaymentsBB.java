@@ -33,7 +33,7 @@ public  class   OccPeriodPaymentsBB
     
     private OccPeriodDataHeavy currentOccPeriod;
     
-       // payments
+   // payments
     private List<Payment> filteredPaymentList;
     private Payment selectedPayment;
     
@@ -45,7 +45,7 @@ public  class   OccPeriodPaymentsBB
     @PostConstruct
     public void initBean() {
         SessionBean sb = getSessionBean();
-       currentOccPeriod = sb.getSessOccPeriod();
+        currentOccPeriod = sb.getSessOccPeriod();
        
     }
     
