@@ -659,7 +659,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             }
             
             sp.setLimitResultCount_rtMin(RoleType.EnforcementOfficial);
-            sp.setLimitResultCount_ctl(true);
+            sp.setLimitResultCount_ctl(false);
             sp.setLimitResultCount_val(RESULT_COUNT_LIMIT_DEFAULT);
             
             sp.setActive_rtMin(RoleType.MuniStaff);
@@ -1225,7 +1225,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         // Shared param #6
         params.setLimitResultCount_rtMin(RoleType.EnforcementOfficial);
-        params.setLimitResultCount_ctl(true);
+        params.setLimitResultCount_ctl(false);
         params.setLimitResultCount_val(RESULT_COUNT_LIMIT_DEFAULT);
 
         // Shared param #7

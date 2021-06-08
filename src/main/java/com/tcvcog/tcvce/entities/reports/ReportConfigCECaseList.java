@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities.reports;
 
+import com.sun.java.swing.plaf.windows.WindowsTreeUI;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeViolationPropCECaseHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
@@ -13,6 +14,7 @@ import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryBacked;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.primefaces.model.charts.hbar.HorizontalBarChartModel;
@@ -68,6 +70,7 @@ public class ReportConfigCECaseList
             streetContainerList = new ArrayList<>();
             streetContainerList.addAll(streetSCC.values());
             streetContainerList.sort(null);
+            Collections.reverse(streetContainerList);
             
         }
     }
