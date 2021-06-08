@@ -30,19 +30,21 @@ public class AddressParse {
         Property prop = new Property();
         prop.setAddress("1237 MORRELLE AVE");
         parseAddress(prop);
-        prop.setAddress("889 4th st BEACHwood.");
+        prop.setAddress("889A 4th st BEACHwood.");
         parseAddress(prop);
         
     }
     
     private static Property parseAddress(Property prop){
-        Pattern patNum = Pattern.compile("\\d+");
+        Pattern pat = Pattern.compile("(?<num>\\d+[a-zA-Z]*)\\W+(?<street>\\w.*)");
         Pattern patStreet = Pattern.compile("\\s([a-zA-Z0-9][a-zA-Z_\\s.]*)");
-        Matcher matNum = patNum.matcher(prop.getAddress());
+        Matcher matPat = pat.matcher(prop.getAddress());
         Matcher matStreet = patStreet.matcher(prop.getAddress());
         
-        while (matNum.find()){
-            System.out.println(matNum.group());
+        while (matPat.find()){
+            System.out.println(matPat.group());
+            System.out.println("NUM:" + matPat.group("num"));
+            System.out.println("STREET:" + matPat.group("street"));
         }
         
         while (matStreet.find()){

@@ -19,6 +19,15 @@
 
 
 
+                        <div class="report-trailblaze-headerbox">
+                            <div class="report-trailblaze-headerbox-title">
+                                <h:outputText value="Report Summary" />
+                            </div>
+                            <div class="report-trailblaze-headerbox-tail">
+                                <h:outputText value=" text"/>
+                            </div>
+                        </div>
+
                         <div class="ui-g data_container_nested_restrict_report">
                             <!--NESTED DATA FIELD -->
                             <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
@@ -81,7 +90,16 @@
                         </div>
 
 
-                        <h1>Code Violation Summary</h1>
+                        <div class="report-trailblaze-headerbox">
+                            <div class="report-trailblaze-headerbox-title">
+                                <h:outputText value="Violations" />
+                            </div>
+                            <div class="report-trailblaze-headerbox-tail">
+                                <h:outputText value=" text"/>
+                            </div>
+                        </div>
+                        
+                        
                         <div class="ui-g data_container_nested_restrict_report">
                             <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
 
@@ -139,7 +157,15 @@
                         </div>
 
 
-                        <h1>Case activity by street</h1>
+
+                        <div class="report-trailblaze-headerbox">
+                            <div class="report-trailblaze-headerbox-title">
+                                <h:outputText value="Code Enforcement by Street" />
+                            </div>
+                            <div class="report-trailblaze-headerbox-tail">
+                                <h:outputText value=" text"/>
+                            </div>
+                        </div>
 
                         <ui:repeat id="cases-by-street-uirpt"
                                    value="#{reportingBB.reportCECaseList.streetContainerList}"

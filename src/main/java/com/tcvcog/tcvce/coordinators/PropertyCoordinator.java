@@ -332,17 +332,12 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         if(prop.getAddress() != null){
             
 
-            Pattern patNum = Pattern.compile("\\d+");
-            Pattern patStreet = Pattern.compile("\\s([a-zA-Z0-9][a-zA-Z_\\s.]*)");
+            Pattern patNum = Pattern.compile("(?<num>\\d+[a-zA-Z]*)\\W+(?<street>\\w.*)");
             Matcher matNum = patNum.matcher(prop.getAddress());
-            Matcher matStreet = patStreet.matcher(prop.getAddress());
 
             while (matNum.find()){
-                prop.setAddressNum(Integer.parseInt(matNum.group()));
-            }
-
-            while (matStreet.find()){
-                prop.setAddressStreet(matStreet.group(1));
+                prop.setAddressNum(matNum.group("num"));
+                prop.setAddressStreet(matNum.group("street"));
             }
 
         }

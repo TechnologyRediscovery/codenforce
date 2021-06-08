@@ -28,7 +28,7 @@ public class    PropertyPublic
     protected String address;
     
     // Pre-Humanization migration
-    protected int addressNum;
+    protected String addressNum;
     protected String addressStreet;
     
     protected PropertyStatus status;
@@ -230,14 +230,14 @@ public class    PropertyPublic
     /**
      * @return the addressNum
      */
-    public int getAddressNum() {
+    public String getAddressNum() {
         return addressNum;
     }
 
     /**
      * @param addressNum the addressNum to set
      */
-    public void setAddressNum(int addressNum) {
+    public void setAddressNum(String addressNum) {
         this.addressNum = addressNum;
     }
 

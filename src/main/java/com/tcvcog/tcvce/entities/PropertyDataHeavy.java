@@ -242,7 +242,9 @@ public  class       PropertyDataHeavy
         
         if(propInfoCaseList != null && !propInfoCaseList.isEmpty()){
             for(CECaseDataHeavy cdh: propInfoCaseList){
-                evList.addAll(cdh.getEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ALL));
+                if(cdh != null){
+                    evList.addAll(cdh.getEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ALL));
+                }
             }
         }
         return evList;
