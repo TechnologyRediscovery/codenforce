@@ -10,6 +10,7 @@
         <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/resources/favicon.ico"/>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <h:outputStylesheet name="css/style.css"/>
+        <h:outputStylesheet name="css/primeflex.min.css"/>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
         <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"/>
         <link href='https://fonts.googleapis.com/css?family=Heebo' rel='stylesheet'/>
@@ -100,9 +101,9 @@
 
                             <!-- TOP NAVIGATION BAR -->
                             <div class="ui-g data_container_nested_restrict" style="background-color: gray; margin-bottom: 0px;">
-                                <h:form id="topnavbar">
+                                <h:form styleClass="p-grid p-p-3" id="topnavbar">
                                     
-                                    <div class="activebob-container"
+                                    <div class="activebob-container p-col"
                                          id="activbob-muni">
 
                                         <div class="ui-g data_container_nested_restrict">
@@ -148,7 +149,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="activebob-container "
+                                    <div class="activebob-container p-col"
                                          id="activbob-code">
 
                                         <div class="ui-g data_container_nested_restrict">
@@ -204,7 +205,7 @@
                                     </div>
 
 
-                                    <div class="activebob-container"
+                                    <div class="activebob-container p-col"
                                          id="aob-property">
 
                                         <div class="ui-g data_container_nested_restrict">
@@ -280,7 +281,7 @@
                                     </div>
 
 
-                                    <div class="activebob-container"
+                                    <div class="activebob-container p-col"
                                          id="aob-person">
 
                                         <div class="ui-g data_container_nested_restrict">
@@ -354,7 +355,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="activebob-container"
+                                    <div class="activebob-container p-col"
                                          id="aob-cecase">
 
                                         <div class="ui-g data_container_nested_restrict">
@@ -421,7 +422,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="activebob-container"
+                                    <div class="activebob-container p-col"
                                          id="aob-occperiod">
 
                                         <div class="ui-g data_container_nested_restrict">
@@ -467,7 +468,7 @@
                                                     <p:commandLink id="activebob-proplist-prop-explore-cl"
                                                                    ajax="false"
                                                                    action="#{navigationBB.onOccPeriodListItemSelect(ose)}">
-                                                        <h:outputText value="#{ose.propertyUnitID} (ID:#{ose.periodID})" />
+                                                        <h:outputText value="#{ose.propertyUnitID} (ID:#{ose.periodID})"/>
                                                     </p:commandLink>
 
 
