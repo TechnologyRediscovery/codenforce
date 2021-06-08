@@ -421,33 +421,87 @@
                                         </div>
                                     </div>
 
-                                    
+                                    <div class="activebob-container"
+                                         id="aob-occperiod">
+
+                                        <div class="ui-g data_container_nested_restrict">
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
+                                                <div class="aob-container aob-container-iconifiedheader">
+                                                    <div class="inline-icon">
+                                                        <i class="material-icons">
+                                                            <h:outputText value="date_range"/>
+                                                        </i>
+                                                    </div>
+                                                    <h:outputText value="Occupancy Period"/>
+                                                </div>
+
+                                                <div class="aob-container aob-container-objectstring">
+                                                    <h:outputText value="Unit #{sessionBean.sessOccPeriodPropertyUnit.unitNumber} (#{sessionBean.sessOccPeriod.periodID})"/>
+                                                </div>
+
+                                                <div class="aob-container aob-container-actions">
+                                                    <div class="restrict-main-contents-io-link link-button">
+                                                        <p:commandLink id="activebob-occperiod-view-cl"
+                                                                       value="view"
+                                                                       ajax="false"
+                                                                       action="occPeriodWorkflow"/>
+                                                    </div>
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+                                                        <p:commandLink  id="activebob-occperiodlist-cb"
+                                                                        value="change"
+                                                                        oncomplete="PF('activebob-occperiodlist-overlay-var').show();"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p:overlayPanel id="activebob-occperiodlist-overlay"
+                                                            widgetVar="activebob-occperiodlist-overlay-var"
+                                                            appendTo="activebob-occperiod"
+                                                            dismissable="true">
+
+                                                <h:outputText value="#{sessionBean.sessOccPeriodList.size()}"/>
+
+                                                <ui:repeat id="activebob-occperiodlist-repeat"
+                                                           value="#{sessionBean.sessOccPeriodList}"
+                                                           var="ose">
+                                                    <p:commandLink id="activebob-proplist-prop-explore-cl"
+                                                                   ajax="false"
+                                                                   action="#{navigationBB.onOccPeriodListItemSelect(ose)}">
+                                                        <h:outputText value="#{ose.propertyUnitID} (ID:#{ose.periodID})" />
+                                                    </p:commandLink>
+
+
+                                                    <p:spacer height="2px" />
+                                                </ui:repeat>
+                                            </p:overlayPanel>
+                                        </div>
+                                    </div>
                                 </h:form>
                             </div>
                             <div style="float:right;">
                                 <h:form id="userform">
 
-                                        <h:outputText value="#{systemServicesBB.bbSessionUser.person.firstName} #{systemServicesBB.bbSessionUser.person.lastName} ( #{systemServicesBB.bbSessionUser.username})"/>
+                                    <h:outputText value="#{systemServicesBB.bbSessionUser.person.firstName} #{systemServicesBB.bbSessionUser.person.lastName} ( #{systemServicesBB.bbSessionUser.username})"/>
                                     
-                                  <div class="restrict-main-contents-io-link link-button">
-                                                        <p:commandLink        id="navbar-button-usersettings2"
-                                                                              ajax="true" 
-                                                                              actionListener="#{userBB.initiateUserUpdates}"
-                                                                              rendered="true"
-                                                                              disabled="false"
-                                                                              oncomplete="PF('navcontainer-dialog-usersettings').show()"
-                                                                              value="user settings" 
-                                                                              update="usersettings-form"/>
-                                                    </div>
+                                        <div class="restrict-main-contents-io-link link-button">
+                                            <p:commandLink id="navbar-button-usersettings2"
+                                                           ajax="true"
+                                                           actionListener="#{userBB.initiateUserUpdates}"
+                                                           rendered="true"
+                                                           disabled="false"
+                                                           oncomplete="PF('navcontainer-dialog-usersettings').show()"
+                                                           value="user settings"
+                                                           update="usersettings-form"/>
+                                        </div>
 
 
-                                                    <div class="restrict-main-contents-io-link link-button">
+                                        <div class="restrict-main-contents-io-link link-button">
 
-                                                        <p:commandLink    id="navcontres-button-logout2"
-                                                                          action="#{systemServicesBB.logout}" 
-                                                                          value="logout"
-                                                                          ajax="false"/>
-                                                    </div>
+                                            <p:commandLink id="navcontres-button-logout2"
+                                                           action="#{systemServicesBB.logout}"
+                                                           value="logout"
+                                                           ajax="false"/>
+                                        </div>
                                 </h:form>
                             </div>
 
