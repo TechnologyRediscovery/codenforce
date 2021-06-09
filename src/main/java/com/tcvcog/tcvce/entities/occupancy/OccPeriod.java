@@ -44,12 +44,10 @@ public  class       OccPeriod
     protected LocalDateTime createdTS;
     
     protected LocalDateTime startDate;
-    protected java.util.Date startDateUtilDate;
     protected LocalDateTime startDateCertifiedTS;
     protected User startDateCertifiedBy;
     
     protected LocalDateTime endDate;
-    protected java.util.Date endDateUtilDate;
     protected LocalDateTime endDateCertifiedTS;
     protected User endDateCertifiedBy;
     
@@ -394,23 +392,20 @@ public  class       OccPeriod
      * @return the startDateUtilDate
      */
     public java.util.Date getStartDateUtilDate() {
-        startDateUtilDate = DateTimeUtil.convertUtilDate(startDate);
-         return startDateUtilDate;
+        return DateTimeUtil.convertUtilDate(startDate);
     }
 
     /**
      * @return the endDateUtilDate
      */
     public java.util.Date getEndDateUtilDate() {
-        endDateUtilDate = DateTimeUtil.convertUtilDate(endDate);
-        return endDateUtilDate;
+        return DateTimeUtil.convertUtilDate(endDate);
     }
 
     /**
      * @param startDateUtilDate the startDateUtilDate to set
      */
     public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
-        this.startDateUtilDate = startDateUtilDate;
         startDate = DateTimeUtil.convertUtilDate(startDateUtilDate);
     }
 
@@ -418,7 +413,6 @@ public  class       OccPeriod
      * @param endDateUtilDate the endDateUtilDate to set
      */
     public void setEndDateUtilDate(java.util.Date endDateUtilDate) {
-        this.endDateUtilDate = endDateUtilDate;
         endDate = DateTimeUtil.convertUtilDate(endDateUtilDate);
     }
 

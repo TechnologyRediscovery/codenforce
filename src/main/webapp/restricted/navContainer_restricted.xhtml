@@ -88,13 +88,13 @@
                                                 </div>
                                             </div>                                
                                         </ui:repeat>
-                                        <p:commandButton    id="navcontres-button-logout"
-                                                            action="#{systemServicesBB.logout}" 
-                                                            value=""
-                                                            title="Logout"
-                                                            style="width:10px"
-                                                            icon="fa fa-sign-out"
-                                                            ajax="false"/>
+                                        <p:commandButton id="navcontres-button-logout"
+                                                         action="#{systemServicesBB.logout}"
+                                                         value=""
+                                                         title="Logout"
+                                                         style="width:10px"
+                                                         icon="fa fa-sign-out"
+                                                         ajax="false"/>
                                     </div>
                                 </div>
                             </h:form>
@@ -402,8 +402,8 @@
                                             <p:overlayPanel id="activebob-cecaselist-overlay"
                                                             widgetVar="activebob-cecaselist-overlay-var"
                                                             appendTo="activebob-cecase"
-                                                            dismissable="true"
-                                                            >
+                                                            dismissable="true">
+
                                                 <h:outputText value="#{sessionBean.sessCECaseList.size()}"/>
 
                                                 <ui:repeat id="activebob-cecaselist-repeat"
@@ -412,7 +412,7 @@
                                                     <p:commandLink id="activebob-proplist-prop-explore-cl"
                                                                    ajax="false"
                                                                    action="#{navigationBB.onCECaseListItemSelect(cse)}">
-                                                        <h:outputText value="#{cse.caseName} at #{cse.property.address} (ID:#{cse.caseID})" />
+                                                        <h:outputText value="#{cse.caseName} at #{cse.property.address} (ID:#{cse.caseID})"/>
                                                     </p:commandLink>
 
 
@@ -437,7 +437,7 @@
                                                 </div>
 
                                                 <div class="aob-container aob-container-objectstring">
-                                                    <h:outputText value="Unit #{sessionBean.sessOccPeriodPropertyUnit.unitNumber} (#{sessionBean.sessOccPeriod.periodID})"/>
+                                                    <h:outputText value="Unit #{sessionBean.sessOccPeriod.propUnitProp.unitNumber} (#{sessionBean.sessOccPeriod.periodID})"/>
                                                 </div>
 
                                                 <div class="aob-container aob-container-actions">

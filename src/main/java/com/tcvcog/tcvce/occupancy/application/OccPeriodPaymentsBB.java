@@ -33,7 +33,7 @@ public  class   OccPeriodPaymentsBB
     
     private OccPeriodDataHeavy currentOccPeriod;
     
-   // payments
+    //payments
     private List<Payment> filteredPaymentList;
     private Payment selectedPayment;
     

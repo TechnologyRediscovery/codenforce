@@ -45,9 +45,9 @@ import java.util.List;
  * @author sylvia
  */
 public  class       OccPeriodDataHeavy 
-        extends     OccPeriod 
+        extends     OccPeriodPropertyUnitHeavy
         implements  IFace_EventRuleGoverned, 
-                    IFace_CredentialSigned{
+                    IFace_CredentialSigned {
     
     protected OccPeriodStatusEnum status;
 
@@ -81,38 +81,9 @@ public  class       OccPeriodDataHeavy
      * @param cred 
      */
     public OccPeriodDataHeavy(OccPeriod opLight, Credential cred) {
-        this.credentialSignature = cred.getSignature();
-        
-        this.periodID = opLight.periodID;
-        this.propertyUnitID = opLight.propertyUnitID;
-        this.type = opLight.type;
-        
-        this.governingInspection = opLight.governingInspection;
-        this.manager = opLight.manager;
-        
-        this.periodTypeCertifiedBy = opLight.periodTypeCertifiedBy;
-        this.periodTypeCertifiedTS = opLight.periodTypeCertifiedTS;
-        
-        this.source = opLight.source;
-        this.createdBy = opLight.createdBy;
-        this.createdTS = opLight.createdTS;
-        
-        this.startDate = opLight.startDate;
-        this.startDateCertifiedTS = opLight.startDateCertifiedTS;
-        this.startDateCertifiedBy = opLight.startDateCertifiedBy;
-        
-        this.endDate = opLight.endDate;
-        this.endDateCertifiedTS = opLight.endDateCertifiedTS;
-        this.endDateCertifiedBy = opLight.endDateCertifiedBy;
-        
-        this.authorizedTS = opLight.authorizedTS;
-        this.authorizedBy = opLight.authorizedBy;
-        
-        this.overrideTypeConfig = opLight.overrideTypeConfig;
-        this.notes = opLight.notes;
-        
-        this.active = opLight.active;
+        this(opLight);
 
+        this.credentialSignature = cred.getSignature();
     }
 
     /**
@@ -121,34 +92,7 @@ public  class       OccPeriodDataHeavy
      * @param opLight 
      */
     public OccPeriodDataHeavy(OccPeriod opLight) {
-        this.periodID = opLight.periodID;
-        this.propertyUnitID = opLight.propertyUnitID;
-        this.type = opLight.type;
-        
-        this.governingInspection = opLight.governingInspection;
-        this.manager = opLight.manager;
-        
-        this.periodTypeCertifiedBy = opLight.periodTypeCertifiedBy;
-        this.periodTypeCertifiedTS = opLight.periodTypeCertifiedTS;
-        
-        this.source = opLight.source;
-        this.createdBy = opLight.createdBy;
-        this.createdTS = opLight.createdTS;
-        
-        this.startDate = opLight.startDate;
-        this.startDateCertifiedTS = opLight.startDateCertifiedTS;
-        this.startDateCertifiedBy = opLight.startDateCertifiedBy;
-        
-        this.endDate = opLight.endDate;
-        this.endDateCertifiedTS = opLight.endDateCertifiedTS;
-        this.endDateCertifiedBy = opLight.endDateCertifiedBy;
-        
-        this.authorizedTS = opLight.authorizedTS;
-        this.authorizedBy = opLight.authorizedBy;
-        
-        this.overrideTypeConfig = opLight.overrideTypeConfig;
-        this.notes = opLight.notes;
-
+        super(opLight);
     }
     
     @Override
