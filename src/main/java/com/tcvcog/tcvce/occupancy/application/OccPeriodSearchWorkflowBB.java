@@ -121,17 +121,14 @@ public  class   OccPeriodSearchWorkflowBB
         
         
         search_occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
-        try {
-            occPeriodList = oc.getOccPeriodPropertyUnitHeavy(getSessionBean().getSessOccPeriodList());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        if(occPeriodList != null && occPeriodList.isEmpty()){
+        occPeriodList = getSessionBean().getSessOccPeriodList();
+
+        if (occPeriodList != null && occPeriodList.isEmpty()) {
             occPeriodList = new ArrayList();
         }
         appendResultsToList = false;
         occPeriodQueryList = getSessionBean().getQueryOccPeriodList();
-        if(occPeriodQueryList != null && !occPeriodQueryList.isEmpty()){
+        if (occPeriodQueryList != null && !occPeriodQueryList.isEmpty()) {
             occPeriodQuerySelected = occPeriodQueryList.get(0);
         }
         search_propList = getSessionBean().getSessPropertyList();

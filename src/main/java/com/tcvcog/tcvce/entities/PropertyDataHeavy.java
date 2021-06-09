@@ -169,18 +169,18 @@ public  class       PropertyDataHeavy
         return credentialSignature;
     }
 
-    public List<OccPeriod> getCompletePeriodList(){
+    public List<OccPeriod> getCompletePeriodList() {
         List<OccPeriod> perList = new ArrayList<>();
-        if(unitWithListsList != null && !unitWithListsList.isEmpty()){
-            for(PropertyUnitDataHeavy pudh: unitWithListsList){
-                if(pudh.getPeriodList() != null && !pudh.getPeriodList().isEmpty()){
+
+        if (unitWithListsList != null && !unitWithListsList.isEmpty()) {
+            for (PropertyUnitDataHeavy pudh: unitWithListsList) {
+                if (pudh.getPeriodList() != null && !pudh.getPeriodList().isEmpty()) {
                     perList.addAll(pudh.getPeriodList());
                 }
             }
         }
         
         return perList;
-        
     }
     
     /**

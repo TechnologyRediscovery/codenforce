@@ -468,7 +468,7 @@
                                                     <p:commandLink id="activebob-proplist-prop-explore-cl"
                                                                    ajax="false"
                                                                    action="#{navigationBB.onOccPeriodListItemSelect(ose)}">
-                                                        <h:outputText value="#{ose.propertyUnitID} (ID:#{ose.periodID})"/>
+                                                        <h:outputText value="Unit #{ose.propUnitProp.unitNumber} at #{ose.propUnitProp.property.address} (ID:#{ose.periodID})"/>
                                                     </p:commandLink>
 
 
