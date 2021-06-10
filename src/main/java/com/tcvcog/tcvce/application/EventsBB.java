@@ -78,7 +78,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     
     private List<EventDomainEnum> eventDomainList;
     private EventDomainEnum eventDomainActive;
-    private EventDomainEnum eventDomianSelected;
+    private EventDomainEnum eventDomainSelected;
     private IFace_EventRuleGoverned currentERGBOb;
     private String currentERGBObTitle;
     private EventCnFPropUnitCasePeriodHeavy currentEvent;
@@ -268,7 +268,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
      
      */
     public void onEventDomainListChange(){
-        configureEventDomain(eventDomianSelected);
+        configureEventDomain(eventDomainSelected);
         
         
     }
@@ -1593,14 +1593,14 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
      * @return the eventDomianSelected
      */
     public EventDomainEnum getEventDomianSelected() {
-        return eventDomianSelected;
+        return eventDomainSelected;
     }
 
     /**
      * @param eventDomianSelected the eventDomianSelected to set
      */
     public void setEventDomianSelected(EventDomainEnum eventDomianSelected) {
-        this.eventDomianSelected = eventDomianSelected;
+        this.eventDomainSelected = eventDomianSelected;
     }
 
     /**

@@ -60,18 +60,20 @@
                           sortBy="#{event.timeStart}"
                           styleClass="centeredColumnContent">
                     <h:outputText value="#{empty event.timeStart ? ceCaseSearchProfileBB.getPrettyDate(event.creationts) : ceCaseSearchProfileBB.getPrettyDate(event.timeStart) }"/>
-
-
                 </p:column>
 
                 <p:column headerText="Category"
                           sortBy="#{event.category.eventCategoryTitle}"
                           styleClass="centeredColumnContent">
+
                     <div class="#{event.category.icon.styleClass}">
                         <i class="material-icons status-display-icon-i"><h:outputText value="#{event.category.icon.materialIcon}"/></i>
                     </div>
+
                     <h:outputText value="#{event.category.eventType.label}:"/>
+
                     <p:spacer height="1px" />
+
                     <h:outputText value="#{event.category.eventCategoryTitle}"/>
                 </p:column>
 
@@ -696,7 +698,7 @@
             <div class="ui-g data_container_nested_restrict">
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                     <div class="restrict-data-field-label-inline">
-                        <h:outputLabel  for="event-remove-button">
+                        <h:outputLabel for="event-remove-button">
                             <h:outputText value="Deactivated events can be recovered by changing event view options"/>
                         </h:outputLabel>
                     </div>
@@ -795,8 +797,7 @@
                                          actionListener="#{ceCaseSearchProfileBB.onPersonLookupByIDButtonChange}"
                                          ajax="true"
                                          immediate="true"
-                                         update="messages-global-form
-                                                         person-scroller"/>
+                                         update="messages-global-form person-scroller"/>
                     </div>
                 </div>
 
