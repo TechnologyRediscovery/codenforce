@@ -32,6 +32,7 @@ import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -401,9 +402,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 //    ***************************** UTILITIES **********************************
 //    --------------------------------------------------------------------------
     
-    
-    
-    
     /**
      * Chooses the default date field to search for any subclass of our SearchParams
      * family of objects
@@ -468,16 +466,40 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
              }
             
             // ****************************
-            // **         DATES          **
+            // **         DATES          
+            // ** UPDATED TO CHECK FOR DATE RULE LIST**
             // ****************************
             if (params.isDate_startEnd_ctl()) {
-                params.appendSQL("AND ");
-                if(params.getDate_field() != null && params.getDate_field().extractDateFieldString() != null){
-                    params.appendSQL(params.getDate_field().extractDateFieldString());
-                } else {
-                    params.appendSQL(selectDefaultDateFieldString(params));
+                if(params.getDateRuleList() != null && !params.getDateRuleList().isEmpty()){
+                    // we've got date rules in a list
+                    for(SearchParamsDateRule dr: params.getDateRuleList()){
+                        params.appendSQL("AND ");
+                        if(dr.getDate_field() != null && dr.getDate_field().extractDateFieldString() != null){
+                            params.appendSQL(dr.getDate_field().extractDateFieldString());
+                        } else {
+                            // add process for adapting to date rule list
+                            params.appendSQL(selectDefaultDateFieldString(params));
+                        }
+                        if(dr.isDate_null_ctl()){
+                            if(dr.isDate_null_val()){
+                                params.appendSQL(" IS NULL ");
+                            } else {
+                                params.appendSQL(" IS NOT NULL ");
+                            }
+                        } else {
+                            params.appendSQL(" BETWEEN ? AND ? ");
+                        }
+                    }
+                } else { // start legacy date
+                    params.appendSQL("AND ");
+                    if(params.getDate_field() != null && params.getDate_field().extractDateFieldString() != null){
+                        params.appendSQL(params.getDate_field().extractDateFieldString());
+                    } else {
+                        params.appendSQL(selectDefaultDateFieldString(params));
+                    }
+                    params.appendSQL(" BETWEEN ? AND ? ");
+                    
                 }
-                params.appendSQL(" BETWEEN ? AND ? ");
             } 
 
             // ****************************
@@ -1944,19 +1966,38 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         // SPECIFIC TO THIS QUERY
         params.setDate_startEnd_ctl(true);
-        params.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATION_DOFRECORD);
-        params.setDate_relativeDates_ctl(false);
+        params.setDateRuleList(new ArrayList<>());
         
-        // start a long time ago
-        params.setDate_start_val(LocalDateTime.now().minusYears(100));
-        // go up til stop date of query
-        params.setDate_end_val(params.getDate_end_val());
+        SearchParamsDateRule drOpen = genParams_getDateRule();
         
-        // but make sure they are open cases
-        params.setCaseOpen_ctl(true);
-        params.setCaseOpen_val(true);
+        drOpen.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATION_DOFRECORD);
+        drOpen.setDate_start_val(LocalDateTime.of(1970, 1, 1, 0, 0));
+        // set to end of report
+        drOpen.setDate_end_val(null);
+        
+        params.getDateRuleList().add(drOpen);
+        
+        SearchParamsDateRule drClose = genParams_getDateRule();
+        drClose.setDate_field(SearchParamsCECaseDateFieldsEnum.CLOSE);
+        
+        // client sets this to end of report
+        drClose.setDate_start_val(null);
+        drClose.setDate_end_val(LocalDateTime.now());
+        params.getDateRuleList().add(drClose);
+        
+        // don't touch this, let dates do it
+        params.setCaseOpen_ctl(false);
+        params.setCaseOpen_val(false);
         
         return params;
+    }
+    
+    /**
+     * Factory method for date rule objects
+     * @return 
+     */
+    public SearchParamsDateRule genParams_getDateRule(){
+        return new SearchParamsDateRule();
     }
     
     /* --------------------------------------------

@@ -12,7 +12,9 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -50,6 +52,14 @@ public  class           SearchParams
     private int date_relativeDates_start_val;
     private int date_realtiveDates_end_val;
     
+    /**
+     * If date_startEnd_ctl is true, this will be checked for 
+     * not nullness and emptiness. if not empty, 
+     * implement these rules and NOT the unbundled
+     * date fields, which have a new home in this composition
+     */
+    private List<SearchParamsDateRule> dateRuleList;
+    
     // set #3: User
     private RoleType user_rtMin;
     private boolean user_ctl;
@@ -76,6 +86,7 @@ public  class           SearchParams
    public SearchParams(){
        sql = new StringBuilder();
        log = new StringBuilder();
+       dateRuleList = new ArrayList<>();
    }
    
    
@@ -750,6 +761,20 @@ public  class           SearchParams
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the dateRuleList
+     */
+    public List<SearchParamsDateRule> getDateRuleList() {
+        return dateRuleList;
+    }
+
+    /**
+     * @param dateRuleList the dateRuleList to set
+     */
+    public void setDateRuleList(List<SearchParamsDateRule> dateRuleList) {
+        this.dateRuleList = dateRuleList;
     }
     
     

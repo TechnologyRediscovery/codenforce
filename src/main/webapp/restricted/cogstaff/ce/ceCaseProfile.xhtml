@@ -6982,12 +6982,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         var="citvv"
                                         widgetVar="citation-violation-compactlist-widgetvar">
 
-                                        <h:outputText  value="Ch. #{v.violatedEnfElement.ordchapterNo}:" />
-                                        <h:outputText  value="#{v.violatedEnfElement.ordchapterTitle} | " />
-                                        <h:outputText  value="&#167;#{v.violatedEnfElement.ordSecNum}:" />
-                                        <h:outputText  value="#{v.violatedEnfElement.ordSecTitle} |  " />
-                                        <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
-                                        <h:outputText  value="#{v.violatedEnfElement.ordSubSecTitle} " />
+                                        <h:outputText  value="Ch. #{citvv.violatedEnfElement.ordchapterNo}:" />
+                                        <h:outputText  value="#{citvv.violatedEnfElement.ordchapterTitle} | " />
+                                        <h:outputText  value="&#167;#{citvv.violatedEnfElement.ordSecNum}:" />
+                                        <h:outputText  value="#{citvv.violatedEnfElement.ordSecTitle} |  " />
+                                        <h:outputText  value="&#167;&#167;#{citvv.violatedEnfElement.ordSubSecNum} " />
+                                        <h:outputText  value="#{citvv.violatedEnfElement.ordSubSecTitle} " />
                                         <h:outputText id="v-source-name-compactlist-ot" value="(#{citvv.violatedEnfElement.source.sourceName}" />
                                         <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
                                         <h:outputText id="v-source-year-compactlist-ot" value="#{citvv.violatedEnfElement.source.sourceYear}) | "/>
@@ -7059,7 +7059,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:outputLabel for="citation-text-ot"
                                                    styleClass="data_field_label">
                                         <h:outputText value="Official Text: "/>
-
                                     </p:outputLabel>
 
                                     <p:commandLink      id="citation-update-cb-4" 

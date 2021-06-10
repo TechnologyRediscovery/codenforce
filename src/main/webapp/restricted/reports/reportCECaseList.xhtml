@@ -155,6 +155,29 @@
 
                             </div>
                         </div>
+                        
+                        
+
+
+
+                        <div class="report-trailblaze-headerbox">
+                            <div class="report-trailblaze-headerbox-title">
+                                <h:outputText value="Testing" />
+                            </div>
+                            <div class="report-trailblaze-headerbox-tail">
+                                <h:outputText value=" text"/>
+                            </div>
+                        </div>
+                        
+                        
+                        <ui:repeat id="cases-openasofend-uir"
+                                   value="#{reportingBB.reportCECaseList.caseListOpenAsOfDateEnd}"
+                                   var="cseoaode">
+                        
+                            <h:outputText value="ID: #{cseoaode.caseID} | #{cseoaode.caseName} | #{cseoaode.property.address}" />
+                            <br/>
+                        </ui:repeat>
+                        
 
 
 

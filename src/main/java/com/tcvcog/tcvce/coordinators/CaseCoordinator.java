@@ -314,7 +314,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
                 cse.setCitationList(citation_getCitationList(cse));
 
-                cse.setViolationList(violation_getCodeViolations(ci.getCodeViolations(cse.getCaseID())));
+                cse.setViolationList(violation_getCodeViolations(ci.getCodeViolations(cse)));
                 Collections.sort(cse.getViolationList());
                 
                 cse.setEventList(ec.getEventList(cse));
@@ -1040,12 +1040,26 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpenedInDateRange().size());
         }
         
-        QueryCECase query_active_asof = sc.initQuery(QueryCECaseEnum.OPENCASES, ua.getKeyCard());
+        QueryCECase query_active_asof = sc.initQuery(QueryCECaseEnum.OPEN_ASOFENDDATE, ua.getKeyCard());
 //        QueryCECase query_active_asof = sc.initQuery(QueryCECaseEnum.OPEN_ASOFENDDATE, ua.getKeyCard());
         spcse = query_active_asof.getPrimaryParams();
-        spcse.setDate_start_val(rpt.getDate_start_val());
-        spcse.setDate_end_val(rpt.getDate_end_val());
-        rpt.setCaseListOpenAsOfDateEnd(cecase_assembleCECaseDataHeavyList(sc.runQuery(query_active_asof).getBOBResultList(), ua));
+        
+        if(spcse.getDateRuleList() != null && spcse.getDateRuleList().size() == 2){
+            spcse.getDateRuleList().get(0).setDate_end_val(rpt.getDate_end_val());
+            spcse.getDateRuleList().get(1).setDate_start_val(rpt.getDate_end_val().plusDays(1));
+        }
+        
+        List<CECase> cseList = sc.runQuery(query_active_asof).getBOBResultList();
+        if(cseList != null && !cseList.isEmpty()){
+            System.out.println("CaseCoordinator.assembleCECaseListReport: OPEN AS OF CASE LIST");
+            for(CECase cse: cseList){
+                System.out.print("CID: " + cse.getCaseID());
+                System.out.println("| name: " + cse.getCaseName());
+            }
+        }
+        
+        rpt.setCaseListOpenAsOfDateEnd(cecase_assembleCECaseDataHeavyList(cseList, ua));
+        
         if(rpt.getCaseListOpenAsOfDateEnd() != null){
             System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpenAsOfDateEnd().size());
             // compute average case age for opened as of date list
@@ -1978,13 +1992,17 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public Citation citation_getCitation(int citationID) throws IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
         Citation cit = ci.getCitation(citationID);
-        cit.setViolationList(ci.getCodeViolations(ci.getCodeViolations(citationID)));
-        
+        cit.setViolationList(ci.getCodeViolations(ci.getCodeViolationsByCitation(cit)));
 
         return cit;
 
     }
 
+    /**
+     * Logic container for retrieving the default citation status
+     * @return
+     * @throws IntegrationException 
+     */
     private CitationStatus citation_getStartingCitationStatus() throws IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
         CitationStatus cs = ci.getCitationStatus(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
