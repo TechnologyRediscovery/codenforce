@@ -431,7 +431,7 @@
                                                 </div>
 
                                                 <div class="aob-container aob-container-objectstring">
-                                                    <h:outputText value="Unit #{sessionBean.sessOccPeriod.propUnitProp.unitNumber} (ID:#{sessionBean.sessOccPeriod.periodID})"/>
+                                                    <h:outputText value="#{sessionBean.sessOccPeriod.type.title} | Unit #{sessionBean.sessOccPeriod.propUnitProp.unitNumber} (ID:#{sessionBean.sessOccPeriod.periodID})"/>
                                                 </div>
 
                                                 <div class="aob-container aob-container-actions">
@@ -462,7 +462,7 @@
                                                     <p:commandLink id="activebob-proplist-prop-explore-cl"
                                                                    ajax="false"
                                                                    action="#{navigationBB.onOccPeriodListItemSelect(ose)}">
-                                                        <h:outputText value="Unit #{ose.propUnitProp.unitNumber} at #{ose.propUnitProp.property.address} (ID:#{ose.periodID})"/>
+                                                        <h:outputText value="#{ose.propUnitProp.property.address} #{ose.propUnitProp.unitNumber} (ID:#{ose.periodID})"/>
                                                     </p:commandLink>
 
 

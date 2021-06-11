@@ -19,8 +19,9 @@
                         <!-- Title -->
                         <h:form id="occperiod-launcher">
                             <h1>
-                                <h:outputText id="header-unit-ot" value="Unit #{occPeriodSearchWorkflowBB.currentPropertyUnit.unitNumber} @ "/>
+                                <h:outputText id="header-title-ot" value="#{occPeriodSearchWorkflowBB.currentOccPeriod.type.title} @ "/>
                                 <h:outputText id="header-addr-ot" value="#{occPeriodSearchWorkflowBB.currentPropertyUnit.property.address} "/>
+                                <h:outputText id="header-unit-ot" value="#{occPeriodSearchWorkflowBB.currentPropertyUnit.unitNumber} "/>
                                 <h:outputText id="header-muni-ot" value="(#{occPeriodSearchWorkflowBB.currentPropertyUnit.property.muni.muniName})"/>
                             </h1>
                         </h:form>
