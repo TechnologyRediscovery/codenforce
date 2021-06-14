@@ -63,63 +63,63 @@ public  class   OccPeriodSearchWorkflowBB
 //    *******************************
     private boolean periodStartDateNull;
     private boolean periodEndDateNull;
-    
+
     private String formNoteText;
-    
+
     private List<OccPeriodType> occPeriodTypeList;
     private OccPeriodType selectedOccPeriodType;
-    
+
     private List<PropertyUnit> propertyUnitCandidateList;
     private PropertyUnit selectedPropertyUnit;
-    
+
     private List<User> managerInspectorCandidateList;
     private User selectedManager;
-    
-    
-    
+
+
+
 //    *******************************
 //    ************ SEARCH ***********
 //    *******************************
     private List<OccPeriodType> search_occPeriodTypeList;
-    
+
     private List<QueryOccPeriod> occPeriodQueryList;
     private QueryOccPeriod occPeriodQuerySelected;
-    
+
     private List<Property> search_propList;
     protected List<Person> search_personList;
-   
+
     private List<OccPeriodPropertyUnitHeavy> occPeriodList;
     private List<OccPeriodPropertyUnitHeavy> occPeriodListFiltered;
     private boolean appendResultsToList;
-    
+
     private SearchParamsOccPeriod searchParamsSelected;
-    
+
     /**
      * Creates a new instance of OccPeriodSearchWorkflowBB
      */
     public OccPeriodSearchWorkflowBB()  {
     }
-    
+
     @PostConstruct
     public void initBean(){
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        
-        
+
+
         currentOccPeriod = getSessionBean().getSessOccPeriod();
         PropertyIntegrator pi = getPropertyIntegrator();
-        
+
         periodEndDateNull = false;
         periodStartDateNull = false;
         occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
-        
+
         try {
             currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
             propertyUnitCandidateList = getSessionBean().getSessProperty().getUnitList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        
-        
+
+
         search_occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
         occPeriodList = getSessionBean().getSessOccPeriodList();
 
@@ -133,25 +133,25 @@ public  class   OccPeriodSearchWorkflowBB
         }
         search_propList = getSessionBean().getSessPropertyList();
         search_personList = getSessionBean().getSessPersonList();
-        
+
         configureParameters();
     }
-    
+
     private void configureParameters(){
-        if(occPeriodQuerySelected != null 
-                && 
-            occPeriodQuerySelected.getParamsList() != null 
-                && 
+        if(occPeriodQuerySelected != null
+                &&
+            occPeriodQuerySelected.getParamsList() != null
+                &&
             !occPeriodQuerySelected.getParamsList().isEmpty()){
-            
+
             searchParamsSelected = occPeriodQuerySelected.getParamsList().get(0);
         } else {
             searchParamsSelected = null;
         }
     }
-    
-    
-    
+
+
+
     public void reloadCurrentOccPeriodDataHeavy(){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
@@ -167,11 +167,11 @@ public  class   OccPeriodSearchWorkflowBB
         } catch (SearchException ex) {
             System.out.println(ex);
         }
-        
+
     }
-    
-       
-    
+
+
+
     public int getPeriodListSize(){
         int s = 0;
         if(occPeriodList != null && !occPeriodList.isEmpty()){
@@ -179,24 +179,24 @@ public  class   OccPeriodSearchWorkflowBB
         }
         return s;
     }
-     
-     public void certifyOccPeriodField(ActionEvent ev){
-         
-         OccupancyCoordinator oc = getOccupancyCoordinator();
-         FacesContext context = getFacesContext();
-         String field = context.getExternalContext().getRequestParameterMap().get("fieldtocertify");
-         String certifymode = context.getExternalContext().getRequestParameterMap().get("certifymode");
-         
-         System.out.println("OccInspectionBB.certifuyOccPeriodField | field: " + field + " | mode: " + certifymode);
-         
-         UserAuthorized u = getSessionBean().getSessUser();
-         LocalDateTime now = LocalDateTime.now();
-         
-         switch(field){
+
+    public void certifyOccPeriodField(ActionEvent ev) {
+
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        FacesContext context = getFacesContext();
+        String field = context.getExternalContext().getRequestParameterMap().get("fieldtocertify");
+        String certifyMode = context.getExternalContext().getRequestParameterMap().get("certifymode");
+
+        System.out.println("OccInspectionBB.certifyOccPeriodField | field: " + field + " | mode: " + certifyMode);
+
+        UserAuthorized u = getSessionBean().getSessUser();
+        LocalDateTime now = LocalDateTime.now();
+
+        switch (field) {
             case "authorization":
                 currentOccPeriod.setAuthorizedBy(u);
                 currentOccPeriod.setAuthorizedTS(now);
-                if(certifymode.equals("withdraw")){
+                if (certifyMode.equals("withdraw")) {
                     currentOccPeriod.setAuthorizedBy(null);
                     currentOccPeriod.setAuthorizedTS(null);
                 }
@@ -204,63 +204,63 @@ public  class   OccPeriodSearchWorkflowBB
             case "occperiodtype":
                 currentOccPeriod.setPeriodTypeCertifiedBy(u);
                 currentOccPeriod.setPeriodTypeCertifiedTS(now);
-                if(certifymode.equals("withdraw")){
+                if (certifyMode.equals("withdraw")) {
                     currentOccPeriod.setPeriodTypeCertifiedBy(null);
                     currentOccPeriod.setPeriodTypeCertifiedTS(null);
                 }
                 break;
             case "startdate":
-                if(periodStartDateNull){
+                if (periodStartDateNull) {
                     currentOccPeriod.setStartDate(null);
                 }
                 currentOccPeriod.setStartDateCertifiedBy(u);
                 currentOccPeriod.setStartDateCertifiedTS(now);
-                if(certifymode.equals("withdraw")){
+                if (certifyMode.equals("withdraw")) {
                     currentOccPeriod.setStartDateCertifiedBy(null);
                     currentOccPeriod.setStartDateCertifiedTS(null);
                 }
                 break;
             case "enddate":
-                if(periodEndDateNull){
+                if (periodEndDateNull) {
                     currentOccPeriod.setEndDate(null);
                 }
                 currentOccPeriod.setEndDateCertifiedBy(u);
                 currentOccPeriod.setEndDateCertifiedTS(now);
-                if(certifymode.equals("withdraw")){
+                if (certifyMode.equals("withdraw")) {
                     currentOccPeriod.setEndDateCertifiedBy(null);
                     currentOccPeriod.setEndDateCertifiedTS(null);
                 }
                 break;
             default:
                 getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                "Error! Unable to certify field", ""));
-         }
-         
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Error! Unable to certify field", ""));
+        }
+
         try {
             oc.editOccPeriod(currentOccPeriod, u);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully udpated field status!", ""));
+                            "Successfully updated field status!", ""));
         } catch (IntegrationException | BObStatusException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), ""));
             System.out.println(ex);
-            
+
         }
         reloadCurrentOccPeriodDataHeavy();
-         
-     }
-     
-     
+
+    }
+
+
      public void authorizeOccPeriod(ActionEvent ev){
          OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             oc.authorizeOccPeriod(currentOccPeriod, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_INFO,
-               "Success! Occupancy period ID " + currentOccPeriod.getPeriodID() 
+               "Success! Occupancy period ID " + currentOccPeriod.getPeriodID()
                        + " is now authorized and permits can be generated.", ""));
         } catch (AuthorizationException | BObStatusException | IntegrationException ex) {
             System.out.println(ex);
@@ -271,22 +271,22 @@ public  class   OccPeriodSearchWorkflowBB
      }
        /**
       * utility pass through method to be called when loading Occperiod advanced settings
-      * @param ev 
+      * @param ev
       */
      public void updateOccPeriodInitialize(ActionEvent ev){
-         
+
      }
-     
+
      public void updateOccPeriodCommit() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         if (selectedManager != null) {
             currentOccPeriod.setManager(selectedManager);
         }
-        
+
         if(selectedOccPeriodType != null) {
             currentOccPeriod.setType(selectedOccPeriodType);
         }
-        
+
         try {
             oc.editOccPeriod(currentOccPeriod, getSessionBean().getSessUser());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -312,15 +312,15 @@ public  class   OccPeriodSearchWorkflowBB
 //        }
 //        reloadCurrentOccPeriodDataHeavy();
      }
-     
+
      /**
       * Logic container for liasing with the OccCoor to
       * update managers
-      * @param ev 
+      * @param ev
       */
      public void updateOccPeriodManager(ActionEvent ev){
-         
-         
+
+
      }
 
     /**
@@ -355,17 +355,17 @@ public  class   OccPeriodSearchWorkflowBB
 
 
      /**
-     * Loads an OccPeriodDataHeavy and injects it into the session bean 
+     * Loads an OccPeriodDataHeavy and injects it into the session bean
      * and sends the user to the Workflow/status page
      * @param op
-     * @return 
+     * @return
      */
     public String exploreOccPeriod(OccPeriod op) {
         SystemCoordinator sc = getSystemCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
         OccupancyCoordinator oc = getOccupancyCoordinator();
         Credential cred = getSessionBean().getSessUser().getMyCredential();
-        
+
         try {
             getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(op, cred));
             getSessionBean().setSessProperty(pc.getPropertyDataHeavyByUnit(op.getPropertyUnitID(), getSessionBean().getSessUser()));
@@ -375,22 +375,22 @@ public  class   OccPeriodSearchWorkflowBB
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to assemble the data-rich occ period", ""));
-            
+
         }
         return "occPeriodWorkflow";
-        
+
     }
-    
+
     /**
      * Listener method for requests from the user to clear the results list
-     * @param ev 
+     * @param ev
      */
     public void clearOccPeriodList(ActionEvent ev){
         if(occPeriodList !=  null){
             occPeriodList.clear();
         }
     }
-    
+
     public void loadOccPeriodHistory(ActionEvent ev){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
@@ -400,11 +400,11 @@ public  class   OccPeriodSearchWorkflowBB
             getFacesContext().addMessage(null,
                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
                            "Unable to assemble the data-rich occ period", ""));
-            
+
         }
     }
-    
-    
+
+
     /**
      * Responder to the query button on the UI
      *
@@ -412,12 +412,12 @@ public  class   OccPeriodSearchWorkflowBB
      */
     public void executeQuery(ActionEvent ev) {
         System.out.println("OccPeriodSearchWorkflowBB.executeQuery");
-        
-        
+
+
         executeQuery();
     }
-    
-    
+
+
     /**
      * Entry way into the Query world via the SearchCoordinator who is responsible
      * for calling appropriate Coordinators and configuration methods and such
@@ -426,7 +426,7 @@ public  class   OccPeriodSearchWorkflowBB
         SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         int listSize = 0;
-        
+
         if(!appendResultsToList){
             occPeriodList.clear();
         }
@@ -445,9 +445,9 @@ public  class   OccPeriodSearchWorkflowBB
                             "Could not query for Periods due to search errors, sorry.", ""));
         }
     }
-    
+
     public void changeQuerySelected(){
-        
+
         configureParameters();
         getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -461,10 +461,10 @@ public  class   OccPeriodSearchWorkflowBB
             occPeriodQuerySelected = occPeriodQueryList.get(0);
         }
         configureParameters();
-        
+
     }
-    
-    
+
+
     /**
      * @return the searchParamsSelected
      */
@@ -609,5 +609,5 @@ public  class   OccPeriodSearchWorkflowBB
     public void setSearch_personList(List<Person> search_personList) {
         this.search_personList = search_personList;
     }
-    
+
 }

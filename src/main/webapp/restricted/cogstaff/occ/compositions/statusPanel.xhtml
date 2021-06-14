@@ -69,41 +69,48 @@
 
                 <!-- Just labels -->
                 <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-vertical">
-                    <div class="restrict-data-field-label-vertical" >
+                    <div class="restrict-data-field-label-vertical">
                         <h:outputLabel value=" "/>
                     </div>
                     <div class="restrict-data-field-value-vertical" style="font-weight: 700;">
                         Date:
                     </div>
                     <div class="restrict-data-field-value-vertical" style="font-weight: 700;">
-                        Details:
+                        Status:
                     </div>
                 </div>
 
                 <!-- Occupancy start date -->
                 <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-vertical">
-                    <div class="restrict-data-field-label-vertical" >
+                    <div class="restrict-data-field-label-vertical">
                         <h:outputLabel value="Start date"/>
                         <div class="restrict-main-contents-io-link link-button">
 
                             <!-- removed action listener -->
-                            <p:commandLink      id="occperiod-editstart-init-cb"
-                                                ajax="true"
-                                                oncomplete="PF('occperiod-editstart-dialog-var').show()"
-                                                disabled="false"
-                                                style="color:blue;"
-                                                value="edit" />
+                            <p:commandLink id="occperiod-editstart-init-cb"
+                                           ajax="true"
+                                           oncomplete="PF('occperiod-editstart-dialog-var').show()"
+                                           disabled="false"
+                                           style="color:blue;"
+                                           value="edit"/>
                         </div>
                     </div>
-                    <div class="restrict-data-field-value-vertical" >
+                    <div class="restrict-data-field-value-vertical">
                         <h:outputText id="seloccperiod-sdate-it" value="#{occPeriodSearchWorkflowBB.currentOccPeriod.startDatePrettyNoTime}"/>
                     </div>
-
+                    <div class="restrict-data-field-value-vertical">
+                        <i class="fa fa-#{empty occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedTS ? 'unlock' : 'lock'} p-mr-1" aria-hidden="true"/>
+                        <p:commandLink id="occperiod-startdate-togglelock-cb"
+                                       ajax="true"
+                                       style="color:blue;">
+                            <h:outputText value="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedTS ? 'Unlocked' : 'Locked'}"/>
+                        </p:commandLink>
+                    </div>
                 </div>
 
                 <!-- Occupancy end date -->
                 <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-vertical">
-                    <div class="restrict-data-field-label-vertical" >
+                    <div class="restrict-data-field-label-vertical">
                         <h:outputLabel value="End date"/>
                         <div class="restrict-main-contents-io-link link-button">
 
@@ -116,14 +123,47 @@
                                            value="edit"/>
 
                         </div>
-
                     </div>
-                    <div class="restrict-data-field-value-vertical" >
-                        <!-- this is nbsp -->
-                        <h:outputText value="&#xA0;"/>
-                        <h:outputText id="seloccperiod-edate-it" value="#{occPeriodSearchWorkflowBB.currentOccPeriod.endDatePrettyNoTime}"/>
+                    <div class="restrict-data-field-value-vertical">
+                        <h:outputText id="seloccperiod-edate-it"
+                                      value="#{occPeriodSearchWorkflowBB.currentOccPeriod.endDatePrettyNoTime}"/>
                     </div>
-
+                    <div class="restrict-data-field-value-vertical">
+                        <h:panelGroup id="occperiod-enddate-lockunlock-group">
+                            <i id="occperiod-lockunlock-icon"
+                               class="fa fa-#{empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedTS ? 'unlock' : 'lock'} p-mr-1"
+                               aria-hidden="true"/>
+                            <!-- command link if end date is unlocked -->
+                            <p:commandLink id="occperiod-enddate-lock-cb"
+                                           ajax="true"
+                                           style="color:blue;"
+                                           actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
+                                           rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy}"
+                                           value="Unlocked"
+                                           update="occperiod-enddate-lockunlock-group">
+                                <f:param name="fieldtocertify" value="enddate"/>
+                                <f:param name="certifymode" value="certify" />
+                                <p:confirm header="Confirmation" message="Are you sure you want to lock the end date?" icon="pi pi-info-circle"/>
+                            </p:commandLink>
+                            <!-- command link if end date is locked -->
+                            <p:commandLink id="occperiod-enddate-unlock-cb"
+                                           ajax="true"
+                                           style="color:blue;"
+                                           actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
+                                           rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy}"
+                                           value="Locked"
+                                           update="occperiod-enddate-lockunlock-group">
+                                <f:param name="fieldtocertify" value="enddate"/>
+                                <f:param name="certifymode" value="withdraw" />
+                                <p:confirm header="Confirmation"
+                                           message="Are you sure you want to unlock the end date? It was originally locked by
+                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy.person.firstName}
+                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy.person.lastName}
+                                                     on #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedTS)}"
+                                           icon="pi pi-exclamation-triangle"/>
+                            </p:commandLink>
+                        </h:panelGroup>
+                    </div>
                 </div>
             </div>
 
@@ -148,8 +188,6 @@
                 </div>
                 <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
                     <div class="restrict-main-contents-io-button gray_button">
-
-
                         <p:commandButton id="refresh-period-cb"
                                          ajax="false"
                                          icon="fa fa-refresh"
@@ -157,12 +195,21 @@
                                          value="reload period"/>
                     </div>
                 </div>
-
             </div>
         </h:form>
     </p:panel>
 
     <!-- Dialogs -->
+
+    <p:confirmDialog global="true"
+                     responsive="true"
+                     resizable="true"
+                     width="600">
+        <h:form>
+            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+            <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" />
+        </h:form>
+    </p:confirmDialog>
 
     <!-- Change period type dialog -->
     <p:dialog id="occperiod-changetype-dialog"
@@ -326,7 +373,7 @@
                                     styleClass="data_field_value"/>
 
                         <h:message for="occperiod-date-start-cal" showDetail="false" showSummary="true"
-                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
                     </div>
 
                 </div>
@@ -397,7 +444,7 @@
                                     styleClass="data_field_value"/>
 
                         <h:message for="occperiod-date-end-cal" showDetail="false" showSummary="true"
-                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
                     </div>
 
                 </div>
@@ -408,13 +455,10 @@
                                      value="Change end date of occupancy period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
                                      action="#{occPeriodSearchWorkflowBB.updateOccPeriodCommit}"
                                      icon="fa fa-user"/>
-
                 </div>
 
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
-
                     <div class="restrict-main-contents-io-button gray_button">
-
                         <!-- Removed action listener -->
                         <p:commandButton id="occperiod-editend-abort-button"
                                          ajax="true"
