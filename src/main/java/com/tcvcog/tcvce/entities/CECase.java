@@ -480,6 +480,15 @@ public class        CECase
         return hash;
     }
 
+    /**
+     * Cases are equal if they have the same ID;
+     * CAUTION: Since only IDs are the only input
+     * to equality, cases whose contents may be different
+     * will still be equal if they are keyed the same.
+     * 
+     * @param obj
+     * @return 
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

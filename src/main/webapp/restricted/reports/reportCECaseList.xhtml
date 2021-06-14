@@ -105,8 +105,11 @@
 
 
                                 <h:form id="cselistreport-bar-violations-form">
+                                    <ui:remove>
+                                        
                                     <p:pieChart id="pie-violations"
                                                 model="#{reportingBB.reportCECaseList.pieViol}" />
+                                    </ui:remove>
 
                                 </h:form>
 
@@ -155,10 +158,6 @@
 
                             </div>
                         </div>
-                        
-                        
-
-
 
                         <div class="report-trailblaze-headerbox">
                             <div class="report-trailblaze-headerbox-title">
@@ -173,14 +172,10 @@
                         <ui:repeat id="cases-openasofend-uir"
                                    value="#{reportingBB.reportCECaseList.caseListOpenAsOfDateEnd}"
                                    var="cseoaode">
-                        
                             <h:outputText value="ID: #{cseoaode.caseID} | #{cseoaode.caseName} | #{cseoaode.property.address}" />
                             <br/>
                         </ui:repeat>
                         
-
-
-
                         <div class="report-trailblaze-headerbox">
                             <div class="report-trailblaze-headerbox-title">
                                 <h:outputText value="Code Enforcement by Street" />

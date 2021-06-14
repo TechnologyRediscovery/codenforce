@@ -1027,8 +1027,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             return null;
         }
         
-        
-        
         QueryCECase query_opened = sc.initQuery(QueryCECaseEnum.OPENED_INDATERANGE, ua.getKeyCard());
         SearchParamsCECase spcse = query_opened.getPrimaryParams();
         spcse.setDate_startEnd_ctl(true);
@@ -1041,15 +1039,31 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
         
         QueryCECase query_active_asof = sc.initQuery(QueryCECaseEnum.OPEN_ASOFENDDATE, ua.getKeyCard());
-//        QueryCECase query_active_asof = sc.initQuery(QueryCECaseEnum.OPEN_ASOFENDDATE, ua.getKeyCard());
-        spcse = query_active_asof.getPrimaryParams();
         
-        if(spcse.getDateRuleList() != null && spcse.getDateRuleList().size() == 2){
-            spcse.getDateRuleList().get(0).setDate_end_val(rpt.getDate_end_val());
-            spcse.getDateRuleList().get(1).setDate_start_val(rpt.getDate_end_val().plusDays(1));
+        if(query_active_asof.getParamsList() != null && query_active_asof.getParamsList().size() == 2){
+
+            // setup params
+            spcse = query_active_asof.getPrimaryParams();
+
+            // client field injection: cases open as of EOR but closed between EOR+1 and now()
+            if(spcse.getDateRuleList() != null && spcse.getDateRuleList().size() == 2){
+                spcse.getDateRuleList().get(0).setDate_end_val(rpt.getDate_end_val());
+                spcse.getDateRuleList().get(1).setDate_start_val(rpt.getDate_end_val().plusDays(1));
+                System.out.println("CaseCoordinator.report_buildCECaseListReport " + spcse.getDateRuleList()  );
+            }
+
+            // client field injection: cases open as of EOR and not closed, even today
+            if(query_active_asof.getParamsList() != null && !query_active_asof.getParamsList().isEmpty()){
+                SearchParamsCECase sponc = query_active_asof.getParamsList().get(1);
+                sponc.getDateRuleList().get(0).setDate_end_val(rpt.getDate_start_val());
+                System.out.println("CaseCoordinator.report_buildCECaseListReport " + sponc.getDateRuleList()  );
+            }
         }
         
+        
         List<CECase> cseList = sc.runQuery(query_active_asof).getBOBResultList();
+        System.out.println("Query: " + query_active_asof.getQueryLog());
+        
         if(cseList != null && !cseList.isEmpty()){
             System.out.println("CaseCoordinator.assembleCECaseListReport: OPEN AS OF CASE LIST");
             for(CECase cse: cseList){
@@ -1060,17 +1074,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
         rpt.setCaseListOpenAsOfDateEnd(cecase_assembleCECaseDataHeavyList(cseList, ua));
         
-        if(rpt.getCaseListOpenAsOfDateEnd() != null){
+        if(rpt.getCaseListOpenAsOfDateEnd() != null && !rpt.getCaseListOpenAsOfDateEnd().isEmpty()){
             System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpenAsOfDateEnd().size());
             // compute average case age for opened as of date list
-            if(!rpt.getCaseListOpenAsOfDateEnd().isEmpty()){
-                long sumOfAges = 0l;
-                for(CECase cse: rpt.getCaseListOpenAsOfDateEnd()){
-                    sumOfAges += cse.getCaseAgeAsOf(rpt.getDate_end_val());
-                }
-                double avg = (double) sumOfAges / (double) rpt.getCaseListOpenAsOfDateEnd().size();
-                rpt.setAverageAgeOfCasesOpenAsOfReportEndDate(avg);
+            long sumOfAges = 0l;
+            for(CECase cse: rpt.getCaseListOpenAsOfDateEnd()){
+                sumOfAges += cse.getCaseAgeAsOf(rpt.getDate_end_val());
             }
+            double avg = (double) sumOfAges / (double) rpt.getCaseListOpenAsOfDateEnd().size();
+            rpt.setAverageAgeOfCasesOpenAsOfReportEndDate(avg);
         }
         
         QueryCECase query_closed = sc.initQuery(QueryCECaseEnum.CLOSED_CASES, ua.getKeyCard());
@@ -1086,7 +1098,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
         // BUILD BY STREET
         
-        rpt = organizeByStreet(rpt);
+        rpt = report_ceCaseList_organizeByStreet(rpt);
         
         
         
@@ -1128,7 +1140,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
     }
     
-    private ReportConfigCECaseList organizeByStreet(ReportConfigCECaseList rptCseList){
+    private ReportConfigCECaseList report_ceCaseList_organizeByStreet(ReportConfigCECaseList rptCseList){
         
         if(rptCseList != null){
             Map<String, ReportCECaseListStreetCECaseContainer> streetCaseMap = new HashMap<>();
@@ -1184,6 +1196,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                     } // close for over case list
                 } // close null/emtpy check
             } // close for over enum vals
+            
+            
+            report_ceCaseList_removeDupsByStreet(streetCaseMap);
             rptCseList.setStreetSCC(streetCaseMap);
             rptCseList.assembleStreetList();
 
@@ -1193,7 +1208,28 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
     }
     
+    /**
+     * Removes cases which were opened and closed in the same period
+     * and leaves them in the Closed group
+     * @param rpt 
+     */
+    private void report_ceCaseList_removeDupsByStreet(Map<String, ReportCECaseListStreetCECaseContainer> streetCaseMap){
+        for(String rclsc: streetCaseMap.keySet()){
+            ReportCECaseListStreetCECaseContainer cont = streetCaseMap.get(rclsc);
+            for(CECaseDataHeavy cse: cont.getCaseOpenedList()){
+                if(cont.getCaseClosedList().contains(cse)){
+                    System.out.println("CaseCoordinator.removeDupes: removing case ID " + cse.getCaseID());
+                    cont.getCaseClosedList().remove(cse);
+                }
+            }
+        }
+    }
     
+    
+    /**
+     * Builds a violation pie chart
+     * @param rpt 
+     */
       private void initPieViols(ReportConfigCECaseList rpt){
         rpt.setPieViol(new PieChartModel());
         ChartData pieData = new ChartData();

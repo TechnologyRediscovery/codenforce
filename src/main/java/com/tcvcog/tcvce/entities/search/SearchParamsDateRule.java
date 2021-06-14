@@ -40,6 +40,22 @@ public class SearchParamsDateRule {
     protected int date_relativeDates_start_val;
     protected int date_realtiveDates_end_val;
 
+    
+    @Override
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        if(date_field != null){
+            sb.append("Field: " + date_field.extractDateFieldString());
+        }
+        sb.append("START: " + date_start_val);
+        sb.append("END: " + date_end_val);
+        sb.append("Null ctl: " + date_null_ctl);
+        sb.append("Null val: " + date_null_val);
+        sb.append("Rel Dates" + date_relativeDates_ctl);
+        return sb.toString();
+        
+    }
+    
     /**
      * @return the date_rtMin
      */

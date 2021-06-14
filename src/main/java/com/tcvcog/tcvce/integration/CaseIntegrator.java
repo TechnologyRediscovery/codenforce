@@ -219,10 +219,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                         for(SearchParamsDateRule dr: params.getDateRuleList()){
                             if(dr.isDate_null_ctl()){
                                 // no injection needed
-                                System.out.println("CaseIntegrator.searchForCases: Found null date rule; no injection");
+                                System.out.println("CaseIntegrator.searchForCases: Found null date rule; no injection: " + params.getFilterName());
                             } else { // inject dates
-                                stmt.setTimestamp(++paramCounter, params.getDateStart_val_sql());
-                                stmt.setTimestamp(++paramCounter, params.getDateEnd_val_sql());
+                                stmt.setTimestamp(++paramCounter, java.sql.Timestamp.valueOf(dr.getDate_start_val()));
+                                stmt.setTimestamp(++paramCounter, java.sql.Timestamp.valueOf(dr.getDate_end_val()));
                             }
                         }
                     } else { // legacy no date rule list
