@@ -90,9 +90,9 @@
                             <p:commandLink id="occperiod-editstart-init-cb"
                                            ajax="true"
                                            oncomplete="PF('occperiod-editstart-dialog-var').show()"
-                                           disabled="false"
                                            style="color:blue;"
-                                           value="edit"/>
+                                           value="edit"
+                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedTS}"/>
                         </div>
                     </div>
                     <div class="restrict-data-field-value-vertical">
@@ -109,7 +109,7 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy}"
                                            value="Unlocked"
-                                           update="occperiod-startdate-lockunlock-group">
+                                           update="occperiod-startdate-lockunlock-group occperiod-editstart-init-cb">
                                 <f:param name="fieldtocertify" value="startdate"/>
                                 <f:param name="certifymode" value="certify"/>
                                 <p:confirm header="Confirmation" message="Are you sure you want to lock the start date?" icon="pi pi-info-circle"/>
@@ -121,7 +121,7 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy}"
                                            value="Locked"
-                                           update="occperiod-startdate-lockunlock-group">
+                                           update="occperiod-startdate-lockunlock-group occperiod-editstart-init-cb">
                                 <f:param name="fieldtocertify" value="startdate"/>
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
@@ -145,9 +145,9 @@
                             <p:commandLink id="occperiod-editend-init-cb"
                                            ajax="true"
                                            oncomplete="PF('occperiod-editend-dialog-var').show()"
-                                           disabled="false"
                                            style="color:blue;"
-                                           value="edit"/>
+                                           value="edit"
+                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedTS}"/>
 
                         </div>
                     </div>
@@ -166,7 +166,7 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy}"
                                            value="Unlocked"
-                                           update="occperiod-enddate-lockunlock-group">
+                                           update="occperiod-enddate-lockunlock-group occperiod-editend-init-cb">
                                 <f:param name="fieldtocertify" value="enddate"/>
                                 <f:param name="certifymode" value="certify"/>
                                 <p:confirm header="Confirmation" message="Are you sure you want to lock the end date?" icon="pi pi-info-circle"/>
@@ -178,7 +178,7 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy}"
                                            value="Locked"
-                                           update="occperiod-enddate-lockunlock-group">
+                                           update="occperiod-enddate-lockunlock-group occperiod-editend-init-cb">
                                 <f:param name="fieldtocertify" value="enddate"/>
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
