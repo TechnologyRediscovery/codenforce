@@ -75,7 +75,7 @@
             <div class="ui-g data_container_nested_restrict">
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                     <div class="restrict-data-field-label-inline">
-                        <p:outputLabel for="occperiod-manager-ot">
+                        <p:outputLabel>
                             <h:outputText value="Authorization status"/>
                         </p:outputLabel>
                     </div>
@@ -139,10 +139,41 @@
 
                         <h:outputText id="occperiod-manager-ot"
                                       value="#{occPeriodSearchWorkflowBB.currentOccPeriod.manager.person.firstName}
-                                                              #{occPeriodSearchWorkflowBB.currentOccPeriod.manager.person.lastName} "/>
+                                                              #{occPeriodSearchWorkflowBB.currentOccPeriod.manager.person.lastName}"/>
                         <br/>
                         <h:outputText id="occperiod-manager-username"
                                       value="(#{occPeriodSearchWorkflowBB.currentOccPeriod.manager.username})"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Created by -->
+            <div class="ui-g data_container_nested_restrict">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                    <div class="restrict-data-field-label-inline">
+                        <p:outputLabel>
+                            <h:outputText value="Created by"/>
+                        </p:outputLabel>
+                    </div>
+                    <div class="restrict-data-field-value-inline">
+                        <h:outputText value="#{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.person.firstName}
+                                                              #{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.person.lastName}"/>
+                        <br/>
+                        <h:outputText value="(#{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.username})"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Created at -->
+            <div class="ui-g data_container_nested_restrict">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                    <div class="restrict-data-field-label-inline">
+                        <p:outputLabel>
+                            <h:outputText value="Created at"/>
+                        </p:outputLabel>
+                    </div>
+                    <div class="restrict-data-field-value-inline">
+                        <h:outputText value="#{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.createdTS)}"/>
                     </div>
                 </div>
             </div>
