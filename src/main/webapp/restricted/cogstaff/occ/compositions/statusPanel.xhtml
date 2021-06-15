@@ -70,6 +70,53 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Authorization status -->
+            <div class="ui-g data_container_nested_restrict">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                    <div class="restrict-data-field-label-inline">
+                        <p:outputLabel for="occperiod-manager-ot">
+                            <h:outputText value="Authorization status"/>
+                        </p:outputLabel>
+                    </div>
+                    <div class="restrict-data-field-value-inline">
+                        <h:panelGroup id="occperiod-authorization-lockunlock-group">
+                            <i class="fa fa-#{empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedTS ? 'exclamation-circle' : 'shield'} p-mr-1"
+                               aria-hidden="true"/>
+                            <!-- command link if period is unauthorized -->
+                            <p:commandLink id="occperiod-authorization-lock-cb"
+                                           ajax="true"
+                                           style="color:blue;"
+                                           actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
+                                           rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}"
+                                           value="Unauthorized"
+                                           update="occperiod-authorization-lockunlock-group">
+                                <f:param name="fieldtocertify" value="authorization"/>
+                                <f:param name="certifymode" value="certify"/>
+                                <p:confirm header="Confirmation" message="Are you sure you want to authorize this occupancy period?" icon="pi pi-info-circle"/>
+                            </p:commandLink>
+                            <!-- command link if period is authorized -->
+                            <p:commandLink id="occperiod-authorization-unlock-cb"
+                                           ajax="true"
+                                           style="color:blue;"
+                                           actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
+                                           rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}"
+                                           value="Authorized"
+                                           update="occperiod-authorization-lockunlock-group">
+                                <f:param name="fieldtocertify" value="authorization"/>
+                                <f:param name="certifymode" value="withdraw"/>
+                                <p:confirm header="Confirmation"
+                                           message="Are you sure you want to deauthorize the occupancy period? It was originally authorized by
+                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy.person.firstName}
+                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy.person.lastName}
+                                                         on #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.authorizedTS)}"
+                                           icon="pi pi-exclamation-triangle"/>
+                            </p:commandLink>
+                        </h:panelGroup>
+                    </div>
+                </div>
+            </div>
+
             <!-- Manager -->
             <div class="ui-g data_container_nested_restrict">
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
@@ -99,6 +146,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Dates -->
             <div class="ui-g data_container_nested_restrict">
 

@@ -171,7 +171,6 @@ public  class   OccPeriodSearchWorkflowBB
     }
 
 
-
     public int getPeriodListSize(){
         int s = 0;
         if(occPeriodList != null && !occPeriodList.isEmpty()){
