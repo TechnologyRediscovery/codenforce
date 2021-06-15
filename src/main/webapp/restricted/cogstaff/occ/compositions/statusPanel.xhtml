@@ -26,12 +26,47 @@
                                            style="color:blue;"
                                            oncomplete="PF('occperiod-changetype-dialog-var').show()"
                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                           value="edit"/>
+                                           value="edit"
+                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedTS}"/>
                         </div>
                     </div>
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="occperiod-type-ot"
                                       value="#{occPeriodSearchWorkflowBB.currentOccPeriod.type.title}"/>
+                        <br/>
+                        <h:panelGroup id="occperiod-type-lockunlock-group">
+                            <i class="fa fa-#{empty occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedTS ? 'exclamation-circle' : 'shield'} p-mr-1"
+                               aria-hidden="true"/>
+                            <!-- command link if period type is unlocked -->
+                            <p:commandLink id="occperiod-type-lock-cb"
+                                           ajax="true"
+                                           style="color:blue;"
+                                           actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
+                                           rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy}"
+                                           value="Uncertified"
+                                           update="occperiod-type-lockunlock-group occperiod-changetype-cb">
+                                <f:param name="fieldtocertify" value="occperiodtype"/>
+                                <f:param name="certifymode" value="certify"/>
+                                <p:confirm header="Confirmation" message="Are you sure you want to certify the period type?" icon="pi pi-info-circle"/>
+                            </p:commandLink>
+                            <!-- command link if period type is locked -->
+                            <p:commandLink id="occperiod-type-unlock-cb"
+                                           ajax="true"
+                                           style="color:blue;"
+                                           actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
+                                           rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy}"
+                                           value="Certified"
+                                           update="occperiod-type-lockunlock-group occperiod-changetype-cb">
+                                <f:param name="fieldtocertify" value="occperiodtype"/>
+                                <f:param name="certifymode" value="withdraw"/>
+                                <p:confirm header="Confirmation"
+                                           message="Are you sure you want to unlock the start date? It was originally locked by
+                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy.person.firstName}
+                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy.person.lastName}
+                                                         on #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedTS)}"
+                                           icon="pi pi-exclamation-triangle"/>
+                            </p:commandLink>
+                        </h:panelGroup>
                     </div>
                 </div>
             </div>
@@ -227,6 +262,7 @@
 
     <!-- Dialogs -->
 
+    <!-- Universal confirmation dialog template-y thing -->
     <p:confirmDialog global="true"
                      responsive="true"
                      resizable="true"
