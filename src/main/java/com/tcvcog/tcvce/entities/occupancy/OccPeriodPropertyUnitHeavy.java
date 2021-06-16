@@ -67,6 +67,9 @@ public class OccPeriodPropertyUnitHeavy
         this.notes = opLight.notes;
         
         this.active = opLight.active;
+
+        this.lastUpdatedBy = opLight.lastUpdatedBy;
+        this.lastUpdatedTS = opLight.lastUpdatedTS;
     }
 //
 //    /**

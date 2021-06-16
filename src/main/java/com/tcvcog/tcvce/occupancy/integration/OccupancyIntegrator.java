@@ -335,7 +335,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 + "       typecertifiedby_userid, typecertifiedts, startdate, startdatecertifiedby_userid, \n"
                 + "       startdatecertifiedts, enddate, enddatecertifiedby_userid, enddatecterifiedts, \n"
                 + "       manager_userid, authorizationts, authorizedby_userid, overrideperiodtypeconfig, \n"
-                + "       notes, createdby_userid, active \n"
+                + "       notes, createdby_userid, active, lastupdatedby_userid, lastupdatedts \n"
                 + "  FROM public.occperiod WHERE periodid=?;";
 
         Connection con = getPostgresCon();
@@ -411,6 +411,14 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
         
         op.setActive(rs.getBoolean("active"));
+
+        if (rs.getInt("lastupdatedby_userid") != 0) {
+            op.setLastUpdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+        }
+
+        if (rs.getTimestamp("lastupdatedts") != null) {
+            op.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+        }
 
         return op;
     }
@@ -718,7 +726,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 + "            typecertifiedby_userid, typecertifiedts, startdate, startdatecertifiedby_userid, \n"
                 + "            startdatecertifiedts, enddate, enddatecertifiedby_userid, enddatecterifiedts, \n"
                 + "            manager_userid, authorizationts, authorizedby_userid, overrideperiodtypeconfig, \n"
-                + "            notes, createdby_userid, active)\n"
+                + "            notes, createdby_userid, active, lastupdatedby_userid, lastupdatedts)\n"
                 + "    VALUES (DEFAULT, ?, ?, now(), ?, \n"
                 + "            ?, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
@@ -815,6 +823,12 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             
             stmt.setBoolean(18, period.isActive());
 
+            if (period.getLastUpdatedBy() != null) {
+                stmt.setInt(19, period.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(19, java.sql.Types.NULL);
+            }
+
             stmt.execute();
 
             String lastIDNumSQL = "SELECT currval('occperiodid_seq'::regclass)";
@@ -847,7 +861,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 + "       startdatecertifiedby_userid=?, startdatecertifiedts=?, enddate=?, \n"
                 + "       enddatecertifiedby_userid=?, enddatecterifiedts=?, manager_userid=?, \n"
                 + "       authorizationts=?, authorizedby_userid=?, overrideperiodtypeconfig=?, \n"
-                + "       notes=?, createdby_userid=?, active=? \n"
+                + "       notes=?, createdby_userid=?, active=?, lastupdatedby_userid=?, lastupdatedts=now() \n"
                 + " WHERE periodid=?;";
         ResultSet rs = null;
         Connection con = null;
@@ -937,7 +951,13 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
             stmt.setBoolean(18, period.isActive());
 
-            stmt.setInt(19, period.getPeriodID());
+            if(period.getLastUpdatedBy() != null){
+                stmt.setInt(19, period.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(19, java.sql.Types.NULL);
+            }
+
+            stmt.setInt(20, period.getPeriodID());
 
             stmt.executeUpdate();
 

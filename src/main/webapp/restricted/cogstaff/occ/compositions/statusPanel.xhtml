@@ -7,7 +7,8 @@
              toggleable="true"
              widgetVar="occperiod-status-panel-var"
              collapsed="false"
-             header="Occupancy Period Status | ID: #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}">
+             header="Occupancy Period Status | ID: #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}
+             | last updated: #{occPeriodSearchWorkflowBB.getPrettyDateNoTime(occPeriodSearchWorkflowBB.currentOccPeriod.lastUpdatedTS)}">
 
         <h:form id="occperiod-status-form">
             <!-- Manager -->
@@ -146,7 +147,7 @@
                 </div>
             </div>
 
-            <!-- Created by -->
+            <!-- Created by and at fields -->
             <div class="ui-g data_container_nested_restrict">
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                     <div class="restrict-data-field-label-inline">
@@ -156,23 +157,10 @@
                     </div>
                     <div class="restrict-data-field-value-inline">
                         <h:outputText value="#{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.person.firstName}
-                                                              #{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.person.lastName}"/>
+                                                  #{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.person.lastName}
+                                                  (#{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.username})"/>
                         <br/>
-                        <h:outputText value="(#{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.username})"/>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Created at -->
-            <div class="ui-g data_container_nested_restrict">
-                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-                    <div class="restrict-data-field-label-inline">
-                        <p:outputLabel>
-                            <h:outputText value="Created at"/>
-                        </p:outputLabel>
-                    </div>
-                    <div class="restrict-data-field-value-inline">
-                        <h:outputText value="#{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.createdTS)}"/>
+                        <h:outputText value="at #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.createdTS)}"/>
                     </div>
                 </div>
             </div>
@@ -209,7 +197,7 @@
                         </div>
                     </div>
                     <div class="restrict-data-field-value-vertical">
-                        <h:outputText id="seloccperiod-sdate-it" value="#{occPeriodSearchWorkflowBB.currentOccPeriod.startDatePrettyNoTime}"/>
+                        <h:outputText id="seloccperiod-sdate-it" value="#{occPeriodSearchWorkflowBB.currentOccPeriod.startDatePretty}"/>
                     </div>
                     <div class="restrict-data-field-value-vertical">
                         <h:panelGroup id="occperiod-startdate-lockunlock-group">
@@ -266,7 +254,7 @@
                     </div>
                     <div class="restrict-data-field-value-vertical">
                         <h:outputText id="seloccperiod-edate-it"
-                                      value="#{occPeriodSearchWorkflowBB.currentOccPeriod.endDatePrettyNoTime}"/>
+                                      value="#{occPeriodSearchWorkflowBB.currentOccPeriod.endDatePretty}"/>
                     </div>
                     <div class="restrict-data-field-value-vertical">
                         <h:panelGroup id="occperiod-enddate-lockunlock-group">

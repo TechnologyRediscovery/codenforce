@@ -9,6 +9,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,8 +60,9 @@ public  class       OccPeriod
     protected String notes;
     
     protected boolean active;
-    
-    
+
+    protected User lastUpdatedBy;
+    protected LocalDateTime lastUpdatedTS;
     
     @Override
     public int compareTo(OccPeriod op) {
@@ -445,6 +447,41 @@ public  class       OccPeriod
     }
 
     /**
+     * @return the lastUpdatedBy
+     */
+    public User getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    /**
+     * @param lastUpdatedBy the lastUpdatedBy to set
+     */
+    public void setLastUpdatedBy(User lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    /**
+     * @return the lastUpdatedTS
+     */
+    public LocalDateTime getLastUpdatedTS() {
+        return lastUpdatedTS;
+    }
+
+    /**
+     * @param lastUpdatedTS the lastUpdatedTS to set
+     */
+    public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
+        this.lastUpdatedTS = lastUpdatedTS;
+    }
+
+    /**
+     * @return the lastUpdatedUtilDate
+     */
+    public java.util.Date getLastUpdatedUtilDate() {
+        return DateTimeUtil.convertUtilDate(lastUpdatedTS);
+    }
+
+    /**
      *
      * @param lst
      */
@@ -500,5 +537,4 @@ public  class       OccPeriod
     public List<EventCnF> getEventList(){
         return eventList;
     }
-
 }

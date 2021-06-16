@@ -180,7 +180,7 @@ public  class   OccPeriodSearchWorkflowBB
         return s;
     }
 
-    public void certifyOccPeriodField(ActionEvent ev) {
+    public String certifyOccPeriodField(ActionEvent ev) {
 
         OccupancyCoordinator oc = getOccupancyCoordinator();
         FacesContext context = getFacesContext();
@@ -251,6 +251,7 @@ public  class   OccPeriodSearchWorkflowBB
         }
         reloadCurrentOccPeriodDataHeavy();
 
+        return "occPeriodWorkflow";
     }
 
 
