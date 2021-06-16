@@ -12,6 +12,6 @@
 
 ![screenshot](img/upload.png)
 
-4. Navigate to your uploaded document at the TOP/BOTTOM of the Files and Photos panel, and select "edit" under the Actions column to add a title and description for your document.
+4. Navigate to your uploaded document at the bottom of the Files and Photos panel, and select "edit" under the Actions column to add a title and description for your document.
 
 ![screenshot](img/edit.png)
