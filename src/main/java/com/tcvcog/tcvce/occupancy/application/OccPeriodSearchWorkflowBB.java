@@ -40,6 +40,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -323,6 +324,17 @@ public  class   OccPeriodSearchWorkflowBB
      }
 
     /**
+     * Listener for commencement of note writing process
+     * Copied from CECaseSearchProfileBB
+     *
+     * @param ev
+     */
+    public void onCaseNoteInitButtonChange(ActionEvent ev) {
+        formNoteText = new String();
+
+    }
+
+    /**
      * Listener for requests to go view the property profile of a property associated
      * with the given case
      * largely copied from CECaseSearchProfileBB (Maybe this should be in BackingBeanUtils?)
@@ -489,6 +501,20 @@ public  class   OccPeriodSearchWorkflowBB
      * @return the currentPropertyUnit
      */
     public PropertyUnit getCurrentPropertyUnit() { return currentPropertyUnit; }
+
+    /**
+     * @return the formNoteText
+     */
+    public String getFormNoteText() {
+        return formNoteText;
+    }
+
+    /**
+     * @param formNoteText the formNoteText to set
+     */
+    public void setFormNoteText(String formNoteText) {
+        this.formNoteText = formNoteText;
+    }
 
     /**
      * @return the occPeriodList

@@ -731,8 +731,7 @@ public class CECaseSearchProfileBB
      * Listener for user requests to commit new note content to the current
      * Property
      *
-     * @param ev
-     * @return 
+     * @return
      */
     public String onCaseNoteCommitButtonChange() {
         CaseCoordinator cc = getCaseCoordinator();
@@ -749,7 +748,7 @@ public class CECaseSearchProfileBB
             cc.cecase_updateCECaseNotes(mbp, currentCase);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Succesfully appended note!", ""));
+                            "Successfully appended note!", ""));
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
