@@ -5,9 +5,8 @@
                 xmlns="http://www.w3.org/1999/xhtml">
     <p:panel id="occperiod-notes-panel"
              toggleable="true"
-             widgetVar="occperiod-status-panel-var"
+             widgetVar="occperiod-notes-panel-var"
              collapsed="false"
-             rendered="true"
              header="Notes">
 
         <h:form id="occperiod-notes-form">
@@ -19,7 +18,7 @@
                              oncomplete="PF('occperiod-note-dialog-var').show()"
                              update="occperiod-note-create-form"/>
 
-            <p:spacer height="5px" />
+            <p:spacer height="5px"/>
             <h:outputText id="occperiod-notes-ot"
                           escape="false"
                           value="#{occPeriodSearchWorkflowBB.currentOccPeriod.notes}"/>
@@ -48,7 +47,7 @@
                           height="200"/>
 
 
-            <p:spacer height="5px" />
+            <p:spacer height="5px"/>
             <p:commandButton id="occperiod-updatemetadata-button-cancel"
                              ajax="true" tabindex="27"
                              value="Cancel"
