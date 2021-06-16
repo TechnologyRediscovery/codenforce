@@ -44,7 +44,7 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy}"
                                            value="Uncertified"
-                                           update="occperiod-type-lockunlock-group occperiod-changetype-cb">
+                                           update="occperiod-status-form">
                                 <f:param name="fieldtocertify" value="occperiodtype"/>
                                 <f:param name="certifymode" value="certify"/>
                                 <p:confirm header="Confirmation" message="Are you sure you want to certify the period type?" icon="pi pi-info-circle"/>
@@ -56,7 +56,7 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy}"
                                            value="Certified"
-                                           update="occperiod-type-lockunlock-group occperiod-changetype-cb">
+                                           update="occperiod-status-form">
                                 <f:param name="fieldtocertify" value="occperiodtype"/>
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
@@ -90,7 +90,7 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}"
                                            value="Unauthorized"
-                                           update="occperiod-authorization-lockunlock-group">
+                                           update="occperiod-status-form">
                                 <f:param name="fieldtocertify" value="authorization"/>
                                 <f:param name="certifymode" value="certify"/>
                                 <p:confirm header="Confirmation" message="Are you sure you want to authorize this occupancy period?" icon="pi pi-info-circle"/>
@@ -102,7 +102,7 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}"
                                            value="Authorized"
-                                           update="occperiod-authorization-lockunlock-group">
+                                           update="occperiod-status-form">
                                 <f:param name="fieldtocertify" value="authorization"/>
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
@@ -210,7 +210,7 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy}"
                                            value="Unlocked"
-                                           update="occperiod-startdate-lockunlock-group occperiod-editstart-init-cb">
+                                           update="occperiod-status-form">
                                 <f:param name="fieldtocertify" value="startdate"/>
                                 <f:param name="certifymode" value="certify"/>
                                 <p:confirm header="Confirmation" message="Are you sure you want to lock the start date?" icon="pi pi-info-circle"/>
@@ -222,7 +222,7 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy}"
                                            value="Locked"
-                                           update="occperiod-startdate-lockunlock-group occperiod-editstart-init-cb">
+                                           update="occperiod-status-form">
                                 <f:param name="fieldtocertify" value="startdate"/>
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
@@ -267,7 +267,7 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy}"
                                            value="Unlocked"
-                                           update="occperiod-enddate-lockunlock-group occperiod-editend-init-cb">
+                                           update="occperiod-status-form">
                                 <f:param name="fieldtocertify" value="enddate"/>
                                 <f:param name="certifymode" value="certify"/>
                                 <p:confirm header="Confirmation" message="Are you sure you want to lock the end date?" icon="pi pi-info-circle"/>
@@ -279,7 +279,7 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy}"
                                            value="Locked"
-                                           update="occperiod-enddate-lockunlock-group occperiod-editend-init-cb">
+                                           update="occperiod-status-form">
                                 <f:param name="fieldtocertify" value="enddate"/>
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
