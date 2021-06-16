@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportCEARList;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.application.LegendItem;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -55,6 +56,8 @@ import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -66,6 +69,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import org.primefaces.model.charts.ChartData;
@@ -1030,9 +1035,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         QueryCECase query_opened = sc.initQuery(QueryCECaseEnum.OPENED_INDATERANGE, ua.getKeyCard());
         SearchParamsCECase spcse = query_opened.getPrimaryParams();
         spcse.setDate_startEnd_ctl(true);
-        spcse.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATIONTS);
+        spcse.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATION_DOFRECORD);
         spcse.setDate_start_val(rpt.getDate_start_val());
         spcse.setDate_end_val(rpt.getDate_end_val());
+        
         rpt.setCaseListOpenedInDateRange(cecase_assembleCECaseDataHeavyList(sc.runQuery(query_opened).getBOBResultList(), ua));
         if(rpt.getCaseListOpenedInDateRange() != null){
             System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpenedInDateRange().size());
@@ -1062,7 +1068,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
         
         List<CECase> cseList = sc.runQuery(query_active_asof).getBOBResultList();
-        System.out.println("Query: " + query_active_asof.getQueryLog());
+         System.out.println("Query: " + query_active_asof.getQueryLog());
         
         if(cseList != null && !cseList.isEmpty()){
             System.out.println("CaseCoordinator.assembleCECaseListReport: OPEN AS OF CASE LIST");
@@ -1097,10 +1103,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
         
         // BUILD BY STREET
-        
         rpt = report_ceCaseList_organizeByStreet(rpt);
-        
-        
         
         // EVENTS
         
@@ -1112,34 +1115,44 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         rpt.setEventList(sc.runQuery(query_ev).getBOBResultList());
         
         // VIOLATIONS
-        QueryCodeViolation qcv = sc.initQuery(QueryCodeViolationEnum.LOGGED_PAST30_NOV_CITMAYBE, ua.getKeyCard());
-        SearchParamsCodeViolation params = qcv.getPrimaryParams();
-        params.setDate_relativeDates_ctl(false);
-        params.setDate_start_val(rpt.getDate_start_val());
-        params.setDate_end_val(rpt.getDate_end_val());
-        rpt.setViolationsLoggedNOVDateRange(sc.runQuery(qcv).getResults());
-        
-        qcv = sc.initQuery(QueryCodeViolationEnum.COMP_PAST30, ua.getKeyCard());
-        params = qcv.getPrimaryParams();
-        params.setDate_relativeDates_ctl(false);
-        params.setDate_start_val(rpt.getDate_start_val());
-        params.setDate_end_val(rpt.getDate_end_val());
-        rpt.setViolationsLoggedComplianceDateRange(sc.runQuery(qcv).getResults());
-        
-        qcv = sc.initQuery(QueryCodeViolationEnum.CITED_PAST30, ua.getKeyCard());
-        params = qcv.getPrimaryParams();
-        params.setDate_relativeDates_ctl(false);
-        params.setDate_start_val(rpt.getDate_start_val());
-        params.setDate_end_val(rpt.getDate_end_val());
-        rpt.setViolationsCitedDateRange(sc.runQuery(qcv).getResults());
-        
+//        QueryCodeViolation qcv = sc.initQuery(QueryCodeViolationEnum.LOGGED_PAST30_NOV_CITMAYBE, ua.getKeyCard());
+//        SearchParamsCodeViolation params = qcv.getPrimaryParams();
+//        params.setDate_relativeDates_ctl(false);
+//        params.setDate_start_val(rpt.getDate_start_val());
+//        params.setDate_end_val(rpt.getDate_end_val());
+//        rpt.setViolationsLoggedNOVDateRange(sc.runQuery(qcv).getResults());
+//        
+//        qcv = sc.initQuery(QueryCodeViolationEnum.COMP_PAST30, ua.getKeyCard());
+//        params = qcv.getPrimaryParams();
+//        params.setDate_relativeDates_ctl(false);
+//        params.setDate_start_val(rpt.getDate_start_val());
+//        params.setDate_end_val(rpt.getDate_end_val());
+//        rpt.setViolationsLoggedComplianceDateRange(sc.runQuery(qcv).getResults());
+//        
+//        qcv = sc.initQuery(QueryCodeViolationEnum.CITED_PAST30, ua.getKeyCard());
+//        params = qcv.getPrimaryParams();
+//        params.setDate_relativeDates_ctl(false);
+//        params.setDate_start_val(rpt.getDate_start_val());
+//        params.setDate_end_val(rpt.getDate_end_val());
+//        rpt.setViolationsCitedDateRange(sc.runQuery(qcv).getResults());
+//        
 //        initBarViolationsPastMonth(rpt);
         initPieViols(rpt);
+        initPieEnforcement(rpt);
+        initPieCitation(rpt);
+        initPieClosure(rpt);
+
         
         return rpt;
         
     }
     
+    /**
+     * Internal logic for taking apart case lists and turning them into street-categorized
+     * maps
+     * @param rptCseList
+     * @return the inputted report config object with its street container list assembled
+     */
     private ReportConfigCECaseList report_ceCaseList_organizeByStreet(ReportConfigCECaseList rptCseList){
         
         if(rptCseList != null){
@@ -1197,16 +1210,18 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 } // close null/emtpy check
             } // close for over enum vals
             
-            
             report_ceCaseList_removeDupsByStreet(streetCaseMap);
             rptCseList.setStreetSCC(streetCaseMap);
             rptCseList.assembleStreetList();
-
+            
+        
         } // close param null check
         
         return rptCseList;
         
     }
+    
+    
     
     /**
      * Removes cases which were opened and closed in the same period
@@ -1235,32 +1250,243 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         ChartData pieData = new ChartData();
         
         PieChartDataSet dataSet = new PieChartDataSet();
-        List<Number> propValues = new ArrayList<>();
+        List<Number> violationCounts = new ArrayList<>();
         
-        propValues.add(rpt.getViolationsLoggedNOVDateRange().size());
-        propValues.add(rpt.getViolationsLoggedComplianceDateRange().size());
-        propValues.add(rpt.getViolationsCitedDateRange().size());
+        List<CodeViolation> vl = new ArrayList<>();
+        for(CECaseDataHeavy cdh: rpt.assembleFullCaseLiset()){
+            vl.addAll(cdh.assembleViolationList(ViewOptionsActiveListsEnum.VIEW_ACTIVE));
+        }
         
-        dataSet.setData(propValues);
+        // build our count map
+        Map<ViolationStatusEnum, Integer> violMap = new HashMap<>();
+        violMap.put(ViolationStatusEnum.RESOLVED, 0);
+        violMap.put(ViolationStatusEnum.UNRESOLVED_WITHINCOMPTIMEFRAME, 0);
+        violMap.put(ViolationStatusEnum.UNRESOLVED_EXPIREDCOMPLIANCETIMEFRAME, 0);
+        violMap.put(ViolationStatusEnum.UNRESOLVED_CITED, 0);
+        violMap.put(ViolationStatusEnum.NULLIFIED, 0);
         
+        for(CodeViolation cv: vl){
+            Integer catCount = violMap.get(cv.getStatus());
+            catCount += 1;
+            violMap.put(cv.getStatus(), catCount);
+        }
+        
+        Set<ViolationStatusEnum> keySet = violMap.keySet();
         List<String> pieColors = new ArrayList<>();
-        pieColors.add("rgb(200,100,33)");
-        pieColors.add("rgb(100,0,33)");
-        pieColors.add("rgb(20,40,233)");
+        List<LegendItem> legend = new ArrayList<>();
+
+        SystemCoordinator sc = getSystemCoordinator();
+        
+        for(ViolationStatusEnum vse: keySet){
+            Integer i = violMap.get(vse);
+            violationCounts.add(i);
+            String color = sc.generateRandomRGBColor();
+            pieColors.add(color);
+            LegendItem li = new LegendItem();
+            li.setColorRGBString(color);
+            li.setValue(i);
+            li.setTitle(vse.getLabel());
+            legend.add(li);
+            
+        }
+        
+        rpt.setPieViolLegend(legend);
+        dataSet.setData(violationCounts);
         dataSet.setBackgroundColor(pieColors);
-        
         pieData.addChartDataSet(dataSet);
-        List<String> labels = new ArrayList<>();
-        labels.add("New Violations");
-        labels.add("Compliance");
-        labels.add("Cited");
-        
-        pieData.setLabels(labels);
         rpt.getPieViol().setData(pieData);
     }
-    
-    
-      private void initBarViolationsPastMonth(ReportConfigCECaseList rpt){
+      
+      
+    /**
+     * Builds a pie chart about case enforcement status
+     * @param rpt 
+     */
+      private void initPieEnforcement(ReportConfigCECaseList rpt){
+          
+        if(rpt != null){
+            
+            rpt.setPieEnforcement(new PieChartModel());
+            ChartData pieData = new ChartData();
+
+            PieChartDataSet dataSet = new PieChartDataSet();
+            List<Number> enfStatusNumList = new ArrayList<>();
+
+            int within = 0;
+            int expired = 0;
+
+            for(CECaseDataHeavy cse: rpt.assembleNonClosedCaseList()){
+                if(cse.getStatusBundle().getPhase().getCaseStage() == CaseStageEnum.Enforcement){
+                    if(cse.getStatusBundle().getPhase() == CasePhaseEnum.InsideComplianceWindow){
+                        within++;
+                    }
+                    if(cse.getStatusBundle().getPhase() == CasePhaseEnum.TimeframeExpiredNotCited){
+                        expired++;
+                    }
+                }
+            }
+
+            enfStatusNumList.add(within);
+            enfStatusNumList.add(expired);
+
+            dataSet.setData(enfStatusNumList);
+
+            List<String> pieColors = new ArrayList<>();
+            pieColors.add("rgb(200,100,33)");
+            pieColors.add("rgb(100,0,33)");
+            dataSet.setBackgroundColor(pieColors);
+
+            pieData.addChartDataSet(dataSet);
+            List<String> labels = new ArrayList<>();
+            labels.add("Within compliance timeframe");
+            labels.add("Expired compliance timeframe");
+
+//            pieData.setLabels(labels);
+            rpt.getPieEnforcement().setData(pieData);
+        }
+    }
+      
+      
+    /**
+     * Builds a pie chart about citations
+     * @param rpt 
+     */
+      private void initPieCitation(ReportConfigCECaseList rpt){
+        if(rpt != null){
+
+            rpt.setPieCitation(new PieChartModel());
+            ChartData pieData = new ChartData();
+
+            PieChartDataSet dataSet = new PieChartDataSet();
+            List<Number> statusCounts = new ArrayList<>();
+            
+            List<CECaseDataHeavy> nccl = rpt.assembleNonClosedCaseList();
+            List<Citation> citl = new ArrayList<>();
+            for(CECaseDataHeavy cse: nccl){
+                citl.addAll(cse.assembleCitationListNonDrafts());
+            }
+            
+            rpt.setCitationList(citl);
+           
+            Map<String, Integer> citStatusMap = new HashMap<>();
+
+            // COUNT BY Citation status
+            if(!citl.isEmpty()){
+                for(Citation cit: citl){
+                    String statTitle = cit.getStatus().getStatusTitle();
+                    if(citStatusMap.containsKey(statTitle)){
+                        Integer statCount = citStatusMap.get(statTitle) + 1;
+                        citStatusMap.put(statTitle, statCount);
+                    } else {
+                        citStatusMap.put(statTitle, 1);
+                    }
+                }
+            }
+
+            Set<String> keySet = citStatusMap.keySet();
+
+            List<String> pieColors = new ArrayList<>();
+            List<LegendItem> legend = new ArrayList<>();
+
+            SystemCoordinator sc = getSystemCoordinator();
+
+            for(String k: keySet){
+                Integer i = citStatusMap.get(k);
+                statusCounts.add(i);
+                String color = sc.generateRandomRGBColor();
+                pieColors.add(color);
+                LegendItem li = new LegendItem();
+                li.setColorRGBString(color);
+                li.setValue(i);
+                li.setTitle(k);
+                legend.add(li);
+
+            }
+            rpt.setPieCitationLegend(legend);
+            dataSet.setData(statusCounts);
+            dataSet.setBackgroundColor(pieColors);
+            pieData.addChartDataSet(dataSet);
+            rpt.getPieCitation().setData(pieData);
+        }
+    }
+      
+      
+    /**
+     * Builds a pie chart about case closures
+     * @param rpt 
+     */
+      private void initPieClosure(ReportConfigCECaseList rpt){
+        rpt.setPieClosure(new PieChartModel());
+        ChartData pieData = new ChartData();
+        
+        PieChartDataSet dataSet = new PieChartDataSet();
+        List<Number> closingEventCountList = new ArrayList<>();
+        
+        List<EventCnF> evList = new ArrayList<>();
+        
+        // GET ONLY CLOSING EVENTS
+        if(rpt.getCaseListClosedInDateRange() != null && !rpt.getCaseListClosedInDateRange().isEmpty()){
+            for(CECaseDataHeavy cse: rpt.getCaseListClosedInDateRange()){
+                List<EventCnF> evl = cse.getEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ALL);
+                if(!evl.isEmpty()){
+                    for(EventCnF ev: evl){
+                        if(ev.getCategory().getEventType() == EventType.Closing){
+                            evList.add(ev);
+                            break; // only add the first closing event encountered
+                        }
+                    }
+                }
+            }
+        }
+        
+        Map<String, Integer> closeEventMap = new HashMap<>();
+        
+        // COUNT BY CLOSE EVENT CATEGORY TITLE
+        if(!evList.isEmpty()){
+            for(EventCnF ce: evList){
+                if(closeEventMap.containsKey(ce.getCategory().getEventCategoryTitle())){
+                    Integer catCount = closeEventMap.get(ce.getCategory().getEventCategoryTitle()) + 1;
+                    closeEventMap.put(ce.getCategory().getEventCategoryTitle(), catCount);
+                } else {
+                    closeEventMap.put(ce.getCategory().getEventCategoryTitle(), 1);
+                }
+            }
+        }
+        
+        Set<String> keySet = closeEventMap.keySet();
+        
+        List<String> pieColors = new ArrayList<>();
+        List<LegendItem> legend = new ArrayList<>();
+        
+        SystemCoordinator sc = getSystemCoordinator();
+        
+        for(String k: keySet){
+            Integer i = closeEventMap.get(k);
+            closingEventCountList.add(i);
+            String color = sc.generateRandomRGBColor();
+            pieColors.add(color);
+            LegendItem li = new LegendItem();
+            li.setColorRGBString(color);
+            li.setValue(i);
+            li.setTitle(k);
+            legend.add(li);
+            
+        }
+        
+        rpt.setPieClosureLegend(legend);
+        
+        // Inject into our pie
+        dataSet.setData(closingEventCountList);
+        dataSet.setBackgroundColor(pieColors);
+        pieData.addChartDataSet(dataSet);
+        rpt.getPieClosure().setData(pieData);
+    }
+      
+      /**
+       * In-process logic for violations: Horizontal cannot be stacked?
+       * @param rpt 
+       */
+    private void initBarViolationsPastMonth(ReportConfigCECaseList rpt){
           
           
           HorizontalBarChartModel hbcm = new HorizontalBarChartModel();
@@ -1344,7 +1570,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         CECaseDataHeavy c = rptCse.getCse();
 
         List<EventCnF> evList = new ArrayList<>();
-        Iterator<EventCnF> iter = c.getEventListMaster().iterator();
+        Iterator<EventCnF> iter = c.getEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ALL).iterator();
         while (iter.hasNext()) {
             EventCnF ev = iter.next();
 

@@ -81,7 +81,6 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setInt(1, blobid);
             rs = stmt.executeQuery();
             while(rs.next()){
-                System.out.println("BlobIntegrator.getBlobLight: | retrieving blobID "  + blobid);
                 blob = generateBlobLight(rs);
             }
             

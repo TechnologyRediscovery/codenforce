@@ -5,10 +5,10 @@
  */
 package com.tcvcog.tcvce.entities.reports;
 
-import com.sun.java.swing.plaf.windows.WindowsTreeUI;
+import com.tcvcog.tcvce.application.LegendItem;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CodeViolationPropCECaseHeavy;
-import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryBacked;
@@ -22,7 +22,7 @@ import org.primefaces.model.charts.pie.PieChartModel;
 
 /**
  *
- * @author sylvia
+ * @author Ellen Bascomb of Apartment 31Y
  */
 public class ReportConfigCECaseList 
         extends Report 
@@ -47,6 +47,8 @@ public class ReportConfigCECaseList
     private List<CECaseDataHeavy> caseListOpenAsOfDateEnd;
     private List<CECaseDataHeavy> caseListClosedInDateRange;
     
+    protected List<Citation> citationList;
+    
     private List<EventCnFPropUnitCasePeriodHeavy> eventList;
     
     // VIOLATIONS
@@ -57,15 +59,19 @@ public class ReportConfigCECaseList
     private HorizontalBarChartModel barViolationsReport;
     
     private PieChartModel pieViol;
+    protected List<LegendItem> pieViolLegend;
+    private PieChartModel pieEnforcement;
+    protected List<LegendItem> pieEnforcementLegend;
+    private PieChartModel pieCitation;
+    protected List<LegendItem> pieCitationLegend;
+    private PieChartModel pieClosure;
+    protected List<LegendItem> pieClosureLegend;
+    
     // Metrics
     private double averageAgeOfCasesClosed;
     private double averageAgeOfCasesOpenAsOfReportEndDate;
     
-    
-    
     public void assembleStreetList(){
-        
-        
         if(streetSCC != null && !streetSCC.isEmpty()){
             streetContainerList = new ArrayList<>();
             streetContainerList.addAll(streetSCC.values());
@@ -73,6 +79,41 @@ public class ReportConfigCECaseList
             Collections.reverse(streetContainerList);
             
         }
+    }
+    
+    /**
+     * Collapses the opened and open as of lists
+     * @return combined list
+     */
+    public List<CECaseDataHeavy> assembleNonClosedCaseList(){
+        List<CECaseDataHeavy> ncl = new ArrayList<>();
+        if(caseListOpenedInDateRange != null && !caseListOpenedInDateRange.isEmpty()){
+            ncl.addAll(caseListOpenedInDateRange);
+        }
+        if(caseListOpenAsOfDateEnd != null && !caseListOpenAsOfDateEnd.isEmpty()){
+            ncl.addAll(caseListOpenAsOfDateEnd);
+        }
+        
+        return ncl;
+        
+    }
+    
+    /**
+     * Convenience method for pulling all non-closed cases and all closed cases
+     * and feeding them to caller
+     * 
+     * Should produce the same result as combining opened, continuing, and closed
+     * case lists. 
+     * 
+     * @return 
+     */
+    public List<CECaseDataHeavy> assembleFullCaseLiset(){
+        List<CECaseDataHeavy> cl = new ArrayList<>();
+        cl.addAll(assembleNonClosedCaseList());
+        if(caseListClosedInDateRange != null && !caseListClosedInDateRange.isEmpty()){
+            cl.addAll(caseListClosedInDateRange);
+        }
+        return cl;
     }
 
     /**
@@ -363,6 +404,118 @@ public class ReportConfigCECaseList
      */
     public void setStreetSCC(Map<String, ReportCECaseListStreetCECaseContainer> streetSCC) {
         this.streetSCC = streetSCC;
+    }
+
+    /**
+     * @return the pieEnforcement
+     */
+    public PieChartModel getPieEnforcement() {
+        return pieEnforcement;
+    }
+
+    /**
+     * @return the pieCitation
+     */
+    public PieChartModel getPieCitation() {
+        return pieCitation;
+    }
+
+    /**
+     * @return the pieClosure
+     */
+    public PieChartModel getPieClosure() {
+        return pieClosure;
+    }
+
+    /**
+     * @param pieEnforcement the pieEnforcement to set
+     */
+    public void setPieEnforcement(PieChartModel pieEnforcement) {
+        this.pieEnforcement = pieEnforcement;
+    }
+
+    /**
+     * @param pieCitation the pieCitation to set
+     */
+    public void setPieCitation(PieChartModel pieCitation) {
+        this.pieCitation = pieCitation;
+    }
+
+    /**
+     * @param pieClosure the pieClosure to set
+     */
+    public void setPieClosure(PieChartModel pieClosure) {
+        this.pieClosure = pieClosure;
+    }
+
+    /**
+     * @return the pieViolLegend
+     */
+    public List<LegendItem> getPieViolLegend() {
+        return pieViolLegend;
+    }
+
+    /**
+     * @return the pieEnforcementLegend
+     */
+    public List<LegendItem> getPieEnforcementLegend() {
+        return pieEnforcementLegend;
+    }
+
+    /**
+     * @return the pieCitationLegend
+     */
+    public List<LegendItem> getPieCitationLegend() {
+        return pieCitationLegend;
+    }
+
+    /**
+     * @return the pieClosureLegend
+     */
+    public List<LegendItem> getPieClosureLegend() {
+        return pieClosureLegend;
+    }
+
+    /**
+     * @param pieViolLegend the pieViolLegend to set
+     */
+    public void setPieViolLegend(List<LegendItem> pieViolLegend) {
+        this.pieViolLegend = pieViolLegend;
+    }
+
+    /**
+     * @param pieEnforcementLegend the pieEnforcementLegend to set
+     */
+    public void setPieEnforcementLegend(List<LegendItem> pieEnforcementLegend) {
+        this.pieEnforcementLegend = pieEnforcementLegend;
+    }
+
+    /**
+     * @param pieCitationLegend the pieCitationLegend to set
+     */
+    public void setPieCitationLegend(List<LegendItem> pieCitationLegend) {
+        this.pieCitationLegend = pieCitationLegend;
+    }
+
+    /**
+     * @param pieClosureLegend the pieClosureLegend to set
+     */
+    public void setPieClosureLegend(List<LegendItem> pieClosureLegend) {
+        this.pieClosureLegend = pieClosureLegend;
+    }
+
+    /**
+     * @return the citationList
+     */
+    public List<Citation> getCitationList() {
+        return citationList;
+    }
+
+    /**
+     * @param citationList the citationList to set
+     */
+    public void setCitationList(List<Citation> citationList) {
+        this.citationList = citationList;
     }
     
     

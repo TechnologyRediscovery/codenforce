@@ -28,6 +28,7 @@ public class CitationStatus extends Status {
     private boolean nonStatusEditsForbidden;
     private EventRuleAbstract phaseChangeRule;
     
+    
 
     /**
      * @return the nonStatusEditsForbidden

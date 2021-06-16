@@ -92,6 +92,206 @@
 
                         <div class="report-trailblaze-headerbox">
                             <div class="report-trailblaze-headerbox-title">
+                                <h:outputText value="Case Breakdown" />
+                            </div>
+                            <div class="report-trailblaze-headerbox-tail">
+                                <h:outputText value="I'm an invisible placeholder"/>
+                            </div>
+                        </div>
+                        
+                        <div class="ui-g data_container_nested_restrict_report">
+                            
+                            <div class="ui-g-9 ui-md-9 ui-lg-9" >
+                                
+                                <div class="report-tb-kpis">
+
+                                    <div class="report-tb-kpi-container">
+                                        <div class="ui-g">
+                                            <div class="ui-g-4 ui-md-4 ui-lg-4" >
+                                                <div class="report-tb-kpi-icon">
+                                                      <div class="inline-icon">
+
+                                                            <i class="material-icons">
+                                                                <h:outputText value="location_city"/>
+                                                            </i>
+                                                        </div>
+
+                                                </div>
+                                                <div class="report-tb-kpi-title">
+                                                    Investigation
+                                                </div>
+                                                <div class="report-tb-kpi-value">
+                                                    32
+                                                </div>
+                                                
+                                                
+                                                
+                                            </div>
+                                            <div class="ui-g-8 ui-md-8 ui-lg-8" >
+                                                <p:pieChart id="pie-enforcement"
+                                                            model="#{reportingBB.reportCECaseList.pieEnforcement}" />
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                    
+                                    <div class="report-tb-kpi-container">
+                                        <div class="ui-g">
+                                            <div class="ui-g-4 ui-md-4 ui-lg-4" >
+                                                
+                                                <div class="report-kpi-aggregate-container">
+
+                                                    <div class="report-tb-kpi-icon">
+                                                        <div class="inline-icon">
+                                                            <i class="material-icons">
+                                                                <h:outputText value="location_city"/>
+                                                            </i>
+                                                        </div>
+
+                                                        <div class="report-tb-kpi-title">
+                                                            <h:outputText value="Citations" />
+                                                        </div>
+                                                        <div class="report-tb-kpi-value"
+                                                             style="float:right;">
+                                                            <h:outputText value="#{reportingBB.reportCECaseList.citationList.size()}" />
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="report-legend-title">
+                                                        <h:outputText value="legend"/>
+                                                    </div>
+                                                    <div class="report-legend-container">
+                                                    
+                                                        <ui:repeat value="#{reportingBB.reportCECaseList.pieCitationLegend}" 
+                                                               var="liclose">
+                                                            <div class="report-legend-item"
+                                                                 style="background-color: #{liclose.colorRGBString}">
+                                                                <div class="report-legend-title">
+                                                                    <h:outputText value="#{liclose.title}" />
+                                                                </div>
+                                                                <div class="report-legend-count">
+                                                                    <h:outputText value="#{liclose.value}" />
+                                                                </div>
+                                                                
+                                                                <div class="report-legend-perc">
+                                                                    <h:outputText value="#{liclose.percent}" />
+                                                                </div>
+                                                            </div>
+                                                        </ui:repeat>
+                                                        
+                                                    </div>
+                                                </div>
+                                                
+                                            </div>
+                                            <div class="ui-g-8 ui-md-8 ui-lg-8" >
+                                                <div class="report-pie-title">
+                                                    <h:outputText value="Citation Status" />
+                                                </div>
+                                                <p:pieChart id="pie-citation"
+                                                            model="#{reportingBB.reportCECaseList.pieCitation}" />
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                    <div class="report-tb-kpi-container">
+                                        <div class="ui-g">
+                                            <div class="ui-g-4 ui-md-4 ui-lg-4" >
+                                                <div class="report-tb-kpi-icon">
+                                                      <div class="inline-icon">
+
+                                                            <i class="material-icons">
+                                                                <h:outputText value="location_city"/>
+                                                            </i>
+                                                        </div>
+
+                                                </div>
+                                                <div class="report-tb-kpi-title">
+                                                    Citation
+                                                </div>
+                                                <div class="report-tb-kpi-value">
+                                                    18
+                                                </div>
+                                            </div>
+                                            <div class="ui-g-8 ui-md-8 ui-lg-8" >
+                                              
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="report-tb-kpi-container">
+                                        <div class="ui-g">
+                                            <div class="ui-g-4 ui-md-4 ui-lg-4" >
+                                                
+                                                <div class="report-kpi-aggregate-container">
+
+                                                    <div class="report-tb-kpi-icon">
+                                                        <div class="inline-icon">
+                                                            <i class="material-icons">
+                                                                <h:outputText value="location_city"/>
+                                                            </i>
+                                                        </div>
+
+                                                        <div class="report-tb-kpi-title">
+                                                            <h:outputText value="Closed" />
+                                                        </div>
+                                                        <div class="report-tb-kpi-value"
+                                                             style="float:right;">
+                                                            <h:outputText value="#{reportingBB.reportCECaseList.caseListClosedInDateRange.size()}" />
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="report-legend-title">
+                                                        <h:outputText value="legend"/>
+                                                    </div>
+                                                    <div class="report-legend-container">
+                                                    
+                                                        <ui:repeat value="#{reportingBB.reportCECaseList.pieClosureLegend}" 
+                                                               var="liclose">
+                                                            <div class="report-legend-item"
+                                                                 style="background-color: #{liclose.colorRGBString}">
+                                                                <div class="report-legend-title">
+                                                                    <h:outputText value="#{liclose.title}" />
+                                                                </div>
+                                                                <div class="report-legend-count">
+                                                                    <h:outputText value="#{liclose.value}" />
+                                                                </div>
+                                                                
+                                                                <div class="report-legend-perc">
+                                                                    <h:outputText value="#{liclose.percent}" />
+                                                                </div>
+                                                            </div>
+                                                        </ui:repeat>
+                                                        
+                                                    </div>
+                                                </div>
+                                                
+                                            </div>
+                                            <div class="ui-g-8 ui-md-8 ui-lg-8" >
+                                                <div class="report-pie-title">
+                                                    <h:outputText value="Closure Pathways" />
+                                                </div>
+                                                <p:pieChart id="pie-closure"
+                                                            model="#{reportingBB.reportCECaseList.pieClosure}" />
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                        
+
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="report-trailblaze-headerbox">
+                            <div class="report-trailblaze-headerbox-title">
                                 <h:outputText value="Violations" />
                             </div>
                             <div class="report-trailblaze-headerbox-tail">
@@ -105,11 +305,9 @@
 
 
                                 <h:form id="cselistreport-bar-violations-form">
-                                    <ui:remove>
                                         
                                     <p:pieChart id="pie-violations"
                                                 model="#{reportingBB.reportCECaseList.pieViol}" />
-                                    </ui:remove>
 
                                 </h:form>
 
@@ -161,7 +359,42 @@
 
                         <div class="report-trailblaze-headerbox">
                             <div class="report-trailblaze-headerbox-title">
-                                <h:outputText value="Testing" />
+                                <h:outputText value="Non closed list" />
+                            </div>
+                            <div class="report-trailblaze-headerbox-tail">
+                                <h:outputText value=" text"/>
+                            </div>
+                        </div>
+                        
+                        
+                        <ui:repeat id="cases-nonclosed-uir"
+                                   value="#{reportingBB.reportCECaseList.assembleNonClosedCaseList()}"
+                                   var="cseoaode">
+                            <h:outputText value="ID: #{cseoaode.caseID} | #{cseoaode.caseName} | #{cseoaode.property.address}" />
+                            <br/>
+                        </ui:repeat>
+                        
+
+                        <div class="report-trailblaze-headerbox">
+                            <div class="report-trailblaze-headerbox-title">
+                                <h:outputText value="Opened" />
+                            </div>
+                            <div class="report-trailblaze-headerbox-tail">
+                                <h:outputText value=" text"/>
+                            </div>
+                        </div>
+                        
+                        
+                        <ui:repeat id="cases-opened-uir"
+                                   value="#{reportingBB.reportCECaseList.caseListOpenedInDateRange}"
+                                   var="cseoaode">
+                            <h:outputText value="ID: #{cseoaode.caseID} | #{cseoaode.caseName} | #{cseoaode.property.address}" />
+                            <br/>
+                        </ui:repeat>
+
+                        <div class="report-trailblaze-headerbox">
+                            <div class="report-trailblaze-headerbox-title">
+                                <h:outputText value="Continuing" />
                             </div>
                             <div class="report-trailblaze-headerbox-tail">
                                 <h:outputText value=" text"/>

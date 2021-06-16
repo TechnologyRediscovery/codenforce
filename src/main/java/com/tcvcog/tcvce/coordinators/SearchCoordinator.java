@@ -650,13 +650,17 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
+    /**
+     * Debugging only
+     * @param q 
+     */
     private void logQueryRun(Query q){
-        System.out.println("****** QUERY RESULT ******");
-        if(q.getBOBResultList() != null){
-            System.out.println("SearchCoordinator.logQueryRun | result size: " + q.getBOBResultList().size());
-        }
-        System.out.print("Query type: ");
-        System.out.println(q.getClass().getTypeName());
+//        System.out.println("****** QUERY RESULT ******");
+//        if(q.getBOBResultList() != null){
+//            System.out.println("SearchCoordinator.logQueryRun | result size: " + q.getBOBResultList().size());
+//        }
+//        System.out.print("Query type: ");
+//        System.out.println(q.getClass().getTypeName());
         
     }
     

@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import javax.annotation.PostConstruct;
 
 /**
@@ -247,6 +248,31 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         is.setClassList(classListFinal);
         return is;
     }
+    
+    /**
+     * Creates a random rbg color in the form
+     * rgb(xxx,xxx,xxx)
+     * @return 
+     */
+    public String generateRandomRGBColor(){
+         
+        Random r = new Random();
+        int red = r.nextInt(256);
+            int green = r.nextInt(256);
+            int blue = r.nextInt(256);
+            StringBuilder sb = new StringBuilder();
+            sb.append("rgb(");
+            sb.append(red);
+            sb.append(",");
+            sb.append(green);
+            sb.append(",");
+            sb.append(blue);
+            sb.append(")");
+            return sb.toString();
+        
+        
+    }
+    
 
     /**
      * Builds a complete list of BOb sources for drop downs

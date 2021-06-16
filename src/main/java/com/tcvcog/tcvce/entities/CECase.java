@@ -271,6 +271,26 @@ public class        CECase
         }
         return dispCits;
     }
+    
+    /**
+     * Sorts through this case's citations and returns only those
+     * not in draft state
+     * @return 
+     */
+    public List<Citation> assembleCitationListNonDrafts(){
+        List<Citation> citl = new ArrayList<>();
+        if(citationList != null && !citationList.isEmpty()){
+            System.out.println("CECase.assembleCitationListNonDraft: list size" + citationList.size());
+            for(Citation cit: citationList){
+                // look for citations which are not in draft state
+                if(cit.getStatus().isNonStatusEditsForbidden()){
+                    citl.add(cit);
+                    System.out.println("CECase.assembleCitationListNonDraft: found non-draft citation ID " + cit.getCitationID());
+                }
+            }
+        }
+        return citl;
+    }
 
    
     
@@ -706,10 +726,6 @@ public class        CECase
     }
 
    
-    public List<EventCnF> getEventListMaster() {
-        return eventListMaster;
-    }
-
     @Override
     public void setEventList(List<EventCnF> eventList) {
         this.eventList = eventList;

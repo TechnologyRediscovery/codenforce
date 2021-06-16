@@ -18,7 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities;
 
 /**
- *
+ * The master enum for code enforcement case status
  * @author ellen bascomb of apt 31y
  */
 public enum CasePhaseEnum {
