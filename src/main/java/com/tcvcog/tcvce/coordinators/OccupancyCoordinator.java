@@ -447,20 +447,32 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @throws BObStatusException
      * @throws IntegrationException
      */
-    public void authorizeOccPeriod(OccPeriod period, UserAuthorized u) throws AuthorizationException, BObStatusException, IntegrationException {
+    public void toggleOccPeriodAuthorization(OccPeriod period, UserAuthorized u) throws AuthorizationException, BObStatusException, IntegrationException {
         OccupancyIntegrator oi = getOccupancyIntegrator();
         if (u.getKeyCard().isHasEnfOfficialPermissions()) {
             // TODO: Figure out occupancy period status and authorization permission
 
-            if (true) {
-                period.setAuthorizedBy(u);
-                period.setAuthorizedTS(LocalDateTime.now());
-                oi.updateOccPeriod(period);
+            // If it is not currently authorized
+            if (period.getAuthorizedBy() == null) {
+                // And it is ready for authorization
+                if (period.getEndDateCertifiedBy() != null &&
+                        period.getStartDateCertifiedBy() != null &&
+                        period.getPeriodTypeCertifiedBy() != null) {
+                    // Authorize it!
+                    period.setAuthorizedBy(u);
+                    period.setAuthorizedTS(LocalDateTime.now());
+                    oi.updateOccPeriod(period);
+                } else {
+                    throw new BObStatusException("Occupancy period is not ready for authorization");
+                }
             } else {
-                throw new BObStatusException("Occ period not ready for authorization");
+                // If it's already authorized, toggle it back to unauthorized
+                period.setAuthorizedBy(null);
+                period.setAuthorizedTS(null);
+                oi.updateOccPeriod(period);
             }
         } else {
-            throw new AuthorizationException("Users must have enforcement official permissions to authorize an occupancy period");
+            throw new AuthorizationException("Users must have enforcement official permissions to authorize or deauthorize an occupancy period");
         }
     }
     

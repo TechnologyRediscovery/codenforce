@@ -51,9 +51,9 @@ public  class       OccPeriod
     protected LocalDateTime endDate;
     protected LocalDateTime endDateCertifiedTS;
     protected User endDateCertifiedBy;
-    
-    protected LocalDateTime authorizedTS;
+
     protected User authorizedBy;
+    protected LocalDateTime authorizedTS;
     
     protected boolean overrideTypeConfig;
     
@@ -63,7 +63,53 @@ public  class       OccPeriod
 
     protected User lastUpdatedBy;
     protected LocalDateTime lastUpdatedTS;
-    
+
+    public OccPeriod() {
+    }
+
+    public OccPeriod(OccPeriod otherPeriod) {
+        copyAllValues(otherPeriod);
+    }
+
+    public void copyAllValues(OccPeriod otherPeriod) {
+        setPeriodID(otherPeriod.getPeriodID());
+        setPropertyUnitID(otherPeriod.getPropertyUnitID());
+
+        setType(otherPeriod.getType());
+
+        setGoverningInspection(otherPeriod.getGoverningInspection());
+
+        setManager(otherPeriod.getManager());
+
+        setPeriodTypeCertifiedBy(otherPeriod.getPeriodTypeCertifiedBy());
+        setPeriodTypeCertifiedTS(otherPeriod.getPeriodTypeCertifiedTS());
+        setEventList(otherPeriod.getEventList());
+
+        setSource(otherPeriod.getSource());
+        setCreatedBy(otherPeriod.getCreatedBy());
+        setCreatedTS(otherPeriod.getCreatedTS());
+
+        setStartDate(otherPeriod.getStartDate());
+        setStartDateCertifiedBy(otherPeriod.getStartDateCertifiedBy());
+        setStartDateCertifiedTS(otherPeriod.getStartDateCertifiedTS());
+
+        setEndDate(otherPeriod.getEndDate());
+        setEndDateCertifiedBy(otherPeriod.getEndDateCertifiedBy());
+        setEndDateCertifiedTS(otherPeriod.getEndDateCertifiedTS());
+
+        setAuthorizedBy(otherPeriod.getAuthorizedBy());
+        setAuthorizedTS(otherPeriod.getAuthorizedTS());
+
+        setOverrideTypeConfig(otherPeriod.isOverrideTypeConfig());
+
+        setNotes(otherPeriod.getNotes());
+
+        setActive(otherPeriod.isActive());
+
+        setLastUpdatedBy(otherPeriod.getLastUpdatedBy());
+        setLastUpdatedTS(otherPeriod.getLastUpdatedTS());
+    }
+
     @Override
     public int compareTo(OccPeriod op) {
         int c = 0;

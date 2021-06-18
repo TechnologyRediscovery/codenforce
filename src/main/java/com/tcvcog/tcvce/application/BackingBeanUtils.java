@@ -513,7 +513,7 @@ public class        BackingBeanUtils
     }
 
     
-    public String getPrettyDate(LocalDateTime d){
+    public String getPrettyDate(LocalDateTime d) {
         return DateTimeUtil.getPrettyDate(d);
     }
     

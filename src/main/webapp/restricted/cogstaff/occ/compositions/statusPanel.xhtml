@@ -11,7 +11,7 @@
              | last updated: #{occPeriodSearchWorkflowBB.getPrettyDateNoTime(occPeriodSearchWorkflowBB.currentOccPeriod.lastUpdatedTS)}">
 
         <h:form id="occperiod-status-form">
-            <!-- Manager -->
+            <!-- Period type -->
             <div class="ui-g data_container_nested_restrict">
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                     <div class="restrict-data-field-label-inline">
@@ -20,7 +20,6 @@
                         </p:outputLabel>
                         <div class="restrict-main-contents-io-link link-button">
 
-                            <!-- Removed action listener -->
                             <p:commandLink id="occperiod-changetype-cb"
                                            ajax="true"
                                            style="color:blue;"
@@ -44,7 +43,8 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy}"
                                            value="Uncertified"
-                                           update="occperiod-status-form">
+                                           update="occperiod-status-form"
+                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}">
                                 <f:param name="fieldtocertify" value="occperiodtype"/>
                                 <f:param name="certifymode" value="certify"/>
                                 <p:confirm header="Confirmation" message="Are you sure you want to certify the period type?" icon="pi pi-info-circle"/>
@@ -56,7 +56,8 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy}"
                                            value="Certified"
-                                           update="occperiod-status-form">
+                                           update="occperiod-status-form"
+                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}">
                                 <f:param name="fieldtocertify" value="occperiodtype"/>
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
@@ -87,10 +88,13 @@
                             <p:commandLink id="occperiod-authorization-lock-cb"
                                            ajax="true"
                                            style="color:blue;"
-                                           actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
+                                           actionListener="#{occPeriodSearchWorkflowBB.toggleOccPeriodAuthorization}"
                                            rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}"
                                            value="Unauthorized"
-                                           update="occperiod-status-form">
+                                           update="occperiod-status-form"
+                                           disabled="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy
+                                                        || empty occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy
+                                                        || empty occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy}">
                                 <f:param name="fieldtocertify" value="authorization"/>
                                 <f:param name="certifymode" value="certify"/>
                                 <p:confirm header="Confirmation" message="Are you sure you want to authorize this occupancy period?" icon="pi pi-info-circle"/>
@@ -99,7 +103,7 @@
                             <p:commandLink id="occperiod-authorization-unlock-cb"
                                            ajax="true"
                                            style="color:blue;"
-                                           actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
+                                           actionListener="#{occPeriodSearchWorkflowBB.toggleOccPeriodAuthorization}"
                                            rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}"
                                            value="Authorized"
                                            update="occperiod-status-form">
@@ -126,13 +130,13 @@
                         </p:outputLabel>
                         <div class="restrict-main-contents-io-link link-button">
 
-                            <!-- Removed action listener -->
                             <p:commandLink id="occperiod-changemanager-cb"
                                            ajax="true"
                                            style="color:blue;"
                                            oncomplete="PF('occperiod-changemanager-dialog-var').show()"
                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                           value="edit"/>
+                                           value="edit"
+                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}"/>
                         </div>
                     </div>
                     <div class="restrict-data-field-value-inline">
@@ -187,7 +191,6 @@
                         <h:outputLabel value="Start date"/>
                         <div class="restrict-main-contents-io-link link-button">
 
-                            <!-- removed action listener -->
                             <p:commandLink id="occperiod-editstart-init-cb"
                                            ajax="true"
                                            oncomplete="PF('occperiod-editstart-dialog-var').show()"
@@ -210,7 +213,8 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy}"
                                            value="Unlocked"
-                                           update="occperiod-status-form">
+                                           update="occperiod-status-form"
+                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}">
                                 <f:param name="fieldtocertify" value="startdate"/>
                                 <f:param name="certifymode" value="certify"/>
                                 <p:confirm header="Confirmation" message="Are you sure you want to lock the start date?" icon="pi pi-info-circle"/>
@@ -222,7 +226,8 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy}"
                                            value="Locked"
-                                           update="occperiod-status-form">
+                                           update="occperiod-status-form"
+                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}">
                                 <f:param name="fieldtocertify" value="startdate"/>
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
@@ -242,7 +247,6 @@
                         <h:outputLabel value="End date"/>
                         <div class="restrict-main-contents-io-link link-button">
 
-                            <!-- removed action listener -->
                             <p:commandLink id="occperiod-editend-init-cb"
                                            ajax="true"
                                            oncomplete="PF('occperiod-editend-dialog-var').show()"
@@ -267,7 +271,8 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy}"
                                            value="Unlocked"
-                                           update="occperiod-status-form">
+                                           update="occperiod-status-form"
+                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}">
                                 <f:param name="fieldtocertify" value="enddate"/>
                                 <f:param name="certifymode" value="certify"/>
                                 <p:confirm header="Confirmation" message="Are you sure you want to lock the end date?" icon="pi pi-info-circle"/>
@@ -279,7 +284,8 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
                                            rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy}"
                                            value="Locked"
-                                           update="occperiod-status-form">
+                                           update="occperiod-status-form"
+                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}">
                                 <f:param name="fieldtocertify" value="enddate"/>
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
@@ -377,10 +383,11 @@
                 </div>
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                     <p:commandButton id="occperiod-changetype-button"
-                                     ajax="false"
                                      value="Change type of period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
-                                     action="#{occPeriodSearchWorkflowBB.updateOccPeriodCommit}"
-                                     icon="fa fa-user"/>
+                                     icon="fa fa-user"
+                                     oncomplete="PF('occperiod-changetype-dialog-var').hide()"
+                                     update="occperiod-status-form"
+                                     actionListener="#{occPeriodSearchWorkflowBB.saveOccPeriodChanges}"/>
 
                 </div>
 
@@ -389,11 +396,10 @@
                     <div class="restrict-main-contents-io-button gray_button">
 
                         <p:commandButton id="occperiod-changetype-abort-button"
-                                         ajax="true"
                                          value="Cancel"
-                                         process="@none"
-                                         immediate="true"
-                                         icon="fa fa-stop"/>
+                                         icon="fa fa-stop"
+                                         oncomplete="PF('occperiod-changetype-dialog-var').hide()"
+                                         actionListener="#{occPeriodSearchWorkflowBB.discardOccPeriodChanges}"/>
                     </div>
                 </div>
             </div>
@@ -439,23 +445,20 @@
                 </div>
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                     <p:commandButton id="occperiod-changemanager-button"
-                                     ajax="false"
                                      value="Change manager of period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
-                                     action="#{occPeriodSearchWorkflowBB.updateOccPeriodCommit}"
-                                     icon="fa fa-user"/>
-
+                                     icon="fa fa-user"
+                                     oncomplete="PF('occperiod-changemanager-dialog-var').hide()"
+                                     update="occperiod-status-form"
+                                     actionListener="#{occPeriodSearchWorkflowBB.saveOccPeriodChanges}"/>
                 </div>
 
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
-
                     <div class="restrict-main-contents-io-button gray_button">
-
                         <p:commandButton id="occperiod-changemanager-abort-button"
-                                         ajax="true"
                                          value="Cancel"
-                                         process="@none"
-                                         immediate="true"
-                                         icon="fa fa-stop"/>
+                                         icon="fa fa-stop"
+                                         oncomplete="PF('occperiod-changemanager-dialog-var').hide()"
+                                         actionListener="#{occPeriodSearchWorkflowBB.discardOccPeriodChanges}"/>
                     </div>
                 </div>
             </div>
@@ -508,10 +511,11 @@
 
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                     <p:commandButton id="occperiod-editstart-button"
-                                     ajax="false"
                                      value="Change start date of occupancy period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
-                                     action="#{occPeriodSearchWorkflowBB.updateOccPeriodCommit}"
-                                     icon="fa fa-user"/>
+                                     icon="fa fa-user"
+                                     oncomplete="PF('occperiod-editstart-dialog-var').hide()"
+                                     update="occperiod-status-form"
+                                     actionListener="#{occPeriodSearchWorkflowBB.saveOccPeriodChanges}"/>
 
                 </div>
 
@@ -519,14 +523,11 @@
 
                     <div class="restrict-main-contents-io-button gray_button">
 
-                        <!-- Removed action listener -->
                         <p:commandButton id="occperiod-editstart-abort-button"
-                                         ajax="true"
                                          value="Cancel"
-                                         process="@none"
-                                         immediate="true"
                                          icon="fa fa-stop"
-                                         oncomplete="PF('occperiod-editstart-dialog-var').hide()"/>
+                                         oncomplete="PF('occperiod-editstart-dialog-var').hide()"
+                                         actionListener="#{occPeriodSearchWorkflowBB.discardOccPeriodChanges}"/>
                     </div>
                 </div>
             </div>
@@ -579,22 +580,20 @@
 
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                     <p:commandButton id="occperiod-editend-button"
-                                     ajax="false"
                                      value="Change end date of occupancy period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
-                                     action="#{occPeriodSearchWorkflowBB.updateOccPeriodCommit}"
-                                     icon="fa fa-user"/>
+                                     icon="fa fa-user"
+                                     oncomplete="PF('occperiod-editend-dialog-var').hide()"
+                                     update="occperiod-status-form"
+                                     actionListener="#{occPeriodSearchWorkflowBB.saveOccPeriodChanges}"/>
                 </div>
 
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                     <div class="restrict-main-contents-io-button gray_button">
-                        <!-- Removed action listener -->
                         <p:commandButton id="occperiod-editend-abort-button"
-                                         ajax="true"
                                          value="Cancel"
-                                         process="@none"
-                                         immediate="true"
                                          icon="fa fa-stop"
-                                         oncomplete="PF('occperiod-editend-dialog-var').hide()"/>
+                                         oncomplete="PF('occperiod-editend-dialog-var').hide()"
+                                         actionListener="#{occPeriodSearchWorkflowBB.discardOccPeriodChanges}"/>
                     </div>
                 </div>
             </div>
