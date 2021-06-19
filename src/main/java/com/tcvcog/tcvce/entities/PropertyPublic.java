@@ -17,7 +17,9 @@
 package com.tcvcog.tcvce.entities;
 
 /**
- *
+ * Retired approach to public info bundles
+ * 
+ * @deprecated 
  * @author sylvia
  */
 public class    PropertyPublic 

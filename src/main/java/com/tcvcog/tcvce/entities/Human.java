@@ -1,0 +1,241 @@
+/*
+ * Copyright (C) 2020 Technology Rediscovery LLC
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.tcvcog.tcvce.entities;
+
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+/**
+ *
+ * @author sylvia
+ */
+public  class   Human 
+        extends TrackedEntity
+        implements IFace_deactivatable, IFace_noteHolder{
+    
+        static final String TABLE_NAME = "human";
+    
+        protected int humanID;
+        protected String name;
+        protected LocalDate dob;
+        protected boolean under18;
+        
+        protected String jobTitle;
+        protected boolean businessEntity;
+        protected boolean multiHuman;
+        protected BOBSource source;
+        
+        protected LocalDate deceasedDate;
+        protected User deceasedBy;
+        
+        protected Integer cloneOfHumanID;
+        protected String notes;
+      
+
+    /**
+     * @return the humanID
+     */
+    public int getHumanID() {
+        return humanID;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @return the dob
+     */
+    public LocalDate getDob() {
+        return dob;
+    }
+
+    /**
+     * @return the under18
+     */
+    public boolean isUnder18() {
+        return under18;
+    }
+
+    /**
+     * @return the jobTitle
+     */
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    /**
+     * @return the businessEntity
+     */
+    public boolean isBusinessEntity() {
+        return businessEntity;
+    }
+
+    /**
+     * @return the multiHuman
+     */
+    public boolean isMultiHuman() {
+        return multiHuman;
+    }
+
+    /**
+     * @return the source
+     */
+    public BOBSource getSource() {
+        return source;
+    }
+
+ 
+    /**
+     * @return the deceasedDate
+     */
+    public LocalDate getDeceasedDate() {
+        return deceasedDate;
+    }
+
+    /**
+     * @return the deceasedBy
+     */
+    public User getDeceasedBy() {
+        return deceasedBy;
+    }
+
+   
+    /**
+     * @param humanID the humanID to set
+     */
+    public void setHumanID(int humanID) {
+        this.humanID = humanID;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @param dob the dob to set
+     */
+    public void setDob(LocalDate dob) {
+        this.dob = dob;
+    }
+
+    /**
+     * @param under18 the under18 to set
+     */
+    public void setUnder18(boolean under18) {
+        this.under18 = under18;
+    }
+
+    /**
+     * @param jobTitle the jobTitle to set
+     */
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
+    }
+
+    /**
+     * @param businessEntity the businessEntity to set
+     */
+    public void setBusinessEntity(boolean businessEntity) {
+        this.businessEntity = businessEntity;
+    }
+
+    /**
+     * @param multiHuman the multiHuman to set
+     */
+    public void setMultiHuman(boolean multiHuman) {
+        this.multiHuman = multiHuman;
+    }
+
+    /**
+     * @param source the source to set
+     */
+    public void setSource(BOBSource source) {
+        this.source = source;
+    }
+
+   
+
+    /**
+     * @param deceasedDate the deceasedDate to set
+     */
+    public void setDeceasedDate(LocalDate deceasedDate) {
+        this.deceasedDate = deceasedDate;
+    }
+
+    /**
+     * @param deceasedBy the deceasedBy to set
+     */
+    public void setDeceasedBy(User deceasedBy) {
+        this.deceasedBy = deceasedBy;
+    }
+
+  
+
+    /**
+     * @return the cloneOfHumanID
+     */
+    public Integer getCloneOfHumanID() {
+        return cloneOfHumanID;
+    }
+
+    /**
+     * @param cloneOfHumanID the cloneOfHumanID to set
+     */
+    public void setCloneOfHumanID(Integer cloneOfHumanID) {
+        this.cloneOfHumanID = cloneOfHumanID;
+    }
+
+    @Override
+    public boolean isDeactivated() {
+            return deactivatedTS != null;
+    }
+
+   
+
+    @Override
+    public int getDBKey() {
+        return humanID;
+    }
+
+    @Override
+    public String getTableName() {
+        return TABLE_NAME;
+    }
+
+    @Override
+    public String getNotes() {
+        return notes;
+    }
+
+    @Override
+    public void setNotes(String n) {
+        notes = n;
+    }
+
+        
+    
+    
+}

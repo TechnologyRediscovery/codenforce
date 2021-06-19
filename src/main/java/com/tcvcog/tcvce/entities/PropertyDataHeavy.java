@@ -38,7 +38,12 @@ public  class       PropertyDataHeavy
     
     private List<PropertyUnitDataHeavy> unitWithListsList;
     
+    /**
+     * @deprecated  replaced by Humans!
+     */
     private List<Person> personList;
+    
+    protected List<ParcelHumanLink> humans;
     
     private List<CECaseDataHeavy> propInfoCaseList;
     
@@ -61,102 +66,16 @@ public  class       PropertyDataHeavy
     public PropertyDataHeavy(Property prop, Credential cred){
         
         this.credentialSignature = cred.getSignature();
-           
-        this.propertyID = prop.getPropertyID();
-        this.muni = prop.getMuni();
-        this.muniCode = prop.getMuniCode();
-        this.parID = prop.getParID();
-        this.lotAndBlock = prop.getLotAndBlock();
-        this.address = prop.getAddress();
-
-        this.useType = prop.getUseType();      
-        this.useGroup = prop.getUseGroup();
-        this.constructionType = prop.getConstructionType();
-        this.countyCode = prop.getCountyCode();
-
-        this.notes = prop.getNotes();
-        this.address_city = prop.getAddress_city();
-        this.address_state = prop.getAddress_state();
-        this.address_zip = prop.getAddress_zip();
-
-        this.ownerCode = prop.getOwnerCode();
-        this.propclass = prop.getPropclass();
-
-        this.lastUpdatedTS = prop.getLastUpdatedTS();
-        this.lastUpdatedBy = prop.getLastUpdatedBy();
-        this.locationDescriptor = prop.getLocationDescriptor();
-
-        this.bobSource = prop.getBobSource();
-        this.unfitDateStart = prop.getUnfitDateStart();
-        this.unfitDateStop = prop.getUnfitDateStop();
-        this.unfitBy = prop.getUnfitBy();
-
-        this.abandonedDateStart = prop.getAbandonedDateStart();
-        this.abandonedDateStop = prop.getAbandonedDateStop();
-        this.abandonedBy = prop.getAbandonedBy();
-        this.vacantDateStart = prop.getVacantDateStart();
-
-        this.vacantDateStop = prop.getVacantDateStop();
-        this.vacantBy = prop.getVacantBy();
-        this.condition = prop.getCondition();
-
-        this.landBankProspect = prop.getLandBankProspect();
-        this.LandBankHeld = prop.isLandBankHeld();
-        this.active = prop.isActive();
-        this.nonAddressable = prop.isNonAddressable();
-        
-        this.creationTS = prop.getCreationTS();
+         
+        this.addresses = prop.getAddresses();
         
         
     }
     
 
     public PropertyDataHeavy(Property prop){
-        this.propertyID = prop.getPropertyID();
-        this.muni = prop.getMuni();
-        this.muniCode = prop.getMuniCode();
-        this.parID = prop.getParID();
-        this.lotAndBlock = prop.getLotAndBlock();
-        this.address = prop.getAddress();
 
-        this.useType = prop.getUseType();
-        this.useGroup = prop.getUseGroup();
-        this.constructionType = prop.getConstructionType();
-        this.countyCode = prop.getCountyCode();
-
-        this.notes = prop.getNotes();
-        this.address_city = prop.getAddress_city();
-        this.address_state = prop.getAddress_state();
-        this.address_zip = prop.getAddress_zip();
-
-        this.ownerCode = prop.getOwnerCode();
-        this.propclass = prop.getPropclass();
-
-        this.lastUpdatedTS = prop.getLastUpdatedTS();
-        this.lastUpdatedBy = prop.getLastUpdatedBy();
-        this.locationDescriptor = prop.getLocationDescriptor();
-
-        this.bobSource = prop.getBobSource();
-        this.unfitDateStart = prop.getUnfitDateStart();
-        this.unfitDateStop = prop.getUnfitDateStop();
-        this.unfitBy = prop.getUnfitBy();
-
-        this.abandonedDateStart = prop.getAbandonedDateStart();
-        this.abandonedDateStop = prop.getAbandonedDateStop();
-        this.abandonedBy = prop.getAbandonedBy();
-        this.vacantDateStart = prop.getVacantDateStart();
-
-        this.vacantDateStop = prop.getVacantDateStop();
-        this.vacantBy = prop.getVacantBy();
-        this.condition = prop.getCondition();
-
-        this.landBankProspect = prop.getLandBankProspect();
-        this.LandBankHeld = prop.isLandBankHeld();
-        this.active = prop.isActive();
-        this.nonAddressable = prop.isNonAddressable();
-        
         this.unitList = prop.getUnitList();
-        this.creationTS = prop.getCreationTS();
         
         
     }
@@ -336,6 +255,20 @@ public  class       PropertyDataHeavy
      */
     public void setExtDataList(List<PropertyExtData> extDataList) {
         this.extDataList = extDataList;
+    }
+
+    /**
+     * @return the humans
+     */
+    public List<ParcelHumanLink> getHumans() {
+        return humans;
+    }
+
+    /**
+     * @param humans the humans to set
+     */
+    public void setHumans(List<ParcelHumanLink> humans) {
+        this.humans = humans;
     }
 
 

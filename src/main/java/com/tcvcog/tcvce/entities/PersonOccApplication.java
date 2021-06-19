@@ -26,7 +26,7 @@ public class        PersonOccApplication
     
     public PersonOccApplication(Person p){
         this.personID = p.personID;
-
+        this.name = p.name;
         this.personType = p.personType;
         this.applicationPersonType = p.personType;
         this.muniCode = p.muniCode;
@@ -37,9 +37,6 @@ public class        PersonOccApplication
         this.creationTimeStamp = p.creationTimeStamp;
 
         // for backwards compatability
-
-        this.firstName = p.firstName;
-        this.lastName = p.lastName;
 
         // frist, middle initial, and last all in lastName
         this.compositeLastName = p.compositeLastName;

@@ -30,6 +30,7 @@ public class CECaseDataHeavy
     private Property property;
     private PropertyUnit propertyUnit;
     
+    protected List<CECaseHumanLink> humans;
     
     private List<Proposal> proposalList;
     private List<EventRuleImplementation> eventRuleList;
@@ -381,6 +382,17 @@ public class CECaseDataHeavy
      */
     public void setBlobList(List<BlobLight> blobList) {
         this.blobList = blobList;
+    }
+        
+    public List<CECaseHumanLink> getHumans() {
+        return humans;
+    }
+
+    /**
+     * @param humans the humans to set
+     */
+    public void setHumans(List<CECaseHumanLink> humans) {
+        this.humans = humans;
     }
 
 }
