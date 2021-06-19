@@ -14,7 +14,7 @@
                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                              value="Add New Note"
                              icon="fa fa-sticky-note-o"
-                             actionListener="#{occPeriodSearchWorkflowBB.onCaseNoteInitButtonChange}"
+                             actionListener="#{occPeriodSearchWorkflowBB.clearFormNoteText}"
                              oncomplete="PF('occperiod-note-dialog-var').show()"
                              update="occperiod-note-create-form"/>
 
@@ -40,26 +40,24 @@
         <h:form id="occperiod-note-create-form">
 
             <h:outputText styleClass="ui-label" value="Note text: (name and time automatically inserted) "/>
-            <p:textEditor id="occperiod-notes-editor"
+            <p:textEditor id="occperiod-note-editor"
                           value="#{occPeriodSearchWorkflowBB.formNoteText}"
                           required="false"
                           secure="false"
                           height="200"/>
 
-
             <p:spacer height="5px"/>
-            <p:commandButton id="occperiod-updatemetadata-button-cancel"
-                             ajax="true" tabindex="27"
+
+            <p:commandButton id="occperiod-note-button-cancel"
                              value="Cancel"
                              icon="fa fa-stop"
-                             process="@none"
-                             immediate="true"
                              onclick="PF('occperiod-note-dialog-var').hide()"/>
 
-            <p:commandButton id="occperiod-dialog-notes-button-addnote"
-                             ajax="false"
-                             action="#{occPeriodSearchWorkflowBB.onCaseNoteCommitButtonChange}"
+            <p:commandButton id="occperiod-note-button-addnote"
                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                             actionListener="#{occPeriodSearchWorkflowBB.appendOccPeriodNotes}"
+                             onclick="PF('occperiod-note-dialog-var').hide()"
+                             update="occperiod-notes-form"
                              value="Attach Note"
                              styleClass="inline-button"
                              icon="fa fa-sticky-note-o"/>

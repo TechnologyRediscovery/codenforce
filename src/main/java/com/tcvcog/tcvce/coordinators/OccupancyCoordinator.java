@@ -45,6 +45,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
+import com.tcvcog.tcvce.integration.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
@@ -55,10 +56,6 @@ import com.tcvcog.tcvce.entities.occupancy.OccSpaceType;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceTypeInspectionDirective;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
-import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.EventIntegrator;
-import com.tcvcog.tcvce.integration.PropertyIntegrator;
-import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
@@ -79,9 +76,6 @@ import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
-import com.tcvcog.tcvce.integration.BlobIntegrator;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
-import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.util.Iterator;
@@ -860,8 +854,16 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * SystemCoordinator's appendNoteBlock() method
      * @throws IntegrationException
      */
-    public void attachNoteToOccPeriod(OccPeriod period) throws IntegrationException {
+    public void attachNoteToOccPeriod(MessageBuilderParams mbp, OccPeriod period) throws BObStatusException, IntegrationException {
         OccupancyIntegrator oi = getOccupancyIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+
+        if (period == null || mbp == null) {
+            throw new BObStatusException("Cannot append if notes, occperiod, or user are null");
+        }
+
+        period.setNotes(sc.appendNoteBlock(mbp));
+        period.setLastUpdatedBy(mbp.getUser());
         oi.updateOccPeriod(period);
     }
     

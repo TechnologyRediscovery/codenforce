@@ -40,6 +40,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -175,6 +176,7 @@ public class OccPeriodSearchWorkflowBB
         return s;
     }
 
+
     public void certifyOccPeriodField(ActionEvent ev) {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         FacesContext context = getFacesContext();
@@ -243,6 +245,7 @@ public class OccPeriodSearchWorkflowBB
         }
     }
 
+
     /**
      * utility pass through method to be called when loading Occperiod advanced settings
      *
@@ -305,26 +308,46 @@ public class OccPeriodSearchWorkflowBB
 //        reloadCurrentOccPeriodDataHeavy();
     }
 
+
     /**
-     * Logic container for liasing with the OccCoor to
-     * update managers
+     * This method clears the cache of the last written note.
      *
      * @param ev
      */
-    public void updateOccPeriodManager(ActionEvent ev) {
-
-
+    public void clearFormNoteText(ActionEvent ev) {
+        formNoteText = new String();
     }
 
     /**
-     * Listener for commencement of note writing process
-     * Copied from CECaseSearchProfileBB
+     * This method goes down the coordinator stack to add a cached note
+     * (formNoteText) to the end of the occperiod's note field in the database
+     * in a structured and consistent way, while also requiring different permissions.
      *
      * @param ev
      */
-    public void onCaseNoteInitButtonChange(ActionEvent ev) {
-        formNoteText = new String();
+    public void appendOccPeriodNotes(ActionEvent ev) {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
 
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        mbp.setCred(getSessionBean().getSessUser().getKeyCard());
+        mbp.setExistingContent(currentOccPeriod.getNotes());
+        mbp.setNewMessageContent(formNoteText);
+        mbp.setHeader("Occupancy Period Note");
+        mbp.setUser(getSessionBean().getSessUser());
+
+        try {
+
+            oc.attachNoteToOccPeriod(mbp, currentOccPeriod);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully appended note!", ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Fatal error appending note; apologies!", ""));
+
+        }
     }
 
     /**

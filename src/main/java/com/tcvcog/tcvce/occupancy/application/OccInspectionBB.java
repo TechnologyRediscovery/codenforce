@@ -518,16 +518,16 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                                     getSessionBean().getSessUser().getMyCredential(),
                                     formNoteText,
                                     currentOccPeriod.getNotes()));
-        try {
-            oc.attachNoteToOccPeriod(currentOccPeriod);
-            getFacesContext().addMessage(null,
-               new FacesMessage(FacesMessage.SEVERITY_INFO,
-               "Success! Note added", ""));
-        } catch (IntegrationException ex) {
-                getFacesContext().addMessage(null,
-                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                   ex.getMessage(), ""));
-        }
+//        try {
+////            oc.attachNoteToOccPeriod(currentOccPeriod); this method changed and this file is currently abandoned
+//            getFacesContext().addMessage(null,
+//               new FacesMessage(FacesMessage.SEVERITY_INFO,
+//               "Success! Note added", ""));
+//        } catch (IntegrationException ex) {
+//                getFacesContext().addMessage(null,
+//                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                   ex.getMessage(), ""));
+//        }
     }
     
     
