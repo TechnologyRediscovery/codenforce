@@ -8,21 +8,21 @@
              widgetVar="occperiod-permits-panel-var"
              collapsed="false"
              header="Permits">
-        <h:form id="occperiod-permits-form-datatable">
+        <h:form id="occperiod-permits-form">
             <p:commandButton id="occperiod-permits-button-newpermit"
                              value="Configure new permit"
                              ajax="true"
                              process="@form"
                              actionListener="#{occInspectionBB.reports_initializeOccPermitReport}"
                              oncomplete="PF('occperiod-createpermit-occpermit-var').show()"
-                             disabled="#{empty occInspectionBB.currentOccPeriod.authorizedTS}"
+                             disabled="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedTS}"
                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                              icon="fa fa-plus"
                              update="occperiod-createpermit-occpermit-form"/>
 
             <p:spacer height="5px"/>
 
-            <p:dataTable id="occperiod-permits-datatable-permits"
+            <p:dataTable id="occperiod-permits-datatable"
                          var="permit"
                          rowKey="#{permit.permitID}"
                          value="#{occInspectionBB.currentOccPeriod.permitList}"

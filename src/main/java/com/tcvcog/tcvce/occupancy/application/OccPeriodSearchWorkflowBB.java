@@ -227,9 +227,15 @@ public class OccPeriodSearchWorkflowBB
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             oc.toggleOccPeriodAuthorization(currentOccPeriod, getSessionBean().getSessUser());
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Success! Occupancy period ID " + currentOccPeriod.getPeriodID()
-                            + " is now authorized and permits can be generated.", ""));
+            if (currentOccPeriod.getAuthorizedBy() != null) {
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Success! Occupancy period ID " + currentOccPeriod.getPeriodID()
+                                + " is now authorized and permits can be generated.", ""));
+            } else {
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Occupancy period ID " + currentOccPeriod.getPeriodID()
+                                + " has been successfully deauthorized.", ""));
+            }
         } catch (AuthorizationException | BObStatusException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
