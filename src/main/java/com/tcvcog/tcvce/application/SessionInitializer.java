@@ -594,12 +594,13 @@ public  class       SessionInitializer
         // start with default CE domain
         sb.setSessEventsPageEventDomainRequest(EventDomainEnum.CODE_ENFORCEMENT);
         
-        QueryEvent futureEvents = sc.initQuery(QueryEventEnum.MUINI_FUTURE_7DAYS, cred);
-        try {
-            sb.setQueryEventFuture7Days(sc.runQuery(futureEvents));
-        } catch (SearchException ex) {
-            System.out.println(ex);
-        }
+//        QueryEvent futureEvents = sc.initQuery(QueryEventEnum.MUINI_FUTURE_7DAYS, cred);
+//        try {
+            // TODO: Debug hanging issues
+//            sb.setQueryEventFuture7Days(sc.runQuery(futureEvents));
+//        } catch (SearchException ex) {
+//            System.out.println(ex);
+//        }
     }
 
 

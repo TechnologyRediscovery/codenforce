@@ -484,7 +484,74 @@ div.headerLink a:before, a:visited{
     
 }
 
+.report-kpi-aggregate-container{
+    
+    
+}
 
+.report-tb-kpi-icon{
+    
+    
+}
+
+.report-tb-kpi-title{
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.report-tb-kpi-value{
+    margin-bottom: 8px;
+    font-size: 1.5em;
+    
+}
+
+.report-pie-title{
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    
+}
+
+
+
+.report-legend-item{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 8px;
+}
+
+.report-legend-colorbox{
+    margin-right: 8px;
+    
+    
+}
+
+.report-legend-title{
+    margin-right: 8px;
+    font-size: 1.2em;
+    
+}
+
+.report-legend-count{
+    font-size: 1.2em;
+    
+}
+
+.report-legend-perc{
+    
+    
+}
+
+.report-icon{
+    
+    margin-right: 8px;
+}
+
+.report-pie-container{
+      display: block; 
+      width: 600px;
+}
 
 
 .cases-report-citations-2cols{
@@ -2843,6 +2910,7 @@ input{
     width: 100%;
     padding-top: 1px;
     margin-bottom: 1px;
+    font-family: sans-serif;
 }
 
 .restrict-main-contents-io-title{

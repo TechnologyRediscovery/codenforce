@@ -45,7 +45,7 @@ public enum CasePhaseEnum {
                                         true,
                                         true),
     
-    InsideComplianceWindow      (   "Inside violation complaince window", 
+    InsideComplianceWindow      (   "Inside violation compliance window", 
                                     "Allow time for violation resolution; monitor property for intensifications",
                                     "howto-insidetimeframe",
                                         3, 

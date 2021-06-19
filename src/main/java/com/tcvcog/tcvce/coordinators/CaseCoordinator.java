@@ -71,6 +71,8 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import org.primefaces.model.charts.ChartData;
@@ -1137,8 +1139,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 //        rpt.setViolationsCitedDateRange(sc.runQuery(qcv).getResults());
 //        
 //        initBarViolationsPastMonth(rpt);
-        initPieViols(rpt);
         initPieEnforcement(rpt);
+        initPieViols(rpt);
         initPieCitation(rpt);
         initPieClosure(rpt);
 
@@ -1246,6 +1248,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param rpt 
      */
       private void initPieViols(ReportConfigCECaseList rpt){
+          CaseCoordinator cc = getCaseCoordinator();
         rpt.setPieViol(new PieChartModel());
         ChartData pieData = new ChartData();
         
@@ -1259,18 +1262,22 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
         // build our count map
         Map<ViolationStatusEnum, Integer> violMap = new HashMap<>();
-        violMap.put(ViolationStatusEnum.RESOLVED, 0);
         violMap.put(ViolationStatusEnum.UNRESOLVED_WITHINCOMPTIMEFRAME, 0);
         violMap.put(ViolationStatusEnum.UNRESOLVED_EXPIREDCOMPLIANCETIMEFRAME, 0);
+        violMap.put(ViolationStatusEnum.RESOLVED, 0);
         violMap.put(ViolationStatusEnum.UNRESOLVED_CITED, 0);
         violMap.put(ViolationStatusEnum.NULLIFIED, 0);
         
         for(CodeViolation cv: vl){
-            Integer catCount = violMap.get(cv.getStatus());
+            ViolationStatusEnum vs = cv.getStatus();
+            
+            Integer catCount = violMap.get(vs);
             catCount += 1;
             violMap.put(cv.getStatus(), catCount);
         }
         
+        rpt.setPieViolStatMap(violMap);
+        rpt.setPieViolCompCount(violMap.get(ViolationStatusEnum.RESOLVED));
         Set<ViolationStatusEnum> keySet = violMap.keySet();
         List<String> pieColors = new ArrayList<>();
         List<LegendItem> legend = new ArrayList<>();
@@ -1312,36 +1319,65 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             PieChartDataSet dataSet = new PieChartDataSet();
             List<Number> enfStatusNumList = new ArrayList<>();
 
-            int within = 0;
-            int expired = 0;
-
+            Map<String, Integer> statMap = new HashMap<>();
+            
+            statMap.put(CaseStageEnum.Investigation.getLabel(), 0);
+            statMap.put(CasePhaseEnum.InsideComplianceWindow.getLabel(), 0);
+            statMap.put(CasePhaseEnum.TimeframeExpiredNotCited.getLabel(), 0);
+            statMap.put(CaseStageEnum.Citation.getLabel(), 0);
+            
             for(CECaseDataHeavy cse: rpt.assembleNonClosedCaseList()){
+                if(cse.getStatusBundle().getPhase().getStage() == CaseStageEnum.Investigation){
+                    Integer statCount = statMap.get(CaseStageEnum.Investigation.getLabel());
+                    statCount += 1;
+                    statMap.put(CaseStageEnum.Investigation.getLabel(), statCount);
+                    
+                }
                 if(cse.getStatusBundle().getPhase().getCaseStage() == CaseStageEnum.Enforcement){
                     if(cse.getStatusBundle().getPhase() == CasePhaseEnum.InsideComplianceWindow){
-                        within++;
+                        Integer statCount = statMap.get(CasePhaseEnum.InsideComplianceWindow.getLabel());
+                        statCount += 1;
+                        statMap.put(CasePhaseEnum.InsideComplianceWindow.getLabel(), statCount);
                     }
                     if(cse.getStatusBundle().getPhase() == CasePhaseEnum.TimeframeExpiredNotCited){
-                        expired++;
+                        Integer statCount = statMap.get(CasePhaseEnum.TimeframeExpiredNotCited.getLabel());
+                        statCount += 1;
+                        statMap.put(CasePhaseEnum.TimeframeExpiredNotCited.getLabel(), statCount);
                     }
+                }
+                if(cse.getStatusBundle().getPhase().getStage() == CaseStageEnum.Citation){
+                    Integer statCount = statMap.get(CaseStageEnum.Citation.getLabel());
+                    statCount += 1;
+                    statMap.put(CaseStageEnum.Citation.getLabel(), statCount);
                 }
             }
 
-            enfStatusNumList.add(within);
-            enfStatusNumList.add(expired);
-
-            dataSet.setData(enfStatusNumList);
+            
+            Set<String> keySet = statMap.keySet();
 
             List<String> pieColors = new ArrayList<>();
-            pieColors.add("rgb(200,100,33)");
-            pieColors.add("rgb(100,0,33)");
+            List<LegendItem> legend = new ArrayList<>();
+
+            SystemCoordinator sc = getSystemCoordinator();
+
+            for(String k: keySet){
+                Integer i = statMap.get(k);
+                enfStatusNumList.add(i);
+                String color = sc.generateRandomRGBColor();
+                pieColors.add(color);
+                LegendItem li = new LegendItem();
+                li.setColorRGBString(color);
+                li.setValue(i);
+                li.setTitle(k);
+                legend.add(li);
+
+            }
+            rpt.setPieEnforcementLegend(legend);
+            
             dataSet.setBackgroundColor(pieColors);
-
+            dataSet.setData(enfStatusNumList);
             pieData.addChartDataSet(dataSet);
-            List<String> labels = new ArrayList<>();
-            labels.add("Within compliance timeframe");
-            labels.add("Expired compliance timeframe");
 
-//            pieData.setLabels(labels);
             rpt.getPieEnforcement().setData(pieData);
         }
     }

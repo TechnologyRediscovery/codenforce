@@ -10,6 +10,7 @@ import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CodeViolationPropCECaseHeavy;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
+import com.tcvcog.tcvce.entities.ViolationStatusEnum;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryBacked;
 import java.io.Serializable;
@@ -60,6 +61,10 @@ public class ReportConfigCECaseList
     
     private PieChartModel pieViol;
     protected List<LegendItem> pieViolLegend;
+    private Map<ViolationStatusEnum, Integer> pieViolStatMap;
+    private int pieViolCompCount;
+    
+    
     private PieChartModel pieEnforcement;
     protected List<LegendItem> pieEnforcementLegend;
     private PieChartModel pieCitation;
@@ -70,6 +75,12 @@ public class ReportConfigCECaseList
     // Metrics
     private double averageAgeOfCasesClosed;
     private double averageAgeOfCasesOpenAsOfReportEndDate;
+    
+    public ReportConfigCECaseList(){
+        violationsCitedDateRange = new ArrayList<>();
+        violationsLoggedComplianceDateRange = new ArrayList<>();
+        violationsCitedDateRange = new ArrayList<>();
+    }
     
     public void assembleStreetList(){
         if(streetSCC != null && !streetSCC.isEmpty()){
@@ -516,6 +527,34 @@ public class ReportConfigCECaseList
      */
     public void setCitationList(List<Citation> citationList) {
         this.citationList = citationList;
+    }
+
+    /**
+     * @return the pieViolStatMap
+     */
+    public Map<ViolationStatusEnum, Integer> getPieViolStatMap() {
+        return pieViolStatMap;
+    }
+
+    /**
+     * @param pieViolStatMap the pieViolStatMap to set
+     */
+    public void setPieViolStatMap(Map<ViolationStatusEnum, Integer> pieViolStatMap) {
+        this.pieViolStatMap = pieViolStatMap;
+    }
+
+    /**
+     * @return the pieViolCompCount
+     */
+    public int getPieViolCompCount() {
+        return pieViolCompCount;
+    }
+
+    /**
+     * @param pieViolCompCount the pieViolCompCount to set
+     */
+    public void setPieViolCompCount(int pieViolCompCount) {
+        this.pieViolCompCount = pieViolCompCount;
     }
     
     

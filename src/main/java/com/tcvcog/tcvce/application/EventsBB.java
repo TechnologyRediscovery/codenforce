@@ -143,9 +143,6 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void initBean() {
         EventCoordinator ec = getEventCoordinator();
-        MunicipalityCoordinator mc = getMuniCoordinator();
-        PropertyCoordinator pc = getPropertyCoordinator();
-        SearchCoordinator sc = getSearchCoordinator();
         SessionBean sb = getSessionBean();
         
         eventsViewOptionsCandidates = Arrays.asList(ViewOptionsActiveHiddenListsEnum.values());
@@ -174,7 +171,8 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
             }
                 
         } else { // we don't have a session event, so make a new one
-            initiateNewEvent();
+            // TODO: uncommon when heap issue is solved
+//            initiateNewEvent();
         }
         
         EventDomainEnum sessEvDomainReq = getSessionBean().getSessEventsPageEventDomainRequest();
@@ -204,7 +202,9 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         eventList = new ArrayList<>();
         filteredEventList = new ArrayList<>();
         
-        initEventSearch();
+        // TODO: Fix me when I'm not killing my heap on session load!!
+        
+        // initEventSearch();
     }
     
     
@@ -292,19 +292,19 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         }
         switch (currentMode) {
             case VIEW:
-                onModeViewInit();
+//                onModeViewInit();
                 break;
             case LOOKUP:
-                onModeLookupInit();
+//                onModeLookupInit();
                 break;
             case INSERT:
-                onModeInsertInit();
+//                onModeInsertInit();
                 break;
             case UPDATE:
-                onModeUpdateInit();
+//                onModeUpdateInit();
                 break;
             case REMOVE:
-                onModeRemoveInit();
+//                onModeRemoveInit();
                 break;
             default:
                 break;
