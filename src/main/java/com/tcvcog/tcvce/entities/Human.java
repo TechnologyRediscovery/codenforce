@@ -29,7 +29,7 @@ public  class   Human
         extends TrackedEntity
         implements IFace_deactivatable, IFace_noteHolder{
     
-        static final String TABLE_NAME = "human";
+        static final String TABLE_NAME = "public.human";
     
         protected int humanID;
         protected String name;

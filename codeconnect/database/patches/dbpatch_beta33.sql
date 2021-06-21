@@ -83,8 +83,6 @@ INSERT INTO public.textblockcategory(
     VALUES (101, "Injectable Template", 10, 999);
 
 
-<<<<<<< HEAD
-=======
 -- COMMENTS FROM SNAPPER
 -- Person column Ghosts and clones don't seem to make much sense
 -- ECD: Ghost (static copy never to change for archival purposes)
@@ -584,7 +582,6 @@ CREATE TABLE public.humancecase
 
 
 -- this is closesed to current propertyunit (occ is based on one of these)
->>>>>>> humanization
 
 
 
