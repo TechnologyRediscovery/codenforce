@@ -16,6 +16,8 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -103,28 +105,28 @@ public class Fee extends BOb {
      * @return the effective date
      */
     public Date getEffectiveUtilDate() {
-        return convertUtilDate(effectiveDate);
+        return DateTimeUtil.convertUtilDate(effectiveDate);
     }
 
     /**
      * @param effectiveUtilDate the date to set
      */
     public void setEffectiveUtilDate(Date effectiveUtilDate) {
-        effectiveDate = convertUtilDate(effectiveUtilDate);
+        effectiveDate = DateTimeUtil.convertUtilDate(effectiveUtilDate);
     }
 
     /**
      * @return the expiry date
      */
     public Date getExpiryUtilDate() {
-        return convertUtilDate(expiryDate);
+        return DateTimeUtil.convertUtilDate(expiryDate);
     }
 
     /**
      * @param expiryUtilDate the date to set
      */
     public void setExpiryUtilDate(Date expiryUtilDate) {
-        expiryDate = convertUtilDate(expiryUtilDate);
+        expiryDate = DateTimeUtil.convertUtilDate(expiryUtilDate);
     }
     
     public String getNotes() {

@@ -50,7 +50,7 @@ public  class       CECasePaymentsBB
     }
 
        
-     public String editCECasePayments(){
+     public String editCECasePayments() {
          
          getSessionBean().setFeeManagementDomain(EventDomainEnum.CODE_ENFORCEMENT);
          getSessionBean().setFeeManagementCeCase(currentCase);
@@ -59,7 +59,7 @@ public  class       CECasePaymentsBB
          return "payments";
      }
      
-     public String editOnePayment(Payment thisPayment){
+     public String editOnePayment(Payment thisPayment) {
          
          getSessionBean().setFeeManagementDomain(EventDomainEnum.CODE_ENFORCEMENT);
          getSessionBean().setSessPayment(thisPayment);
@@ -68,7 +68,7 @@ public  class       CECasePaymentsBB
          return "payments";
      }
      
-     public String editCECaseFees(){
+     public String editCECaseFees() {
          
          getSessionBean().setFeeManagementDomain(EventDomainEnum.CODE_ENFORCEMENT);
          getSessionBean().setFeeManagementCeCase(currentCase);

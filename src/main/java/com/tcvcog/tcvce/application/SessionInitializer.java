@@ -625,7 +625,7 @@ public  class       SessionInitializer
         OccPeriod op = null;
         try {
             // Session object init
-            sb.setSessOccPeriodList(occCord.assembleOccPeriodHistoryList(cred));
+            sb.setSessOccPeriodListLight(occCord.assembleOccPeriodHistoryList(cred));
             if(sb.getSessOccPeriodList().isEmpty()){
                 op = occCord.getOccPeriod(sb.getSessMuni().getDefaultOccPeriodID());
             } else {

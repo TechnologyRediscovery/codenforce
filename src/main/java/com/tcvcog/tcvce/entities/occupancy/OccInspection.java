@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -313,7 +314,7 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     }
     
     public String getPassedInspectionTSPretty(){
-        return EntityUtils.getPrettyDate(passedInspectionTS);
+        return DateTimeUtil.getPrettyDate(passedInspectionTS);
     }
 
     /**
@@ -331,7 +332,7 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     }
     
     public String getEffectiveDateOfRecordPretty(){
-        return EntityUtils.getPrettyDate(effectiveDateOfRecord);
+        return DateTimeUtil.getPrettyDate(effectiveDateOfRecord);
     }
 
     /**
@@ -434,7 +435,7 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
      * @return the effectiveDateOfRecordUtilDate
      */
     public java.util.Date getEffectiveDateOfRecordUtilDate() {
-        effectiveDateOfRecordUtilDate = convertUtilDate(effectiveDateOfRecord);
+        effectiveDateOfRecordUtilDate = DateTimeUtil.convertUtilDate(effectiveDateOfRecord);
         
         return effectiveDateOfRecordUtilDate;
     }
@@ -444,7 +445,7 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
      */
     public void setEffectiveDateOfRecordUtilDate(java.util.Date effectiveDateOfRecordUtilDate) {
         this.effectiveDateOfRecordUtilDate = effectiveDateOfRecordUtilDate;
-        effectiveDateOfRecord = convertUtilDate(effectiveDateOfRecordUtilDate);
+        effectiveDateOfRecord = DateTimeUtil.convertUtilDate(effectiveDateOfRecordUtilDate);
     }
 
     /**

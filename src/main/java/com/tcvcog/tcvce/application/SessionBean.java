@@ -40,6 +40,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.EventException;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 
 /**
@@ -100,7 +101,7 @@ public class    SessionBean
     
     private List<Property> sessPropertyList;
     private ActivatableRouteEnum sessPropertyListRoute;
-    
+
     private PropertyUnit sessPropertyUnit;
     
     private boolean startPropInfoPageWithAdd;
@@ -110,7 +111,9 @@ public class    SessionBean
     private List<QueryProperty> queryPropertyList;
     
     /**
-     * Convenience method for setting the session property with only an ID
+     * Convenience method for setting the session property and
+     * property list with only an ID
+     *
      * @param propID
      * @throws BObStatusException
      * @throws IntegrationException 
@@ -121,16 +124,12 @@ public class    SessionBean
             throw new BObStatusException("Prop ID cannot be 0");
         }
         Property pr = pc.getProperty(propID);
-        try {
-            sessProperty = pc.assemblePropertyDataHeavy(pr, sessUser);
-        } catch (SearchException ex) {
-            System.out.println(ex);
-        }
+        setSessProperty(pr);
     }
     
     /**
-     * Convenience method for setting the session property DH with only a base
-     * class instance
+     * Convenience method for setting the session property and property list
+     * with only a base class instance
      * 
      * @param prop 
      */
@@ -142,6 +141,8 @@ public class    SessionBean
             System.out.println("SessionBean.setSessionProperty: error setting session prop");
             System.out.println(ex);
         }
+
+        sessPropertyList = pc.assemblePropertyHistoryList(sessUser.getKeyCard());
     }
     
     
@@ -196,10 +197,11 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     private OccPeriodDataHeavy sessOccPeriod;
+
     private ActivatableRouteEnum sessOccPeriodRoute;
     private OccPeriod sessOccPeriodQueued;
     private ActivatableRouteEnum sessOccPeriodListRoute;
-    private List<OccPeriod> sessOccPeriodList;
+    private List<OccPeriodPropertyUnitHeavy> sessOccPeriodList;
     
     private OccPermit sessOccPermit;
     private OccInspection sessOccInspection;
@@ -372,7 +374,7 @@ public class    SessionBean
             ********** BEGIN CASCADING LOGIC FOR COORDINATING SESSION OBJECTS ******
             */
             
-            if(bob instanceof Property || bob instanceof PropertyDataHeavy){
+            if (bob instanceof Property) {
                 Property prop = (Property) bob;
                 PropertyDataHeavy pdh = pc.assemblePropertyDataHeavy(prop, ua);
                 sessProperty = pdh;
@@ -380,7 +382,7 @@ public class    SessionBean
                 
                 // PERSONS
                 sessPersonList = pdh.getPersonList();
-                if(sessPersonList != null && !sessPersonList.isEmpty()){
+                if (sessPersonList != null && !sessPersonList.isEmpty()) {
                     sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
                     sessPersonRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
                     sessPersonListRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
@@ -393,7 +395,7 @@ public class    SessionBean
                 
                 // CASES 
                 sessCECaseList = pdh.getCeCaseList();
-                if(sessCECaseList != null && !sessCECaseList.isEmpty()){
+                if  (sessCECaseList != null && !sessCECaseList.isEmpty()) {
                     sessCECase = cc.cecase_assembleCECaseDataHeavy(sessCECaseList.get(0), ua);
                     sessEventList = ec.assembleEventCnFPropUnitCasePeriodHeavyList(
                             sessCECase.getEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN));
@@ -408,9 +410,10 @@ public class    SessionBean
                 }
                 
                 // OCC PERIODS
-                sessOccPeriodList = pdh.getCompletePeriodList();
-                if(sessOccPeriodList != null && !sessOccPeriodList.isEmpty()){
-                    sessOccPeriod = oc.assembleOccPeriodDataHeavy(sessOccPeriodList.get(0), ua.getKeyCard());
+                setSessOccPeriodListLight(pdh.getCompletePeriodList());
+
+                if (sessOccPeriodList != null && !sessOccPeriodList.isEmpty()) {
+                    setSessOccPeriod(sessOccPeriodList.get(0));
                     sessOccPeriodRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
                     sessOccPeriodListRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
                 } else {
@@ -420,7 +423,7 @@ public class    SessionBean
                 
                  
                 // EVENTS
-                if(sessEventList != null && !sessEventList.isEmpty()){
+                if (sessEventList != null && !sessEventList.isEmpty()) {
                     sessEvent = sessEventList.get(0);
                     sessEventRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
                     sessEventListRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
@@ -430,7 +433,7 @@ public class    SessionBean
                 }
                 
                 // CEARS
-                if(sessCEARList != null && !sessCEARList.isEmpty()){
+                if (sessCEARList != null && !sessCEARList.isEmpty()) {
                     sessCEAR = sessCEARList.get(0);
                     sessCEARRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
                     sessCEARRListoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
@@ -444,7 +447,7 @@ public class    SessionBean
                 
                 
 
-            } else if(bob instanceof Person || bob instanceof PersonDataHeavy) {
+            } else if (bob instanceof Person) {
                 Person pers = (Person) bob;
                 PersonDataHeavy persdh = perc.assemblePersonDataHeavy(pers, ua.getKeyCard());
                 sessPerson = persdh;
@@ -475,40 +478,56 @@ public class    SessionBean
                 
                 
                 
-            } else if(bob instanceof CECase || bob instanceof CECaseDataHeavy){
+            } else if (bob instanceof CECase) {
                 CECase cse = (CECase) bob;
                 CECaseDataHeavy csedh = cc.cecase_assembleCECaseDataHeavy(cse, ua);
                 // make sure property is the one hosting the case
                 sessCECase = csedh;
-                
-                sessProperty = pc.assemblePropertyDataHeavy(pc.getProperty(cse.getPropertyID()), ua);
-                sessPropertyList = pc.assemblePropertyHistoryList(ua.getKeyCard());
-                
+
+                // Set current property to match the CE case's relevant property
+                setSessProperty(cse.getPropertyID());
+
                 sessCECaseList = sessProperty.getCeCaseList();
                 
                 sessPersonList = sessProperty.getPersonList();
                 if(sessPersonList != null && !sessPersonList.isEmpty()){
                     sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
                 }
-                
-                sessOccPeriodList = sessProperty.getCompletePeriodList();
-                if(sessOccPeriodList != null && !sessOccPeriodList.isEmpty()){
-                    sessOccPeriod = oc.assembleOccPeriodDataHeavy(sessOccPeriodList.get(0), ua.getKeyCard());
+
+                setSessOccPeriodListLight(sessProperty.getCompletePeriodList());
+                if (sessOccPeriodList != null && !sessOccPeriodList.isEmpty()) {
+                    setSessOccPeriod(sessOccPeriodList.get(0));
                 }
+
                 return "ceCaseProfile";
-                
-                
-                
-                
-            } else if(bob instanceof OccPeriod){
-                OccPeriod per = (OccPeriod) bob;
-                OccPeriodDataHeavy opdh = oc.assembleOccPeriodDataHeavy(per, ua.getKeyCard());
-                
-                
-            } else if(bob instanceof EventCnF){
+
+            } else if (bob instanceof OccPeriod) {
+                OccPeriod period = (OccPeriod) bob;
+
+                // Set sessOccPeriod
+                setSessOccPeriod(period);
+
+                // Set current property to match the sessOccPeriod's propertyUnit
+                setSessProperty(sessOccPeriod.getPropUnitProp().getProperty());
+
+                // Set person--copied from CECase
+                sessPersonList = sessProperty.getPersonList();
+                if(sessPersonList != null && !sessPersonList.isEmpty()){
+                    sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
+                }
+
+                // Set CECase
+                sessCECaseList = sessProperty.getCeCaseList();
+                if (sessCECaseList != null && !sessCECaseList.isEmpty()) {
+                    setSessCECase(sessCECaseList.get(0));
+                }
+
+                return "occPeriodWorkflow";
+
+            } else if (bob instanceof EventCnF) {
                 EventCnF ev = (EventCnF) bob;
                 
-            } else if(bob instanceof CEActionRequest){
+            } else if (bob instanceof CEActionRequest) {
                 CEActionRequest cear = (CEActionRequest) bob;
             }
             
@@ -1050,7 +1069,7 @@ public class    SessionBean
     /**
      * @return the sessOccPeriodList
      */
-    public List<OccPeriod> getSessOccPeriodList() {
+    public List<OccPeriodPropertyUnitHeavy> getSessOccPeriodList() {
         return sessOccPeriodList;
     }
 
@@ -1081,8 +1100,22 @@ public class    SessionBean
     /**
      * @param sessOccPeriodList the sessOccPeriodList to set
      */
-    public void setSessOccPeriodList(List<OccPeriod> sessOccPeriodList) {
+    public void setSessOccPeriodList(List<OccPeriodPropertyUnitHeavy> sessOccPeriodList) {
         this.sessOccPeriodList = sessOccPeriodList;
+    }
+
+    /**
+     * overload that converts OccPeriod list to one containing property information
+     *
+     * @param lightOccPeriodList the lightOccPeriodList to set
+     */
+    public void setSessOccPeriodListLight(List<OccPeriod> lightOccPeriodList) {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            setSessOccPeriodList(oc.getOccPeriodPropertyUnitHeavy(lightOccPeriodList));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
     }
 
     /**
@@ -1358,20 +1391,35 @@ public class    SessionBean
      * @param sessOccPeriod the sessOccPeriod to set
      */
     public void setSessOccPeriod(OccPeriodDataHeavy sessOccPeriod) {
+
+        // Set PropertyUnitWithProp because we have property integrator object here and not in the class
+        PropertyIntegrator pi = getPropertyIntegrator();
+        try {
+            sessOccPeriod.setPropUnitProp(pi.getPropertyUnitWithProp(sessOccPeriod.getPeriodID()));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+
         this.sessOccPeriod = sessOccPeriod;
     }
+
     /**
-     * @param opBase     
+     * Sets the current session occupancy period to the heavy value of opBase
+     * @param occPeriodBase
      */
-    public void setSessOccPeriod(OccPeriod opBase) {
+    public void setSessOccPeriod(OccPeriod occPeriodBase) {
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        OccPeriodDataHeavy opdh = null;
+
+        // Convert occPeriodBase to a heavy data class (because it can be modified, presumably)
+        OccPeriodDataHeavy occPeriodHeavy = null;
         try {
-            opdh = oc.assembleOccPeriodDataHeavy(opBase, sessUser.getKeyCard());
+            occPeriodHeavy = oc.assembleOccPeriodDataHeavy(occPeriodBase, sessUser.getKeyCard());
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
         }
-        this.sessOccPeriod = opdh;
+
+        // Set the current session occ period to this converted "heavy" occ period
+        setSessOccPeriod(occPeriodHeavy);
     }
 
     /**

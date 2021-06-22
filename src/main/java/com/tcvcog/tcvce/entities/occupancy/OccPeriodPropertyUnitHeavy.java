@@ -16,7 +16,10 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 
 /**
  *
@@ -26,41 +29,29 @@ public class OccPeriodPropertyUnitHeavy
         extends OccPeriod{
     
     protected PropertyUnitWithProp propUnitProp;
-    
-    public OccPeriodPropertyUnitHeavy(OccPeriod opLight){
-        this.periodID = opLight.periodID;
-        this.propertyUnitID = opLight.propertyUnitID;
-        this.type = opLight.type;
-        
-        this.governingInspection = opLight.governingInspection;
-        this.manager = opLight.manager;
-        
-        this.periodTypeCertifiedBy = opLight.periodTypeCertifiedBy;
-        this.periodTypeCertifiedTS = opLight.periodTypeCertifiedTS;
-        
-        this.source = opLight.source;
-        this.createdBy = opLight.createdBy;
-        this.createdTS = opLight.createdTS;
-        
-        this.startDate = opLight.startDate;
-        this.startDateCertifiedTS = opLight.startDateCertifiedTS;
-        this.startDateCertifiedBy = opLight.startDateCertifiedBy;
-        
-        this.endDate = opLight.endDate;
-        this.endDateCertifiedTS = opLight.endDateCertifiedTS;
-        this.endDateCertifiedBy = opLight.endDateCertifiedBy;
-        
-        this.authorizedTS = opLight.authorizedTS;
-        this.authorizedBy = opLight.authorizedBy;
-        
-        this.overrideTypeConfig = opLight.overrideTypeConfig;
-        this.notes = opLight.notes;
-        
-        this.active = opLight.active;
-        
+
+    public OccPeriodPropertyUnitHeavy() {
     }
-    
-    
+
+    public OccPeriodPropertyUnitHeavy(OccPeriod otherPeriodLight) {
+        super(otherPeriodLight);
+    }
+
+    public OccPeriodPropertyUnitHeavy(OccPeriodPropertyUnitHeavy otherPeriod) {
+        super(otherPeriod);
+        this.propUnitProp = otherPeriod.propUnitProp;
+    }
+
+
+//
+//    /**
+//     * Uses provided property integrator object to set the member variable containing the PropertyUnitWithProp object
+//     *
+//     * @param pi Property integrator object, required for this operation
+//     */
+//    public void updatePropUnitProp(PropertyIntegrator pi) throws IntegrationException {
+//        setPropUnitProp(pi.getPropertyUnitWithProp(propertyUnitID));
+//    }
 
     /**
      * @return the propUnitProp
@@ -75,5 +66,8 @@ public class OccPeriodPropertyUnitHeavy
     public void setPropUnitProp(PropertyUnitWithProp propUnitProp) {
         this.propUnitProp = propUnitProp;
     }
-    
+
+    /**
+     * @param propertyUnitID the propertyUnitID to set
+     */
 }

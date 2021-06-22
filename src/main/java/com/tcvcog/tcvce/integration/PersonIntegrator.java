@@ -406,6 +406,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public int insertPerson(Person personToStore) throws IntegrationException {
+        UserCoordinator uc = getUserCoordinator();
+
         int unknownPersonSourceID = Integer.parseInt(getResourceBundle(
                 Constants.DB_FIXED_VALUE_BUNDLE).getString("unknownPersonSource"));
         System.out.println("PersonIntegrator.insertPerson");
@@ -487,7 +489,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setInt(21, unknownPersonSourceID);
             }
-            stmt.setInt(22, personToStore.getCreatorUserID());
+            if (personToStore != null && personToStore.getCreatorUserID() != 0) {
+                stmt.setInt(22, personToStore.getCreatorUserID());
+            } else {
+                stmt.setInt(22, uc.auth_getPublicUserAuthorized().getUserID());
+            }
             stmt.setBoolean(23, personToStore.isBusinessEntity());
             
             stmt.setString(24, personToStore.getMailingAddressStreet());

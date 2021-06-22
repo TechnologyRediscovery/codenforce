@@ -44,6 +44,7 @@ import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.io.IOException;
@@ -499,7 +500,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                 
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Successfully created follow-up event ID " + even.getEventID() + " on " + getPrettyDate(even.getTimeStart()), ""));
+                                "Successfully created follow-up event ID " + even.getEventID() + " on " + DateTimeUtil.getPrettyDate(even.getTimeStart()), ""));
             }
         } catch (BObStatusException | EventException | IntegrationException ex) {
              getFacesContext().addMessage(null,

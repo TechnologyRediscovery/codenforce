@@ -996,8 +996,8 @@
     </managed-bean>
     
     <managed-bean>
-        <managed-bean-name>occPeriodSearchBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodSearchBB</managed-bean-class>
+        <managed-bean-name>occPeriodSearchWorkflowBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodSearchWorkflowBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
@@ -1061,7 +1061,7 @@
             <to-view-id>/restricted/cogstaff/occ/occPermitNewPeriod.xhtml</to-view-id>
             <redirect />       
         </navigation-case>
-        
+
         <navigation-case>
             <from-outcome>occPeriodWorkflow</from-outcome>
             <to-view-id>/restricted/cogstaff/occ/occPeriodWorkflow.xhtml</to-view-id>
@@ -1111,7 +1111,7 @@
         
         <navigation-case>
             <from-outcome>selectForApply</from-outcome>
-            <to-view-id>/public/services/occPermitApplicationFlow/occPermitSelectForApply.xhtml#currentStep</to-view-id>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermit3SelectForApply.xhtml#currentStep</to-view-id>
             <redirect />
         </navigation-case>
         
@@ -1495,7 +1495,7 @@
         </navigation-case>
         <navigation-case>
             <from-outcome>addPropertyUnit</from-outcome>
-            <to-view-id>/public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml#currentStep</to-view-id>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermit2AddPropertyUnit.xhtml#currentStep</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>
@@ -1560,49 +1560,49 @@
         
         
         <navigation-case>
-            <from-view-id>/public/services/occpermitApplicationFlow/occPermitChooseMuni.xhtml</from-view-id>
+            <from-view-id>/public/services/occpermitApplicationFlow/occPermit0ChooseMuni.xhtml</from-view-id>
             <from-outcome>chooseProperty</from-outcome>
-            <to-view-id>/public/services/occPermitApplicationFlow/occPermitChoosePropertyUnit.xhtml#currentStep</to-view-id>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermit1ChoosePropertyUnit.xhtml#currentStep</to-view-id>
             <redirect />
         </navigation-case>
         
         <navigation-case>
-            <from-view-id>/public/services/occPermitApplicationFlow/occPermitChooseProperty.xhtml</from-view-id>
+            <from-view-id>/public/services/occPermitApplicationFlow/occPermit1ChooseProperty.xhtml</from-view-id>
             <from-outcome>addPropertyUnit</from-outcome>
-            <to-view-id>/public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml#currentStep</to-view-id>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermit2AddPropertyUnit.xhtml#currentStep</to-view-id>
             <redirect />
         </navigation-case>
     
         <navigation-case>
-            <from-view-id>/public/services/occPermitApplicationFlow/occPermitChooseProperty.xhtml</from-view-id>
+            <from-view-id>/public/services/occPermitApplicationFlow/occPermit2ChooseProperty.xhtml</from-view-id>
             <from-outcome>addReason</from-outcome>
-            <to-view-id>/public/services/occPermitApplicationFlow/occPermitAddReason.xhtml#currentStep</to-view-id>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermit4AddReason.xhtml#currentStep</to-view-id>
             <redirect />
         </navigation-case>
         
         <navigation-case>
-            <from-view-id> /public/services/occPermitApplicationFlow/occPermitAddPropertyUnit.xhtml </from-view-id>
+            <from-view-id> /public/services/occPermitApplicationFlow/occPermit2AddPropertyUnit.xhtml </from-view-id>
             <from-outcome>addReason</from-outcome>
-            <to-view-id>/public/services/occPermitApplicationFlow/occPermitAddReason.xhtml#currentStep</to-view-id>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermit4AddReason.xhtml#currentStep</to-view-id>
             <redirect />
         </navigation-case>
         
         <navigation-case>
-            <from-view-id> /public/services/occPermitApplicationFlow/occPermitAddReason.xhtml </from-view-id>
+            <from-view-id> /public/services/occPermitApplicationFlow/occPermit4AddReason.xhtml </from-view-id>
             <from-outcome> addPeople </from-outcome>
             <to-view-id> /public/services/occPermitApplicationFlow/occPermitAddPeople.xhtml#currentStep</to-view-id>
             <redirect />
         </navigation-case>
         
         <navigation-case>
-            <from-view-id> /public/services/occPermitApplicationFlow/occPermitAddReason.xhtml </from-view-id>
+            <from-view-id> /public/services/occPermitApplicationFlow/occPermit4AddReason.xhtml </from-view-id>
             <from-outcome> managePeople </from-outcome>
-            <to-view-id> /public/services/occPermitApplicationFlow/personsRequirementManage.xhtml#currentStep</to-view-id>
+            <to-view-id> /public/services/occPermitApplicationFlow/occPermit5PersonsRequirementManage.xhtml#currentStep</to-view-id>
             <redirect />
         </navigation-case>
         
         <navigation-case>
-            <from-view-id> /public/services/occPermitApplicationFlow/personsRequirementManage.xhtl </from-view-id>
+            <from-view-id> /public/services/occPermitApplicationFlow/occPermit5PersonsRequirementManage.xhtml </from-view-id>
             <from-outcome> searchPeople </from-outcome>
             <to-view-id> /public/services/personSearchPublic.xhtml </to-view-id>
             <redirect />
@@ -1616,16 +1616,16 @@
         </navigation-case>
 
         <navigation-case>
-            <from-view-id> /public/services/occPermitApplicationFlow/personsRequirementManage.xhtl</from-view-id>
+            <from-view-id> /public/services/occPermitApplicationFlow/occPermit5PersonsRequirementManage.xhtml</from-view-id>
             <from-outcome> reviewApplication </from-outcome>
-            <to-view-id> /public/services/occPermitApplicationFlow/reviewAndSubmit.xhtml</to-view-id>
+            <to-view-id> /public/services/occPermitApplicationFlow/occPermit6ReviewAndSubmit.xhtml</to-view-id>
             <redirect />
         </navigation-case>
         
         <navigation-case>
             <from-view-id> /public/services/personSearchPublic.xhtml </from-view-id>
             <from-outcome> managePeople </from-outcome>
-            <to-view-id> /public/services/occPermitApplicationFlow/personsRequirementManage.xhtml#currentStep</to-view-id>
+            <to-view-id> /public/services/occPermitApplicationFlow/occPermit5PersonsRequirementManage.xhtml#currentStep</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>
@@ -1943,7 +1943,7 @@
     <navigation-rule>
         <navigation-case>
             <from-outcome>occPermitApplicationFlow</from-outcome>
-            <to-view-id>/public/services/occPermitApplicationFlow/occPermitChooseMuni.xhtml</to-view-id>
+            <to-view-id>/public/services/occPermitApplicationFlow/occPermit0ChooseMuni.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>
@@ -2101,16 +2101,16 @@
         
         
         <navigation-case>
-            <from-view-id>/public/services/rental/renta4SelectForRegistration.xhtml</from-view-id>
+            <from-view-id>/public/services/rental/rental4SelectForRegistration.xhtml</from-view-id>
             <from-outcome>personInfo</from-outcome>
-            <to-view-id>/public/services/rental/rental5personsRequirementManage.xhtml#currentStep</to-view-id>
+            <to-view-id>/public/services/rental/rental5PersonsRequirementManage.xhtml#currentStep</to-view-id>
             <redirect />
         </navigation-case>
         
         
         
         <navigation-case>
-            <from-view-id>/public/services/rental/rental5personsRequirementManage.xhtml</from-view-id>
+            <from-view-id>/public/services/rental/rental5PersonsRequirementManage.xhtml</from-view-id>
             <from-outcome>review</from-outcome>
             <to-view-id>/public/services/rental/rental6ReviewAndSubmit.xhtml#currentStep</to-view-id>
             <redirect />

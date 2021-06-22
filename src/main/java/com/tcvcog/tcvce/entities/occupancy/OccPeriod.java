@@ -6,11 +6,10 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
-import com.tcvcog.tcvce.entities.BOBSource;
-import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.IFace_EventHolder;
-import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,26 +45,71 @@ public  class       OccPeriod
     protected LocalDateTime createdTS;
     
     protected LocalDateTime startDate;
-    protected java.util.Date startDateUtilDate;
     protected LocalDateTime startDateCertifiedTS;
     protected User startDateCertifiedBy;
     
     protected LocalDateTime endDate;
-    protected java.util.Date endDateUtilDate;
     protected LocalDateTime endDateCertifiedTS;
     protected User endDateCertifiedBy;
-    
-    protected LocalDateTime authorizedTS;
+
     protected User authorizedBy;
+    protected LocalDateTime authorizedTS;
     
     protected boolean overrideTypeConfig;
     
     protected String notes;
     
     protected boolean active;
-    
-    
-    
+
+    protected User lastUpdatedBy;
+    protected LocalDateTime lastUpdatedTS;
+
+    public OccPeriod() {
+    }
+
+    public OccPeriod(OccPeriod otherPeriod) {
+        copyAllValues(otherPeriod);
+    }
+
+    public void copyAllValues(OccPeriod otherPeriod) {
+        setPeriodID(otherPeriod.getPeriodID());
+        setPropertyUnitID(otherPeriod.getPropertyUnitID());
+
+        setType(otherPeriod.getType());
+
+        setGoverningInspection(otherPeriod.getGoverningInspection());
+
+        setManager(otherPeriod.getManager());
+
+        setPeriodTypeCertifiedBy(otherPeriod.getPeriodTypeCertifiedBy());
+        setPeriodTypeCertifiedTS(otherPeriod.getPeriodTypeCertifiedTS());
+        setEventList(otherPeriod.getEventList());
+
+        setSource(otherPeriod.getSource());
+        setCreatedBy(otherPeriod.getCreatedBy());
+        setCreatedTS(otherPeriod.getCreatedTS());
+
+        setStartDate(otherPeriod.getStartDate());
+        setStartDateCertifiedBy(otherPeriod.getStartDateCertifiedBy());
+        setStartDateCertifiedTS(otherPeriod.getStartDateCertifiedTS());
+
+        setEndDate(otherPeriod.getEndDate());
+        setEndDateCertifiedBy(otherPeriod.getEndDateCertifiedBy());
+        setEndDateCertifiedTS(otherPeriod.getEndDateCertifiedTS());
+
+        setAuthorizedBy(otherPeriod.getAuthorizedBy());
+        setAuthorizedTS(otherPeriod.getAuthorizedTS());
+
+        setOverrideTypeConfig(otherPeriod.isOverrideTypeConfig());
+
+        setNotes(otherPeriod.getNotes());
+
+        setActive(otherPeriod.isActive());
+
+        setLastUpdatedBy(otherPeriod.getLastUpdatedBy());
+        setLastUpdatedTS(otherPeriod.getLastUpdatedTS());
+    }
+
     @Override
     public int compareTo(OccPeriod op) {
         int c = 0;
@@ -77,7 +121,19 @@ public  class       OccPeriod
         return c;
         
     }
-   
+
+    public long getPeriodAge() {
+        if(endDate != null){
+            return DateTimeUtil.getTimePeriodAsDays(startDate, endDate);
+        } else {
+            return DateTimeUtil.getTimePeriodAsDays(startDate, LocalDateTime.now());
+        }
+    }
+
+    public long getPeriodAgeAsOf(LocalDateTime ageEndTime){
+        return DateTimeUtil.getTimePeriodAsDays(startDate, ageEndTime);
+
+    }
     
     /**
      * @return the periodID
@@ -164,6 +220,23 @@ public  class       OccPeriod
     }
 
     /**
+     * @return the prettified startdate
+     */
+    public String getStartDatePretty() {
+        if(startDate != null){
+            return DateTimeUtil.getPrettyDate(startDate);
+        }
+        return null;
+    }
+
+    public String getStartDatePrettyNoTime() {
+        if(startDate != null){
+            return DateTimeUtil.getPrettyDateNoTime(startDate);
+        }
+        return null;
+    }
+
+    /**
      * @return the endDate
      */
     public LocalDateTime getEndDate() {
@@ -182,6 +255,23 @@ public  class       OccPeriod
      */
     public User getEndDateCertifiedBy() {
         return endDateCertifiedBy;
+    }
+
+    /**
+     * @return the prettified enddate
+     */
+    public String getEndDatePretty() {
+        if(endDate != null){
+            return DateTimeUtil.getPrettyDate(endDate);
+        }
+        return null;
+    }
+
+    public String getEndDatePrettyNoTime() {
+        if(endDate != null){
+            return DateTimeUtil.getPrettyDateNoTime(endDate);
+        }
+        return null;
     }
 
     /**
@@ -350,32 +440,28 @@ public  class       OccPeriod
      * @return the startDateUtilDate
      */
     public java.util.Date getStartDateUtilDate() {
-        startDateUtilDate = convertUtilDate(startDate);
-         return startDateUtilDate;
+        return DateTimeUtil.convertUtilDate(startDate);
     }
 
     /**
      * @return the endDateUtilDate
      */
     public java.util.Date getEndDateUtilDate() {
-        endDateUtilDate = convertUtilDate(endDate);
-        return endDateUtilDate;
+        return DateTimeUtil.convertUtilDate(endDate);
     }
 
     /**
      * @param startDateUtilDate the startDateUtilDate to set
      */
     public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
-        this.startDateUtilDate = startDateUtilDate;
-        startDate = convertUtilDate(startDateUtilDate);
+        startDate = DateTimeUtil.convertUtilDate(startDateUtilDate);
     }
 
     /**
      * @param endDateUtilDate the endDateUtilDate to set
      */
     public void setEndDateUtilDate(java.util.Date endDateUtilDate) {
-        this.endDateUtilDate = endDateUtilDate;
-        endDate = convertUtilDate(endDateUtilDate);
+        endDate = DateTimeUtil.convertUtilDate(endDateUtilDate);
     }
 
     /**
@@ -404,6 +490,41 @@ public  class       OccPeriod
      */
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    /**
+     * @return the lastUpdatedBy
+     */
+    public User getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    /**
+     * @param lastUpdatedBy the lastUpdatedBy to set
+     */
+    public void setLastUpdatedBy(User lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    /**
+     * @return the lastUpdatedTS
+     */
+    public LocalDateTime getLastUpdatedTS() {
+        return lastUpdatedTS;
+    }
+
+    /**
+     * @param lastUpdatedTS the lastUpdatedTS to set
+     */
+    public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
+        this.lastUpdatedTS = lastUpdatedTS;
+    }
+
+    /**
+     * @return the lastUpdatedUtilDate
+     */
+    public java.util.Date getLastUpdatedUtilDate() {
+        return DateTimeUtil.convertUtilDate(lastUpdatedTS);
     }
 
     /**
@@ -462,5 +583,4 @@ public  class       OccPeriod
     public List<EventCnF> getEventList(){
         return eventList;
     }
-
 }

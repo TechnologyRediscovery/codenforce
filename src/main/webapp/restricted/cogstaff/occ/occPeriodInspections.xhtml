@@ -1111,12 +1111,9 @@
 
                                 <h:panelGroup>
                                     <h:outputText styleClass="ui-label" value="Note text: "/>
-                                    <p:editor   id="occperiod-inspection-notes-editor"  
-                                                value="#{occInspectionBB.formNoteText}" 
-                                                controls="bold italic underline strikethrough font size style color 
-                                                bullets numbering center undo redo rule link removeformat outdent 
-                                                indent link unlink copy cut paste rule alignleft center alignright"
-                                                width="500" required="false"
+                                    <p:textEditor   id="occperiod-inspection-notes-editor"  
+                                                value="#{occInspectionBB.formNoteText}"
+                                                required="false"
                                                 height="200"/>
 
                                     <h:message for="occperiod-inspection-notes-editor" showDetail="false" showSummary="true" 

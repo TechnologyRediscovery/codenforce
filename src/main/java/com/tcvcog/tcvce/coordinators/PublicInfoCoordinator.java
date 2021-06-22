@@ -68,6 +68,8 @@ import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -317,7 +319,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         PublicInfoBundleCEActionRequest pib = new PublicInfoBundleCEActionRequest();
 
-        pib.setDateOfRecord(getPrettyDate(req.getDateOfRecord()));
+        pib.setDateOfRecord(DateTimeUtil.getPrettyDate(req.getDateOfRecord()));
 
         pib.setTypeName("CEAR");
 
@@ -1532,7 +1534,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                     sb.append("<br /><br />");
                 }
                 sb.append("CODE ENFORCEMENT REQUEST NOTE ADDED AT ");
-                sb.append(getPrettyDate(current));
+                sb.append(DateTimeUtil.getPrettyDate(current));
                 sb.append("by public user: <br />");
                 sb.append(message);
                 sb.append("<br />");
@@ -1571,7 +1573,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                     sb.append("<br /><br />");
                 }
                 sb.append("APPLICATION NOTE ADDED AT ");
-                sb.append(getPrettyDate(current));
+                sb.append(DateTimeUtil.getPrettyDate(current));
                 sb.append("by public user: <br />");
                 sb.append(message);
                 sb.append("<br />");

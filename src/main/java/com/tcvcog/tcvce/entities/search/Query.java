@@ -12,6 +12,8 @@ import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -232,7 +234,7 @@ public abstract class   Query<E extends BOb>
      */
     public String getExecutionTimestampPretty() {
         if(executionTimestamp != null){
-            return EntityUtils.getPrettyDate(executionTimestamp);
+            return DateTimeUtil.getPrettyDate(executionTimestamp);
         }
         return null;
     }

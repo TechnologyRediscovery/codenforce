@@ -190,22 +190,20 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private void setupUnitMemberVariablesBasedOnCurrentOccPeriod() throws IntegrationException, BObStatusException, SearchException{
         OccupancyCoordinator oc = getOccupancyCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
-        if(currentOccPeriod != null){
-                if(currentOccPeriod.getConfiguredTS() == null){
-                    currentOccPeriod = oc.assembleOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessUser().getMyCredential());
-                }
-                currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
-                currentInspection = currentOccPeriod.getGoverningInspection();
-                // all inspected spaces are visible by default
-                if(currentInspection != null){
-                    currentInspection.setViewSetting(ViewOptionsOccChecklistItemsEnum.ALL_ITEMS);
-                }
+        if (currentOccPeriod != null) {
+            if (currentOccPeriod.getConfiguredTS() == null) {
+                currentOccPeriod = oc.assembleOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessUser().getMyCredential());
             }
-        
-       
-        feeList = currentOccPeriod.getFeeList();
-        paymentList = currentOccPeriod.getPaymentList();
-        
+            currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
+            currentInspection = currentOccPeriod.getGoverningInspection();
+            // all inspected spaces are visible by default
+            if (currentInspection != null) {
+                currentInspection.setViewSetting(ViewOptionsOccChecklistItemsEnum.ALL_ITEMS);
+            }
+
+            feeList = currentOccPeriod.getFeeList();
+            paymentList = currentOccPeriod.getPaymentList();
+        }        
     }
     
     public void loadSpacesInType(){
@@ -520,16 +518,16 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                                     getSessionBean().getSessUser().getMyCredential(),
                                     formNoteText,
                                     currentOccPeriod.getNotes()));
-        try {
-            oc.attachNoteToOccPeriod(currentOccPeriod);
-            getFacesContext().addMessage(null,
-               new FacesMessage(FacesMessage.SEVERITY_INFO,
-               "Success! Note added", ""));
-        } catch (IntegrationException ex) {
-                getFacesContext().addMessage(null,
-                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                   ex.getMessage(), ""));
-        }
+//        try {
+////            oc.attachNoteToOccPeriod(currentOccPeriod); this method changed and this file is currently abandoned
+//            getFacesContext().addMessage(null,
+//               new FacesMessage(FacesMessage.SEVERITY_INFO,
+//               "Success! Note added", ""));
+//        } catch (IntegrationException ex) {
+//                getFacesContext().addMessage(null,
+//                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                   ex.getMessage(), ""));
+//        }
     }
     
     
@@ -751,7 +749,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      public void authorizeOccPeriod(ActionEvent ev){
          OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            oc.authorizeOccPeriod(currentOccPeriod, getSessionBean().getSessUser());
+            oc.toggleOccPeriodAuthorization(currentOccPeriod, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_INFO,
                "Success! Occupancy period ID " + currentOccPeriod.getPeriodID() 

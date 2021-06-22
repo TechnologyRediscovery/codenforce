@@ -5,6 +5,8 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -71,7 +73,7 @@ public class CECaseBase
 
     
     public long getCaseAge() {
-        return getTimePeriodAsDays(originationDate, LocalDateTime.now());
+        return DateTimeUtil.getTimePeriodAsDays(originationDate, LocalDateTime.now());
     }
 
     /**
@@ -233,7 +235,7 @@ public class CECaseBase
      */
     public String getOriginiationDatePretty() {
         if(originationDate != null){
-            originiationDatePretty = getPrettyDate(originationDate);
+            originiationDatePretty = DateTimeUtil.getPrettyDate(originationDate);
         }
         return originiationDatePretty;
     }
@@ -243,7 +245,7 @@ public class CECaseBase
      */
     public String getClosingDatePretty() {
         if(closingDate != null){
-            closingDatePretty = getPrettyDate(closingDate);
+            closingDatePretty = DateTimeUtil.getPrettyDate(closingDate);
         }
         return closingDatePretty;
     }
@@ -352,7 +354,7 @@ public class CECaseBase
      * @return the closingDateUtilDate
      */
     public java.util.Date getClosingDateUtilDate() {
-        closingDateUtilDate = convertUtilDate(closingDate);
+        closingDateUtilDate = DateTimeUtil.convertUtilDate(closingDate);
         return closingDateUtilDate;
     }
 
@@ -360,7 +362,7 @@ public class CECaseBase
      * @param cd     
      */
     public void setClosingDateUtilDate(java.util.Date cd) {
-        closingDate = convertUtilDate(cd);
+        closingDate = DateTimeUtil.convertUtilDate(cd);
         closingDateUtilDate = cd;
     }
 
@@ -368,7 +370,7 @@ public class CECaseBase
      * @return the originationDateUtilDate
      */
     public java.util.Date getOriginationDateUtilDate() {
-        originationDateUtilDate = convertUtilDate(originationDate);
+        originationDateUtilDate = DateTimeUtil.convertUtilDate(originationDate);
         return originationDateUtilDate;
     }
 
@@ -376,7 +378,7 @@ public class CECaseBase
      * @param od     
      */
     public void setOriginationDateUtilDate(java.util.Date od) {
-        originationDate = convertUtilDate(od);
+        originationDate = DateTimeUtil.convertUtilDate(od);
         this.originationDateUtilDate = od;
     }
 

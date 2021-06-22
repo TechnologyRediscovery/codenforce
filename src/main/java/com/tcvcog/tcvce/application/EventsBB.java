@@ -49,6 +49,7 @@ import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.integration.EventIntegrator;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.io.Serializable;
@@ -77,7 +78,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
     
     private List<EventDomainEnum> eventDomainList;
     private EventDomainEnum eventDomainActive;
-    private EventDomainEnum eventDomianSelected;
+    private EventDomainEnum eventDomainSelected;
     private IFace_EventRuleGoverned currentERGBOb;
     private String currentERGBObTitle;
     private EventCnFPropUnitCasePeriodHeavy currentEvent;
@@ -267,7 +268,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
      
      */
     public void onEventDomainListChange(){
-        configureEventDomain(eventDomianSelected);
+        configureEventDomain(eventDomainSelected);
         
         
     }
@@ -985,7 +986,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
                     sb.append(" (");
                     sb.append(op.getPropUnitProp().getProperty().getMuni().getMuniName());
                     sb.append(") | Start Date: ");
-                    sb.append(getPrettyDateNoTime(op.getStartDate()));
+                    sb.append(DateTimeUtil.getPrettyDateNoTime(op.getStartDate()));
                     
                 }
             }
@@ -1592,14 +1593,14 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
      * @return the eventDomianSelected
      */
     public EventDomainEnum getEventDomianSelected() {
-        return eventDomianSelected;
+        return eventDomainSelected;
     }
 
     /**
      * @param eventDomianSelected the eventDomianSelected to set
      */
     public void setEventDomianSelected(EventDomainEnum eventDomianSelected) {
-        this.eventDomianSelected = eventDomianSelected;
+        this.eventDomainSelected = eventDomianSelected;
     }
 
     /**

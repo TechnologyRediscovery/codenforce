@@ -22,6 +22,8 @@ import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccApplication;
 import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -82,7 +84,7 @@ public class OccPermitApplication extends BOb {
      */
     public String getSubmissionDatePretty() {
        
-        return EntityUtils.getPrettyDate(submissionDate);
+        return DateTimeUtil.getPrettyDate(submissionDate);
     }
     
     /**
@@ -136,13 +138,13 @@ public class OccPermitApplication extends BOb {
     }
 
     public Date getSubmissionDateUtilDate() {
-        submissionDateUtilDate = convertUtilDate(submissionDate);
+        submissionDateUtilDate = DateTimeUtil.convertUtilDate(submissionDate);
         return submissionDateUtilDate;
     }
 
     public void setSubmissionDateUtilDate(Date submissionDateUtilDate) {
         this.submissionDateUtilDate = submissionDateUtilDate;
-        submissionDate = convertUtilDate(submissionDateUtilDate);
+        submissionDate = DateTimeUtil.convertUtilDate(submissionDateUtilDate);
     }
 
     public PropertyUnit getApplicationPropertyUnit() {

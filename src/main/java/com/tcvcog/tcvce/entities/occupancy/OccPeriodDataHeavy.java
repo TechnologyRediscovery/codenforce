@@ -45,9 +45,9 @@ import java.util.List;
  * @author sylvia
  */
 public  class       OccPeriodDataHeavy 
-        extends     OccPeriod 
+        extends     OccPeriodPropertyUnitHeavy
         implements  IFace_EventRuleGoverned, 
-                    IFace_CredentialSigned{
+                    IFace_CredentialSigned {
     
     protected OccPeriodStatusEnum status;
 
@@ -77,80 +77,67 @@ public  class       OccPeriodDataHeavy
      * Populates superclass members and stamps the 
      * authorizing Credential's signature
      * 
-     * @param opLight 
+     * @param otherPeriodLight
      * @param cred 
      */
-    public OccPeriodDataHeavy(OccPeriod opLight, Credential cred) {
-        this.credentialSignature = cred.getSignature();
-        
-        this.periodID = opLight.periodID;
-        this.propertyUnitID = opLight.propertyUnitID;
-        this.type = opLight.type;
-        
-        this.governingInspection = opLight.governingInspection;
-        this.manager = opLight.manager;
-        
-        this.periodTypeCertifiedBy = opLight.periodTypeCertifiedBy;
-        this.periodTypeCertifiedTS = opLight.periodTypeCertifiedTS;
-        
-        this.source = opLight.source;
-        this.createdBy = opLight.createdBy;
-        this.createdTS = opLight.createdTS;
-        
-        this.startDate = opLight.startDate;
-        this.startDateCertifiedTS = opLight.startDateCertifiedTS;
-        this.startDateCertifiedBy = opLight.startDateCertifiedBy;
-        
-        this.endDate = opLight.endDate;
-        this.endDateCertifiedTS = opLight.endDateCertifiedTS;
-        this.endDateCertifiedBy = opLight.endDateCertifiedBy;
-        
-        this.authorizedTS = opLight.authorizedTS;
-        this.authorizedBy = opLight.authorizedBy;
-        
-        this.overrideTypeConfig = opLight.overrideTypeConfig;
-        this.notes = opLight.notes;
-        
-        this.active = opLight.active;
+    public OccPeriodDataHeavy(OccPeriod otherPeriodLight, Credential cred) {
+        super(otherPeriodLight);
 
+        this.credentialSignature = cred.getSignature();
+    }
+
+    /**
+     * Populates superclass members and stamps the
+     * authorizing Credential's signature
+     * This one is for a superclass with property unit info, though.
+     *
+     * @param otherPeriodLighter
+     * @param cred
+     */
+    public OccPeriodDataHeavy(OccPeriodPropertyUnitHeavy otherPeriodLighter, Credential cred) {
+        super(otherPeriodLighter);
+
+        this.credentialSignature = cred.getSignature();
+    }
+
+    /**
+     * Complete copy of another OccPeriodDataHeavy, including credential signature
+     *
+     * @param otherPeriod
+     */
+    public OccPeriodDataHeavy(OccPeriodDataHeavy otherPeriod) {
+        super(otherPeriod);
+
+        this.status = otherPeriod.status;
+
+        this.applicationList = otherPeriod.applicationList;
+        this.personListApplicants = otherPeriod.personListApplicants;
+        this.personList = otherPeriod.personList;
+
+        this.proposalList = otherPeriod.proposalList;
+        this.eventRuleList = otherPeriod.eventRuleList;
+
+        this.inspectionList = otherPeriod.inspectionList;
+        this.permitList = otherPeriod.permitList;
+
+        this.blobIDList = otherPeriod.blobIDList;
+
+        this.feeList = otherPeriod.feeList;
+        this.paymentList = otherPeriod.paymentList;
+
+        this.configuredTS = otherPeriod.configuredTS;
+        this.credentialSignature = otherPeriod.credentialSignature;
     }
 
     /**
      * Pre-credential requiring method for creating detailed subclass
-     * 
-     * @deprecated 
-     * @param opLight 
+     *
+     * @param otherPeriodLight
      */
-    public OccPeriodDataHeavy(OccPeriod opLight) {
-        this.periodID = opLight.periodID;
-        this.propertyUnitID = opLight.propertyUnitID;
-        this.type = opLight.type;
-        
-        this.governingInspection = opLight.governingInspection;
-        this.manager = opLight.manager;
-        
-        this.periodTypeCertifiedBy = opLight.periodTypeCertifiedBy;
-        this.periodTypeCertifiedTS = opLight.periodTypeCertifiedTS;
-        
-        this.source = opLight.source;
-        this.createdBy = opLight.createdBy;
-        this.createdTS = opLight.createdTS;
-        
-        this.startDate = opLight.startDate;
-        this.startDateCertifiedTS = opLight.startDateCertifiedTS;
-        this.startDateCertifiedBy = opLight.startDateCertifiedBy;
-        
-        this.endDate = opLight.endDate;
-        this.endDateCertifiedTS = opLight.endDateCertifiedTS;
-        this.endDateCertifiedBy = opLight.endDateCertifiedBy;
-        
-        this.authorizedTS = opLight.authorizedTS;
-        this.authorizedBy = opLight.authorizedBy;
-        
-        this.overrideTypeConfig = opLight.overrideTypeConfig;
-        this.notes = opLight.notes;
-
+    public OccPeriodDataHeavy(OccPeriod otherPeriodLight) {
+        super(otherPeriodLight);
     }
+
     
     @Override
     public EventDomainEnum discloseEventDomain() {

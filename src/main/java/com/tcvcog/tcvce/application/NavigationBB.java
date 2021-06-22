@@ -26,6 +26,8 @@ import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -235,7 +237,25 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
         return navTo;
         
     }
-    
+
+    /**
+     * Listener for user requests to view an occ period from the active object box navlist
+     * @param period
+     * @return
+     */
+    public String onOccPeriodListItemSelect(OccPeriod period){
+        String navTo = "";
+        try {
+            navTo = getSessionBean().activateSessionObject(period);
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+                    "Unable to load selected property", ""));
+        }
+
+        return navTo;
+    }
     
 
     //Eric

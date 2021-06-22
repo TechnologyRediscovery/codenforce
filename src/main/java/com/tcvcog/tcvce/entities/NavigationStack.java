@@ -27,6 +27,7 @@ import javax.faces.context.FacesContext;
  */
 public class NavigationStack {
 
+
     private LinkedList<String> viewIDStack;
 
     public NavigationStack() {
@@ -88,6 +89,10 @@ public class NavigationStack {
 
         return viewIDStack.peek();
 
+    }
+
+    public LinkedList<String> getViewIDStack() {
+        return viewIDStack;
     }
 
 }

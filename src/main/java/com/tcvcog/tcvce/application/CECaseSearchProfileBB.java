@@ -24,7 +24,6 @@ import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
@@ -67,6 +66,7 @@ import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
@@ -730,8 +730,7 @@ public class CECaseSearchProfileBB
      * Listener for user requests to commit new note content to the current
      * Property
      *
-     * @param ev
-     * @return 
+     * @return
      */
     public String onCaseNoteCommitButtonChange() {
         CaseCoordinator cc = getCaseCoordinator();
@@ -748,7 +747,7 @@ public class CECaseSearchProfileBB
             cc.cecase_updateCECaseNotes(mbp, currentCase);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Succesfully appended note!", ""));
+                            "Successfully appended note!", ""));
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -1204,7 +1203,7 @@ public class CECaseSearchProfileBB
         } 
         getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                    "Stipulated compliance dates is now: " + getPrettyDate(getCurrentViolation().getStipulatedComplianceDate()), ""));
+                                    "Stipulated compliance dates is now: " + DateTimeUtil.getPrettyDate(getCurrentViolation().getStipulatedComplianceDate()), ""));
         return "ceCaseProfile";
 
     }

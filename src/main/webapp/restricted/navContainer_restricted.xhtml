@@ -8,11 +8,12 @@
 
     <h:head>
         <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/resources/favicon.ico"/>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <h:outputStylesheet name="css/style.css"/>
+        <h:outputStylesheet name="css/primeflex.min.css"/>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
         <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"/>
-        <link href='https://fonts.googleapis.com/css?family=Heebo' rel='stylesheet'/>
+        <link href="https://fonts.googleapis.com/css?family=Heebo" rel="stylesheet"/>
         <title>codeNforce</title>
     </h:head>
     <h:body>
@@ -58,10 +59,10 @@
                                                    var="sidebarnavitem">
                                             <div class="sidebar_menu">
                                                 <div class="sidebar_item">
-                                                    <div class="sidebar_firstmenu_item" >
+                                                    <div class="sidebar_firstmenu_item">
                                                         <div class="sidebar_firstmenu_item_containner">
                                                             <i class="#{sidebarnavitem.icon}"/>
-                                                            <div class="sidebar_firstmenu_font" >
+                                                            <div class="sidebar_firstmenu_font">
                                                                 #{sidebarnavitem.value}
                                                             </div>
                                                         </div>
@@ -72,13 +73,12 @@
                                                             <div class="sidebar_secondmenu_item">
                                                                 <div class="sidebar_secondmenu_item_containner">
                                                                     <i class="#{sidebarnavsubnavitem.getIcon()}"/>
-                                                                    <div class="sidebar_secondmenu_font" >
+                                                                    <div class="sidebar_secondmenu_font">
                                                                         <p:commandLink
                                                                             style="color: inherit; text-decoration: none"
                                                                             action="#{sidebarnavsubnavitem.getPagePath()}"
                                                                             value="#{sidebarnavsubnavitem.value}" 
-                                                                            ajax="false" 
-                                                                            />
+                                                                            ajax="false"/>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -87,22 +87,22 @@
                                                 </div>
                                             </div>                                
                                         </ui:repeat>
-                                        <p:commandButton    id="navcontres-button-logout"
-                                                            action="#{systemServicesBB.logout}" 
-                                                            value=""
-                                                            title="Logout"
-                                                            style="width:10px"
-                                                            icon="fa fa-sign-out"
-                                                            ajax="false"/>
+                                        <p:commandButton id="navcontres-button-logout"
+                                                         action="#{systemServicesBB.logout}"
+                                                         value=""
+                                                         title="Logout"
+                                                         style="width:10px"
+                                                         icon="fa fa-sign-out"
+                                                         ajax="false"/>
                                     </div>
                                 </div>
                             </h:form>
 
                             <!-- TOP NAVIGATION BAR -->
                             <div class="ui-g data_container_nested_restrict" style="background-color: gray; margin-bottom: 0px;">
-                                <h:form id="topnavbar">
+                                <h:form styleClass="p-grid p-p-3" id="topnavbar">
                                     
-                                    <div class="activebob-container"
+                                    <div class="activebob-container p-col"
                                          id="activbob-muni">
 
                                         <div class="ui-g data_container_nested_restrict">
@@ -119,7 +119,7 @@
                                                         </i>
                                                     </div>
 
-                                                    <h:outputText value="Municipality" />
+                                                    <h:outputText value="Municipality"/>
                                                 </div>
                                                 <div class="aob-container aob-container-objectstring">
 
@@ -148,7 +148,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="activebob-container "
+                                    <div class="activebob-container p-col"
                                          id="activbob-code">
 
                                         <div class="ui-g data_container_nested_restrict">
@@ -165,7 +165,7 @@
                                                         </i>
                                                     </div>
 
-                                                    <h:outputText value="Code Book" />
+                                                    <h:outputText value="Code Book"/>
                                                 </div>
                                             </div>    
                                         
@@ -204,7 +204,7 @@
                                     </div>
 
 
-                                    <div class="activebob-container"
+                                    <div class="activebob-container p-col"
                                          id="aob-property">
 
                                         <div class="ui-g data_container_nested_restrict">
@@ -221,12 +221,12 @@
                                                         </i>
                                                     </div>
 
-                                                    <h:outputText value="Property" />
+                                                    <h:outputText value="Property"/>
                                                 </div>
                                                 <div class="aob-container aob-container-objectstring">
 
 
-                                                    <h:outputText value="#{sessionBean.sessProperty.address}" />
+                                                    <h:outputText value="#{sessionBean.sessProperty.address}"/>
 
                                                 </div>
                                                 <div class="aob-container aob-container-actions">
@@ -242,21 +242,20 @@
 
                                                         <p:commandLink id="activebob-proplist-cb"
                                                                        value="change"
-                                                                       oncomplete="PF('activebob-proplist-overlay-var').show();" />
+                                                                       oncomplete="PF('activebob-proplist-overlay-var').show();"/>
                                                     </div>
 
                                                     <p:overlayPanel id="activebob-proplist-overlay"
                                                                     widgetVar="activebob-proplist-overlay-var"
                                                                     appendTo="activebob-property"
-                                                                    dismissable="true"
-                                                                    >
-                                                        <h:outputText value="#{sessionBean.sessPropertyList.size()} properties:" />
+                                                                    dismissable="true">
+                                                        <b><h:outputText value="#{sessionBean.sessPropertyList.size()} properties:"/></b><br/>
 
                                                         <ui:repeat id="activebob-proplist-repeat"
                                                                    value="#{sessionBean.sessPropertyList}"
                                                                    var="sprop">
 
-                                                            <h:outputText value="#{sprop.address}" />
+                                                            <h:outputText value="#{sprop.address}"/>
 
                                                             <div class="restrict-main-contents-io-link link-button">
                                                                 <p:commandLink id="activebob-proplist-prop-explore-cl"
@@ -265,7 +264,6 @@
                                                                                ajax="false">
                                                                 </p:commandLink>
                                                             </div>
-
                                                         </ui:repeat>
 
                                                         <p:commandLink id="activebob-property-view-cl"
@@ -280,7 +278,7 @@
                                     </div>
 
 
-                                    <div class="activebob-container"
+                                    <div class="activebob-container p-col"
                                          id="aob-person">
 
                                         <div class="ui-g data_container_nested_restrict">
@@ -297,11 +295,11 @@
                                                         </i>
                                                     </div>
 
-                                                    <h:outputText value="Person" />
+                                                    <h:outputText value="Person"/>
                                                 </div>
                                                 <div class="aob-container aob-container-objectstring">
 
-                                                    <h:outputText value="#{sessionBean.sessPerson.firstName} #{sessionBean.sessPerson.lastName} (ID:#{sessionBean.sessPerson.personID})" />
+                                                    <h:outputText value="#{sessionBean.sessPerson.firstName} #{sessionBean.sessPerson.lastName} (ID:#{sessionBean.sessPerson.personID})"/>
 
 
                                                 </div>
@@ -322,20 +320,17 @@
 
                                                         <p:commandLink  id="activebob-perslist-cb"
                                                                         value="change"
-                                                                        oncomplete="PF('activebob-perslist-overlay-var').show();" />
+                                                                        oncomplete="PF('activebob-perslist-overlay-var').show();"/>
                                                     </div>
-
-
                                                 </div>
 
                                             </div>
                                             <p:overlayPanel id="activebob-perslist-overlay"
                                                             widgetVar="activebob-perslist-overlay-var"
                                                             appendTo="activebob-person"
-                                                            dismissable="true"
-                                                            >
+                                                            dismissable="true">
 
-                                                <h:outputText value="#{sessionBean.sessPersonList.size()} persons" />
+                                                <b><h:outputText value="#{sessionBean.sessPersonList.size()} persons:"/></b><br/>
 
                                                 <ui:repeat id="activebob-perslist-repeat"
                                                            value="#{sessionBean.sessPersonList}"
@@ -343,8 +338,8 @@
                                                     <p:commandLink id="activebob-proplist-prop-explore-cl"
                                                                    action="#{navigationBB.onViewPersonListItemSelect(spers)}"
                                                                    ajax="false">
-                                                        <h:outputText value="#{spers.firstName} #{spers.lastName}: #{spers.personType.label} (ID:#{spers.personID})" />
-                                                        <p:spacer height="3px" />
+                                                        <h:outputText value="#{spers.firstName} #{spers.lastName}: #{spers.personType.label} (ID:#{spers.personID})"/>
+                                                        <p:spacer height="3px"/>
                                                     </p:commandLink>
 
 
@@ -354,7 +349,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="activebob-container"
+                                    <div class="activebob-container p-col"
                                          id="aob-cecase">
 
                                         <div class="ui-g data_container_nested_restrict">
@@ -371,11 +366,11 @@
                                                         </i>
                                                     </div>
 
-                                                    <h:outputText value="CE Case" />
+                                                    <h:outputText value="CE Case"/>
                                                 </div>
                                                 <div class="aob-container aob-container-objectstring">
 
-                                                    <h:outputText value="#{sessionBean.sessCECase.caseName} (#{sessionBean.sessCECase.caseID})" />
+                                                    <h:outputText value="#{sessionBean.sessCECase.caseName} (ID:#{sessionBean.sessCECase.caseID})"/>
 
                                                 </div>
                                                 <div class="aob-container aob-container-actions">
@@ -384,14 +379,14 @@
                                                         <p:commandLink id="activebob-cecase-view-cl"
                                                                        value="view"
                                                                        ajax="false"
-                                                                       action="ceCaseSearchProfile" />
+                                                                       action="ceCaseSearchProfile"/>
                                                     </div>
 
                                                     <div class="restrict-main-contents-io-link link-button">
 
                                                         <p:commandLink  id="activebob-cecaselist-cb"
                                                                         value="change"
-                                                                        oncomplete="PF('activebob-cecaselist-overlay-var').show();" />
+                                                                        oncomplete="PF('activebob-cecaselist-overlay-var').show();"/>
                                                     </div>
 
 
@@ -401,9 +396,9 @@
                                             <p:overlayPanel id="activebob-cecaselist-overlay"
                                                             widgetVar="activebob-cecaselist-overlay-var"
                                                             appendTo="activebob-cecase"
-                                                            dismissable="true"
-                                                            >
-                                                <h:outputText value="#{sessionBean.sessCECaseList.size()}"/>
+                                                            dismissable="true">
+
+                                                <b><h:outputText value="#{sessionBean.sessCECaseList.size()} cases:"/></b><br/>
 
                                                 <ui:repeat id="activebob-cecaselist-repeat"
                                                            value="#{sessionBean.sessCECaseList}"
@@ -411,43 +406,97 @@
                                                     <p:commandLink id="activebob-proplist-prop-explore-cl"
                                                                    ajax="false"
                                                                    action="#{navigationBB.onCECaseListItemSelect(cse)}">
-                                                        <h:outputText value="#{cse.caseName} at #{cse.property.address} (ID:#{cse.caseID})" />
+                                                        <h:outputText value="#{cse.caseName} at #{cse.property.address} (ID:#{cse.caseID})"/>
                                                     </p:commandLink>
 
 
-                                                    <p:spacer height="2px" />
+                                                    <p:spacer height="2px"/>
                                                 </ui:repeat>
                                             </p:overlayPanel>
                                         </div>
                                     </div>
 
-                                    
+                                    <div class="activebob-container p-col"
+                                         id="aob-occperiod">
+
+                                        <div class="ui-g data_container_nested_restrict">
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
+                                                <div class="aob-container aob-container-iconifiedheader">
+                                                    <div class="inline-icon">
+                                                        <i class="material-icons">
+                                                            <h:outputText value="date_range"/>
+                                                        </i>
+                                                    </div>
+                                                    <h:outputText value="Occupancy Period"/>
+                                                </div>
+
+                                                <div class="aob-container aob-container-objectstring">
+                                                    <h:outputText value="#{sessionBean.sessOccPeriod.type.title} | Unit #{sessionBean.sessOccPeriod.propUnitProp.unitNumber} (ID:#{sessionBean.sessOccPeriod.periodID})"/>
+                                                </div>
+
+                                                <div class="aob-container aob-container-actions">
+                                                    <div class="restrict-main-contents-io-link link-button">
+                                                        <p:commandLink id="activebob-occperiod-view-cl"
+                                                                       value="view"
+                                                                       ajax="false"
+                                                                       action="occPeriodWorkflow"/>
+                                                    </div>
+
+                                                    <div class="restrict-main-contents-io-link link-button">
+                                                        <p:commandLink  id="activebob-occperiodlist-cb"
+                                                                        value="change"
+                                                                        oncomplete="PF('activebob-occperiodlist-overlay-var').show();"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p:overlayPanel id="activebob-occperiodlist-overlay"
+                                                            widgetVar="activebob-occperiodlist-overlay-var"
+                                                            appendTo="activebob-occperiod"
+                                                            dismissable="true">
+
+                                                <b><h:outputText value="#{sessionBean.sessOccPeriodList.size()} periods:"/></b><br/>
+
+                                                <ui:repeat id="activebob-occperiodlist-repeat"
+                                                           value="#{sessionBean.sessOccPeriodList}"
+                                                           var="ose">
+                                                    <p:commandLink id="activebob-proplist-prop-explore-cl"
+                                                                   ajax="false"
+                                                                   action="#{navigationBB.onOccPeriodListItemSelect(ose)}">
+                                                        <h:outputText value="#{ose.propUnitProp.property.address} #{ose.propUnitProp.unitNumber} (ID:#{ose.periodID})"/>
+                                                    </p:commandLink>
+
+
+                                                    <p:spacer height="2px"/>
+                                                </ui:repeat>
+                                            </p:overlayPanel>
+                                        </div>
+                                    </div>
                                 </h:form>
                             </div>
                             <div style="float:right;">
                                 <h:form id="userform">
 
-                                        <h:outputText value="#{systemServicesBB.bbSessionUser.person.firstName} #{systemServicesBB.bbSessionUser.person.lastName} ( #{systemServicesBB.bbSessionUser.username})"/>
+                                    <h:outputText value="#{systemServicesBB.bbSessionUser.person.firstName} #{systemServicesBB.bbSessionUser.person.lastName} ( #{systemServicesBB.bbSessionUser.username})"/>
                                     
-                                  <div class="restrict-main-contents-io-link link-button">
-                                                        <p:commandLink        id="navbar-button-usersettings2"
-                                                                              ajax="true" 
-                                                                              actionListener="#{userBB.initiateUserUpdates}"
-                                                                              rendered="true"
-                                                                              disabled="false"
-                                                                              oncomplete="PF('navcontainer-dialog-usersettings').show()"
-                                                                              value="user settings" 
-                                                                              update="usersettings-form"/>
-                                                    </div>
+                                        <div class="restrict-main-contents-io-link link-button">
+                                            <p:commandLink id="navbar-button-usersettings2"
+                                                           ajax="true"
+                                                           actionListener="#{userBB.initiateUserUpdates}"
+                                                           rendered="true"
+                                                           disabled="false"
+                                                           oncomplete="PF('navcontainer-dialog-usersettings').show()"
+                                                           value="user settings"
+                                                           update="usersettings-form"/>
+                                        </div>
 
 
-                                                    <div class="restrict-main-contents-io-link link-button">
+                                        <div class="restrict-main-contents-io-link link-button">
 
-                                                        <p:commandLink    id="navcontres-button-logout2"
-                                                                          action="#{systemServicesBB.logout}" 
-                                                                          value="logout"
-                                                                          ajax="false"/>
-                                                    </div>
+                                            <p:commandLink id="navcontres-button-logout2"
+                                                           action="#{systemServicesBB.logout}"
+                                                           value="logout"
+                                                           ajax="false"/>
+                                        </div>
                                 </h:form>
                             </div>
 
@@ -461,20 +510,20 @@
 
 
                                 <h2>
-                                    <h:outputText value="User settings:" />
+                                    <h:outputText value="User settings:"/>
 
-                                    <h:outputText value="#{userBB.currentUser.username}" />
+                                    <h:outputText value="#{userBB.currentUser.username}"/>
                                     <h:outputText value="(ID: "/>
-                                    <h:outputText value="#{userBB.currentUser.userID}" />
-                                    <h:outputText value=")" />
-                                    <h:outputText value=" " />
-                                    <h:outputText value="#{userBB.currentUser.person.firstName}" />
-                                    <h:outputText value=" " />
-                                    <h:outputText value="#{userBB.currentUser.person.lastName}" />
-                                    <h:outputText value=" " />
+                                    <h:outputText value="#{userBB.currentUser.userID}"/>
+                                    <h:outputText value=")"/>
+                                    <h:outputText value=" "/>
+                                    <h:outputText value="#{userBB.currentUser.person.firstName}"/>
+                                    <h:outputText value=" "/>
+                                    <h:outputText value="#{userBB.currentUser.person.lastName}"/>
+                                    <h:outputText value=" "/>
                                     <h:outputText value="(ID: "/>
-                                    <h:outputText value="#{userBB.currentUser.person.personID}" />
-                                    <h:outputText value=")" />
+                                    <h:outputText value="#{userBB.currentUser.person.personID}"/>
+                                    <h:outputText value=")"/>
                                 </h2>
 
                                 <div class="ui-g data-container">
@@ -482,20 +531,20 @@
                                     <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
 
-                                        <h:outputText value="#{userBB.currentUser.role.label}" />
-                                        <h:outputText value=":" />
+                                        <h:outputText value="#{userBB.currentUser.role.label}"/>
+                                        <h:outputText value=":"/>
                                         <h:outputText value="rnk" 
                                                       class="dtype-label"/>
-                                        <h:outputText value=":" />
-                                        <h:outputText value="#{userBB.currentUser.role.rank}" />
+                                        <h:outputText value=":"/>
+                                        <h:outputText value="#{userBB.currentUser.role.rank}"/>
 
-                                        <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.muni.muniName}" />
-                                        <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.muni.muniName}" />
-                                        <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.userMuniAuthPeriodID}" />
-                                        <h:outputText value=" | " />
-                                        <h:outputText value="Period created TS:: #{userBB.getPrettyDate(userBB.currentUser.keyCard.governingAuthPeriod.createdTS)}" />
-                                        <h:outputText value=" | " />
-                                        <h:outputText value="Assignment priority:: #{userBB.currentUser.keyCard.governingAuthPeriod.assignmentRelativeOrder} " />
+                                        <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.muni.muniName}"/>
+                                        <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.muni.muniName}"/>
+                                        <h:outputText value="Auth Period ID:: #{userBB.currentUser.keyCard.governingAuthPeriod.userMuniAuthPeriodID}"/>
+                                        <h:outputText value=" | "/>
+                                        <h:outputText value="Period created TS:: #{userBB.getPrettyDate(userBB.currentUser.keyCard.governingAuthPeriod.createdTS)}"/>
+                                        <h:outputText value=" | "/>
+                                        <h:outputText value="Assignment priority:: #{userBB.currentUser.keyCard.governingAuthPeriod.assignmentRelativeOrder} "/>
 
                                         <h:form id="usersettings-messages-form-username">
                                             <h:messages id="usersettings-messages-username"
@@ -518,21 +567,21 @@
                                                          disabled="true"
                                                          validatorMessage="Length must be between 5 and 20 characters"
                                                          styleClass="inputText">
-                                                <f:validateLength minimum="4" maximum="50" />
+                                                <f:validateLength minimum="4" maximum="50"/>
                                             </p:inputText>
                                             <h:message for="usersettings-it-username" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
 
-                                            <p:commandButton    id="usersettings-button-updateusername"
-                                                                ajax="true"
-                                                                actionListener="#{userBB.commitUsernameUpdates}"
-                                                                icon="fa fa-thumbs-o-up"
-                                                                update="    usersettings-it-username
-                                                                usersettings-messages-form-username
-                                                                usersettings-notes-form"
-                                                                value="Update username" 
-                                                                rendered="false"
-                                                                tabindex="3"/>
+                                            <p:commandButton id="usersettings-button-updateusername"
+                                                             ajax="true"
+                                                             actionListener="#{userBB.commitUsernameUpdates}"
+                                                             icon="fa fa-thumbs-o-up"
+                                                             update="    usersettings-it-username
+                                                             usersettings-messages-form-username
+                                                             usersettings-notes-form"
+                                                             value="Update username"
+                                                             rendered="false"
+                                                             tabindex="3"/>
                                         </h:form>
 
                                         <h:form id="usersettings-messages-form-personlink">
@@ -547,47 +596,48 @@
 
                                         <h:form id="usersettings-form-userpersonlink">
 
-                                            <h:outputText value="Your user is currently mapped to: " />
-                                            <p:spacer height="5px" />
-                                            <h:outputText value="#{userBB.currentUser.person.firstName}" />
-                                            <h:outputText value=" " />
-                                            <h:outputText value="#{userBB.currentUser.person.lastName}" />
-                                            <h:outputText value=" (ID: #{userBB.currentUser.person.personID})" />
-                                            <h:outputText value=" " />
+                                            <h:outputText value="Your user is currently mapped to: "/>
+                                            <p:spacer height="5px"/>
+                                            <h:outputText value="#{userBB.currentUser.person.firstName}"/>
+                                            <h:outputText value=" "/>
+                                            <h:outputText value="#{userBB.currentUser.person.lastName}"/>
+                                            <h:outputText value=" (ID: #{userBB.currentUser.person.personID})"/>
+                                            <h:outputText value=" "/>
 
 
-                                            <p:spacer height="5px" />
+                                            <p:spacer height="5px"/>
 
-                                            <p:outputLabel  for="usersettings-som-userpersons" value="Available User-type persons:"/>
-                                            <p:selectOneMenu id="usersettings-som-userpersons" 
-                                                             required="true" 
+                                            <p:outputLabel for="usersettings-som-userpersons"
+                                                           value="Available User-type persons:"/>
+                                            <p:selectOneMenu id="usersettings-som-userpersons"
+                                                             required="true"
                                                              value="#{userBB.formSelectedUserPerson}">
-                                                <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                                <f:selectItem itemLabel="select a person..." noSelectionOption="true"/>
                                                 <f:selectItems value="#{userBB.userPersonList}"  var="p" itemValue="#{p}" 
                                                                itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
                                                 <f:converter converterId="personConverter"/>
                                             </p:selectOneMenu>
                                             <h:message for="usersettings-som-userpersons" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
 
 
-                                            <p:commandButton    id="usersettings-button-genuserpersonlist"
-                                                                ajax="true"
-                                                                actionListener="#{userBB.generateUserPersonList}"
-                                                                update="usersettings-som-userpersons"
-                                                                icon="fa fa-thumbs-0-up"
-                                                                value="Gemerate person list" 
-                                                                tabindex="3"/>
+                                            <p:commandButton id="usersettings-button-genuserpersonlist"
+                                                             ajax="true"
+                                                             actionListener="#{userBB.generateUserPersonList}"
+                                                             update="usersettings-som-userpersons"
+                                                             icon="fa fa-thumbs-0-up"
+                                                             value="Gemerate person list"
+                                                             tabindex="3"/>
 
-                                            <p:commandButton    id="usersettings-button-updatepersonlink"
-                                                                ajax="true"
-                                                                actionListener="#{userBB.commitUserPersonUpdates}"
-                                                                update="usersettings-messages-form-personlink
-                                                                usersettings-form-userpersonlink
-                                                                usersettings-notes-form"
-                                                                icon="fa fa-thumbs-0-up"
-                                                                value="Update person link" 
-                                                                tabindex="4"/>
+                                            <p:commandButton id="usersettings-button-updatepersonlink"
+                                                             ajax="true"
+                                                             actionListener="#{userBB.commitUserPersonUpdates}"
+                                                             update="usersettings-messages-form-personlink
+                                                             usersettings-form-userpersonlink
+                                                             usersettings-notes-form"
+                                                             icon="fa fa-thumbs-0-up"
+                                                             value="Update person link"
+                                                             tabindex="4"/>
                                         </h:form>
 
                                         <h:form id="usersettings-messages-form-updatepassword">
@@ -614,10 +664,10 @@
                                                         validatorMessage="Length must be between 8 and 50 characters"
                                                         feedback="true"
                                                         styleClass="inputText">
-                                                <f:validateLength minimum="8" maximum="50" />
+                                                <f:validateLength minimum="8" maximum="50"/>
                                             </p:password>
 
-                                            <p:spacer height="5px" />
+                                            <p:spacer height="5px"/>
 
                                             <p:outputLabel for="usersettings-it-password">
                                                 <h:outputText value="Re-enter password"/>
@@ -631,20 +681,20 @@
                                                         validatorMessage="Length must be between 8 and 50 characters"
                                                         feedback="true"
                                                         styleClass="inputText">
-                                                <f:validateLength minimum="8" maximum="50" />
+                                                <f:validateLength minimum="8" maximum="50"/>
                                             </p:password>
 
                                             <h:message for="usersettings-it-password" showDetail="false" showSummary="true" 
-                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                            <p:commandButton    id="usersettings-button-updatepassword"
-                                                                ajax="true"
-                                                                actionListener="#{userBB.commitPasswordUpdates}"
-                                                                update="usersettings-messages-form-updatepassword
-                                                                usersettings-form-updatepassword
-                                                                usersettings-notes-form"
-                                                                icon="fa fa-lock"
-                                                                value="Update password" 
-                                                                tabindex="3"/>
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
+                                            <p:commandButton id="usersettings-button-updatepassword"
+                                                             ajax="true"
+                                                             actionListener="#{userBB.commitPasswordUpdates}"
+                                                             update="usersettings-messages-form-updatepassword
+                                                             usersettings-form-updatepassword
+                                                             usersettings-notes-form"
+                                                             icon="fa fa-lock"
+                                                             value="Update password"
+                                                             tabindex="3"/>
                                         </h:form>
 
 
@@ -652,10 +702,10 @@
                                         <h:form id="usersettings-notes-form">
 
                                             <h:outputText value="Notes: " styleClass="bold"/>
-                                            <p:spacer height="3px" />
+                                            <p:spacer height="3px"/>
                                             <h:outputText   id="usersettings-notes-ot"
                                                             value="#{userBB.currentUser.notes}" 
-                                                            escape="false" />
+                                                            escape="false"/>
                                         </h:form>
 
 
@@ -680,21 +730,21 @@
 
                                                 <p:column width="3%" exportable="false">
                                                     <f:facet name="header">
-                                                        <h:outputText value="Expand row" />
+                                                        <h:outputText value="Expand row"/>
                                                     </f:facet>
                                                     <p:rowToggler/>
                                                 </p:column>
 
                                                 <p:column>
                                                     <f:facet name="header">
-                                                        <h:outputText value="Period ID" />
+                                                        <h:outputText value="Period ID"/>
                                                     </f:facet>
                                                     <h:outputText value="#{period.userMuniAuthPeriodID}"/>
                                                 </p:column>
 
                                                 <p:column>
                                                     <f:facet name="header">
-                                                        <h:outputText value="Muni" />
+                                                        <h:outputText value="Muni"/>
                                                     </f:facet>
                                                     <h:outputText value="#{period.muni.muniName}"/>
                                                 </p:column>
@@ -702,21 +752,21 @@
 
                                                 <p:column>
                                                     <f:facet name="header">
-                                                        <h:outputText value="Access start" />
+                                                        <h:outputText value="Access start"/>
                                                     </f:facet>
                                                     <h:outputText value="#{systemServicesBB.getPrettyDate(period.startDate)}"/>
                                                 </p:column>
 
                                                 <p:column>
                                                     <f:facet name="header">
-                                                        <h:outputText value="Access stop" />
+                                                        <h:outputText value="Access stop"/>
                                                     </f:facet>
                                                     <h:outputText value="#{systemServicesBB.getPrettyDate(period.stopDate)}"/>
                                                 </p:column>
 
                                                 <p:column>
                                                     <f:facet name="header">
-                                                        <h:outputText value="Role" />
+                                                        <h:outputText value="Role"/>
                                                     </f:facet>
                                                     <h:outputText value="#{period.role.label}"/>
                                                     <h:outputText value=" (rank: #{period.role.rank})"/>
@@ -724,13 +774,13 @@
 
                                                 <p:column>
                                                     <f:facet name="header">
-                                                        <h:outputText value="Deactivated TS" />
+                                                        <h:outputText value="Deactivated TS"/>
                                                     </f:facet>
                                                     <h:outputText value="#{systemServicesBB.getPrettyDate(period.recorddeactivatedTS)}"/>
                                                 </p:column>
                                                 <p:column>
                                                     <f:facet name="header">
-                                                        <h:outputText value="Assignment rank" />
+                                                        <h:outputText value="Assignment rank"/>
                                                     </f:facet>
                                                     <h:outputText value="#{period.assignmentRelativeOrder}"/>
                                                 </p:column>
@@ -738,7 +788,7 @@
 
                                                 <p:column>
                                                     <f:facet name="header">
-                                                        <h:outputText value="Actions" />
+                                                        <h:outputText value="Actions"/>
                                                     </f:facet>
                                                     <p:commandButton ajax="true"
                                                                      id="usersettings-umaps-button-credentialize" 
@@ -746,23 +796,23 @@
                                                                      icon="fa fa-credit-card"
                                                                      styleClass="multiButtonLineButton" 
                                                                      actionListener="#{userBB.credentializeUserMuniAuthPeriod(period)}"
-                                                                     update="usersettings-umaps-messages-form" />
+                                                                     update="usersettings-umaps-messages-form"/>
                                                 </p:column>
                                                 <p:rowExpansion>
                                                     <div class="outlinedBox">
 
 
 
-                                                        <h:outputLabel value="Created by: " />
-                                                        <p:spacer height="0px" />
-                                                        <h:outputLabel value="user id: " />
-                                                        <h:outputText value="#{period.createdByUserID}" />
+                                                        <h:outputLabel value="Created by: "/>
+                                                        <p:spacer height="0px"/>
+                                                        <h:outputLabel value="user id: "/>
+                                                        <h:outputText value="#{period.createdByUserID}"/>
 
 
-                                                        <h:outputLabel value="Created TS:" />
+                                                        <h:outputLabel value="Created TS:"/>
                                                         <h:outputText value="#{systemServicesBB.getPrettyDate(period.createdTS)}"/>
 
-                                                        <h:outputLabel value="Notes" />
+                                                        <h:outputLabel value="Notes"/>
                                                         <h:outputText value="#{period.notes}" escape="false"/>
 
                                                         <h4>Log entries associated with this authorization period</h4>
@@ -780,31 +830,31 @@
 
                                                                 <p:column>
                                                                     <f:facet name="header">
-                                                                        <h:outputText value="Log entry ID" />
+                                                                        <h:outputText value="Log entry ID"/>
                                                                     </f:facet>
                                                                     <h:outputText value="#{entry.logBookEntryID}"/>
                                                                 </p:column>
                                                                 <p:column>
                                                                     <f:facet name="header">
-                                                                        <h:outputText value="AuthPerID" />
+                                                                        <h:outputText value="AuthPerID"/>
                                                                     </f:facet>
                                                                     <h:outputText value="#{entry.userMuniAuthPeriodID}"/>
                                                                 </p:column>
                                                                 <p:column>
                                                                     <f:facet name="header">
-                                                                        <h:outputText value="Cat" />
+                                                                        <h:outputText value="Cat"/>
                                                                     </f:facet>
                                                                     <h:outputText value="#{entry.category}"/>
                                                                 </p:column>
                                                                 <p:column>
                                                                     <f:facet name="header">
-                                                                        <h:outputText value="TS" />
+                                                                        <h:outputText value="TS"/>
                                                                     </f:facet>
                                                                     <h:outputText value="#{entry.entryTS}"/>
                                                                 </p:column>
                                                                 <p:column>
                                                                     <f:facet name="header">
-                                                                        <h:outputText value="Client address" />
+                                                                        <h:outputText value="Client address"/>
                                                                     </f:facet>
                                                                     <h:outputText value="#{entry.header_remoteaddr}"/>
                                                                 </p:column>
