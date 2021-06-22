@@ -31,7 +31,7 @@ import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
-import com.tcvcog.tcvce.entities.PersonOccApplication;
+import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.PersonWithChanges;
 import com.tcvcog.tcvce.entities.Property;
@@ -1106,8 +1106,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public List<PersonOccApplication> getPersonOccApplicationList(OccPermitApplication application) throws IntegrationException{
-        List<PersonOccApplication> personList = new ArrayList<>();
+    public List<OccApplicationHumanLink> getPersonOccApplicationList(OccPermitApplication application) throws IntegrationException{
+        List<OccApplicationHumanLink> personList = new ArrayList<>();
         String selectQuery =  "SELECT person_personid, occpermitapplication_applicationid, applicant, preferredcontact, \n" +
                                 "   applicationpersontype, active\n" +
                                 "   FROM public.occpermitapplicationperson WHERE occpermitapplication_applicationid=? AND active=true;";
@@ -1146,12 +1146,12 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public PersonOccApplication getPersonOccApplication(int personID, int applicationID) throws IntegrationException{
+    public OccApplicationHumanLink getPersonOccApplication(int personID, int applicationID) throws IntegrationException{
         String selectQuery =  "SELECT person_personid, applicant, preferredcontact, \n" +
                                 "   applicationpersontype, active\n" +
                                 "   FROM public.occpermitapplicationperson "
                               + "WHERE occpermitapplication_applicationid=? AND person_personID=?;";
-        PersonOccApplication output = null;
+        OccApplicationHumanLink output = null;
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -1185,8 +1185,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public List<PersonOccApplication> getPersonOccApplicationListWithInactive(OccPermitApplication application) throws IntegrationException{
-        List<PersonOccApplication> personList = new ArrayList<>();
+    public List<OccApplicationHumanLink> getPersonOccApplicationListWithInactive(OccPermitApplication application) throws IntegrationException{
+        List<OccApplicationHumanLink> personList = new ArrayList<>();
         String selectQuery =  "SELECT person_personid, occpermitapplication_applicationid, applicant, preferredcontact, \n" +
                                 "   applicationpersontype, active\n" +
                                 "   FROM public.occpermitapplicationperson WHERE occpermitapplication_applicationid=?;";
@@ -1216,8 +1216,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         return personList;
     }
     
-    private PersonOccApplication generatePersonOccPeriod(ResultSet rs) throws SQLException, IntegrationException{
-        PersonOccApplication pop = new PersonOccApplication(getPerson(rs.getInt("person_personid")));
+    private OccApplicationHumanLink generatePersonOccPeriod(ResultSet rs) throws SQLException, IntegrationException{
+        OccApplicationHumanLink pop = new OccApplicationHumanLink(getPerson(rs.getInt("person_personid")));
         pop.setApplicationID(rs.getInt("occpermitapplication_applicationid"));
         pop.setApplicant(rs.getBoolean("applicant"));
         pop.setPreferredContact(rs.getBoolean("preferredcontact"));

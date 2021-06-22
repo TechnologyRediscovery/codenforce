@@ -20,13 +20,22 @@ import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import java.time.LocalDateTime;
 
 /**
- *
- * @author sylvia
+ * Note that we might have thought that this class should
+ * extend Parcel: the tradeoff is that doing so would mean we lose
+ * the TrackedEntity superclass applied to externall scraped info. Not
+ * extending Parcel means that we can use the TrackedEntity tools
+ * easily and compose a Parcel of its Info bundles. Not extending also
+ * allows us to have a list of these objects in a single Parcel, not 
+ * something we can do with inheritance.
+ * 
+ * @author Ellen Bascomb of Apartment 31Y
  */
 public class ParcelInfo 
         extends TrackedEntity{
     
     protected PropertyUseType useType;
+    protected int parcelInfoID;
+    protected int parcelInternalID;
     
     protected String useGroup;
     protected String constructionType;
@@ -34,7 +43,6 @@ public class ParcelInfo
     protected String ownerCode;
     protected String propClass;
     
-    protected int parcelInfoID;
     protected OccLocationDescriptor  locationDescriptor;
     
     protected BOBSource bobSource;
@@ -513,6 +521,20 @@ public class ParcelInfo
      */
     public void setUseType(PropertyUseType useType) {
         this.useType = useType;
+    }
+
+    /**
+     * @return the parcelInternalID
+     */
+    public int getParcelInternalID() {
+        return parcelInternalID;
+    }
+
+    /**
+     * @param parcelInternalID the parcelInternalID to set
+     */
+    public void setParcelInternalID(int parcelInternalID) {
+        this.parcelInternalID = parcelInternalID;
     }
 
    

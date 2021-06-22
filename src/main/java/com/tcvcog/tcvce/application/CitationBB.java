@@ -24,7 +24,7 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Citation;
-import com.tcvcog.tcvce.entities.CitationStatus;
+import com.tcvcog.tcvce.entities.CitationStatusLogEntry;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CourtEntity;
 import com.tcvcog.tcvce.entities.PageModeEnum;
@@ -54,7 +54,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable {
     private Citation currentCitation;
     private CECaseDataHeavy currentCase;
 
-    private List<CitationStatus> citationStatusList;
+    private List<CitationStatusLogEntry> citationStatusList;
     private List<CourtEntity> courtEntityList;
 
     private boolean issueCitationDisabled;
@@ -434,7 +434,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the CitationStatusList
      */
-    public List<CitationStatus> getCitationStatusList() {
+    public List<CitationStatusLogEntry> getCitationStatusList() {
 
         return citationStatusList;
     }
@@ -442,7 +442,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable {
     /**
      * @param citationStatusList
      */
-    public void setCitationStatusList(List<CitationStatus> citationStatusList) {
+    public void setCitationStatusList(List<CitationStatusLogEntry> citationStatusList) {
         this.citationStatusList = citationStatusList;
     }
 

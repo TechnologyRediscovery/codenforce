@@ -26,7 +26,7 @@ import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonOccApplication;
+import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
@@ -52,7 +52,7 @@ public  class       OccPeriodDataHeavy
     protected OccPeriodStatusEnum status;
 
     private List<OccPermitApplication> applicationList;
-    private List<PersonOccApplication> personListApplicants;
+    private List<OccApplicationHumanLink> personListApplicants;
     private List<Person> personList;
     
     private List<Proposal> proposalList;
@@ -333,7 +333,7 @@ public  class       OccPeriodDataHeavy
     /**
      * @param personListApplicants the personListApplicants to set
      */
-    public void setPersonListApplicants(List<PersonOccApplication> personListApplicants) {
+    public void setPersonListApplicants(List<OccApplicationHumanLink> personListApplicants) {
         this.personListApplicants = personListApplicants;
     }
 
@@ -434,7 +434,7 @@ public  class       OccPeriodDataHeavy
         return personList;
     }
     
-    public List<PersonOccApplication> getPersonListApplicants(){
+    public List<OccApplicationHumanLink> getPersonListApplicants(){
         return personListApplicants;
     }
 

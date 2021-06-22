@@ -35,7 +35,7 @@ import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonOccApplication;
+import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -429,14 +429,14 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Bundles a PersonOccApplication into a
-     * PublicInfoBundlePersonoccApplication by stripping out its private
-     * information.
+     * Bundles a OccApplicationHumanLink into a
+ PublicInfoBundlePersonoccApplication by stripping out its private
+ information.
      *
      * @param input
      * @return
      */
-    public PublicInfoBundlePersonOccApplication extractPublicInfo(PersonOccApplication input) {
+    public PublicInfoBundlePersonOccApplication extractPublicInfo(OccApplicationHumanLink input) {
 
         PublicInfoBundlePersonOccApplication pib = new PublicInfoBundlePersonOccApplication();
 
@@ -458,7 +458,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             pib.setShowDetailsPageButton(true);
         } else {
-            PersonOccApplication skeleton = new PersonOccApplication();
+            OccApplicationHumanLink skeleton = new OccApplicationHumanLink();
             skeleton.setPersonID(input.getPersonID());
             skeleton.setApplicationID(input.getApplicationID());
             pib.setBundledPerson(skeleton);
@@ -648,7 +648,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             List<PublicInfoBundlePersonOccApplication> attachedPersonBundles = new ArrayList<>();
 
-            for (PersonOccApplication p : input.getAttachedPersons()) {
+            for (OccApplicationHumanLink p : input.getAttachedPersons()) {
 
                 attachedPersonBundles.add(extractPublicInfo(p));
 
@@ -1294,17 +1294,17 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
     /**
      * Converts a bundled PublicInfoBundlePersonOccPeriods to an unbundled
-     * PersonOccApplication for internal use. Currently does check for changes.
+ OccApplicationHumanLink for internal use. Currently does check for changes.
      *
      * @param input
      * @return
      * @throws IntegrationException
      */
-    public PersonOccApplication export(PublicInfoBundlePersonOccApplication input) throws IntegrationException {
+    public OccApplicationHumanLink export(PublicInfoBundlePersonOccApplication input) throws IntegrationException {
         PersonIntegrator pi = getPersonIntegrator();
-        PersonOccApplication unbundled = input.getBundledPerson();
+        OccApplicationHumanLink unbundled = input.getBundledPerson();
 
-        PersonOccApplication exportable = pi.getPersonOccApplication(unbundled.getPersonID(), unbundled.getApplicationID());
+        OccApplicationHumanLink exportable = pi.getPersonOccApplication(unbundled.getPersonID(), unbundled.getApplicationID());
 
         if (exportable == null) {
 
@@ -1417,7 +1417,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         exportable.setPreferredContact(export(input.getPreferredContact()));
         exportable.setConnectedPeriod(export(input.getConnectedPeriod()));
 
-        ArrayList<PersonOccApplication> personHorde = new ArrayList<>();
+        ArrayList<OccApplicationHumanLink> personHorde = new ArrayList<>();
 
         if (input.getAttachedPersons() != null) {
 

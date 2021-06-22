@@ -24,7 +24,7 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.entities.PersonOccApplication;
+import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -78,7 +78,7 @@ public class PersonEditPublicBB extends BackingBeanUtils implements Serializable
     public String addCloneToApplicantPersons(Person clone) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         pi.updatePerson(clone);
-        getSessionBean().getSessOccPermitApplication().getAttachedPersons().add((PersonOccApplication) clone);
+        getSessionBean().getSessOccPermitApplication().getAttachedPersons().add((OccApplicationHumanLink) clone);
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
         oc.verifyOccPermitPersonsRequirement(getSessionBean().getSessOccPermitApplication());

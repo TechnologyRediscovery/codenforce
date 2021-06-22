@@ -19,7 +19,8 @@ package com.tcvcog.tcvce.entities;
 import java.time.LocalDateTime;
 
 /**
- *
+ *  Linking object reprsenting a connection between a human and parcel;
+ * Manifest as Parcel objects stored in a list by a Human derivative
  * @author sylvia
  */
 public class HumanParcelLink 
@@ -28,9 +29,9 @@ public class HumanParcelLink
     
     protected int linkID;
     protected int humanID;
-    protected BOBSource linkSource;
     protected HumanParcelRole role;
     
+    protected BOBSource linkSource;
     
     protected LocalDateTime linkCreatedTS;
     protected User linkCreatedBy;

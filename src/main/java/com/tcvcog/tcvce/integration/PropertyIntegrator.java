@@ -493,7 +493,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("PersonIntegrator ...", ex);
+            throw new IntegrationException("Property Integrator ...", ex);
         } finally {
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -600,7 +600,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @throws SQLException
      * @throws IntegrationException 63+
      */
-    private HumanParcelLink generateHumanParcelLink(ResultSet rs) throws SQLException, IntegrationException{
+    private HumanParcelLink generateParcelHumanLink(ResultSet rs) throws SQLException, IntegrationException{
         SystemIntegrator si = getSystemIntegrator();
         HumanParcelLink hpl = 
         
@@ -617,7 +617,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
     }
     
-<<<<<<< HEAD
     /**
      * Hacky utility method for counting properties by municode
      * @param muniCode
@@ -655,27 +654,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     }
     
     
-    /**
-     * Primary retrieval method for properties by ID; should ONLY be called by
-     * the PropertyCoordinator!!!
-     * @param propertyID
-     * @return
-     * @throws IntegrationException 
-     */
-    public Property getProperty(int propertyID) throws IntegrationException {
-        Property p = new Property();
-        PropertyCoordinator pc = getPropertyCoordinator();
-        String query = "SELECT propertyid, municipality_municode, parid, lotandblock, address, \n" +
-                        "       usegroup, constructiontype, countycode, notes, addr_city, addr_state, \n" +
-                        "       addr_zip, ownercode, propclass, lastupdated, lastupdatedby, locationdescription, \n" +
-                        "       bobsource_sourceid, unfitdatestart, unfitdatestop, unfitby_userid, \n" +
-                        "       abandoneddatestart, abandoneddatestop, abandonedby_userid, vacantdatestart, \n" +
-                        "       vacantdatestop, vacantby_userid, condition_intensityclassid, \n" +
-                        "       landbankprospect_intensityclassid, landbankheld, active, nonaddressable, \n" +
-                        "       usetype_typeid, creationts \n" +
-                        "  FROM public.property WHERE propertyid=?;";
-=======
-    
+  
     /**
      * Updates a record in the mailingaddress table
      * @param addr with fields as they are to be udpated
@@ -799,7 +778,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
 
             stmt.execute();
->>>>>>> humanization
 
             String idNumQuery = "SELECT currval('mailingaddress_addressid_seq');";
             Statement st = con.createStatement();

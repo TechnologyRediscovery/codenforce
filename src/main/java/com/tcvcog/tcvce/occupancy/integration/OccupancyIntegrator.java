@@ -26,7 +26,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonOccApplication;
+import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PublicInfoBundleOccPermitApplication;
@@ -1151,9 +1151,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             if(occpermitapp.getConnectedPeriod() != null)
             {
             
-                occpermitapp.setAttachedPersons(new ArrayList<PersonOccApplication>());
+                occpermitapp.setAttachedPersons(new ArrayList<OccApplicationHumanLink>());
                 
-                for (PersonOccApplication skeleton : pi.getPersonOccApplicationList(occpermitapp)) {
+                for (OccApplicationHumanLink skeleton : pi.getPersonOccApplicationList(occpermitapp)) {
 
                     if (skeleton.isApplicant()){
                         occpermitapp.setApplicantPerson(skeleton);
@@ -1568,7 +1568,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
      * @param applicationID
      * @throws IntegrationException
      */
-    public void insertOccApplicationPerson(PersonOccApplication person, int applicationID) throws IntegrationException {
+    public void insertOccApplicationPerson(OccApplicationHumanLink person, int applicationID) throws IntegrationException {
 
         String query = "INSERT INTO public.occpermitapplicationperson(occpermitapplication_applicationid, "
                 + "person_personid, applicant, preferredcontact, active, applicationpersontype)\n"
@@ -1596,7 +1596,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             }
     }
     
-    public void updatePersonOccPeriod(PersonOccApplication input, OccPermitApplication app) throws IntegrationException{
+    public void updatePersonOccPeriod(OccApplicationHumanLink input, OccPermitApplication app) throws IntegrationException{
         Connection con = getPostgresCon();
         String query = "UPDATE occpermitapplicationperson "
                 + "SET applicant = ?, preferredcontact = ?, applicationpersontype = ?::persontype, active = ? "

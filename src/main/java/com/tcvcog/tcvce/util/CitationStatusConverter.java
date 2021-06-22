@@ -17,7 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.util;
 
-import com.tcvcog.tcvce.entities.CitationStatus;
+import com.tcvcog.tcvce.entities.CitationStatusLogEntry;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
@@ -35,7 +35,7 @@ public class CitationStatusConverter extends EntityConverter implements Converte
         if(titleS.isEmpty()) {
             return null; 
         }
-        CitationStatus o = (CitationStatus) this.getViewMap(fc).get(titleS);
+        CitationStatusLogEntry o = (CitationStatusLogEntry) this.getViewMap(fc).get(titleS);
         return o;
     }
 
@@ -46,7 +46,7 @@ public class CitationStatusConverter extends EntityConverter implements Converte
             return "";
         }
         
-        CitationStatus cs = (CitationStatus) o;
+        CitationStatusLogEntry cs = (CitationStatusLogEntry) o;
         String title = cs.getStatusTitle();  
         if (title != null){
             this.getViewMap(fc).put(title,o);

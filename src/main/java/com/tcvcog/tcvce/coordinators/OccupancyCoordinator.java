@@ -70,7 +70,7 @@ import java.util.List;
 import java.util.ListIterator;
 import com.tcvcog.tcvce.entities.IFace_Proposable;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.PersonOccApplication;
+import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
 import com.tcvcog.tcvce.entities.occupancy.OccApplicationStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
@@ -896,7 +896,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         }
         
         List<PersonType> applicationPersonTypes = new ArrayList<>();
-        for (PersonOccApplication applicationPerson : opa.getAttachedPersons()) {
+        for (OccApplicationHumanLink applicationPerson : opa.getAttachedPersons()) {
             if (applicationPerson.getFirstName() == null || applicationPerson.getFirstName().contentEquals("")){
                 throw new BObStatusException("The first name field is not optional. "
                         + "If you are filling in the name of a business, "
@@ -1044,8 +1044,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
         OccupancyIntegrator oi = getOccupancyIntegrator();
         
-        List<PersonOccApplication> applicationPersons = application.getAttachedPersons();
-        for (PersonOccApplication person : applicationPersons) {
+        List<OccApplicationHumanLink> applicationPersons = application.getAttachedPersons();
+        for (OccApplicationHumanLink person : applicationPersons) {
 
             //see javadoc
             if (person.getPersonID() == 0){
@@ -1073,11 +1073,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         PropertyIntegrator pri = getPropertyIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
 
-        List<PersonOccApplication> existingList = pi.getPersonOccApplicationListWithInactive(opa);
+        List<OccApplicationHumanLink> existingList = pi.getPersonOccApplicationListWithInactive(opa);
 
-        PersonOccApplication applicationPerson = new PersonOccApplication();
+        OccApplicationHumanLink applicationPerson = new OccApplicationHumanLink();
 
-        for (PersonOccApplication existingPerson : existingList) {
+        for (OccApplicationHumanLink existingPerson : existingList) {
 
             boolean removed = true;
 
@@ -1085,7 +1085,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
             while (itr.hasNext()) {
 
-                applicationPerson = (PersonOccApplication) itr.next();
+                applicationPerson = (OccApplicationHumanLink) itr.next();
 
                 /* If the person  is the applicantPerson on the 
                     OccPermitApplication, set applicant to true*/

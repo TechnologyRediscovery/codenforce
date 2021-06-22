@@ -20,7 +20,7 @@ package com.tcvcog.tcvce.entities.occupancy;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonOccApplication;
+import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -53,7 +53,7 @@ public class OccPermitApplication extends BOb {
  application. The occupancy coordinator will digest this list to determine if the requirements 
     * have been satisfied.
     */
-    private List<PersonOccApplication> attachedPersons;
+    private List<OccApplicationHumanLink> attachedPersons;
 
     /**
      * @return the id
@@ -170,14 +170,14 @@ public class OccPermitApplication extends BOb {
     /**
      * @return the attachedPersons
      */
-    public List<PersonOccApplication> getAttachedPersons() {
+    public List<OccApplicationHumanLink> getAttachedPersons() {
         return attachedPersons;
     }
 
     /**
      * @param attachedPersons the attachedPersons to set
      */
-    public void setAttachedPersons(List<PersonOccApplication> attachedPersons) {
+    public void setAttachedPersons(List<OccApplicationHumanLink> attachedPersons) {
         this.attachedPersons = attachedPersons;
     }
 

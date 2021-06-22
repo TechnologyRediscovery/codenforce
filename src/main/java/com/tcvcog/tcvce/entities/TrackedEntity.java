@@ -16,15 +16,17 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
  * Base class for entities created during humanization
- * that contains creation, update, deactivation , and notes fields
+ * that contains creation, update, deactivation fields
  * @author sylvia
  */
-public abstract class TrackedEntity {
+public abstract class TrackedEntity 
+        implements Serializable, IFace_TableNameHolder{
     
     /** Humanization Object standard fields **/
     protected LocalDateTime createdTS;
@@ -33,8 +35,6 @@ public abstract class TrackedEntity {
     protected User lastupdatedBy;
     protected LocalDateTime deactivatedTS;
     protected User deactivatedBy;
-    
-
     
     
     public static String getPrettyDate(LocalDateTime ldtDate){

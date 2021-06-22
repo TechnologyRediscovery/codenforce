@@ -27,7 +27,7 @@ import java.util.Objects;
  * @author ellen bascomb of apt 31y
  */
 public  class       CodeViolation  
-        extends BOb
+        extends     BOb
         implements  Serializable,
                     Comparable<CodeViolation> {
     

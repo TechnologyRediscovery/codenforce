@@ -36,6 +36,7 @@ import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.TrackedEntity;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import java.io.Serializable;
@@ -48,6 +49,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.faces.application.FacesMessage;
 
 /**
  *
@@ -146,6 +148,92 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             
         }
     }
+    
+    
+    /** Unified pathway for deactivating TrackedEntities
+     * 
+     * @param te
+     * @param ua
+     * @throws IntegrationException 
+     */
+    public void deactivateTrackedEntity(TrackedEntity te, UserAuthorized ua) throws IntegrationException{
+        if(te != null && ua != null){
+            
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("UPDATE ");
+            sb.append(te.getDBTableName());
+            sb.append(" SET deactivatedts=now() AND deactivatedby_userid=? WHERE ");
+            sb.append(te.getPKFieldName());
+            sb.append("=?;");
+            Connection con = getPostgresCon();
+            PreparedStatement stmt = null;
+
+            try {
+                stmt = con.prepareStatement(sb.toString());
+                stmt.setInt(1, ua.getUserID());
+                stmt.setInt(2, te.getDBKey());
+                
+                stmt.executeUpdate();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.toString());
+                throw new IntegrationException("Tracked Entity has been deactivated", ex);
+
+            } finally{
+                 if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+                 if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            } // close finally
+            
+        }
+        
+    }
+    
+    
+    /**
+     * Reverses a deactivation action by writing NULL to the deactivatedts and deactivatedby_userid
+     * fields of a TrackedEntity
+     * 
+     * @param te
+     * @param ua
+     * @throws IntegrationException 
+     */
+    public void reactivateTrackedEntity(TrackedEntity te, UserAuthorized ua) throws IntegrationException{
+         if(te != null && ua != null){
+            
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("UPDATE ");
+            sb.append(te.getDBTableName());
+            sb.append(" SET deactivatedts=NULL AND deactivatedby_userid=NULL WHERE ");
+            sb.append(te.getPKFieldName());
+            sb.append("=?;");
+            Connection con = getPostgresCon();
+            PreparedStatement stmt = null;
+
+            try {
+                stmt = con.prepareStatement(sb.toString());
+                stmt.setInt(1, te.getDBKey());
+                
+                stmt.executeUpdate();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.toString());
+                throw new IntegrationException("Tracked Entity has been deactivated", ex);
+
+            } finally{
+                 if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+                 if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            } // close finally
+            
+        }
+        
+        
+    }
+    
+    
+    
+    
     
     /**
      * Populates common fields among LinkedObjectRole family

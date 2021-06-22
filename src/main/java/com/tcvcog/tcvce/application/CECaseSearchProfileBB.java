@@ -41,7 +41,7 @@ import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.CaseStageEnum;
 import com.tcvcog.tcvce.entities.Citation;
-import com.tcvcog.tcvce.entities.CitationStatus;
+import com.tcvcog.tcvce.entities.CitationStatusLogEntry;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CourtEntity;
@@ -198,7 +198,7 @@ public class CECaseSearchProfileBB
      *              Citation jazz
     /*******************************************************/
     private Citation currentCitation;
-    private List<CitationStatus> citationStatusList;
+    private List<CitationStatusLogEntry> citationStatusList;
     private List<CourtEntity> courtEntityList;
 
     private boolean issueCitationDisabled;
@@ -3252,7 +3252,7 @@ public class CECaseSearchProfileBB
     /**
      * @return the citationStatusList
      */
-    public List<CitationStatus> getCitationStatusList() {
+    public List<CitationStatusLogEntry> getCitationStatusList() {
         return citationStatusList;
     }
 
@@ -3308,7 +3308,7 @@ public class CECaseSearchProfileBB
     /**
      * @param citationStatusList the citationStatusList to set
      */
-    public void setCitationStatusList(List<CitationStatus> citationStatusList) {
+    public void setCitationStatusList(List<CitationStatusLogEntry> citationStatusList) {
         this.citationStatusList = citationStatusList;
     }
 

@@ -2301,9 +2301,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    private CitationStatus citation_getStartingCitationStatus() throws IntegrationException {
+    private CitationStatusLogEntry citation_getStartingCitationStatus() throws IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
-        CitationStatus cs = ci.getCitationStatus(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+        CitationStatusLogEntry cs = ci.getCitationStatus(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                 .getString("citationInitialStatusID")));
         return cs;
     }
@@ -2384,7 +2384,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
         newCitation.setViolationList(al);
         newCitation.setNotes(notesBuilder.toString());
-        newCitation.setIsActive(true);
 
         return newCitation;
     }

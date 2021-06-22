@@ -30,7 +30,7 @@ import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonOccApplication;
+import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -95,7 +95,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     private List<OccPermitApplication> applicationList;
 
     private List<PropertyUnit> unitList;
-    private List<PersonOccApplication> attachedPersons;
+    private List<OccApplicationHumanLink> attachedPersons;
 
     private String internalNoteText;
     private String externalNoteText;
@@ -429,18 +429,18 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         } else {
 
-            attachedPersons.add(new PersonOccApplication(person));
+            attachedPersons.add(new OccApplicationHumanLink(person));
 
         }
     }
 
-    public void removePersonFromApplication(PersonOccApplication person) {
+    public void removePersonFromApplication(OccApplicationHumanLink person) {
         attachedPersons.remove(person);
     }
 
     public String addANewPerson() {
 
-        attachedPersons.add(new PersonOccApplication());
+        attachedPersons.add(new OccApplicationHumanLink());
 
         return "";
     }
@@ -764,7 +764,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         List<Person> skeletonHorde = new ArrayList<>();
         
-        for(PersonOccApplication skeleton : selectedApplication.getAttachedPersons()){
+        for(OccApplicationHumanLink skeleton : selectedApplication.getAttachedPersons()){
             
             skeletonHorde.add(skeleton);
             
@@ -1170,11 +1170,11 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
     }
 
-    public List<PersonOccApplication> getAttachedPersons() {
+    public List<OccApplicationHumanLink> getAttachedPersons() {
         return attachedPersons;
     }
 
-    public void setAttachedPersons(List<PersonOccApplication> attachedPersons) {
+    public void setAttachedPersons(List<OccApplicationHumanLink> attachedPersons) {
         this.attachedPersons = attachedPersons;
     }
 

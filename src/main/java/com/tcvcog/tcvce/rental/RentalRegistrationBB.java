@@ -21,7 +21,7 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
-import com.tcvcog.tcvce.entities.PersonOccApplication;
+import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -674,13 +674,13 @@ public class RentalRegistrationBB extends BackingBeanUtils implements Serializab
     public String reviewApplication() {
 
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        List<PersonOccApplication> unbundledPersons = new ArrayList<>();
+        List<OccApplicationHumanLink> unbundledPersons = new ArrayList<>();
 
         //An application we'll use to test if the person requirements have been met.
         OccPermitApplication temp = new OccPermitApplication();
 
         for (PublicInfoBundlePerson p : attachedPersons) {
-            unbundledPersons.add(new PersonOccApplication(p.getBundledPerson()));
+            unbundledPersons.add(new OccApplicationHumanLink(p.getBundledPerson()));
         }
 
         temp.setAttachedPersons(unbundledPersons);
@@ -916,7 +916,7 @@ public class RentalRegistrationBB extends BackingBeanUtils implements Serializab
 
         List<PersonChangeOrder> changeList = new ArrayList<>();
 
-        List<PersonOccApplication> currentPersonList = new ArrayList<>();
+        List<OccApplicationHumanLink> currentPersonList = new ArrayList<>();
 
         List<Person> existingPersonList = new ArrayList<>();
 
@@ -958,7 +958,7 @@ public class RentalRegistrationBB extends BackingBeanUtils implements Serializab
 
         //Export the workingPropUnits list from PublicInfoBundles to PersonOccPeriods. This should preserve changes made by the user.
         for (PublicInfoBundlePerson bundle : attachedPersons) {
-            currentPersonList.add(new PersonOccApplication(pic.export(bundle))); //This must be a PersonOccApplication in order to store the person type data in the correct field.
+            currentPersonList.add(new OccApplicationHumanLink(pic.export(bundle))); //This must be a OccApplicationHumanLink in order to store the person type data in the correct field.
         }
 
         //Grab the persons that are currently in the database
@@ -966,7 +966,7 @@ public class RentalRegistrationBB extends BackingBeanUtils implements Serializab
             existingPersonList.add(pi.getPerson(p.getPersonID()));
         }
 
-        for (PersonOccApplication workingPerson : currentPersonList) {
+        for (OccApplicationHumanLink workingPerson : currentPersonList) {
 
             //Intialize change order so it's ready to receive edits.
             PersonChangeOrder skeleton = new PersonChangeOrder();

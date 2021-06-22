@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Technology Rediscovery LLC
+ * Copyright (C) 2021 Technology Rediscovery LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,18 @@
 package com.tcvcog.tcvce.entities;
 
 /**
- * Implemented during humanization; specifies an interface for retrieving
- * the object's DB key identifier
- * @author sylvia
+ * Creates unified method for asking an object
+ * for its corresponding database table name
+ * ** POTENTIALLY A VIOLATION OF MVC DESIGN PRINCIPLES **
+ * Should a business object know where it lives in the DB?
+ * Ellen says: YES, they shall know this.
+ * 
+ * @author Ellen Bascomb of Apartment 31Y
  */
-public interface IFace_keyIdentified 
-        extends IFace_TableNameHolder{
+public interface IFace_TableNameHolder {
+  
+    public String getDBTableName();
+  
     
-    public String getPKFieldName();
-    
-    /**
-     * Used by entities who come from a DB record with an int primary key
-     * @return the primary key of the record
-     */
-    
-    public int getDBKey();
     
 }

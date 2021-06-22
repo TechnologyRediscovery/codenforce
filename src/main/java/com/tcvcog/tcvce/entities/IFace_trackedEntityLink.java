@@ -23,7 +23,8 @@ import java.time.LocalDateTime;
  * 
  * @author Ellen Bascomb (APT 31Y)
  */
-public interface IFace_trackedEntityLink {
+public interface IFace_trackedEntityLink 
+        extends IFace_keyIdentified{
     
     public LocalDateTime getLinkCreatedTS();
     public void setLinkCreatedTS(LocalDateTime ts);

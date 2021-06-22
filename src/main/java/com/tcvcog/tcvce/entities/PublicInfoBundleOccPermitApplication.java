@@ -69,7 +69,7 @@ public class PublicInfoBundleOccPermitApplication extends PublicInfoBundle {
         
         input.setPreferredContact(new Person());
         
-        input.setAttachedPersons(new ArrayList<PersonOccApplication>());
+        input.setAttachedPersons(new ArrayList<OccApplicationHumanLink>());
         
         input.setConnectedPeriod(new OccPeriod());
         

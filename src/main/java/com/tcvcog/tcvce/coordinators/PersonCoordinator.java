@@ -29,7 +29,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
-import com.tcvcog.tcvce.entities.PersonOccApplication;
+import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.PersonWithChanges;
 import com.tcvcog.tcvce.entities.Property;
@@ -532,7 +532,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param person
      * @return 
      */
-    public PersonOccApplication anonymizePersonData(PersonOccApplication person){
+    public OccApplicationHumanLink anonymizePersonData(OccApplicationHumanLink person){
         
         // anonymize all but first two characters of first name
         if(person.getFirstName() != null) {

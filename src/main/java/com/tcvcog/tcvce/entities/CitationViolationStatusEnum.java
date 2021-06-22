@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Technology Rediscovery LLC
+ * Copyright (C) 2021 Technology Rediscovery LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,29 @@
 package com.tcvcog.tcvce.entities;
 
 /**
- * Implemented during humanization; specifies an interface for retrieving
- * the object's DB key identifier
+ *
  * @author sylvia
  */
-public interface IFace_keyIdentified 
-        extends IFace_TableNameHolder{
+public enum CitationViolationStatusEnum {
+
+    PENDING ("Pending"),
+    GUILTY ("Guilty"),
+    DISMISSED ("Dimissed"),
+    COMPLIANCE ("Compliance"),
+    INVALID ("Deemed ivalid by judge");
     
-    public String getPKFieldName();
+    private final String label;
     
-    /**
-     * Used by entities who come from a DB record with an int primary key
-     * @return the primary key of the record
-     */
+    private CitationViolationStatusEnum(String lab){
+        label = lab;
+    }
     
-    public int getDBKey();
+    public String getLable(){
+        return label;
+    }
+    
+
+    
+    
     
 }

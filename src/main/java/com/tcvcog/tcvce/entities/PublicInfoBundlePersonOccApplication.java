@@ -17,31 +17,31 @@
 package com.tcvcog.tcvce.entities;
 
 /**
- * A wrapper class that stores a PersonOccApplication that is stripped of all sensitive
- * information.
+ * A wrapper class that stores a OccApplicationHumanLink that is stripped of all sensitive
+ information.
  * Look at the JavaDocs of the PublicInfoBundle Class for more information.
  *
  * @author Nathan Dietz
  */
 public class PublicInfoBundlePersonOccApplication extends PublicInfoBundle {
     
-    private PersonOccApplication bundledPerson;
+    private OccApplicationHumanLink bundledPerson;
     
     @Override
     public String toString(){
         return this.getClass().getName() + bundledPerson.getPersonID();
     }
 
-    public PersonOccApplication getBundledPerson() {
+    public OccApplicationHumanLink getBundledPerson() {
         return bundledPerson;
     }
 
     /**
-     * Remove all sensitive data from the PersonOccApplication and set it in the
-     * bundledPerson field.
+     * Remove all sensitive data from the OccApplicationHumanLink and set it in the
+ bundledPerson field.
      * @param input 
      */
-    public void setBundledPerson(PersonOccApplication input) {
+    public void setBundledPerson(OccApplicationHumanLink input) {
         
         //PersonOccPeriod and person share most of the same fields,
         //so let's use its anonymization method
@@ -49,8 +49,8 @@ public class PublicInfoBundlePersonOccApplication extends PublicInfoBundle {
         
         temp.setBundledPerson(input);
         
-        //take it out and then transfer the PersonOccApplication-specific fields
-        PersonOccApplication skeleton = new PersonOccApplication(temp.getBundledPerson());
+        //take it out and then transfer the OccApplicationHumanLink-specific fields
+        OccApplicationHumanLink skeleton = new OccApplicationHumanLink(temp.getBundledPerson());
         
         skeleton.setApplicant(input.isApplicant());
         
