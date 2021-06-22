@@ -19,7 +19,6 @@ package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
@@ -55,7 +54,7 @@ public  class       EventCnF
     protected LocalDateTime timeEnd;
     
     protected User userCreator;
-    protected LocalDateTime creationts;
+    protected LocalDateTime creationTS;
     
     protected User lastUpdatedBy;
     protected LocalDateTime lastUpdatedTS;
@@ -89,7 +88,7 @@ public  class       EventCnF
         this.timeEnd = ev.timeEnd;
         
         this.userCreator = ev.userCreator;
-        this.creationts = ev.creationts;
+        this.creationTS = ev.creationTS;
         
         this.lastUpdatedBy = ev.lastUpdatedBy;
         this.lastUpdatedTS = ev.lastUpdatedTS;
@@ -138,7 +137,7 @@ public  class       EventCnF
      * @return the creationts
      */
     public LocalDateTime getCreationts() {
-        return creationts;
+        return creationTS;
     }
 
     /**
@@ -198,7 +197,7 @@ public  class       EventCnF
      * @param creationts the creationts to set
      */
     public void setCreationts(LocalDateTime creationts) {
-        this.creationts = creationts;
+        this.creationTS = creationts;
     }
 
     /**
@@ -261,8 +260,8 @@ public  class       EventCnF
         int c = 0;
         if(this.timeStart != null && e.timeStart != null){
              c = this.timeStart.compareTo(e.timeStart);
-        } else if(this.creationts != null && e.creationts != null){
-             c = this.creationts.compareTo(e.creationts);
+        } else if(this.creationTS != null && e.creationTS != null){
+             c = this.creationTS.compareTo(e.creationTS);
         } 
         return c;
         
@@ -273,7 +272,7 @@ public  class       EventCnF
         int hash = 5;
         hash = 97 * hash + this.eventID;
         hash = 97 * hash + Objects.hashCode(this.category);
-        hash = 97 * hash + Objects.hashCode(this.creationts);
+        hash = 97 * hash + Objects.hashCode(this.creationTS);
         hash = 97 * hash + Objects.hashCode(this.description);
         hash = 97 * hash + Objects.hashCode(this.userCreator);
         hash = 97 * hash + (this.active ? 1 : 0);

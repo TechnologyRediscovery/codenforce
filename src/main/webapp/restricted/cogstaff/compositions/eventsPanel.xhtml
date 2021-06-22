@@ -3,16 +3,14 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
-    <p:panel id="cecase-events-panel"
+    <p:panel id="events-panel"
              toggleable="true"
              collapsed="false"
-             header="Events (#{ceCaseSearchProfileBB.currentCase.eventList.size()})">
+             header="Events (#{eventsBB.eventListSize})">
 
+        <h:form id="events-form">
 
-
-        <h:form id="cecase-events-form">
-
-            <p:commandButton id="cecase-events-add-button"
+            <p:commandButton id="events-add-button"
                              ajax="true"
                              styleClass="noFill button-size-small"
                              action="#{ceCaseSearchProfileBB.onEventAddInitButtonChange}"
@@ -43,7 +41,7 @@
             <p:dataTable id="cecase-events-table"
                          var="event"
                          sortMode="multiple"
-                         value="#{ceCaseSearchProfileBB.currentCase.getEventList(ceCaseSearchProfileBB.eventViewOptionSelected)}"
+                         value="#{eventsBB.eventList}"
                          tableStyleClass="primeDataTable"
                          rowKey="#{event.eventID}"
                          reflow="true">
@@ -58,7 +56,7 @@
                 <p:column headerText="Date"
                           sortBy="#{event.timeStart}"
                           styleClass="centeredColumnContent">
-                    <h:outputText value="#{empty event.timeStart ? ceCaseSearchProfileBB.getPrettyDate(event.creationts) : ceCaseSearchProfileBB.getPrettyDate(event.timeStart) }"/>
+                    <h:outputText value="#{empty event.timeStart ? eventsBB.getPrettyDate(event.creationTS) : eventsBB.getPrettyDate(event.timeStart) }"/>
                 </p:column>
 
                 <p:column headerText="Category"
@@ -87,22 +85,22 @@
                           styleClass="centeredColumnContent">
                     <div class="restrict-main-contents-io-link link-button">
                         <p:commandLink id="event-open-button"
-                                       ajax="true"
                                        styleClass="noFill button-size-small"
-                                       action="#{ceCaseSearchProfileBB.onEventViewButtonChange(event)}"
                                        value="view"
                                        oncomplete="PF('event-profile-dialog-var').show()"
-                                       update="event-profile-dialog event-profile-form"/>
+                                       update="event-profile-dialog event-profile-form">
+                            <f:setPropertyActionListener target="#{eventsBB.selectedEvent}" value="#{event}"/>
+                        </p:commandLink>
                     </div>
-                    <h:outputText value="&#xA0;&#xA0;|"/>
+                    <h:outputText value="&#xA0;&#xA0;|"/> <!-- these are just nbsp but that doesn't work in compositions -->
                     <div class="restrict-main-contents-io-link link-button">
                         <p:commandLink id="event-update-button"
-                                       ajax="true"
                                        styleClass="noFill button-size-small"
-                                       action="#{ceCaseSearchProfileBB.onEventViewButtonChange(event)}"
                                        value="edit"
                                        oncomplete="PF('event-update-dialog-var').show()"
-                                       update="event-update-dialog event-update-form"/>
+                                       update="event-update-dialog event-update-form">
+                            <f:setPropertyActionListener target="#{eventsBB.selectedEvent}" value="#{event}"/>
+                        </p:commandLink>
                     </div>
                 </p:column>
             </p:dataTable>
@@ -120,7 +118,7 @@
               closable="true"
               closeOnEscape="true"
               modal="true"
-              header="Event id #{ceCaseSearchProfileBB.currentEvent.eventID} profile"
+              header="Event id #{eventsBB.selectedEvent.eventID} profile"
               rendered="true">
 
         <h:form id="event-profile-form">
@@ -134,7 +132,7 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-domain-ot"
-                                      value="#{ceCaseSearchProfileBB.currentEvent.domain.title} "/>
+                                      value="#{eventsBB.selectedEvent.domain.title} "/>
                     </div>
                 </div>
 
@@ -147,7 +145,7 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-et-ot"
-                                      value="#{ceCaseSearchProfileBB.currentEvent.category.eventType.label} "/>
+                                      value="#{eventsBB.selectedEvent.category.eventType.label} "/>
                     </div>
                 </div>
 
@@ -160,7 +158,7 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-ec-ot"
-                                      value="#{ceCaseSearchProfileBB.currentEvent.category.eventCategoryTitle}"/>
+                                      value="#{eventsBB.selectedEvent.category.eventCategoryTitle}"/>
                     </div>
                     <p:commandLink id="event-cat-details-cl"
                                    disabled="false"
@@ -178,7 +176,7 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-descr-ot"
-                                      value="#{ceCaseSearchProfileBB.currentEvent.description}"/>
+                                      value="#{eventsBB.selectedEvent.description}"/>
                     </div>
                 </div>
 
@@ -191,7 +189,7 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-st-ot"
-                                      value="#{ceCaseSearchProfileBB.getPrettyDate(ceCaseSearchProfileBB.currentEvent.timeStart)}"/>
+                                      value="#{eventsBB.getPrettyDate(eventsBB.selectedEvent.timeStart)}"/>
 
                     </div>
                 </div>
@@ -205,7 +203,7 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-time-end-ot"
-                                      value="#{ceCaseSearchProfileBB.getPrettyDate(ceCaseSearchProfileBB.currentEvent.timeEnd)}"/>
+                                      value="#{eventsBB.getPrettyDate(eventsBB.selectedEvent.timeEnd)}"/>
                     </div>
                 </div>
 
@@ -219,7 +217,7 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-mintoview-ot"
-                                      value="#{ceCaseSearchProfileBB.currentEvent.category.userRankMinimumToView}"/>
+                                      value="#{eventsBB.selectedEvent.category.userRankMinimumToView}"/>
                     </div>
                 </div>
 
@@ -232,7 +230,7 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-mintoupdate-ot"
-                                      value="#{ceCaseSearchProfileBB.currentEvent.category.userRankMinimumToUpdate}"/>
+                                      value="#{eventsBB.selectedEvent.category.userRankMinimumToUpdate}"/>
                     </div>
                 </div>
 
@@ -245,7 +243,7 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-active-ot"
-                                      value="#{ceCaseSearchProfileBB.currentEvent.active ? 'Yes':'No'}"/>
+                                      value="#{eventsBB.selectedEvent.active ? 'Yes':'No'}"/>
                     </div>
 
                     <div class="restrict-data-field-value-inline">
