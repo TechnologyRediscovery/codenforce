@@ -23,14 +23,14 @@
 
             <p:selectOneMenu style="width: 300px;"
                              id="prop-viewoptionsevents-solb"
-                             value="#{ceCaseSearchProfileBB.eventViewOptionSelected}"
+                             value="#{eventsBB.eventListFilterMode}"
                              tabindex="10">
 
-                <p:ajax update="cecase-events-table"
+                <p:ajax update="events-table"
                         immediate="true"/>
 
                 <f:selectItems id="prop-events-selitems"
-                               value="#{ceCaseSearchProfileBB.eventViewOptions}"
+                               value="#{eventsBB.eventListFilterModes}"
                                var="evo"
                                itemValue="#{evo}"
                                itemLabel="#{evo.label}"/>
@@ -38,7 +38,7 @@
 
             <p:spacer height="5px"/>
 
-            <p:dataTable id="cecase-events-table"
+            <p:dataTable id="events-table"
                          var="event"
                          sortMode="multiple"
                          value="#{eventsBB.eventList}"

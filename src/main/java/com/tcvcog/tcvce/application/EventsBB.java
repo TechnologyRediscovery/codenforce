@@ -16,20 +16,30 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.IFace_EventHolder;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
+/**
+ * The premier backing bean for universal events panel workflow.
+ *
+ * @author jurplel
+ */
 public class EventsBB extends BackingBeanUtils implements Serializable {
 
     private IFace_EventHolder currentEventHolder;
-    private List<EventCnF> eventList;
+    private List<EventCnF> eventList = new ArrayList<>();
+
+    private ViewOptionsActiveHiddenListsEnum eventListFilterMode;
 
     // Single selected event for editing and viewing
     private EventCnF selectedEvent;
@@ -38,6 +48,13 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
 
     @PostConstruct
     public void initBean() {
+        SessionBean sb = getSessionBean();
+        EventCoordinator ec = getEventCoordinator();
+
+        // Default events list filter mode
+        setEventListFilterMode(ec.determineDefaultEventView(sb.getSessUser()));
+
+        // Find event holder and setup event list
         updateEventHolder();
     }
 
@@ -66,19 +83,44 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     /**
      * Repopulates eventList parameter with the latest and greatest events from
      * our special guest the event-containing object.
+     * This method also filters the events according to eventListFilterMode
      */
     public void updateEventList() {
-        if (currentEventHolder != null)
-            eventList = currentEventHolder.getEventList();
+        if (currentEventHolder == null)
+            return;
+
+        eventList.clear();
+        eventList.addAll(currentEventHolder.getEventList());
+
+        if (eventListFilterMode == null)
+            return;
+
+        // Get filter conditions
+        Predicate<EventCnF> filterFunc = null;
+        switch (eventListFilterMode) {
+            case VIEW_ALL:
+                break;
+            case VIEW_ACTIVE_NOTHIDDEN:
+                filterFunc = event -> !event.isActive() || event.isHidden();
+                break;
+            case VIEW_ACTIVE_HIDDEN:
+                filterFunc = event -> !event.isActive() || !event.isHidden();
+                break;
+            case VIEW_INACTIVE:
+                filterFunc = event -> event.isActive();
+                break;
+        }
+
+        // remove all elements of eventList that return true with filterFunc
+        if (filterFunc != null) {
+            eventList.removeIf(filterFunc);
+        }
     }
 
     //
-    // Getters and setters start here
+    // Getter and setter style methods that are not as straightforward
+    // or do not point to a specific value start here.
     //
-
-    public List<EventCnF> getEventList() {
-        return eventList;
-    }
 
     public int getEventListSize() {
         int size = 0;
@@ -86,6 +128,28 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
             size = eventList.size();
 
         return size;
+    }
+
+    public List<ViewOptionsActiveHiddenListsEnum> getEventListFilterModes() {
+        return Arrays.asList(ViewOptionsActiveHiddenListsEnum.values());
+    }
+
+    //
+    // Mostly boring getters and setters start here.
+    //
+
+    public List<EventCnF> getEventList() {
+        return eventList;
+    }
+
+
+    public ViewOptionsActiveHiddenListsEnum getEventListFilterMode() {
+        return eventListFilterMode;
+    }
+
+    public void setEventListFilterMode(ViewOptionsActiveHiddenListsEnum eventListFilterMode) {
+        this.eventListFilterMode = eventListFilterMode;
+        updateEventList();
     }
 
     public EventCnF getSelectedEvent() {
