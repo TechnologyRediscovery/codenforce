@@ -39,7 +39,6 @@ public class Citation
     
     private List<EventCnF> eventList;
     
-    private CECase ceCaseNoLists;
     private User userOwner;
     
     private LocalDateTime dateOfRecord;
@@ -179,7 +178,6 @@ public class Citation
         int hash = 7;
         hash = 71 * hash + this.citationID;
         hash = 71 * hash + Objects.hashCode(this.citationNo);
-        hash = 71 * hash + Objects.hashCode(this.ceCaseNoLists);
         hash = 71 * hash + Objects.hashCode(this.userOwner);
         hash = 71 * hash + Objects.hashCode(this.dateOfRecord);
         hash = 71 * hash + Objects.hashCode(this.timeStamp);
@@ -214,9 +212,6 @@ public class Citation
             return false;
         }
         if (!Objects.equals(this.notes, other.notes)) {
-            return false;
-        }
-        if (!Objects.equals(this.ceCaseNoLists, other.ceCaseNoLists)) {
             return false;
         }
         if (!Objects.equals(this.userOwner, other.userOwner)) {
@@ -262,19 +257,6 @@ public class Citation
         this.origin_courtentity = origin_courtentity;
     }
 
-    /**
-     * @return the ceCaseNoLists
-     */
-    public CECase getCeCaseNoLists() {
-        return ceCaseNoLists;
-    }
-
-    /**
-     * @param ceCaseNoLists the ceCaseNoLists to set
-     */
-    public void setCeCaseNoLists(CECase ceCaseNoLists) {
-        this.ceCaseNoLists = ceCaseNoLists;
-    }
 
     /**
      * @return the dateOfRecordUtilDate

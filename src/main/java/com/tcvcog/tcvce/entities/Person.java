@@ -34,9 +34,9 @@ public  class       Person
         extends     Human
         implements  IFace_Loggable{
     
+    protected List<MailingAddress> addressList;
     protected List<ContactEmail> emailList;
     protected List<ContactPhone> phoneList;
-    protected List<MailingAddress> addressList;
 
     public Person() {
     }

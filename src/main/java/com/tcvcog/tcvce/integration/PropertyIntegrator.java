@@ -93,7 +93,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         PropertyCoordinator pc = getPropertyCoordinator();
         String query =  "SELECT parcelkey, muni_municode, parcelidcnty, source_sourceid, createdts, createdby_userid, \n" +
                         "       lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, \n" +
-                        "       notes\n" +
+                        "       notes, lotandblock \n" +
                         "  FROM public.parcel WHERE parcelkey=?;";
 
         Connection con = getPostgresCon();
@@ -140,6 +140,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         if(rs.getInt("source_sourceid") != 0){
             parcel.setSource(si.getBOBSource(rs.getInt("source_sourceid")));
         }
+        parcel.setLotAndBlock(rs.getString("lotandblock"));
         si.populateTrackedFields(parcel, rs);
         return parcel;
         
@@ -157,7 +158,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         PropertyCoordinator pc = getPropertyCoordinator();
         String query = "SELECT parcelkey, muni_municode, parcelidcnty, source_sourceid, createdts, createdby_userid, \n" +
                         "       lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, \n" +
-                        "       notes\n" +
+                        "       notes, lotandblock \n" +
                         "  FROM public.parcel WHERE parcelidcnty=?;";
 
         Connection con = getPostgresCon();
@@ -1033,16 +1034,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         try {
             p.setMuni(mi.getMuni(rs.getInt("municipality_muniCode")));
             p.setNotes(rs.getString("notes"));
-<<<<<<< HEAD
-            p.setAddress_city(rs.getString("addr_city"));
-            
-            p.setAddress_state(rs.getString("addr_state"));
-            p.setAddress_zip(rs.getString("addr_zip"));
-            p.setOwnerCode(rs.getString("ownercode"));  // for legacy compat
-            p.setPropclass(rs.getString("propclass"));
-=======
->>>>>>> humanization
-            
             if(rs.getTimestamp("lastupdated") != null){
                 p.setLastUpdatedTS(rs.getTimestamp("lastupdated").toLocalDateTime());
             }

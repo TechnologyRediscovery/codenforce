@@ -33,6 +33,7 @@ public  class Parcel
     
     private int parcelkey;
     private String countyParcelID;
+    private String lotAndBlock;
     private Municipality muni;
     private BOBSource source;
     protected String notes;
@@ -172,6 +173,20 @@ public  class Parcel
     @Override
     public String getTableName() {
      return TABLE_NAME;    
+    }
+
+    /**
+     * @return the lotAndBlock
+     */
+    public String getLotAndBlock() {
+        return lotAndBlock;
+    }
+
+    /**
+     * @param lotAndBlock the lotAndBlock to set
+     */
+    public void setLotAndBlock(String lotAndBlock) {
+        this.lotAndBlock = lotAndBlock;
     }
 
     
