@@ -17,12 +17,17 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
+import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.IFace_EventHolder;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.event.ActionEvent;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +41,9 @@ import java.util.function.Predicate;
  */
 public class EventsBB extends BackingBeanUtils implements Serializable {
 
+    private String formNoteText;
+
+    private EventDomainEnum pageEventDomain;
     private IFace_EventHolder currentEventHolder;
     private List<EventCnF> eventList = new ArrayList<>();
 
@@ -65,7 +73,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     public void updateEventHolder() {
         SessionBean sb = getSessionBean();
 
-        EventDomainEnum pageEventDomain = sb.getSessEventsPageEventDomainRequest();
+        pageEventDomain = sb.getSessEventsPageEventDomainRequest();
         switch (pageEventDomain) {
             case CODE_ENFORCEMENT:
                 currentEventHolder = sb.getSessCECase();
@@ -117,10 +125,58 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         }
     }
 
+    public void toggleEventActive() {
+        EventCoordinator ec = getEventCoordinator();
+        selectedEvent.setActive(!selectedEvent.isActive());
+        try {
+            ec.updateEvent(selectedEvent, getSessionBean().getSessUser());
+        } catch (IntegrationException | BObStatusException | EventException ex) {
+            System.out.println(ex);
+            selectedEvent.setActive(!selectedEvent.isActive());
+        }
+    }
+
+    public void newEvent() {
+//        if (pageEventDomain == null)
+//            return;
+//
+//        EventCoordinator ec = getEventCoordinator();
+//
+//        EventCnF newEvent;
+//        try {
+//            newEvent = ec.initEvent(currentEventHolder, null);
+//        } catch (BObStatusException | EventException ex) {
+//            System.out.println(ex);
+//            return;
+//        }
+//
+//        getSessionBean().setSessEvent(newEvent);
+//        newEvent.setCeCaseID(currentCase.getBObID());
+//
+//
+//        switch (pageEventDomain) {
+//            case CODE_ENFORCEMENT:
+//                currentEventHolder = sb.getSessCECase();
+//                break;
+//            case OCCUPANCY:
+//                newEvent.setCeCaseID(currentEventHolder.getBObID());
+//                break;
+//            case UNIVERSAL:
+//                System.out.println("EventsBB reached universal case in newEvent()--really seems like you *should* do something about this");
+//                break;
+//        }
+//
+//        selectedEvent = newEvent;
+    }
+
     //
     // Getter and setter style methods that are not as straightforward
     // or do not point to a specific value start here.
     //
+
+    public void clearFormNoteText(ActionEvent ev) {
+        formNoteText = new String();
+    }
 
     public int getEventListSize() {
         int size = 0;

@@ -243,29 +243,16 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-active-ot"
-                                      value="#{eventsBB.selectedEvent.active ? 'Yes':'No'}"/>
-                    </div>
-
-                    <div class="restrict-data-field-value-inline">
-                        <div class="restrict-main-contents-io-link">
-                            <p:commandLink id="case-deactivate-cb"
-                                           ajax="true"
-                                           actionListener="#{ceCaseSearchProfileBB.onEventRemoveInitButtonChange}"
-                                           oncomplete="PF('event-deactivate-dialog-var').show()"
-                                           style="color:blue;"
-                                           rendered="#{ceCaseSearchProfileBB.currentEvent.active}"
-                                           value="deactivate event"/>
-                        </div>
+                                      value="#{eventsBB.selectedEvent.active ? 'Yes' : 'No'}"/>
                     </div>
 
                     <div class="restrict-data-field-value-inline">
                         <div class="restrict-main-contents-io-link">
                             <p:commandLink id="case-reactivate-cb"
-                                           ajax="false"
-                                           actionListener="#{ceCaseSearchProfileBB.onEventReactivateCommitButtonChange}"
+                                           actionListener="#{eventsBB.toggleEventActive}"
                                            style="color:blue;"
-                                           rendered="#{!ceCaseSearchProfileBB.currentEvent.active}"
-                                           value="reactivate event"/>
+                                           value="#{eventsBB.selectedEvent.active ? 'deactivate event' : 'reactivate event'}"
+                                           update="event-profile-form"/>
                         </div>
                     </div>
                 </div>
@@ -274,12 +261,8 @@
 
             <div class="restrict-main-contents-io-button gray_button">
                 <p:commandButton id="event-profile-done-button"
-                                 ajax="true"
                                  value="Done"
-                                 process="@none"
-                                 immediate="true"
                                  oncomplete="PF('event-profile-dialog-var').hide()"
-                                 actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}"
                                  icon="fa fa-stop"/>
             </div>
         </h:form>
@@ -290,27 +273,25 @@
                              value="Add New Note"
                              disabled="true"
                              icon="fa fa-sticky-note-o"
-                             actionListener="#{ceCaseSearchProfileBB.onEventNoteInitButtonChange}"
+                             actionListener="#{eventsBB.clearFormNoteText}"
                              oncomplete="PF('event-note-dialog-var').show()"
                              update="event-note-form"/>
 
             <h:outputText id="event-note-ot"
-                          value="#{ceCaseSearchProfileBB.currentEvent.notes}"
+                          value="#{eventsBB.selectedEvent.notes}"
                           escape="false"/>
         </h:form>
 
         <h:form id="event-note-form">
             <h:outputText styleClass="ui-label" value="Note text: "/>
             <p:textEditor id="event-notes-editor"
-                          value="#{ceCaseSearchProfileBB.formNoteText}"
+                          value="#{eventsBB.formNoteText}"
                           required="false"
                           secure="false"
                           height="200"/>
 
             <p:commandButton id="event-dialog-notes-button-addnote"
-                             ajax="false"
                              disabled="true"
-                             actionListener="#{ceCaseSearchProfileBB.onNoteCommitButtonChange}"
                              oncomplete="PF('event-note-dialog-var').hide()"
                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                              value="Attach Note"

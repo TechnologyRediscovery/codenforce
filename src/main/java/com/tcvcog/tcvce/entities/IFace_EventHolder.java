@@ -20,7 +20,7 @@ import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.util.List;
 
 /**
- * Defines basic getters and 
+ * Defines basic getters and setters
  * @author sylvia
  */
 public interface IFace_EventHolder {
