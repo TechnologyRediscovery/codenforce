@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Technology Rediscovery LLC
+ * Copyright (C) 2021 Technology Rediscovery LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,9 @@
 package com.tcvcog.tcvce.entities;
 
 /**
- * Species an interface of a single getter and a single setter for a DB notes field
- * Note that this interface extends IFace_keyIdentified which means you can ask
- * a noteholder for its DB table name, primary key field name, and the object's PK/ID
  * 
  * @author sylvia
  */
-public interface IFace_noteHolder 
-        extends IFace_keyIdentified{
-    /**
-     * Getter for the note field
-     * @return the notes on the object
-     */
-    public String getNotes();
+public interface IFace_PersonLinkHolder {
     
-    /**
-     * Setter for the note field
-     * @param n the notes to set
-     */
-    public void setNotes(String n);
 }

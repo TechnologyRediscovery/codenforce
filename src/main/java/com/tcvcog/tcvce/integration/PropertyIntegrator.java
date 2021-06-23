@@ -818,23 +818,21 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         HumanParcelRole hpr = null;
         
         try {
-            
             String s =  "SELECT roleid, title, createdts, description, muni_municode, deactivatedts, \n" +
                         "       notes\n" +
                         "  FROM public.humanparcelrole WHERE roleid=?;";
-            
             stmt = con.prepareStatement(s);
             stmt.setInt(1, roleID);
 
             rs = stmt.executeQuery();
-
+            
             while (rs.next()) {
                 hpr = new HumanParcelRole(si.generateLinkedObjectRole(rs),HUMAN_PARCEL_ROLE_TABLE_NAME );
             }
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("PersonIntegrator ...", ex);
+            throw new IntegrationException("PropertyIntegrator ...", ex);
         } finally {
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }

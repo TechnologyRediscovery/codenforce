@@ -24,8 +24,7 @@ import java.time.LocalDateTime;
  */
 public  class   MailingAddress 
         extends TrackedEntity
-        implements  IFace_deactivatable, 
-                    IFace_keyIdentified,
+        implements  IFace_keyIdentified,
                     IFace_noteHolder{ 
     final String TABLE_NAME = "mailingaddress";
     

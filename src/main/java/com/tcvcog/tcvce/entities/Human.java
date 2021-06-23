@@ -27,7 +27,7 @@ import java.util.List;
  */
 public  class   Human 
         extends TrackedEntity
-        implements IFace_deactivatable, IFace_noteHolder{
+        implements IFace_noteHolder{
     
         static final String TABLE_NAME = "public.human";
     

@@ -428,11 +428,7 @@ CREATE TABLE public.humanmailingaddress
         deactivatedts                   TIMESTAMP WITH TIME ZONE,
         deactivatedby_userid            INTEGER CONSTRAINT humanmailing_deactivatedby_userid_fk REFERENCES login (userid),  
         notes                           TEXT         
-    
-
-
     );
-
 
 CREATE TABLE public.mailingaddressparcel
     (
@@ -446,7 +442,6 @@ CREATE TABLE public.mailingaddressparcel
         deactivatedts                   TIMESTAMP WITH TIME ZONE,
         deactivatedby_userid            INTEGER CONSTRAINT mailingaddressparcel_deactivatedby_userid_fk REFERENCES login (userid),  
         notes                       TEXT
-
     );
 
 

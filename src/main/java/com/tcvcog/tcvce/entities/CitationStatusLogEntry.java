@@ -28,12 +28,18 @@ import java.time.LocalDateTime;
  * @author ellen bascomb of apt 31y
  */
 public class    CitationStatusLogEntry 
-        extends TrackedEntity {
+        extends TrackedEntity
+        implements IFace_noteHolder{
+    
+    final static String CITATION_STATUS_TABLE = "citationcitationstatus";
+    final static String CITATION_STATUS_PKFIELD = "citationstatusid";
     
     private int statusID;
     private String statusTitle;
     private String description;
     private Icon icon;
+    
+    private int citationStatusID;
 
     private LocalDateTime dateOfRecord;
     
@@ -150,8 +156,38 @@ public class    CitationStatusLogEntry
     /**
      * @param notes the notes to set
      */
+    @Override
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    /**
+     * @return the citationStatusID
+     */
+    public int getCitationStatusID() {
+        return citationStatusID;
+    }
+
+    /**
+     * @param citationStatusID the citationStatusID to set
+     */
+    public void setCitationStatusID(int citationStatusID) {
+        this.citationStatusID = citationStatusID;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return CITATION_STATUS_PKFIELD;
+    }
+
+    @Override
+    public int getDBKey() {
+        return citationStatusID;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return CITATION_STATUS_TABLE;
     }
     
 }

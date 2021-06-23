@@ -24,7 +24,6 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.Credential;
-
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
@@ -37,12 +36,6 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
-import com.tcvcog.tcvce.entities.search.QueryEvent;
-import com.tcvcog.tcvce.entities.search.QueryEventEnum;
-import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
-import com.tcvcog.tcvce.entities.search.QueryOccPeriodEnum;
-import com.tcvcog.tcvce.entities.search.QueryProperty;
-import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
@@ -150,13 +143,15 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Logic container for Person object assembly
+     * from an underlying human record
+     * 
      * @param p
-     * @return 
+     * @return the configured person
      */
     private Person configurePerson(Person p){
         PersonIntegrator pi = getPersonIntegrator();
         
-        p.setAddressList(addressList);
+        p.setAddressList();
         p.setPhoneList(pi.getContactPhoneList(p.getHumanID()));
         p.setEmailList(pi.getContactEmailList(p.getHumanID()));
         

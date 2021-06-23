@@ -184,9 +184,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                  if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
                  if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             } // close finally
-            
         }
-        
     }
     
     
@@ -237,6 +235,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
     
     /**
      * Populates common fields among LinkedObjectRole family
+     * 
      * @param rs containing each common field in linked objects
      * @return the superclass ready to be injected into a subtype
      * @throws java.sql.SQLException
@@ -264,10 +263,8 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 lor.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
             }
             lor.setNotes(rs.getString("notes"));
-            
         }
         return lor;
-        
     }
 
     

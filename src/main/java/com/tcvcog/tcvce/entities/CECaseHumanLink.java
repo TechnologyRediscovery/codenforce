@@ -19,12 +19,16 @@ package com.tcvcog.tcvce.entities;
 import java.time.LocalDateTime;
 
 /**
- *
+ * Humans attached to CECases store their metadata in this class
+ * 
  * @author sylvia
  */
 public class CECaseHumanLink 
         extends Human
         implements IFace_trackedEntityLink{
+   
+    final static String CECASEHUMAN_TABLE = "";
+    final static String CECASEHUMAN_PKFIELD = "";
     
     protected int ceCaseID;
     

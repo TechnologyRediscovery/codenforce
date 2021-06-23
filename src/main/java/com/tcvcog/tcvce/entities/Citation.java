@@ -27,8 +27,12 @@ import java.util.Objects;
  * 
  * @author ellen bascomb of apt 31y
  */
-public class Citation 
+public class    Citation 
         extends TrackedEntity {
+    
+    final static String CITATION_TABLE = "citation";
+    final static String CITATION_PKFIELD = "citationid";
+    
     
     /**
      * Database Key
@@ -292,6 +296,21 @@ public class Citation
      */
     public void setPersonList(List<Person> personList) {
         this.personList = personList;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return CITATION_PKFIELD;
+    }
+
+    @Override
+    public int getDBKey() {
+         return citationID;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return CITATION_TABLE;
     }
     
 }

@@ -165,52 +165,123 @@ CREATE TABLE public.citationphotodoc
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
--- ******** RUN LOCALLY UP TO HERE ******** 
+
+
+CREATE TYPE linkedobjectroleschema AS ENUM ('OccApplicationHuman', 'CECaseHuman', 'OccPeriodHuman', 'ParcelHuman', 'ParcelUnitHuman', 'CitationHuman', 'EventHuman', 'MailingaddressHuman', 'ParcelMailingaddress');
+
+CREATE SEQUENCE IF NOT EXISTS linkedobjectrole_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE public.linkedobjectrole
+(
+	lorid 			INTEGER NOT NULL DEFAULT nextval('linkedobjectrole_seq') PRIMARY KEY,
+	lorschema_schemaid 	linkedobjectroleschema NOT NULL,
+	title 			TEXT NOT NULL,
+	description     TEXT,
+	createdts       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+	deactivatedts   TIMESTAMP WITH TIME ZONE,
+	notes			TEXT
+);
+
 
 DROP TABLE public.eventperson;
 
 
+CREATE SEQUENCE IF NOT EXISTS eventhuman_linkid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
 CREATE TABLE public.eventhuman
+    (
+        linkid                  INTEGER PRIMARY KEY DEFAULT nextval('eventhuman_linkid_seq'),
+        event_eventid 			INTEGER NOT NULL CONSTRAINT eventhuman_eventid_fk REFERENCES event (eventid),
+        human_humanid           INTEGER NOT NULL CONSTRAINT parcelunithuman_humanid_fk REFERENCES human (humanid),
+        linkedobjectrole_lorid  INTEGER CONSTRAINT eventhuman_lorid_fk REFERENCES linkedobjectrole (lorid),
+        createdts               TIMESTAMP WITH TIME ZONE,
+        createdby_userid        INTEGER CONSTRAINT eventhuman_createdby_userid_fk REFERENCES login (userid),     
+        lastupdatedts           TIMESTAMP WITH TIME ZONE,
+        lastupdatedby_userid    INTEGER CONSTRAINT eventhuman_lastupdatedby_userid_fk REFERENCES login (userid),
+        deactivatedts           TIMESTAMP WITH TIME ZONE,
+        deactivatedby_userid    INTEGER CONSTRAINT eventhuman_deactivatedby_userid_fk REFERENCES login (userid),   
+        notes                   TEXT
+    );
+
+DROP TABLE CASCADE occpermitapplicationperson ;
+
+
+
+CREATE TABLE public.occpermitapplicationhuman
 (
-  human_humanid integer,
-  event_eventid integer,
-  role TEXT,
-  source_sourceid integer,
-  createdts timestamp with time zone,
-  createdby_userid integer,
-  lastupdatedts timestamp with time zone,
-  lastupdatedby_userid integer,
-  deactivatedts timestamp with time zone,
-  deactivatedby_userid integer,
-  notes text,
-
-  CONSTRAINT eventhuman_comppk PRIMARY KEY (human_humanid, event_eventid),
-  
-  CONSTRAINT eventhuman_humanid_fk FOREIGN KEY (human_humanid)
+  occpermitapplication_applicationid integer NOT NULL,
+  human_humanid integer NOT NULL,
+  applicant boolean,
+  preferredcontact boolean,
+  applicationpersontype persontype NOT NULL DEFAULT 'Other'::persontype,
+  active boolean,
+  CONSTRAINT occpermitapplicationhuman_comp_pk PRIMARY KEY (occpermitapplication_applicationid, human_humanid),
+  CONSTRAINT occpermitapplicationhuman_applicationid_fk FOREIGN KEY (occpermitapplication_applicationid)
+      REFERENCES public.occpermitapplication (applicationid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT occpermitapplicationhuman_humanid_fk FOREIGN KEY (human_humanid)
       REFERENCES public.human (humanid) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  
-  CONSTRAINT eventhuman_eventid_fk FOREIGN KEY (event_eventid)
-  		REFERENCES public.event (eventid) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-
-  CONSTRAINT humancitation_sourceid_fk FOREIGN KEY (source_sourceid)
-      REFERENCES public.bobsource (sourceid) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-
-  CONSTRAINT humancitation_createdby_userid_fk FOREIGN KEY (createdby_userid)
-      REFERENCES public.login (userid) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-
-  CONSTRAINT humancitation_deactivatedby_userid_fk FOREIGN KEY (deactivatedby_userid)
-      REFERENCES public.login (userid) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-
-  CONSTRAINT humancitation_lastupdatdby_userid_fk FOREIGN KEY (lastupdatedby_userid)
-      REFERENCES public.login (userid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 ) ;
 
+ALTER TABLE citationhuman ADD COLUMN linkedobjectrole_lorid INTEGER 
+    CONSTRAINT citationhuman_lorid_fk 
+    REFERENCES linkedobjectrole (lorid);  
+
+
+
+  -- OCCAPPLICATIONHUMAN ("","OccApplicationHuman"), 
+
+  -- JURPLEL can update this
+
+
+
+  --   CECASEHUMAN ("humancecase", "CECaseHuman"), 
+  --   Unification of link structure
+ALTER TABLE humancecase ADD COLUMN linkedobjectrole_lorid INTEGER 
+    CONSTRAINT citationhuman_lorid_fk 
+    REFERENCES linkedobjectrole (lorid);  
+
+ALTER TABLE humancecase ADD COLUMN source_sourceid
+    CONSTRAINT humancecase_sourceid_fk
+    REFERENCES bobsource (sourceid);
+
+
+CREATE SEQUENCE IF NOT EXISTS humancecase_linkid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER TABLE humancecase ADD COLUMN linkid INTEGER NOT NULL 
+    CONSTRAINT humancecase_linkid_pk PRIMARY KEY 
+    DEFAULT nextval('humancecase_linkid_seq');
+
+
+  --   OCCPERIODHUMAN ("humanoccperiod","OccPeriodHuman"), 
+  --   PARCELHUMAN ("humanparcel","ParcelHuman"), 
+  --   PARCELUNITHUMAN ("humanparcelunit","ParcelUnitHuman"), 
+  --   CITATIONHUMAN ("citationhuman","CitationHuman"), 
+  --   EVENTHUMAN ("","EventHuman"), 
+  --   MAILINGADDRESSHUMAN ("humanmailingaddress","MailingaddressHuman"), 
+  --   PARCELMAILINGADDRESS  ("parcelmailingaddress","ParcelMailingaddress");
+    
+
+
+
+
+-- ******** RUN LOCALLY UP TO HERE ******** 
 
 
 --IF datepublished IS NULL the patch is still open and receiving changes

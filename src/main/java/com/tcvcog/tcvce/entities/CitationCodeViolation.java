@@ -26,8 +26,12 @@ public class CitationCodeViolation
         extends CodeViolation
         implements IFace_trackedEntityLink{
     
-    protected CitationViolationStatusEnum citVStatus;
+    final static String CITATION_CODEVIOLATION_TABLE = "citationviolation";
+    final static String CITATION_CODEVIOLATION_PKFIELD = "citationviolationid";
     
+    protected int citationViolationID;
+    
+    protected CitationViolationStatusEnum citVStatus;
     
     protected BOBSource linkSource;
     
@@ -185,6 +189,35 @@ public class CitationCodeViolation
      @Override
     public boolean isLinkDeactivated() {
         return linkDeactivatedTS != null;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return CITATION_CODEVIOLATION_PKFIELD;
+    }
+
+    @Override
+    public int getDBKey() {
+        return citationViolationID;
+    }
+
+    @Override
+    public String getDBTableName() {
+       return CITATION_CODEVIOLATION_TABLE;
+    }
+
+    /**
+     * @return the citationViolationID
+     */
+    public int getCitationViolationID() {
+        return citationViolationID;
+    }
+
+    /**
+     * @param citationViolationID the citationViolationID to set
+     */
+    public void setCitationViolationID(int citationViolationID) {
+        this.citationViolationID = citationViolationID;
     }
 
     

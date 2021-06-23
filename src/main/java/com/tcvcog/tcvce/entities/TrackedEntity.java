@@ -25,8 +25,9 @@ import java.time.format.DateTimeFormatter;
  * that contains creation, update, deactivation fields
  * @author sylvia
  */
-public abstract class TrackedEntity 
-        implements Serializable, IFace_TableNameHolder{
+public abstract class   TrackedEntity 
+        implements      Serializable, 
+                        IFace_keyIdentified{
     
     /** Humanization Object standard fields **/
     protected LocalDateTime createdTS;

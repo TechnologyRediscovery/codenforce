@@ -19,7 +19,11 @@ package com.tcvcog.tcvce.entities;
 import java.time.LocalDateTime;
 
 /**
- *
+ * Humanization standard
+ * 
+ * Java incarnation of a record from the linkedobjectrole table
+ * that describes how a peripheral and core object are related
+ * 
  * @author sylvia
  */
 public class LinkedObjectRole {

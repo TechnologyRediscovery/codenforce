@@ -1228,6 +1228,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     
     /**
      * Creates a record in the person-property linking table, after checking that it does not exist
+     * 
+     * @deprecated replaced by parcel and human!!!!!
      * @param person
      * @param prop
      * @throws IntegrationException 
@@ -1270,6 +1272,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     }
     /**
      * Creates a record in the person-property linking table, after checking that it does not exist
+     * @deprecated replaced by parcel and human
      * @param person
      * @param prop
      * @throws IntegrationException 
@@ -1300,6 +1303,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     /**
      * Accepts a Person object to store in the database.
      *
+     * @deprecated replaced by humans!!!!!
      * @param personToStore the person to store
      * @return the unique id number assigned to the record just created in
      * postgres through a call to currval('[sequence_name]')
@@ -1434,7 +1438,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * eventPersonConnect for each one
      * 
      * @param ev
-     
+       @deprecated replaced by humans
      * @throws IntegrationException 
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
@@ -1641,11 +1645,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     /**
      * Updates a given record for a person in the database. Will throw an error
- if the person does not exist. Note that this method will retrieve the
- Person object's ID number to determine which record to update in the db
-     *
+     * if the person does not exist. Note that this method will retrieve the
+     * Person object's ID number to determine which record to update in the db
+     *  @deprecated replaced by humans
      * @param personToUpdate the Person object with the updated data to be
- stored in the database. All old information will be overwritten
+     * stored in the database. All old information will be overwritten
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public void updatePerson(Person personToUpdate) throws IntegrationException {
@@ -2000,29 +2004,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
-    public void deletePerson(Person pers) throws IntegrationException {
-        if(pers == null){ return; }
-        
-        Connection con = getPostgresCon();
-        String query = "DELETE FROM person WHERE personid = ?";
-
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, pers.getPersonID());
-            stmt.execute();
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to delete person--probably because"
-                    + "this person has been attached to another database entity"
-                    + "such as a case or event. (Best leave this person in.)");
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
+  
     
     /**
      * Single point of entry for all queries against the person table, one SearchParamsPerson
@@ -2411,6 +2393,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         return persIDList;
     }
     
+    /**
+     * TODO: JURPLEL needs to adapt this to humans
+     * @param rs
+     * @return 
+     */
     public PersonChangeOrder generatePersonChangeOrder(ResultSet rs){
         PersonChangeOrder skeleton = new PersonChangeOrder();
         UserCoordinator uc = getUserCoordinator();
@@ -2452,6 +2439,12 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
+    
+    /**
+     * TODO: JURPLEL needs to adapt to public occ application
+     * @param order
+     * @throws IntegrationException 
+     */
     public void insertPersonChangeOrder(PersonChangeOrder order) throws IntegrationException{
         
         String query =  "INSERT INTO public.personchange(\n" +
@@ -2507,6 +2500,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
+    /**
+     * TODO: JURPLEL needs to adapt this to humans on the public side
+     * @param order
+     * @throws IntegrationException 
+     */
     public void updatePersonChangeOrder(PersonChangeOrder order) throws IntegrationException{
         
         String query =  "UPDATE public.personchange\n" +
@@ -2566,6 +2564,12 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
+    /**
+     * TODO: JURPLEL needs to adapt this
+     * @param personID
+     * @return
+     * @throws IntegrationException 
+     */
     public List<PersonChangeOrder> getPersonChangeOrderList(int personID) throws IntegrationException{
         
         String query =  "SELECT personchangeid, person_personid, firstname, lastname, compositelastname, \n" +
@@ -2604,7 +2608,13 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-        public List<PersonChangeOrder> getPersonChangeOrderListAll(int personID) throws IntegrationException{
+    /**
+     * TODO: JURPLEL: Adapt to humans
+     * @param personID
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<PersonChangeOrder> getPersonChangeOrderListAll(int personID) throws IntegrationException{
         
         String query =  "SELECT personchangeid, person_personid, firstname, lastname, compositelastname, \n" +
 "       phonecell, phonehome, phonework, email, addressstreet, addresscity, \n" +

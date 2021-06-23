@@ -24,8 +24,7 @@ import java.time.LocalDateTime;
  */
 public  class Parcel 
         extends TrackedEntity
-        implements IFace_deactivatable, 
-                   IFace_keyIdentified,
+        implements IFace_keyIdentified,
                    IFace_noteHolder{
         
     final static String TABLE_NAME = "parcel";
