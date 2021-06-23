@@ -48,7 +48,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 
 /**
  * @author Ellen Bascomb
@@ -177,7 +176,7 @@ public class OccPeriodSearchWorkflowBB
     }
 
 
-    public void certifyOccPeriodField(ActionEvent ev) {
+    public void certifyOccPeriodField() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         FacesContext context = getFacesContext();
         String field = context.getExternalContext().getRequestParameterMap().get("fieldtocertify");
@@ -221,11 +220,11 @@ public class OccPeriodSearchWorkflowBB
                         "Error! Unable to certify field", ""));
         }
 
-        saveOccPeriodChanges(ev);
+        saveOccPeriodChanges();
     }
 
 
-    public void toggleOccPeriodAuthorization(ActionEvent ev) {
+    public void toggleOccPeriodAuthorization() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             oc.toggleOccPeriodAuthorization(currentOccPeriod, getSessionBean().getSessUser());
@@ -251,7 +250,7 @@ public class OccPeriodSearchWorkflowBB
      *
      * @param ev
      */
-    public void updateOccPeriodInitialize(ActionEvent ev) {
+    public void updateOccPeriodInitialize() {
 
     }
 
@@ -260,7 +259,7 @@ public class OccPeriodSearchWorkflowBB
      * It will fail in certain conditions, in which case the currentOccPeriod is returned to
      * a backup made before any current unsaved changes.
      */
-    public void saveOccPeriodChanges(ActionEvent ev) {
+    public void saveOccPeriodChanges() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
 
         try {
@@ -270,15 +269,14 @@ public class OccPeriodSearchWorkflowBB
             System.out.println("OccPeriodSearchWorkflowBB.saveOccPeriodChanges successful");
 
             // Set backup copy in case of failure if saving to database succeeds
-            lastSavedOccPeriod.copyAllValues(currentOccPeriod);
+            lastSavedOccPeriod = new OccPeriod(currentOccPeriod);
         } catch (IntegrationException | BObStatusException ex) {
-            System.out.println("test2");
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     ex.getMessage(), ""));
             System.out.println("OccPeriodSearchWorkflowBB.saveOccPeriodChanges failure");
 
             // Restore working copy of occ period to last working one if saving to database fails.
-            discardOccPeriodChanges(ev);
+            discardOccPeriodChanges();
         }
     }
 
@@ -286,10 +284,10 @@ public class OccPeriodSearchWorkflowBB
      * This method will discard the changes to the current working occ period and
      * set its value to that of the occ period present in the last successful save.
      */
-    public void discardOccPeriodChanges(ActionEvent ev) {
+    public void discardOccPeriodChanges() {
         System.out.println("OccPeriodSearchWorkflowBB.discardOccPeriodChanges");
 
-        currentOccPeriod.copyAllValues(lastSavedOccPeriod);
+        currentOccPeriod = new OccPeriodDataHeavy(lastSavedOccPeriod);
     }
 
     public void updatePeriodPropUnit() {
@@ -314,7 +312,7 @@ public class OccPeriodSearchWorkflowBB
      *
      * @param ev
      */
-    public void clearFormNoteText(ActionEvent ev) {
+    public void clearFormNoteText() {
         formNoteText = new String();
     }
 
@@ -325,7 +323,7 @@ public class OccPeriodSearchWorkflowBB
      *
      * @param ev
      */
-    public void appendOccPeriodNotes(ActionEvent ev) {
+    public void appendOccPeriodNotes() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
 
         MessageBuilderParams mbp = new MessageBuilderParams();
@@ -416,13 +414,13 @@ public class OccPeriodSearchWorkflowBB
      *
      * @param ev
      */
-    public void clearOccPeriodList(ActionEvent ev) {
+    public void clearOccPeriodList() {
         if (occPeriodList != null) {
             occPeriodList.clear();
         }
     }
 
-    public void loadOccPeriodHistory(ActionEvent ev) {
+    public void loadOccPeriodHistory() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             occPeriodList.addAll(oc.getOccPeriodPropertyUnitHeavy(oc.assembleOccPeriodHistoryList(getSessionBean().getSessUser().getMyCredential())));
@@ -435,25 +433,12 @@ public class OccPeriodSearchWorkflowBB
         }
     }
 
-
-    /**
-     * Responder to the query button on the UI
-     *
-     * @param ev
-     */
-    public void executeQuery(ActionEvent ev) {
-        System.out.println("OccPeriodSearchWorkflowBB.executeQuery");
-
-
-        executeQuery();
-    }
-
-
     /**
      * Entry way into the Query world via the SearchCoordinator who is responsible
      * for calling appropriate Coordinators and configuration methods and such
      */
     public void executeQuery() {
+        System.out.println("OccPeriodSearchWorkflowBB.executeQuery");
         SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         int listSize = 0;
@@ -485,7 +470,7 @@ public class OccPeriodSearchWorkflowBB
                         "New query loaded!", ""));
     }
 
-    public void resetQuery(ActionEvent ev) {
+    public void resetQuery() {
         SearchCoordinator sc = getSearchCoordinator();
         occPeriodQueryList = sc.buildQueryOccPeriodList(getSessionBean().getSessUser().getMyCredential());
         if (occPeriodQueryList != null && !occPeriodQueryList.isEmpty()) {

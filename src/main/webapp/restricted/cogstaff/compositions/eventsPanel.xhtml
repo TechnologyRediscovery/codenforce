@@ -11,13 +11,11 @@
         <h:form id="events-form">
 
             <p:commandButton id="events-add-button"
-                             ajax="true"
                              styleClass="noFill button-size-small"
-                             action="#{ceCaseSearchProfileBB.onEventAddInitButtonChange}"
                              value="Add Event"
-                             icon="fa fa-plus"
+                             actionListener="eventsBB.newEvent"
                              oncomplete="PF('event-add-dialog-var').show()"
-                             update="event-add-dialog event-add-form"/>
+                             update="event-add-dialog"/>
 
             <p:spacer height="5px"/>
 
@@ -89,17 +87,17 @@
                                        value="view"
                                        oncomplete="PF('event-profile-dialog-var').show()"
                                        update="event-profile-dialog event-profile-form">
-                            <f:setPropertyActionListener target="#{eventsBB.selectedEvent}" value="#{event}"/>
+                            <f:setPropertyActionListener target="#{eventsBB.currentEvent}" value="#{event}"/>
                         </p:commandLink>
                     </div>
-                    <h:outputText value="&#xA0;&#xA0;|"/> <!-- these are just nbsp but that doesn't work in compositions -->
+                    <h:outputText value="&#xA0;&#xA0;|"/> <!-- these are just nbsp but those don't work in compositions -->
                     <div class="restrict-main-contents-io-link link-button">
-                        <p:commandLink id="event-update-button"
+                        <p:commandLink id="event-edit-button"
                                        styleClass="noFill button-size-small"
                                        value="edit"
-                                       oncomplete="PF('event-update-dialog-var').show()"
-                                       update="event-update-dialog event-update-form">
-                            <f:setPropertyActionListener target="#{eventsBB.selectedEvent}" value="#{event}"/>
+                                       oncomplete="PF('event-edit-dialog-var').show()"
+                                       update="event-edit-dialog event-edit-form">
+                            <f:setPropertyActionListener target="#{eventsBB.currentEvent}" value="#{event}"/>
                         </p:commandLink>
                     </div>
                 </p:column>
@@ -118,8 +116,7 @@
               closable="true"
               closeOnEscape="true"
               modal="true"
-              header="Event id #{eventsBB.selectedEvent.eventID} profile"
-              rendered="true">
+              header="Event id #{eventsBB.currentEvent.eventID} profile">
 
         <h:form id="event-profile-form">
             <div class="ui-g data_container_nested_restrict">
@@ -132,7 +129,7 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-domain-ot"
-                                      value="#{eventsBB.selectedEvent.domain.title} "/>
+                                      value="#{eventsBB.currentEvent.domain.title} "/>
                     </div>
                 </div>
 
@@ -145,7 +142,7 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-et-ot"
-                                      value="#{eventsBB.selectedEvent.category.eventType.label} "/>
+                                      value="#{eventsBB.currentEvent.category.eventType.label} "/>
                     </div>
                 </div>
 
@@ -158,7 +155,7 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-ec-ot"
-                                      value="#{eventsBB.selectedEvent.category.eventCategoryTitle}"/>
+                                      value="#{eventsBB.currentEvent.category.eventCategoryTitle}"/>
                     </div>
                     <p:commandLink id="event-cat-details-cl"
                                    disabled="false"
@@ -176,7 +173,7 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-descr-ot"
-                                      value="#{eventsBB.selectedEvent.description}"/>
+                                      value="#{eventsBB.currentEvent.description}"/>
                     </div>
                 </div>
 
@@ -189,7 +186,7 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-st-ot"
-                                      value="#{eventsBB.getPrettyDate(eventsBB.selectedEvent.timeStart)}"/>
+                                      value="#{eventsBB.getPrettyDate(eventsBB.currentEvent.timeStart)}"/>
 
                     </div>
                 </div>
@@ -203,7 +200,7 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-time-end-ot"
-                                      value="#{eventsBB.getPrettyDate(eventsBB.selectedEvent.timeEnd)}"/>
+                                      value="#{eventsBB.getPrettyDate(eventsBB.currentEvent.timeEnd)}"/>
                     </div>
                 </div>
 
@@ -217,20 +214,20 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-mintoview-ot"
-                                      value="#{eventsBB.selectedEvent.category.userRankMinimumToView}"/>
+                                      value="#{eventsBB.currentEvent.category.userRankMinimumToView}"/>
                     </div>
                 </div>
 
                 <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
                     <div class="restrict-data-field-label-inline">
-                        <p:outputLabel for="event-mintoupdate-ot">
-                            <h:outputText value="Rank req. to update"/>
+                        <p:outputLabel for="event-mintoedit-ot">
+                            <h:outputText value="Rank req. to edit"/>
                         </p:outputLabel>
                     </div>
 
                     <div class="restrict-data-field-value-inline">
-                        <h:outputText id="event-mintoupdate-ot"
-                                      value="#{eventsBB.selectedEvent.category.userRankMinimumToUpdate}"/>
+                        <h:outputText id="event-mintoedit-ot"
+                                      value="#{eventsBB.currentEvent.category.userRankMinimumToUpdate}"/>
                     </div>
                 </div>
 
@@ -243,7 +240,7 @@
 
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="event-active-ot"
-                                      value="#{eventsBB.selectedEvent.active ? 'Yes' : 'No'}"/>
+                                      value="#{eventsBB.currentEvent.active ? 'Yes' : 'No'}"/>
                     </div>
 
                     <div class="restrict-data-field-value-inline">
@@ -251,7 +248,7 @@
                             <p:commandLink id="case-reactivate-cb"
                                            actionListener="#{eventsBB.toggleEventActive}"
                                            style="color:blue;"
-                                           value="#{eventsBB.selectedEvent.active ? 'deactivate event' : 'reactivate event'}"
+                                           value="#{eventsBB.currentEvent.active ? 'deactivate event' : 'reactivate event'}"
                                            update="event-profile-form"/>
                         </div>
                     </div>
@@ -278,7 +275,7 @@
                              update="event-note-form"/>
 
             <h:outputText id="event-note-ot"
-                          value="#{eventsBB.selectedEvent.notes}"
+                          value="#{eventsBB.currentEvent.notes}"
                           escape="false"/>
         </h:form>
 
@@ -310,7 +307,7 @@
               closable="true"
               closeOnEscape="true"
               modal="true"
-              header="Attaching new event to case ID #{ceCaseSearchProfileBB.currentCase.caseID}"
+              header="Attaching new event to object with ID #{eventsBB.currentEventHolder.BObID}"
               rendered="true">
 
         <h:form id="event-add-form">
@@ -335,7 +332,7 @@
                                             event-add-dialog-show-cb
                                             event-add-currtypecat-type-ot
                                             event-add-currtypecat-cat-ot
-                                            selectedEventCategoryDescription"/>
+                                            currentEventCategoryDescription"/>
 
                             <f:selectItems value="#{ceCaseSearchProfileBB.eventTypeCandidates}" var="et" itemLabel="#{et.label}"/>
                         </p:selectOneListbox>
@@ -355,7 +352,7 @@
                                             value="#{ceCaseSearchProfileBB.eventCategorySelected}"
                                             tabindex="11">
                             <p:ajax listener="#{ceCaseSearchProfileBB.onEventCategoryMenuChange}"
-                                    update="selectedEventCategoryDescription
+                                    update="currentEventCategoryDescription
                                             event-add-dialog-show-cb
                                             event-add-currtypecat-cat-ot
                                             event-add-time-start-cal
@@ -389,18 +386,16 @@
                 </div>
 
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-                    <h2><h:outputText id="event-add-currtypecat-type-ot"
-                                      value="#{ceCaseSearchProfileBB.eventTypeSelected.label}"
-                    />
+                    <h2>
+                        <h:outputText id="event-add-currtypecat-type-ot"
+                                      value="#{ceCaseSearchProfileBB.eventTypeSelected.label}"/>
                         <h:outputText value=": "/>
                         <h:outputText id="event-add-currtypecat-cat-ot"
-                                      value="#{ceCaseSearchProfileBB.eventCategorySelected.eventCategoryTitle}"
-                        />
+                                      value="#{ceCaseSearchProfileBB.eventCategorySelected.eventCategoryTitle}"/>
                     </h2>
                     <p:spacer height="3px"/>
-                    <h:outputText id="selectedEventCategoryDescription"
-                                  value="#{ceCaseSearchProfileBB.eventCategorySelected.eventCategoryDesc}"
-                    />
+                    <h:outputText id="currentEventCategoryDescription"
+                                  value="#{ceCaseSearchProfileBB.eventCategorySelected.eventCategoryDesc}"/>
                 </div>
 
                 <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
@@ -414,8 +409,8 @@
                     <div class="restrict-main-contents-io-content">
                         <p:growl for="event-add-time-start-cal"/>
 
-                        <p:datePicker value="#{ceCaseSearchProfileBB.currentEvent.timeStartUtilDate}"
-                                      rendered="#{!empty ceCaseSearchProfileBB.currentEvent}"
+                        <p:datePicker value="#{eventsBB.currentEvent.timeStartUtilDate}"
+                                      rendered="#{!empty eventsBB.currentEvent}"
                                       id="event-add-time-start-cal"
                                       autocomplete="false"
                                       monthNavigator="true"
@@ -458,7 +453,7 @@
 
                     <div class="restrict-main-contents-io-content">
                         <p:growl for="event-add-time-end-cal" />
-                        <p:calendar value="#{ceCaseSearchProfileBB.currentEvent.timeEndUtilDate}"
+                        <p:calendar value="#{eventsBB.currentEvent.timeEndUtilDate}"
                                     id="event-add-time-end-cal"
                                     mode="popup"
                                     showOn="button"
@@ -481,7 +476,7 @@
 
                     <div class="restrict-main-contents-io-content">
                         <p:inputText id="event-add-descr-it"
-                                     value="#{ceCaseSearchProfileBB.currentEvent.description}"
+                                     value="#{eventsBB.currentEvent.description}"
                                      style="width: 100%;"
                                      tabindex="3"
                                      required="false"/>
@@ -505,7 +500,7 @@
 
                     <div class="restrict-main-contents-io-content">
                         <p:dataScroller id="event-add-personlist"
-                                        value="#{ceCaseSearchProfileBB.currentEvent.personList}"
+                                        value="#{eventsBB.currentEvent.personList}"
                                         var="per"
                                         widgetVar="noticebuilder-pers-ds-var">
 
@@ -540,32 +535,31 @@
         </h:form>
     </p:dialog>
 
-    <!-- Event update dialog -->
-    <p:dialog id="event-update-dialog"
+    <!-- Event edit dialog -->
+    <p:dialog id="event-edit-dialog"
               height="800" width="1600"
-              widgetVar="event-update-dialog-var"
+              widgetVar="event-edit-dialog-var"
               responsive="true"
               resizable="trie"
               closable="true"
               closeOnEscape="true"
               modal="true"
-              header="Update event id #{ceCaseSearchProfileBB.currentEvent.eventID}"
-              rendered="true">
+              header="Edit event id #{eventsBB.currentEvent.eventID}">
 
-        <h:form id="event-update-form">
+        <h:form id="event-edit-form">
             <p style="font-style:  italic;">Note: Event type and category cannot be updated. Instead, remove incorrect event and make a new one.</p>
             <div class="ui-g data_container_nested_restrict">
                 <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
                     <div class="restrict-main-contents-io-title">
-                        <h:outputLabel for="event-update-time-start-cal">
+                        <h:outputLabel for="event-edit-time-start-cal">
                             <h:outputText value="Start time"/>
                         </h:outputLabel>
                     </div>
 
                     <div class="restrict-main-contents-io-content">
-                        <p:growl for="event-update-time-start-cal"/>
-                        <p:calendar value="#{ceCaseSearchProfileBB.currentEvent.timeStartUtilDate}"
-                                    id="event-update-time-start-cal"
+                        <p:growl for="event-edit-time-start-cal"/>
+                        <p:calendar value="#{eventsBB.currentEvent.timeStartUtilDate}"
+                                    id="event-edit-time-start-cal"
                                     mode="popup"
                                     showOn="button"
                                     pattern="EEE, dd MMM, yyyy HH:mm:ss"
@@ -575,39 +569,39 @@
                                     required="true">
 
                             <p:ajax listener="#{ceCaseSearchProfileBB.onTimeStartChange()}"
-                                    update="event-update-time-end-cal"/>
+                                    update="event-edit-time-end-cal"/>
                         </p:calendar>
                     </div>
                 </div>
 
                 <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
                     <div class="restrict-main-contents-io-title">
-                        <h:outputLabel for="event-update-time-start-cal">
+                        <h:outputLabel for="event-edit-time-start-cal">
                             <h:outputText value="Duration"/>
                         </h:outputLabel>
                     </div>
 
                     <div class="restrict-main-contents-io-content">
-                        <p:inputNumber id="event-update-duration-in"
+                        <p:inputNumber id="event-edit-duration-in"
                                        value="#{ceCaseSearchProfileBB.eventDurationFormField}"
                                        style="width: 50px;">
                             <p:ajax listener="#{ceCaseSearchProfileBB.onEventDurationChange}"
-                                    update="event-update-time-end-cal"/>
+                                    update="event-edit-time-end-cal"/>
                         </p:inputNumber>
                     </div>
                 </div>
 
                 <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
                     <div class="restrict-main-contents-io-title">
-                        <h:outputLabel for="event-update-time-end-cal">
+                        <h:outputLabel for="event-edit-time-end-cal">
                             <h:outputText value="End time"/>
                         </h:outputLabel>
                     </div>
 
                     <div class="restrict-main-contents-io-content">
-                        <p:growl for="event-update-time-end-cal"/>
-                        <p:calendar value="#{ceCaseSearchProfileBB.currentEvent.timeEndUtilDate}"
-                                    id="event-update-time-end-cal"
+                        <p:growl for="event-edit-time-end-cal"/>
+                        <p:calendar value="#{eventsBB.currentEvent.timeEndUtilDate}"
+                                    id="event-edit-time-end-cal"
                                     mode="popup"
                                     disabled="true"
                                     showOn="button"
@@ -621,14 +615,14 @@
 
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                     <div class="restrict-main-contents-io-title">
-                        <h:outputLabel for="event-update-descr">
+                        <h:outputLabel for="event-edit-descr">
                             <h:outputText value="Description"/>
                         </h:outputLabel>
                     </div>
 
                     <div class="restrict-main-contents-io-content">
-                        <p:inputText id="eventDesc"
-                                     value="#{ceCaseSearchProfileBB.currentEvent.description}"
+                        <p:inputText id="event-edit-descr"
+                                     value="#{eventsBB.currentEvent.description}"
                                      style="width: 100%;"
                                      tabindex="3"
                                      required="false"/>
@@ -636,24 +630,21 @@
                 </div>
 
                 <div class="restrict-main-contents-io-button">
-                    <p:commandButton id="event-update-dialog-show-cb"
-                                     ajax="false"
-                                     action="#{ceCaseSearchProfileBB.onEventUpdateCommitButtonChange}"
+                    <p:commandButton id="event-edit-dialog-show-cb"
                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                     oncomplete="PF('event-edit-dialog-var').hide()"
+                                     actionListener="#{eventsBB.saveEventChanges}"
                                      value="Save edits"
                                      icon="fa fa-edit"
-                                     update="messages-global-form"/>
+                                     update="events-panel"/>
                 </div>
 
                 <div class="restrict-main-contents-io-button gray_button">
                     <p:commandButton id="event-profile-done-button"
-                                     ajax="true"
-                                     value="Cancel"
-                                     process="@none"
-                                     immediate="true"
-                                     oncomplete="PF('event-update-dialog-var').hide()"
-                                     actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}"
-                                     icon="fa fa-stop"/>
+                                     oncomplete="PF('event-edit-dialog-var').hide()"
+                                     actionListener="#{eventsBB.discardEventChanges}"
+                                     icon="fa fa-stop"
+                                     value="Cancel"/>
                 </div>
             </div>
 
@@ -661,6 +652,7 @@
     </p:dialog>
 
     <!-- Event deactivate dialog -->
+    <!-- Note to self: This should be replaced with one of the confirmdialogs from the other page -->
     <p:dialog id="event-deactivate-dialog"
               height="300" width="400"
               widgetVar="event-deactivate-dialog-var"
@@ -957,7 +949,7 @@
                                          oncomplete="PF('event-personchoose-dialog-var').hide()"
                                          disabled="#{!(ceCaseSearchProfileBB.currentEvent.eventID == 0)}"
                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                         update="event-update-dialog event-add-dialog"/>
+                                         update="event-edit-dialog event-add-dialog"/>
 
                     </div>
                 </div>

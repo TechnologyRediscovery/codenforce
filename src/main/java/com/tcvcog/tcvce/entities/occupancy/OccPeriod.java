@@ -25,7 +25,7 @@ public  class       OccPeriod
         implements  IFace_Loggable,
                     IFace_EventHolder,
                     Comparable<OccPeriod>,
-                    IFace_ActivatableBOB{
+                    IFace_ActivatableBOB {
     
     protected int periodID;
     protected int propertyUnitID;
@@ -68,47 +68,45 @@ public  class       OccPeriod
     }
 
     public OccPeriod(OccPeriod otherPeriod) {
-        copyAllValues(otherPeriod);
+        this.periodID = otherPeriod.getPeriodID();
+        this.propertyUnitID = otherPeriod.getPropertyUnitID();
+
+        this.type = otherPeriod.getType();
+
+        this.governingInspection = otherPeriod.getGoverningInspection();
+
+        this.manager = otherPeriod.getManager();
+
+        this.periodTypeCertifiedBy = otherPeriod.getPeriodTypeCertifiedBy();
+        this.periodTypeCertifiedTS = otherPeriod.getPeriodTypeCertifiedTS();
+        this.eventList = otherPeriod.getEventList();
+
+        this.source = otherPeriod.getSource();
+        this.createdBy = otherPeriod.getCreatedBy();
+        this.createdTS = otherPeriod.getCreatedTS();
+
+        this.startDate = otherPeriod.getStartDate();
+        this.startDateCertifiedBy = otherPeriod.getStartDateCertifiedBy();
+        this.startDateCertifiedTS = otherPeriod.getStartDateCertifiedTS();
+
+        this.endDate = otherPeriod.getEndDate();
+        this.endDateCertifiedBy = otherPeriod.getEndDateCertifiedBy();
+        this.endDateCertifiedTS = otherPeriod.getEndDateCertifiedTS();
+
+        this.authorizedBy = otherPeriod.getAuthorizedBy();
+        this.authorizedTS = otherPeriod.getAuthorizedTS();
+
+        this.overrideTypeConfig = otherPeriod.isOverrideTypeConfig();
+
+        this.notes = otherPeriod.getNotes();
+
+        this.active = otherPeriod.isActive();
+
+        this.lastUpdatedBy = otherPeriod.getLastUpdatedBy();
+        this.lastUpdatedTS = otherPeriod.getLastUpdatedTS();
     }
 
-    public void copyAllValues(OccPeriod otherPeriod) {
-        setPeriodID(otherPeriod.getPeriodID());
-        setPropertyUnitID(otherPeriod.getPropertyUnitID());
 
-        setType(otherPeriod.getType());
-
-        setGoverningInspection(otherPeriod.getGoverningInspection());
-
-        setManager(otherPeriod.getManager());
-
-        setPeriodTypeCertifiedBy(otherPeriod.getPeriodTypeCertifiedBy());
-        setPeriodTypeCertifiedTS(otherPeriod.getPeriodTypeCertifiedTS());
-        setEventList(otherPeriod.getEventList());
-
-        setSource(otherPeriod.getSource());
-        setCreatedBy(otherPeriod.getCreatedBy());
-        setCreatedTS(otherPeriod.getCreatedTS());
-
-        setStartDate(otherPeriod.getStartDate());
-        setStartDateCertifiedBy(otherPeriod.getStartDateCertifiedBy());
-        setStartDateCertifiedTS(otherPeriod.getStartDateCertifiedTS());
-
-        setEndDate(otherPeriod.getEndDate());
-        setEndDateCertifiedBy(otherPeriod.getEndDateCertifiedBy());
-        setEndDateCertifiedTS(otherPeriod.getEndDateCertifiedTS());
-
-        setAuthorizedBy(otherPeriod.getAuthorizedBy());
-        setAuthorizedTS(otherPeriod.getAuthorizedTS());
-
-        setOverrideTypeConfig(otherPeriod.isOverrideTypeConfig());
-
-        setNotes(otherPeriod.getNotes());
-
-        setActive(otherPeriod.isActive());
-
-        setLastUpdatedBy(otherPeriod.getLastUpdatedBy());
-        setLastUpdatedTS(otherPeriod.getLastUpdatedTS());
-    }
 
     @Override
     public int compareTo(OccPeriod op) {
@@ -582,5 +580,10 @@ public  class       OccPeriod
     @Override
     public List<EventCnF> getEventList(){
         return eventList;
+    }
+
+    @Override
+    public int getBObID() {
+        return periodID;
     }
 }

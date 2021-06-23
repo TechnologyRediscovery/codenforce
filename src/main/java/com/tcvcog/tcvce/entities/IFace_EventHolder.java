@@ -28,5 +28,9 @@ public interface IFace_EventHolder {
     public void setEventList(List<EventCnF> evList);
     public List<EventCnF> getEventList(ViewOptionsActiveHiddenListsEnum evViewOpt);
     public List<EventCnF> getEventList();
-    
+
+    // Migrated down from IFace_EventRuleGoverned (hopefully that doesn't cause any problems)
+    // Maybe this should be in a BOb interface instead of the event one?
+    public int getBObID();
+
 }

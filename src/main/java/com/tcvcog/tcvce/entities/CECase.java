@@ -177,7 +177,12 @@ public class        CECase
         } // close null check
         return visEventList;
     }
-    
+
+    @Override
+    public int getBObID() {
+        return caseID;
+    }
+
     /**
      * Builds our violation list based on inputted view options
      * @param viewOption

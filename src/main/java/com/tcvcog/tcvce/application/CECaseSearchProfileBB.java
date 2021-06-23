@@ -2093,7 +2093,7 @@ public class CECaseSearchProfileBB
             System.out.println("EventsBB.refreshavailableEventCategories");
         }
     }
-     /**
+    /**
      * Listener for user changes to the event category list on event add
      */
     public void onEventCategoryMenuChange(){
@@ -2101,7 +2101,7 @@ public class CECaseSearchProfileBB
         configureEventFieldsOnAddConfig();
     }
    
-      /**
+    /**
      * Sets current event field values to those suggested by the 
      * selected event category
      */

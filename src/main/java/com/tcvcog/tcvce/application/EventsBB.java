@@ -27,12 +27,10 @@ import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.event.ActionEvent;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * The premier backing bean for universal events panel workflow.
@@ -41,16 +39,21 @@ import java.util.function.Predicate;
  */
 public class EventsBB extends BackingBeanUtils implements Serializable {
 
-    private String formNoteText;
 
     private EventDomainEnum pageEventDomain;
+
     private IFace_EventHolder currentEventHolder;
     private List<EventCnF> eventList = new ArrayList<>();
 
     private ViewOptionsActiveHiddenListsEnum eventListFilterMode;
 
-    // Single selected event for editing and viewing
-    private EventCnF selectedEvent;
+    // form-only stuff
+    private String formNoteText;
+
+    // Single event that is currently used for editing/viewing
+    // and also a copy of its last saved state to restore on edit cancel
+    private EventCnF lastSavedSelectedEvent;
+    private EventCnF currentEvent;
 
     public EventsBB() {}
 
@@ -107,12 +110,12 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
 
     public void toggleEventActive() {
         EventCoordinator ec = getEventCoordinator();
-        selectedEvent.setActive(!selectedEvent.isActive());
+        currentEvent.setActive(!currentEvent.isActive());
         try {
-            ec.updateEvent(selectedEvent, getSessionBean().getSessUser());
+            ec.updateEvent(currentEvent, getSessionBean().getSessUser());
         } catch (IntegrationException | BObStatusException | EventException ex) {
             System.out.println(ex);
-            selectedEvent.setActive(!selectedEvent.isActive());
+            currentEvent.setActive(!currentEvent.isActive());
         }
     }
 
@@ -131,30 +134,50 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
 //        }
 //
 //        getSessionBean().setSessEvent(newEvent);
-//        newEvent.setCeCaseID(currentCase.getBObID());
-//
-//
-//        switch (pageEventDomain) {
-//            case CODE_ENFORCEMENT:
-//                currentEventHolder = sb.getSessCECase();
-//                break;
-//            case OCCUPANCY:
-//                newEvent.setCeCaseID(currentEventHolder.getBObID());
-//                break;
-//            case UNIVERSAL:
-//                System.out.println("EventsBB reached universal case in newEvent()--really seems like you *should* do something about this");
-//                break;
-//        }
+//        if (currentEventHolder != null)
+//            newEvent.setCeCaseID(currentEventHolder.getBObID()); // wrong!!
 //
 //        selectedEvent = newEvent;
     }
 
-    //
-    // Getter and setter style methods that are not as straightforward
-    // or do not point to a specific value start here.
-    //
+    /**
+     * This method attempts to update the database entry for the selectedEvent.
+     * It will fail in certain conditions, in which case the selectedEvent is returned to
+     * a backup made before any current unsaved changes.
+     */
+    public void saveEventChanges() {
+        EventCoordinator ec = getEventCoordinator();
 
-    public void clearFormNoteText(ActionEvent ev) {
+        try {
+            ec.updateEvent(currentEvent, getSessionBean().getSessUser());
+
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Save successful on event ID: " + currentEvent.getEventID(), ""));
+            System.out.println("EventsBB.saveEventChanges successful");
+
+            // Set backup copy in case of failure if saving to database succeeds
+            lastSavedSelectedEvent = new EventCnF(currentEvent);
+        } catch (IntegrationException | BObStatusException | EventException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    ex.getMessage(), ""));
+            System.out.println("EventsBB.saveEventChanges failure");
+
+            // Restore working copy of occ period to last working one if saving to database fails.
+            discardEventChanges();
+        }
+    }
+
+    /**
+     * This method will discard the changes to the current working event and
+     * set its value to that of the event present in the last successful save.
+     */
+    public void discardEventChanges() {
+        System.out.println("OccPeriodSearchWorkflowBB.discardOccPeriodChanges");
+
+        currentEvent = new EventCnF(lastSavedSelectedEvent);
+    }
+
+    public void clearFormNoteText() {
         formNoteText = new String();
     }
 
@@ -178,6 +201,9 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         return eventList;
     }
 
+    public IFace_EventHolder getCurrentEventHolder() {
+        return currentEventHolder;
+    }
 
     public ViewOptionsActiveHiddenListsEnum getEventListFilterMode() {
         return eventListFilterMode;
@@ -188,11 +214,20 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         updateEventList();
     }
 
-    public EventCnF getSelectedEvent() {
-        return selectedEvent;
+    public EventCnF getCurrentEvent() {
+        return currentEvent;
     }
 
-    public void setSelectedEvent(EventCnF selectedEvent) {
-        this.selectedEvent = selectedEvent;
+    public void setCurrentEvent(EventCnF currentEvent) {
+        this.currentEvent = currentEvent;
+        this.lastSavedSelectedEvent = new EventCnF(this.currentEvent);
+    }
+
+    public String getFormNoteText() {
+        return formNoteText;
+    }
+
+    public void setFormNoteText(String formNoteText) {
+        this.formNoteText = formNoteText;
     }
 }

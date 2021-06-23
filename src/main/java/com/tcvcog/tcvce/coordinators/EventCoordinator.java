@@ -520,12 +520,12 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws BObStatusException thrown if the case is in an improper state for proposed event
      * @throws com.tcvcog.tcvce.domain.EventException
      */
-    public EventCnF initEvent(IFace_EventRuleGoverned erg, EventCategory ec) throws BObStatusException, EventException{
+    public EventCnF initEvent(IFace_EventHolder erg, EventCategory ec) throws BObStatusException, EventException {
         
         CECaseDataHeavy cse = null;
         OccPeriod op = null;
         
-        // the moment of event instantiaion!!!!
+        // the moment of event instantiation!!!!
         EventCnF e = new EventCnF();
         
         if(erg != null){

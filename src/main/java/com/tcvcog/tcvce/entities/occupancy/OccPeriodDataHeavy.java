@@ -143,11 +143,6 @@ public  class       OccPeriodDataHeavy
     public EventDomainEnum discloseEventDomain() {
         return EventDomainEnum.OCCUPANCY;
     }
-    
-     @Override
-    public int getBObID() {
-        return periodID;
-    }
 
     
     @Override

@@ -97,12 +97,7 @@ public class CECaseDataHeavy
     public EventDomainEnum discloseEventDomain() {
         return EventDomainEnum.CODE_ENFORCEMENT;
     }
-    
-    
-    @Override
-    public int getBObID() {
-        return caseID;
-    }
+
 
 
 

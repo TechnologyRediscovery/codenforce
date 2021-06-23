@@ -39,8 +39,6 @@ public interface IFace_EventRuleGoverned extends IFace_EventHolder {
     
     public EventDomainEnum discloseEventDomain();
     
-    public int getBObID();
-    
 //    public void setEventList(List<EventCnF> lst);
 //
 //    public List<EventCnF> assembleEventList(ViewOptionsActiveHiddenListsEnum voahle);

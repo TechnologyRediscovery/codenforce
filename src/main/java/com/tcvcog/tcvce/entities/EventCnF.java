@@ -94,8 +94,8 @@ public  class       EventCnF
         this.lastUpdatedTS = ev.lastUpdatedTS;
         
         this.active = ev.active;
+
         this.hidden = ev.hidden;
-        
         this.notes = ev.notes;
         
         this.personList = ev.personList;
