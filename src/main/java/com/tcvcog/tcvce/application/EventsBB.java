@@ -98,31 +98,11 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
             return;
 
         eventList.clear();
-        eventList.addAll(currentEventHolder.getEventList());
-
         if (eventListFilterMode == null)
-            return;
+            eventList.addAll(currentEventHolder.getEventList());
+        else
+            eventList.addAll(currentEventHolder.getEventList(eventListFilterMode));
 
-        // Get filter conditions
-        Predicate<EventCnF> filterFunc = null;
-        switch (eventListFilterMode) {
-            case VIEW_ALL:
-                break;
-            case VIEW_ACTIVE_NOTHIDDEN:
-                filterFunc = event -> !event.isActive() || event.isHidden();
-                break;
-            case VIEW_ACTIVE_HIDDEN:
-                filterFunc = event -> !event.isActive() || !event.isHidden();
-                break;
-            case VIEW_INACTIVE:
-                filterFunc = event -> event.isActive();
-                break;
-        }
-
-        // remove all elements of eventList that return true with filterFunc
-        if (filterFunc != null) {
-            eventList.removeIf(filterFunc);
-        }
     }
 
     public void toggleEventActive() {
