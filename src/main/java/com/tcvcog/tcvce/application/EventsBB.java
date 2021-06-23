@@ -28,6 +28,7 @@ import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import java.io.Serializable;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,6 +50,8 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
 
     // form-only stuff
     private String formNoteText;
+
+    private long formEventDuration;
 
     // Single event that is currently used for editing/viewing
     // and also a copy of its last saved state to restore on edit cancel
@@ -172,9 +175,18 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
      * set its value to that of the event present in the last successful save.
      */
     public void discardEventChanges() {
-        System.out.println("OccPeriodSearchWorkflowBB.discardOccPeriodChanges");
+        System.out.println("EventsBB.discardEventChanges");
 
-        currentEvent = new EventCnF(lastSavedSelectedEvent);
+        setCurrentEvent(new EventCnF(lastSavedSelectedEvent));
+    }
+
+    /**
+     * Updates event's end time using a given duration from the start time
+     */
+    public void updateEndTimeFromDuration(){
+        if (getCurrentEvent().getTimeStart() != null) {
+            getCurrentEvent().setTimeEnd(getCurrentEvent().getTimeStart().plusMinutes(formEventDuration));
+        }
     }
 
     public void clearFormNoteText() {
@@ -220,6 +232,10 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
 
     public void setCurrentEvent(EventCnF currentEvent) {
         this.currentEvent = currentEvent;
+        // Calculate duration for forms
+        if (currentEvent.getTimeStart() != null && currentEvent.getTimeEnd() != null)
+            formEventDuration = ChronoUnit.MINUTES.between(currentEvent.getTimeStart(), currentEvent.getTimeEnd());
+
         this.lastSavedSelectedEvent = new EventCnF(this.currentEvent);
     }
 
@@ -229,5 +245,13 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
 
     public void setFormNoteText(String formNoteText) {
         this.formNoteText = formNoteText;
+    }
+
+    public long getFormEventDuration() {
+        return formEventDuration;
+    }
+
+    public void setFormEventDuration(long formEventDuration) {
+        this.formEventDuration = formEventDuration;
     }
 }

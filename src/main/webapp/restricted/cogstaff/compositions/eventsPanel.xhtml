@@ -577,15 +577,15 @@
                 <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
                     <div class="restrict-main-contents-io-title">
                         <h:outputLabel for="event-edit-time-start-cal">
-                            <h:outputText value="Duration"/>
+                            <h:outputText value="Duration (mins)"/>
                         </h:outputLabel>
                     </div>
 
                     <div class="restrict-main-contents-io-content">
                         <p:inputNumber id="event-edit-duration-in"
-                                       value="#{ceCaseSearchProfileBB.eventDurationFormField}"
+                                       value="#{eventsBB.formEventDuration}"
                                        style="width: 50px;">
-                            <p:ajax listener="#{ceCaseSearchProfileBB.onEventDurationChange}"
+                            <p:ajax listener="#{eventsBB.updateEndTimeFromDuration}"
                                     update="event-edit-time-end-cal"/>
                         </p:inputNumber>
                     </div>
