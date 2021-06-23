@@ -24,7 +24,7 @@
                              value="#{eventsBB.eventListFilterMode}"
                              tabindex="10">
 
-                <p:ajax update="events-table"
+                <p:ajax update="events-panel"
                         immediate="true"/>
 
                 <f:selectItems id="prop-events-selitems"
@@ -259,6 +259,8 @@
             <div class="restrict-main-contents-io-button gray_button">
                 <p:commandButton id="event-profile-done-button"
                                  value="Done"
+                                 actionListener="#{eventsBB.updateEventList}"
+                                 update="events-panel"
                                  oncomplete="PF('event-profile-dialog-var').hide()"
                                  icon="fa fa-stop"/>
             </div>
