@@ -13,7 +13,6 @@
             <p:commandButton id="events-add-button"
                              styleClass="noFill button-size-small"
                              value="Add Event"
-                             actionListener="eventsBB.newEvent"
                              oncomplete="PF('event-add-dialog-var').show()"
                              update="event-add-dialog"/>
 
@@ -326,50 +325,35 @@
                         <p:growl for="event-add-type-solb"/>
                         <p:selectOneListbox id="event-add-type-solb"
                                             required="true"
-                                            value="#{ceCaseSearchProfileBB.eventTypeSelected}"
+                                            value="#{eventsBB.potentialType}"
                                             tabindex="10">
 
-                            <p:ajax listener="#{ceCaseSearchProfileBB.onEventTypeMenuChange}"
-                                    update="categoryList
-                                            event-add-dialog-show-cb
-                                            event-add-currtypecat-type-ot
-                                            event-add-currtypecat-cat-ot
-                                            currentEventCategoryDescription"/>
+                            <p:ajax update="event-add-form"/>
 
-                            <f:selectItems value="#{ceCaseSearchProfileBB.eventTypeCandidates}" var="et" itemLabel="#{et.label}"/>
+                            <f:selectItems value="#{eventsBB.listOfPotentialTypes}" var="et" itemLabel="#{et.label}"/>
                         </p:selectOneListbox>
                     </div>
                 </div>
 
                 <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field">
                     <div class="restrict-main-contents-io-title">
-                        <h:outputLabel for="event-add-cat-solb"> <!-- PROBABLY A BUG HERE IF YOU ARE LOOKING FOR ONE -->
+                        <h:outputLabel for="event-add-cat-solb">
                             <h:outputText value="Category"/>
                         </h:outputLabel>
                     </div>
 
                     <div class="restrict-main-contents-io-content">
-                        <p:selectOneListbox style="width: 100%;"
-                                            id="categoryList"
-                                            value="#{ceCaseSearchProfileBB.eventCategorySelected}"
+                        <p:selectOneListbox id="event-add-cat-solb"
+                                            style="width: 100%;"
+                                            value="#{eventsBB.potentialCategory}"
                                             tabindex="11">
-                            <p:ajax listener="#{ceCaseSearchProfileBB.onEventCategoryMenuChange}"
-                                    update="currentEventCategoryDescription
-                                            event-add-dialog-show-cb
-                                            event-add-currtypecat-cat-ot
-                                            event-add-time-start-cal
-                                            event-add-time-end-cal
-                                            event-add-descr-it
-                                            event-add-duration-in
-                                            event-add-time-end-cal"/>
+
+                            <p:ajax update="event-add-form"/>
 
                             <f:converter converterId="eventCategoryConverter"/>
 
-                            <f:selectItems  id="catItemsList"
-                                            value="#{ceCaseSearchProfileBB.eventCategoryCandidates}"
-                                            var="ec"
-                                            itemValue="#{ec}"
-                                            itemLabel="#{ec.eventCategoryTitle}"/>
+                            <f:selectItems value="#{eventsBB.listOfPotentialCategories}" var="ec" itemValue="#{ec}"
+                                           itemLabel="#{ec.eventCategoryTitle}"/>
 
                         </p:selectOneListbox>
                     </div>
@@ -390,14 +374,14 @@
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                     <h2>
                         <h:outputText id="event-add-currtypecat-type-ot"
-                                      value="#{ceCaseSearchProfileBB.eventTypeSelected.label}"/>
+                                      value="#{eventsBB.potentialType.label}"/>
                         <h:outputText value=": "/>
                         <h:outputText id="event-add-currtypecat-cat-ot"
-                                      value="#{ceCaseSearchProfileBB.eventCategorySelected.eventCategoryTitle}"/>
+                                      value="#{eventsBB.potentialCategory.eventCategoryTitle}"/>
                     </h2>
                     <p:spacer height="3px"/>
                     <h:outputText id="currentEventCategoryDescription"
-                                  value="#{ceCaseSearchProfileBB.eventCategorySelected.eventCategoryDesc}"/>
+                                  value="#{eventsBB.potentialCategory.eventCategoryDesc}"/>
                 </div>
 
                 <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
@@ -411,8 +395,7 @@
                     <div class="restrict-main-contents-io-content">
                         <p:growl for="event-add-time-start-cal"/>
 
-                        <p:datePicker value="#{eventsBB.currentEvent.timeStartUtilDate}"
-                                      rendered="#{!empty eventsBB.currentEvent}"
+                        <p:datePicker value="#{eventsBB.potentialTimeStartUtilDate}"
                                       id="event-add-time-start-cal"
                                       autocomplete="false"
                                       monthNavigator="true"
@@ -487,7 +470,7 @@
 
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                     <div class="restrict-main-contents-io-title">
-                        <h:outputLabel for="event-add-descr"> <!-- ALSO MAYBE A BUG? -->
+                        <h:outputLabel for="event-add-descr"> <!-- MAYBE A BUG? -->
                             <h:outputText value="Person connections"/>
                         </h:outputLabel>
                     </div>
@@ -517,7 +500,7 @@
                 <p:commandButton id="event-add-dialog-show-cb"
                                  ajax="false"
                                  action="#{ceCaseSearchProfileBB.onEventAddCommitButtonChange}"
-                                 disabled="#{empty ceCaseSearchProfileBB.eventCategorySelected}"
+                                 disabled="#{empty eventsBB.potentialCategory}"
                                  rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                  value="Create new event "
                                  icon="fa fa-bolt"

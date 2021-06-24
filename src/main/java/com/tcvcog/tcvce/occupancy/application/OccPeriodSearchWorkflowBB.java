@@ -248,7 +248,6 @@ public class OccPeriodSearchWorkflowBB
     /**
      * utility pass through method to be called when loading Occperiod advanced settings
      *
-     * @param ev
      */
     public void updateOccPeriodInitialize() {
 
@@ -310,7 +309,6 @@ public class OccPeriodSearchWorkflowBB
     /**
      * This method clears the cache of the last written note.
      *
-     * @param ev
      */
     public void clearFormNoteText() {
         formNoteText = new String();
@@ -321,7 +319,6 @@ public class OccPeriodSearchWorkflowBB
      * (formNoteText) to the end of the occperiod's note field in the database
      * in a structured and consistent way, while also requiring different permissions.
      *
-     * @param ev
      */
     public void appendOccPeriodNotes() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -412,7 +409,6 @@ public class OccPeriodSearchWorkflowBB
     /**
      * Listener method for requests from the user to clear the results list
      *
-     * @param ev
      */
     public void clearOccPeriodList() {
         if (occPeriodList != null) {

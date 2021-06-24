@@ -696,7 +696,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      */
     public Map<EventType, List<EventCategory>> assembleEventTypeCatMap_toEnact(
                                                 EventDomainEnum domain,
-                                                IFace_EventRuleGoverned erg, 
+                                                IFace_EventHolder erg,
                                                 UserAuthorized ua){
        Map<EventType, List<EventCategory>> typeCatMap = new HashMap<>();
        List<EventType> typeList = determinePermittedEventTypes(domain, erg, ua);
@@ -720,7 +720,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return 
      */
     public List<EventType> determinePermittedEventTypes(    EventDomainEnum domain, 
-                                                            IFace_EventRuleGoverned erg, 
+                                                            IFace_EventHolder erg,
                                                             UserAuthorized ua){
         List<EventType> typeList = new ArrayList<>();
         if(domain == null || erg == null || ua == null){

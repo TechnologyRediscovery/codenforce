@@ -20,18 +20,19 @@ import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
-import com.tcvcog.tcvce.entities.IFace_EventHolder;
+import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The premier backing bean for universal events panel workflow.
@@ -39,8 +40,6 @@ import java.util.List;
  * @author jurplel
  */
 public class EventsBB extends BackingBeanUtils implements Serializable {
-
-
     private EventDomainEnum pageEventDomain;
 
     private IFace_EventHolder currentEventHolder;
@@ -48,10 +47,18 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
 
     private ViewOptionsActiveHiddenListsEnum eventListFilterMode;
 
-    // form-only stuff
-    private String formNoteText;
+    private Map<EventType, List<EventCategory>> typeCategoryMap;
 
+    // form logic stuff
+    private String formNoteText;
     private long formEventDuration;
+
+    // potential values used in the the new event form (subset of form logic stuff I guess)
+    private LocalDateTime potentialTimeStart;
+    private long potentialDuration;
+
+    private EventType potentialType;
+    private EventCategory potentialCategory;
 
     // Single event that is currently used for editing/viewing
     // and also a copy of its last saved state to restore on edit cancel
@@ -70,6 +77,9 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
 
         // Find event holder and setup event list
         updateEventHolder();
+
+        // Populate map of event types and categories
+        typeCategoryMap = ec.assembleEventTypeCatMap_toEnact(pageEventDomain, currentEventHolder, getSessionBean().getSessUser());
     }
 
     /**
@@ -183,7 +193,13 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     /**
      * Updates event's end time using a given duration from the start time
      */
-    public void updateEndTimeFromDuration(){
+    public void updateEndTimeFromDuration() {
+        if (getCurrentEvent().getTimeStart() != null) {
+            getCurrentEvent().setTimeEnd(getCurrentEvent().getTimeStart().plusMinutes(formEventDuration));
+        }
+    }
+
+    public void getPotentialEndTime() {
         if (getCurrentEvent().getTimeStart() != null) {
             getCurrentEvent().setTimeEnd(getCurrentEvent().getTimeStart().plusMinutes(formEventDuration));
         }
@@ -206,6 +222,37 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     }
 
     //
+    // New event stuff
+    //
+
+    public List<EventType> getListOfPotentialTypes() {
+        final List<EventType> keys = new ArrayList(typeCategoryMap.keySet());
+        // Set a default potentialType if there isn't already one
+        if (potentialType == null)
+            potentialType = keys.get(0);
+        return keys;
+    }
+
+    public List<EventCategory> getListOfPotentialCategories() {
+        if (potentialType != null && typeCategoryMap.containsKey(potentialType)) {
+            List<EventCategory> eventCategories = typeCategoryMap.get(potentialType);
+            // Set a default potentialCategory if there isn't already one in this list
+            if (!eventCategories.contains(potentialCategory))
+                potentialCategory = eventCategories.get(0);
+            return eventCategories;
+        } else {
+            return new ArrayList();
+        }
+    }
+
+    public void discardPotentialEvent() {
+        setPotentialTimeStart(null);
+        setPotentialDuration(0);
+        setPotentialCategory(null);
+        setPotentialType(null);
+    }
+
+    //
     // Mostly boring getters and setters start here.
     //
 
@@ -221,6 +268,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         return eventListFilterMode;
     }
 
+    // Not completely boring
     public void setEventListFilterMode(ViewOptionsActiveHiddenListsEnum eventListFilterMode) {
         this.eventListFilterMode = eventListFilterMode;
         updateEventList();
@@ -230,6 +278,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         return currentEvent;
     }
 
+    // Not boring
     public void setCurrentEvent(EventCnF currentEvent) {
         this.currentEvent = currentEvent;
         // Calculate duration for forms
@@ -253,5 +302,41 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
 
     public void setFormEventDuration(long formEventDuration) {
         this.formEventDuration = formEventDuration;
+    }
+
+    public LocalDateTime getPotentialTimeStart() {
+        return potentialTimeStart;
+    }
+
+    public java.util.Date getPotentialTimeStartUtilDate() {
+        return DateTimeUtil.convertUtilDate(potentialTimeStart);
+    }
+
+    public void setPotentialTimeStart(LocalDateTime potentialTimeStart) {
+        this.potentialTimeStart = potentialTimeStart;
+    }
+
+    public long getPotentialDuration() {
+        return potentialDuration;
+    }
+
+    public void setPotentialDuration(long potentialDuration) {
+        this.potentialDuration = potentialDuration;
+    }
+
+    public EventType getPotentialType() {
+        return potentialType;
+    }
+
+    public void setPotentialType(EventType potentialType) {
+        this.potentialType = potentialType;
+    }
+
+    public EventCategory getPotentialCategory() {
+        return potentialCategory;
+    }
+
+    public void setPotentialCategory(EventCategory potentialCategory) {
+        this.potentialCategory = potentialCategory;
     }
 }
