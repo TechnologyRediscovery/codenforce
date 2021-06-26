@@ -13,6 +13,7 @@
             <p:commandButton id="events-add-button"
                              styleClass="noFill button-size-small"
                              value="Add Event"
+                             actionListener="#{eventsBB.resetPotentialEvent}"
                              oncomplete="PF('event-add-dialog-var').show()"
                              update="event-add-dialog"/>
 
@@ -362,10 +363,9 @@
 
                     <div class="restrict-main-contents-io-content">
                         <p:selectBooleanCheckbox id="event-add-updatefields-sbb"
-                                                 label="Auto fill event details"
+                                                 itemLabel="Auto fill event details"
                                                  title="Description and duration will be set automatically"
-                                                 value="#{ceCaseSearchProfileBB.updateNewEventFieldsWithCatChange}"
-                                                 disabled="false">
+                                                 value="#{eventsBB.updateFieldsOnCategoryChange}">
                             <p:ajax/>
                         </p:selectBooleanCheckbox>
                     </div>
@@ -380,7 +380,7 @@
                                       value="#{eventsBB.potentialCategory.eventCategoryTitle}"/>
                     </h2>
                     <p:spacer height="3px"/>
-                    <h:outputText id="currentEventCategoryDescription"
+                    <h:outputText id="event-add-currtypecat-desc"
                                   value="#{eventsBB.potentialCategory.eventCategoryDesc}"/>
                 </div>
 
@@ -395,20 +395,18 @@
                     <div class="restrict-main-contents-io-content">
                         <p:growl for="event-add-time-start-cal"/>
 
-                        <p:datePicker value="#{eventsBB.potentialTimeStartUtilDate}"
-                                      id="event-add-time-start-cal"
-                                      autocomplete="false"
-                                      monthNavigator="true"
-                                      yearNavigator="true"
-                                      showTime="true"
-                                      pattern="dd MMM, yyyy HH:mm"
-                                      tabindex="16"
-                                      required="true">
-
-                            <p:ajax update="event-add-time-end-cal"
-                                    listener="#{ceCaseSearchProfileBB.onTimeStartChange}"/>
-
-                        </p:datePicker>
+                        <p:calendar value="#{eventsBB.potentialTimeStartUtilDate}"
+                                    id="event-add-time-start-cal"
+                                    mode="popup"
+                                    showOn="button"
+                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                    navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true"
+                                    showSecond="false" showMillisec="false"
+                                    showButtonPanel="true"
+                                    showTodayButton="true"
+                                    required="true">
+                            <p:ajax update="event-add-time-end-cal"/>
+                        </p:calendar>
                     </div>
                 </div>
 
@@ -421,10 +419,9 @@
 
                     <div class="restrict-main-contents-io-content">
                         <p:inputNumber id="event-add-duration-in"
-                                       value="#{ceCaseSearchProfileBB.eventDurationFormField}"
+                                       value="#{eventsBB.potentialDuration}"
                                        style="width: 50px;">
-                            <p:ajax listener="#{ceCaseSearchProfileBB.onEventDurationChange}"
-                                    update="event-add-time-end-cal"/>
+                            <p:ajax update="event-add-time-end-cal"/>
                         </p:inputNumber>
                     </div>
                 </div>
@@ -438,8 +435,8 @@
 
                     <div class="restrict-main-contents-io-content">
                         <p:growl for="event-add-time-end-cal" />
-                        <p:calendar value="#{eventsBB.currentEvent.timeEndUtilDate}"
-                                    id="event-add-time-end-cal"
+                        <p:calendar id="event-add-time-end-cal"
+                                    value="#{eventsBB.potentialTimeEndUtilDate}"
                                     mode="popup"
                                     showOn="button"
                                     disabled="true"
@@ -461,16 +458,18 @@
 
                     <div class="restrict-main-contents-io-content">
                         <p:inputText id="event-add-descr-it"
-                                     value="#{eventsBB.currentEvent.description}"
+                                     value="#{eventsBB.potentialDescription}"
                                      style="width: 100%;"
                                      tabindex="3"
-                                     required="false"/>
+                                     required="false">
+                            <p:ajax/>
+                        </p:inputText>
                     </div>
                 </div>
 
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                     <div class="restrict-main-contents-io-title">
-                        <h:outputLabel for="event-add-descr"> <!-- MAYBE A BUG? -->
+                        <h:outputLabel for="event-add-personlist">
                             <h:outputText value="Person connections"/>
                         </h:outputLabel>
                     </div>
@@ -498,23 +497,19 @@
 
             <div class="restrict-main-contents-io-button">
                 <p:commandButton id="event-add-dialog-show-cb"
-                                 ajax="false"
-                                 action="#{ceCaseSearchProfileBB.onEventAddCommitButtonChange}"
                                  disabled="#{empty eventsBB.potentialCategory}"
                                  rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                 value="Create new event "
+                                 value="Create new event"
                                  icon="fa fa-bolt"
-                                 update="messages-global-form"/>
+                                 actionListener="#{eventsBB.createNewEvent}"
+                                 oncomplete="PF('event-add-dialog-var').hide()"
+                                 update="events-panel"/>
             </div>
 
             <div class="restrict-main-contents-io-button gray_button">
                 <p:commandButton id="event-add-cancel-button"
-                                 ajax="true"
                                  value="Cancel"
-                                 process="@none"
-                                 immediate="true"
                                  oncomplete="PF('event-add-dialog-var').hide()"
-                                 actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}"
                                  icon="fa fa-stop"/>
             </div>
         </h:form>
@@ -553,8 +548,7 @@
                                     showTodayButton="true"
                                     required="true">
 
-                            <p:ajax listener="#{ceCaseSearchProfileBB.onTimeStartChange()}"
-                                    update="event-edit-time-end-cal"/>
+                            <p:ajax update="event-edit-time-end-cal"/>
                         </p:calendar>
                     </div>
                 </div>
@@ -570,7 +564,7 @@
                         <p:inputNumber id="event-edit-duration-in"
                                        value="#{eventsBB.formEventDuration}"
                                        style="width: 50px;">
-                            <p:ajax listener="#{eventsBB.updateEndTimeFromDuration}"
+                            <p:ajax listener="#{eventsBB.updateTimeEndFromDuration}"
                                     update="event-edit-time-end-cal"/>
                         </p:inputNumber>
                     </div>

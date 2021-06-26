@@ -1752,7 +1752,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
         fuev.setUserCreator(ua);
         fuev.setTimeStart(LocalDateTime.now().plusDays(nov.getFollowupEventDaysRequest()));
-        fuev.setTimeEnd(fuev.getTimeStart().minusMinutes(cat.getDefaultdurationmins()));
+        fuev.setTimeEnd(fuev.getTimeStart().minusMinutes(cat.getDefaultDurationMins()));
         
         List<EventCnF> evlist = ec.addEvent(fuev, (IFace_EventRuleGoverned) cse, ua);
         return evlist.get(0);

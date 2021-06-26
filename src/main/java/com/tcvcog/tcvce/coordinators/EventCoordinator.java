@@ -214,22 +214,22 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public List<EventCnF> addEvent(     EventCnF ev, 
-                                        IFace_EventRuleGoverned erg, 
+                                        IFace_EventHolder erg,
                                         UserAuthorized ua) 
                             throws      BObStatusException, 
                                         EventException, 
                                         IntegrationException{
         
-        if(ev == null || erg == null || ua == null){
+        if (ev == null || erg == null || ua == null) {
             throw new BObStatusException("Cannot process event with incomplete args");
         }
         
         // *************************
         // Check Connections to the mother BOb
         // *************************
-        if(erg instanceof OccPeriodDataHeavy && ev.getOccPeriodID() == 0){
+        if (erg instanceof OccPeriod && ev.getOccPeriodID() == 0) {
             ev.setOccPeriodID(erg.getBObID());
-        } else if (erg instanceof CECaseDataHeavy && ev.getCeCaseID() == 0){
+        } else if (erg instanceof CECase && ev.getCeCaseID() == 0) {
             ev.setCeCaseID(erg.getBObID());
         } 
         
@@ -294,7 +294,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
         // deal with no end time
         if(ev.getTimeEnd() == null){
-            timeEndComputed = ev.getTimeStart().plusMinutes(ev.getCategory().getDefaultdurationmins());
+            timeEndComputed = ev.getTimeStart().plusMinutes(ev.getCategory().getDefaultDurationMins());
             ev.setTimeEnd(timeEndComputed);
      
             mbp = new MessageBuilderParams();
@@ -513,7 +513,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * case phase (closed cases cannot have action, origination, or compliance events.
      * Includes the instantiation of EventCnF objects
      * 
-     * @param erg which for Beta v0.9 includes CECaseDataHeavy and OccPeriod object; null means 
+     * @param erg which for Beta v0.9 includes CECase and OccPeriod object; null means
      * caller will need to insert the BOb ID later
      * @param ec the type of event to attach to the case
      * @return an initialized event with basic properties set
@@ -522,15 +522,15 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      */
     public EventCnF initEvent(IFace_EventHolder erg, EventCategory ec) throws BObStatusException, EventException {
         
-        CECaseDataHeavy cse = null;
+        CECase cse = null;
         OccPeriod op = null;
         
         // the moment of event instantiation!!!!
         EventCnF e = new EventCnF();
         
         if(erg != null){
-            if(erg instanceof CECaseDataHeavy){
-                cse = (CECaseDataHeavy) erg;
+            if(erg instanceof CECase){
+                cse = (CECase) erg;
                 if(cse.getStatusBundle() != null){
                     
                     if(cse.getStatusBundle().getPhase() == CasePhaseEnum.Closed && 
@@ -544,7 +544,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                    ){
                        throw new BObStatusException("This event cannot be attached to a closed case");
                    }
-                } 
+                }
                 e.setCeCaseID(cse.getCaseID());
                 e.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
             } else if (erg instanceof OccPeriod){
@@ -559,7 +559,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             e.setCategory(ec);
 
             e.setTimeStart(LocalDateTime.now());
-            e.setTimeEnd(e.getTimeStart().plusMinutes(ec.getDefaultdurationmins()));
+            e.setTimeEnd(e.getTimeStart().plusMinutes(ec.getDefaultDurationMins()));
         }
         
         e.setActive(true);

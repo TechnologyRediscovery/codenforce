@@ -79,15 +79,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
-import javax.faces.event.ValueChangeEvent;
+
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.SelectEvent;
 
 /**
  *
@@ -2110,8 +2106,8 @@ public class CECaseSearchProfileBB
                 && currentEvent != null 
                 && updateNewEventFieldsWithCatChange){
             currentEvent.setTimeStart(LocalDateTime.now());
-            setEventDurationFormField(getEventCategorySelected().getDefaultdurationmins());
-            currentEvent.setTimeEnd(getCurrentEvent().getTimeStart().plusMinutes(getEventCategorySelected().getDefaultdurationmins()));
+            setEventDurationFormField(getEventCategorySelected().getDefaultDurationMins());
+            currentEvent.setTimeEnd(getCurrentEvent().getTimeStart().plusMinutes(getEventCategorySelected().getDefaultDurationMins()));
             currentEvent.setDescription(getEventCategorySelected().getHostEventDescriptionSuggestedText());
         }
     }

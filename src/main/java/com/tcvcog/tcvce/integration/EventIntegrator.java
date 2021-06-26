@@ -18,7 +18,6 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
@@ -26,13 +25,11 @@ import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.IFace_EventHolder;
-import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import java.io.Serializable;
@@ -828,7 +825,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             ec.setDirective(choiceInt.getDirective(rs.getInt("directive_directiveid")));
         }
         ec.setActive(rs.getBoolean("active"));
-        ec.setDefaultdurationmins(rs.getInt("defaultdurationmins"));
+        ec.setDefaultDurationMins(rs.getInt("defaultdurationmins"));
         
         ec.setUserRankMinimumToEnact(rs.getInt("userrankminimumtoenact"));
         ec.setUserRankMinimumToView(rs.getInt("userrankminimumtoview"));
@@ -948,7 +945,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(10, java.sql.Types.NULL);
             }
-            stmt.setInt(11, ec.getDefaultdurationmins());
+            stmt.setInt(11, ec.getDefaultDurationMins());
 
             stmt.setBoolean(12, ec.isActive());
             stmt.setInt(13, ec.getUserRankMinimumToEnact());
@@ -1007,7 +1004,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(10, java.sql.Types.NULL);
             }
-            stmt.setInt(11, ec.getDefaultdurationmins());
+            stmt.setInt(11, ec.getDefaultDurationMins());
 
             stmt.setBoolean(12, ec.isActive());
             stmt.setInt(13, ec.getUserRankMinimumToEnact());
