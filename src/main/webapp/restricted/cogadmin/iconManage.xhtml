@@ -175,11 +175,20 @@
                                              iconmanage-messages-form"
                                              />
                             
-                            <p:commandButton    id="icon-commitinsert-cb"
+                             <p:commandButton    id="icon-commitinsert-cb"
                                                 ajax="true" value="Add new icon" icon="fa fa-plus" 
                                                 tabindex="11" actionListener="#{iconBB.commitInsert}"
                                                 disabled="#{!(iconBB.currentIcon.iconid == 0)}"
                                              oncomplete="PF('icon-addupdate-dialog').hide()"
+                                             update="icon-manage-form:icon-table
+                                             iconmanage-messages-form"
+                                             />
+                             
+                             <p:commandButton    id="icon-commitremove-cb"
+                                                ajax="true" value="Remove icon" icon="fa fa-trash" 
+                                                tabindex="11" actionListener="#{iconBB.commitDelete}"
+                                                disabled="#{!(iconBB.currentIcon.iconid == 0)}"
+                                             oncomplete="PF('').hide()"
                                              update="icon-manage-form:icon-table
                                              iconmanage-messages-form"
                                              />

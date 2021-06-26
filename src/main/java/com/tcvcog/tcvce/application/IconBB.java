@@ -78,11 +78,25 @@ public class IconBB extends BackingBeanUtils implements Serializable{
         }
         
     }
+    //method for deleting existing icons
+    public void commitDelete(ActionEvent ev) {
+//		  SystemIntegrator si = getSystemIntegrator(); 
+//		  try {
+//			  si.deleteIcon(currentIcon); 
+//			  getFacesContext().addMessage(null, 
+//					  new FacesMessage(FacesMessage.SEVERITY_INFO, 
+//							  "Success! Icon removed", "")); 
+//		  } catch (IntegrationException ex) { getFacesContext().addMessage(null, new
+//				  FacesMessage(FacesMessage.SEVERITY_ERROR, "Could not remove icon, sorry",
+//				  "")); }
+//		 
+    }
     
     public void createNewIcon(){
         Icon i = new Icon();
         currentIcon = i;
     }
+    
 
     /**
      * @return the iconList
