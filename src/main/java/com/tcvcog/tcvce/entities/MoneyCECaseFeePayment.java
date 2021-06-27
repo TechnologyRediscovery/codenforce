@@ -21,40 +21,21 @@ package com.tcvcog.tcvce.entities;
  * @author Nathan Dietz
  */
 public class MoneyCECaseFeePayment 
-        extends Payment{
+        extends Payment {
 
-    private int moneyPaymentID;
     private int CECaseAssignedFeeID;
     
     public MoneyCECaseFeePayment() {
+        super();
     }
-    
-    public MoneyCECaseFeePayment(Payment p){
+
+    public MoneyCECaseFeePayment(Payment p) {
+        super(p);
+    }
+
+    public MoneyCECaseFeePayment(MoneyCECaseFeePayment p) {
+        super(p);
         this.CECaseAssignedFeeID = p.getAssignedFeeID();
-        this.moneyPaymentID = p.getPaymentID();
-        this.paymentID = p.getPaymentID();
-        this.paymentType = p.getPaymentType();
-        this.dateDeposited = p.getDateDeposited();
-        this.dateReceived = p.getDateReceived();
-        this.amount = p.getAmount();
-        this.payer = p.getPayer();
-        this.referenceNum = p.getReferenceNum();
-        this.checkNum = p.getCheckNum();
-        this.cleared = p.isCleared();
-        this.notes = p.getNotes();
-        this.recordedBy = p.getRecordedBy();
-        this.entryTimestamp = p.getEntryTimestamp();
-        this.assignedFeeID = p.getAssignedFeeID();
-        this.domain = p.getDomain();
-        
-    }
-
-    public int getMoneyPaymentID() {
-        return moneyPaymentID;
-    }
-
-    public void setMoneyPaymentID(int moneyPaymentID) {
-        this.moneyPaymentID = moneyPaymentID;
     }
 
     public int getCECaseAssignedFeeID() {
@@ -64,7 +45,5 @@ public class MoneyCECaseFeePayment
     public void setCECaseAssignedFeeID(int CECaseAssignedFeeID) {
         this.CECaseAssignedFeeID = CECaseAssignedFeeID;
     }
-    
-    
     
 }

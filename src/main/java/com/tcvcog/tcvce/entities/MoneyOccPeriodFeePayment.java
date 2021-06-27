@@ -30,24 +30,16 @@ public  class   MoneyOccPeriodFeePayment
     private int occPeriodAssignedFeeID;
     
     public MoneyOccPeriodFeePayment() {
+        super();
     }
 
-    public MoneyOccPeriodFeePayment(Payment p){
+    public MoneyOccPeriodFeePayment(Payment p) {
+        super(p);
+    }
+
+    public MoneyOccPeriodFeePayment(MoneyOccPeriodFeePayment p) {
+        super(p);
         this.occPeriodAssignedFeeID = p.getAssignedFeeID();
-        this.paymentID = p.getPaymentID();
-        this.paymentType = p.getPaymentType();
-        this.dateDeposited = p.getDateDeposited();
-        this.dateReceived = p.getDateReceived();
-        this.amount = p.getAmount();
-        this.payer = p.getPayer();
-        this.referenceNum = p.getReferenceNum();
-        this.checkNum = p.getCheckNum();
-        this.cleared = p.isCleared();
-        this.notes = p.getNotes();
-        this.recordedBy = p.getRecordedBy();
-        this.entryTimestamp = p.getEntryTimestamp();
-        this.assignedFeeID = p.getAssignedFeeID();
-        this.domain = p.getDomain();
         
     }
     
@@ -58,7 +50,5 @@ public  class   MoneyOccPeriodFeePayment
     public void setOccPeriodAssignedFeeID(int occPeriodAssignedFeeID) {
         this.occPeriodAssignedFeeID = occPeriodAssignedFeeID;
     }
-    
-    
-    
+
 }
