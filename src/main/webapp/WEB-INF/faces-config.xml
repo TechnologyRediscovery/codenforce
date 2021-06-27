@@ -649,12 +649,6 @@
     </managed-bean>
     
     <managed-bean>
-        <managed-bean-name>propertyProfileBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PropertyProfileBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>    
-    
-    <managed-bean>
         <managed-bean-name>propertyCasesBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PropertyCasesBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
