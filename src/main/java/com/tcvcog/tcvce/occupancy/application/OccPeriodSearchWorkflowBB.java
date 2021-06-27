@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.application.SessionBean;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
@@ -27,12 +28,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
@@ -101,35 +97,35 @@ public class OccPeriodSearchWorkflowBB
     public void initBean() {
         System.out.printf("OccPeriodSearchWorkflowBB constructed");
         OccupancyCoordinator oc = getOccupancyCoordinator();
+        SessionBean sb = getSessionBean();
 
-
-        currentOccPeriod = getSessionBean().getSessOccPeriod();
+        currentOccPeriod = sb.getSessOccPeriod();
         lastSavedOccPeriod = new OccPeriod(currentOccPeriod);
         PropertyIntegrator pi = getPropertyIntegrator();
 
-        occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
+        occPeriodTypeList = sb.getSessMuni().getProfile().getOccPeriodTypeList();
 
         try {
             currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
-            propertyUnitCandidateList = getSessionBean().getSessProperty().getUnitList();
+            propertyUnitCandidateList = sb.getSessProperty().getUnitList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
 
 
-        search_occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
-        occPeriodList = getSessionBean().getSessOccPeriodList();
+        search_occPeriodTypeList = sb.getSessMuni().getProfile().getOccPeriodTypeList();
+        occPeriodList = sb.getSessOccPeriodList();
 
         if (occPeriodList != null && occPeriodList.isEmpty()) {
             occPeriodList = new ArrayList();
         }
         appendResultsToList = false;
-        occPeriodQueryList = getSessionBean().getQueryOccPeriodList();
+        occPeriodQueryList = sb.getQueryOccPeriodList();
         if (occPeriodQueryList != null && !occPeriodQueryList.isEmpty()) {
             occPeriodQuerySelected = occPeriodQueryList.get(0);
         }
-        search_propList = getSessionBean().getSessPropertyList();
-        search_personList = getSessionBean().getSessPersonList();
+        search_propList = sb.getSessPropertyList();
+        search_personList = sb.getSessPersonList();
 
         configureParameters();
     }

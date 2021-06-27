@@ -226,7 +226,7 @@ public class CECaseSearchProfileBB
         SessionBean sb = getSessionBean();
         queryList = sc.buildQueryCECaseList(getSessionBean().getSessUser().getMyCredential());
         querySelected = getSessionBean().getQueryCECase();
-
+        
         configureParameters();
 
         caseList = new ArrayList<>();
@@ -2246,7 +2246,7 @@ public class CECaseSearchProfileBB
         PersonCoordinator pc = getPersonCoordinator();
         workingPerson = pc.personCreateMakeSkeleton(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni());
     }
-    
+
     /**
      * Action listener for creation of new person objectgs
      * @param ev

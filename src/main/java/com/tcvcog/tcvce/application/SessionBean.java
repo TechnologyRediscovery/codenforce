@@ -504,11 +504,14 @@ public class    SessionBean
             } else if (bob instanceof OccPeriod) {
                 OccPeriod period = (OccPeriod) bob;
 
+
                 // Set sessOccPeriod
                 setSessOccPeriod(period);
 
+
                 // Set current property to match the sessOccPeriod's propertyUnit
                 setSessProperty(sessOccPeriod.getPropUnitProp().getProperty());
+
 
                 // Set person--copied from CECase
                 sessPersonList = sessProperty.getPersonList();
@@ -516,11 +519,13 @@ public class    SessionBean
                     sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
                 }
 
+
                 // Set CECase
                 sessCECaseList = sessProperty.getCeCaseList();
                 if (sessCECaseList != null && !sessCECaseList.isEmpty()) {
                     setSessCECase(sessCECaseList.get(0));
                 }
+
 
                 return "occPeriodWorkflow";
 

@@ -207,7 +207,6 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     // Some of this stuff I feel could be moved up the chain for sure (e.g. to addEvent)
     // Also maybe missing some faces messages here for failure states i guess
     public void createNewEvent() {
-        System.out.println("called?");
         if (pageEventDomain == null || currentEventHolder == null || potentialCategory == null) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Event must have a category ", ""));
@@ -246,7 +245,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         // This is kinda slow and should ultimately be replaced with something more elegant,
         // maybe on the session bean's side...
         try {
-            getSessionBean().activateSessionObject(currentEventHolderBOB);
+            String output = getSessionBean().activateSessionObject(currentEventHolderBOB);
         } catch (BObStatusException ex) {
             System.out.println("Failed to activate session object:" + ex);
         }
