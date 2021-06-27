@@ -58,8 +58,6 @@ public class OccPeriodSearchWorkflowBB
 //  *******************************
 //  ************ WORKFLOW**********
 //  *******************************
-    private String formNoteText;
-
     private List<OccPeriodType> occPeriodTypeList;
     private OccPeriodType selectedOccPeriodType;
 
@@ -301,46 +299,6 @@ public class OccPeriodSearchWorkflowBB
 //        reloadCurrentOccPeriodDataHeavy();
     }
 
-
-    /**
-     * This method clears the cache of the last written note.
-     *
-     */
-    public void clearFormNoteText() {
-        formNoteText = new String();
-    }
-
-    /**
-     * This method goes down the coordinator stack to add a cached note
-     * (formNoteText) to the end of the occperiod's note field in the database
-     * in a structured and consistent way, while also requiring different permissions.
-     *
-     */
-    public void appendOccPeriodNotes() {
-        OccupancyCoordinator oc = getOccupancyCoordinator();
-
-        MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.setCred(getSessionBean().getSessUser().getKeyCard());
-        mbp.setExistingContent(currentOccPeriod.getNotes());
-        mbp.setNewMessageContent(formNoteText);
-        mbp.setHeader("Occupancy Period Note");
-        mbp.setUser(getSessionBean().getSessUser());
-
-        try {
-
-            oc.attachNoteToOccPeriod(mbp, currentOccPeriod);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully appended note!", ""));
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Fatal error appending note; apologies!", ""));
-
-        }
-    }
-
     /**
      * Listener for requests to go view the property profile of a property associated
      * with the given case
@@ -506,20 +464,6 @@ public class OccPeriodSearchWorkflowBB
      */
     public PropertyUnit getCurrentPropertyUnit() {
         return currentPropertyUnit;
-    }
-
-    /**
-     * @return the formNoteText
-     */
-    public String getFormNoteText() {
-        return formNoteText;
-    }
-
-    /**
-     * @param formNoteText the formNoteText to set
-     */
-    public void setFormNoteText(String formNoteText) {
-        this.formNoteText = formNoteText;
     }
 
     /**

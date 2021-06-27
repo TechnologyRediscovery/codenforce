@@ -119,7 +119,7 @@ public class CECaseSearchProfileBB
     private List<BOBSource> bobSourceOptionList;
     
     private String formNoteText;
-    
+
     private List<Property> propListForSearch;
     private CaseStageEnum[] caseStageList;
 
@@ -226,7 +226,7 @@ public class CECaseSearchProfileBB
         SessionBean sb = getSessionBean();
         queryList = sc.buildQueryCECaseList(getSessionBean().getSessUser().getMyCredential());
         querySelected = getSessionBean().getQueryCECase();
-        
+
         configureParameters();
 
         caseList = new ArrayList<>();
@@ -720,41 +720,6 @@ public class CECaseSearchProfileBB
 
     }
 
-    
-    
-    /**
-     * Listener for user requests to commit new note content to the current
-     * Property
-     *
-     * @return
-     */
-    public String onCaseNoteCommitButtonChange() {
-        CaseCoordinator cc = getCaseCoordinator();
-        
-        MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.setCred(getSessionBean().getSessUser().getKeyCard());
-        mbp.setExistingContent(currentCase.getNotes());
-        mbp.setNewMessageContent(formNoteText);
-        mbp.setHeader("Case Note");
-        mbp.setUser(getSessionBean().getSessUser());
-       
-        try {
-            
-            cc.cecase_updateCECaseNotes(mbp, currentCase);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully appended note!", ""));
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Fatal error appending note; apologies!", ""));
-
-        }
-
-        return "ceCaseProfile";
-
-    }
     
     public String onProposalViewButtonChange(Proposal prop){
         return "workflow";

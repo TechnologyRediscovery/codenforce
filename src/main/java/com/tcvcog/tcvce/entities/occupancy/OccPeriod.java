@@ -25,7 +25,8 @@ public  class       OccPeriod
         implements  IFace_Loggable,
                     IFace_EventHolder,
                     Comparable<OccPeriod>,
-                    IFace_ActivatableBOB {
+                    IFace_ActivatableBOB,
+                    IFace_NoteHolder {
     
     protected int periodID;
     protected int propertyUnitID;
@@ -296,6 +297,7 @@ public  class       OccPeriod
     /**
      * @return the notes
      */
+    @Override
     public String getNotes() {
         return notes;
     }
@@ -430,6 +432,7 @@ public  class       OccPeriod
     /**
      * @param notes the notes to set
      */
+    @Override
     public void setNotes(String notes) {
         this.notes = notes;
     }

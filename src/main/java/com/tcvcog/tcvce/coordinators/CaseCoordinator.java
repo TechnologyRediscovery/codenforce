@@ -922,7 +922,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws BObStatusException
      * @throws IntegrationException
      */
-    public void cecase_updateCECaseNotes(MessageBuilderParams mbp, CECaseDataHeavy c) throws BObStatusException, IntegrationException {
+    public void cecase_updateCECaseNotes(MessageBuilderParams mbp, CECase c) throws BObStatusException, IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
         if (c == null || mbp == null) {

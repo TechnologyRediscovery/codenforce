@@ -28,7 +28,8 @@ public class        CECase
                     IFace_EventHolder,
                     IFace_StatusLogHolder,
                     Comparable<CECase>,
-                    IFace_ActivatableBOB{
+                    IFace_ActivatableBOB,
+                    IFace_NoteHolder {
     
     protected int caseID;
     protected int publicControlCode;
@@ -366,6 +367,7 @@ public class        CECase
     /**
      * @return the notes
      */
+    @Override
     public String getNotes() {
         return notes;
     }
@@ -373,6 +375,7 @@ public class        CECase
     /**
      * @param notes the notes to set
      */
+    @Override
     public void setNotes(String notes) {
         this.notes = notes;
     }

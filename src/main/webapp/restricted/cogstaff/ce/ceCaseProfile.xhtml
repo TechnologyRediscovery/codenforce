@@ -88,7 +88,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <h:outputText value="payments" />
                                 </a>
                                 <h:outputText value=" | " />
-                                <a href="#cecase-notes-panel">
+                                <a href="#notes-panel">
                                     <h:outputText value="notes" />
                                 </a>
                                 <h:outputText value=" | " />
@@ -1218,36 +1218,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </h:form>
                                     </p:panel>
 
-
-                                    <p:panel id="cecase-notes-panel"
-                                             toggleable="true"
-                                             collapsed="false"
-                                             header="Notes"
-                                             rendered="true"
-                                             >
-
-                                        <h:form id="cecase-notes-form">
-
-                                            <p:commandButton   id="propinfo-notes-add-button"
-                                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                               value="Add New Note"  
-                                                               icon="fa fa-sticky-note-o"
-                                                               actionListener="#{ceCaseSearchProfileBB.onCaseNoteInitButtonChange}"
-                                                               oncomplete="PF('cecase-note-dialog-var').show()"
-                                                               update="cecase-note-create-form"/>
-
-                                            <p:spacer height="5px" />
-                                            <h:outputText id="cecase-notes-ot"
-                                                          escape="false"
-                                                          value="#{ceCaseSearchProfileBB.currentCase.notes}"/>
-
-
-
-                                        </h:form>
-
-                                    </p:panel>
-
-
+                                    <ui:include src="../compositions/notesPanel.xhtml"/>
 
 
                                     <!--Update Table-->
@@ -1349,52 +1320,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                         </h:form>
 
-                    </p:dialog>
-
-
-
-
-
-
-                    <p:dialog   id="cecase-note-dialog"
-                                height="300" width="750"
-                                widgetVar="cecase-note-dialog-var"
-                                closable="true"
-                                resizable="true"
-                                responsive="true"
-                                modal="true"
-                                header="Note Builder"
-                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                >
-
-                        <h:form id="cecase-note-create-form">
-
-                            <h:outputText styleClass="ui-label" value="Note text: (name and time automatically inserted) "/>
-                            <p:textEditor   id="cecase-notes-editor"
-                                            value="#{ceCaseSearchProfileBB.formNoteText}"
-                                            required="false"
-                                            secure="false"
-                                            height="200"/>
-
-
-                            <p:spacer height="5px" />
-                            <p:commandButton    id="cecase-updatemetadata-button-cancel"
-                                                ajax="true"  tabindex="27"
-                                                value="Cancel"
-                                                icon="fa fa-stop"
-                                                process="@none"
-                                                immediate="true"
-                                                onclick="PF('cecase-note-dialog-var').hide()"
-                                                />
-
-                            <p:commandButton   id="cecase-dialog-notes-button-addnote"
-                                               ajax="false" 
-                                               action="#{ceCaseSearchProfileBB.onCaseNoteCommitButtonChange}"
-                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
-                                               value="Attach Note"  
-                                               styleClass="inline-button"
-                                               icon="fa fa-sticky-note-o"/>
-                        </h:form>
                     </p:dialog>
 
 

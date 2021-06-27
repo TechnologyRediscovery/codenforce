@@ -3,33 +3,33 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns="http://www.w3.org/1999/xhtml">
-    <p:panel id="occperiod-notes-panel"
+    <p:panel id="notes-panel"
              toggleable="true"
-             widgetVar="occperiod-notes-panel-var"
+             widgetVar="notes-panel-var"
              collapsed="false"
              header="Notes">
 
-        <h:form id="occperiod-notes-form">
-            <p:commandButton id="occperiod-notes-add-button"
+        <h:form id="notes-form">
+            <p:commandButton id="notes-add-button"
                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                              value="Add New Note"
                              icon="fa fa-sticky-note-o"
-                             actionListener="#{occPeriodSearchWorkflowBB.clearFormNoteText}"
-                             oncomplete="PF('occperiod-note-dialog-var').show()"
-                             update="occperiod-note-create-form"/>
+                             actionListener="#{notesBB.clearFormNoteText}"
+                             oncomplete="PF('note-dialog-var').show()"
+                             update="note-create-form"/>
 
             <p:spacer height="5px"/>
-            <h:outputText id="occperiod-notes-ot"
+            <h:outputText id="notes-ot"
                           escape="false"
-                          value="#{occPeriodSearchWorkflowBB.currentOccPeriod.notes}"/>
+                          value="#{notesBB.currentNoteHolder.notes}"/>
 
         </h:form>
     </p:panel>
 
     <!-- Notes dialog -->
-    <p:dialog id="occperiod-note-dialog"
+    <p:dialog id="note-dialog"
               height="300" width="750"
-              widgetVar="occperiod-note-dialog-var"
+              widgetVar="note-dialog-var"
               closable="true"
               resizable="true"
               responsive="true"
@@ -37,27 +37,27 @@
               header="Note Builder"
               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}">
 
-        <h:form id="occperiod-note-create-form">
+        <h:form id="note-create-form">
 
             <h:outputText styleClass="ui-label" value="Note text: (name and time automatically inserted) "/>
-            <p:textEditor id="occperiod-note-editor"
-                          value="#{occPeriodSearchWorkflowBB.formNoteText}"
+            <p:textEditor id="note-editor"
+                          value="#{notesBB.formNoteText}"
                           required="false"
                           secure="false"
                           height="200"/>
 
             <p:spacer height="5px"/>
 
-            <p:commandButton id="occperiod-note-button-cancel"
+            <p:commandButton id="note-button-cancel"
                              value="Cancel"
                              icon="fa fa-stop"
-                             onclick="PF('occperiod-note-dialog-var').hide()"/>
+                             onclick="PF('note-dialog-var').hide()"/>
 
-            <p:commandButton id="occperiod-note-button-addnote"
+            <p:commandButton id="note-button-addnote"
                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                             actionListener="#{occPeriodSearchWorkflowBB.appendOccPeriodNotes}"
-                             onclick="PF('occperiod-note-dialog-var').hide()"
-                             update="occperiod-notes-form"
+                             actionListener="#{notesBB.appendNotes}"
+                             onclick="PF(note-dialog-var').hide()"
+                             update="notes-form"
                              value="Attach Note"
                              styleClass="inline-button"
                              icon="fa fa-sticky-note-o"/>
