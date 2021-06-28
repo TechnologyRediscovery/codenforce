@@ -763,7 +763,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             }
 
             stmt.setBigDecimal(4, BigDecimal.valueOf(payment.getAmount()));
-            stmt.setInt(5, payment.getPayer().getPersonID());
+            stmt.setInt(5, payment.getPayer().getHumanID());
             stmt.setString(6, payment.getReferenceNum());
             stmt.setInt(7, payment.getCheckNum());
             stmt.setBoolean(8, payment.isCleared());
@@ -1179,7 +1179,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
                 stmt.setNull(3, java.sql.Types.NULL);
             }
             stmt.setBigDecimal(4, BigDecimal.valueOf(payment.getAmount()));
-            stmt.setInt(5, payment.getPayer().getPersonID());
+            stmt.setInt(5, payment.getPayer().getHumanID());
             stmt.setString(6, payment.getReferenceNum());
             stmt.setInt(7, payment.getCheckNum());
             stmt.setString(8, payment.getNotes());

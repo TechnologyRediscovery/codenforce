@@ -418,7 +418,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setShowDetailsPageButton(true);
         } else {
             Person skeleton = new Person();
-            skeleton.setPersonID(input.getPersonID());
+            skeleton.setPersonID(input.getHumanID());
             pib.setBundledPerson(skeleton);
             pib.setPaccStatusMessage("A public information bundle was found but public "
                     + "access was switched off by a code officer. Please contact your municipal office. ");
@@ -459,7 +459,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setShowDetailsPageButton(true);
         } else {
             OccApplicationHumanLink skeleton = new OccApplicationHumanLink();
-            skeleton.setPersonID(input.getPersonID());
+            skeleton.setPersonID(input.getHumanID());
             skeleton.setApplicationID(input.getApplicationID());
             pib.setBundledPerson(skeleton);
             pib.setPaccStatusMessage("A public information bundle was found but public "
@@ -515,7 +515,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setShowDetailsPageButton(true);
         } else {
             Property skeleton = new Property();
-            skeleton.setPropertyID(skeleton.getPropertyID());
+            skeleton.setPropertyID(skeleton.getParcelkey());
             pib.setBundledProperty(skeleton);
             pib.setPaccStatusMessage("A public information bundle was found but public "
                     + "access was switched off by a code officer. Please contact your municipal office. ");
@@ -1088,7 +1088,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         PropertyCoordinator pc = getPropertyCoordinator();
 
         Property unbundled = input.getBundledProperty();
-        Property exportable = pc.getProperty(unbundled.getPropertyID());
+        Property exportable = pc.getProperty(unbundled.getParcelkey());
 
         exportable.setAddress(unbundled.getAddress());
         exportable.setStatus(unbundled.getStatus());
@@ -1213,7 +1213,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         PersonCoordinator pc = getPersonCoordinator();
         Person unbundled = input.getBundledPerson();
 
-        Person exportable = pc.getPerson(unbundled.getPersonID());
+        Person exportable = pc.getPerson(unbundled.getHumanID());
 
         if (exportable == null) {
 
@@ -1304,7 +1304,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         PersonIntegrator pi = getPersonIntegrator();
         OccApplicationHumanLink unbundled = input.getBundledPerson();
 
-        OccApplicationHumanLink exportable = pi.getPersonOccApplication(unbundled.getPersonID(), unbundled.getApplicationID());
+        OccApplicationHumanLink exportable = pi.getPersonOccApplication(unbundled.getHumanID(), unbundled.getApplicationID());
 
         if (exportable == null) {
 
@@ -1583,7 +1583,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 
                 PropertyCoordinator pc = getPropertyCoordinator();
                 
-                currentProp = pc.getProperty(dbApplication.getApplicationPropertyUnit().getPropertyID());
+                currentProp = pc.getProperty(dbApplication.getApplicationPropertyUnit().getParcelkey());
                 
                 objectKind = "Occupancy Permit Application";
                 

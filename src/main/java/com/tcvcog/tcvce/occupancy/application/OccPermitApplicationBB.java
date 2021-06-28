@@ -253,7 +253,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         OccPermitApplication occpermitapp = oc.initOccPermitApplication();
         getSessionBean().setSessOccPermitApplication(occpermitapp);
 
-        getSessionBean().setOccPermitAppActiveProp(pi.getProperty(getSessionBean().getSessProperty().getPropertyID()));
+        getSessionBean().setOccPermitAppActiveProp(pi.getProperty(getSessionBean().getSessProperty().getParcelkey()));
 
         if (prop.getUnitList().size() == 1) {
             List<PropertyUnit> propertyUnitList = prop.getUnitList();
@@ -426,7 +426,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public String selectPropertyUnit(PublicInfoBundlePropertyUnit unit) {
 
-        unit.getBundledUnit().setPropertyID(getSessionBean().getOccPermitAppActiveProp().getBundledProperty().getPropertyID());
+        unit.getBundledUnit().setPropertyID(getSessionBean().getOccPermitAppActiveProp().getBundledProperty().getParcelkey());
         getSessionBean().setOccPermitAppActivePropUnit(unit);
         getSessionBean().getNavStack().pushCurrentPage();
         
@@ -559,7 +559,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         for (PublicInfoBundlePerson test : attachedPersons) {
 
-            if (test.getBundledPerson().getPersonID() == person.getBundledPerson().getPersonID()) {
+            if (test.getBundledPerson().getHumanID() == person.getBundledPerson().getHumanID()) {
 
                 duplicateFlag = true;
 
@@ -847,10 +847,10 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         newUnitList = new ArrayList<>();
 
-        int changedbyID = applicant.getBundledPerson().getPersonID();
+        int changedbyID = applicant.getBundledPerson().getHumanID();
         
         //Grab the unit list that is currently attached to the property in the database
-        Property existingProp = pc.getProperty(selectedProperty.getBundledProperty().getPropertyID());
+        Property existingProp = pc.getProperty(selectedProperty.getBundledProperty().getParcelkey());
 
         //Export the workingPropUnits list from PublicInfoBundles to units. This should preserve changes made by the user.
         for (PublicInfoBundlePropertyUnit bundle : workingPropUnits) {
@@ -883,7 +883,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
                 //This unit doesn't exist in our database. Save all of its fields so it can be saved to the database
                 
-                workingUnit.setPropertyID(existingProp.getPropertyID());
+                workingUnit.setPropertyID(existingProp.getParcelkey());
 
                 workingUnit.setUnitID(pri.insertPropertyUnit(workingUnit));
 
@@ -988,7 +988,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         //If that fails, we'll insert the person into the database
         Person changedby = pic.export(applicant);
 
-        if (changedby.getPersonID() == 0) {
+        if (changedby.getHumanID() == 0) {
             //Getting from the database failed. We'll have to insert it.
             changedby.setMuniCode(getSessionBean().getSessMuniQueued().getMuniCode());
             changedby.setPersonID(pi.insertPerson(changedby));
@@ -1006,7 +1006,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             //than the applicant. Let's see if they are in the database
             contactUnbundled = pic.export(contactPerson);
 
-            if (contactUnbundled.getPersonID() == 0) {
+            if (contactUnbundled.getHumanID() == 0) {
                 //Getting from the database failed. We'll have to insert it.
                 contactUnbundled.setMuniCode(getSessionBean().getSessMuniQueued().getMuniCode());
 
@@ -1024,7 +1024,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         //Grab the persons that are currently in the database
         for (Person p : currentPersonList) {
-            existingPersonList.add(pi.getPerson(p.getPersonID()));
+            existingPersonList.add(pi.getPerson(p.getHumanID()));
         }
 
         for (OccApplicationHumanLink workingPerson : currentPersonList) {
@@ -1045,7 +1045,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                     //they don't exist in the database. No need to keep checking.
                     //Let's remove this entry from the list for performance and safety
                     itr.remove();
-                } else if (workingPerson.getPersonID() == existingPerson.getPersonID()) {
+                } else if (workingPerson.getHumanID() == existingPerson.getHumanID()) {
 
                     //this block fires if the person ID already exists in our database. The person is an existing one that may have been changed
                     skeleton.setAdded(false);
@@ -1066,7 +1066,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                 if (!skeleton.changedOccured()) {
                     //there were no differences between the applicant and the person we're looking at right now.
                     //It's the applicant, so let's set the ID to reflect that
-                    workingPerson.setPersonID(changedby.getPersonID());
+                    workingPerson.setPersonID(changedby.getHumanID());
                 } else {
 
                     //It wasn't the applicant, so let's try the preferred contact
@@ -1075,7 +1075,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                     if (!skeleton.changedOccured()) {
                         //there were no differences between the preferred contact and the person we're looking at right now.
                         //It's the preferred contact, so let's set the ID to reflect that
-                        workingPerson.setPersonID(contactUnbundled.getPersonID());
+                        workingPerson.setPersonID(contactUnbundled.getHumanID());
                     } else {
                     
                         //This person does not exist in our database
@@ -1104,7 +1104,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         //We are done getting change orders. It's time to get them ready for the database and insert them.
         for (PersonChangeOrder order : changeList) {
 
-            order.setChangedBy(changedby.getPersonID());
+            order.setChangedBy(changedby.getHumanID());
 
             pi.insertPersonChangeOrder(order);
 

@@ -237,7 +237,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 }
                 
                 if (params.isProperty_ctl()) {
-                    stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
+                    stmt.setInt(++paramCounter, params.getProperty_val().getParcelkey());
                 }
                 
                 if (params.isPropertyUnit_ctl()) {
@@ -245,7 +245,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 }
                 
                  if (params.isPersonInfoCaseID_ctl()) {
-                    stmt.setInt(++paramCounter, params.getPersonInfoCaseID_val().getPersonID());
+                    stmt.setInt(++paramCounter, params.getPersonInfoCaseID_val().getHumanID());
                 }
                  
                 if(params.isSource_ctl()){
@@ -446,7 +446,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                 }
                 // Violation set 1
                 if (params.isProperty_ctl()) {
-                    stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
+                    stmt.setInt(++paramCounter, params.getProperty_val().getParcelkey());
                 }
                 
                 // violation set 2
@@ -733,7 +733,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ceCase.getPublicControlCode());
-            stmt.setInt(2, ceCase.getPropertyID());
+            stmt.setInt(2, ceCase.getParcelkey());
             if(ceCase.getPropertyUnitID() != 0) {
                 stmt.setInt(3, ceCase.getPropertyUnitID());
             } else { 
@@ -834,7 +834,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ceCase.getPublicControlCode());
-            stmt.setInt(2, ceCase.getPropertyID());
+            stmt.setInt(2, ceCase.getParcelkey());
             if(ceCase.getPropertyUnitID() != 0){
                 stmt.setInt(3, ceCase.getPropertyUnitID());
             } else {
@@ -1618,7 +1618,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt.setInt(1, c.getCaseID());
             stmt.setString(2, notice.getNoticeTextBeforeViolations());
             stmt.setTimestamp(3, java.sql.Timestamp.valueOf(notice.getDateOfRecord()));
-            stmt.setInt(4, notice.getRecipient().getPersonID());
+            stmt.setInt(4, notice.getRecipient().getHumanID());
             stmt.setString(5, notice.getNoticeTextAfterViolations());
             stmt.setString(6, notice.getNotes());
             stmt.setInt(7, notice.getCreationBy().getUserID());
@@ -1800,7 +1800,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             
             stmt.setTimestamp(1, java.sql.Timestamp.valueOf(nov.getLockedAndqueuedTS()));
             stmt.setInt(2, nov.getLockedAndQueuedBy().getUserID());
-            stmt.setInt(3, nov.getRecipient().getPersonID());
+            stmt.setInt(3, nov.getRecipient().getHumanID());
             stmt.setInt(4, nov.getNoticeID());
 
             stmt.execute();
@@ -1929,7 +1929,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             
             stmt.setString(1, notice.getNoticeTextBeforeViolations());
             stmt.setTimestamp(2, java.sql.Timestamp.valueOf(notice.getDateOfRecord()));
-            stmt.setInt(3, notice.getRecipient().getPersonID());
+            stmt.setInt(3, notice.getRecipient().getHumanID());
             stmt.setString(4, notice.getNoticeTextAfterViolations());
             if(notice.getNotifyingOfficer() != null){
                 stmt.setInt(5, notice.getNotifyingOfficer().getUserID());
@@ -2819,7 +2819,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, prop.getPropertyID());
+            stmt.setInt(1, prop.getParcelkey());
             rs = stmt.executeQuery();
             
             while(rs.next()){

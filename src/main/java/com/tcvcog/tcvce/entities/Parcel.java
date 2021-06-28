@@ -28,6 +28,8 @@ public  class Parcel
                    IFace_noteHolder{
         
     final static String TABLE_NAME = "parcel";
+    final static String PKFIELD = "parcelkey";
+    
     
     
     private int parcelkey;
@@ -158,22 +160,14 @@ public  class Parcel
         this.notes = notes;
     }
 
-    @Override
-    public boolean isDeactivated() {
-        return deactivatedTS != null;
-        
-    }
+  
 
     @Override
     public int getDBKey() {
         return parcelkey;
     }
 
-    @Override
-    public String getTableName() {
-     return TABLE_NAME;    
-    }
-
+   
     /**
      * @return the lotAndBlock
      */
@@ -186,6 +180,16 @@ public  class Parcel
      */
     public void setLotAndBlock(String lotAndBlock) {
         this.lotAndBlock = lotAndBlock;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return PKFIELD;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return TABLE_NAME;
     }
 
     

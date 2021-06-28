@@ -40,7 +40,7 @@ public class    PropertyUnit
 
     public PropertyUnit(PropertyUnit input){
         unitID = input.getUnitID();
-        propertyID = input.getPropertyID();
+        propertyID = input.getParcelkey();
         unitNumber = input.getUnitNumber();
         otherKnownAddress = input.getOtherKnownAddress();
         rentalIntentDateStart = input.getRentalIntentDateStart();

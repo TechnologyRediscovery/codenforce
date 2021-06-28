@@ -708,11 +708,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 }
                 
                 if (params.isPerson_ctl()) {
-                    stmt.setInt(++paramCounter, params.getPerson_val().getPersonID());
+                    stmt.setInt(++paramCounter, params.getPerson_val().getHumanID());
                 }
                 
                 if (params.isProperty_ctl()) {
-                    stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
+                    stmt.setInt(++paramCounter, params.getProperty_val().getParcelkey());
                 }
                 
                 if (params.isPropertyUseType_ctl()) {

@@ -105,7 +105,7 @@ public class PersonInfoBB extends BackingBeanUtils{
             // with a successful update, write field dump of previous values to person notes
             pc.addNotesToPerson(workingPerson, getSessionBean().getSessUser(), fieldDump);
             // refresh our current person
-            currPerson = pc.assemblePersonDataHeavy(pc.getPerson(workingPerson.getPersonID()), getSessionBean().getSessUser().getMyCredential());
+            currPerson = pc.assemblePersonDataHeavy(pc.getPerson(workingPerson.getHumanID()), getSessionBean().getSessUser().getMyCredential());
             sc.logObjectView(getSessionBean().getSessUser(), currPerson);
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -172,7 +172,7 @@ public class PersonInfoBB extends BackingBeanUtils{
         try {
             pc.addNotesToPerson(currPerson, getSessionBean().getSessUser(), getFormNotes());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO
-                    , "Done: Notes added to person ID:" + currPerson.getPersonID(),"" ));
+                    , "Done: Notes added to person ID:" + currPerson.getHumanID(),"" ));
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR

@@ -196,14 +196,14 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             stmt.setInt(2, actionRequest.getMuni().getMuniCode());
 
             if (actionRequest.isIsAtKnownAddress()) {
-                stmt.setInt(3, actionRequest.getRequestProperty().getPropertyID());
+                stmt.setInt(3, actionRequest.getRequestProperty().getParcelkey());
                 actionRequest.setAddressOfConcern(actionRequest.getRequestProperty().getAddress());
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }
 
             stmt.setInt(4, actionRequest.getIssue().getIssueTypeID());
-            stmt.setInt(5, actionRequest.getRequestor().getPersonID());
+            stmt.setInt(5, actionRequest.getRequestor().getHumanID());
             // case ID is null since the request hasn't been assigned to a case yet
             stmt.setNull(6, java.sql.Types.NULL); // 0 is the int version of null
 
@@ -478,7 +478,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(q);
-            stmt.setInt(1, req.getRequestProperty().getPropertyID());
+            stmt.setInt(1, req.getRequestProperty().getParcelkey());
             stmt.setInt(2, req.getRequestID());
             System.out.println("CEActionRequestorIntegrator.updateActionRequestProperty | statement: " + stmt.toString());
             // Retrieve action data from postgres
@@ -506,7 +506,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(q);
-            stmt.setInt(1, req.getRequestor().getPersonID());
+            stmt.setInt(1, req.getRequestor().getHumanID());
             stmt.setInt(2, req.getRequestID());
             System.out.println("CEActionRequestorIntegrator.updateActionRequestor| statement: " + stmt.toString());
             // Retrieve action data from postgres
@@ -936,11 +936,11 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 }
                 
                 if(params.isRequestorPerson_ctl()){
-                    stmt.setInt(++paramCounter, params.getRequestorPerson_val().getPersonID());
+                    stmt.setInt(++paramCounter, params.getRequestorPerson_val().getHumanID());
                 }
                 
                 if(params.isProperty_ctl()){
-                    stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
+                    stmt.setInt(++paramCounter, params.getProperty_val().getParcelkey());
                 }
                 
 

@@ -33,7 +33,7 @@ public class PublicInfoBundlePerson extends PublicInfoBundle {
     
     @Override
     public String toString(){
-        return this.getClass().getName() + bundledPerson.getPersonID();
+        return this.getClass().getName() + bundledPerson.getHumanID();
     }
     
     public Person getBundledPerson() {

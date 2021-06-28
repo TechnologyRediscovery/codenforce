@@ -32,7 +32,7 @@ public class PersonWithChanges
         
     public PersonWithChanges(Person input){
         this.name = input.name;
-        this.personID = input.getPersonID();
+        this.personID = input.getHumanID();
         this.personType = input.getPersonType();
         this.muniCode = input.getMuniCode();
         this.muniName = input.getMuniName();

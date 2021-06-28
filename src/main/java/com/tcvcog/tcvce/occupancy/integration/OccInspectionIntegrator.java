@@ -2000,7 +2000,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             stmt.setBoolean(3, occInsp.isEnablePacc());
             stmt.setString(4, occInsp.getNotes());
             if (occInsp.getThirdPartyInspector() != null) {
-                stmt.setInt(5, occInsp.getThirdPartyInspector().getPersonID());
+                stmt.setInt(5, occInsp.getThirdPartyInspector().getHumanID());
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
@@ -2160,7 +2160,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             stmt.setBoolean(4, occInsp.isEnablePacc());
             stmt.setString(5, occInsp.getNotes());
             if (occInsp.getThirdPartyInspector() != null) {
-                stmt.setInt(6, occInsp.getThirdPartyInspector().getPersonID());
+                stmt.setInt(6, occInsp.getThirdPartyInspector().getHumanID());
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }

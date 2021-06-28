@@ -693,9 +693,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(2, userToInsert.getNotes());
             
             if(userToInsert.getPerson() == null){
-                stmt.setInt(3, userToInsert.getPersonID());
+                stmt.setInt(3, userToInsert.getHumanID());
             } else {
-                stmt.setInt(3, userToInsert.getPerson().getPersonID());
+                stmt.setInt(3, userToInsert.getPerson().getHumanID());
             }
             
             if(userToInsert.getCreatedByUserId() != 0){
@@ -914,14 +914,14 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             // check both the object and ID person link fields
             // without a Person object, use the raw ID
             if(usr.getPerson() == null){
-                if(usr.getPersonID() != 0){
-                    stmt.setInt(2, usr.getPersonID());
+                if(usr.getHumanID() != 0){
+                    stmt.setInt(2, usr.getHumanID());
                 } else {
                     stmt.setNull(2, java.sql.Types.NULL);
                 }
             } else { // we've got a person object
-                if(usr.getPerson().getPersonID() != 0){ // make sure it's not a new Person
-                    stmt.setInt(2, usr.getPerson().getPersonID());
+                if(usr.getPerson().getHumanID() != 0){ // make sure it's not a new Person
+                    stmt.setInt(2, usr.getPerson().getHumanID());
                 } else {
                     stmt.setNull(2, java.sql.Types.NULL);
                 }

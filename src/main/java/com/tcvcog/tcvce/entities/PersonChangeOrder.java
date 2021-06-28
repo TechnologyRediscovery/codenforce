@@ -66,7 +66,7 @@ public class PersonChangeOrder extends ChangeOrder {
      */
     public PersonChangeOrder(Person original, Person proposed) {
 
-        personID = proposed.getPersonID();
+        personID = proposed.getHumanID();
 
         //check each field for changes
         if (!compareStrings(original.getFirstName(), proposed.getFirstName())) {
@@ -138,7 +138,7 @@ public class PersonChangeOrder extends ChangeOrder {
     }
 
     public PersonChangeOrder(Person input) {
-        personID = input.getPersonID();
+        personID = input.getHumanID();
         personType = input.getPersonType();
         firstName = input.getFirstName();
         lastName = input.getLastName();
@@ -278,7 +278,7 @@ public class PersonChangeOrder extends ChangeOrder {
         this.personChangeID = personChangeID;
     }
 
-    public int getPersonID() {
+    public int.getHumanID() {
         return personID;
     }
 

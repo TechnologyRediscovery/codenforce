@@ -59,7 +59,7 @@ public class UserAuthorized extends User{
             this.userID = u.getUserID();
             this.username = u.getUsername();
             this.person = u.getPerson();
-            this.personID = u.getPersonID();
+            this.personID = u.getHumanID();
             this.notes = u.getNotes();
             this.badgeNumber = u.getBadgeNumber();
             this.oriNumber = u.getOriNumber();

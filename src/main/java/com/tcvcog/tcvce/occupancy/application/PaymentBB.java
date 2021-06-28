@@ -486,7 +486,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     public int getSelectedPaymentPayer() {
-        return selectedPayment.getPayer().getPersonID();
+        return selectedPayment.getPayer().getHumanID();
     }
 
     public void setSelectedPaymentPayer(int personID) {

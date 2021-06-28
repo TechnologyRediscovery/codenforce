@@ -44,7 +44,7 @@ public class        PropertyUnitDataHeavy
         if(prop != null){
 
             this.unitID = prop.getUnitID();
-            this.propertyID = prop.getPropertyID();
+            this.propertyID = prop.getParcelkey();
             this.unitNumber = prop.getUnitNumber();
 
             this.notes = prop.getNotes();

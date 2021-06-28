@@ -275,7 +275,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 }
                 
                 if (params.isProperty_ctl()) {
-                    stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
+                    stmt.setInt(++paramCounter, params.getProperty_val().getParcelkey());
                 }
 
                 if (params.isPropertyUnit_ctl()) {
@@ -288,7 +288,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
                 // filter OCC-8
                 if (params.isPerson_ctl()) {
-                    stmt.setInt(++paramCounter, params.getPerson_val().getPersonID());
+                    stmt.setInt(++paramCounter, params.getPerson_val().getHumanID());
                 }
 
             } else {
@@ -1579,7 +1579,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, applicationID);
-            stmt.setInt(2, person.getPersonID());
+            stmt.setInt(2, person.getHumanID());
 
             stmt.setBoolean(3, person.isApplicant());
             stmt.setBoolean(4, person.isPreferredContact());
@@ -1609,7 +1609,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setBoolean(2, input.isPreferredContact());
             stmt.setString(3, input.getApplicationPersonType().name());
             stmt.setBoolean(4, input.isLinkActive());
-            stmt.setInt(5, input.getPersonID());
+            stmt.setInt(5, input.getHumanID());
             stmt.setInt(6, app.getId());
             stmt.execute();
 

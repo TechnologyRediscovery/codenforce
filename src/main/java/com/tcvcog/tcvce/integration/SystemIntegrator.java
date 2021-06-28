@@ -973,11 +973,11 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 stmt = con.prepareStatement(insertSB.toString());
                 
                 stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getPersonID());
+                stmt.setInt(2, p.getHumanID());
                 
                 stmt.execute();
                 
-                System.out.println("SystemIntegrator.logObjectView: Person view logged id = " + p.getPersonID());
+                System.out.println("SystemIntegrator.logObjectView: Person view logged id = " + p.getHumanID());
                 
             } else if (ob instanceof Property) {
                 Property p = (Property) ob;
@@ -986,11 +986,11 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 stmt = con.prepareStatement(insertSB.toString());
                 
                 stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getPropertyID());
+                stmt.setInt(2, p.getParcelkey());
 
                 stmt.execute();
 
-                System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getPropertyID());
+                System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getParcelkey());
             } else if (ob instanceof CECaseDataHeavy) {
                 CECaseDataHeavy c = (CECaseDataHeavy) ob;
                 
@@ -1078,7 +1078,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 selectSB.append("AND person_personid = ? ");
                 stmt = con.prepareStatement(selectSB.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getPersonID());
+                stmt.setInt(2, p.getHumanID());
                 rs = stmt.executeQuery();
                 if (rs.first()) {
                     // history entry with this user and person already exists
@@ -1091,16 +1091,16 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 }
                 // each UPDATE and INSERT SQL structures take the params in this order
                 stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getPersonID());
+                stmt.setInt(2, p.getHumanID());
                 stmt.execute();
-                System.out.println("SystemIntegrator.logObjectView: Person view logged id = " + p.getPersonID());
+                System.out.println("SystemIntegrator.logObjectView: Person view logged id = " + p.getHumanID());
             } else if (ob instanceof Property) {
                 Property p = (Property) ob;
                 // prepare SELECT statement
                 selectSB.append("AND property_propertyid = ? ");
                 stmt = con.prepareStatement(selectSB.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getPropertyID());
+                stmt.setInt(2, p.getParcelkey());
                 rs = stmt.executeQuery();
                 if (rs.first()) {
                     // history entry with this user and person already exists
@@ -1113,9 +1113,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 }
                 // each UPDATE and INSERT SQL structures take the params in this order
                 stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getPropertyID());
+                stmt.setInt(2, p.getParcelkey());
                 stmt.execute();
-                System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getPropertyID());
+                System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getParcelkey());
             } else if (ob instanceof CECaseDataHeavy) {
                 CECaseDataHeavy c = (CECaseDataHeavy) ob;
                 // prepare SELECT statement

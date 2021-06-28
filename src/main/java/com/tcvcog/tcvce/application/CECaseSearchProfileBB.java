@@ -534,7 +534,7 @@ public class CECaseSearchProfileBB
             try {
                 currentCase = cc.cecase_assembleCECaseDataHeavy(cse, getSessionBean().getSessUser());
                 getSessionBean().setSessCECase(currentCase);
-                getSessionBean().setSessProperty(currentCase.getPropertyID());
+                getSessionBean().setSessProperty(currentCase.getParcelkey());
             } catch (IntegrationException | BObStatusException | SearchException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null, 
@@ -918,7 +918,7 @@ public class CECaseSearchProfileBB
      */
     public String exploreProperty(){
         try {
-            getSessionBean().setSessProperty(currentCase.getPropertyID());
+            getSessionBean().setSessProperty(currentCase.getParcelkey());
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,

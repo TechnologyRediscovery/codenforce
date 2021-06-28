@@ -1210,7 +1210,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, bl.getPhotoDocID());
-            stmt.setInt(2, prop.getPropertyID());
+            stmt.setInt(2, prop.getParcelkey());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println("BlobIntegrator.removePropertyBlobLink() | ERROR: "+ ex);
@@ -1440,7 +1440,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             
             stmt = con.prepareStatement(query);
             stmt.setInt(1, bl.getPhotoDocID());
-            stmt.setInt(2, prop.getPropertyID());
+            stmt.setInt(2, prop.getParcelkey());
             stmt.execute();
             System.out.println("BlobIntegrator.linkBlobToProperty | link succesfull. ");
             
@@ -2517,7 +2517,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         try {
             
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, prop.getPropertyID());
+            stmt.setInt(1, prop.getParcelkey());
             rs = stmt.executeQuery();
             while(rs.next()){
                  idList.add(rs.getInt("photodoc_photodocid"));

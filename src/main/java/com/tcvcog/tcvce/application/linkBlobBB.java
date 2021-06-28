@@ -65,7 +65,7 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         PersonIntegrator pi = getPersonIntegrator();
         
         try{
-            pi.getPerson(getPersonID());
+            pi.getPerson.getHumanID());
         }catch(IntegrationException e){
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR
@@ -74,7 +74,7 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         }
         
         try {
-            bi.linkPhotoBlobToPerson(selectedBlobID, getPersonID());
+            bi.linkPhotoBlobToPerson(selectedBlobID,.getHumanID());
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR
@@ -132,7 +132,7 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the personID
      */
-    public int getPersonID() {
+    public int.getHumanID() {
         return personID;
     }
 

@@ -22,7 +22,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- *
+ * The root object of the humanization system that replaces person records
+ * in the database with human records. there is no longer such thing as a 
+ * personID, only humanIDs. 
  * @author sylvia
  */
 public  class   Human 
@@ -30,6 +32,8 @@ public  class   Human
         implements IFace_noteHolder{
     
         static final String TABLE_NAME = "public.human";
+        static final String PKFIELD = "humanid";
+        
     
         protected int humanID;
         protected String name;
@@ -208,21 +212,10 @@ public  class   Human
         this.cloneOfHumanID = cloneOfHumanID;
     }
 
-    @Override
-    public boolean isDeactivated() {
-            return deactivatedTS != null;
-    }
-
-   
 
     @Override
     public int getDBKey() {
         return humanID;
-    }
-
-    @Override
-    public String getTableName() {
-        return TABLE_NAME;
     }
 
     @Override
@@ -233,6 +226,16 @@ public  class   Human
     @Override
     public void setNotes(String n) {
         notes = n;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return PKFIELD;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return TABLE_NAME;
     }
 
         

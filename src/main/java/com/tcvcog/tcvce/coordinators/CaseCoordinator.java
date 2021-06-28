@@ -154,7 +154,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         try {
 
-            cse.setProperty(pc.getProperty(c.getPropertyID()));
+            cse.setProperty(pc.getProperty(c.getParcelkey()));
             cse.setPropertyUnit(pc.getPropertyUnit(c.getPropertyUnitID()));
 
             // PROPOSAL LIST
@@ -353,7 +353,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         if (cse != null) {
             csepuh = new CECasePropertyUnitHeavy(cse);
-            csepuh.setProperty(pc.getProperty(cse.getPropertyID()));
+            csepuh.setProperty(pc.getProperty(cse.getParcelkey()));
             if (cse.getPropertyUnitID() != 0) {
                 csepuh.setPropUnit(pc.getPropertyUnit(cse.getPropertyUnitID()));
             }
@@ -743,7 +743,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         // timestamp set by postgres
         // no closing date, by design of case flow
         newCase.setPublicControlCode(casePCC);
-        newCase.setPropertyID(p.getPropertyID());
+        newCase.setPropertyID(p.getParcelkey());
         newCase.setCaseManager(ua);
 
         return newCase;
@@ -900,7 +900,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             cse.setOriginationDate(LocalDateTime.now());
         }
 
-        if (cse.getPropertyID() == 0) {
+        if (cse.getParcelkey() == 0) {
             throw new BObStatusException("Cases must have a nonzero property id");
         }
 

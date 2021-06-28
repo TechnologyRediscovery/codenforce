@@ -61,7 +61,7 @@ public class    Citation
     private List<EventCnF> eventList;
     private List<CitationCodeViolationLink> violationList;
     private List<BlobLight> blobList;
-    private List<Person> personList;
+    private List<CitationHumanLink> personList;
     
     private String notes;
     
@@ -195,6 +195,13 @@ public class    Citation
     public void setStatusLog(List<CitationStatusLogEntry> status) {
         this.statusLog = status;
     }
+    
+    public CitationStatusLogEntry getStatus(){
+        if(statusLog != null && !statusLog.isEmpty()){
+            return statusLog.get(0); // return the first, most current status log entry
+        } 
+        return null;
+    }
 
     /**
      * @return the origin_courtentity
@@ -287,14 +294,14 @@ public class    Citation
     /**
      * @return the personList
      */
-    public List<Person> getPersonList() {
+    public List<CitationHumanLink> getPersonList() {
         return personList;
     }
 
     /**
      * @param personList the personList to set
      */
-    public void setPersonList(List<Person> personList) {
+    public void setPersonList(List<CitationHumanLink> personList) {
         this.personList = personList;
     }
 

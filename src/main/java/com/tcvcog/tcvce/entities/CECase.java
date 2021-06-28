@@ -83,7 +83,7 @@ public class        CECase
         publicControlCode = input.getPublicControlCode();
         paccEnabled = input.isPaccEnabled();
         allowForwardLinkedPublicAccess = input.isAllowForwardLinkedPublicAccess();
-        propertyID = input.getPropertyID();
+        propertyID = input.getParcelkey();
         propertyUnitID = input.getPropertyUnitID();
         caseManager = input.getCaseManager();
         caseName = input.getCaseName();
@@ -252,7 +252,7 @@ public class        CECase
             for(Citation cit: citationList){
                 switch(viewOption){
                     case VIEW_ACTIVE:
-                        if(cit.isIsActive()){
+                        if(cit.isActive()){
                             dispCits.add(cit);
                         }
                         break;
@@ -260,7 +260,7 @@ public class        CECase
                             dispCits.add(cit);
                         break;
                     case VIEW_INACTIVE:
-                        if(!cit.isIsActive()){
+                        if(!cit.isActive()){
                             dispCits.add(cit);
                         }
                         break;

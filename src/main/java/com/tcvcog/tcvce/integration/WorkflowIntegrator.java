@@ -702,7 +702,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
 
         try {
             stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(1, p.getResponderActual().getPersonID());
+            stmt.setInt(1, p.getResponderActual().getHumanID());
             stmt.setString(2, p.getNotes());
             stmt.setInt(3, p.getChosenChoice().getChoiceID());
             if(p instanceof ProposalCECase){

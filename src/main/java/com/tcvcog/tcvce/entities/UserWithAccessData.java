@@ -30,7 +30,7 @@ public class UserWithAccessData extends User{
         this.roleType = u.getRoleType();
         this.username = u.getUsername();
         this.person = u.getPerson();
-        this.personID = u.getPersonID();
+        this.personID = u.getHumanID();
         this.notes = u.getNotes();
         this.badgeNumber = u.getBadgeNumber();
         this.oriNumber = u.getOriNumber();

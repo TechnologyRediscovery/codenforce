@@ -751,7 +751,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             sb.append(" ");
             sb.append(currPers.getLastName());
             sb.append("(");
-            sb.append(currPers.getPersonID());
+            sb.append(currPers.getHumanID());
             sb.append(")");
             
             sb.append(" to ");
@@ -760,7 +760,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             sb.append(" ");
             sb.append(updatedPers.getLastName());
             sb.append("(");
-            sb.append(updatedPers.getPersonID());
+            sb.append(updatedPers.getHumanID());
             sb.append(")");
             
             return sb;
@@ -847,7 +847,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     public void user_updateUser(User u) throws IntegrationException, AuthorizationException{
         UserIntegrator ui = getUserIntegrator();
         StringBuilder sb = new StringBuilder();
-        if(u != null && (u.getPerson() != null || u.getPersonID() != 0)){
+        if(u != null && (u.getPerson() != null || u.getHumanID() != 0)){
                 ui.updateUser(u);
         }
     }
@@ -869,7 +869,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     public void user_updateUserPersonLink(User u, Person freshPerson) throws IntegrationException, AuthorizationException{
         
         UserIntegrator ui = getUserIntegrator();
-        if(u != null && u.getPersonID() != 0){
+        if(u != null && u.getHumanID() != 0){
     
             // TODO: complete note on user udpates
             MessageBuilderParams mb = new MessageBuilderParams();

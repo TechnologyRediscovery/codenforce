@@ -106,12 +106,12 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         PersonDataHeavy pdh = null;
         if(pers != null && cred != null){
             // if we have a skeleton person, don't try to get a person from the DB, since there's no ID
-            if(pers.getPersonID() == 0){
+            if(pers.getHumanID() == 0){
                 pdh = new PersonDataHeavy(pers, cred);
                 
             } else {
 
-               pdh = new PersonDataHeavy(getPerson(pers.getPersonID()), cred);
+               pdh = new PersonDataHeavy(getPerson(pers.getHumanID()), cred);
                SearchCoordinator sc = getSearchCoordinator();
 
                try {
@@ -237,7 +237,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
             mbp.setCred(u.getMyCredential());
             p.setNotes(sc.appendNoteBlock(mbp));
             pi.updatePersonNotes(p);
-            System.out.println("PersonCoordinator.addNotesToPerson: person: " + p.getPersonID() + " notes: " + noteToAdd);
+            System.out.println("PersonCoordinator.addNotesToPerson: person: " + p.getHumanID() + " notes: " + noteToAdd);
         } else {
             throw new BObStatusException("cannot append note given a null person, user, or note string");
             
@@ -603,7 +603,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         sb.append(Constants.FMT_HTML_BREAK);
         sb.append(Constants.FMT_NOTE_SEP_INTERNAL);
         sb.append("Field dump of Person ID: ");
-        sb.append(p.getPersonID());
+        sb.append(p.getHumanID());
         sb.append(Constants.FMT_HTML_BREAK);
         sb.append("Timestamp: ");
         sb.append(sc.stampCurrentTimeForNote());
@@ -824,7 +824,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         
         for(Person input : personList){
             
-            skeletonHorde.add(getPersonWithChanges(input.getPersonID()));
+            skeletonHorde.add(getPersonWithChanges(input.getHumanID()));
             
         }
         
@@ -852,7 +852,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
 
         //If the user added the person, their changes will already be in the database. No need to update
         if (!order.isAdded()) {
-            Person skeleton = getPerson(order.getPersonID());
+            Person skeleton = getPerson(order.getHumanID());
             if (order.isRemoved()) {
                 skeleton.setActive(false); //just deactivate the person.
             } else {

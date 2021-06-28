@@ -107,11 +107,11 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
         if(prop != null && ua != null){
             // if we've been given a skeleton, just inject it into data heavy subclass
-            if(prop.getPropertyID() == 0){
+            if(prop.getParcelkey() == 0){
                 pdh = new PropertyDataHeavy(prop);
             } else {
 
-               pdh = new PropertyDataHeavy(getProperty(prop.getPropertyID()));
+               pdh = new PropertyDataHeavy(getProperty(prop.getParcelkey()));
 
                try {
                    // CECase list
@@ -148,7 +148,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                    // wait on blobs
                    pdh.setBlobList(bc.getBlobLightList(bi.getBlobIDs(prop)));
                    // external data
-                   pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getPropertyID())));
+                   pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getParcelkey())));
 
                } catch (EventException | AuthorizationException | BObStatusException | BlobException | IntegrationException | SearchException ex) {
                    System.out.println(ex);
@@ -361,7 +361,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         PersonCoordinator pc = getPersonCoordinator();
         if (pdh != null && pers != null) {
             for (Person p : pdh.getPersonList()) {
-                if (p.getPersonID() == pers.getPersonID()) {
+                if (p.getHumanID() == pers.getHumanID()) {
                     proceedWithConnect = false;
                 }
             }
@@ -400,14 +400,14 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         sb.append(" in ");
         sb.append(p.getMuni().getMuniName());
         sb.append(" (ID:");
-        sb.append(p.getPropertyID());
+        sb.append(p.getParcelkey());
         sb.append(")");
         sb.append(" and Person ");
         sb.append(pers.getFirstName());
         sb.append(" ");
         sb.append(pers.getLastName());
         sb.append(" (ID:");
-        sb.append(pers.getPersonID());
+        sb.append(pers.getHumanID());
         sb.append(") ");
         mbp.setNewMessageContent(sb.toString());
         mbp.setExistingContent(p.getNotes());
@@ -776,7 +776,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public PropertyUnit initPropertyUnit(Property p) {
         PropertyUnit propUnit = new PropertyUnit();
-        propUnit.setPropertyID(p.getPropertyID());
+        propUnit.setPropertyID(p.getParcelkey());
         propUnit.setUnitNumber(Constants.TEMP_UNIT_NUM);
         propUnit.setUnitNumber("");
         propUnit.setRentalNotes("");
@@ -809,7 +809,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
             // decide if we're updating a unit or inserting it based on initial value
             // newly created units don't have an ID, just a default unit number
-            unit.setPropertyID(prop.getPropertyID());
+            unit.setPropertyID(prop.getParcelkey());
 
             if (unit.getUnitID() == 0) {
                 pi.insertPropertyUnit(unit);

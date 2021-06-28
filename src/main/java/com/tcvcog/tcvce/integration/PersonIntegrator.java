@@ -1247,14 +1247,14 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         try {
             stmt = con.prepareStatement(selectQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            stmt.setInt(1, prop.getPropertyID());
-            stmt.setInt(2, person.getPersonID());
+            stmt.setInt(1, prop.getParcelkey());
+            stmt.setInt(2, person.getHumanID());
             rs = stmt.executeQuery();
             
             if(!rs.first()){
                 stmt = con.prepareStatement(query);
-                stmt.setInt(1, prop.getPropertyID());
-                stmt.setInt(2, person.getPersonID());
+                stmt.setInt(1, prop.getParcelkey());
+                stmt.setInt(2, person.getHumanID());
 
                 stmt.execute();
             }
@@ -1285,8 +1285,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, prop.getPropertyID());
-            stmt.setInt(2, person.getPersonID());
+            stmt.setInt(1, prop.getParcelkey());
+            stmt.setInt(2, person.getHumanID());
             stmt.execute();
             
         } catch (SQLException ex) {
@@ -1471,7 +1471,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         try {
             String s = "SELECT ceevent_eventid, person_personid FROM public.eventperson WHERE person_personid=?;";
             stmt = con.prepareStatement(s);
-            stmt.setInt(1, p.getPersonID());
+            stmt.setInt(1, p.getHumanID());
 
             rs = stmt.executeQuery();
 
@@ -1502,7 +1502,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ev.getEventID());
-            stmt.setInt(2, p.getPersonID());
+            stmt.setInt(2, p.getHumanID());
 
             System.out.println("PersonIntegrator.connectPersonToEvent | sql: " + stmt.toString());
             stmt.execute();
@@ -1570,7 +1570,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, munui.getMuniCode());
-            stmt.setInt(2, p.getPersonID());
+            stmt.setInt(2, p.getHumanID());
 
             System.out.println("PersonIntegrator.connectPersonToMunicipality | sql: " + stmt.toString());
             stmt.execute();
@@ -1606,7 +1606,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, c.getCitationID());
-            stmt.setInt(2, p.getPersonID());
+            stmt.setInt(2, p.getHumanID());
 
             stmt.execute();
 
@@ -1724,7 +1724,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(26, personToUpdate.isCanExpire());
             stmt.setString(27, personToUpdate.getMailingAddressThirdLine());
             
-            stmt.setInt(28, personToUpdate.getPersonID());
+            stmt.setInt(28, personToUpdate.getHumanID());
 
             stmt.execute();
             System.out.println("PersonIntegrator.updatePerson : Excecuted update");
@@ -1756,7 +1756,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         try {
             String s = "SELECT person_personid FROM public.propertyperson WHERE property_propertyid = ?;";
             stmt = con.prepareStatement(s);
-            stmt.setInt(1, p.getPropertyID());
+            stmt.setInt(1, p.getParcelkey());
 
             rs = stmt.executeQuery();
 
@@ -1873,7 +1873,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             String s = "select createghostperson(p.*, ? ) from person AS p where personid = ?;";
             stmt = con.prepareStatement(s);
             stmt.setInt(1, u.getUserID());
-            stmt.setInt(2, p.getPersonID());
+            stmt.setInt(2, p.getHumanID());
 
             rs = stmt.executeQuery();
             
@@ -1919,7 +1919,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             String s = "select createcloneperson(p.*, ? ) from person AS p where personid = ?;";
             stmt = con.prepareStatement(s);
             stmt.setInt(1, u.getUserID());
-            stmt.setInt(2, p.getPersonID());
+            stmt.setInt(2, p.getHumanID());
 
             rs = stmt.executeQuery();
             
@@ -1992,7 +1992,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         try {
             stmt = con.prepareStatement(query);
             stmt.setString(1, p.getNotes() );
-            stmt.setInt(2, p.getPersonID());
+            stmt.setInt(2, p.getHumanID());
             stmt.execute();
 
         } catch (SQLException ex) {
@@ -2332,7 +2332,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 
                 // filter PERS-12
                 if (params.isProperty_ctl()) {
-                     stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
+                     stmt.setInt(++paramCounter, params.getProperty_val().getParcelkey());
                 }
                 
                 // filter PERS-13
@@ -2353,7 +2353,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 }
                 // filter PERS-17
                 if (params.isMergeTarget_ctl()) {
-                     stmt.setInt(++paramCounter, params.getMergeTarget_val().getPersonID());
+                     stmt.setInt(++paramCounter, params.getMergeTarget_val().getHumanID());
                 }
 //                // filter PERS-18
 //                if (params.isMuni_ctl()) {
@@ -2464,7 +2464,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, order.getPersonID());
+            stmt.setInt(1, order.getHumanID());
             stmt.setString(2,order.getFirstName());
             stmt.setString(3, order.getLastName());
             stmt.setBoolean(4, order.isCompositeLastName());
@@ -2485,7 +2485,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(19, order.isRemoved());
             stmt.setBoolean(20, order.isAdded());
             stmt.setTimestamp(21, Timestamp.valueOf(LocalDateTime.now()));
-            stmt.setInt(22, order.getPersonID());
+            stmt.setInt(22, order.getHumanID());
 
             stmt.execute();
 
@@ -2521,7 +2521,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, order.getPersonID());
+            stmt.setInt(1, order.getHumanID());
             stmt.setString(2, order.getFirstName());
             stmt.setString(3, order.getLastName());
             stmt.setBoolean(4, order.isCompositeLastName());

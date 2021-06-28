@@ -29,7 +29,7 @@ public class PublicInfoBundlePersonOccApplication extends PublicInfoBundle {
     
     @Override
     public String toString(){
-        return this.getClass().getName() + bundledPerson.getPersonID();
+        return this.getClass().getName() + bundledPerson.getHumanID();
     }
 
     public OccApplicationHumanLink getBundledPerson() {

@@ -142,7 +142,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 //              PropertyIntegrator pi = getPropertyIntegrator();
 //                if (currentRequest.getRequestProperty() != null) {
 //                      try {
-//                          personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getPropertyID()).getPersonOccApplicationList();
+//                          personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getParcelkey()).getPersonOccApplicationList();
 //                      } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
 //                          System.out.println(ex);
 //                      }
@@ -556,7 +556,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
         // LT goal: bundle these into a transaction that is rolled back if either 
         // the person or the request bounces
-        if (currentRequest.getRequestor().getPersonID() == 0) {
+        if (currentRequest.getRequestor().getHumanID() == 0) {
             
             //The person is not in our database, prepared it for saving
             if (getSessionBean().getSessUser() != null) {

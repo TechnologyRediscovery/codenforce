@@ -87,7 +87,7 @@ public class PersonPropertiesBB extends BackingBeanUtils{
             try {
                 pc.connectPersonToProperty(currPerson, selectedProperty);
                  getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            "Successfully connected person ID " + currPerson.getPersonID() + " to property ID " + getSelectedProperty().getPropertyID() , ""));
+                            "Successfully connected person ID " + currPerson.getHumanID() + " to property ID " + getSelectedProperty().getParcelkey() , ""));
                 currPerson = pc.assemblePersonDataHeavy(currPerson, getSessionBean().getSessUser().getMyCredential());
             } catch (IntegrationException ex) {
                 System.out.println(ex);

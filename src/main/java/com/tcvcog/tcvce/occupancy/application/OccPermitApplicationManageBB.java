@@ -412,7 +412,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         for (Person test : attachedPersons) {
 
-            if (test.getPersonID() == person.getPersonID()) {
+            if (test.getHumanID() == person.getHumanID()) {
 
                 duplicateFlag = true;
 
@@ -548,7 +548,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
     public void addNewUnit() {
         PropertyUnit newUnit = new PropertyUnit();
-        newUnit.setPropertyID(propertyForApplication.getPropertyID());
+        newUnit.setPropertyID(propertyForApplication.getParcelkey());
         newUnit.setActive(true);
         propertyForApplication.getUnitList().add(newUnit);
         setCurrentViewOption(currentViewOption);

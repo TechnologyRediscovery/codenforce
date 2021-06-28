@@ -119,7 +119,7 @@ public class PersonSearchBB extends BackingBeanUtils{
        if(currentPerson != null){
              getFacesContext().addMessage(null,
             new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                    "Your current person is PersonID: " + currentPerson.getPersonID() + " ("+ currentPerson.getLastName() + ")", ""));
+                    "Your current person is PersonID: " + currentPerson.getHumanID() + " ("+ currentPerson.getLastName() + ")", ""));
        }
        
        
@@ -400,7 +400,7 @@ public class PersonSearchBB extends BackingBeanUtils{
         try {
             pc.addNotesToPerson(currentPerson, getSessionBean().getSessUser(), formNotes);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO
-                    , "Done: Notes added to person ID:" + currentPerson.getPersonID(),"" ));
+                    , "Done: Notes added to person ID:" + currentPerson.getHumanID(),"" ));
             sc.logObjectView(getSessionBean().getSessUser(), currentPerson);
 //            refreshCurrentPerson();
         } catch (IntegrationException ex) {

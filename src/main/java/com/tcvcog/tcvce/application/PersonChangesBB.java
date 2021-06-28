@@ -78,7 +78,7 @@ public class PersonChangesBB
 
                 currPersonList = new ArrayList<>();
 
-                currPersonList.add(pc.getPersonWithChanges(getSessionBean().getSessPerson().getPersonID()));
+                currPersonList.add(pc.getPersonWithChanges(getSessionBean().getSessPerson().getHumanID()));
             }
 
         } catch (IntegrationException ex) {
@@ -165,7 +165,7 @@ public class PersonChangesBB
                     + " "
                     + change.getApprovedBy().getPerson().getLastName()
                     + " (ID# "
-                    + change.getApprovedBy().getPersonID()
+                    + change.getApprovedBy().getHumanID()
                     + ")";
         } else if (change.isActive()) {
             return "No action taken yet";

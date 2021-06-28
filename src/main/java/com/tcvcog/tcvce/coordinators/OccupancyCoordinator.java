@@ -1048,18 +1048,18 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         for (OccApplicationHumanLink person : applicationPersons) {
 
             //see javadoc
-            if (person.getPersonID() == 0){
+            if (person.getHumanID() == 0){
                 throw new IntegrationException("OccupancyCoordinator.insertOccApplicationPersonLinks() detected a person not yet in the database."
                                                 + " Please insert persons into the database before running this method!");
             }
             
             /* If the person  is the applicantPerson on the 
             OccPermitApplication, set applicant to true*/
-            person.setApplicant(application.getApplicantPerson().getPersonID() == person.getPersonID());
+            person.setApplicant(application.getApplicantPerson().getHumanID() == person.getHumanID());
 
             /* If the person is the preferredContact on the 
             OccPermitApplication, set preferredcontact to true */
-            person.setPreferredContact(application.getPreferredContact().getPersonID() == person.getPersonID());
+            person.setPreferredContact(application.getPreferredContact().getHumanID() == person.getHumanID());
             
             oi.insertOccApplicationPerson(person, application.getId());
             
@@ -1095,11 +1095,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                     OccPermitApplication, set preferredcontact to true */
                 applicationPerson.setPreferredContact(opa.getPreferredContact() != null && opa.getPreferredContact().equals(applicationPerson));
 
-                if (applicationPerson.getPersonID() == 0) {
+                if (applicationPerson.getHumanID() == 0) {
 
                     applicationPerson.setPersonType(applicationPerson.getApplicationPersonType());
                     
-                    Property prop = pc.getProperty(opa.getApplicationPropertyUnit().getPropertyID());
+                    Property prop = pc.getProperty(opa.getApplicationPropertyUnit().getParcelkey());
                     
                     applicationPerson.setMuniCode(prop.getMuni().getMuniCode());
                     
@@ -1111,7 +1111,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                     //Let's remove them so we don't insert them every time the for loop fires
                     itr.remove();
                     break;
-                } else if (applicationPerson.getPersonID() == existingPerson.getPersonID()) {
+                } else if (applicationPerson.getHumanID() == existingPerson.getHumanID()) {
                     removed = false;
                     
                     applicationPerson.setLinkActive(true);

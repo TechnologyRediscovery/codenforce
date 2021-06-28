@@ -134,6 +134,10 @@ public abstract class   TrackedEntity
     public void setDeactivatedBy(User deactivatedBy) {
         this.deactivatedBy = deactivatedBy;
     }
+    
+    public boolean isActive(){
+        return deactivatedTS == null;
+    }
 
   
 
