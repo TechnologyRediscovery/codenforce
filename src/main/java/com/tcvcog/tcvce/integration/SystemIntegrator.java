@@ -186,6 +186,29 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
              
         } // close finally
     }
+    
+    //method for deleting icons
+//    public void deleteIcon(Icon i) throws IntegrationException {
+//        Connection con = getPostgresCon();
+//        PreparedStatement stmt = null;
+//        
+//        try {
+//            stmt = con.prepareStatement(query);
+//            stmt.setString(1, i.getName());
+//            stmt.setString(2, i.getStyleClass());
+//            stmt.setString(3, i.getFontAwesome());
+//            stmt.setString(4, i.getMaterialIcon());
+//            stmt.setInt(5, i.getIconid());
+//            stmt.executeUpdate();
+//        } catch (SQLException ex) {
+//            System.out.println(ex.toString());
+//            throw new IntegrationException("unable to update icon", ex);
+//        } finally {
+//             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+//             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+//             
+//        } // close finally
+//    }
 
     public void insertIcon(Icon i) throws IntegrationException {
         Connection con = getPostgresCon();

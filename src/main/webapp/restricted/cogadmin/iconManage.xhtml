@@ -8,7 +8,7 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Icon manager</title>
+        <title>Icon Manager</title>
     </h:head>
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
@@ -20,7 +20,7 @@
                     </h:messages>
                     </h:form>
                             
-                    <h1>Icon manager</h1>
+                    <h1>Icon Manager</h1>
                     <f:view>
                         <h:form id="icon-manage-form">
                             
@@ -108,7 +108,7 @@
                     <p:dialog   height="750" width="1000"
                                 widgetVar="icon-addupdate-dialog"
                                 closable="true" 
-                                rendered="#{sessionBsessionUserUser.keyCard.hasSysAdminPermissions}">
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}">
                         <h:form id="icon-add-update-form">
                             
                             <h2>Add/update icon</h2>
@@ -175,11 +175,20 @@
                                              iconmanage-messages-form"
                                              />
                             
-                            <p:commandButton    id="icon-commitinsert-cb"
+                             <p:commandButton    id="icon-commitinsert-cb"
                                                 ajax="true" value="Add new icon" icon="fa fa-plus" 
                                                 tabindex="11" actionListener="#{iconBB.commitInsert}"
                                                 disabled="#{!(iconBB.currentIcon.iconid == 0)}"
                                              oncomplete="PF('icon-addupdate-dialog').hide()"
+                                             update="icon-manage-form:icon-table
+                                             iconmanage-messages-form"
+                                             />
+                             
+                             <p:commandButton    id="icon-commitremove-cb"
+                                                ajax="true" value="Remove icon" icon="fa fa-trash" 
+                                                tabindex="11" actionListener="#{iconBB.commitDelete}"
+                                                disabled="#{!(iconBB.currentIcon.iconid == 0)}"
+                                             oncomplete="PF('').hide()"
                                              update="icon-manage-form:icon-table
                                              iconmanage-messages-form"
                                              />
