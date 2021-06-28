@@ -30,6 +30,22 @@
                             <!-- Navbar -->
                             <div class="page-links">
                                 <a href="#occperiod-status-panel">occupancy period status</a>
+                                <h:outputText value=" | "/>
+                                <a href="#occperiod-permits-panel">
+                                    <h:outputText value="permits"/>
+                                </a>
+                                <h:outputText value=" | "/>
+                                <a href="#events-panel">
+                                    <h:outputText value="events (#{eventsBB.eventListSize})"/>
+                                </a>
+                                <h:outputText value=" | "/>
+                                <a href="#payments-panel">
+                                    <h:outputText value="payments (#{paymentsBB.paymentListSize})"/>
+                                </a>
+                                <h:outputText value=" | "/>
+                                <a href="#notes-panel">
+                                    <h:outputText value="notes"/>
+                                </a>
                             </div>
                             <div class="ui-g data_container_nested_restrict">
                                 <!-- First column -->
