@@ -923,12 +923,6 @@
     </managed-bean>
 
     <managed-bean>
-        <managed-bean-name>notesBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.NotesBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-
-    <managed-bean>
         <managed-bean-name>eventCatConfigBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.EventCatConfigBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
@@ -1028,7 +1022,7 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules occ periods ~~~~~~~~~~~~~~~~~~~~~ --> 
-    
+
     
    
     
@@ -2157,6 +2151,18 @@
     <managed-bean>
         <managed-bean-name>cECaseListExport</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECaseListExport</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>notesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.NotesBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>paymentsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PaymentsBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>

@@ -3,23 +3,22 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
-    <p:panel id="cecase-payments-panel"
+    <p:panel id="payments-panel"
              toggleable="true"
              collapsed="false"
-             header="Payments">
+             header="Payments (#{paymentsBB.paymentListSize})">
 
-        <p:growl id="cecase-payments-growl" />
+        <p:growl id="payments-growl"/>
 
-        <h:form id="cecase-payments-payments-form">
+        <h:form id="payments-payments-form">
 
-            <p:dataTable id="cecase-payments-table"
+            <p:dataTable id="payments-table"
+                         value="#{paymentsBB.currentPaymentHolder.paymentList}"
                          var="payment"
-                         value="#{cECasePaymentsBB.currentCase.paymentList}"
                          rowKey="#{payment.moneyPaymentID}"
                          tableStyleClass="primeDataTable"
                          rowExpandMode="single"
-                         expandedRow="false"
-                         filteredValue="#{cECasePaymentsBB.filteredPaymentList}">
+                         expandedRow="false">
 
                 <p:column width="3%">
                     <f:facet name="header">
@@ -153,14 +152,14 @@
 
                         <p:spacer height="15px"/>
                         <div class="rowExpansion">
-                            <p:commandButton value="Edit this payment" action="#{cECasePaymentsBB.editOnePayment(payment)}"/>
+                            <p:commandButton value="Edit this payment" action="#{paymentsBB.editPayment(payment)}"/>
                         </div>
                     </div>
                 </p:rowExpansion>
 
             </p:dataTable>
 
-            <p:commandButton value="Edit this payment list" action="#{cECasePaymentsBB.editCECasePayments()}"/>
+            <p:commandButton value="Edit this payment list" action="#{paymentsBB.editHolderPayments}"/>
 
         </h:form>
     </p:panel>
