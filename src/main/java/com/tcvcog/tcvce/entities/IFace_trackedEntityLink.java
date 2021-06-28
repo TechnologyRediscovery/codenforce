@@ -31,6 +31,9 @@ public interface IFace_trackedEntityLink
     public User getLinkCreatedBy();
     public void setLinkCreatedBy(User usr);
     
+    public void setLinkSource(BOBSource source);
+    public BOBSource getLinkSource();
+    
     public LocalDateTime getLinkLastUpdatedTS();
     public void setLinkLastUpdatedTS(LocalDateTime ts);
     public User getLinkLastUpdatedBy();
@@ -47,5 +50,7 @@ public interface IFace_trackedEntityLink
     public String getLinkNotes();
     
     public LinkedObjectRole getLinkedObjectRole();
+    
+    public LinkedObjectRoleSchemaEnum getLinkedObjectRoleSchemaEnum();
     
 }

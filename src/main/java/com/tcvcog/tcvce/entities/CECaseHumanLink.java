@@ -27,10 +27,11 @@ public class CECaseHumanLink
         extends Human
         implements IFace_trackedEntityLink{
    
-    final static String CECASEHUMAN_TABLE = "";
-    final static String CECASEHUMAN_PKFIELD = "";
+    final static LinkedObjectRoleSchemaEnum ROLE_SCHEMA = LinkedObjectRoleSchemaEnum.CECASEHUMAN;
     
     protected int ceCaseID;
+    protected LinkedObjectRole linkRole;
+    protected BOBSource linkSource;
     
     protected LocalDateTime linkCreatedTS;
     protected User linkCreatedBy;
@@ -206,6 +207,47 @@ public class CECaseHumanLink
     @Override
     public void setLinkDeactivatedTS(LocalDateTime linkDeactivatedTS) {
         this.linkDeactivatedTS = linkDeactivatedTS;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return ROLE_SCHEMA.getLinkedTablePKField();
+    }
+
+    @Override
+    public String getDBTableName() {
+        return ROLE_SCHEMA.getLinkedTableName();
+    }
+
+    @Override
+    public LinkedObjectRole getLinkedObjectRole() {
+        return linkRole;
+    }
+
+    /**
+     * @param linkRole the linkRole to set
+     */
+    public void setLinkRole(LinkedObjectRole linkRole) {
+        this.linkRole = linkRole;
+    }
+
+    @Override
+    public LinkedObjectRoleSchemaEnum getLinkedObjectRoleSchemaEnum() {
+        return ROLE_SCHEMA;
+    }
+
+    /**
+     * @return the linkSource
+     */
+    public BOBSource getLinkSource() {
+        return linkSource;
+    }
+
+    /**
+     * @param linkSource the linkSource to set
+     */
+    public void setLinkSource(BOBSource linkSource) {
+        this.linkSource = linkSource;
     }
 
    

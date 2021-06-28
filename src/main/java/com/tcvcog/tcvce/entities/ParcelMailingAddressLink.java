@@ -19,13 +19,17 @@ package com.tcvcog.tcvce.entities;
 import java.time.LocalDateTime;
 
 /**
- *
- * @author sylvia
+ * Represents a Mailing address associated with a given parcel
+ * 
+ * @author Ellen Bascomb of Apartment 31Y
  */
 public class ParcelMailingAddressLink
         extends MailingAddress
         implements IFace_trackedEntityLink{
-         
+
+    final static LinkedObjectRoleSchemaEnum ROLE_SCHEMA = LinkedObjectRoleSchemaEnum.PARCELMAILINGADDRESS;
+    
+    protected LinkedObjectRole linkRole;
     protected BOBSource linkSource;
     
     protected LocalDateTime linkCreatedTS;
@@ -199,6 +203,33 @@ public class ParcelMailingAddressLink
     @Override
     public void setLinkDeactivatedTS(LocalDateTime linkDeactivatedTS) {
         this.linkDeactivatedTS = linkDeactivatedTS;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return ROLE_SCHEMA.getLinkedTablePKField();
+    }
+
+    @Override
+    public String getDBTableName() {
+        return ROLE_SCHEMA.getLinkedTableName();
+    }
+
+    @Override
+    public LinkedObjectRole getLinkedObjectRole() {
+        return linkRole;
+    }
+
+    @Override
+    public LinkedObjectRoleSchemaEnum getLinkedObjectRoleSchemaEnum() {
+        return ROLE_SCHEMA;
+    }
+
+    /**
+     * @param linkRole the linkRole to set
+     */
+    public void setLinkRole(LinkedObjectRole linkRole) {
+        this.linkRole = linkRole;
     }
 
    

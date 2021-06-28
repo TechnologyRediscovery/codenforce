@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * Represents a set of humans associated with an Occupancy Application
@@ -16,7 +17,10 @@ import java.io.Serializable;
  * @author Ellen Bascomb of Apartment 31Y
  */
 public class        OccApplicationHumanLink 
-        extends     Human {
+        extends     Human 
+        implements  IFace_trackedEntityLink{
+    
+    final static LinkedObjectRoleSchemaEnum ROLE_SCHEMA = LinkedObjectRoleSchemaEnum.OCCAPPLICATIONHUMAN;
     
     private int applicationID;
     private boolean applicant;
@@ -24,6 +28,7 @@ public class        OccApplicationHumanLink
     private PersonType applicationPersonType;
     private boolean linkActive; //stores if this link is active in the database, not the person object itself
 
+    protected BOBSource linkSource;
 
     /**
      * @return the preferredContact
@@ -76,6 +81,115 @@ public class        OccApplicationHumanLink
 
     public void setApplicationID(int applicationID) {
         this.applicationID = applicationID;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getDBTableName() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public LocalDateTime getLinkCreatedTS() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setLinkCreatedTS(LocalDateTime ts) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public User getLinkCreatedBy() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setLinkCreatedBy(User usr) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public LocalDateTime getLinkLastUpdatedTS() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setLinkLastUpdatedTS(LocalDateTime ts) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public User getLinkLastUpdatedBy() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setLinkLastUpdatedBy(User usr) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public LocalDateTime getLinkDeactivatedTS() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setLinkDeactivatedTS(LocalDateTime ts) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setLinkDeactivatedBy(User usr) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public User getLinkDeactivatedBy() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean isLinkDeactivated() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setLinkNotes(String n) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getLinkNotes() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public LinkedObjectRole getLinkedObjectRole() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public LinkedObjectRoleSchemaEnum getLinkedObjectRoleSchemaEnum() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    /**
+     * @return the linkSource
+     */
+    public BOBSource getLinkSource() {
+        return linkSource;
+    }
+
+    /**
+     * @param linkSource the linkSource to set
+     */
+    public void setLinkSource(BOBSource linkSource) {
+        this.linkSource = linkSource;
     }
     
 }

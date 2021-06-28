@@ -27,10 +27,13 @@ import java.time.LocalDateTime;
 public class ParcelUnitHumanLink
         extends Human 
         implements IFace_trackedEntityLink{
-    
+
+    final static LinkedObjectRoleSchemaEnum ROLE_SCHEMA = LinkedObjectRoleSchemaEnum.PARCELUNITHUMAN;
     protected int linkID;
     protected int parcelUnitID;
-    protected HumanParcelRole role;
+    
+    protected LinkedObjectRole linkRole;
+    protected BOBSource linkSource;
     
     protected LocalDateTime linkCreatedTS;
     protected User linkCreatedBy;
@@ -98,20 +101,6 @@ public class ParcelUnitHumanLink
 
   
 
-    /**
-     * @return the role
-     */
-    public HumanParcelRole getRole() {
-        return role;
-    }
-
-    /**
-     * @param role the role to set
-     */
-    public void setRole(HumanParcelRole role) {
-        this.role = role;
-    }
-    
     /**
      * @return the linkCreatedTS
      */
@@ -230,6 +219,47 @@ public class ParcelUnitHumanLink
     @Override
     public void setLinkDeactivatedTS(LocalDateTime linkDeactivatedTS) {
         this.linkDeactivatedTS = linkDeactivatedTS;
+    }
+
+    /**
+     * @param linkRole the linkRole to set
+     */
+    public void setLinkRole(LinkedObjectRole linkRole) {
+        this.linkRole = linkRole;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return ROLE_SCHEMA.getLinkedTablePKField();
+    }
+
+    @Override
+    public String getDBTableName() {
+        return ROLE_SCHEMA.getLinkedTableName();
+    }
+
+    @Override
+    public LinkedObjectRole getLinkedObjectRole() {
+        return linkRole;
+    }
+
+    @Override
+    public LinkedObjectRoleSchemaEnum getLinkedObjectRoleSchemaEnum() {
+        return ROLE_SCHEMA;
+    }
+
+    /**
+     * @return the linkSource
+     */
+    public BOBSource getLinkSource() {
+        return linkSource;
+    }
+
+    /**
+     * @param linkSource the linkSource to set
+     */
+    public void setLinkSource(BOBSource linkSource) {
+        this.linkSource = linkSource;
     }
 
    

@@ -20,14 +20,16 @@ import java.time.LocalDateTime;
 
 /**
  * Represents a connection between a human and a mailing address in the DB
- * @author sylvia
+ * @author Ellen Bascomb of Apartment 31Y
  */
 public class HumanMailingAddressLink 
         extends MailingAddress
         implements IFace_trackedEntityLink{
     
+    final static LinkedObjectRoleSchemaEnum ROLE_SCHEMA = LinkedObjectRoleSchemaEnum.MAILINGADDRESSHUMAN;
+    
     protected BOBSource linkSource;
-    protected HumanMailingAddressRole role;
+    protected LinkedObjectRole linkRole;
     
     protected LocalDateTime linkCreatedTS;
     protected User linkCreatedBy;
@@ -198,18 +200,33 @@ public class HumanMailingAddressLink
         this.linkDeactivatedTS = linkDeactivatedTS;
     }
 
-    /**
-     * @return the role
-     */
-    public HumanMailingAddressRole getRole() {
-        return role;
-    }
+   
 
     /**
-     * @param role the role to set
+     * @param linkRole the linkRole to set
      */
-    public void setRole(HumanMailingAddressRole role) {
-        this.role = role;
+    public void setLinkRole(LinkedObjectRole linkRole) {
+        this.linkRole = linkRole;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return ROLE_SCHEMA.getLinkedTablePKField();
+    }
+
+    @Override
+    public String getDBTableName() {
+        return ROLE_SCHEMA.getLinkedTableName();
+    }
+
+    @Override
+    public LinkedObjectRole getLinkedObjectRole() {
+        return linkRole;
+    }
+
+    @Override
+    public LinkedObjectRoleSchemaEnum getLinkedObjectRoleSchemaEnum() {
+        return ROLE_SCHEMA;
     }
 
    

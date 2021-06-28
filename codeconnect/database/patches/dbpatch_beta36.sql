@@ -242,14 +242,14 @@ ALTER TABLE citationhuman ADD COLUMN linkedobjectrole_lorid INTEGER
 
   -- OCCAPPLICATIONHUMAN ("","OccApplicationHuman"), 
 
-  -- JURPLEL can update this
+  -- JURPLEL can update this table????
 
 
 
   --   CECASEHUMAN ("humancecase", "CECaseHuman"), 
   --   Unification of link structure
 ALTER TABLE humancecase ADD COLUMN linkedobjectrole_lorid INTEGER 
-    CONSTRAINT citationhuman_lorid_fk 
+    CONSTRAINT humancecase_lorid_fk 
     REFERENCES linkedobjectrole (lorid);  
 
 ALTER TABLE humancecase ADD COLUMN source_sourceid
@@ -270,18 +270,93 @@ ALTER TABLE humancecase ADD COLUMN linkid INTEGER NOT NULL
 
 
   --   OCCPERIODHUMAN ("humanoccperiod","OccPeriodHuman"), 
+DROP TABLE occperiodperson CASCADE;
+
+ALTER TABLE humanoccperiod DROP COLUMN persontype;
+
+ALTER TABLE humanoccperiod ADD COLUMN occperiod_periodid INTEGER
+    CONSTRAINT humanoccperiod_periodid_fk
+    REFERENCES occperiod (periodid);
+
+ALTER TABLE humanoccperiod ADD COLUMN linkedobjectrole_lorid INTEGER 
+    CONSTRAINT humanoccperiod_lorid_fk 
+    REFERENCES linkedobjectrole (lorid);  
+
+
+ALTER TABLE humanoccperiod ADD COLUMN source_sourceid INTEGER
+    CONSTRAINT humanoccperiod_sourceid_fk
+    REFERENCES bobsource (sourceid);
+
   --   PARCELHUMAN ("humanparcel","ParcelHuman"), 
+
+ALTER TABLE humanparcel DROP COLUMN role_roleid;
+
+ALTER TABLE humanparcel ADD COLUMN linkedobjectrole_lorid INTEGER 
+    CONSTRAINT humanparcel_lorid_fk 
+    REFERENCES linkedobjectrole (lorid);  
+
+
+
+
   --   PARCELUNITHUMAN ("humanparcelunit","ParcelUnitHuman"), 
+ALTER TABLE humanparcelunit DROP COLUMN role_roleid;
+
+ALTER TABLE humanparcelunit ADD COLUMN linkedobjectrole_lorid INTEGER 
+    CONSTRAINT humanparcelunit_lorid_fk 
+    REFERENCES linkedobjectrole (lorid);  
+
+ALTER TABLE humanparcelunit ADD COLUMN source_sourceid INTEGER
+    CONSTRAINT humanparcelunit_sourceid_fk
+    REFERENCES bobsource (sourceid);
+
+
   --   CITATIONHUMAN ("citationhuman","CitationHuman"), 
-  --   EVENTHUMAN ("","EventHuman"), 
+
+ -- GOOD SHAPE!!!
+
+
+  --   EVENTHUMAN ("eventhuman","EventHuman"), 
+
+  ALTER TABLE eventhuman ADD COLUMN source_sourceid INTEGER
+    CONSTRAINT eventhuman_sourceid_fk
+    REFERENCES bobsource (sourceid);
+
   --   MAILINGADDRESSHUMAN ("humanmailingaddress","MailingaddressHuman"), 
+
+CREATE SEQUENCE IF NOT EXISTS humanmailing_linkid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER TABLE humanmailingaddress ADD COLUMN linkid INTEGER NOT NULL 
+    CONSTRAINT humanmailingaddress_linkid_pk PRIMARY KEY 
+    DEFAULT nextval('humanmailing_linkid_seq');
   --   PARCELMAILINGADDRESS  ("parcelmailingaddress","ParcelMailingaddress");
-    
+  
+CREATE SEQUENCE IF NOT EXISTS parcelmailing_linkid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
 
+ALTER TABLE parcelmailingaddress ADD COLUMN linkid INTEGER NOT NULL 
+    CONSTRAINT parcelmailingaddress_linkid_pk PRIMARY KEY 
+    DEFAULT nextval('parcelmailing_linkid_seq');
+  
 
-
-
+ALTER TABLE public.parcelmailingaddress DROP COLUMN parcelmailingid;
 -- ******** RUN LOCALLY UP TO HERE ******** 
+
+ALTER TABLE parcelmailingaddress ADD COLUMN linkedobjectrole_lorid INTEGER 
+    CONSTRAINT parcelmailing_lorid_fk 
+    REFERENCES linkedobjectrole (lorid);  
+
+
+
+
 
 
 --IF datepublished IS NULL the patch is still open and receiving changes

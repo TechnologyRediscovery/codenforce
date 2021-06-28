@@ -22,9 +22,9 @@ import java.time.LocalDateTime;
  * Humanization standard
  * 
  * Java incarnation of a record from the linkedobjectrole table
- * that describes how a peripheral and core object are related
+ * that describes how a objects/records are related
  * 
- * @author sylvia
+ * @author Ellen Bascomb of Apartment 31Y
  */
 public class LinkedObjectRole {
     

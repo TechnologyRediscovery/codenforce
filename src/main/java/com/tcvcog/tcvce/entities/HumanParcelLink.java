@@ -27,9 +27,12 @@ public class HumanParcelLink
         extends Parcel
         implements IFace_trackedEntityLink{
     
+    final static LinkedObjectRoleSchemaEnum ROLE_SCHEMA = LinkedObjectRoleSchemaEnum.PARCELHUMAN;
+    
     protected int linkID;
     protected int humanID;
-    protected HumanParcelRole role;
+    
+    protected LinkedObjectRole linkRole;
     
     protected BOBSource linkSource;
     
@@ -60,12 +63,7 @@ public class HumanParcelLink
         return linkSource;
     }
 
-    /**
-     * @return the role
-     */
-    public HumanParcelRole getRole() {
-        return role;
-    }
+   
 
     /**
      * @param linkID the linkID to set
@@ -83,12 +81,7 @@ public class HumanParcelLink
         this.linkSource = linkSource;
     }
 
-    /**
-     * @param role the role to set
-     */
-    public void setRole(HumanParcelRole role) {
-        this.role = role;
-    }
+  
     
     
 
@@ -222,6 +215,26 @@ public class HumanParcelLink
     @Override
     public void setLinkDeactivatedTS(LocalDateTime linkDeactivatedTS) {
         this.linkDeactivatedTS = linkDeactivatedTS;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return ROLE_SCHEMA.getLinkedTablePKField();
+    }
+
+    @Override
+    public String getDBTableName() {
+        return ROLE_SCHEMA.getLinkedTableName();
+    }
+
+    @Override
+    public LinkedObjectRole getLinkedObjectRole() {
+        return linkRole;
+    }
+
+    @Override
+    public LinkedObjectRoleSchemaEnum getLinkedObjectRoleSchemaEnum() {
+        return ROLE_SCHEMA;
     }
 
    

@@ -19,17 +19,22 @@ package com.tcvcog.tcvce.entities;
 import java.time.LocalDateTime;
 
 /**
- *
- * @author sylvia
+ * Represents a connection between a Citation and a CodeViolation
+ * Note that the LinkedObjectRole member is sort of unnecesary here since
+ * we have a separate status object. This is unique to the Citation-CV link
+ * because its role changes over time as a case moves through the
+ * court system.
+ * 
+ * @author Ellen Bascomb
  */
-public class CitationCodeViolation 
+public class CitationCodeViolationLink 
         extends CodeViolation
         implements IFace_trackedEntityLink{
     
-    final static String CITATION_CODEVIOLATION_TABLE = "citationviolation";
-    final static String CITATION_CODEVIOLATION_PKFIELD = "citationviolationid";
+    final static LinkedObjectRoleSchemaEnum ROLE_SCHEMA = LinkedObjectRoleSchemaEnum.CITATIONCODEVIOLATION;
     
     protected int citationViolationID;
+    protected LinkedObjectRole linkRole;
     
     protected CitationViolationStatusEnum citVStatus;
     
@@ -193,7 +198,7 @@ public class CitationCodeViolation
 
     @Override
     public String getPKFieldName() {
-        return CITATION_CODEVIOLATION_PKFIELD;
+        return ROLE_SCHEMA.getLinkedTablePKField();
     }
 
     @Override
@@ -203,7 +208,7 @@ public class CitationCodeViolation
 
     @Override
     public String getDBTableName() {
-       return CITATION_CODEVIOLATION_TABLE;
+       return ROLE_SCHEMA.getLinkedTableName();
     }
 
     /**
@@ -218,6 +223,23 @@ public class CitationCodeViolation
      */
     public void setCitationViolationID(int citationViolationID) {
         this.citationViolationID = citationViolationID;
+    }
+
+    /**
+     * @param linkRole the linkRole to set
+     */
+    public void setLinkRole(LinkedObjectRole linkRole) {
+        this.linkRole = linkRole;
+    }
+
+    @Override
+    public LinkedObjectRole getLinkedObjectRole() {
+        return linkRole;
+    }
+
+    @Override
+    public LinkedObjectRoleSchemaEnum getLinkedObjectRoleSchemaEnum() {
+        return ROLE_SCHEMA;
     }
 
     

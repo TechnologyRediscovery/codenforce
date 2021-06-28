@@ -20,15 +20,20 @@ package com.tcvcog.tcvce.entities;
 import java.time.LocalDateTime;
 
 /**
- *
- * @author sylvia
+ * Represents a human attached to an OccPeriod
+ * @author Ellen Bascomb of Apartment 31Y
  */
 public class OccPeriodHumanLink 
         extends Human
         implements IFace_trackedEntityLink{
+
+    final static LinkedObjectRoleSchemaEnum ROLE_SCHEMA = LinkedObjectRoleSchemaEnum.OCCPERIODHUMAN;
     
     protected int linkID;
-    protected PersonType personType;
+    protected LinkedObjectRole linkRole;
+    protected BOBSource linkSource;
+        
+
     
     protected LocalDateTime linkCreatedTS;
     protected User linkCreatedBy;
@@ -160,20 +165,6 @@ public class OccPeriodHumanLink
     }
 
     /**
-     * @return the personType
-     */
-    public PersonType getPersonType() {
-        return personType;
-    }
-
-    /**
-     * @param personType the personType to set
-     */
-    public void setPersonType(PersonType personType) {
-        this.personType = personType;
-    }
-
-    /**
      * @return the linkID
      */
     public int getLinkID() {
@@ -186,9 +177,6 @@ public class OccPeriodHumanLink
     public void setLinkID(int linkID) {
         this.linkID = linkID;
     }
-    
-    
-    
     
     /**
      * @param linkCreatedTS the linkCreatedTS to set
@@ -212,6 +200,47 @@ public class OccPeriodHumanLink
     @Override
     public void setLinkDeactivatedTS(LocalDateTime linkDeactivatedTS) {
         this.linkDeactivatedTS = linkDeactivatedTS;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return ROLE_SCHEMA.getLinkedTablePKField();
+    }
+
+    @Override
+    public String getDBTableName() {
+        return ROLE_SCHEMA.getLinkedTableName();
+    }
+
+    @Override
+    public LinkedObjectRole getLinkedObjectRole() {
+        return linkRole;
+    }
+
+    @Override
+    public LinkedObjectRoleSchemaEnum getLinkedObjectRoleSchemaEnum() {
+        return ROLE_SCHEMA;
+    }
+
+    /**
+     * @param linkRole the linkRole to set
+     */
+    public void setLinkRole(LinkedObjectRole linkRole) {
+        this.linkRole = linkRole;
+    }
+
+    /**
+     * @return the linkSource
+     */
+    public BOBSource getLinkSource() {
+        return linkSource;
+    }
+
+    /**
+     * @param linkSource the linkSource to set
+     */
+    public void setLinkSource(BOBSource linkSource) {
+        this.linkSource = linkSource;
     }
 
    

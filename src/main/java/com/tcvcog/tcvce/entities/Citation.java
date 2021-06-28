@@ -59,7 +59,7 @@ public class    Citation
     // objects in its LinkedList but CodeViolation only gets the citation IDs which
     // it can use to look up a Citation if needs be
     private List<EventCnF> eventList;
-    private List<CitationCodeViolation> violationList;
+    private List<CitationCodeViolationLink> violationList;
     private List<BlobLight> blobList;
     private List<Person> personList;
     
@@ -127,14 +127,14 @@ public class    Citation
     /**
      * @return the violationList
      */
-    public List<CitationCodeViolation> getViolationList() {
+    public List<CitationCodeViolationLink> getViolationList() {
         return violationList;
     }
 
     /**
      * @param violationList the violationList to set
      */
-    public void setViolationList(List<CitationCodeViolation> violationList) {
+    public void setViolationList(List<CitationCodeViolationLink> violationList) {
         this.violationList = violationList;
     }
 

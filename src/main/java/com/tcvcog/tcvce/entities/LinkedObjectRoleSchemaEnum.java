@@ -24,23 +24,26 @@ package com.tcvcog.tcvce.entities;
  */
 public enum LinkedObjectRoleSchemaEnum {
     
-    OCCAPPLICATIONHUMAN ("occpermitapplicationhuman","OccApplicationHuman"), 
-    CECASEHUMAN ("humancecase", "CECaseHuman"), 
-    OCCPERIODHUMAN ("humanoccperiod","OccPeriodHuman"), 
-    PARCELHUMAN ("humanparcel","ParcelHuman"), 
-    PARCELUNITHUMAN ("humanparcelunit","ParcelUnitHuman"), 
-    CITATIONHUMAN ("citationhuman","CitationHuman"), 
-    EVENTHUMAN ("eventhuman","EventHuman"), 
-    MAILINGADDRESSHUMAN ("humanmailingaddress","MailingaddressHuman"), 
-    PARCELMAILINGADDRESS  ("parcelmailingaddress","ParcelMailingaddress");
+    OCCAPPLICATIONHUMAN ("occpermitapplicationhuman","OccApplicationHuman", "???"),  // for Jurplel to update
+    CECASEHUMAN ("humancecase", "CECaseHuman", "linkid"), 
+    OCCPERIODHUMAN ("humanoccperiod","OccPeriodHuman", ""), 
+    PARCELHUMAN ("humanparcel","ParcelHuman", ""), 
+    PARCELUNITHUMAN ("humanparcelunit","ParcelUnitHuman", ""), 
+    CITATIONHUMAN ("citationhuman","CitationHuman", ""), 
+    CITATIONCODEVIOLATION ("citationcodeviolation","CitationCodeViolation", ""),
+    EVENTHUMAN ("eventhuman","EventHuman", ""), 
+    MAILINGADDRESSHUMAN ("humanmailingaddress","MailingaddressHuman", ""), 
+    PARCELMAILINGADDRESS  ("parcelmailingaddress","ParcelMailingaddress", ""),
+    MUNIHUMAN ("humanmuni","MuniHuman","");
     
     private final String LINKED_TABLE_NAME;
     private final String LINK_ROLE_SCHEMA_TYPE_STRING;
+    private final String LINKED_TABLE_PK;
     
-    private LinkedObjectRoleSchemaEnum(String ltn, String ts){
+    private LinkedObjectRoleSchemaEnum(String ltn, String ts, String pk){
         LINKED_TABLE_NAME = ltn;
         LINK_ROLE_SCHEMA_TYPE_STRING = ts;
-        
+        LINKED_TABLE_PK = pk;
     }
     
     public String getLinkedTableName(){
@@ -49,6 +52,10 @@ public enum LinkedObjectRoleSchemaEnum {
     
     public String getRoleSChemaTypeString(){
         return LINK_ROLE_SCHEMA_TYPE_STRING;
+    }
+    
+    public String getLinkedTablePKField(){
+        return LINKED_TABLE_PK;
     }
     
 }
