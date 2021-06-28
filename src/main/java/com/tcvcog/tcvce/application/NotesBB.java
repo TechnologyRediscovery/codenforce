@@ -41,7 +41,7 @@ public class NotesBB extends BackingBeanUtils implements Serializable {
 
     /**
      * Grabs the current page event type from the sessionBean and uses that to populate
-     * the currentEventHolder object with something we can grab events from!
+     * the currentNoteHolder object with something we can grab events from!
      */
     public void updateNoteHolder() {
         SessionBean sb = getSessionBean();
@@ -70,8 +70,8 @@ public class NotesBB extends BackingBeanUtils implements Serializable {
 
     /**
      * This method goes down the coordinator stack to add a cached note
-     * (formNoteText) to the end of the occperiod's note field in the database
-     * in a structured and consistent way, while also requiring different permissions.
+     * (formNoteText) to the end of a note field in the database in a structured
+     * and consistent way, while also requiring different permissions.
      *
      */
     public void appendNotes() {
@@ -79,17 +79,18 @@ public class NotesBB extends BackingBeanUtils implements Serializable {
         mbp.setCred(getSessionBean().getSessUser().getKeyCard());
         mbp.setExistingContent(currentNoteHolder.getNotes());
         mbp.setNewMessageContent(formNoteText);
-        mbp.setHeader("Occupancy Period Note");
         mbp.setUser(getSessionBean().getSessUser());
 
         try {
             switch (pageEventDomain) {
                 case CODE_ENFORCEMENT:
+                    mbp.setHeader("Occupancy Period Note");
                     CaseCoordinator cc = getCaseCoordinator();
                     CECase ceCase = (CECase) currentNoteHolder;
                     cc.cecase_updateCECaseNotes(mbp, ceCase);
                     break;
                 case OCCUPANCY:
+                    mbp.setHeader("CE Case Note");
                     OccupancyCoordinator oc = getOccupancyCoordinator();
                     OccPeriod occPeriod = (OccPeriod) currentNoteHolder;
                     oc.attachNoteToOccPeriod(mbp, occPeriod);
