@@ -1011,12 +1011,6 @@
     </managed-bean>
     
     <managed-bean>
-        <managed-bean-name>occPeriodPaymentsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodPaymentsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
-    <managed-bean>
         <managed-bean-name>occPeriodFilesBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPeriodFilesBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
@@ -1642,12 +1636,6 @@
         <managed-bean-class>com.tcvcog.tcvce.coordinators.PaymentCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
-
-    <managed-bean>
-        <managed-bean-name>cECasePaymentsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECasePaymentsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules: payments ~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     <navigation-rule>
@@ -1695,7 +1683,7 @@
     <!--*********************************************************************-->
     <!--**                       XI. REPORT                                **-->
     <!--*********************************************************************-->
-    
+
     <managed-bean>
         <managed-bean-name>paymentBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.PaymentBB</managed-bean-class>
