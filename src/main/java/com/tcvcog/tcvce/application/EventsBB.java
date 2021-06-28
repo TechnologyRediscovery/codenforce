@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 
@@ -212,6 +213,8 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
             return;
         }
 
+        SessionBean sb = getSessionBean();
+
 
         // Create the event and add it to the database
         EventCoordinator ec = getEventCoordinator();
@@ -232,7 +235,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         newEvent.setDescription(potentialDescription);
 
         try {
-            ec.addEvent(newEvent, currentEventHolder, getSessionBean().getSessUser());
+            ec.addEvent(newEvent, currentEventHolder, sb.getSessUser());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Successfully logged event with an ID " + newEvent.getEventID() + " ", ""));
         } catch (BObStatusException | EventException | IntegrationException ex) {
@@ -240,13 +243,18 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
             return;
         }
 
-        // Reload current event holder in session bean so we can get the new events from it!
-        // This is kinda slow and should ultimately be replaced with something more elegant,
-        // maybe on the session bean's side...
-        try {
-            String output = getSessionBean().activateSessionObject(currentEventHolderBOB);
-        } catch (BObStatusException ex) {
-            System.out.println("Failed to activate session object:" + ex);
+        switch (pageEventDomain) {
+            case CODE_ENFORCEMENT:
+                CECase ceCase = (CECase) currentEventHolder;
+                sb.setSessCECase(ceCase);
+                break;
+            case OCCUPANCY:
+                OccPeriod occPeriod = (OccPeriod) currentEventHolder;
+                sb.setSessOccPeriod(occPeriod);
+                break;
+            case UNIVERSAL:
+                System.out.println("EventsBB reached universal case in createNewEvent()--do something about this maybe?");
+                break;
         }
 
         updateEventHolder();
