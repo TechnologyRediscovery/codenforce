@@ -357,7 +357,7 @@ public class    SessionBean
      * @return the page to navigate to
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public String activateSessionObject(IFace_ActivatableBOB bob) throws BObStatusException{
+    public String navigateToPageCorrespondingToObject(IFace_ActivatableBOB bob) throws BObStatusException{
         PropertyCoordinator pc = getPropertyCoordinator();
         PersonCoordinator perc = getPersonCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
@@ -502,6 +502,8 @@ public class    SessionBean
                 return "ceCaseProfile";
 
             } else if (bob instanceof OccPeriod) {
+                // WARNING! This bit was done very badly! I just copied stuff from the CECase one, but many of these
+                // methods assume that they are dealing with CECase. This needs completely gone over!
                 OccPeriod period = (OccPeriod) bob;
 
 

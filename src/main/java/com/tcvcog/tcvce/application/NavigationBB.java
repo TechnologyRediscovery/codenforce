@@ -200,7 +200,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     public String onPropertyListItemSelect(Property prop){
         String navTo = "";
         try {
-            navTo = getSessionBean().activateSessionObject(prop);
+            navTo = getSessionBean().navigateToPageCorrespondingToObject(prop);
         } catch (BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -224,7 +224,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     public String onCECaseListItemSelect(CECase cse){
         String navTo = "";
         try {
-            navTo = getSessionBean().activateSessionObject(cse);
+            navTo = getSessionBean().navigateToPageCorrespondingToObject(cse);
         } catch (BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -244,7 +244,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     public String onOccPeriodListItemSelect(OccPeriod period){
         String navTo = "";
         try {
-            navTo = getSessionBean().activateSessionObject(period);
+            navTo = getSessionBean().navigateToPageCorrespondingToObject(period);
         } catch (BObStatusException ex) {
             System.out.println(ex);
 
@@ -286,7 +286,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     public String onViewPersonListItemSelect(Person pers) {
        String navTo = "";
         try {
-            navTo = getSessionBean().activateSessionObject(pers);
+            navTo = getSessionBean().navigateToPageCorrespondingToObject(pers);
         } catch (BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
