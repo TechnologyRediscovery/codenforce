@@ -10,4 +10,8 @@ public interface IFace_PaymentHolder {
 
     public void setPaymentListGeneral(List<Payment> paymentList);
 
+//    public List<FeeAssigned> getFeeList();
+//
+//    public void setFeeList(List<FeeAssigned> feeList);
+
 }

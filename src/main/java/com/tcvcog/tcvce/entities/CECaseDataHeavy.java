@@ -270,6 +270,13 @@ public class CECaseDataHeavy
     }
 
     /**
+     * @param feeList the feeList to set
+     */
+    public void setFeeList(List<MoneyCECaseFeeAssigned> feeList) {
+        this.feeList = feeList;
+    }
+
+    /**
      * @return the paymentList
      */
     @Override
@@ -277,12 +284,6 @@ public class CECaseDataHeavy
         return paymentList;
     }
 
-    /**
-     * @param feeList the feeList to set
-     */
-    public void setFeeList(List<MoneyCECaseFeeAssigned> feeList) {
-        this.feeList = feeList;
-    }
 
     /**
      * @param paymentList the paymentList to set

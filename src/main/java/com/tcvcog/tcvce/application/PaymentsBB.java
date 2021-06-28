@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2021 Technology Rediscovery LLC
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
@@ -59,7 +75,7 @@ public class PaymentsBB extends BackingBeanUtils implements Serializable {
     public String editPayment(Payment thisPayment) {
         SessionBean sb = getSessionBean();
 
-        sb.setFeeManagementDomain(EventDomainEnum.CODE_ENFORCEMENT);
+        sb.setFeeManagementDomain(pageEventDomain);
         sb.setSessPayment(thisPayment);
         sb.getNavStack().pushCurrentPage();
 
@@ -72,7 +88,7 @@ public class PaymentsBB extends BackingBeanUtils implements Serializable {
     public String editHolderPayments() {
         SessionBean sb = getSessionBean();
 
-        sb.setFeeManagementDomain(EventDomainEnum.CODE_ENFORCEMENT);
+        sb.setFeeManagementDomain(pageEventDomain);
         switch (pageEventDomain) {
             case CODE_ENFORCEMENT:
                 CECase ceCase = (CECase) currentPaymentHolder;
@@ -83,12 +99,34 @@ public class PaymentsBB extends BackingBeanUtils implements Serializable {
                 sb.setFeeManagementOccPeriod(occPeriod);
                 break;
             case UNIVERSAL:
-                System.out.println("PaymentsBB reached universal case in editCECasePayments()--do something about this maybe?");
+                System.out.println("PaymentsBB reached universal case in editHolderPayments()--do something about this maybe?");
                 break;
         }
         sb.getNavStack().pushCurrentPage();
 
         return "payments";
+    }
+
+    public String editHolderFees() {
+        SessionBean sb = getSessionBean();
+
+        sb.setFeeManagementDomain(pageEventDomain);
+        switch (pageEventDomain) {
+            case CODE_ENFORCEMENT:
+                CECase ceCase = (CECase) currentPaymentHolder;
+                sb.setFeeManagementCeCase(ceCase);
+                break;
+            case OCCUPANCY:
+                OccPeriod occPeriod = (OccPeriod) currentPaymentHolder;
+                sb.setFeeManagementOccPeriod(occPeriod);
+                break;
+            case UNIVERSAL:
+                System.out.println("PaymentsBB reached universal case in editHolderFees()--do something about this maybe?");
+                break;
+        }
+        sb.getNavStack().pushCurrentPage();
+
+        return "feeManage";
     }
 
     // Other stuff
@@ -99,6 +137,16 @@ public class PaymentsBB extends BackingBeanUtils implements Serializable {
             size = currentPaymentHolder.getPaymentList().size();
 
         return size;
+    }
+
+    public int getFeeListSize() {
+//        int size = 0;
+//        if (currentPaymentHolder != null && currentPaymentHolder.getPaymentList() != null)
+//            size = currentPaymentHolder.getPaymentList().size();
+
+//        return size;
+        // Waiting on fee interface additions
+        return -1;
     }
 
     // Boring getters and setters

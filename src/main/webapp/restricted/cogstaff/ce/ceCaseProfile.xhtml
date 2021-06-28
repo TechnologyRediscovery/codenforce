@@ -79,8 +79,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <h:outputText value="photos &amp; blobs"/>
                                 </a>
                                 <h:outputText value=" | "/>
-                                <a href="#cecase-fees-panel">
-                                    <h:outputText value="fees"/>
+                                <a href="#fees-panel">
+                                    <h:outputText value="fees (#{paymentsBB.feeListSize})"/>
                                 </a>
                                 <h:outputText value=" | "/>
                                 <a href="#payments-panel">
@@ -975,130 +975,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </h:form>
                                     </p:panel>
 
-                                    <p:panel id="cecase-payments-fees-panel"
-                                             toggleable="true"
-                                             collapsed="false"
-                                             header="Fees"
-                                             rendered="true">
-
-
-                                        <h:form id="cecase-fees-form">
-
-                                            <p:dataTable
-                                                id="feeTable"
-                                                var="fee"
-                                                value="#{cECasePaymentsBB.currentCase.feeList}"
-                                                rowKey="#{fee.ceCaseAssignedFeeID}"
-                                                tableStyleClass="primeDataTable"
-                                                rowExpandMode="single"
-                                                expandedRow="false"
-                                                filteredValue="#{cECasePaymentsBB.filteredFeeList}"
-                                                >
-
-                                                <p:column width="3%">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Exp"/>
-                                                    </f:facet>
-                                                    <p:rowToggler/>
-                                                </p:column>
-                                                <p:column width="8%">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="ID" />
-                                                    </f:facet>
-                                                    <h:outputText value="#{fee.ceCaseAssignedFeeID}"/>
-                                                </p:column>
-
-
-                                                <p:column width="10%" sortBy="#{fee.fee.name}"
-                                                          filterBy="#{fee.fee.name}">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Fee Name" />
-                                                    </f:facet>
-                                                    <h:outputText value="#{fee.fee.name}"/>
-                                                </p:column>
-
-                                                <p:column width="10%" sortBy="#{fee.fee.amount}"
-                                                          filterBy="#{fee.fee.amount}">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Amount" />
-                                                    </f:facet>
-                                                    <h:outputText value="#{fee.fee.amount}"/>
-                                                </p:column>
-
-                                                <p:column width="15%" filterBy="#{fee.fee.effectiveDate}"
-                                                          sortBy="#{fee.fee.effectiveDate}">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Effective" />
-                                                    </f:facet>
-                                                    <h:outputText value="#{fee.fee.effectiveDate}"/>
-                                                </p:column>
-
-                                                <p:column width="15%" filterBy="#{fee.fee.expiryDate}"
-                                                          sortBy="#{fee.fee.expiryDate}">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Expiry" />
-                                                    </f:facet>
-                                                    <h:outputText value="#{fee.fee.expiryDate}"/>
-                                                </p:column>
-                                                <p:rowExpansion>
-                                                    <div class="outlinedBox">
-                                                        <h2>Full fee listing for fee <h:outputText value="#{fee.fee.occupancyInspectionFeeID}"/> </h2>
-
-                                                        <h:outputLabel styleClass="ui-label-inline" value="Notes"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{fee.fee.notes}"/>
-                                                        </div>
-
-                                                        <h:outputLabel styleClass="ui-label-inline" value="Assigned By"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{fee.assignedBy.person.firstName} #{fee.assignedBy.person.lastName} (ID: #{fee.assignedBy.userID})"/>
-                                                        </div>
-
-                                                        <h:outputLabel styleClass="ui-label-inline" value="Last Modified"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{fee.lastModified}"/>
-                                                        </div>
-
-                                                        <h:outputLabel styleClass="ui-label-inline" value="Other notes"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{fee.notes}"/>
-                                                        </div>
-
-                                                        <h:outputLabel styleClass="ui-label-inline" value="Amount Reduced By"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="$ #{fee.reducedBy}"/>
-                                                        </div>
-
-                                                        <h:outputLabel styleClass="ui-label-inline" value="Reduced By"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{fee.reducedByUser.person.firstName} #{fee.reducedByUser.person.lastName} (ID: #{fee.reducedByUser.userID}"/>
-                                                        </div>
-
-                                                        <h:outputLabel styleClass="ui-label-inline" value="Waived By"/>
-                                                        <p:spacer height="15px"/>
-                                                        <div class="rowExpansion">
-                                                            <h:outputText value="#{fee.waivedBy.person.firstName} #{fee.waivedBy.person.lastName} (ID: #{fee.waivedBy.userID}"/>
-                                                        </div>
-
-                                                        <ui:remove>
-                                                            <p:spacer height="15px"/>
-                                                            <div class="rowExpansion">
-                                                                <p:commandButton value="Edit this payment" action="#{cECasePaymentsBB.editOnePayment(payment)}"/>
-                                                            </div>
-                                                        </ui:remove>
-                                                    </div>
-                                                </p:rowExpansion>
-
-                                            </p:dataTable>
-                                            <p:commandButton value="Edit this Fee list" action="#{cECasePaymentsBB.editCECaseFees()}"/>
-                                        </h:form>
-                                    </p:panel>
+                                    <ui:include src="../compositions/feesPanel.xhtml"/>
 
                                     <ui:include src="../compositions/paymentsPanel.xhtml"/>
 

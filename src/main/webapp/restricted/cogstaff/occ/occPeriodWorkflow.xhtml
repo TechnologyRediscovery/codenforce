@@ -39,6 +39,10 @@
                                     <h:outputText value="events (#{eventsBB.eventListSize})"/>
                                 </a>
                                 <h:outputText value=" | "/>
+                                <a href="#fees-panel">
+                                    <h:outputText value="fees (#{paymentsBB.feeListSize})"/>
+                                </a>
+                                <h:outputText value=" | "/>
                                 <a href="#payments-panel">
                                     <h:outputText value="payments (#{paymentsBB.paymentListSize})"/>
                                 </a>
@@ -56,6 +60,7 @@
                                 <!-- Second column -->
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
                                     <ui:include src="../compositions/eventsPanel.xhtml"/>
+                                    <ui:include src="../compositions/feesPanel.xhtml"/>
                                     <ui:include src="../compositions/paymentsPanel.xhtml"/>
                                     <ui:include src="../compositions/notesPanel.xhtml"/>
                                 </div>
