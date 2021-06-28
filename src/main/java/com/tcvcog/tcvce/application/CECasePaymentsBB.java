@@ -19,7 +19,6 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
-import com.tcvcog.tcvce.entities.MoneyCECaseFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
 import java.io.Serializable;
 import java.util.List;
@@ -36,7 +35,7 @@ public  class       CECasePaymentsBB
     private CECaseDataHeavy currentCase;
     
     private List<MoneyCECaseFeeAssigned> filteredFeeList;
-    private List<MoneyCECaseFeePayment> filteredPaymentList;
+    private List<Payment> filteredPaymentList;
     
     @PostConstruct
     public void initBean() {
@@ -109,14 +108,14 @@ public  class       CECasePaymentsBB
     /**
      * @return the filteredPaymentList
      */
-    public List<MoneyCECaseFeePayment> getFilteredPaymentList() {
+    public List<Payment> getFilteredPaymentList() {
         return filteredPaymentList;
     }
 
     /**
      * @param filteredPaymentList the filteredPaymentList to set
      */
-    public void setFilteredPaymentList(List<MoneyCECaseFeePayment> filteredPaymentList) {
+    public void setFilteredPaymentList(List<Payment> filteredPaymentList) {
         this.filteredPaymentList = filteredPaymentList;
     }
     

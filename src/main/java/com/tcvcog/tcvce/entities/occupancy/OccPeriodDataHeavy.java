@@ -17,17 +17,7 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
-import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
-import com.tcvcog.tcvce.entities.EventRuleImplementation;
-import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
-import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
-import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
-import com.tcvcog.tcvce.entities.Payment;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonOccApplication;
-import com.tcvcog.tcvce.entities.Proposal;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
@@ -47,7 +37,8 @@ import java.util.List;
 public  class       OccPeriodDataHeavy 
         extends     OccPeriodPropertyUnitHeavy
         implements  IFace_EventRuleGoverned, 
-                    IFace_CredentialSigned {
+                    IFace_CredentialSigned,
+                    IFace_PaymentHolder {
     
     protected OccPeriodStatusEnum status;
 
@@ -64,7 +55,7 @@ public  class       OccPeriodDataHeavy
     private List<Integer> blobIDList;
     
     private List<MoneyOccPeriodFeeAssigned> feeList;
-    private List<MoneyOccPeriodFeePayment> paymentList;
+    private List<Payment> paymentList;
 
     private LocalDateTime configuredTS;
     private String credentialSignature;
@@ -242,14 +233,16 @@ public  class       OccPeriodDataHeavy
       /**
      * @return the paymentList
      */
-    public List<MoneyOccPeriodFeePayment> getPaymentList() {
+    @Override
+    public List<Payment> getPaymentList() {
         return paymentList;
     }
 
     /**
      * @param paymentList the paymentList to set
      */
-    public void setPaymentList(List<MoneyOccPeriodFeePayment> paymentList) {
+    @Override
+    public void setPaymentList(List<Payment> paymentList) {
         this.paymentList = paymentList;
     }
     
@@ -257,12 +250,13 @@ public  class       OccPeriodDataHeavy
      * Takes the general Payment type and converts it to 
      * @param paymentList the paymentList to set
      */
+    @Override
     public void setPaymentListGeneral(List<Payment> paymentList) {
-        List<MoneyOccPeriodFeePayment> skeletonHorde = new ArrayList<>();
+        List<Payment> skeletonHorde = new ArrayList<>();
         
         for (Payment p : paymentList) {
             
-            skeletonHorde.add(new MoneyOccPeriodFeePayment(p));
+            skeletonHorde.add(new Payment(p));
             
         }
         

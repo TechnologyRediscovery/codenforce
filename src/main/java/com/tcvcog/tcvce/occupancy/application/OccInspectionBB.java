@@ -124,8 +124,8 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
   
     
      // payments
-    private List<MoneyOccPeriodFeePayment> paymentList;
-    private List<MoneyOccPeriodFeePayment> filteredPaymentList;
+    private List<Payment> paymentList;
+    private List<Payment> filteredPaymentList;
     private Payment selectedPayment;
     
     //fees
@@ -1246,7 +1246,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the filteredPaymentList
      */
-    public List<MoneyOccPeriodFeePayment> getFilteredPaymentList() {
+    public List<Payment> getFilteredPaymentList() {
         return filteredPaymentList;
     }
 
@@ -1271,18 +1271,18 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         return selectedFee;
     }
 
-    public List<MoneyOccPeriodFeePayment> getPaymentList() {
+    public List<Payment> getPaymentList() {
         return paymentList;
     }
 
-    public void setPaymentList(List<MoneyOccPeriodFeePayment> paymentList) {
+    public void setPaymentList(List<Payment> paymentList) {
         this.paymentList = paymentList;
     }
     
     /**
      * @param filteredPaymentList the filteredPaymentList to set
      */
-    public void setFilteredPaymentList(List<MoneyOccPeriodFeePayment> filteredPaymentList) {
+    public void setFilteredPaymentList(List<Payment> filteredPaymentList) {
         this.filteredPaymentList = filteredPaymentList;
     }
 

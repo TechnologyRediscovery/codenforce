@@ -32,7 +32,6 @@ import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.FeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
-import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccApplication;
@@ -1180,13 +1179,13 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             }
         }
 
-        ArrayList<MoneyOccPeriodFeePayment> paymentHorde = new ArrayList<>();
+        ArrayList<Payment> paymentHorde = new ArrayList<>();
 
         if (input.getPaymentList() != null) {
 
             for (PublicInfoBundlePayment bundle : input.getPaymentList()) {
 
-                paymentHorde.add(new MoneyOccPeriodFeePayment(export(bundle)));
+                paymentHorde.add(new Payment(export(bundle)));
 
             }
         }
