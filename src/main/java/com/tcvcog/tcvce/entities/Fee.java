@@ -31,14 +31,30 @@ public class Fee extends BOb {
 
     private String name;
     private double amount;
+
     private LocalDateTime effectiveDate;
     private LocalDateTime expiryDate;
+
     private String notes;
     private boolean autoAssigned;
 
-    public Fee(){
+    public Fee() {
         effectiveDate = LocalDateTime.now();
         expiryDate = LocalDateTime.now();
+    }
+
+    public Fee(Fee fee) {
+        this.feeID = fee.getFeeID();
+        this.muni = fee.getMuni();
+
+        this.name = fee.getName();
+        this.amount = fee.getAmount();
+
+        this.effectiveDate = fee.getEffectiveDate();
+        this.expiryDate = fee.getExpiryDate();
+
+        this.notes = fee.getNotes();
+        this.autoAssigned = fee.isAutoAssigned();
     }
     
     /**

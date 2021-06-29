@@ -17,13 +17,12 @@
 package com.tcvcog.tcvce.entities;
 
 /**
- * Marks an Event as existing in either the CodeEnforcement
- * or Occupancy domain; used for routing in Integration and
- * tallying of event stuff
+ * Object for specifying either the Code Enforcement
+ * or Occupancy domain
  * 
  * @author Ellen Bascomb
  */
-public enum EventDomainEnum {
+public enum DomainEnum {
     
     CODE_ENFORCEMENT        (   "Code enforcement cases", 
                                 "cecase_caseid",
@@ -40,7 +39,7 @@ public enum EventDomainEnum {
                                                                 // and combine the results\
     private final String abbrev;
     
-    private EventDomainEnum(String t, String db, String ab){
+    private DomainEnum(String t, String db, String ab){
         title = t;
         dbField = db;
         abbrev = ab;

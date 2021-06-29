@@ -18,7 +18,6 @@ package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.entities.*;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import java.time.LocalDateTime;
@@ -54,7 +53,7 @@ public  class       OccPeriodDataHeavy
     
     private List<Integer> blobIDList;
     
-    private List<MoneyOccPeriodFeeAssigned> feeList;
+    private List<FeeAssigned> feeList;
     private List<Payment> paymentList;
 
     private LocalDateTime configuredTS;
@@ -131,8 +130,8 @@ public  class       OccPeriodDataHeavy
 
     
     @Override
-    public EventDomainEnum discloseEventDomain() {
-        return EventDomainEnum.OCCUPANCY;
+    public DomainEnum discloseEventDomain() {
+        return DomainEnum.OCCUPANCY;
     }
 
     
@@ -359,14 +358,14 @@ public  class       OccPeriodDataHeavy
     /**
      * @return the feeList
      */
-    public List<MoneyOccPeriodFeeAssigned> getFeeList() {
+    public List<FeeAssigned> getFeeList() {
         return feeList;
     }
 
     /**
      * @param feeList the feeList to set
      */
-    public void setFeeList(List<MoneyOccPeriodFeeAssigned> feeList) {
+    public void setFeeList(List<FeeAssigned> feeList) {
         this.feeList = feeList;
     }
 

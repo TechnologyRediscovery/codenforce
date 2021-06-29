@@ -30,7 +30,7 @@ import java.io.Serializable;
  */
 public class PaymentsBB extends BackingBeanUtils implements Serializable {
 
-    private EventDomainEnum pageEventDomain;
+    private DomainEnum pageEventDomain;
 
     private IFace_PaymentHolder currentPaymentHolder;
 

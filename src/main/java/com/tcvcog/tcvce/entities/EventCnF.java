@@ -33,7 +33,7 @@ public  class       EventCnF
         extends     BOb
         implements  Comparable<EventCnF>,
                     IFace_Loggable,
-                    IFace_ActivatableBOB{
+                    IFace_ActivatableBOB {
     
     protected int eventID;
     protected EventCategory category;
@@ -46,7 +46,7 @@ public  class       EventCnF
      * But that seemed to likely lead to more confusion since the DB
      * has two columns, since each is keyed differently
      */
-    protected EventDomainEnum domain;
+    protected DomainEnum domain;
     protected int ceCaseID;
     protected int occPeriodID;
     
@@ -303,14 +303,14 @@ public  class       EventCnF
     /**
      * @return the domain
      */
-    public EventDomainEnum getDomain() {
+    public DomainEnum getDomain() {
         return domain;
     }
 
     /**
      * @param domain the domain to set
      */
-    public void setDomain(EventDomainEnum domain) {
+    public void setDomain(DomainEnum domain) {
         this.domain = domain;
     }
 

@@ -129,9 +129,9 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     private Payment selectedPayment;
     
     //fees
-    private List<MoneyOccPeriodFeeAssigned> feeList;
-    private List<MoneyOccPeriodFeeAssigned> filteredFeeList;
-    private MoneyOccPeriodFeeAssigned selectedFee;
+    private List<FeeAssigned> feeList;
+    private List<FeeAssigned> filteredFeeList;
+    private FeeAssigned selectedFee;
     
     /**
      * Creates a new instance of InspectionsBB
@@ -779,7 +779,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      }
      
     public String editOccPeriodPayments(){
-         getSessionBean().setFeeManagementDomain(EventDomainEnum.OCCUPANCY);
+         getSessionBean().setFeeManagementDomain(DomainEnum.OCCUPANCY);
          getSessionBean().setFeeManagementOccPeriod(currentOccPeriod);
          getSessionBean().getNavStack().pushCurrentPage();
          
@@ -787,7 +787,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      }
      
     public String editOnePayment(Payment thisPayment){
-         getSessionBean().setFeeManagementDomain(EventDomainEnum.OCCUPANCY);
+         getSessionBean().setFeeManagementDomain(DomainEnum.OCCUPANCY);
          getSessionBean().setSessionPayment(thisPayment);
          getSessionBean().getNavStack().pushCurrentPage();
          
@@ -795,7 +795,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
      }
      
      public String editOccPeriodFees(){
-         getSessionBean().setFeeManagementDomain(EventDomainEnum.OCCUPANCY);
+         getSessionBean().setFeeManagementDomain(DomainEnum.OCCUPANCY);
          getSessionBean().setFeeManagementOccPeriod(currentOccPeriod);
          getSessionBean().getNavStack().pushCurrentPage();
          
@@ -1260,14 +1260,14 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the filteredFeeList
      */
-    public List<MoneyOccPeriodFeeAssigned> getFilteredFeeList() {
+    public List<FeeAssigned> getFilteredFeeList() {
         return filteredFeeList;
     }
 
     /**
      * @return the selectedFee
      */
-    public MoneyOccPeriodFeeAssigned getSelectedFee() {
+    public FeeAssigned getSelectedFee() {
         return selectedFee;
     }
 
@@ -1293,25 +1293,25 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         this.selectedPayment = selectedPayment;
     }
 
-    public List<MoneyOccPeriodFeeAssigned> getFeeList() {
+    public List<FeeAssigned> getFeeList() {
         return feeList;
     }
 
-    public void setFeeList(List<MoneyOccPeriodFeeAssigned> feeList) {
+    public void setFeeList(List<FeeAssigned> feeList) {
         this.feeList = feeList;
     }
     
     /**
      * @param filteredFeeList the filteredFeeList to set
      */
-    public void setFilteredFeeList(List<MoneyOccPeriodFeeAssigned> filteredFeeList) {
+    public void setFilteredFeeList(List<FeeAssigned> filteredFeeList) {
         this.filteredFeeList = filteredFeeList;
     }
 
     /**
      * @param selectedFee the selectedFee to set
      */
-    public void setSelectedFee(MoneyOccPeriodFeeAssigned selectedFee) {
+    public void setSelectedFee(FeeAssigned selectedFee) {
         this.selectedFee = selectedFee;
     }
 

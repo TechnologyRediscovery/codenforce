@@ -47,7 +47,7 @@ import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
+import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
@@ -331,7 +331,7 @@ public class CECaseSearchProfileBB
         currentCodeSet = getSessionBean().getSessMuni().getCodeSet();
 
         // EVENT STUFF
-        setTypeCatMap(ec.assembleEventTypeCatMap_toEnact(EventDomainEnum.CODE_ENFORCEMENT, currentCase, getSessionBean().getSessUser()));
+        setTypeCatMap(ec.assembleEventTypeCatMap_toEnact(DomainEnum.CODE_ENFORCEMENT, currentCase, getSessionBean().getSessUser()));
         eventTypeCandidates = new ArrayList<>(getTypeCatMap().keySet());
         eventCategoryCandidates = new ArrayList<>();
         if(eventTypeCandidates != null && !eventTypeCandidates.isEmpty()){
@@ -502,7 +502,7 @@ public class CECaseSearchProfileBB
 
     
     /**
-     * Primary listener method which copies a reference to the selected 
+     * Primary listener method which copies a reference to the selected
      * user from the list and sets it on the selected user perch
      * @param cse
      * @return 
@@ -1920,8 +1920,8 @@ public class CECaseSearchProfileBB
 
         try {
             getCurrentEvent().setCategory(getEventCategorySelected());
-            getCurrentEvent().setDomain(EventDomainEnum.CODE_ENFORCEMENT);
-            if(getCurrentEvent().getDomain() == null && getCurrentEvent().getDomain() == EventDomainEnum.UNIVERSAL){
+            getCurrentEvent().setDomain(DomainEnum.CODE_ENFORCEMENT);
+            if(getCurrentEvent().getDomain() == null && getCurrentEvent().getDomain() == DomainEnum.UNIVERSAL){
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 "Event must have a domain that's not universal", ""));

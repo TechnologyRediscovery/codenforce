@@ -18,7 +18,6 @@
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -165,9 +164,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         } else {
              edh = new EventCnFPropUnitCasePeriodHeavy(ev);
         }
-        if(ev.getDomain() == EventDomainEnum.OCCUPANCY && ev.getOccPeriodID() != 0){
+        if(ev.getDomain() == DomainEnum.OCCUPANCY && ev.getOccPeriodID() != 0){
             edh.setPeriod(oc.getOccPeriodPropertyUnitHeavy(edh.getOccPeriodID()));
-        } else if(ev.getDomain() == EventDomainEnum.CODE_ENFORCEMENT && ev.getCeCaseID() != 0){
+        } else if(ev.getDomain() == DomainEnum.CODE_ENFORCEMENT && ev.getCeCaseID() != 0){
             edh.setCecase(cc.cecase_assembleCECasePropertyUnitHeavy(cc.cecase_getCECase(edh.getCeCaseID())));
             // note that a Property object is already inside our CECase base class
         } else {
@@ -391,9 +390,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 throw new EventException("EventCnF cannot have a non-zero CECase and OccPeriod ID");
             }
             if(ev.getCeCaseID() != 0){
-                ev.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
+                ev.setDomain(DomainEnum.CODE_ENFORCEMENT);
             } else if(ev.getOccPeriodID() != 0){
-                ev.setDomain(EventDomainEnum.OCCUPANCY);
+                ev.setDomain(DomainEnum.OCCUPANCY);
             } else {
                 throw new EventException("EventCnF must have either an occupancy period ID, or CECase ID");
             }
@@ -546,11 +545,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                    }
                 }
                 e.setCeCaseID(cse.getCaseID());
-                e.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
+                e.setDomain(DomainEnum.CODE_ENFORCEMENT);
             } else if (erg instanceof OccPeriod){
                 op = (OccPeriod) erg;
                 e.setOccPeriodID(op.getPeriodID());
-                e.setDomain(EventDomainEnum.OCCUPANCY);
+                e.setDomain(DomainEnum.OCCUPANCY);
             }
         }
         
@@ -695,7 +694,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return 
      */
     public Map<EventType, List<EventCategory>> assembleEventTypeCatMap_toEnact(
-                                                EventDomainEnum domain,
+                                                DomainEnum domain,
                                                 IFace_EventHolder erg,
                                                 UserAuthorized ua){
        Map<EventType, List<EventCategory>> typeCatMap = new HashMap<>();
@@ -719,7 +718,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param ua doing potential creation of an event
      * @return 
      */
-    public List<EventType> determinePermittedEventTypes(    EventDomainEnum domain, 
+    public List<EventType> determinePermittedEventTypes(    DomainEnum domain,
                                                             IFace_EventHolder erg,
                                                             UserAuthorized ua){
         List<EventType> typeList = new ArrayList<>();

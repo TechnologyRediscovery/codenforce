@@ -40,7 +40,7 @@ import java.util.List;
  * @author jurplel
  */
 public class EventsBB extends BackingBeanUtils implements Serializable {
-    private EventDomainEnum pageEventDomain;
+    private DomainEnum pageEventDomain;
 
     private IFace_EventHolder currentEventHolder;
     private IFace_ActivatableBOB currentEventHolderBOB;

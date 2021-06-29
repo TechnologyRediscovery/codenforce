@@ -37,7 +37,7 @@ public class CECaseDataHeavy
 
     private List<CEActionRequest> ceActionRequestList;
 
-    private List<MoneyCECaseFeeAssigned> feeList;
+    private List<FeeAssigned> feeList;
     private List<Payment> paymentList;
     
     private List<Integer> blobIDList;
@@ -90,8 +90,8 @@ public class CECaseDataHeavy
 
 
     @Override
-    public EventDomainEnum discloseEventDomain() {
-        return EventDomainEnum.CODE_ENFORCEMENT;
+    public DomainEnum discloseEventDomain() {
+        return DomainEnum.CODE_ENFORCEMENT;
     }
 
 
@@ -265,14 +265,14 @@ public class CECaseDataHeavy
     /**
      * @return the feeList
      */
-    public List<MoneyCECaseFeeAssigned> getFeeList() {
+    public List<FeeAssigned> getFeeList() {
         return feeList;
     }
 
     /**
      * @param feeList the feeList to set
      */
-    public void setFeeList(List<MoneyCECaseFeeAssigned> feeList) {
+    public void setFeeList(List<FeeAssigned> feeList) {
         this.feeList = feeList;
     }
 

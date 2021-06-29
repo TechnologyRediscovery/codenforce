@@ -27,7 +27,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
+import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.IFace_EventHolder;
 import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
@@ -289,7 +289,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             
             stmt.setInt(1, event.getCategory().getCategoryID());
             
-            if(event.getDomain() == EventDomainEnum.CODE_ENFORCEMENT && event.getCeCaseID() != 0){
+            if(event.getDomain() == DomainEnum.CODE_ENFORCEMENT && event.getCeCaseID() != 0){
                 stmt.setInt(2, event.getCeCaseID());
             } else {
                 stmt.setNull(2, java.sql.Types.NULL);
@@ -308,7 +308,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(5, event.isActive());
             stmt.setString(6, event.getNotes());
             
-            if(event.getDomain() == EventDomainEnum.OCCUPANCY && event.getOccPeriodID() != 0){
+            if(event.getDomain() == DomainEnum.OCCUPANCY && event.getOccPeriodID() != 0){
                 stmt.setInt(7, event.getOccPeriodID());
             } else {
                 stmt.setNull(7, java.sql.Types.NULL);
@@ -391,7 +391,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(sb.toString());
             
             
-            if(event.getDomain() == EventDomainEnum.CODE_ENFORCEMENT && event.getCeCaseID() != 0){
+            if(event.getDomain() == DomainEnum.CODE_ENFORCEMENT && event.getCeCaseID() != 0){
                 stmt.setInt(1, event.getCeCaseID());
             } else {
                 stmt.setNull(1, java.sql.Types.NULL);
@@ -409,7 +409,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             
             stmt.setBoolean(4, event.isActive());
             
-            if(event.getDomain() == EventDomainEnum.OCCUPANCY && event.getOccPeriodID() != 0){
+            if(event.getDomain() == DomainEnum.OCCUPANCY && event.getOccPeriodID() != 0){
                 stmt.setInt(5, event.getOccPeriodID());
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
@@ -518,7 +518,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         // we need an EventDomain for the BOBID, too, so set it arbitrarily if it's null
         if(params.getEventDomain_val() == null){
-            params.setEventDomain_val(EventDomainEnum.UNIVERSAL);
+            params.setEventDomain_val(DomainEnum.UNIVERSAL);
             params.appendToParamLog("DOMAIN CONTROL: no object specified - Code Enforcement chosen as default; | ");
         }
         
@@ -528,7 +528,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         // to get to property and hence municipality, we must traverse different key pathways
         // through the database for CE versus Occ. This is all backflippy crazy shit because
         // of the decision decision to maintain only one event tablef or both Occ events and CE events.
-        if(params.getEventDomain_val().equals(EventDomainEnum.CODE_ENFORCEMENT)){
+        if(params.getEventDomain_val().equals(DomainEnum.CODE_ENFORCEMENT)){
             params.appendSQL("LEFT OUTER JOIN public.cecase ON (cecase.caseid = event.cecase_caseid) \n");
             params.appendSQL("LEFT OUTER JOIN public.property ON (cecase.property_propertyid = property_propertyid)  \n");
             

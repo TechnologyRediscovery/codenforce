@@ -31,9 +31,8 @@ import com.tcvcog.tcvce.domain.ExceptionSeverityEnum;
 import com.tcvcog.tcvce.domain.SessionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
+import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.User;
@@ -57,12 +56,9 @@ import javax.servlet.http.HttpServletRequest;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.SubSysEnum;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -592,7 +588,7 @@ public  class       SessionInitializer
             sb.setQueryEvent(sb.getQueryEventList().get(0));
         }
         // start with default CE domain
-        sb.setSessEventsPageEventDomainRequest(EventDomainEnum.CODE_ENFORCEMENT);
+        sb.setSessEventsPageEventDomainRequest(DomainEnum.CODE_ENFORCEMENT);
         
         QueryEvent futureEvents = sc.initQuery(QueryEventEnum.MUINI_FUTURE_7DAYS, cred);
         try {

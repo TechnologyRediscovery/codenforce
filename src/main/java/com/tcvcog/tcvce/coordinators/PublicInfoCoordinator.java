@@ -29,9 +29,8 @@ import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
+import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.FeeAssigned;
-import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonOccApplication;
@@ -801,12 +800,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         if (input.getCategory().getUserRankMinimumToView() <= PUBLIC_VIEW_USER_RANK) {
 
-            if (input.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
+            if (input.getDomain() == DomainEnum.CODE_ENFORCEMENT) {
                 CaseCoordinator cc = getCaseCoordinator();
                 CECase c = cc.cecase_getCECase(input.getCeCaseID());
                 pib.setCaseManager(c.getCaseManager());
                 pib.setCecaseID(c.getCaseID());
-            } else if (input.getDomain() == EventDomainEnum.OCCUPANCY) {
+            } else if (input.getDomain() == DomainEnum.OCCUPANCY) {
                 OccupancyCoordinator oc = getOccupancyCoordinator();
                 OccPeriod period = oc.getOccPeriod(input.getOccPeriodID());
                 pib.setCaseManager(period.getManager());
@@ -1004,13 +1003,13 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             exportable = new EventCnFPropUnitCasePeriodHeavy(unbundled);
         }
 
-        if (unbundled.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
+        if (unbundled.getDomain() == DomainEnum.CODE_ENFORCEMENT) {
 
             CECase ceLight = cc.cecase_getCECase(input.getCecaseID());
 
             exportable.setCecase(cc.cecase_assembleCECasePropertyUnitHeavy(ceLight));
 
-        } else if (unbundled.getDomain() == EventDomainEnum.OCCUPANCY) {
+        } else if (unbundled.getDomain() == DomainEnum.OCCUPANCY) {
 
             OccPeriod opLight = oc.getOccPeriod(input.getPeriodID());
 
@@ -1163,12 +1162,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             }
         }
 
-        ArrayList<MoneyOccPeriodFeeAssigned> feeHorde = new ArrayList<>();
+        ArrayList<FeeAssigned> feeHorde = new ArrayList<>();
 
         if (input.getFeeList() != null) {
             for (PublicInfoBundleFeeAssigned bundle : input.getFeeList()) {
 
-                MoneyOccPeriodFeeAssigned temp = new MoneyOccPeriodFeeAssigned(export(bundle));
+                FeeAssigned temp = new FeeAssigned(export(bundle));
 
                 temp.setOccPeriodID(exportable.getPeriodID());
 

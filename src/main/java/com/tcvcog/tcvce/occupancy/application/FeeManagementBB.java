@@ -31,11 +31,9 @@ import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
+import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.FeeAssigned;
-import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
-import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import java.io.Serializable;
@@ -44,7 +42,6 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 
 /**
  *
@@ -86,7 +83,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     private List<Fee> allFees;
 
     //Generalized fields
-    private EventDomainEnum currentDomain;
+    private DomainEnum currentDomain;
     private String currentMode;
     private boolean waived;
     private boolean redirected;
@@ -202,49 +199,30 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         // "Select" button was selected
         if (currentFeeSelected == true) {
 
-            //Set the correct domain and create the correct type of Assigned Fee object
-            if (currentDomain == EventDomainEnum.OCCUPANCY) {
+            if (selectedAssignedFee != null) {
 
-                MoneyOccPeriodFeeAssigned skeleton = (MoneyOccPeriodFeeAssigned) currentFee;
+                switch (currentDomain) {
 
-                if (selectedAssignedFee != null) {
-                    skeleton.setOccPeriodID(currentOccPeriod.getPeriodID());
-
-                } else {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Please select an assigned fee to update", ""));
+                    case CODE_ENFORCEMENT:
+                        currentFee.setCaseID(currentCase.getCaseID());
+                        break;
+                    case OCCUPANCY:
+                        currentFee.setOccPeriodID(currentOccPeriod.getPeriodID());
+                        break;
                 }
 
-                //set selected fee
-                selectedAssignedFee = skeleton;
-                //update the current selected fee list in side panel
+                // Set selected fee
+                selectedAssignedFee = currentFee;
+                // Update the current selected fee list in side panel
                 feeAssignedList = new ArrayList<>();
-                feeAssignedList.add(skeleton);
-
-            } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT){
-
-                MoneyCECaseFeeAssigned skeleton = (MoneyCECaseFeeAssigned) currentFee;
-
-                if (selectedAssignedFee != null) {
-
-                    skeleton.setCaseID(currentCase.getCaseID());
-
-                } else {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Please select an assigned fee to update", ""));
-                }
-
-                //set selected fee
-                selectedAssignedFee = skeleton;
-                //update the current selected fee list in side panel
-                feeAssignedList = new ArrayList<>();
-                feeAssignedList.add(skeleton);
-
+                feeAssignedList.add(currentFee);
+            }
+            else {
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Please select an assigned fee to update", ""));
             }
 
-            //Message Noticefication
+            // Message Notification
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Current Selected Assigned Fee: " + selectedAssignedFee.getAssignedFeeID(), ""));
             
         } else {
@@ -254,7 +232,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
             refreshFeeAssignedList();
 
-            //Message Noticefication
+            // Message Notification
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Fee: " + selectedAssignedFee.getAssignedFeeID(), ""));
         }
 
@@ -404,7 +382,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         PaymentCoordinator pc = getPaymentCoordinator();
 
-        if (currentDomain == EventDomainEnum.OCCUPANCY) {
+        if (currentDomain == DomainEnum.OCCUPANCY) {
 
             try {
                 pc.insertAssignedFee(selectedAssignedFee, currentOccPeriod, waived);
@@ -448,7 +426,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     public String onUpdateAssignedFeeButtonChange() {
 
         PaymentCoordinator pc = getPaymentCoordinator();
-        if (currentDomain == EventDomainEnum.OCCUPANCY) {
+        if (currentDomain == DomainEnum.OCCUPANCY) {
             try {
 
                 pc.updateAssignedFee(selectedAssignedFee, currentOccPeriod, waived);
@@ -494,7 +472,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         PaymentCoordinator pc = getPaymentCoordinator();
 
-        if (currentDomain == EventDomainEnum.OCCUPANCY) {
+        if (currentDomain == DomainEnum.OCCUPANCY) {
 
             try {
                 pc.updateAssignedFee(selectedAssignedFee, currentOccPeriod, true); // set waived to true
@@ -511,7 +489,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                                 "We encountered a problem while waiving the fee!", ""));
             }
         }
-        if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
+        if (currentDomain == DomainEnum.CODE_ENFORCEMENT) {
 
             try {
                 pc.updateAssignedFee(selectedAssignedFee, currentCase, selectedViolation, true); // set waived to true
@@ -571,7 +549,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     public String whatDomainFees() {
-        if (currentDomain == EventDomainEnum.OCCUPANCY) {
+        if (currentDomain == DomainEnum.OCCUPANCY) {
 
             return "occupancy periods";
 
@@ -739,7 +717,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      */
     public String onUpdatePermissionButtonChange() {
 
-        if (currentDomain == EventDomainEnum.OCCUPANCY) {
+        if (currentDomain == DomainEnum.OCCUPANCY) {
 
             if (existingFeeList.isEmpty() || existingFeeList == null) {
                 
@@ -758,7 +736,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                     scanExistingOccPeriodFeeListWithInsert();
 
             }
-        } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
+        } else if (currentDomain == DomainEnum.CODE_ENFORCEMENT) {
 
             if (existingFeeList.isEmpty() || existingFeeList == null) {
                 
@@ -965,7 +943,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         currentDomain = getSessionBean().getFeeManagementDomain();
 
-        if (currentDomain == EventDomainEnum.OCCUPANCY) {
+        if (currentDomain == DomainEnum.OCCUPANCY) {
 
             OccupancyCoordinator oc = getOccupancyCoordinator();
 
@@ -995,7 +973,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
             }
 
-        } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
+        } else if (currentDomain == DomainEnum.CODE_ENFORCEMENT) {
 
             CaseCoordinator cc = getCaseCoordinator();
 
@@ -1012,15 +990,16 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
             if (currentCase != null) {
 
-                try {
+//                try {
 
-                    feeAssignedList = (ArrayList<FeeAssigned>) pc.getAssignedFees(currentCase);
+                    // PLEASE UNCOMMENT ME IF YOU ARE TRYING TO USE THIS CLASS!
+//                    feeAssignedList = (ArrayList<FeeAssigned>) pc.getAssignedFees(currentCase);
                     feeList = new ArrayList<>();
-                } catch (IntegrationException ex) {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Oops! We encountered a problem trying to refresh the fee assigned list!", ""));
-                }
+//                } catch (IntegrationException ex) {
+//                    getFacesContext().addMessage(null,
+//                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                                    "Oops! We encountered a problem trying to refresh the fee assigned list!", ""));
+//                }
             }
         }
     }
@@ -1070,9 +1049,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     /**
      * The user has selected a violation, display all of its associated fees.
-     * @param e 
      */
-    public void violationSelected(ActionEvent e) {
+    public void violationSelected() {
 
         feeList.clear();
 
@@ -1178,11 +1156,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     public boolean editingOccPeriod() {
-        return (getSessionBean().getNavStack().peekLastPage() != null && currentOccPeriod != null && currentDomain == EventDomainEnum.OCCUPANCY);
+        return (getSessionBean().getNavStack().peekLastPage() != null && currentOccPeriod != null && currentDomain == DomainEnum.OCCUPANCY);
     }
 
     public boolean editingCECase() {
-        return (getSessionBean().getNavStack().peekLastPage() != null && currentCase != null && currentDomain == EventDomainEnum.CODE_ENFORCEMENT);
+        return (getSessionBean().getNavStack().peekLastPage() != null && currentCase != null && currentDomain == DomainEnum.CODE_ENFORCEMENT);
     }
 
     public ArrayList<OccPeriodType> getTypeList() {
@@ -1283,11 +1261,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
     }
 
-    public EventDomainEnum getCurrentDomain() {
+    public DomainEnum getCurrentDomain() {
         return currentDomain;
     }
 
-    public void setCurrentDomain(EventDomainEnum currentDomain) {
+    public void setCurrentDomain(DomainEnum currentDomain) {
         this.currentDomain = currentDomain;
     }
 

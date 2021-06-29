@@ -33,8 +33,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
@@ -177,7 +175,7 @@ public class    SessionBean
      * objects
      */
     private PageModeEnum sessEventsPagePageModeRequest;
-    private EventDomainEnum sessEventsPageEventDomainRequest;
+    private DomainEnum sessEventsPageEventDomainRequest;
     
     private EventCnF sessEvent;
     private ActivatableRouteEnum sessEventRoute;
@@ -289,7 +287,7 @@ public class    SessionBean
     private String feeRedirTo;
     private Payment sessionPayment;
     
-    private EventDomainEnum feeManagementDomain;
+    private DomainEnum feeManagementDomain;
     private CECase feeManagementCeCase;
     
     /* >>> -------------------------------------------------------------- <<< */
@@ -1357,11 +1355,11 @@ public class    SessionBean
         this.feeManagementCeCase = feeManagementCeCase;
     }
 
-    public EventDomainEnum getFeeManagementDomain() {
+    public DomainEnum getFeeManagementDomain() {
         return feeManagementDomain;
     }
 
-    public void setFeeManagementDomain(EventDomainEnum feeManagementDomain) {
+    public void setFeeManagementDomain(DomainEnum feeManagementDomain) {
         this.feeManagementDomain = feeManagementDomain;
     }
 
@@ -1686,14 +1684,14 @@ public class    SessionBean
     /**
      * @return the sessEventsPageEventDomainRequest
      */
-    public EventDomainEnum getSessEventsPageEventDomainRequest() {
+    public DomainEnum getSessEventsPageEventDomainRequest() {
         return sessEventsPageEventDomainRequest;
     }
 
     /**
      * @param sessEventsPageEventDomainRequest the sessEventsPageEventDomainRequest to set
      */
-    public void setSessEventsPageEventDomainRequest(EventDomainEnum sessEventsPageEventDomainRequest) {
+    public void setSessEventsPageEventDomainRequest(DomainEnum sessEventsPageEventDomainRequest) {
         this.sessEventsPageEventDomainRequest = sessEventsPageEventDomainRequest;
     }
 

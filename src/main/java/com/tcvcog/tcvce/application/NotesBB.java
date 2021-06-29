@@ -22,7 +22,7 @@ import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
+import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.IFace_NoteHolder;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -40,7 +40,7 @@ public class NotesBB extends BackingBeanUtils implements Serializable {
 
     private String formNoteText;
 
-    private EventDomainEnum pageEventDomain;
+    private DomainEnum pageEventDomain;
 
     private IFace_NoteHolder currentNoteHolder;
 

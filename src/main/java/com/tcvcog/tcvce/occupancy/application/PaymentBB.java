@@ -27,9 +27,8 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
+import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.FeeAssigned;
-import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
 import com.tcvcog.tcvce.entities.Person;
@@ -56,9 +55,9 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     private CECaseDataHeavy currentCase;
     private FeeAssigned selectedAssignedFee;
     private ArrayList<FeeAssigned> feeAssignedList;
-    private ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFilteredFeeList;
+    private ArrayList<FeeAssigned> occPeriodFilteredFeeList;
 
-    private EventDomainEnum currentDomain;
+    private DomainEnum currentDomain;
     private String currentMode;
     private boolean redirected;
     private boolean currentPaymentSelected;
@@ -108,7 +107,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         }
         currentDomain = getSessionBean().getFeeManagementDomain();
 
-        if (currentDomain == EventDomainEnum.OCCUPANCY) {
+        if (currentDomain == DomainEnum.OCCUPANCY) {
 
             OccupancyCoordinator oc = getOccupancyCoordinator();
 
@@ -137,7 +136,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
             }
 
-        } else if (currentDomain == EventDomainEnum.CODE_ENFORCEMENT) {
+        } else if (currentDomain == DomainEnum.CODE_ENFORCEMENT) {
 
             CaseCoordinator cc = getCaseCoordinator();
 
@@ -416,7 +415,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
      * @return whether or not the user is currently editing Payments related to an OccPeriod
      */
     public boolean editingOccPeriod() {
-        return (getSessionBean().getNavStack().peekLastPage() != null && currentOccPeriod != null && currentDomain == EventDomainEnum.OCCUPANCY);
+        return (getSessionBean().getNavStack().peekLastPage() != null && currentOccPeriod != null && currentDomain == DomainEnum.OCCUPANCY);
     }
 
     /**
@@ -424,7 +423,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
      * @return whether or not the user is currently editing Payments related to a CECase
      */
     public boolean editingCECase() {
-        return (getSessionBean().getNavStack().peekLastPage() != null && currentCase != null && currentDomain == EventDomainEnum.CODE_ENFORCEMENT);
+        return (getSessionBean().getNavStack().peekLastPage() != null && currentCase != null && currentDomain == DomainEnum.CODE_ENFORCEMENT);
     }
 
     /**
@@ -690,11 +689,11 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         this.feeAssignedList = assignedFeeList;
     }
 
-    public ArrayList<MoneyOccPeriodFeeAssigned> getOccPeriodFilteredFeeList() {
+    public ArrayList<FeeAssigned> getOccPeriodFilteredFeeList() {
         return occPeriodFilteredFeeList;
     }
 
-    public void setOccPeriodFilteredFeeList(ArrayList<MoneyOccPeriodFeeAssigned> occPeriodFilteredFeeList) {
+    public void setOccPeriodFilteredFeeList(ArrayList<FeeAssigned> occPeriodFilteredFeeList) {
         this.occPeriodFilteredFeeList = occPeriodFilteredFeeList;
     }
 
@@ -706,11 +705,11 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         this.currentCase = currentCase;
     }
 
-    public EventDomainEnum getCurrentDomain() {
+    public DomainEnum getCurrentDomain() {
         return currentDomain;
     }
 
-    public void setCurrentDomain(EventDomainEnum currentDomain) {
+    public void setCurrentDomain(DomainEnum currentDomain) {
         this.currentDomain = currentDomain;
     }
 

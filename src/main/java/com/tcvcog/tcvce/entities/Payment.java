@@ -40,7 +40,7 @@ public class Payment extends BOb {
     protected User recordedBy;
     protected LocalDateTime entryTimestamp;
     protected int assignedFeeID;
-    protected EventDomainEnum domain;
+    protected DomainEnum domain;
     
    public Payment() {
        notes = " ";
@@ -264,11 +264,11 @@ public class Payment extends BOb {
         this.assignedFeeID = assignedFeeID;
     }
 
-    public EventDomainEnum getDomain() {
+    public DomainEnum getDomain() {
         return domain;
     }
 
-    public void setDomain(EventDomainEnum domain) {
+    public void setDomain(DomainEnum domain) {
         this.domain = domain;
     }
 }

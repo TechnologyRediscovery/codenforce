@@ -17,10 +17,8 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.util;
 
-import com.tcvcog.tcvce.entities.CEActionRequestStatus;
-import com.tcvcog.tcvce.entities.CitationStatus;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
-import com.tcvcog.tcvce.entities.search.IFace_dateFieldHolder;
+import com.tcvcog.tcvce.entities.DomainEnum;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
@@ -38,7 +36,7 @@ public class SearchParamsEventDomainConverter extends EntityConverter implements
         if(titleS.isEmpty()) {
             return null; 
         }
-         EventDomainEnum o = (EventDomainEnum) this.getViewMap(fc).get(titleS);
+         DomainEnum o = (DomainEnum) this.getViewMap(fc).get(titleS);
         return o;
     }
 
@@ -49,7 +47,7 @@ public class SearchParamsEventDomainConverter extends EntityConverter implements
             return "";
         }
         
-        EventDomainEnum ed = (EventDomainEnum) o;
+        DomainEnum ed = (DomainEnum) o;
         String title = ed.getTitle();
         if (title != null){
             this.getViewMap(fc).put(title,o);

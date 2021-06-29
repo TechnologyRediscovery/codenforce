@@ -12,11 +12,10 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CodeViolationPropCECaseHeavy;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
+import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
@@ -174,12 +173,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         for(SearchParamsEvent sp: paramsList){
             evTempList.clear();
             // audit the params and get the result list back
-            if(sp.getEventDomain_val() == EventDomainEnum.UNIVERSAL){
+            if(sp.getEventDomain_val() == DomainEnum.UNIVERSAL){
                 // query for Code Enf
-                sp.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
+                sp.setEventDomain_val(DomainEnum.CODE_ENFORCEMENT);
                 runQuery_event_IntegratorCall(sp, evTempList);
                 // now add Occ events as well
-                sp.setEventDomain_val(EventDomainEnum.OCCUPANCY);
+                sp.setEventDomain_val(DomainEnum.OCCUPANCY);
                 runQuery_event_IntegratorCall(sp, evTempList);
             } else {
                 runQuery_event_IntegratorCall(sp, evTempList);
@@ -1533,14 +1532,14 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
     public SearchParamsEvent genParams_event_occperid(SearchParamsEvent params, Credential cred ){
         params.setEventDomain_ctl(true);
-        params.setEventDomain_val(EventDomainEnum.OCCUPANCY);
+        params.setEventDomain_val(DomainEnum.OCCUPANCY);
         params.setBobID_ctl(true);
         return params;
     }
     
     public SearchParamsEvent genParams_event_cecase(SearchParamsEvent params, Credential cred ){
         params.setEventDomain_ctl(true);
-        params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
+        params.setEventDomain_val(DomainEnum.CODE_ENFORCEMENT);
         params.setBobID_ctl(true);
         return params;
         
@@ -1554,7 +1553,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setDate_start_val(LocalDateTime.now().minusDays(30));
         params.setLimitResultCount_ctl(false);
         params.setEventDomain_ctl(true);
-        params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
+        params.setEventDomain_val(DomainEnum.CODE_ENFORCEMENT);
         
         // all other event controls are off by default
         
@@ -1570,7 +1569,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setDate_start_val(LocalDateTime.now().minusHours(HOURS_IN_DAY));
         params.setLimitResultCount_ctl(false);
         params.setEventDomain_ctl(true);
-        params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
+        params.setEventDomain_val(DomainEnum.CODE_ENFORCEMENT);
         
         // all other event controls are off by default
         
@@ -1586,7 +1585,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setDate_start_val(LocalDateTime.now().minusDays(DAYS_IN_WEEK));
         params.setLimitResultCount_ctl(false);
         params.setEventDomain_ctl(true);
-        params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
+        params.setEventDomain_val(DomainEnum.CODE_ENFORCEMENT);
         
         // all other event controls are off by default
         
@@ -1603,7 +1602,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setDate_end_val(LocalDateTime.now().plusDays(DAYS_IN_WEEK));
         params.setLimitResultCount_ctl(false);
         params.setEventDomain_ctl(true);
-        params.setEventDomain_val(EventDomainEnum.CODE_ENFORCEMENT);
+        params.setEventDomain_val(DomainEnum.CODE_ENFORCEMENT);
         
         // all other event controls are off by default
         

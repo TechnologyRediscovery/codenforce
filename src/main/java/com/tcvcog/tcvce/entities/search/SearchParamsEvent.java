@@ -6,7 +6,7 @@
 package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
+import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
@@ -31,7 +31,7 @@ public class        SearchParamsEvent
     
     // filter EVENT-3
     private boolean eventDomain_ctl;
-    private EventDomainEnum eventDomain_val;
+    private DomainEnum eventDomain_val;
     
     // filter EVENT-4
     private boolean eventDomainPK_ctl;
@@ -77,8 +77,8 @@ public class        SearchParamsEvent
    }
    
    
-   public EventDomainEnum[] getEventDomainList(){
-       EventDomainEnum[] domains = EventDomainEnum.values();
+   public DomainEnum[] getEventDomainList(){
+       DomainEnum[] domains = DomainEnum.values();
        return domains;
    }
    
@@ -190,14 +190,14 @@ public class        SearchParamsEvent
     /**
      * @return the eventDomain_val
      */
-    public EventDomainEnum getEventDomain_val() {
+    public DomainEnum getEventDomain_val() {
         return eventDomain_val;
     }
 
     /**
      * @param eventDomain_val the eventDomain_val to set
      */
-    public void setEventDomain_val(EventDomainEnum eventDomain_val) {
+    public void setEventDomain_val(DomainEnum eventDomain_val) {
         this.eventDomain_val = eventDomain_val;
     }
 

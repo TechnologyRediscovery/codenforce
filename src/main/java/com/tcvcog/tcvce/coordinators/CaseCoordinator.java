@@ -157,13 +157,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             System.out.println(ex);
         }
 
-        try {
-            cse.setFeeList(pi.getFeeAssigned(c));
+        // Skip payment stuff for now--i totally broke this stuff
 
-            cse.setPaymentListGeneral(pi.getPaymentList(c));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
+//        try {
+//            cse.setFeeList(pi.getFeeAssigned(c));
+//
+//            cse.setPaymentListGeneral(pi.getPaymentList(c));
+//        } catch (IntegrationException ex) {
+//            System.out.println(ex);
+//        }
         return cse;
     }
 
