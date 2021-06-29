@@ -351,7 +351,9 @@ public  class       EventCnF
 
     /**
      * @return the timeStartUtilDate
+     * @deprecated primefaces now supports LocalDateTime values
      */
+    @Deprecated
     public java.util.Date getTimeStartUtilDate() {
         return DateTimeUtil.convertUtilDate(timeStart);
     }
@@ -366,7 +368,9 @@ public  class       EventCnF
 
     /**
      * @return the timeEndUtilDate
+     * @deprecated primefaces now supports LocalDateTime values
      */
+    @Deprecated
     public java.util.Date getTimeEndUtilDate() {
         return DateTimeUtil.convertUtilDate(timeEnd);
     }
@@ -389,7 +393,9 @@ public  class       EventCnF
 
     /**
      * @param tsud
+     * @deprecated primefaces now supports LocalDateTime values
      */
+    @Deprecated
     public void setTimeStartUtilDate(java.util.Date tsud) {
         timeStart = DateTimeUtil.convertUtilDate(tsud);
     }
@@ -403,7 +409,9 @@ public  class       EventCnF
 
     /**
      * @param teud
+     * @deprecated primefaces now supports LocalDateTime values
      */
+    @Deprecated
     public void setTimeEndUtilDate(java.util.Date teud) {
         timeEnd = DateTimeUtil.convertUtilDate(teud);
     }

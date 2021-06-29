@@ -26,7 +26,7 @@ import com.tcvcog.tcvce.integration.PropertyIntegrator;
  * @author sylvia
  */
 public class OccPeriodPropertyUnitHeavy 
-        extends OccPeriod{
+        extends OccPeriod {
     
     protected PropertyUnitWithProp propUnitProp;
 

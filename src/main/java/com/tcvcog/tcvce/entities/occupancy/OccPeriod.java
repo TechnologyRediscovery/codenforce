@@ -439,28 +439,36 @@ public  class       OccPeriod
    
     /**
      * @return the startDateUtilDate
+     * @deprecated primefaces now supports LocalDateTime values
      */
+    @Deprecated
     public java.util.Date getStartDateUtilDate() {
         return DateTimeUtil.convertUtilDate(startDate);
     }
 
     /**
      * @return the endDateUtilDate
+     * @deprecated primefaces now supports LocalDateTime values
      */
+    @Deprecated
     public java.util.Date getEndDateUtilDate() {
         return DateTimeUtil.convertUtilDate(endDate);
     }
 
     /**
      * @param startDateUtilDate the startDateUtilDate to set
+     * @deprecated primefaces now supports LocalDateTime values
      */
+    @Deprecated
     public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
         startDate = DateTimeUtil.convertUtilDate(startDateUtilDate);
     }
 
     /**
      * @param endDateUtilDate the endDateUtilDate to set
+     * @deprecated primefaces now supports LocalDateTime values
      */
+    @Deprecated
     public void setEndDateUtilDate(java.util.Date endDateUtilDate) {
         endDate = DateTimeUtil.convertUtilDate(endDateUtilDate);
     }
@@ -519,13 +527,6 @@ public  class       OccPeriod
      */
     public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
         this.lastUpdatedTS = lastUpdatedTS;
-    }
-
-    /**
-     * @return the lastUpdatedUtilDate
-     */
-    public java.util.Date getLastUpdatedUtilDate() {
-        return DateTimeUtil.convertUtilDate(lastUpdatedTS);
     }
 
     /**
