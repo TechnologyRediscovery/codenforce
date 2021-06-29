@@ -218,7 +218,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                             throws      BObStatusException, 
                                         EventException, 
                                         IntegrationException{
-        
+
+
         if (ev == null || erg == null || ua == null) {
             throw new BObStatusException("Cannot process event with incomplete args");
         }
@@ -230,22 +231,20 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             ev.setOccPeriodID(erg.getBObID());
         } else if (erg instanceof CECase && ev.getCeCaseID() == 0) {
             ev.setCeCaseID(erg.getBObID());
-        } 
+        }
         
         configureEventTimes(ev, ua);
-        
-        LocalDateTime now = LocalDateTime.now();
-        
+
         // ****************
         // Event essentials
         // ****************
         ev.setUserCreator(ua);
         ev.setLastUpdatedBy(ua);
-        ev.setLastUpdatedTS(now);
+        ev.setLastUpdatedTS(LocalDateTime.now());
         
         ev.setActive(true);
         ev.setHidden(false);
-        
+
         // **********************************
         // Allow domain coordinators to check
         // **********************************
@@ -255,11 +254,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // position our primary event at the head of the list
         evsToAddQu.add(ev);
         // then let the other domain folks add to this stack if needed
-        
-            return addEvent_processStack(evsToAddQu);
-        
 
-        
+        return addEvent_processStack(evsToAddQu);
+
+
+
     }
     
     /**

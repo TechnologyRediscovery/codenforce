@@ -42,7 +42,6 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     private DomainEnum pageDomain;
 
     private IFace_EventHolder currentEventHolder;
-    private IFace_ActivatableBOB currentEventHolderBOB;
     private List<EventCnF> eventList = new ArrayList<>();
 
     private ViewOptionsActiveHiddenListsEnum eventListFilterMode;
@@ -94,11 +93,9 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         switch (pageDomain) {
             case CODE_ENFORCEMENT:
                 currentEventHolder = sb.getSessCECase();
-                currentEventHolderBOB = sb.getSessCECase();
                 break;
             case OCCUPANCY:
                 currentEventHolder = sb.getSessOccPeriod();
-                currentEventHolderBOB = sb.getSessOccPeriod();
                 break;
             case UNIVERSAL:
                 System.out.println("EventsBB reached universal case in updateEventHolder()--do something about this maybe?");
