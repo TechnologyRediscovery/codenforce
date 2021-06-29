@@ -40,7 +40,7 @@ public class    PropertyUnit
 
     public PropertyUnit(PropertyUnit input){
         unitID = input.getUnitID();
-        propertyID = input.getParcelkey();
+        parcelKey = input.getParcelKey();
         unitNumber = input.getUnitNumber();
         otherKnownAddress = input.getOtherKnownAddress();
         rentalIntentDateStart = input.getRentalIntentDateStart();
@@ -57,7 +57,7 @@ public class    PropertyUnit
     public int hashCode() {
         int hash = 5;
         hash = 43 * hash + this.unitID;
-        hash = 43 * hash + this.propertyID;
+        hash = 43 * hash + this.parcelKey;
         hash = 43 * hash + Objects.hashCode(this.unitNumber);
         hash = 43 * hash + Objects.hashCode(this.notes);
         hash = 43 * hash + Objects.hashCode(this.otherKnownAddress);
@@ -86,7 +86,7 @@ public class    PropertyUnit
         if (this.unitID != other.unitID) {
             return false;
         }
-        if (this.propertyID != other.propertyID) {
+        if (this.parcelKey != other.parcelKey) {
             return false;
         }
         if (this.active != other.active) {

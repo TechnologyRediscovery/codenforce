@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Business object representing a single code enforcement case
  * @author sylvia
  */
 public class        CECase 
@@ -83,7 +83,7 @@ public class        CECase
         publicControlCode = input.getPublicControlCode();
         paccEnabled = input.isPaccEnabled();
         allowForwardLinkedPublicAccess = input.isAllowForwardLinkedPublicAccess();
-        propertyID = input.getParcelkey();
+        propertyID = input.getp
         propertyUnitID = input.getPropertyUnitID();
         caseManager = input.getCaseManager();
         caseName = input.getCaseName();

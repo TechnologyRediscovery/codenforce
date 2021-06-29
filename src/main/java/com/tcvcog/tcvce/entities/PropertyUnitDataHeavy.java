@@ -26,10 +26,14 @@ import java.util.List;
  */
 public class        PropertyUnitDataHeavy 
         extends     PropertyUnit
-        implements  IFace_CredentialSigned{
+        implements  IFace_CredentialSigned,
+                    IFace_humanListHolder{
 
     private List<OccPeriod> periodList;
-    protected List<OccPeriodHumanLink> humans;
+    
+    protected LinkedHumanSchemaEnum humanLinkSchemaEnum;
+    protected List<HumanLink> humanLinkList;
+     
     
     private List<PropertyUnitChangeOrder> changeOrderList;
     
@@ -44,7 +48,7 @@ public class        PropertyUnitDataHeavy
         if(prop != null){
 
             this.unitID = prop.getUnitID();
-            this.propertyID = prop.getParcelkey();
+            this.parcelKey = prop.getParcelKey();
             this.unitNumber = prop.getUnitNumber();
 
             this.notes = prop.getNotes();
@@ -101,18 +105,31 @@ public class        PropertyUnitDataHeavy
         this.changeOrderList = changeOrderList;
     }
 
-    /**
-     * @return the humans
-     */
-    public List<OccPeriodHumanLink> getHumans() {
-        return humans;
+    
+    @Override
+    public List<HumanLink> getHumanLinkList() {
+        return humanLinkList;
     }
 
-    /**
-     * @param humans the humans to set
-     */
-    public void setHumans(List<OccPeriodHumanLink> humans) {
-        this.humans = humans;
+    @Override
+    public void setHumanLinkList(List<HumanLink> hll) {
+        humanLinkList = hll;
     }
 
+    @Override
+    public LinkedHumanSchemaEnum getLinkSchema() {
+        return humanLinkSchemaEnum;
+    }
+
+    @Override
+    public void setLinkSchema(LinkedHumanSchemaEnum lhse) {
+        humanLinkSchemaEnum = lhse;
+    }
+
+    @Override
+    public int getHostPK() {
+        return parcelKey;
+    }
+    
+    
 }

@@ -72,7 +72,7 @@ public class PropertyUnitChangesBB
         //let's grab the latest copy of the prop from the database and set it on the session bean
         try {
 
-            Property dbProp = pc.getProperty(currProp.getParcelkey());
+            Property dbProp = pc.getProperty(currProp.getParcelKey());
 
             currProp = pc.assemblePropertyDataHeavy(dbProp, getSessionBean().getSessUser());
 

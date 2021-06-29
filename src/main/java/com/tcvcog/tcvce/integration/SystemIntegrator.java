@@ -986,11 +986,11 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 stmt = con.prepareStatement(insertSB.toString());
                 
                 stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getParcelkey());
+                stmt.setInt(2, p.getParcelKey());
 
                 stmt.execute();
 
-                System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getParcelkey());
+                System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getParcelKey());
             } else if (ob instanceof CECaseDataHeavy) {
                 CECaseDataHeavy c = (CECaseDataHeavy) ob;
                 
@@ -1100,7 +1100,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 selectSB.append("AND property_propertyid = ? ");
                 stmt = con.prepareStatement(selectSB.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getParcelkey());
+                stmt.setInt(2, p.getParcelKey());
                 rs = stmt.executeQuery();
                 if (rs.first()) {
                     // history entry with this user and person already exists
@@ -1113,9 +1113,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 }
                 // each UPDATE and INSERT SQL structures take the params in this order
                 stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getParcelkey());
+                stmt.setInt(2, p.getParcelKey());
                 stmt.execute();
-                System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getParcelkey());
+                System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getParcelKey());
             } else if (ob instanceof CECaseDataHeavy) {
                 CECaseDataHeavy c = (CECaseDataHeavy) ob;
                 // prepare SELECT statement

@@ -88,7 +88,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
         SessionBean s = getSessionBean();
         try {
             String propertyAddress = s.getSessProperty().getAddress();
-            String propertyId = String.valueOf(s.getSessProperty().getParcelkey());
+            String propertyId = String.valueOf(s.getSessProperty().getParcelKey());
             return "Current Property: " + propertyAddress + " | ID: " + propertyId;
         } catch (Exception ex) {
             return "Current Property: " + " | ID: ";

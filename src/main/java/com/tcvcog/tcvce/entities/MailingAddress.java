@@ -26,8 +26,8 @@ public  class   MailingAddress
         extends TrackedEntity
         implements  IFace_keyIdentified,
                     IFace_noteHolder{ 
-    final String TABLE_NAME = "mailingaddress";
-    
+    final static String TABLE_NAME = "mailingaddress";
+    final static String PK_FIELD = "addressid";
     
     protected int addressID;
     protected String buildingNo;
@@ -168,22 +168,14 @@ public  class   MailingAddress
         this.source = source;
     }
 
-    @Override
-    public boolean isDeactivated() {
-        return deactivatedTS != null;
-    }
-
+    
 
     @Override
     public int getDBKey() {
         return addressID;
     }
 
-    @Override
-    public String getTableName() {
-        return TABLE_NAME;
-    }
-
+    
     @Override
     public String getNotes() {
         return notes;
@@ -206,6 +198,16 @@ public  class   MailingAddress
      */
     public void setStreet(String street) {
         this.street = street;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return PK_FIELD;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return TABLE_NAME;
     }
     
 }

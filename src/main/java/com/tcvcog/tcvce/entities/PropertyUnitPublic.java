@@ -28,7 +28,7 @@ public  class       PropertyUnitPublic
         implements  Serializable{
     
     protected int unitID;
-    protected int propertyID;
+    protected int parcelKey;
     protected String unitNumber;
     protected String otherKnownAddress;
     protected LocalDateTime rentalIntentDateStart;
@@ -71,17 +71,17 @@ public  class       PropertyUnitPublic
     }
 
     /**
-     * @return the propertyID
+     * @return the parcelKey
      */
-    public int getPropertyID() {
-        return propertyID;
+    public int getParcelKey() {
+        return parcelKey;
     }
 
     /**
-     * @param propertyID the propertyID to set
+     * @param parcelKey the parcelKey to set
      */
-    public void setPropertyID(int propertyID) {
-        this.propertyID = propertyID;
+    public void setParcelKey(int parcelKey) {
+        this.parcelKey = parcelKey;
     }
     
 }

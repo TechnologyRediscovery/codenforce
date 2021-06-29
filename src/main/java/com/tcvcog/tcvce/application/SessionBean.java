@@ -481,7 +481,7 @@ public class    SessionBean
                 // make sure property is the one hosting the case
                 sessCECase = csedh;
                 
-                sessProperty = pc.assemblePropertyDataHeavy(pc.getProperty(cse.getParcelkey()), ua);
+                sessProperty = pc.assemblePropertyDataHeavy(pc.getProperty(cse.getParcelKey()), ua);
                 sessPropertyList = pc.assemblePropertyHistoryList(ua.getKeyCard());
                 
                 sessCECaseList = sessProperty.getCeCaseList();

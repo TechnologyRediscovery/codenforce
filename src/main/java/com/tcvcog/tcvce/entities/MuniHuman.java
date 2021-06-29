@@ -26,7 +26,7 @@ public class MuniHuman
         extends Human 
         implements IFace_trackedEntityLink{
     
-    final static LinkedObjectRoleSchemaEnum ROLE_SCHEMA = LinkedObjectRoleSchemaEnum.MUNIHUMAN;
+    final static LinkedHumanSchemaEnum ROLE_SCHEMA = LinkedHumanSchemaEnum.MUNIHUMAN;
     
     protected LinkedObjectRole linkRole;
     
@@ -234,7 +234,7 @@ public class MuniHuman
     }
 
     @Override
-    public LinkedObjectRoleSchemaEnum getLinkedObjectRoleSchemaEnum() {
+    public LinkedHumanSchemaEnum getLinkedObjectRoleSchemaEnum() {
         return ROLE_SCHEMA;
     }
 

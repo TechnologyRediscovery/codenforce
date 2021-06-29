@@ -75,10 +75,14 @@ public class PersonEditPublicBB extends BackingBeanUtils implements Serializable
 //        clonePerson.setPersonType(getSessionBean().getActivePersonType());
     }
     
-    public String addCloneToApplicantPersons(Person clone) throws IntegrationException{
+    public String addCloneToApplicantPersons(OccApplicationHumanLink clone) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
-        pi.updatePerson(clone);
-        getSessionBean().getSessOccPermitApplication().getAttachedPersons().add((OccApplicationHumanLink) clone);
+        
+//        TODO: Yikes! No intergrator calls here
+//          TODO: JURPLEL please udpdate to work with MVC and humanization
+//        pi.updatePerson(clone);
+        
+        getSessionBean().getSessOccPermitApplication().getAttachedPersons().add(clone);
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
         oc.verifyOccPermitPersonsRequirement(getSessionBean().getSessOccPermitApplication());

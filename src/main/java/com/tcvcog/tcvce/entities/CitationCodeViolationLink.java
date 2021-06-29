@@ -31,7 +31,7 @@ public class CitationCodeViolationLink
         extends CodeViolation
         implements IFace_trackedEntityLink{
     
-    final static LinkedObjectRoleSchemaEnum ROLE_SCHEMA = LinkedObjectRoleSchemaEnum.CITATIONCODEVIOLATION;
+    final static LinkedHumanSchemaEnum ROLE_SCHEMA = LinkedHumanSchemaEnum.CITATIONCODEVIOLATION;
     
     protected int citationViolationID;
     protected LinkedObjectRole linkRole;
@@ -238,7 +238,7 @@ public class CitationCodeViolationLink
     }
 
     @Override
-    public LinkedObjectRoleSchemaEnum getLinkedObjectRoleSchemaEnum() {
+    public LinkedHumanSchemaEnum getLinkedObjectRoleSchemaEnum() {
         return ROLE_SCHEMA;
     }
 

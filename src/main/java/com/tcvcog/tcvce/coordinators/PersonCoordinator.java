@@ -24,11 +24,12 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.Human;
+import com.tcvcog.tcvce.entities.IFace_humanListHolder;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
-import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.PersonWithChanges;
 import com.tcvcog.tcvce.entities.Property;
@@ -37,6 +38,7 @@ import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
+import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -47,7 +49,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * The master controller class for Humans and their Java incarnation called
+ * Person, which is a human with a list of its Addresses, Emails, and Phone numbers
+ * 
  * @author ellen bascomb of apt 31y
  */
 public class PersonCoordinator extends BackingBeanUtils implements Serializable{
@@ -63,15 +67,67 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * Logic intermediary for receiving requests for a Person 
-     * @param personID
-     * @return
-     * @throws IntegrationException 
+     * Primary retrieval method for extracting Humans from the DB
+     * Remember a Human has a name, DOB, and stuff like that, but NO
+     * Addresses, Emails, or Phone numbers--get a Person instead
+     * 
+     * @param humanID
+     * @return the Human object 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public Person getPerson(int personID) throws IntegrationException{
+    public Human getHuman(int humanID) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        if(humanID == 0){
+            return null;
+        }
+        return configureHuman(pi.getHuman(humanID));
+    }
+    
+    
+    /**
+     * Access point for retrieving and injecting a list of Human objects
+     * associated with a Business Object
+     * 
+     * @param hlh BOB implementing this interface
+     * @return The BOB with Humans and their link metatadata already assembled.
+     * Note the caller will probably want to cast back to the original type
+     */
+    public IFace_humanListHolder assembleLinkedHumanLinks(IFace_humanListHolder hlh){
         PersonIntegrator pi = getPersonIntegrator();
         
-        if(personID == 0){
+        
+        
+        
+    }
+    
+    /**
+     * Logic container for configuring a Human object =
+     * @param hum
+     * @return 
+     */
+    private Human configureHuman(Human hum){
+        
+        
+        // config logic for Human's go heres
+  
+        return hum;
+    
+    
+    }
+    
+    
+    
+    
+    /**
+     * A Person is a Human with lists of MailingAddresses, phone numbers, and emails
+     * @param hum
+     * @return the fully-baked human (i.e. a person)
+     * @throws IntegrationException 
+     */
+    public Person getPerson(Human hum) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        
+        if(hum != null){
             return null;
         }
         
@@ -111,7 +167,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
                 
             } else {
 
-               pdh = new PersonDataHeavy(getPerson(pers.getHumanID()), cred);
+               pdh = new PersonDataHeavy(getPerson(pers), cred);
                SearchCoordinator sc = getSearchCoordinator();
 
                try {
@@ -148,10 +204,11 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param p
      * @return the configured person
      */
-    private Person configurePerson(Person p){
+    private Person configurePerson(Person p) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
+        PropertyIntegrator propi = getPropertyIntegrator();
         
-        p.setAddressList();
+        p.setAddressList(propi.getMailingAddressListByHuman(p.getHumanID()));
         p.setPhoneList(pi.getContactPhoneList(p.getHumanID()));
         p.setEmailList(pi.getContactEmailList(p.getHumanID()));
         
@@ -595,6 +652,15 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return person;
     }
     
+    /**
+     * Attempt at archiving state of a pre-human person
+     * to track changes to field names; come up with new approach
+     * Post humanization
+     * 
+     * @deprecated 
+     * @param p
+     * @return 
+     */
     public String dumpPerson(Person p){
         SystemCoordinator sc = getSystemCoordinator();
         StringBuilder sb = new StringBuilder();
@@ -610,15 +676,15 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         sb.append(Constants.FMT_HTML_BREAK);
         
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getPersonType().getLabel());
+//        sb.append(p.getPersonType().getLabel());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getMuniCode());
+//        sb.append(p.getMuniCode());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getMuniName());
+//        sb.append(p.getMuniName());
         sb.append(Constants.FMT_HTML_BREAK);
 
         if(p.getSource() != null){
@@ -628,11 +694,11 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         }
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getCreatorUserID());
+//        sb.append(p.getCreatorUserID());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getCreationTimeStamp());
+//        sb.append(p.getCreationTimeStamp());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
@@ -644,7 +710,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.isCompositeLastName());
+//        sb.append(p.isCompositeLastName());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
@@ -656,15 +722,15 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getPhoneCell());
+//        sb.append(p.getPhoneCell());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getPhoneHome());
+//        sb.append(p.getPhoneHome());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getPhoneWork());
+//        sb.append(p.getPhoneWork());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
@@ -688,27 +754,27 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.isUseSeparateMailingAddress());
+//        sb.append(p.isUseSeparateMailingAddress());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getMailingAddressStreet());
+//        sb.append(p.getMailingAddressStreet());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getMailingAddressThirdLine());
+//        sb.append(p.getMailingAddressThirdLine());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getMailingAddressCity());
+//        sb.append(p.getMailingAddressCity());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getMailingAddressZip());
+//        sb.append(p.getMailingAddressZip());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getMailingAddressState());
+//        sb.append(p.getMailingAddressState());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
@@ -716,27 +782,27 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getLastUpdated());
+//        sb.append(p.getLastUpdated());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getLastUpdatedPretty());
+//        sb.append(p.getLastUpdatedPretty());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.isCanExpire());
+//        sb.append(p.isCanExpire());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getExpiryDate());
+//        sb.append(p.getExpiryDate());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getExpireString());
+//        sb.append(p.getExpireString());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getExpiryNotes());
+//        sb.append(p.getExpiryNotes());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
@@ -744,7 +810,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getLinkedUserID());
+//        sb.append(p.getLinkedUserID());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
@@ -752,55 +818,55 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getVerifiedByUserID());
+//        sb.append(p.getVerifiedByUserID());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.isReferencePerson());
+//        sb.append(p.isReferencePerson());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getGhostCreatedDate());
+//        sb.append(p.getGhostCreatedDate());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getGhostCreatedDatePretty());
+//        sb.append(p.getGhostCreatedDatePretty());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getGhostOf());
+//        sb.append(p.getGhostOf());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getGhostCreatedByUserID());
+//        sb.append(p.getGhostCreatedByUserID());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getCloneCreatedDate());
+//        sb.append(p.getCloneCreatedDate());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getCloneCreatedDatePretty());
+//        sb.append(p.getCloneCreatedDatePretty());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getCloneOf());
+//        sb.append(p.getCloneOf());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getCloneCreatedByUserID());
+//        sb.append(p.getCloneCreatedByUserID());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getGhostsList());
+//        sb.append(p.getGhostsList());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getCloneList());
+//        sb.append(p.getCloneList());
         sb.append(Constants.FMT_HTML_BREAK);
 
         sb.append(Constants.FMT_FIELDKVSEP_WSPACE);
-        sb.append(p.getMergedList());
+//        sb.append(p.getMergedList());
         sb.append(Constants.FMT_HTML_BREAK);
         
         return sb.toString();

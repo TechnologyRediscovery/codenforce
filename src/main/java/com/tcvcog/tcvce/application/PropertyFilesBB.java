@@ -87,7 +87,7 @@ public class PropertyFilesBB
 //            blob.setBytes(ev.getFile().getContents());  // set bytes
             blob.setFilename(ev.getFile().getFileName());
             
-            int municode = currProp.getMuniCode();
+            int municode = currProp.getMuni().getMuniCode();
             
             if(municode == 0){
                 municode = currProp.getMuni().getMuniCode();
@@ -107,7 +107,7 @@ public class PropertyFilesBB
             
             BlobIntegrator blobi = getBlobIntegrator();
             
-            blobi.linkBlobToProperty(blob.getPhotoDocID(), currProp.getParcelkey());
+            blobi.linkBlobToProperty(blob.getPhotoDocID(), currProp.getParcelKey());
             
         } catch (IntegrationException | IOException ex) {
             System.out.println("PropertyFilesBB.handleFileUpload | " + ex);

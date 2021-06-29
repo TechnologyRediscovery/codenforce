@@ -973,7 +973,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         if (selectedRequest != null) {
 
             try {
-                caseListForSelectedProperty = ci.getCECasesByProp(selectedRequest.getRequestProperty().getParcelkey());
+                caseListForSelectedProperty = ci.getCECasesByProp(selectedRequest.getRequestProperty().getParcelKey());
                 System.out.println("CEActionRequestsBB.getCaseListForSelectedProperty | case list size: " + caseListForSelectedProperty.size());
             } catch (IntegrationException | BObStatusException ex) {
                 System.out.println(ex);

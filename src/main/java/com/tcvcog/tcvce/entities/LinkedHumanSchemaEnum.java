@@ -22,28 +22,27 @@ package com.tcvcog.tcvce.entities;
  * 
  * @author sylvia
  */
-public enum LinkedObjectRoleSchemaEnum {
+public enum LinkedHumanSchemaEnum {
     
-    OCCAPPLICATIONHUMAN ("occpermitapplicationhuman","OccApplicationHuman", "???"),  // for Jurplel to update
-    CECASEHUMAN ("humancecase", "CECaseHuman", "linkid"), 
-    OCCPERIODHUMAN ("humanoccperiod","OccPeriodHuman", ""), 
-    PARCELHUMAN ("humanparcel","ParcelHuman", ""), 
-    PARCELUNITHUMAN ("humanparcelunit","ParcelUnitHuman", ""), 
-    CITATIONHUMAN ("citationhuman","CitationHuman", ""), 
-    CITATIONCODEVIOLATION ("citationcodeviolation","CitationCodeViolation", ""),
-    EVENTHUMAN ("eventhuman","EventHuman", ""), 
-    MAILINGADDRESSHUMAN ("humanmailingaddress","MailingaddressHuman", ""), 
-    PARCELMAILINGADDRESS  ("parcelmailingaddress","ParcelMailingaddress", ""),
-    MUNIHUMAN ("humanmuni","MuniHuman","");
+    OCCAPPLICATIONHUMAN ("occpermitapplicationhuman","OccApplicationHuman", "???", ""),  // for Jurplel to update
+    CECASEHUMAN ("humancecase", "CECaseHuman", "linkid", "cecase_caseid"), 
+    OCCPERIODHUMAN ("humanoccperiod","OccPeriodHuman", "linkid", "occperiod_periodid"), 
+    PARCELHUMAN ("humanparcel","ParcelHuman", "linkid", "parcel_parcelkey"), 
+    PARCELUNITHUMAN ("humanparcelunit","ParcelUnitHuman", "linkid", "parcelunit_unitid"), 
+    CITATIONHUMAN ("citationhuman","CitationHuman", "linkid", "citation_citationid"), 
+    EVENTHUMAN ("eventhuman","EventHuman", "linkid", "event_eventid"), 
+    MUNIHUMAN ("humanmuni","MuniHuman","linkid", "muni_municode");
     
     private final String LINKED_TABLE_NAME;
     private final String LINK_ROLE_SCHEMA_TYPE_STRING;
-    private final String LINKED_TABLE_PK;
-    
-    private LinkedObjectRoleSchemaEnum(String ltn, String ts, String pk){
+    private final String LINKING_TABLE_PK_FIELD;
+    private final String TARGET_TABLE_FK_FIELD;
+
+    private LinkedHumanSchemaEnum(String ltn, String ts, String ltpk, String ttfk){
         LINKED_TABLE_NAME = ltn;
         LINK_ROLE_SCHEMA_TYPE_STRING = ts;
-        LINKED_TABLE_PK = pk;
+        LINKING_TABLE_PK_FIELD = ltpk;
+        TARGET_TABLE_FK_FIELD = ttfk;
     }
     
     public String getLinkedTableName(){
@@ -55,7 +54,11 @@ public enum LinkedObjectRoleSchemaEnum {
     }
     
     public String getLinkedTablePKField(){
-        return LINKED_TABLE_PK;
+        return LINKING_TABLE_PK_FIELD;
+    }
+    
+    public String getTargetTableFKField(){
+        return TARGET_TABLE_FK_FIELD;
     }
     
 }

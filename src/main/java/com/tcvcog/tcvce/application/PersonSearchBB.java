@@ -269,7 +269,8 @@ public class PersonSearchBB extends BackingBeanUtils{
         PersonCoordinator pc = getPersonCoordinator();
         // keep a stashed copy of our oroginal field values to write to notes
         // on a succesful update
-        fieldDump = pc.dumpPerson(currentPerson);
+        // TODO: create way to track changes in humanization schema
+
         
         
     }

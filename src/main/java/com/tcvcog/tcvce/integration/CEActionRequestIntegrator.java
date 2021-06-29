@@ -196,7 +196,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             stmt.setInt(2, actionRequest.getMuni().getMuniCode());
 
             if (actionRequest.isIsAtKnownAddress()) {
-                stmt.setInt(3, actionRequest.getRequestProperty().getParcelkey());
+                stmt.setInt(3, actionRequest.getRequestProperty().getParcelKey());
                 actionRequest.setAddressOfConcern(actionRequest.getRequestProperty().getAddress());
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
@@ -478,7 +478,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(q);
-            stmt.setInt(1, req.getRequestProperty().getParcelkey());
+            stmt.setInt(1, req.getRequestProperty().getParcelKey());
             stmt.setInt(2, req.getRequestID());
             System.out.println("CEActionRequestorIntegrator.updateActionRequestProperty | statement: " + stmt.toString());
             // Retrieve action data from postgres
@@ -940,7 +940,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 }
                 
                 if(params.isProperty_ctl()){
-                    stmt.setInt(++paramCounter, params.getProperty_val().getParcelkey());
+                    stmt.setInt(++paramCounter, params.getProperty_val().getParcelKey());
                 }
                 
 

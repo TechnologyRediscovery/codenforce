@@ -21,12 +21,14 @@ import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.EventRuleImplementation;
+import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
+import com.tcvcog.tcvce.entities.IFace_humanListHolder;
+import com.tcvcog.tcvce.entities.LinkedHumanSchemaEnum;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
 import com.tcvcog.tcvce.entities.Proposal;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
@@ -47,13 +49,15 @@ import java.util.List;
 public  class       OccPeriodDataHeavy 
         extends     OccPeriod 
         implements  IFace_EventRuleGoverned, 
-                    IFace_CredentialSigned{
+                    IFace_CredentialSigned,
+                    IFace_humanListHolder{
     
     protected OccPeriodStatusEnum status;
 
     private List<OccPermitApplication> applicationList;
-    private List<OccApplicationHumanLink> personListApplicants;
-    private List<Person> personList;
+    
+    protected LinkedHumanSchemaEnum humanLinkSchemaEnum;
+    protected List<HumanLink> humanLinkList;
     
     private List<Proposal> proposalList;
     private List<EventRuleImplementation> eventRuleList;
@@ -423,20 +427,7 @@ public  class       OccPeriodDataHeavy
         this.status = status;
     }
 
-    /**
-     * @param personList the personList to set
-     */
-    public void setPersonList(List<Person> personList) {
-        this.personList = personList;
-    }
-    
-    public List<Person> getPersonList(){
-        return personList;
-    }
-    
-    public List<OccApplicationHumanLink> getPersonListApplicants(){
-        return personListApplicants;
-    }
+  
 
     @Override
     public boolean isOpen() {
@@ -447,8 +438,31 @@ public  class       OccPeriodDataHeavy
         }
         
     }
+ @Override
+    public List<HumanLink> getHumanLinkList() {
+        return humanLinkList;
+    }
 
+    @Override
+    public void setHumanLinkList(List<HumanLink> hll) {
+        humanLinkList = hll;
+    }
+
+    @Override
+    public LinkedHumanSchemaEnum getLinkSchema() {
+        return humanLinkSchemaEnum;
+    }
+
+    @Override
+    public void setLinkSchema(LinkedHumanSchemaEnum lhse) {
+        humanLinkSchemaEnum = lhse;
+    }
    
+    @Override
+    public int getHostPK() {
+        return periodID;
+    }
+
    
     
 }

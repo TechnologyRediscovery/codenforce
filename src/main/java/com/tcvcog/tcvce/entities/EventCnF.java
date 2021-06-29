@@ -33,11 +33,16 @@ public  class       EventCnF
         extends     BOb
         implements  Comparable<EventCnF>,
                     IFace_Loggable,
-                    IFace_ActivatableBOB{
+                    IFace_ActivatableBOB,
+                    IFace_humanListHolder{
     
     protected int eventID;
     protected EventCategory category;
     protected String description;
+    
+    
+    protected LinkedHumanSchemaEnum humanLinkSchemaEnum;
+    protected List<HumanLink> humanLinkList;
     
     /**
      * Indicates to clients which BOb identifier to use
@@ -436,4 +441,31 @@ public  class       EventCnF
         this.lastUpdatedTS = lastUpdatedTS;
     }
    
+    
+    @Override
+    public List<HumanLink> getHumanLinkList() {
+        return humanLinkList;
+    }
+
+    @Override
+    public void setHumanLinkList(List<HumanLink> hll) {
+        humanLinkList = hll;
+    }
+
+    @Override
+    public LinkedHumanSchemaEnum getLinkSchema() {
+        return humanLinkSchemaEnum;
+    }
+
+    @Override
+    public void setLinkSchema(LinkedHumanSchemaEnum lhse) {
+        humanLinkSchemaEnum = lhse;
+    }
+
+    @Override
+    public int getHostPK() {
+        return eventID;
+    }
+
+    
 }

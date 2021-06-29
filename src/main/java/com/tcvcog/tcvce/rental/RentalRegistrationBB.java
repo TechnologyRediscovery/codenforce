@@ -395,7 +395,7 @@ public class RentalRegistrationBB extends BackingBeanUtils implements Serializab
      */
     public String selectPropertyUnit(PublicInfoBundlePropertyUnit unit) {
 
-        unit.getBundledUnit().setPropertyID(getSessionBean().getOccPermitAppActiveProp().getBundledProperty().getParcelkey());
+        unit.getBundledUnit().setParcelKey(getSessionBean().getOccPermitAppActiveProp().getBundledProperty().getParcelKey());
         getSessionBean().setOccPermitAppActivePropUnit(unit);
         getSessionBean().getNavStack().pushCurrentPage();
 
@@ -795,7 +795,7 @@ public class RentalRegistrationBB extends BackingBeanUtils implements Serializab
         int changedbyID = applicant.getBundledPerson().getHumanID();
         
         //Grab the unit list that is currently attached to the property in the database
-        Property existingProp = pc.getProperty(prop.getBundledProperty().getParcelkey());
+        Property existingProp = pc.getProperty(prop.getBundledProperty().getParcelKey());
 
         //Export the workingPropUnits list from PublicInfoBundles to units. This should preserve changes made by the user.
         for (PublicInfoBundlePropertyUnit bundle : workingPropUnits) {
@@ -825,7 +825,7 @@ public class RentalRegistrationBB extends BackingBeanUtils implements Serializab
 
             if (workingUnit != null && added == true) {
 
-                workingUnit.setPropertyID(existingProp.getParcelkey());
+                workingUnit.setParcelKey(existingProp.getParcelKey());
 
                 workingUnit.setUnitID(pri.insertPropertyUnit(workingUnit));
 

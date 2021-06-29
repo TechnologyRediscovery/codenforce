@@ -237,7 +237,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                 }
                 
                 if (params.isProperty_ctl()) {
-                    stmt.setInt(++paramCounter, params.getProperty_val().getParcelkey());
+                    stmt.setInt(++paramCounter, params.getProperty_val().getParcelKey());
                 }
                 
                 if (params.isPropertyUnit_ctl()) {
@@ -446,7 +446,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                 }
                 // Violation set 1
                 if (params.isProperty_ctl()) {
-                    stmt.setInt(++paramCounter, params.getProperty_val().getParcelkey());
+                    stmt.setInt(++paramCounter, params.getProperty_val().getParcelKey());
                 }
                 
                 // violation set 2
@@ -2819,7 +2819,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, prop.getParcelkey());
+            stmt.setInt(1, prop.getParcelKey());
             rs = stmt.executeQuery();
             
             while(rs.next()){

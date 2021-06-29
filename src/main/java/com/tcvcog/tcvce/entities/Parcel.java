@@ -31,22 +31,21 @@ public  class Parcel
     final static String PKFIELD = "parcelkey";
     
     
-    
-    private int parcelkey;
-    private String countyParcelID;
-    private String lotAndBlock;
-    private Municipality muni;
-    private BOBSource source;
+    protected int parcelKey;
+    protected String countyParcelID;
+    protected String lotAndBlock;
+    protected Municipality muni;
+    protected BOBSource source;
     protected String notes;
     
     protected ParcelInfo parcelInfo;
     
 
     /**
-     * @return the parcelkey
+     * @return the parcelKey
      */
-    public int getParcelkey() {
-        return parcelkey;
+    public int getParcelKey() {
+        return parcelKey;
     }
 
     /**
@@ -66,10 +65,10 @@ public  class Parcel
  
 
     /**
-     * @param parcelkey the parcelkey to set
+     * @param parcelKey the parcelKey to set
      */
-    public void setParcelkey(int parcelkey) {
-        this.parcelkey = parcelkey;
+    public void setParcelKey(int parcelKey) {
+        this.parcelKey = parcelKey;
     }
 
     /**
@@ -164,7 +163,7 @@ public  class Parcel
 
     @Override
     public int getDBKey() {
-        return parcelkey;
+        return parcelKey;
     }
 
    

@@ -362,22 +362,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         return muniCodeNameMap;
     }
 
-    /**
-     * Experimental method--decided to let respective Coordinators do this
-     *
-     * @deprecated
-     * @param obj
-     * @return
-     */
-    public String generateFieldDumpString(BOb obj) {
-        String dump = obj.toString();
-        PersonCoordinator pc = getPersonCoordinator();
-
-        if (obj instanceof Person) {
-            return pc.dumpPerson((Person) obj);
-        }
-        return dump;
-    }
 
     /**
      * @param muniCodeNameMap the muniCodeNameMap to set

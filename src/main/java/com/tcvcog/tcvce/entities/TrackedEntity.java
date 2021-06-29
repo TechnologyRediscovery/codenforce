@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * Base class for entities created during humanization
  * that contains creation, update, deactivation fields
+ * 
  * @author sylvia
  */
 public abstract class   TrackedEntity 
@@ -73,7 +74,7 @@ public abstract class   TrackedEntity
     /**
      * @return the lastupdatedBy
      */
-    public User getLastupdatedBy() {
+    public User getLastUpdatedBy() {
         return lastupdatedBy;
     }
 

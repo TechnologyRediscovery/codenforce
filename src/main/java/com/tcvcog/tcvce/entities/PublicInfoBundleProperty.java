@@ -39,7 +39,7 @@ public class PublicInfoBundleProperty extends PublicInfoBundle {
     @Override
     public String toString(){
         
-        return this.getClass().getName() + bundledProperty.getParcelkey();
+        return this.getClass().getName() + bundledProperty.getParcelKey();
     }
 
     public Property getBundledProperty() {

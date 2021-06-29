@@ -31,27 +31,20 @@ import java.util.List;
  */
 public  class       PropertyDataHeavy 
         extends     Property 
-        implements  IFace_CredentialSigned{
+        implements  IFace_CredentialSigned,
+                    IFace_humanListHolder{
+    
+    protected LinkedHumanSchemaEnum humanLinkSchemaEnum;
+    protected List<HumanLink> humanLinkList;
     
     
     private List<CECasePropertyUnitHeavy> ceCaseList;
-    
     private List<PropertyUnitDataHeavy> unitWithListsList;
-    
-    /**
-     * @deprecated  replaced by Humans!
-     */
-    private List<Person> personList;
-    
-    protected List<ParcelHumanLink> humans;
-    
     private List<CECaseDataHeavy> propInfoCaseList;
-    
     private List<BlobLight> blobList;
+    private List<PropertyExtData> extDataList;
     
     private String credentialSignature;
-    
-    private List<PropertyExtData> extDataList;
     
     public PropertyDataHeavy(){
         
@@ -178,26 +171,12 @@ public  class       PropertyDataHeavy
     }
 
 
-    /**
-     * @return the personList
-     */
-    public List<Person> getPersonList() {
-        return personList;
-    }
 
     /**
      * @param ceCaseList the ceCaseList to set
      */
     public void setCeCaseList(List<CECasePropertyUnitHeavy> ceCaseList) {
         this.ceCaseList = ceCaseList;
-    }
-
-
-    /**
-     * @param personList the personList to set
-     */
-    public void setPersonList(List<Person> personList) {
-        this.personList = personList;
     }
 
 
@@ -257,21 +236,34 @@ public  class       PropertyDataHeavy
         this.extDataList = extDataList;
     }
 
-    /**
-     * @return the humans
-     */
-    public List<ParcelHumanLink> getHumans() {
-        return humans;
+   
+
+
+   @Override
+    public List<HumanLink> getHumanLinkList() {
+        return humanLinkList;
     }
 
-    /**
-     * @param humans the humans to set
-     */
-    public void setHumans(List<ParcelHumanLink> humans) {
-        this.humans = humans;
+    @Override
+    public void setHumanLinkList(List<HumanLink> hll) {
+        humanLinkList = hll;
     }
 
+    @Override
+    public LinkedHumanSchemaEnum getLinkSchema() {
+        return humanLinkSchemaEnum;
+    }
 
-  
+    @Override
+    public void setLinkSchema(LinkedHumanSchemaEnum lhse) {
+        humanLinkSchemaEnum = lhse;
+    }
+
+    
+    @Override
+    public int getHostPK() {
+        return parcelKey;
+    }
+
     
 }

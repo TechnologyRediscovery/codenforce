@@ -19,21 +19,18 @@ package com.tcvcog.tcvce.entities;
 import java.time.LocalDateTime;
 
 /**
- * Represents a human connected to a parcel
+ * Attachment metatdata container for Humans connected to any number of BOBs
  * 
  * @author Ellen Bascomb of Apartment 31Y
  */
-public class ParcelHumanLink 
-        extends Human
-        implements IFace_trackedEntityLink{
-    
-    final static LinkedObjectRoleSchemaEnum ROLE_SCHEMA = LinkedObjectRoleSchemaEnum.PARCELHUMAN;
+public class        HumanLink 
+        extends     Human
+        implements  IFace_trackedEntityLink{
     
     protected int linkID;
-    protected int parcelKey;
-    protected BOBSource linkSource;
     
     protected LinkedObjectRole linkRole;
+    protected BOBSource linkSource;
     
     protected LocalDateTime linkCreatedTS;
     protected User linkCreatedBy;
@@ -45,8 +42,8 @@ public class ParcelHumanLink
     protected User linkDeactivatedBy;
     
     protected String linkNotes;
-
-    public ParcelHumanLink(Human h){
+    
+    public HumanLink(Human h){
         
         this.humanID = h.humanID;
         this.name = h.name;
@@ -67,56 +64,9 @@ public class ParcelHumanLink
         this.lastupdatedBy = h.lastupdatedBy;
         this.deactivatedTS = h.deactivatedTS;
         this.deactivatedBy = h.deactivatedBy;
-        
-        
-        
     }
     
-    /**
-     * @return the linkID
-     */
-    public int getLinkID() {
-        return linkID;
-    }
-
-    /**
-     * @param linkID the linkID to set
-     */
-    public void setLinkID(int linkID) {
-        this.linkID = linkID;
-    }
-
-    /**
-     * @return the linkSource
-     */
-    public BOBSource getLinkSource() {
-        return linkSource;
-    }
-
-    /**
-     * @param linkSource the linkSource to set
-     */
-    public void setLinkSource(BOBSource linkSource) {
-        this.linkSource = linkSource;
-    }
-
-    /**
-     * @return the parcelKey
-     */
-    public int getParcelKey() {
-        return parcelKey;
-    }
-
-   
-
-    /**
-     * @param parcelKey the parcelKey to set
-     */
-    public void setParcelKey(int parcelKey) {
-        this.parcelKey = parcelKey;
-    }
-
-    /**
+     /**
      * @param humanID the humanID to set
      */
     @Override
@@ -216,10 +166,11 @@ public class ParcelHumanLink
     public boolean isLinkDeactivated() {
         return linkDeactivatedTS != null;
     }
-    
+
+ 
     
 
-  
+    
     /**
      * @param linkCreatedTS the linkCreatedTS to set
      */
@@ -244,24 +195,11 @@ public class ParcelHumanLink
         this.linkDeactivatedTS = linkDeactivatedTS;
     }
 
-    @Override
-    public String getPKFieldName() {
-        return ROLE_SCHEMA.getLinkedTablePKField();
-    }
-
-    @Override
-    public String getDBTableName() {
-        return ROLE_SCHEMA.getLinkedTableName();
-    }
+  
 
     @Override
     public LinkedObjectRole getLinkedObjectRole() {
-        return linkRole;
-    }
-
-    @Override
-    public LinkedObjectRoleSchemaEnum getLinkedObjectRoleSchemaEnum() {
-        return ROLE_SCHEMA;
+        return getLinkRole();
     }
 
     /**
@@ -271,6 +209,43 @@ public class ParcelHumanLink
         this.linkRole = linkRole;
     }
 
-         
-        
+   
+    /**
+     * @return the linkSource
+     */
+    @Override
+    public BOBSource getLinkSource() {
+        return linkSource;
+    }
+
+    /**
+     * @param linkSource the linkSource to set
+     */
+    @Override
+    public void setLinkSource(BOBSource linkSource) {
+        this.linkSource = linkSource;
+    }
+
+    /**
+     * @return the linkID
+     */
+    public int getLinkID() {
+        return linkID;
+    }
+
+    /**
+     * @return the linkRole
+     */
+    public LinkedObjectRole getLinkRole() {
+        return linkRole;
+    }
+
+    /**
+     * @param linkID the linkID to set
+     */
+    public void setLinkID(int linkID) {
+        this.linkID = linkID;
+    }
+
+   
 }

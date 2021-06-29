@@ -134,7 +134,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
         Parcel parcel = new Parcel();
         
-        parcel.setParcelkey(rs.getInt("parcelkey"));
+        parcel.setParcelKey(rs.getInt("parcelkey"));
         parcel.setCountyParcelID(rs.getString("parcelidcnty"));
         parcel.setMuni(mi.getMuni(rs.getInt("muni_municode")));
         if(rs.getInt("source_sourceid") != 0){
@@ -533,7 +533,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      */
     public List<HumanMailingAddressLink> getMailingAddressListByHuman(int humanID) throws IntegrationException{
         
-        List<HumanMailingAddressLink> hmall = new ArrayList<>();
+        List<HumanMailingAddressLink> hmal = new ArrayList<>();
         
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -552,7 +552,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                hmall.add(generateHumanMailingAddressLink(rs));
+                hmal.add(generateHumanMailingAddressLink(rs));
             }
 
         } catch (SQLException ex) {
@@ -563,7 +563,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return hmall;
+        return hmal;
     }
     
     
@@ -701,8 +701,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 stmt.setNull(9, java.sql.Types.NULL);
             }
             
-            if(addr.getLastupdatedBy() != null){
-                stmt.setInt(10, addr.getLastupdatedBy().getUserID());
+            if(addr.getLastUpdatedBy() != null){
+                stmt.setInt(10, addr.getLastUpdatedBy().getUserID());
             } else {
                 stmt.setNull(10, java.sql.Types.NULL);
             }
@@ -771,8 +771,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
             
             
-            if(addr.getLastupdatedBy() != null){
-                stmt.setInt(11, addr.getLastupdatedBy().getUserID());
+            if(addr.getLastUpdatedBy() != null){
+                stmt.setInt(11, addr.getLastUpdatedBy().getUserID());
             } else {
                 stmt.setNull(11, java.sql.Types.NULL);
             }
@@ -1083,7 +1083,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             if(p.getUnitList() != null && p.getUnitList().isEmpty()){
                 System.out.println("PropertyIntegrator.generateProperty | inserting new unit");
                 PropertyUnit pu = pc.initPropertyUnit(p);
-                pu.setPropertyID(p.getParcelkey());
+                pu.setParcelKey(p.getParcelKey());
                 insertPropertyUnit(pu);
             }
             
@@ -1468,7 +1468,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 stmt.setNull(32, java.sql.Types.NULL);
             }
             
-            stmt.setInt(33, prop.getParcelkey());
+            stmt.setInt(33, prop.getParcelKey());
             
             stmt.executeUpdate();
 
@@ -1478,7 +1478,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            System.out.println("Property ID = " + prop.getParcelkey());
+            System.out.println("Property ID = " + prop.getParcelKey());
             System.out.println("Connection closed and update hopefully saved.");
         } // close finally
         return "propertyProfile";
@@ -1501,7 +1501,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         try {
             stmt = con.prepareStatement(query);
             stmt.setString(1, p.getNotes());
-            stmt.setInt(2, p.getParcelkey());
+            stmt.setInt(2, p.getParcelKey());
             
             stmt.executeUpdate();
             
@@ -1940,7 +1940,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
         pu.setUnitID(rs.getInt("unitid"));
         pu.setUnitNumber(rs.getString("unitnumber"));
-        pu.setPropertyID(rs.getInt("property_propertyid"));
+        pu.setParcelKey(rs.getInt("property_propertyid"));
         pu.setOtherKnownAddress(rs.getString("otherknownaddress"));
         pu.setNotes(rs.getString("notes"));
         
@@ -2094,7 +2094,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, p.getParcelkey());
+            stmt.setInt(1, p.getParcelKey());
             rs = stmt.executeQuery();
             while (rs.next()) {
                 unitList.add(getPropertyUnit(rs.getInt("unitid")));

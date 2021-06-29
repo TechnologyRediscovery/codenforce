@@ -28,11 +28,11 @@ import java.util.Objects;
  * @author ellen bascomb of apt 31y
  */
 public class    Citation 
-        extends TrackedEntity {
+        extends TrackedEntity
+        implements IFace_humanListHolder{
     
     final static String CITATION_TABLE = "citation";
     final static String CITATION_PKFIELD = "citationid";
-    
     
     /**
      * Database Key
@@ -61,7 +61,11 @@ public class    Citation
     private List<EventCnF> eventList;
     private List<CitationCodeViolationLink> violationList;
     private List<BlobLight> blobList;
-    private List<CitationHumanLink> personList;
+
+    protected LinkedHumanSchemaEnum humanLinkSchemaEnum;
+    protected List<HumanLink> humanLinkList;
+    
+    
     
     private String notes;
     
@@ -291,19 +295,6 @@ public class    Citation
         this.blobList = blobList;
     }
 
-    /**
-     * @return the personList
-     */
-    public List<CitationHumanLink> getPersonList() {
-        return personList;
-    }
-
-    /**
-     * @param personList the personList to set
-     */
-    public void setPersonList(List<CitationHumanLink> personList) {
-        this.personList = personList;
-    }
 
     @Override
     public String getPKFieldName() {
@@ -320,5 +311,30 @@ public class    Citation
         return CITATION_TABLE;
     }
     
+    @Override
+    public List<HumanLink> getHumanLinkList() {
+        return humanLinkList;
+    }
+
+    @Override
+    public void setHumanLinkList(List<HumanLink> hll) {
+        humanLinkList = hll;
+    }
+
+    @Override
+    public LinkedHumanSchemaEnum getLinkSchema() {
+        return humanLinkSchemaEnum;
+    }
+
+    @Override
+    public void setLinkSchema(LinkedHumanSchemaEnum lhse) {
+        humanLinkSchemaEnum = lhse;
+    }
+
+    @Override
+    public int getHostPK() {
+        return citationID;
+    }
+
 }
 

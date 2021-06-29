@@ -34,7 +34,7 @@ public  class       Person
         extends     Human
         implements  IFace_Loggable{
     
-    protected List<MailingAddress> addressList;
+    protected List<HumanMailingAddressLink> addressList;
     protected List<ContactEmail> emailList;
     protected List<ContactPhone> phoneList;
 
@@ -50,6 +50,112 @@ public  class       Person
        
     }
 
+    /**
+     * Utility method for extracting the first address
+     * in the list
+     * @return the address at position 0 or null if no addresses present
+     */
+    public MailingAddress getPrimaryMailingAddress(){
+        if(addressList != null && !addressList.isEmpty()){
+            return addressList.get(0);
+        }
+        return null;
+        
+    }
+    
+    
+    /**
+     * Adaptor method for reverse compat when Person's had address fields
+     * right on their chest
+     * @return 
+     */
+    public String getAddressStreet(){
+        MailingAddress ma = getPrimaryMailingAddress();
+        if(ma != null){
+            return ma.buildingNo + " " + ma.street;
+        }
+        return "";
+    }
+    
+    /**
+     * Adaptor method for reverse compat when Person's had address fields
+     * right on their chest
+     * @return 
+     */
+    public String getAddressCity(){
+        MailingAddress ma = getPrimaryMailingAddress();
+        if(ma != null){
+            return ma.city;
+        }
+        return "";
+    }
+
+    /**
+     * Adaptor method for reverse compat when Person's had address fields
+     * right on their chest
+     * @return 
+     */
+    public String getAddressState(){
+        MailingAddress ma = getPrimaryMailingAddress();
+        if(ma != null){
+            return ma.state;
+        }
+        return "";
+    }
+    
+    /**
+     * Adaptor method for reverse compat when Person's had address fields
+     * right on their chest
+     * @return 
+     */
+    public String getAddressZip(){
+        MailingAddress ma = getPrimaryMailingAddress();
+        if(ma != null){
+            return ma.zipCode;
+        }
+        return "";
+    }
+    
+    /**
+     * Adaptor method for reverse compat when Person's had address fields
+     * right on their chest
+     * @return 
+     */
+    public String getEmail(){
+        ContactEmail em = getPrimaryEmail();
+        if(em != null){
+            return em.emailaddress;
+        }
+        return "";
+    }
+
+
+    /**
+     * Utility method for extracting the first email
+     * in the list
+     * @return the email at position 0 or null if no email present
+     */
+    public ContactEmail getPrimaryEmail(){
+        if(emailList != null && !emailList.isEmpty()){
+            return emailList.get(0);
+        }
+        return null;
+        
+    }
+    
+    /**
+     * Utility method for extracting the first phone number
+     * in the list
+     * @return the phone at position 0 or null if no phone present
+     */
+    public ContactPhone getPrimaryPhone(){
+        if(phoneList != null && !phoneList.isEmpty()){
+            return phoneList.get(0);
+        }
+        return null;
+        
+    }
+    
     
     /**
      * Adaptor method for legacy compatability with Person objects
@@ -86,7 +192,7 @@ public  class       Person
     /**
      * @return the addressList
      */
-    public List<MailingAddress> getAddressList() {
+    public List<HumanMailingAddressLink> getAddressList() {
         return addressList;
     }
 
@@ -107,7 +213,7 @@ public  class       Person
     /**
      * @param addressList the addressList to set
      */
-    public void setAddressList(List<MailingAddress> addressList) {
+    public void setAddressList(List<HumanMailingAddressLink> addressList) {
         this.addressList = addressList;
     }
     

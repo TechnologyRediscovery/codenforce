@@ -24,13 +24,15 @@ public class CECaseDataHeavy
         IFace_EventRuleGoverned,
         IFace_CredentialSigned,
         IFace_Loggable,
-        IFace_ActivatableBOB{
+        IFace_ActivatableBOB,
+        IFace_humanListHolder{
 
     // accessed through methods specified in the interfaces
     private Property property;
     private PropertyUnit propertyUnit;
     
-    protected List<CECaseHumanLink> humans;
+    protected LinkedHumanSchemaEnum humanLinkSchemaEnum;
+    protected List<HumanLink> humanLinkList;
     
     private List<Proposal> proposalList;
     private List<EventRuleImplementation> eventRuleList;
@@ -384,15 +386,30 @@ public class CECaseDataHeavy
         this.blobList = blobList;
     }
         
-    public List<CECaseHumanLink> getHumans() {
-        return humans;
+
+    @Override
+    public List<HumanLink> getHumanLinkList() {
+        return humanLinkList;
     }
 
-    /**
-     * @param humans the humans to set
-     */
-    public void setHumans(List<CECaseHumanLink> humans) {
-        this.humans = humans;
+    @Override
+    public void setHumanLinkList(List<HumanLink> hll) {
+        humanLinkList = hll;
+    }
+
+    @Override
+    public LinkedHumanSchemaEnum getLinkSchema() {
+        return humanLinkSchemaEnum;
+    }
+
+    @Override
+    public void setLinkSchema(LinkedHumanSchemaEnum lhse) {
+        humanLinkSchemaEnum = lhse;
+    }
+
+    @Override
+    public int getHostPK() {
+        return caseID;
     }
 
 }

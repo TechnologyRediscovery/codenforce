@@ -515,7 +515,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setShowDetailsPageButton(true);
         } else {
             Property skeleton = new Property();
-            skeleton.setPropertyID(skeleton.getParcelkey());
+            skeleton.setPropertyID(skeleton.getParcelKey());
             pib.setBundledProperty(skeleton);
             pib.setPaccStatusMessage("A public information bundle was found but public "
                     + "access was switched off by a code officer. Please contact your municipal office. ");
@@ -1088,7 +1088,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         PropertyCoordinator pc = getPropertyCoordinator();
 
         Property unbundled = input.getBundledProperty();
-        Property exportable = pc.getProperty(unbundled.getParcelkey());
+        Property exportable = pc.getProperty(unbundled.getParcelKey());
 
         exportable.setAddress(unbundled.getAddress());
         exportable.setStatus(unbundled.getStatus());

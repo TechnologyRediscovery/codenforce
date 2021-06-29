@@ -64,7 +64,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
+ * Business logic container for All Things Property related
+ * 
  * @author Dominic Pimpinella, MaRoSco, Ellen Bascomb (31Y)
  */
 public class PropertyCoordinator extends BackingBeanUtils implements Serializable {
@@ -72,6 +73,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     private final String DEFAULTUNITNUMBER = "-1";
     private final boolean DEFAULTRENTAL = false;
 
+    
+    public 
     
     /**
      * Pass through for getting a property count by municode
@@ -107,11 +110,11 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
         if(prop != null && ua != null){
             // if we've been given a skeleton, just inject it into data heavy subclass
-            if(prop.getParcelkey() == 0){
+            if(prop.getParcelKey() == 0){
                 pdh = new PropertyDataHeavy(prop);
             } else {
 
-               pdh = new PropertyDataHeavy(getProperty(prop.getParcelkey()));
+               pdh = new PropertyDataHeavy(getProperty(prop.getParcelKey()));
 
                try {
                    // CECase list
@@ -148,7 +151,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                    // wait on blobs
                    pdh.setBlobList(bc.getBlobLightList(bi.getBlobIDs(prop)));
                    // external data
-                   pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getParcelkey())));
+                   pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getParcelKey())));
 
                } catch (EventException | AuthorizationException | BObStatusException | BlobException | IntegrationException | SearchException ex) {
                    System.out.println(ex);
@@ -400,7 +403,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         sb.append(" in ");
         sb.append(p.getMuni().getMuniName());
         sb.append(" (ID:");
-        sb.append(p.getParcelkey());
+        sb.append(p.getParcelKey());
         sb.append(")");
         sb.append(" and Person ");
         sb.append(pers.getFirstName());
@@ -537,7 +540,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         SystemIntegrator si = getSystemIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
 
-        prop.setLastUpdatedBy(ua);
+        prop.setLastupdatedBy(ua);
         prop.setBobSource(si.getBOBSource(
                 Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString("bobsourcePropertyInternal"))));
@@ -776,7 +779,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public PropertyUnit initPropertyUnit(Property p) {
         PropertyUnit propUnit = new PropertyUnit();
-        propUnit.setPropertyID(p.getParcelkey());
+        propUnit.setParcelKey(p.getParcelKey());
         propUnit.setUnitNumber(Constants.TEMP_UNIT_NUM);
         propUnit.setUnitNumber("");
         propUnit.setRentalNotes("");
@@ -809,7 +812,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
             // decide if we're updating a unit or inserting it based on initial value
             // newly created units don't have an ID, just a default unit number
-            unit.setPropertyID(prop.getParcelkey());
+            unit.setParcelKey(prop.getParcelKey());
 
             if (unit.getUnitID() == 0) {
                 pi.insertPropertyUnit(unit);

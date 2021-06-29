@@ -426,7 +426,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      */
     public String selectPropertyUnit(PublicInfoBundlePropertyUnit unit) {
 
-        unit.getBundledUnit().setPropertyID(getSessionBean().getOccPermitAppActiveProp().getBundledProperty().getParcelkey());
+        unit.getBundledUnit().setParcelKey(getSessionBean().getOccPermitAppActiveProp().getBundledProperty().getParcelKey());
         getSessionBean().setOccPermitAppActivePropUnit(unit);
         getSessionBean().getNavStack().pushCurrentPage();
         
@@ -850,7 +850,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         int changedbyID = applicant.getBundledPerson().getHumanID();
         
         //Grab the unit list that is currently attached to the property in the database
-        Property existingProp = pc.getProperty(selectedProperty.getBundledProperty().getParcelkey());
+        Property existingProp = pc.getProperty(selectedProperty.getBundledProperty().getParcelKey());
 
         //Export the workingPropUnits list from PublicInfoBundles to units. This should preserve changes made by the user.
         for (PublicInfoBundlePropertyUnit bundle : workingPropUnits) {
@@ -883,7 +883,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
                 //This unit doesn't exist in our database. Save all of its fields so it can be saved to the database
                 
-                workingUnit.setPropertyID(existingProp.getParcelkey());
+                workingUnit.setParcelKey(existingProp.getParcelKey());
 
                 workingUnit.setUnitID(pri.insertPropertyUnit(workingUnit));
 

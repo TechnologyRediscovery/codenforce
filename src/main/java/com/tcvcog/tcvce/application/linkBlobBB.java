@@ -65,7 +65,7 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         PersonIntegrator pi = getPersonIntegrator();
         
         try{
-            pi.getPerson.getHumanID());
+            pi.getPerson.getHumanID();
         }catch(IntegrationException e){
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR

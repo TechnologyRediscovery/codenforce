@@ -743,7 +743,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         // timestamp set by postgres
         // no closing date, by design of case flow
         newCase.setPublicControlCode(casePCC);
-        newCase.setPropertyID(p.getParcelkey());
+        newCase.setPropertyID(p.getParcelKey());
         newCase.setCaseManager(ua);
 
         return newCase;
