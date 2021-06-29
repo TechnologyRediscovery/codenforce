@@ -268,7 +268,7 @@
 
                                                         <p:commandLink id="activebob-property-view-cl"
                                                                        ajax="false"
-                                                                       action="propertySearch"/>
+                                                                       action="#{sessionBean.navigateToPageCorrespondingToObject(sessionBean.sessProperty)}"/>
                                                     </p:overlayPanel>
                                                 </div>
 
@@ -311,7 +311,7 @@
                                                         <p:commandLink id="activebob-person-view-cl"
                                                                        ajax="false"
                                                                        value="view"
-                                                                       action="personSearchProfile">
+                                                                       action="#{sessionBean.navigateToPageCorrespondingToObject(sessionBean.sessPerson)}">
 
                                                         </p:commandLink>
                                                     </div>
@@ -379,7 +379,7 @@
                                                         <p:commandLink id="activebob-cecase-view-cl"
                                                                        value="view"
                                                                        ajax="false"
-                                                                       action="ceCaseSearchProfile"/>
+                                                                       action="#{sessionBean.navigateToPageCorrespondingToObject(sessionBean.sessCECase)}"/>
                                                     </div>
 
                                                     <div class="restrict-main-contents-io-link link-button">
@@ -439,7 +439,7 @@
                                                         <p:commandLink id="activebob-occperiod-view-cl"
                                                                        value="view"
                                                                        ajax="false"
-                                                                       action="occPeriodWorkflow"/>
+                                                                       action="#{sessionBean.navigateToPageCorrespondingToObject(sessionBean.sessOccPeriod)}"/>
                                                     </div>
 
                                                     <div class="restrict-main-contents-io-link link-button">

@@ -497,6 +497,8 @@ public class    SessionBean
                     setSessOccPeriod(sessOccPeriodList.get(0));
                 }
 
+                setSessEventsPageEventDomainRequest(DomainEnum.CODE_ENFORCEMENT);
+
                 return "ceCaseProfile";
 
             } else if (bob instanceof OccPeriod) {
@@ -526,6 +528,7 @@ public class    SessionBean
                     setSessCECase(sessCECaseList.get(0));
                 }
 
+                setSessEventsPageEventDomainRequest(DomainEnum.OCCUPANCY);
 
                 return "occPeriodWorkflow";
 
