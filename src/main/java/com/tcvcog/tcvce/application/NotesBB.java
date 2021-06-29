@@ -40,7 +40,7 @@ public class NotesBB extends BackingBeanUtils implements Serializable {
 
     private String formNoteText;
 
-    private DomainEnum pageEventDomain;
+    private DomainEnum pageDomain;
 
     private IFace_NoteHolder currentNoteHolder;
 
@@ -62,8 +62,8 @@ public class NotesBB extends BackingBeanUtils implements Serializable {
     public void updateNoteHolder() {
         SessionBean sb = getSessionBean();
 
-        pageEventDomain = sb.getSessEventsPageEventDomainRequest();
-        switch (pageEventDomain) {
+        pageDomain = sb.getSessEventsPageEventDomainRequest();
+        switch (pageDomain) {
             case CODE_ENFORCEMENT:
                 currentNoteHolder = sb.getSessCECase();
                 break;
@@ -98,7 +98,7 @@ public class NotesBB extends BackingBeanUtils implements Serializable {
         mbp.setUser(getSessionBean().getSessUser());
 
         try {
-            switch (pageEventDomain) {
+            switch (pageDomain) {
                 case CODE_ENFORCEMENT:
                     mbp.setHeader("Occupancy Period Note");
                     CaseCoordinator cc = getCaseCoordinator();

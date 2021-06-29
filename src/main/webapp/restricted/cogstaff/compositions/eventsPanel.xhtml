@@ -13,7 +13,7 @@
             <p:commandButton id="events-add-button"
                              styleClass="noFill button-size-small"
                              value="Add Event"
-                             actionListener="#{eventsBB.resetPotentialEvent}"
+                             actionListener="#{eventsBB.resetSkeletonEvent}"
                              oncomplete="PF('event-add-dialog-var').show()"
                              update="event-add-dialog"/>
 
@@ -326,7 +326,7 @@
                         <p:growl for="event-add-type-solb"/>
                         <p:selectOneListbox id="event-add-type-solb"
                                             required="true"
-                                            value="#{eventsBB.potentialType}"
+                                            value="#{eventsBB.skeletonType}"
                                             tabindex="10">
 
                             <p:ajax update="event-add-form"/>
@@ -346,10 +346,10 @@
                     <div class="restrict-main-contents-io-content">
                         <p:selectOneListbox id="event-add-cat-solb"
                                             style="width: 100%;"
-                                            value="#{eventsBB.potentialCategory}"
+                                            value="#{eventsBB.skeletonEvent.category}"
                                             tabindex="11">
 
-                            <p:ajax update="event-add-form"/>
+                            <p:ajax update="event-add-form" listener="#{eventsBB.potentiallyUpdateFieldsFromCategory}"/>
 
                             <f:converter converterId="eventCategoryConverter"/>
 
@@ -374,14 +374,14 @@
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                     <h2>
                         <h:outputText id="event-add-currtypecat-type-ot"
-                                      value="#{eventsBB.potentialType.label}"/>
+                                      value="#{eventsBB.skeletonType.label}"/>
                         <h:outputText value=": "/>
                         <h:outputText id="event-add-currtypecat-cat-ot"
-                                      value="#{eventsBB.potentialCategory.eventCategoryTitle}"/>
+                                      value="#{eventsBB.skeletonEvent.category.eventCategoryTitle}"/>
                     </h2>
                     <p:spacer height="3px"/>
                     <h:outputText id="event-add-currtypecat-desc"
-                                  value="#{eventsBB.potentialCategory.eventCategoryDesc}"/>
+                                  value="#{eventsBB.skeletonEvent.category.eventCategoryDesc}"/>
                 </div>
 
                 <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
@@ -395,7 +395,7 @@
                     <div class="restrict-main-contents-io-content">
                         <p:growl for="event-add-time-start-cal"/>
 
-                        <p:calendar value="#{eventsBB.potentialTimeStartUtilDate}"
+                        <p:calendar value="#{eventsBB.skeletonEvent.timeStart}"
                                     id="event-add-time-start-cal"
                                     mode="popup"
                                     showOn="button"
@@ -405,7 +405,7 @@
                                     showButtonPanel="true"
                                     showTodayButton="true"
                                     required="true">
-                            <p:ajax update="event-add-time-end-cal"/>
+                            <p:ajax update="event-add-time-end-cal" listener="#{eventsBB.recalculateEndTime}"/>
                         </p:calendar>
                     </div>
                 </div>
@@ -419,7 +419,7 @@
 
                     <div class="restrict-main-contents-io-content">
                         <p:inputNumber id="event-add-duration-in"
-                                       value="#{eventsBB.potentialDuration}"
+                                       value="#{eventsBB.skeletonDuration}"
                                        style="width: 50px;">
                             <p:ajax update="event-add-time-end-cal"/>
                         </p:inputNumber>
@@ -436,7 +436,7 @@
                     <div class="restrict-main-contents-io-content">
                         <p:growl for="event-add-time-end-cal" />
                         <p:calendar id="event-add-time-end-cal"
-                                    value="#{eventsBB.potentialTimeEndUtilDate}"
+                                    value="#{eventsBB.skeletonEvent.timeEnd}"
                                     mode="popup"
                                     showOn="button"
                                     disabled="true"
@@ -458,7 +458,7 @@
 
                     <div class="restrict-main-contents-io-content">
                         <p:inputText id="event-add-descr-it"
-                                     value="#{eventsBB.potentialDescription}"
+                                     value="#{eventsBB.skeletonEvent.description}"
                                      style="width: 100%;"
                                      tabindex="3"
                                      required="false">
@@ -497,7 +497,7 @@
 
             <div class="restrict-main-contents-io-button">
                 <p:commandButton id="event-add-dialog-show-cb"
-                                 disabled="#{empty eventsBB.potentialCategory}"
+                                 disabled="#{empty eventsBB.skeletonEvent.category}"
                                  rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                  value="Create new event"
                                  icon="fa fa-bolt"
@@ -629,6 +629,8 @@
 
         </h:form>
     </p:dialog>
+
+    <!-- Stuff below here is currently unused -->
 
     <!-- Event deactivate dialog -->
     <!-- Note to self: This should be replaced with one of the confirmdialogs from the other page -->

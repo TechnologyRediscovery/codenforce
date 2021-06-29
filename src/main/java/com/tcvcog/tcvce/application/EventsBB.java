@@ -23,7 +23,6 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 
 import javax.annotation.PostConstruct;
@@ -40,7 +39,7 @@ import java.util.List;
  * @author jurplel
  */
 public class EventsBB extends BackingBeanUtils implements Serializable {
-    private DomainEnum pageEventDomain;
+    private DomainEnum pageDomain;
 
     private IFace_EventHolder currentEventHolder;
     private IFace_ActivatableBOB currentEventHolderBOB;
@@ -54,15 +53,13 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     private String formNoteText;
     private long formEventDuration;
 
-    // potential values used in the the new event form (subset of form logic stuff I guess)
+    // skeleton values used in the the new event form (subset of form logic stuff I guess)
+    private EventCnF skeletonEvent;
+
     private boolean updateFieldsOnCategoryChange;
 
-    private LocalDateTime potentialTimeStart;
-    private long potentialDuration;
-
-    private EventType potentialType;
-    private EventCategory potentialCategory;
-    private String potentialDescription;
+    private long skeletonDuration;
+    private EventType skeletonType;
 
     // Single event that is currently used for editing/viewing
     // and also a copy of its last saved state to restore on edit cancel
@@ -83,7 +80,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         updateEventHolder();
 
         // Populate map of event types and categories
-        typeCategoryMap = ec.assembleEventTypeCatMap_toEnact(pageEventDomain, currentEventHolder, getSessionBean().getSessUser());
+        typeCategoryMap = ec.assembleEventTypeCatMap_toEnact(pageDomain, currentEventHolder, getSessionBean().getSessUser());
     }
 
     /**
@@ -93,8 +90,8 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     public void updateEventHolder() {
         SessionBean sb = getSessionBean();
 
-        pageEventDomain = sb.getSessEventsPageEventDomainRequest();
-        switch (pageEventDomain) {
+        pageDomain = sb.getSessEventsPageEventDomainRequest();
+        switch (pageDomain) {
             case CODE_ENFORCEMENT:
                 currentEventHolder = sb.getSessCECase();
                 currentEventHolderBOB = sb.getSessCECase();
@@ -204,46 +201,31 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     // New event stuff
     //
 
-    // Some of this stuff I feel could be moved up the chain for sure (e.g. to addEvent)
-    // Also maybe missing some faces messages here for failure states i guess
     public void createNewEvent() {
-        if (pageEventDomain == null || currentEventHolder == null || potentialCategory == null) {
+        if (pageDomain == null || currentEventHolder == null ||
+                skeletonEvent == null || skeletonEvent.getCategory() == null) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Event must have a category ", ""));
             return;
         }
 
+        EventCoordinator ec = getEventCoordinator();
         SessionBean sb = getSessionBean();
 
-
-        // Create the event and add it to the database
-        EventCoordinator ec = getEventCoordinator();
-
-        EventCnF newEvent;
-        try {
-            newEvent = ec.initEvent(currentEventHolder, potentialCategory);
-        } catch (BObStatusException | EventException ex) {
-            System.out.println("Failed to initialize new event:" + ex);
-            return;
-        }
-
-        newEvent.setDomain(pageEventDomain);
-
-        newEvent.setTimeStart(getPotentialTimeStart());
-        newEvent.setTimeEnd(getPotentialTimeEnd());
-
-        newEvent.setDescription(potentialDescription);
+        // Add new event to database and to the event holder
 
         try {
-            ec.addEvent(newEvent, currentEventHolder, sb.getSessUser());
+            ec.addEvent(skeletonEvent, currentEventHolder, sb.getSessUser());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Successfully logged event with an ID " + newEvent.getEventID() + " ", ""));
+                    "Successfully logged event with an ID " + skeletonEvent.getEventID() + " ", ""));
         } catch (BObStatusException | EventException | IntegrationException ex) {
             System.out.println("Failed to update new event with entered details:" + ex);
             return;
         }
 
-        switch (pageEventDomain) {
+        // Update session event holder variable so we can display new events
+
+        switch (pageDomain) {
             case CODE_ENFORCEMENT:
                 CECase ceCase = (CECase) currentEventHolder;
                 sb.setSessCECase(ceCase);
@@ -266,42 +248,71 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         keys.sort((EventType et1, EventType et2) -> et1.getLabel().compareTo(et2.getLabel()));
 
         // Set a default potentialType if there isn't already one
-        if (potentialType == null)
-            potentialType = keys.get(0);
+        if (skeletonType == null)
+            skeletonType = keys.get(0);
         return keys;
     }
 
     public List<EventCategory> getListOfPotentialCategories() {
-        if (potentialType != null && typeCategoryMap.containsKey(potentialType)) {
-            List<EventCategory> eventCategories = typeCategoryMap.get(potentialType);
+        if (skeletonEvent != null && skeletonType != null && typeCategoryMap.containsKey(skeletonType)) {
+            List<EventCategory> eventCategories = typeCategoryMap.get(skeletonType);
             // Set a default potentialCategory if there isn't already one in this list
-            if (!eventCategories.contains(potentialCategory))
-                potentialCategory = eventCategories.get(0);
+            if (!eventCategories.contains(skeletonEvent.getCategory()))
+                skeletonEvent.setCategory(eventCategories.get(0));
+                potentiallyUpdateFieldsFromCategory();
             return eventCategories;
         } else {
             return new ArrayList();
         }
     }
 
-    public void resetPotentialEvent() {
+    public void resetSkeletonEvent() {
+        // Set potentialEvent to an empty event
+        EventCoordinator ec = getEventCoordinator();
+
+        try {
+            skeletonEvent = ec.initEvent(currentEventHolder, null);
+        } catch (BObStatusException | EventException ex) {
+            System.out.println("Failed to initialize new event:" + ex);
+            return;
+        }
+
+        // ...with this domain
+        skeletonEvent.setDomain(pageDomain);
+
+        // Set fields not included in potentialEvent to default values
         setUpdateFieldsOnCategoryChange(true);
-        setPotentialTimeStart(LocalDateTime.now());
-        setPotentialDuration(0);
-
-        setPotentialType(null);
-        setPotentialCategory(null);
-        setPotentialDescription("");
+        setSkeletonType(null);
+        setSkeletonDuration(0);
     }
 
-    public LocalDateTime getPotentialTimeEnd() {
-        if (getPotentialTimeStart() == null)
-            return null;
+    /**
+     * Sets end time of skeleton event based on the duration held in this class,
+     * and the start time held in the skeleton event.
+     */
+    public void recalculateEndTime() {
+        // Set end time of potential event to its start time + potential duration
+        if (skeletonEvent == null || skeletonEvent.getTimeStart() == null)
+            return;
 
-        return getPotentialTimeStart().plusMinutes(potentialDuration);
+        skeletonEvent.setTimeEnd(skeletonEvent.getTimeStart().plusMinutes(skeletonDuration));
     }
 
-    public java.util.Date getPotentialTimeEndUtilDate() {
-        return DateTimeUtil.convertUtilDate(getPotentialTimeEnd());
+    /**
+     * Sets fields of the skeleton event based on the default fields
+     * of the skeleton event's category (if updateFieldsOnCategoryChange is set)
+     */
+    public void potentiallyUpdateFieldsFromCategory() {
+        if (isUpdateFieldsOnCategoryChange() && getSkeletonEvent() != null && getSkeletonEvent().getCategory() != null) {
+            EventCategory category = getSkeletonEvent().getCategory();
+
+            getSkeletonEvent().setTimeStart(LocalDateTime.now());
+            setSkeletonDuration(category.getDefaultDurationMins());
+
+            getSkeletonEvent().setDescription(category.getHostEventDescriptionSuggestedText());
+
+            recalculateEndTime();
+        }
     }
 
     //
@@ -356,49 +367,29 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         this.formEventDuration = formEventDuration;
     }
 
-    public LocalDateTime getPotentialTimeStart() {
-        return potentialTimeStart;
+    public EventCnF getSkeletonEvent() {
+        return skeletonEvent;
     }
 
-    public java.util.Date getPotentialTimeStartUtilDate() {
-        return DateTimeUtil.convertUtilDate(potentialTimeStart);
+    public void setSkeletonEvent(EventCnF skeletonEvent) {
+        this.skeletonEvent = skeletonEvent;
     }
 
-    public void setPotentialTimeStart(LocalDateTime potentialTimeStart) {
-        this.potentialTimeStart = potentialTimeStart;
+    public long getSkeletonDuration() {
+        return skeletonDuration;
     }
 
-    public void setPotentialTimeStartUtilDate(java.util.Date potentialTimeStart) {
-        this.potentialTimeStart = DateTimeUtil.convertUtilDate(potentialTimeStart);
+    public void setSkeletonDuration(long skeletonDuration) {
+        this.skeletonDuration = skeletonDuration;
+        recalculateEndTime();
     }
 
-    public long getPotentialDuration() {
-        return potentialDuration;
+    public EventType getSkeletonType() {
+        return skeletonType;
     }
 
-    public void setPotentialDuration(long potentialDuration) {
-        this.potentialDuration = potentialDuration;
-    }
-
-    public EventType getPotentialType() {
-        return potentialType;
-    }
-
-    public void setPotentialType(EventType potentialType) {
-        this.potentialType = potentialType;
-    }
-
-    public EventCategory getPotentialCategory() {
-        return potentialCategory;
-    }
-
-    public void setPotentialCategory(EventCategory potentialCategory) {
-        this.potentialCategory = potentialCategory;
-        if (isUpdateFieldsOnCategoryChange() && getPotentialCategory() != null) {
-            setPotentialTimeStart(LocalDateTime.now());
-            setPotentialDuration(getPotentialCategory().getDefaultDurationMins());
-            setPotentialDescription(getPotentialCategory().getHostEventDescriptionSuggestedText());
-        }
+    public void setSkeletonType(EventType skeletonType) {
+        this.skeletonType = skeletonType;
     }
 
     public boolean isUpdateFieldsOnCategoryChange() {
@@ -407,13 +398,6 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
 
     public void setUpdateFieldsOnCategoryChange(boolean updateFieldsOnCategoryChange) {
         this.updateFieldsOnCategoryChange = updateFieldsOnCategoryChange;
-    }
-
-    public String getPotentialDescription() {
-        return potentialDescription;
-    }
-
-    public void setPotentialDescription(String potentialDescription) {
-        this.potentialDescription = potentialDescription;
+        potentiallyUpdateFieldsFromCategory();
     }
 }

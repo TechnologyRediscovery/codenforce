@@ -30,7 +30,7 @@ import java.io.Serializable;
  */
 public class PaymentsBB extends BackingBeanUtils implements Serializable {
 
-    private DomainEnum pageEventDomain;
+    private DomainEnum pageDomain;
 
     private IFace_PaymentHolder currentPaymentHolder;
 
@@ -53,8 +53,8 @@ public class PaymentsBB extends BackingBeanUtils implements Serializable {
     public void updatePaymentHolder() {
         SessionBean sb = getSessionBean();
 
-        pageEventDomain = sb.getSessEventsPageEventDomainRequest();
-        switch (pageEventDomain) {
+        pageDomain = sb.getSessEventsPageEventDomainRequest();
+        switch (pageDomain) {
             case CODE_ENFORCEMENT:
                 currentPaymentHolder = sb.getSessCECase();
                 break;
@@ -75,7 +75,7 @@ public class PaymentsBB extends BackingBeanUtils implements Serializable {
     public String editPayment(Payment thisPayment) {
         SessionBean sb = getSessionBean();
 
-        sb.setFeeManagementDomain(pageEventDomain);
+        sb.setFeeManagementDomain(pageDomain);
         sb.setSessPayment(thisPayment);
         sb.getNavStack().pushCurrentPage();
 
@@ -88,8 +88,8 @@ public class PaymentsBB extends BackingBeanUtils implements Serializable {
     public String editHolderPayments() {
         SessionBean sb = getSessionBean();
 
-        sb.setFeeManagementDomain(pageEventDomain);
-        switch (pageEventDomain) {
+        sb.setFeeManagementDomain(pageDomain);
+        switch (pageDomain) {
             case CODE_ENFORCEMENT:
                 CECase ceCase = (CECase) currentPaymentHolder;
                 sb.setFeeManagementCeCase(ceCase);
@@ -110,8 +110,8 @@ public class PaymentsBB extends BackingBeanUtils implements Serializable {
     public String editHolderFees() {
         SessionBean sb = getSessionBean();
 
-        sb.setFeeManagementDomain(pageEventDomain);
-        switch (pageEventDomain) {
+        sb.setFeeManagementDomain(pageDomain);
+        switch (pageDomain) {
             case CODE_ENFORCEMENT:
                 CECase ceCase = (CECase) currentPaymentHolder;
                 sb.setFeeManagementCeCase(ceCase);
@@ -140,13 +140,11 @@ public class PaymentsBB extends BackingBeanUtils implements Serializable {
     }
 
     public int getFeeListSize() {
-//        int size = 0;
-//        if (currentPaymentHolder != null && currentPaymentHolder.getPaymentList() != null)
-//            size = currentPaymentHolder.getPaymentList().size();
+        int size = 0;
+        if (currentPaymentHolder != null && currentPaymentHolder.getFeeList() != null)
+            size = currentPaymentHolder.getPaymentList().size();
 
-//        return size;
-        // Waiting on fee interface additions
-        return -1;
+        return size;
     }
 
     // Boring getters and setters
