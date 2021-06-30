@@ -9,6 +9,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.time.LocalDateTime;
@@ -27,7 +28,8 @@ public class        CECase
                     IFace_EventHolder,
                     IFace_StatusLogHolder,
                     Comparable<CECase>,
-                    IFace_ActivatableBOB{
+                    IFace_ActivatableBOB,
+                    IFace_NoteHolder {
     
     protected int caseID;
     protected int publicControlCode;
@@ -176,7 +178,12 @@ public class        CECase
         } // close null check
         return visEventList;
     }
-    
+
+    @Override
+    public int getBObID() {
+        return caseID;
+    }
+
     /**
      * Builds our violation list based on inputted view options
      * @param viewOption
@@ -274,14 +281,14 @@ public class        CECase
     
     public long getCaseAge() {
         if(closingDate != null){
-            return EntityUtils.getTimePeriodAsDays(originationDate, closingDate);
+            return DateTimeUtil.getTimePeriodAsDays(originationDate, closingDate);
         } else {
-            return EntityUtils.getTimePeriodAsDays(originationDate, LocalDateTime.now());
+            return DateTimeUtil.getTimePeriodAsDays(originationDate, LocalDateTime.now());
         }
     }
     
     public long getCaseAgeAsOf(LocalDateTime ageEndTime){
-        return EntityUtils.getTimePeriodAsDays(originationDate, ageEndTime);
+        return DateTimeUtil.getTimePeriodAsDays(originationDate, ageEndTime);
         
     }
 
@@ -360,6 +367,7 @@ public class        CECase
     /**
      * @return the notes
      */
+    @Override
     public String getNotes() {
         return notes;
     }
@@ -367,6 +375,7 @@ public class        CECase
     /**
      * @param notes the notes to set
      */
+    @Override
     public void setNotes(String notes) {
         this.notes = notes;
     }
@@ -404,7 +413,7 @@ public class        CECase
      */
     public String getOriginiationDatePretty() {
         if(originationDate != null){
-            return EntityUtils.getPrettyDate(originationDate);
+            return DateTimeUtil.getPrettyDate(originationDate);
         }
         return null;
     }
@@ -414,7 +423,7 @@ public class        CECase
      */
     public String getClosingDatePretty() {
         if(closingDate != null){
-            return EntityUtils.getPrettyDate(closingDate);
+            return DateTimeUtil.getPrettyDate(closingDate);
         }
         return null;
     }
@@ -500,30 +509,38 @@ public class        CECase
 
     /**
      * @return the closingDateUtilDate
+     * @deprecated primefaces now supports LocalDateTime values
      */
+    @Deprecated
     public java.util.Date getClosingDateUtilDate() {
-        return convertUtilDate(closingDate);
+        return DateTimeUtil.convertUtilDate(closingDate);
     }
 
     /**
-     * @param cd     
+     * @param cd
+     * @deprecated primefaces now supports LocalDateTime values
      */
+    @Deprecated
     public void setClosingDateUtilDate(java.util.Date cd) {
-        closingDate = convertUtilDate(cd);
+        closingDate = DateTimeUtil.convertUtilDate(cd);
     }
 
     /**
      * @return the originationDateUtilDate
+     * @deprecated primefaces now supports LocalDateTime values
      */
+    @Deprecated
     public java.util.Date getOriginationDateUtilDate() {
-        return convertUtilDate(originationDate);
+        return DateTimeUtil.convertUtilDate(originationDate);
     }
 
     /**
-     * @param od     
+     * @param od
+     * @deprecated primefaces now supports LocalDateTime values
      */
+    @Deprecated
     public void setOriginationDateUtilDate(java.util.Date od) {
-        originationDate = convertUtilDate(od);
+        originationDate = DateTimeUtil.convertUtilDate(od);
     }
 
     /**

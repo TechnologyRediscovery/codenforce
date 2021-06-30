@@ -41,7 +41,7 @@ public class EventCategory implements Serializable {
     private String hostEventDescriptionSuggestedText;
     
     private Directive directive;
-    private int defaultdurationmins;
+    private int defaultDurationMins;
     private boolean active;
     
     private int userRankMinimumToEnact;
@@ -252,15 +252,15 @@ public class EventCategory implements Serializable {
     /**
      * @return the defaultdurationmins
      */
-    public int getDefaultdurationmins() {
-        return defaultdurationmins;
+    public int getDefaultDurationMins() {
+        return defaultDurationMins;
     }
 
     /**
-     * @param defaultdurationmins the defaultdurationmins to set
+     * @param defaultDurationMins the defaultdurationmins to set
      */
-    public void setDefaultdurationmins(int defaultdurationmins) {
-        this.defaultdurationmins = defaultdurationmins;
+    public void setDefaultDurationMins(int defaultDurationMins) {
+        this.defaultDurationMins = defaultDurationMins;
     }
 
     /**

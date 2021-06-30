@@ -49,6 +49,7 @@ import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -156,13 +157,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             System.out.println(ex);
         }
 
-        try {
-            cse.setFeeList(pi.getFeeAssigned(c));
+        // Skip payment stuff for now--i totally broke this stuff
 
-            cse.setPaymentListGeneral(pi.getPaymentList(c));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
+//        try {
+//            cse.setFeeList(pi.getFeeAssigned(c));
+//
+//            cse.setPaymentListGeneral(pi.getPaymentList(c));
+//        } catch (IntegrationException ex) {
+//            System.out.println(ex);
+//        }
         return cse;
     }
 
@@ -863,9 +866,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         sb.append(" ");
         sb.append(cear.getRequestor().getLastName());
         sb.append(" on ");
-        sb.append(getPrettyDate(cear.getDateOfRecord()));
+        sb.append(DateTimeUtil.getPrettyDate(cear.getDateOfRecord()));
         sb.append(" with a database timestamp of ");
-        sb.append(getPrettyDate(cear.getSubmittedTimeStamp()));
+        sb.append(DateTimeUtil.getPrettyDate(cear.getSubmittedTimeStamp()));
         return sb.toString();
     }
 
@@ -921,7 +924,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws BObStatusException
      * @throws IntegrationException
      */
-    public void cecase_updateCECaseNotes(MessageBuilderParams mbp, CECaseDataHeavy c) throws BObStatusException, IntegrationException {
+    public void cecase_updateCECaseNotes(MessageBuilderParams mbp, CECase c) throws BObStatusException, IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
         if (c == null || mbp == null) {
@@ -1751,7 +1754,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
         fuev.setUserCreator(ua);
         fuev.setTimeStart(LocalDateTime.now().plusDays(nov.getFollowupEventDaysRequest()));
-        fuev.setTimeEnd(fuev.getTimeStart().minusMinutes(cat.getDefaultdurationmins()));
+        fuev.setTimeEnd(fuev.getTimeStart().minusMinutes(cat.getDefaultDurationMins()));
         
         List<EventCnF> evlist = ec.addEvent(fuev, (IFace_EventRuleGoverned) cse, ua);
         return evlist.get(0);
@@ -2608,9 +2611,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             mbp.setHeader("Stipulated compliance date extended");
             StringBuilder sb = new StringBuilder();
             sb.append("Previous stipulated compliance date of ");
-            sb.append(getPrettyDate(oldStipDate));
+            sb.append(DateTimeUtil.getPrettyDate(oldStipDate));
             sb.append(" has been changed to ");
-            sb.append(getPrettyDate(cv.getStipulatedComplianceDate()));
+            sb.append(DateTimeUtil.getPrettyDate(cv.getStipulatedComplianceDate()));
             sb.append(".");
             
             mbp.setNewMessageContent(sb.toString());

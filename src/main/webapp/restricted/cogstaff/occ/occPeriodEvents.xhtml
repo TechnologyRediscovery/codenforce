@@ -47,19 +47,19 @@
                                                 <h:outputLabel styleClass="ui-label" for="newEventTypeMenu">
                                                     <h:outputText value="Step 1: Choose type"/>
                                                 </h:outputLabel>
-                                                <p:selectOneMenu id="newEventTypeMenu" 
-                                                                    required="true" 
-                                                                    value="#{occInspectionBB.selectedEventType}" 
-                                                                    tabindex="10">
+<!--                                                <p:selectOneMenu id="newEventTypeMenu" -->
+<!--                                                                    required="true" -->
+<!--                                                                    value="#{occInspectionBB.selectedEventType}" -->
+<!--                                                                    tabindex="10">-->
                                                     
                                                     <p:ajax update="categoryList
                                                             event-add-dialog-show-cb"
                                                             listener="#{occInspectionBB.events_loadEventCategories}"
                                                             immediate="false"/> 
                                                     <f:selectItem itemLabel="Select event type..." itemDisabled="true" noSelectionOption="true"/>
-                                                    <f:selectItems value="#{occInspectionBB.eventTypeListUserAllowed}" 
-                                                                   var="et" 
-                                                                   itemLabel="#{et.label}" />
+<!--                                                    <f:selectItems value="#{occInspectionBB.eventTypeListUserAllowed}" -->
+<!--                                                                   var="et" -->
+<!--                                                                   itemLabel="#{et.label}" />-->
                                                 </p:selectOneMenu>
                                                 <h:message for="newEventTypeMenu" showDetail="false" showSummary="true" 
                                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -71,10 +71,10 @@
                                                 </h:outputLabel>
 
                                               
-                                                <p:selectOneListbox style="width: 300px;" 
-                                                                    id="categoryList" 
-                                                                    value="#{occInspectionBB.selectedEventCategory}" 
-                                                                    tabindex="10">
+<!--                                                <p:selectOneListbox style="width: 300px;" -->
+<!--                                                                    id="categoryList" -->
+<!--                                                                    value="#{occInspectionBB.selectedEventCategory}" -->
+<!--                                                                    tabindex="10">-->
                                                     
                                                     <p:ajax update="
                                                             event-add-dialog-show-cb"                                                           
@@ -402,12 +402,13 @@
                                         <h:outputText value="Event Notes:"/>
                                     </h:outputLabel>
                                     <h:panelGroup>
-                                        <p:editor id="eventNotes" value="#{occInspectionBB.currentEvent.notes}"
+                                        <p:textEditor id="eventNotes" value="#{occInspectionBB.currentEvent.notes}"
                                                   controls="bold italic underline strikethrough font size style color
                                                   bullets numbering center undo redo rule link removeformat outdent
                                                   indent link unlink copy cut paste rule alignleft center alignright"
                                                   width="700"
-                                                  height="100"/>
+                                                  height="100"
+                                                  secure="false"/>
                                         <h:message for="eventNotes" showDetail="false" showSummary="true"
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </h:panelGroup>

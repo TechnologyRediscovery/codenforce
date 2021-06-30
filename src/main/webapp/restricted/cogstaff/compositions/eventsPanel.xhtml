@@ -1,0 +1,940 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <p:panel id="events-panel"
+             toggleable="true"
+             collapsed="false"
+             header="Events (#{eventsBB.eventListSize})">
+
+        <h:form id="events-form">
+
+            <p:commandButton id="events-add-button"
+                             styleClass="noFill button-size-small"
+                             value="Add Event"
+                             actionListener="#{eventsBB.resetSkeletonEvent}"
+                             oncomplete="PF('event-add-dialog-var').show()"
+                             update="event-add-dialog"/>
+
+            <p:spacer height="5px"/>
+
+            <p:selectOneMenu style="width: 300px;"
+                             id="prop-viewoptionsevents-solb"
+                             value="#{eventsBB.eventListFilterMode}"
+                             tabindex="10">
+
+                <p:ajax update="events-panel"
+                        immediate="true"/>
+
+                <f:selectItems id="prop-events-selitems"
+                               value="#{eventsBB.eventListFilterModes}"
+                               var="evo"
+                               itemValue="#{evo}"
+                               itemLabel="#{evo.label}"/>
+            </p:selectOneMenu>
+
+            <p:spacer height="5px"/>
+
+            <p:dataTable id="events-table"
+                         var="event"
+                         sortMode="multiple"
+                         value="#{eventsBB.eventList}"
+                         tableStyleClass="primeDataTable"
+                         rowKey="#{event.eventID}"
+                         reflow="true">
+
+                <p:column headerText="ID"
+                          width="10%"
+                          styleClass="centeredColumnContent">
+
+                    <h:outputText value="#{event.eventID}"/>
+
+                </p:column>
+                <p:column headerText="Date"
+                          sortBy="#{event.timeStart}"
+                          styleClass="centeredColumnContent">
+                    <h:outputText value="#{empty event.timeStart ? eventsBB.getPrettyDate(event.creationTS) : eventsBB.getPrettyDate(event.timeStart) }"/>
+                </p:column>
+
+                <p:column headerText="Category"
+                          sortBy="#{event.category.eventCategoryTitle}"
+                          styleClass="centeredColumnContent">
+
+                    <div class="#{event.category.icon.styleClass}">
+                        <i class="material-icons status-display-icon-i"><h:outputText value="#{event.category.icon.materialIcon}"/></i>
+                    </div>
+
+                    <h:outputText value="#{event.category.eventType.label}:"/>
+
+                    <p:spacer height="1px" />
+
+                    <h:outputText value="#{event.category.eventCategoryTitle}"/>
+                </p:column>
+
+                <p:column headerText="Description"
+                          styleClass="centeredColumnContent wrapText">
+
+                    <h:outputText value="#{event.description}"/>
+
+                </p:column>
+
+                <p:column headerText="Actions"
+                          styleClass="centeredColumnContent">
+                    <div class="restrict-main-contents-io-link link-button">
+                        <p:commandLink id="event-open-button"
+                                       styleClass="noFill button-size-small"
+                                       value="view"
+                                       oncomplete="PF('event-profile-dialog-var').show()"
+                                       update="event-profile-dialog event-profile-form">
+                            <f:setPropertyActionListener target="#{eventsBB.currentEvent}" value="#{event}"/>
+                        </p:commandLink>
+                    </div>
+                    <h:outputText value="&#xA0;&#xA0;|"/> <!-- these are just nbsp but those don't work in compositions -->
+                    <div class="restrict-main-contents-io-link link-button">
+                        <p:commandLink id="event-edit-button"
+                                       styleClass="noFill button-size-small"
+                                       value="edit"
+                                       oncomplete="PF('event-edit-dialog-var').show()"
+                                       update="event-edit-dialog event-edit-form">
+                            <f:setPropertyActionListener target="#{eventsBB.currentEvent}" value="#{event}"/>
+                        </p:commandLink>
+                    </div>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:panel>
+
+    <!-- Dialogs -->
+
+    <!-- Event profile dialog -->
+    <p:dialog id="event-profile-dialog"
+              height="800" width="1600"
+              widgetVar="event-profile-dialog-var"
+              responsive="true"
+              resizable="true"
+              closable="true"
+              closeOnEscape="true"
+              modal="true"
+              header="Event id #{eventsBB.currentEvent.eventID} profile">
+
+        <h:form id="event-profile-form">
+            <div class="ui-g data_container_nested_restrict">
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                    <div class="restrict-data-field-label-inline" >
+                        <p:outputLabel for="event-domain-ot">
+                            <h:outputText value="Domain"/>
+                        </p:outputLabel>
+                    </div>
+
+                    <div class="restrict-data-field-value-inline">
+                        <h:outputText id="event-domain-ot"
+                                      value="#{eventsBB.currentEvent.domain.title} "/>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                    <div class="restrict-data-field-label-inline">
+                        <p:outputLabel for="event-et-ot">
+                            <h:outputText value="Type"/>
+                        </p:outputLabel>
+                    </div>
+
+                    <div class="restrict-data-field-value-inline">
+                        <h:outputText id="event-et-ot"
+                                      value="#{eventsBB.currentEvent.category.eventType.label} "/>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                    <div class="restrict-data-field-label-inline">
+                        <p:outputLabel for="event-ec-ot">
+                            <h:outputText value="Category"/>
+                        </p:outputLabel>
+                    </div>
+
+                    <div class="restrict-data-field-value-inline">
+                        <h:outputText id="event-ec-ot"
+                                      value="#{eventsBB.currentEvent.category.eventCategoryTitle}"/>
+                    </div>
+                    <p:commandLink id="event-cat-details-cl"
+                                   disabled="false"
+                                   type="button"
+                                   value="details"/>
+                </div>
+
+
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                    <div class="restrict-data-field-label-inline">
+                        <p:outputLabel for="event-descr-ot">
+                            <h:outputText value="Description:"/>
+                        </p:outputLabel>
+                    </div>
+
+                    <div class="restrict-data-field-value-inline">
+                        <h:outputText id="event-descr-ot"
+                                      value="#{eventsBB.currentEvent.description}"/>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                    <div class="restrict-data-field-label-inline">
+                        <p:outputLabel for="event-st-ot">
+                            <h:outputText value="Start time"/>
+                        </p:outputLabel>
+                    </div>
+
+                    <div class="restrict-data-field-value-inline">
+                        <h:outputText id="event-st-ot"
+                                      value="#{eventsBB.getPrettyDate(eventsBB.currentEvent.timeStart)}"/>
+
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                    <div class="restrict-data-field-label-inline">
+                        <p:outputLabel for="event-time-end-ot">
+                            <h:outputText value="End time"/>
+                        </p:outputLabel>
+                    </div>
+
+                    <div class="restrict-data-field-value-inline">
+                        <h:outputText id="event-time-end-ot"
+                                      value="#{eventsBB.getPrettyDate(eventsBB.currentEvent.timeEnd)}"/>
+                    </div>
+                </div>
+
+
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                    <div class="restrict-data-field-label-inline">
+                        <p:outputLabel for="event-mintoview-ot">
+                            <h:outputText value="Rank req. to view"/>
+                        </p:outputLabel>
+                    </div>
+
+                    <div class="restrict-data-field-value-inline">
+                        <h:outputText id="event-mintoview-ot"
+                                      value="#{eventsBB.currentEvent.category.userRankMinimumToView}"/>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                    <div class="restrict-data-field-label-inline">
+                        <p:outputLabel for="event-mintoedit-ot">
+                            <h:outputText value="Rank req. to edit"/>
+                        </p:outputLabel>
+                    </div>
+
+                    <div class="restrict-data-field-value-inline">
+                        <h:outputText id="event-mintoedit-ot"
+                                      value="#{eventsBB.currentEvent.category.userRankMinimumToUpdate}"/>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                    <div class="restrict-data-field-label-inline">
+                        <p:outputLabel for="event-active-ot">
+                            <h:outputText value="Active"/>
+                        </p:outputLabel>
+                    </div>
+
+                    <div class="restrict-data-field-value-inline">
+                        <h:outputText id="event-active-ot"
+                                      value="#{eventsBB.currentEvent.active ? 'Yes' : 'No'}"/>
+                    </div>
+
+                    <div class="restrict-data-field-value-inline">
+                        <div class="restrict-main-contents-io-link">
+                            <p:commandLink id="case-reactivate-cb"
+                                           actionListener="#{eventsBB.toggleEventActive}"
+                                           style="color:blue;"
+                                           value="#{eventsBB.currentEvent.active ? 'deactivate event' : 'reactivate event'}"
+                                           update="event-profile-form"/>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="restrict-main-contents-io-button gray_button">
+                <p:commandButton id="event-profile-done-button"
+                                 value="Done"
+                                 actionListener="#{eventsBB.updateEventList}"
+                                 update="events-panel"
+                                 oncomplete="PF('event-profile-dialog-var').hide()"
+                                 icon="fa fa-stop"/>
+            </div>
+        </h:form>
+
+        <h:form id="event-notes-form">
+            <p:commandButton id="event-notes-add-button"
+                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                             value="Add New Note"
+                             disabled="true"
+                             icon="fa fa-sticky-note-o"
+                             actionListener="#{eventsBB.clearFormNoteText}"
+                             oncomplete="PF('event-note-dialog-var').show()"
+                             update="event-note-form"/>
+
+            <h:outputText id="event-note-ot"
+                          value="#{eventsBB.currentEvent.notes}"
+                          escape="false"/>
+        </h:form>
+
+        <h:form id="event-note-form">
+            <h:outputText styleClass="ui-label" value="Note text: "/>
+            <p:textEditor id="event-notes-editor"
+                          value="#{eventsBB.formNoteText}"
+                          required="false"
+                          secure="false"
+                          height="200"/>
+
+            <p:commandButton id="event-dialog-notes-button-addnote"
+                             disabled="true"
+                             oncomplete="PF('event-note-dialog-var').hide()"
+                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                             value="Attach Note"
+                             styleClass="inline-button"
+                             icon="fa fa-sticky-note-o"
+                             update="event-notes-form"/>
+        </h:form>
+    </p:dialog>
+
+    <!-- Event add dialog -->
+    <p:dialog id="event-add-dialog"
+              height="700" width="1500"
+              widgetVar="event-add-dialog-var"
+              responsive="true"
+              resizable="true"
+              closable="true"
+              closeOnEscape="true"
+              modal="true"
+              header="Attaching new event to object with ID #{eventsBB.currentEventHolder.BObID}"
+              rendered="true">
+
+        <h:form id="event-add-form">
+            <div class="ui-g data_container_nested_restrict">
+
+                <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field">
+                    <div class="restrict-main-contents-io-title">
+                        <h:outputLabel for="event-add-type-solb">
+                            <h:outputText value="Type"/>
+                        </h:outputLabel>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content">
+                        <p:growl for="event-add-type-solb"/>
+                        <p:selectOneListbox id="event-add-type-solb"
+                                            required="true"
+                                            value="#{eventsBB.skeletonType}"
+                                            tabindex="10">
+
+                            <p:ajax update="event-add-form"/>
+
+                            <f:selectItems value="#{eventsBB.listOfPotentialTypes}" var="et" itemLabel="#{et.label}"/>
+                        </p:selectOneListbox>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field">
+                    <div class="restrict-main-contents-io-title">
+                        <h:outputLabel for="event-add-cat-solb">
+                            <h:outputText value="Category"/>
+                        </h:outputLabel>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content">
+                        <p:selectOneListbox id="event-add-cat-solb"
+                                            style="width: 100%;"
+                                            value="#{eventsBB.skeletonEvent.category}"
+                                            tabindex="11">
+
+                            <p:ajax update="event-add-form" listener="#{eventsBB.potentiallyUpdateFieldsFromCategory}"/>
+
+                            <f:converter converterId="eventCategoryConverter"/>
+
+                            <f:selectItems value="#{eventsBB.listOfPotentialCategories}" var="ec" itemValue="#{ec}"
+                                           itemLabel="#{ec.eventCategoryTitle}"/>
+
+                        </p:selectOneListbox>
+                    </div>
+
+                    <p:spacer height="5px"/>
+
+                    <div class="restrict-main-contents-io-content">
+                        <p:selectBooleanCheckbox id="event-add-updatefields-sbb"
+                                                 itemLabel="Auto fill event details"
+                                                 title="Description and duration will be set automatically"
+                                                 value="#{eventsBB.updateFieldsOnCategoryChange}">
+                            <p:ajax/>
+                        </p:selectBooleanCheckbox>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                    <h2>
+                        <h:outputText id="event-add-currtypecat-type-ot"
+                                      value="#{eventsBB.skeletonType.label}"/>
+                        <h:outputText value=": "/>
+                        <h:outputText id="event-add-currtypecat-cat-ot"
+                                      value="#{eventsBB.skeletonEvent.category.eventCategoryTitle}"/>
+                    </h2>
+                    <p:spacer height="3px"/>
+                    <h:outputText id="event-add-currtypecat-desc"
+                                  value="#{eventsBB.skeletonEvent.category.eventCategoryDesc}"/>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
+
+                    <div class="restrict-main-contents-io-title">
+                        <h:outputLabel for="event-add-time-start-cal">
+                            <h:outputText value="Start time"/>
+                        </h:outputLabel>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content">
+                        <p:growl for="event-add-time-start-cal"/>
+
+                        <p:calendar value="#{eventsBB.skeletonEvent.timeStart}"
+                                    id="event-add-time-start-cal"
+                                    mode="popup"
+                                    showOn="button"
+                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                    navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true"
+                                    showSecond="false" showMillisec="false"
+                                    showButtonPanel="true"
+                                    showTodayButton="true"
+                                    required="true">
+                            <p:ajax update="event-add-time-end-cal" listener="#{eventsBB.recalculateEndTime}"/>
+                        </p:calendar>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
+                    <div class="restrict-main-contents-io-title">
+                        <h:outputLabel for="event-add-time-start-cal">
+                            <h:outputText value="Duration (mins)"/>
+                        </h:outputLabel>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content">
+                        <p:inputNumber id="event-add-duration-in"
+                                       value="#{eventsBB.skeletonDuration}"
+                                       style="width: 50px;">
+                            <p:ajax update="event-add-time-end-cal"/>
+                        </p:inputNumber>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
+                    <div class="restrict-main-contents-io-title">
+                        <h:outputLabel for="event-add-time-end-cal">
+                            <h:outputText value="End time"/>
+                        </h:outputLabel>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content">
+                        <p:growl for="event-add-time-end-cal" />
+                        <p:calendar id="event-add-time-end-cal"
+                                    value="#{eventsBB.skeletonEvent.timeEnd}"
+                                    mode="popup"
+                                    showOn="button"
+                                    disabled="true"
+                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                    navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true"
+                                    showSecond="false" showMillisec="false"
+                                    showButtonPanel="true"
+                                    showTodayButton="true"
+                                    required="true"/>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                    <div class="restrict-main-contents-io-title">
+                        <h:outputLabel for="event-add-descr-it">
+                            <h:outputText value="Description"/>
+                        </h:outputLabel>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content">
+                        <p:inputText id="event-add-descr-it"
+                                     value="#{eventsBB.skeletonEvent.description}"
+                                     style="width: 100%;"
+                                     tabindex="3"
+                                     required="false">
+                            <p:ajax/>
+                        </p:inputText>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                    <div class="restrict-main-contents-io-title">
+                        <h:outputLabel for="event-add-personlist">
+                            <h:outputText value="Person connections"/>
+                        </h:outputLabel>
+                    </div>
+
+                    <div class="restrict-main-contents-io-button gray_button">
+                        <p:commandButton value="Manage person connections"
+                                         onclick="PF('event-personchoose-dialog-var').show()"
+                                         disabled="true"
+                                         update="event-personchoose-dialog"
+                                         icon="fa fa-user"/>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content">
+                        <p:dataScroller id="event-add-personlist"
+                                        value="#{eventsBB.currentEvent.personList}"
+                                        var="per"
+                                        widgetVar="noticebuilder-pers-ds-var">
+
+                            <h:outputText value="#{per.firstName} #{per.lastName} (ID:#{per.personID})"/>
+                        </p:dataScroller>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="restrict-main-contents-io-button">
+                <p:commandButton id="event-add-dialog-show-cb"
+                                 disabled="#{empty eventsBB.skeletonEvent.category}"
+                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                 value="Create new event"
+                                 icon="fa fa-bolt"
+                                 actionListener="#{eventsBB.createNewEvent}"
+                                 oncomplete="PF('event-add-dialog-var').hide()"
+                                 update="events-panel"/>
+            </div>
+
+            <div class="restrict-main-contents-io-button gray_button">
+                <p:commandButton id="event-add-cancel-button"
+                                 value="Cancel"
+                                 oncomplete="PF('event-add-dialog-var').hide()"
+                                 icon="fa fa-stop"/>
+            </div>
+        </h:form>
+    </p:dialog>
+
+    <!-- Event edit dialog -->
+    <p:dialog id="event-edit-dialog"
+              height="800" width="1600"
+              widgetVar="event-edit-dialog-var"
+              responsive="true"
+              resizable="trie"
+              closable="true"
+              closeOnEscape="true"
+              modal="true"
+              header="Edit event id #{eventsBB.currentEvent.eventID}">
+
+        <h:form id="event-edit-form">
+            <p style="font-style:  italic;">Note: Event type and category cannot be updated. Instead, remove incorrect event and make a new one.</p>
+            <div class="ui-g data_container_nested_restrict">
+                <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
+                    <div class="restrict-main-contents-io-title">
+                        <h:outputLabel for="event-edit-time-start-cal">
+                            <h:outputText value="Start time"/>
+                        </h:outputLabel>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content">
+                        <p:growl for="event-edit-time-start-cal"/>
+                        <p:calendar value="#{eventsBB.currentEvent.timeStart}"
+                                    id="event-edit-time-start-cal"
+                                    mode="popup"
+                                    showOn="button"
+                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                    navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                    showButtonPanel="true"
+                                    showTodayButton="true"
+                                    required="true">
+
+                            <p:ajax update="event-edit-time-end-cal"/>
+                        </p:calendar>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
+                    <div class="restrict-main-contents-io-title">
+                        <h:outputLabel for="event-edit-time-start-cal">
+                            <h:outputText value="Duration (mins)"/>
+                        </h:outputLabel>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content">
+                        <p:inputNumber id="event-edit-duration-in"
+                                       value="#{eventsBB.formEventDuration}"
+                                       style="width: 50px;">
+                            <p:ajax listener="#{eventsBB.updateTimeEndFromDuration}"
+                                    update="event-edit-time-end-cal"/>
+                        </p:inputNumber>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
+                    <div class="restrict-main-contents-io-title">
+                        <h:outputLabel for="event-edit-time-end-cal">
+                            <h:outputText value="End time"/>
+                        </h:outputLabel>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content">
+                        <p:growl for="event-edit-time-end-cal"/>
+                        <p:calendar value="#{eventsBB.currentEvent.timeEnd}"
+                                    id="event-edit-time-end-cal"
+                                    mode="popup"
+                                    disabled="true"
+                                    showOn="button"
+                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                    navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                    showButtonPanel="true"
+                                    showTodayButton="true"
+                                    required="true"/>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                    <div class="restrict-main-contents-io-title">
+                        <h:outputLabel for="event-edit-descr">
+                            <h:outputText value="Description"/>
+                        </h:outputLabel>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content">
+                        <p:inputText id="event-edit-descr"
+                                     value="#{eventsBB.currentEvent.description}"
+                                     style="width: 100%;"
+                                     tabindex="3"
+                                     required="false"/>
+                    </div>
+                </div>
+
+                <div class="restrict-main-contents-io-button">
+                    <p:commandButton id="event-edit-dialog-show-cb"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                     oncomplete="PF('event-edit-dialog-var').hide()"
+                                     actionListener="#{eventsBB.saveEventChanges}"
+                                     value="Save edits"
+                                     icon="fa fa-edit"
+                                     update="events-panel"/>
+                </div>
+
+                <div class="restrict-main-contents-io-button gray_button">
+                    <p:commandButton id="event-profile-done-button"
+                                     oncomplete="PF('event-edit-dialog-var').hide()"
+                                     actionListener="#{eventsBB.discardEventChanges}"
+                                     icon="fa fa-stop"
+                                     value="Cancel"/>
+                </div>
+            </div>
+
+        </h:form>
+    </p:dialog>
+
+    <!-- Stuff below here is currently unused -->
+
+    <!-- Event deactivate dialog -->
+    <!-- Note to self: This should be replaced with one of the confirmdialogs from the other page -->
+    <p:dialog id="event-deactivate-dialog"
+              height="300" width="400"
+              widgetVar="event-deactivate-dialog-var"
+              responsive="true"
+              resizable="trie"
+              closable="true"
+              closeOnEscape="true"
+              modal="true"
+              header="Deactivate event id #{ceCaseSearchProfileBB.currentEvent.eventID}"
+              rendered="true">
+
+        <h:form id="event-remove-form">
+            <div class="ui-g data_container_nested_restrict">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                    <div class="restrict-data-field-label-inline">
+                        <h:outputLabel for="event-remove-button">
+                            <h:outputText value="Deactivated events can be recovered by changing event view options"/>
+                        </h:outputLabel>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                    <div class="restrict-main-contents-io-button gray_button">
+                        <p:commandButton id="event-nuke-cancel-button"
+                                         ajax="true"
+                                         value="Cancel"
+                                         process="@none"
+                                         immediate="true"
+                                         oncomplete="PF('event-deactivate-dialog-var').hide()"
+                                         actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}"
+                                         icon="fa fa-stop"/>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                    <div class="restrict-main-contents-io-button red_button">
+                        <p:commandButton ajax="false" action="#{ceCaseSearchProfileBB.onEventRemoveCommitButtonChange}"
+                                         value="Deactivate event"
+                                         icon="fa fa-close"
+                                         rendered="true"/>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+
+    <!-- Event person choose(?) dialog -->
+    <p:dialog id="event-personchoose-dialog"
+              height="800" width="1600"
+              widgetVar="event-personchoose-dialog-var"
+              responsive="true"
+              resizable="true"
+              closable="true"
+              closeOnEscape="true"
+              modal="true"
+              header="Link persons to event id #{ceCaseSearchProfileBB.currentEvent.eventID}"
+              rendered="true">
+
+        <h:form id="event-person-form">
+            <div class="ui-g data_container_nested_restrict">
+                <div class="ui-g-12 ui-md-8 ui-lg-8 restrict-data-field">
+                    <div class="restrict-main-contents-io-title">
+                        <p:outputLabel id="person-list-menu-ol"
+                                       for="person-list-menu"
+                                       value="Current person list:"/>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content">
+                        <p:selectOneMenu id="person-list-menu" required="false" value="#{ceCaseSearchProfileBB.eventPersonSelected}">
+                            <f:selectItem itemLabel="select a person..." noSelectionOption="true"/>
+                            <f:selectItems value="#{systemServicesBB.bbSessionPersonList}"  var="p" itemValue="#{p}"
+                                           itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                            <f:converter converterId="personConverter"/>
+                        </p:selectOneMenu>
+                        <h:message for="person-list-menu" showDetail="false" showSummary="true"
+                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-4 ui-lg-4 restrict-data-field">
+                    <div class="restrict-main-contents-io-button">
+                        <p:commandButton ajax="true" actionListener="#{ceCaseSearchProfileBB.queueSelectedPerson}"
+                                         value="Add selected person to event" disabled="true"
+                                         update="person-scroller"/>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                    <h2>Option 2: Manual person lookup</h2>
+
+                    <p>If you wish to send the letter to a person not on the list above,
+                        enter the Person's ID number in the box below and click "Look Up Person".
+                        You can open the Persons's search page by "right-clicking" the link to "Persons"
+                        on the left side bar and opening that page in its own browser tab.</p>
+
+                    <p>You can also go and find a person in the Person search tool, view a person of interest, and then return to this page. The person will appear in the session list above
+                        <h:commandLink class="bold" target="_blank" action="persons"
+                                       value="Open person search in new tab ---> "/>
+                    </p>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                    <div class="restrict-main-contents-io-title">
+                        <h:outputLabel for="personIDIT" value="Person ID Number: "/>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content" >
+                        <p:inputText id="personIDIT" value="#{ceCaseSearchProfileBB.eventPersonIDForLookup}"/>
+                        <p:spacer height="5px" />
+                        <p:commandButton id="event-add-lookupperson-button"
+                                         value="Look up person"
+                                         actionListener="#{ceCaseSearchProfileBB.onPersonLookupByIDButtonChange}"
+                                         ajax="true"
+                                         immediate="true"
+                                         update="messages-global-form person-scroller"/>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                    <p:dataScroller id="person-scroller"
+                                    value="#{ceCaseSearchProfileBB.eventPersonCandidates}"
+                                    var="per"
+                                    widgetVar="noticebuilder-pers-ds-var">
+
+                        <h:outputText value="#{per.firstName} #{per.lastName}"/>
+
+                        <p:spacer height="3px"/>
+
+                        <h:outputText value="ID: #{per.personID}"/>
+
+                        <p:spacer height="3px"/>
+
+                        <p:commandButton id="edit-person-from-lookup"
+                                         ajax="false"
+                                         value="View or edit person"
+                                         action="#{ceCaseSearchProfileBB.onPersonViewButtonChange(per)}"/>
+
+                        <p:spacer height="3px"/>
+
+                        <p:commandButton id="use-person-from-lookup-cb2"
+                                         ajax="true"
+                                         value="Select for NOV"
+                                         actionListener="#{ceCaseSearchProfileBB.storeRecipient(per)}"
+                                         oncomplete="PF('event-personchoose-dialog-var').hide()."
+                                         update="event-lookupperson-table"/>
+                    </p:dataScroller>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                    <p:dataTable id="event-lookupperson-table"
+                                 var="person"
+                                 rowKey="#{person.personID}"
+                                 value="#{ceCaseSearchProfileBB.currentEvent.personList}"
+                                 tableStyleClass="primeDataTable"
+                                 expandedRow="false"
+                                 rowExpandMode="single"
+                                 rowIndexVar="rowIndex">
+
+                        <p:column width="5%">
+                            <p:rowToggler/>
+                        </p:column>
+
+                        <p:column width="50%">
+                            <f:facet name="header">
+                                <h:outputText value="Last"/>
+                            </f:facet>
+                            <h:outputText value="#{person.firstName}"/>
+                            <h:outputText value=" "/>
+                            <h:outputText value="#{person.lastName}"/>
+                            <h:outputText value="(ID: #{person.personID})"/>
+                            <p:spacer height="2px" />
+                            <h:outputText value="#{person.addressStreet}"/>
+                            <p:spacer height="2px" />
+                            <h:outputText value="#{person.addressCity}"/>
+                            <h:outputText value=" "/>
+                            <h:outputText value="#{person.addressState}"/>
+                            <h:outputText value=", "/>
+                            <h:outputText value="#{person.addressZip}"/>
+                        </p:column>
+
+                        <p:column width="8%">
+                            <f:facet name="header">
+                                <h:outputText value="Person Type"/>
+                            </f:facet>
+                            <h:outputText value="#{person.personType.label}"/>
+                        </p:column>
+
+                        <p:column width="15%">
+                            <f:facet name="header">
+                                <h:outputText value="Municipality"/>
+                            </f:facet>
+                            <h:outputText value="#{person.muniName}"/>
+                        </p:column>
+
+                        <p:rowExpansion>
+                            <div class="outlinedBox">
+                                <h2><h:outputText value="#{person.firstName} #{person.lastName}"/>, Person ID:<h:outputText value="#{person.personID}"/></h2>
+
+                                <h:outputLabel styleClass="bold" value="Person Type: "/>
+                                <h:outputText value="#{person.personType.label}"/>
+
+                                <p:spacer height="5px"/>
+
+                                <h:outputLabel styleClass="bold" value="Job Title: "/>
+                                <h:outputText value="#{person.jobTitle}"/>
+
+                                <p:spacer height="5px"/>
+
+                                <h:outputLabel styleClass="bold" value="Email: "/>
+                                <h:outputText value="#{person.email}"/>
+                                <h:outputLabel styleClass="bold" value="Last Updated: "/>
+                                <h:outputText value="#{person.lastUpdatedPretty}"/>
+                                <h:outputLabel styleClass="bold" value="Address: "/>
+
+                                <p:spacer height="5px"/>
+
+                                <h:outputText escape="false" value="#{person.addressStreet}"/>
+
+                                <p:spacer height="5px"/>
+
+                                <h:outputText value="#{person.addressCity}, #{person.addressState} #{person.addressZip}"/>
+                                <h:outputLabel styleClass="bold" value="Use separate mailing address?"/>
+                                <h:outputText value="#{person.useSeparateMailingAddress ? 'Yes':'No'}"/>
+
+                                <p:spacer height="5px"/>
+
+                                <h:outputText escape="false" value="#{person.mailingAddressStreet}"/>
+
+                                <p:spacer height="5px"/>
+
+                                <h:outputText value="#{person.mailingAddressCity}, #{person.mailingAddressState} #{person.mailingAddressZip}"/>
+                                <h:outputLabel styleClass="bold" value="Under 18? "/>
+                                <h:outputText value="#{person.under18 ? 'Yes':'No'}"/>
+
+                                <p:spacer height="5px"/>
+
+                                <h:outputLabel styleClass="bold" value="Active? "/>
+                                <h:outputText value="#{person.active ? 'Yes':'No'}"/>
+
+                                <p:spacer height="5px"/>
+
+                                <h:outputLabel styleClass="bold" value="Composite last name? "/>
+                                <h:outputText value="#{person.compositeLastName? 'Yes':'No'}"/>
+                                <h:outputLabel styleClass="bold" value="Allowed to expire? "/>
+                                <h:outputText value="#{person.canExpire ? 'Yes':'No'}"/>
+
+                                <p:spacer height="5px"/>
+
+                                <h:outputLabel styleClass="bold" value="Expires: "/>
+                                <h:outputText value="#{person.expireString}"/>
+
+                                <p:spacer height="5px"/>
+
+                                <h:outputLabel styleClass="bold" value="Expiry Notes: "/>
+                                <div class="rowExpansion">
+                                    <h:outputText value="#{person.expiryNotes}"/>
+                                </div>
+
+                                <h:outputLabel styleClass="bold" value="Phone(h): "/>
+                                <h:outputText value="#{person.phoneHome}"/>
+
+                                <p:spacer height="5px"/>
+
+                                <h:outputLabel styleClass="bold" value="Phone(w): "/>
+                                <h:outputText value="#{person.phoneWork}"/>
+
+                                <p:spacer height="5px"/>
+
+                                <h:outputLabel styleClass="bold" value="Phone(m): "/>
+                                <h:outputText value="#{person.phoneCell}"/>
+                                <h:outputLabel styleClass="bold" value="Linked to user? "/>
+                                <h:outputText value="#{person.linkedUserID == 0 ? 'No':'Yes'}"/>
+
+                                <p:spacer height="5px"/>
+                            </div>
+                        </p:rowExpansion>
+                    </p:dataTable>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                    <div class="restrict-main-contents-io-button gray_button">
+                        <p:commandButton ajax="true"
+                                         value="Cancel" icon="fa fa-stop"
+                                         process="@none"
+                                         immediate="true"
+                                         onclick="PF('event-personchoose-dialog-var').hide()"/>
+                    </div>
+
+                    <div class="restrict-main-contents-io-button">
+                        <p:commandButton actionListener="#{ceCaseSearchProfileBB.onPersonListCommitButtonChange}"
+                                         ajax="true"
+                                         value="Save person list"
+                                         icon="fa fa-edit"
+                                         oncomplete="PF('event-personchoose-dialog-var').hide()"
+                                         disabled="#{!(ceCaseSearchProfileBB.currentEvent.eventID == 0)}"
+                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                         update="event-edit-dialog event-add-dialog"/>
+
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>

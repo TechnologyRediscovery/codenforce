@@ -44,6 +44,7 @@ import com.tcvcog.tcvce.entities.search.QueryCodeViolation;
 import com.tcvcog.tcvce.entities.search.QueryCodeViolationEnum;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.io.IOException;
@@ -489,7 +490,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         } 
         getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                    "Stipulated compliance dates is now: " + getPrettyDate(currentViolation.getStipulatedComplianceDate()), ""));
+                                    "Stipulated compliance dates is now: " + DateTimeUtil.getPrettyDate(currentViolation.getStipulatedComplianceDate()), ""));
         return "ceCaseViolations";
 
     }

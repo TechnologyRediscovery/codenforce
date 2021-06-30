@@ -17,18 +17,7 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
-import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
-import com.tcvcog.tcvce.entities.EventRuleImplementation;
-import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
-import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
-import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
-import com.tcvcog.tcvce.entities.Payment;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonOccApplication;
-import com.tcvcog.tcvce.entities.Proposal;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import java.time.LocalDateTime;
@@ -45,9 +34,10 @@ import java.util.List;
  * @author sylvia
  */
 public  class       OccPeriodDataHeavy 
-        extends     OccPeriod 
+        extends     OccPeriodPropertyUnitHeavy
         implements  IFace_EventRuleGoverned, 
-                    IFace_CredentialSigned{
+                    IFace_CredentialSigned,
+                    IFace_PaymentHolder {
     
     protected OccPeriodStatusEnum status;
 
@@ -63,8 +53,8 @@ public  class       OccPeriodDataHeavy
     
     private List<Integer> blobIDList;
     
-    private List<MoneyOccPeriodFeeAssigned> feeList;
-    private List<MoneyOccPeriodFeePayment> paymentList;
+    private List<FeeAssigned> feeList;
+    private List<Payment> paymentList;
 
     private LocalDateTime configuredTS;
     private String credentialSignature;
@@ -77,89 +67,71 @@ public  class       OccPeriodDataHeavy
      * Populates superclass members and stamps the 
      * authorizing Credential's signature
      * 
-     * @param opLight 
+     * @param otherPeriodLight
      * @param cred 
      */
-    public OccPeriodDataHeavy(OccPeriod opLight, Credential cred) {
-        this.credentialSignature = cred.getSignature();
-        
-        this.periodID = opLight.periodID;
-        this.propertyUnitID = opLight.propertyUnitID;
-        this.type = opLight.type;
-        
-        this.governingInspection = opLight.governingInspection;
-        this.manager = opLight.manager;
-        
-        this.periodTypeCertifiedBy = opLight.periodTypeCertifiedBy;
-        this.periodTypeCertifiedTS = opLight.periodTypeCertifiedTS;
-        
-        this.source = opLight.source;
-        this.createdBy = opLight.createdBy;
-        this.createdTS = opLight.createdTS;
-        
-        this.startDate = opLight.startDate;
-        this.startDateCertifiedTS = opLight.startDateCertifiedTS;
-        this.startDateCertifiedBy = opLight.startDateCertifiedBy;
-        
-        this.endDate = opLight.endDate;
-        this.endDateCertifiedTS = opLight.endDateCertifiedTS;
-        this.endDateCertifiedBy = opLight.endDateCertifiedBy;
-        
-        this.authorizedTS = opLight.authorizedTS;
-        this.authorizedBy = opLight.authorizedBy;
-        
-        this.overrideTypeConfig = opLight.overrideTypeConfig;
-        this.notes = opLight.notes;
-        
-        this.active = opLight.active;
+    public OccPeriodDataHeavy(OccPeriod otherPeriodLight, Credential cred) {
+        super(otherPeriodLight);
 
+        this.credentialSignature = cred.getSignature();
+    }
+
+    /**
+     * Populates superclass members and stamps the
+     * authorizing Credential's signature
+     * This one is for a superclass with property unit info, though.
+     *
+     * @param otherPeriodLighter
+     * @param cred
+     */
+    public OccPeriodDataHeavy(OccPeriodPropertyUnitHeavy otherPeriodLighter, Credential cred) {
+        super(otherPeriodLighter);
+
+        this.credentialSignature = cred.getSignature();
+    }
+
+    /**
+     * Complete copy of another OccPeriodDataHeavy, including credential signature
+     *
+     * @param otherPeriod
+     */
+    public OccPeriodDataHeavy(OccPeriodDataHeavy otherPeriod) {
+        super(otherPeriod);
+
+        this.status = otherPeriod.status;
+
+        this.applicationList = otherPeriod.applicationList;
+        this.personListApplicants = otherPeriod.personListApplicants;
+        this.personList = otherPeriod.personList;
+
+        this.proposalList = otherPeriod.proposalList;
+        this.eventRuleList = otherPeriod.eventRuleList;
+
+        this.inspectionList = otherPeriod.inspectionList;
+        this.permitList = otherPeriod.permitList;
+
+        this.blobIDList = otherPeriod.blobIDList;
+
+        this.feeList = otherPeriod.feeList;
+        this.paymentList = otherPeriod.paymentList;
+
+        this.configuredTS = otherPeriod.configuredTS;
+        this.credentialSignature = otherPeriod.credentialSignature;
     }
 
     /**
      * Pre-credential requiring method for creating detailed subclass
-     * 
-     * @deprecated 
-     * @param opLight 
+     *
+     * @param otherPeriodLight
      */
-    public OccPeriodDataHeavy(OccPeriod opLight) {
-        this.periodID = opLight.periodID;
-        this.propertyUnitID = opLight.propertyUnitID;
-        this.type = opLight.type;
-        
-        this.governingInspection = opLight.governingInspection;
-        this.manager = opLight.manager;
-        
-        this.periodTypeCertifiedBy = opLight.periodTypeCertifiedBy;
-        this.periodTypeCertifiedTS = opLight.periodTypeCertifiedTS;
-        
-        this.source = opLight.source;
-        this.createdBy = opLight.createdBy;
-        this.createdTS = opLight.createdTS;
-        
-        this.startDate = opLight.startDate;
-        this.startDateCertifiedTS = opLight.startDateCertifiedTS;
-        this.startDateCertifiedBy = opLight.startDateCertifiedBy;
-        
-        this.endDate = opLight.endDate;
-        this.endDateCertifiedTS = opLight.endDateCertifiedTS;
-        this.endDateCertifiedBy = opLight.endDateCertifiedBy;
-        
-        this.authorizedTS = opLight.authorizedTS;
-        this.authorizedBy = opLight.authorizedBy;
-        
-        this.overrideTypeConfig = opLight.overrideTypeConfig;
-        this.notes = opLight.notes;
-
+    public OccPeriodDataHeavy(OccPeriod otherPeriodLight) {
+        super(otherPeriodLight);
     }
+
     
     @Override
-    public EventDomainEnum discloseEventDomain() {
-        return EventDomainEnum.OCCUPANCY;
-    }
-    
-     @Override
-    public int getBObID() {
-        return periodID;
+    public DomainEnum discloseEventDomain() {
+        return DomainEnum.OCCUPANCY;
     }
 
     
@@ -260,14 +232,16 @@ public  class       OccPeriodDataHeavy
       /**
      * @return the paymentList
      */
-    public List<MoneyOccPeriodFeePayment> getPaymentList() {
+    @Override
+    public List<Payment> getPaymentList() {
         return paymentList;
     }
 
     /**
      * @param paymentList the paymentList to set
      */
-    public void setPaymentList(List<MoneyOccPeriodFeePayment> paymentList) {
+    @Override
+    public void setPaymentList(List<Payment> paymentList) {
         this.paymentList = paymentList;
     }
     
@@ -275,12 +249,13 @@ public  class       OccPeriodDataHeavy
      * Takes the general Payment type and converts it to 
      * @param paymentList the paymentList to set
      */
+    @Override
     public void setPaymentListGeneral(List<Payment> paymentList) {
-        List<MoneyOccPeriodFeePayment> skeletonHorde = new ArrayList<>();
+        List<Payment> skeletonHorde = new ArrayList<>();
         
         for (Payment p : paymentList) {
             
-            skeletonHorde.add(new MoneyOccPeriodFeePayment(p));
+            skeletonHorde.add(new Payment(p));
             
         }
         
@@ -383,14 +358,14 @@ public  class       OccPeriodDataHeavy
     /**
      * @return the feeList
      */
-    public List<MoneyOccPeriodFeeAssigned> getFeeList() {
+    public List<FeeAssigned> getFeeList() {
         return feeList;
     }
 
     /**
      * @param feeList the feeList to set
      */
-    public void setFeeList(List<MoneyOccPeriodFeeAssigned> feeList) {
+    public void setFeeList(List<FeeAssigned> feeList) {
         this.feeList = feeList;
     }
 

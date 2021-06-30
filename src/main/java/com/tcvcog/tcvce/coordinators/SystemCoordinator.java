@@ -35,11 +35,11 @@ import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.LogEntry;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -218,7 +218,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
      * @return
      */
     public String stampCurrentTimeForNote() {
-        return getPrettyDate(LocalDateTime.now());
+        return DateTimeUtil.getPrettyDate(LocalDateTime.now());
     }
 
     /**
@@ -358,17 +358,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
      */
     public void setMuniCodeNameMap(Map<Integer, String> muniCodeNameMap) {
         this.muniCodeNameMap = muniCodeNameMap;
-    }
-
-    @Override
-    public String getPrettyDate(LocalDateTime d) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy, HH:mm");
-        if (d != null) {
-            String formattedDateTime = d.format(formatter);
-            return formattedDateTime;
-        } else {
-            return "";
-        }
     }
 
     //xiaohong add

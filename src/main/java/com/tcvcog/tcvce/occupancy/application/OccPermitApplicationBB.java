@@ -102,8 +102,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     
     //This field stores a copy of the applicant. The original is in the 
     //attachedPersons list.
-    private PublicInfoBundlePerson applicant;
-    
+    private PublicInfoBundlePerson applicant; 
+   
     //This field stores a copy of the preferred contact. The original is in the 
     //attachedPersons list.
     private PublicInfoBundlePerson contactPerson;
@@ -419,7 +419,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     /**
      * Sets a property unit on the SessionBean and the OccPermitApplication,
-     * sends user to occPermitAddReason.xhtml
+     * sends user to occPermit4AddReason.xhtml
      *
      * @param unit
      * @return
@@ -470,7 +470,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
     /**
      * Sets the currentApplication on the sessionBean and then sends user to
-     * personsRequirementManage.xhtml
+     * occPermit5PersonsRequirementManage.xhtml
      *
      * @return
      */
@@ -649,46 +649,50 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
      * @return 
      */
     public List<String> getPersonRequirementDescription() {
-
-        List<PersonType> optional = getSessionBean().getSessOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes();
-
-        //Make description for required people
-        
         StringBuilder description = new StringBuilder("It is required that you have these types of people: ");
-
         List<String> descList = new ArrayList<>();
 
-        for (PersonType type : requiredPersons) {
+        //Make description for required people (if the list is valid)
+        if (requiredPersons != null) {
 
-            description.append(type.getLabel()).append(", ");
+            for (PersonType type : requiredPersons) {
 
-        }
+                description.append(type.getLabel()).append(", ");
 
-        //Delete the last comma
-        description.deleteCharAt(description.lastIndexOf(","));
+            }
 
-        descList.add(description.toString());
+            //Delete the last comma
+            int lastComma = description.lastIndexOf(",");
+            if (lastComma > -1) {
+                description.deleteCharAt(description.lastIndexOf(","));        
+            }
 
-        //Make description for optional people
-        
-        description = new StringBuilder();
-
-        description.append("You may also add these types of people: ");
-
-        for (PersonType type : optional) {
-
-            description.append(type.getLabel()).append(", ");
+            descList.add(description.toString());
+            description = new StringBuilder();
 
         }
 
-        //Delete the last comma
-        description.deleteCharAt(description.lastIndexOf(","));
+        //Make description for optional people (if there are any)
+        List<PersonType> optional = getSessionBean().getSessOccPermitApplication().getReason().getPersonsRequirement().getOptionalPersonTypes();
+        if (optional.size() > 0) {
+            description.append("You may also add these types of people: ");
 
-        descList.add(description.toString());
+            for (PersonType type : optional) {
+                description.append(type.getLabel()).append(", ");
+
+            }
+
+            //Delete the last comma
+            int lastComma = description.lastIndexOf(",");
+            if (lastComma > -1) {
+                description.deleteCharAt(description.lastIndexOf(","));        
+            }
+            
+            descList.add(description.toString());
+            description = new StringBuilder();
+        }
 
         //Tell the user how to identify themselves
-        
-        description = new StringBuilder();
 
         description.append("Also, please identify yourself by clicking the \"Set As Applicant\" button in the row with your name.");
 
@@ -800,21 +804,20 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             refreshUnitsAndPersons();
 
             //We want to clear until this page
-            clearUntil = "occPermitAddPropertyUnit.xhtml";
+            clearUntil = "occPermit2AddPropertyUnit.xhtml";
 
         }
 
-        //Clear the navstack until we reach the specified page
-        //If clearUntil is |, we will loop until there are no more pages to clear
-        
-        while (!getSessionBean().getNavStack().peekLastPage().contains(clearUntil)) { 
-                try {
-                    getSessionBean().getNavStack().popLastPage();
-                } catch (NavigationException ex) {
-                    //nothing, we just wanted to clear the stack anyway.
-                }
-            }
-        
+//        //Clear the navstack until we reach the specified page
+//        //If clearUntil is |, we will loop until there are no more pages to clear
+//        while (!getSessionBean().getNavStack().peekLastPage().contains(clearUntil)) {
+//            try {
+//                getSessionBean().getNavStack().popLastPage();
+//            } catch (NavigationException ex) {
+//                //nothing, we just wanted to clear the stack anyway.
+//            }
+//        }
+
         //Mark down that they've already applied for this unit
         alreadyApplied.put(currentApplication.getApplicationPropertyUnit().getUnitNumber(), selectedUnit);
         

@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 
 /**
  * Models the entity: code enforcement action request.This object blends data from several database tables to create
@@ -416,14 +417,14 @@ public class CEActionRequest extends BOb implements Serializable, IFace_BlobHold
      * @return the dateOfRecordUtilDate
      */
     public java.util.Date getDateOfRecordUtilDate() {        
-        return convertUtilDate(dateOfRecord);
+        return DateTimeUtil.convertUtilDate(dateOfRecord);
     }
 
     /**
      * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
      */
     public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        dateOfRecord = convertUtilDate(dateOfRecordUtilDate);
+        dateOfRecord = DateTimeUtil.convertUtilDate(dateOfRecordUtilDate);
     }
 
     @Override

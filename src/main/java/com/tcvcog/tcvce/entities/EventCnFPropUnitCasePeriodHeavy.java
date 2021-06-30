@@ -51,7 +51,7 @@ public  class   EventCnFPropUnitCasePeriodHeavy
         this.timeEnd = ev.getTimeEnd();
         
         this.userCreator = ev.getUserCreator();
-        this.creationts = ev.getCreationts();
+        this.creationTS = ev.getCreationts();
         
         this.lastUpdatedBy = ev.getLastUpdatedBy();
         this.lastUpdatedTS = ev.getLastUpdatedTS();

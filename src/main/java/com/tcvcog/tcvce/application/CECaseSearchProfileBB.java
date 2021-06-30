@@ -24,7 +24,6 @@ import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
@@ -48,7 +47,7 @@ import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
+import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
@@ -67,6 +66,7 @@ import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
@@ -79,15 +79,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
-import javax.faces.event.ValueChangeEvent;
+
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.SelectEvent;
 
 /**
  *
@@ -123,7 +119,7 @@ public class CECaseSearchProfileBB
     private List<BOBSource> bobSourceOptionList;
     
     private String formNoteText;
-    
+
     private List<Property> propListForSearch;
     private CaseStageEnum[] caseStageList;
 
@@ -335,7 +331,7 @@ public class CECaseSearchProfileBB
         currentCodeSet = getSessionBean().getSessMuni().getCodeSet();
 
         // EVENT STUFF
-        setTypeCatMap(ec.assembleEventTypeCatMap_toEnact(EventDomainEnum.CODE_ENFORCEMENT, currentCase, getSessionBean().getSessUser()));
+        setTypeCatMap(ec.assembleEventTypeCatMap_toEnact(DomainEnum.CODE_ENFORCEMENT, currentCase, getSessionBean().getSessUser()));
         eventTypeCandidates = new ArrayList<>(getTypeCatMap().keySet());
         eventCategoryCandidates = new ArrayList<>();
         if(eventTypeCandidates != null && !eventTypeCandidates.isEmpty()){
@@ -506,7 +502,7 @@ public class CECaseSearchProfileBB
 
     
     /**
-     * Primary listener method which copies a reference to the selected 
+     * Primary listener method which copies a reference to the selected
      * user from the list and sets it on the selected user perch
      * @param cse
      * @return 
@@ -724,42 +720,6 @@ public class CECaseSearchProfileBB
 
     }
 
-    
-    
-    /**
-     * Listener for user requests to commit new note content to the current
-     * Property
-     *
-     * @param ev
-     * @return 
-     */
-    public String onCaseNoteCommitButtonChange() {
-        CaseCoordinator cc = getCaseCoordinator();
-        
-        MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.setCred(getSessionBean().getSessUser().getKeyCard());
-        mbp.setExistingContent(currentCase.getNotes());
-        mbp.setNewMessageContent(formNoteText);
-        mbp.setHeader("Case Note");
-        mbp.setUser(getSessionBean().getSessUser());
-       
-        try {
-            
-            cc.cecase_updateCECaseNotes(mbp, currentCase);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Succesfully appended note!", ""));
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Fatal error appending note; apologies!", ""));
-
-        }
-
-        return "ceCaseProfile";
-
-    }
     
     public String onProposalViewButtonChange(Proposal prop){
         return "workflow";
@@ -1204,7 +1164,7 @@ public class CECaseSearchProfileBB
         } 
         getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                    "Stipulated compliance dates is now: " + getPrettyDate(getCurrentViolation().getStipulatedComplianceDate()), ""));
+                                    "Stipulated compliance dates is now: " + DateTimeUtil.getPrettyDate(getCurrentViolation().getStipulatedComplianceDate()), ""));
         return "ceCaseProfile";
 
     }
@@ -1960,8 +1920,8 @@ public class CECaseSearchProfileBB
 
         try {
             getCurrentEvent().setCategory(getEventCategorySelected());
-            getCurrentEvent().setDomain(EventDomainEnum.CODE_ENFORCEMENT);
-            if(getCurrentEvent().getDomain() == null && getCurrentEvent().getDomain() == EventDomainEnum.UNIVERSAL){
+            getCurrentEvent().setDomain(DomainEnum.CODE_ENFORCEMENT);
+            if(getCurrentEvent().getDomain() == null && getCurrentEvent().getDomain() == DomainEnum.UNIVERSAL){
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 "Event must have a domain that's not universal", ""));
@@ -2094,7 +2054,7 @@ public class CECaseSearchProfileBB
             System.out.println("EventsBB.refreshavailableEventCategories");
         }
     }
-     /**
+    /**
      * Listener for user changes to the event category list on event add
      */
     public void onEventCategoryMenuChange(){
@@ -2102,7 +2062,7 @@ public class CECaseSearchProfileBB
         configureEventFieldsOnAddConfig();
     }
    
-      /**
+    /**
      * Sets current event field values to those suggested by the 
      * selected event category
      */
@@ -2111,8 +2071,8 @@ public class CECaseSearchProfileBB
                 && currentEvent != null 
                 && updateNewEventFieldsWithCatChange){
             currentEvent.setTimeStart(LocalDateTime.now());
-            setEventDurationFormField(getEventCategorySelected().getDefaultdurationmins());
-            currentEvent.setTimeEnd(getCurrentEvent().getTimeStart().plusMinutes(getEventCategorySelected().getDefaultdurationmins()));
+            setEventDurationFormField(getEventCategorySelected().getDefaultDurationMins());
+            currentEvent.setTimeEnd(getCurrentEvent().getTimeStart().plusMinutes(getEventCategorySelected().getDefaultDurationMins()));
             currentEvent.setDescription(getEventCategorySelected().getHostEventDescriptionSuggestedText());
         }
     }
@@ -2251,7 +2211,7 @@ public class CECaseSearchProfileBB
         PersonCoordinator pc = getPersonCoordinator();
         workingPerson = pc.personCreateMakeSkeleton(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni());
     }
-    
+
     /**
      * Action listener for creation of new person objectgs
      * @param ev

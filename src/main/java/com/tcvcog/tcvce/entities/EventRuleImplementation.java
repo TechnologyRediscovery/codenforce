@@ -34,7 +34,7 @@ public  class       EventRuleImplementation
         extends     EventRuleAbstract {
     
     protected int implementationID;
-    protected EventDomainEnum domain;
+    protected DomainEnum domain;
     protected int ceCaseID;
     protected int occPeriodID;
     
@@ -106,7 +106,7 @@ public  class       EventRuleImplementation
     /**
      * @return the domain
      */
-    public EventDomainEnum getDomain() {
+    public DomainEnum getDomain() {
         return domain;
     }
 
@@ -197,7 +197,7 @@ public  class       EventRuleImplementation
     /**
      * @param domain the domain to set
      */
-    public void setDomain(EventDomainEnum domain) {
+    public void setDomain(DomainEnum domain) {
         this.domain = domain;
     }
 

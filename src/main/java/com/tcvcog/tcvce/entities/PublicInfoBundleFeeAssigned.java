@@ -33,10 +33,9 @@ public class PublicInfoBundleFeeAssigned extends PublicInfoBundle {
     //A list of anonymized payments that have been applied to the fee
     private List<PublicInfoBundlePayment> paymentList; 
     
-    private int occPerAssignedFeeID;
+    private int assignedFeeID;
     private int occPeriodID;
     private int occPeriodTypeID;
-    private int ceCaseAssignedFeeID;
     private int caseID;
     private int codeSetElement;
     private boolean waived;
@@ -59,21 +58,13 @@ public class PublicInfoBundleFeeAssigned extends PublicInfoBundle {
      */
     public void setBundledFee(FeeAssigned input) {
 
-        switch(input.getDomain()){
-            case CODE_ENFORCEMENT:
-                MoneyCECaseFeeAssigned tempCE = (MoneyCECaseFeeAssigned) input;
-                ceCaseAssignedFeeID = tempCE.getCeCaseAssignedFeeID();
-                caseID = tempCE.getCaseID();
-                codeSetElement = tempCE.getCodeSetElement();
-                
-                break;
-            case OCCUPANCY:
-                MoneyOccPeriodFeeAssigned tempOcc = (MoneyOccPeriodFeeAssigned) input;
-                occPerAssignedFeeID = tempOcc.getOccPerAssignedFeeID();
-                occPeriodID = tempOcc.getOccPeriodID();
-                occPeriodTypeID = tempOcc.getOccPeriodTypeID();
-                break;
-        }
+        assignedFeeID = input.getAssignedFeeID();
+
+        caseID = input.getCaseID();
+        codeSetElement = input.getCodeSetElement();
+
+        occPeriodID = input.getOccPeriodID();
+        occPeriodTypeID = input.getOccPeriodTypeID();
         
         input.setPaymentList(new ArrayList<Payment>());
         
@@ -94,12 +85,12 @@ public class PublicInfoBundleFeeAssigned extends PublicInfoBundle {
         bundledFee = input;
     }
 
-    public int getOccPerAssignedFeeID() {
-        return occPerAssignedFeeID;
+    public int getAssignedFeeID() {
+        return assignedFeeID;
     }
 
-    public void setOccPerAssignedFeeID(int occPerAssignedFeeID) {
-        this.occPerAssignedFeeID = occPerAssignedFeeID;
+    public void setAssignedFeeID(int ceCaseAssignedFeeID) {
+        this.assignedFeeID = ceCaseAssignedFeeID;
     }
 
     public int getOccPeriodID() {
@@ -116,14 +107,6 @@ public class PublicInfoBundleFeeAssigned extends PublicInfoBundle {
 
     public void setOccPeriodTypeID(int occPeriodTypeID) {
         this.occPeriodTypeID = occPeriodTypeID;
-    }
-
-    public int getCeCaseAssignedFeeID() {
-        return ceCaseAssignedFeeID;
-    }
-
-    public void setCeCaseAssignedFeeID(int ceCaseAssignedFeeID) {
-        this.ceCaseAssignedFeeID = ceCaseAssignedFeeID;
     }
 
     public int getCaseID() {

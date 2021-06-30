@@ -23,11 +23,9 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
+import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.FeeAssigned;
-import com.tcvcog.tcvce.entities.MoneyCECaseFeeAssigned;
-import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
 import com.tcvcog.tcvce.entities.User;
@@ -80,15 +78,15 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
             if (fee.isAutoAssigned()) {
 
-                MoneyOccPeriodFeeAssigned skeleton = new MoneyOccPeriodFeeAssigned();
+                FeeAssigned skeleton = new FeeAssigned(fee);
 
+                skeleton.setDomain(DomainEnum.OCCUPANCY);
                 skeleton.setOccPeriodID(period.getPeriodID());
                 skeleton.setOccPeriodTypeID(period.getType().getTypeID());
                 skeleton.setAssignedBy(getSessionBean().getSessUser());
                 skeleton.setAssigned(LocalDateTime.now());
                 skeleton.setLastModified(LocalDateTime.now());
                 skeleton.setNotes("Automatically assigned");
-                skeleton.setFee(fee);
 
                 pi.insertOccPeriodFee(skeleton);
 
@@ -117,15 +115,15 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
             if (fee.isAutoAssigned()) {
 
-                MoneyCECaseFeeAssigned skeleton = new MoneyCECaseFeeAssigned();
+                FeeAssigned skeleton = new FeeAssigned(fee);
 
+                skeleton.setDomain(DomainEnum.CODE_ENFORCEMENT);
                 skeleton.setCaseID(cse.getCaseID());
                 skeleton.setCodeSetElement(codeElement.getCodeSetElementID());
                 skeleton.setAssignedBy(getSessionBean().getSessUser());
                 skeleton.setAssigned(LocalDateTime.now());
                 skeleton.setLastModified(LocalDateTime.now());
                 skeleton.setNotes("Automatically assigned");
-                skeleton.setFee(fee);
 
                 pi.insertCECaseFee(skeleton);
 
@@ -146,7 +144,7 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
      */
     public FeeAssigned sanitizeAssignedFee(FeeAssigned input, boolean waived) throws BObStatusException {
 
-        if (input.getFee() == null) {
+        if (input == null) {
             throw new BObStatusException("Please select a fee to assign");
         }
 
@@ -172,13 +170,12 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
         input = sanitizeAssignedFee(input, waived);
 
-        MoneyOccPeriodFeeAssigned secondSkeleton = new MoneyOccPeriodFeeAssigned(input);
-
-        secondSkeleton.setOccPeriodID(currentOccPeriod.getPeriodID());
-        secondSkeleton.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
+        input.setDomain(DomainEnum.OCCUPANCY);
+        input.setOccPeriodID(currentOccPeriod.getPeriodID());
+        input.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
 
         PaymentIntegrator pi = getPaymentIntegrator();
-        pi.insertOccPeriodFee(secondSkeleton);
+        pi.insertOccPeriodFee(input);
 
     }
 
@@ -188,13 +185,11 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
         PaymentIntegrator pi = getPaymentIntegrator();
 
-        MoneyCECaseFeeAssigned secondSkeleton = new MoneyCECaseFeeAssigned(input);
+        input.setDomain(DomainEnum.CODE_ENFORCEMENT);
+        input.setCaseID(inputCase.getCaseID());
+        input.setCodeSetElement(violation.getCodeViolated().getCodeSetElementID());
 
-        secondSkeleton.setCeCaseAssignedFeeID(input.getAssignedFeeID());
-        secondSkeleton.setCaseID(inputCase.getCaseID());
-        secondSkeleton.setCodeSetElement(violation.getCodeViolated().getCodeSetElementID());
-
-        pi.insertCECaseFee(secondSkeleton);
+        pi.insertCECaseFee(input);
 
     }
 
@@ -204,13 +199,11 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
         input = sanitizeAssignedFee(input, waived);
 
-        MoneyCECaseFeeAssigned secondSkeleton = new MoneyCECaseFeeAssigned(input);
+        input.setDomain(DomainEnum.CODE_ENFORCEMENT);
+        input.setCaseID(currentCase.getCaseID());
+        input.setCodeSetElement(selectedViolation.getCodeViolated().getCodeSetElementID());
 
-        secondSkeleton.setCeCaseAssignedFeeID(input.getAssignedFeeID());
-        secondSkeleton.setCaseID(currentCase.getCaseID());
-        secondSkeleton.setCodeSetElement(selectedViolation.getCodeViolated().getCodeSetElementID());
-
-        pi.updateCECaseFee(secondSkeleton);
+        pi.updateCECaseFee(input);
 
     }
 
@@ -220,51 +213,53 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
         input = sanitizeAssignedFee(input, waived);
 
-        MoneyOccPeriodFeeAssigned secondSkeleton = new MoneyOccPeriodFeeAssigned(input);
+        input.setDomain(DomainEnum.OCCUPANCY);
+        input.setOccPeriodID(currentOccPeriod.getPeriodID());
+        input.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
 
-        secondSkeleton.setOccPeriodID(currentOccPeriod.getPeriodID());
-        secondSkeleton.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
-
-        pi.updateOccPeriodFee(secondSkeleton);
+        pi.updateOccPeriodFee(input);
 
     }
-
+//
     public List<FeeAssigned> getAssignedFees(OccPeriod currentOccPeriod) throws IntegrationException {
 
         PaymentIntegrator pi = getPaymentIntegrator();
         ArrayList<FeeAssigned> skeletonHorde = new ArrayList<>();
-
-        ArrayList<MoneyOccPeriodFeeAssigned> tempList = (ArrayList<MoneyOccPeriodFeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
-
-        for (MoneyOccPeriodFeeAssigned fee : tempList) {
-
-            FeeAssigned skeleton = fee;
-
-            skeleton.setAssignedFeeID(fee.getOccPerAssignedFeeID());
-            skeleton.setDomain(EventDomainEnum.OCCUPANCY);
-            skeletonHorde.add(skeleton);
-
-        }
-
+//
+//        ArrayList<FeeAssigned> tempList = (ArrayList<FeeAssigned>) pi.getFeeAssigned(currentOccPeriod);
+//
+//        // This code is maybe needless now? I am just doing some overview-level refactors so I apologize for
+//        // much of this class's current state.
+//        for (FeeAssigned fee : tempList) {
+//
+//            FeeAssigned skeleton = fee;
+//
+//            skeleton.setDomain(DomainEnum.OCCUPANCY);
+//            skeletonHorde.add(skeleton);
+//
+//        }
+//
         return skeletonHorde;
 
     }
 
+    // Let's just hope you wont need to get the assigned fees
+
     public List<FeeAssigned> getAssignedFees(CECase currentCase) throws IntegrationException {
         PaymentIntegrator pi = getPaymentIntegrator();
         ArrayList<FeeAssigned> skeletonHorde = new ArrayList<>();
-
-        List<MoneyCECaseFeeAssigned> tempList = (ArrayList<MoneyCECaseFeeAssigned>) pi.getFeeAssigned(currentCase);
-
-        for (MoneyCECaseFeeAssigned fee : tempList) {
-
-            FeeAssigned skeleton = fee;
-
-            skeleton.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
-            skeleton.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
-            skeletonHorde.add(skeleton);
-
-        }
+//
+//        List<MoneyCECaseFeeAssigned> tempList = (ArrayList<FeeAssigned>) pi.getFeeAssigned(currentCase);
+//
+//        for (MoneyCECaseFeeAssigned fee : tempList) {
+//
+//            FeeAssigned skeleton = fee;
+//
+//            skeleton.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
+//            skeleton.setDomain(DomainEnum.CODE_ENFORCEMENT);
+//            skeletonHorde.add(skeleton);
+//
+//        }
 
         return skeletonHorde;
 
@@ -412,13 +407,14 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
         pi.insertPayment(input);
         input = pi.getMostRecentPayment(); //So that the join insert knows what payment to join to
 
-        if (appliedTo.getDomain() == EventDomainEnum.OCCUPANCY) {
-            MoneyOccPeriodFeeAssigned skeleton = new MoneyOccPeriodFeeAssigned(appliedTo);
-            pi.insertPaymentPeriodJoin(input, skeleton);
-        } else if (appliedTo.getDomain() == EventDomainEnum.CODE_ENFORCEMENT) {
-            MoneyCECaseFeeAssigned skeleton = new MoneyCECaseFeeAssigned(appliedTo);
-            pi.insertPaymentCaseJoin(input, skeleton);
-        }
+        // Code so interconnected with code I commented out that I also have to comment this out
+//        if (appliedTo.getDomain() == DomainEnum.OCCUPANCY) {
+//            MoneyOccPeriodFeeAssigned skeleton = new MoneyOccPeriodFeeAssigned(appliedTo);
+//            pi.insertPaymentPeriodJoin(input, skeleton);
+//        } else if (appliedTo.getDomain() == DomainEnum.CODE_ENFORCEMENT) {
+//            MoneyCECaseFeeAssigned skeleton = new MoneyCECaseFeeAssigned(appliedTo);
+//            pi.insertPaymentCaseJoin(input, skeleton);
+//        }
 
     }
 

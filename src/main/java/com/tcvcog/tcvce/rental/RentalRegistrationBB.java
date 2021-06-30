@@ -434,7 +434,7 @@ public class RentalRegistrationBB extends BackingBeanUtils implements Serializab
         try {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
 
-            ec.redirect("/tcvce/public/services/rental/rental5personsRequirementManage.xhtml#currentStep");
+            ec.redirect("/tcvce/public/services/rental/rental5PersonsRequirementManage.xhtml#currentStep");
         } catch (IOException ex) {
         }
 

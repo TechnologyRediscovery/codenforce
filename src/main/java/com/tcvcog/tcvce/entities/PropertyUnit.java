@@ -17,6 +17,8 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
@@ -172,14 +174,14 @@ public class    PropertyUnit
      * @return the rentalIntentDateStart
      */
     public Date getRentalIntentDateStartUtil() {
-        return convertUtilDate(rentalIntentDateStart);
+        return DateTimeUtil.convertUtilDate(rentalIntentDateStart);
     }
 
     /**
      * @return the rentalIntentDateStop
      */
     public Date getRentalIntentDateStopUtil() {
-        return convertUtilDate(rentalIntentDateStop);
+        return DateTimeUtil.convertUtilDate(rentalIntentDateStop);
     }
     
     /**
@@ -221,14 +223,14 @@ public class    PropertyUnit
      * @param rentalIntentDateStart the rentalIntentDateStart to set
      */
     public void setRentalIntentDateStartUtil(Date rentalIntentDateStart) {
-        this.rentalIntentDateStart = convertUtilDate(rentalIntentDateStart);
+        this.rentalIntentDateStart = DateTimeUtil.convertUtilDate(rentalIntentDateStart);
     }
 
     /**
      * @param rentalIntentDateStop the rentalIntentDateStop to set
      */
     public void setRentalIntentDateStopUtil(Date rentalIntentDateStop) {
-        this.rentalIntentDateStop = convertUtilDate(rentalIntentDateStop);
+        this.rentalIntentDateStop = DateTimeUtil.convertUtilDate(rentalIntentDateStop);
     }
 
     /**

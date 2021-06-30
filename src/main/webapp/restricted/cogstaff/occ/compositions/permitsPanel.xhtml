@@ -1,0 +1,130 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <p:panel id="occperiod-permits-panel"
+             toggleable="true"
+             widgetVar="occperiod-permits-panel-var"
+             collapsed="false"
+             header="Permits">
+        <h:form id="occperiod-permits-form">
+            <p:commandButton id="occperiod-permits-button-newpermit"
+                             value="Configure new permit"
+                             ajax="true"
+                             process="@form"
+                             actionListener="#{occInspectionBB.reports_initializeOccPermitReport}"
+                             oncomplete="PF('occperiod-createpermit-occpermit-var').show()"
+                             disabled="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedTS}"
+                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                             icon="fa fa-plus"
+                             update="occperiod-createpermit-occpermit-form"/>
+
+            <p:spacer height="5px"/>
+
+            <p:dataTable id="occperiod-permits-datatable"
+                         var="permit"
+                         rowKey="#{permit.permitID}"
+                         value="#{occInspectionBB.currentOccPeriod.permitList}"
+                         tableStyleClass="primeDataTable"
+                         draggableColumns="true"
+                         resizableColumns="true">
+
+                <p:column width="10%">
+                    <f:facet name="header">
+                        <h:outputText value="Print"/>
+                    </f:facet>
+
+                    <p:commandButton ajax="false"
+                                     action="#{occInspectionBB.initializeOccPermitReport(permit)}"
+                                     value="print"
+                                     icon="fa fa-print"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
+                </p:column>
+
+                <p:column width="10%">
+                    <f:facet name="header">
+                        <h:outputText value="Permit ID"/>
+                    </f:facet>
+
+                    <h:outputText value="#{permit.permitID}"/>
+                </p:column>
+
+                <p:column width="10%">
+                    <f:facet name="header">
+                        <h:outputText value="Date issued"/>
+                    </f:facet>
+
+                    <h:outputText value="#{occInspectionBB.getPrettyDate(permit.dateIssued)}"/>
+                </p:column>
+
+                <p:column width="10%">
+                    <f:facet name="header">
+                        <h:outputText value="Issuee"/>
+                    </f:facet>
+
+                    <h:outputText value="#{permit.issuedTo.firstName}"/>
+                    <h:outputText value=" "/>
+                    <h:outputText value="#{permit.issuedTo.LastName}"/>
+
+                    <p:spacer height="0px"/>
+
+                    <h:outputText value=" ("/>
+                    <h:outputText value="#{permit.issuedTo.personType.label}"/>
+                    <h:outputText value=", ID:"/>
+                    <h:outputText value="#{permit.issuedTo.personID}"/>
+                    <h:outputText value=")"/>
+                </p:column>
+
+                <p:column width="15%">
+                    <f:facet name="header">
+                        <h:outputText value="Issuer" />
+                    </f:facet>
+
+                    <h:outputText value="#{permit.issuedBy.person.firstName}"/>
+                    <h:outputText value=""/>
+                    <h:outputText value="#{permit.issuedBy.person.LastName}"/>
+
+                    <p:spacer height="0px"/>
+
+                    <h:outputText value=" (User ID:"/>
+                    <h:outputText value="#{permit.issuedBy.userID}"/>
+                    <h:outputText value=")"/>
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+    </p:panel>
+
+    <!-- Dialog used when making a new permit -->
+    <p:dialog id="occperiod-createpermit-occpermit-dialog"
+              height="650" width="900"
+              widgetVar="occperiod-createpermit-occpermit-var"
+              closable="true"
+              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
+
+        <h:form id="occperiod-createpermit-occpermit-form">
+            <h:messages id="occperiod-createpermit-occpermit-messages"
+                        globalOnly="true" showDetail="true" showSummary="true"
+                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+            </h:messages>
+
+
+            <h:panelGrid columns="2"
+                         columnClasses="gridTd, gridTd">
+            </h:panelGrid>
+
+            <p:commandButton id="occperiod-createpermit-occpermit-button-cancel"
+                             ajax="true"
+                             value="Cancel" icon="fa fa-stop"
+                             onclick="PF('occperiod-createpermit-occpermit-var').hide()"/>
+
+            <p:commandButton id="occperiod-createpermit-occpermit-button-generate"
+                             ajax="false"
+                             action="#{occInspectionBB.reports_generateOccPermit(currentOccPermit)}"
+                             value="Generate permit" icon="fa fa-plus"
+                             disabled="false"
+                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
+        </h:form>
+    </p:dialog>
+</ui:composition>

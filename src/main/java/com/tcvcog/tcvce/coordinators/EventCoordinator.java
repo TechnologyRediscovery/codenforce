@@ -18,7 +18,6 @@
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -165,9 +164,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         } else {
              edh = new EventCnFPropUnitCasePeriodHeavy(ev);
         }
-        if(ev.getDomain() == EventDomainEnum.OCCUPANCY && ev.getOccPeriodID() != 0){
+        if(ev.getDomain() == DomainEnum.OCCUPANCY && ev.getOccPeriodID() != 0){
             edh.setPeriod(oc.getOccPeriodPropertyUnitHeavy(edh.getOccPeriodID()));
-        } else if(ev.getDomain() == EventDomainEnum.CODE_ENFORCEMENT && ev.getCeCaseID() != 0){
+        } else if(ev.getDomain() == DomainEnum.CODE_ENFORCEMENT && ev.getCeCaseID() != 0){
             edh.setCecase(cc.cecase_assembleCECasePropertyUnitHeavy(cc.cecase_getCECase(edh.getCeCaseID())));
             // note that a Property object is already inside our CECase base class
         } else {
@@ -214,39 +213,38 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public List<EventCnF> addEvent(     EventCnF ev, 
-                                        IFace_EventRuleGoverned erg, 
+                                        IFace_EventHolder erg,
                                         UserAuthorized ua) 
                             throws      BObStatusException, 
                                         EventException, 
                                         IntegrationException{
-        
-        if(ev == null || erg == null || ua == null){
+
+
+        if (ev == null || erg == null || ua == null) {
             throw new BObStatusException("Cannot process event with incomplete args");
         }
         
         // *************************
         // Check Connections to the mother BOb
         // *************************
-        if(erg instanceof OccPeriodDataHeavy && ev.getOccPeriodID() == 0){
+        if (erg instanceof OccPeriod && ev.getOccPeriodID() == 0) {
             ev.setOccPeriodID(erg.getBObID());
-        } else if (erg instanceof CECaseDataHeavy && ev.getCeCaseID() == 0){
+        } else if (erg instanceof CECase && ev.getCeCaseID() == 0) {
             ev.setCeCaseID(erg.getBObID());
-        } 
+        }
         
         configureEventTimes(ev, ua);
-        
-        LocalDateTime now = LocalDateTime.now();
-        
+
         // ****************
         // Event essentials
         // ****************
         ev.setUserCreator(ua);
         ev.setLastUpdatedBy(ua);
-        ev.setLastUpdatedTS(now);
+        ev.setLastUpdatedTS(LocalDateTime.now());
         
         ev.setActive(true);
         ev.setHidden(false);
-        
+
         // **********************************
         // Allow domain coordinators to check
         // **********************************
@@ -256,11 +254,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // position our primary event at the head of the list
         evsToAddQu.add(ev);
         // then let the other domain folks add to this stack if needed
-        
-            return addEvent_processStack(evsToAddQu);
-        
 
-        
+        return addEvent_processStack(evsToAddQu);
+
+
+
     }
     
     /**
@@ -294,7 +292,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
         // deal with no end time
         if(ev.getTimeEnd() == null){
-            timeEndComputed = ev.getTimeStart().plusMinutes(ev.getCategory().getDefaultdurationmins());
+            timeEndComputed = ev.getTimeStart().plusMinutes(ev.getCategory().getDefaultDurationMins());
             ev.setTimeEnd(timeEndComputed);
      
             mbp = new MessageBuilderParams();
@@ -391,9 +389,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 throw new EventException("EventCnF cannot have a non-zero CECase and OccPeriod ID");
             }
             if(ev.getCeCaseID() != 0){
-                ev.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
+                ev.setDomain(DomainEnum.CODE_ENFORCEMENT);
             } else if(ev.getOccPeriodID() != 0){
-                ev.setDomain(EventDomainEnum.OCCUPANCY);
+                ev.setDomain(DomainEnum.OCCUPANCY);
             } else {
                 throw new EventException("EventCnF must have either an occupancy period ID, or CECase ID");
             }
@@ -513,24 +511,24 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * case phase (closed cases cannot have action, origination, or compliance events.
      * Includes the instantiation of EventCnF objects
      * 
-     * @param erg which for Beta v0.9 includes CECaseDataHeavy and OccPeriod object; null means 
+     * @param erg which for Beta v0.9 includes CECase and OccPeriod object; null means
      * caller will need to insert the BOb ID later
      * @param ec the type of event to attach to the case
      * @return an initialized event with basic properties set
      * @throws BObStatusException thrown if the case is in an improper state for proposed event
      * @throws com.tcvcog.tcvce.domain.EventException
      */
-    public EventCnF initEvent(IFace_EventRuleGoverned erg, EventCategory ec) throws BObStatusException, EventException{
+    public EventCnF initEvent(IFace_EventHolder erg, EventCategory ec) throws BObStatusException, EventException {
         
-        CECaseDataHeavy cse = null;
+        CECase cse = null;
         OccPeriod op = null;
         
-        // the moment of event instantiaion!!!!
+        // the moment of event instantiation!!!!
         EventCnF e = new EventCnF();
         
         if(erg != null){
-            if(erg instanceof CECaseDataHeavy){
-                cse = (CECaseDataHeavy) erg;
+            if(erg instanceof CECase){
+                cse = (CECase) erg;
                 if(cse.getStatusBundle() != null){
                     
                     if(cse.getStatusBundle().getPhase() == CasePhaseEnum.Closed && 
@@ -544,13 +542,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                    ){
                        throw new BObStatusException("This event cannot be attached to a closed case");
                    }
-                } 
+                }
                 e.setCeCaseID(cse.getCaseID());
-                e.setDomain(EventDomainEnum.CODE_ENFORCEMENT);
+                e.setDomain(DomainEnum.CODE_ENFORCEMENT);
             } else if (erg instanceof OccPeriod){
                 op = (OccPeriod) erg;
                 e.setOccPeriodID(op.getPeriodID());
-                e.setDomain(EventDomainEnum.OCCUPANCY);
+                e.setDomain(DomainEnum.OCCUPANCY);
             }
         }
         
@@ -559,7 +557,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
             e.setCategory(ec);
 
             e.setTimeStart(LocalDateTime.now());
-            e.setTimeEnd(e.getTimeStart().plusMinutes(ec.getDefaultdurationmins()));
+            e.setTimeEnd(e.getTimeStart().plusMinutes(ec.getDefaultDurationMins()));
         }
         
         e.setActive(true);
@@ -695,8 +693,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return 
      */
     public Map<EventType, List<EventCategory>> assembleEventTypeCatMap_toEnact(
-                                                EventDomainEnum domain,
-                                                IFace_EventRuleGoverned erg, 
+                                                DomainEnum domain,
+                                                IFace_EventHolder erg,
                                                 UserAuthorized ua){
        Map<EventType, List<EventCategory>> typeCatMap = new HashMap<>();
        List<EventType> typeList = determinePermittedEventTypes(domain, erg, ua);
@@ -719,8 +717,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param ua doing potential creation of an event
      * @return 
      */
-    public List<EventType> determinePermittedEventTypes(    EventDomainEnum domain, 
-                                                            IFace_EventRuleGoverned erg, 
+    public List<EventType> determinePermittedEventTypes(    DomainEnum domain,
+                                                            IFace_EventHolder erg,
                                                             UserAuthorized ua){
         List<EventType> typeList = new ArrayList<>();
         if(domain == null || erg == null || ua == null){

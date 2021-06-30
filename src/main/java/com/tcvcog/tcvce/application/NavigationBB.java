@@ -26,12 +26,12 @@ import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -200,7 +200,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     public String onPropertyListItemSelect(Property prop){
         String navTo = "";
         try {
-            navTo = getSessionBean().activateSessionObject(prop);
+            navTo = getSessionBean().navigateToPageCorrespondingToObject(prop);
         } catch (BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -224,7 +224,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     public String onCECaseListItemSelect(CECase cse){
         String navTo = "";
         try {
-            navTo = getSessionBean().activateSessionObject(cse);
+            navTo = getSessionBean().navigateToPageCorrespondingToObject(cse);
         } catch (BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -235,7 +235,25 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
         return navTo;
         
     }
-    
+
+    /**
+     * Listener for user requests to view an occ period from the active object box navlist
+     * @param period
+     * @return
+     */
+    public String onOccPeriodListItemSelect(OccPeriod period){
+        String navTo = "";
+        try {
+            navTo = getSessionBean().navigateToPageCorrespondingToObject(period);
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+                    "Unable to load selected property", ""));
+        }
+
+        return navTo;
+    }
     
 
     //Eric
@@ -268,7 +286,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     public String onViewPersonListItemSelect(Person pers) {
        String navTo = "";
         try {
-            navTo = getSessionBean().activateSessionObject(pers);
+            navTo = getSessionBean().navigateToPageCorrespondingToObject(pers);
         } catch (BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,

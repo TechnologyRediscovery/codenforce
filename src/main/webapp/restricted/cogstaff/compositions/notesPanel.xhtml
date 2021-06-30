@@ -1,0 +1,66 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <p:panel id="notes-panel"
+             toggleable="true"
+             widgetVar="notes-panel-var"
+             collapsed="false"
+             header="Notes">
+
+        <h:form id="notes-form">
+            <p:commandButton id="notes-add-button"
+                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                             value="Add New Note"
+                             icon="fa fa-sticky-note-o"
+                             actionListener="#{notesBB.clearFormNoteText}"
+                             oncomplete="PF('note-dialog-var').show()"
+                             update="note-create-form"/>
+
+            <p:spacer height="5px"/>
+            <h:outputText id="notes-ot"
+                          escape="false"
+                          value="#{notesBB.currentNoteHolder.notes}"/>
+
+        </h:form>
+    </p:panel>
+
+    <!-- Notes dialog -->
+    <p:dialog id="note-dialog"
+              height="300" width="750"
+              widgetVar="note-dialog-var"
+              closable="true"
+              resizable="true"
+              responsive="true"
+              modal="true"
+              header="Note Builder"
+              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}">
+
+        <h:form id="note-create-form">
+
+            <h:outputText styleClass="ui-label" value="Note text: (name and time automatically inserted) "/>
+            <p:textEditor id="note-editor"
+                          value="#{notesBB.formNoteText}"
+                          required="false"
+                          secure="false"
+                          height="200"/>
+
+            <p:spacer height="5px"/>
+
+            <p:commandButton id="note-button-cancel"
+                             value="Cancel"
+                             icon="fa fa-stop"
+                             onclick="PF('note-dialog-var').hide()"/>
+
+            <p:commandButton id="note-button-addnote"
+                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                             actionListener="#{notesBB.appendNotes}"
+                             onclick="PF(note-dialog-var').hide()"
+                             update="notes-form"
+                             value="Attach Note"
+                             styleClass="inline-button"
+                             icon="fa fa-sticky-note-o"/>
+        </h:form>
+    </p:dialog>
+</ui:composition>

@@ -23,11 +23,9 @@ import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
+import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**
@@ -70,14 +68,14 @@ public class PersonEventsBB extends BackingBeanUtils{
         OccupancyCoordinator oc = getOccupancyCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         if(ev != null){
-            if(ev.getDomain() == EventDomainEnum.OCCUPANCY){
+            if(ev.getDomain() == DomainEnum.OCCUPANCY){
                 try {
                     getSessionBean().setSessOccPeriodQueued(oc.getOccPeriod(ev.getOccPeriodID()));
                     return "occPeriodWorkflow";
                 } catch (IntegrationException ex) {
                     System.out.println(ex);
                 }
-            } else if(ev.getDomain() == EventDomainEnum.CODE_ENFORCEMENT){
+            } else if(ev.getDomain() == DomainEnum.CODE_ENFORCEMENT){
                 try{
                     getSessionBean().setSessCECaseQueued(cc.cecase_getCECase(ev.getCeCaseID()));
                     return "ceCaseWorkflow";

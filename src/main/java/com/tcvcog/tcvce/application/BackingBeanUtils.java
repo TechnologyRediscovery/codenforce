@@ -67,13 +67,14 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -509,22 +510,15 @@ public class        BackingBeanUtils
         
         
     }
+
     
-    
-    public String getPrettyDate(LocalDateTime d){
-        SystemCoordinator sc = getSystemCoordinator();
-        return sc.getPrettyDate(d);
+    public String getPrettyDate(LocalDateTime d) {
+        return DateTimeUtil.getPrettyDate(d);
     }
     
     
     public String getPrettyDateNoTime(LocalDateTime d){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy");
-        if(d != null){
-            String formattedDateTime = d.format(formatter); 
-            return formattedDateTime;
-        } else {
-            return "";
-        }
+        return DateTimeUtil.getPrettyDateNoTime(d);
     }
     
     /**

@@ -16,6 +16,8 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -29,14 +31,30 @@ public class Fee extends BOb {
 
     private String name;
     private double amount;
+
     private LocalDateTime effectiveDate;
     private LocalDateTime expiryDate;
+
     private String notes;
     private boolean autoAssigned;
 
-    public Fee(){
+    public Fee() {
         effectiveDate = LocalDateTime.now();
         expiryDate = LocalDateTime.now();
+    }
+
+    public Fee(Fee fee) {
+        this.feeID = fee.getFeeID();
+        this.muni = fee.getMuni();
+
+        this.name = fee.getName();
+        this.amount = fee.getAmount();
+
+        this.effectiveDate = fee.getEffectiveDate();
+        this.expiryDate = fee.getExpiryDate();
+
+        this.notes = fee.getNotes();
+        this.autoAssigned = fee.isAutoAssigned();
     }
     
     /**
@@ -103,28 +121,28 @@ public class Fee extends BOb {
      * @return the effective date
      */
     public Date getEffectiveUtilDate() {
-        return convertUtilDate(effectiveDate);
+        return DateTimeUtil.convertUtilDate(effectiveDate);
     }
 
     /**
      * @param effectiveUtilDate the date to set
      */
     public void setEffectiveUtilDate(Date effectiveUtilDate) {
-        effectiveDate = convertUtilDate(effectiveUtilDate);
+        effectiveDate = DateTimeUtil.convertUtilDate(effectiveUtilDate);
     }
 
     /**
      * @return the expiry date
      */
     public Date getExpiryUtilDate() {
-        return convertUtilDate(expiryDate);
+        return DateTimeUtil.convertUtilDate(expiryDate);
     }
 
     /**
      * @param expiryUtilDate the date to set
      */
     public void setExpiryUtilDate(Date expiryUtilDate) {
-        expiryDate = convertUtilDate(expiryUtilDate);
+        expiryDate = DateTimeUtil.convertUtilDate(expiryUtilDate);
     }
     
     public String getNotes() {

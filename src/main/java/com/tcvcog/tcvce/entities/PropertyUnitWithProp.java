@@ -25,8 +25,7 @@ public class PropertyUnitWithProp extends PropertyUnit {
     protected Property property;
 
     public PropertyUnitWithProp(PropertyUnit prop){
-        if(prop != null){
-
+        if (prop != null) {
             this.unitID = prop.getUnitID();
             this.propertyID = prop.getPropertyID();
             this.unitNumber = prop.getUnitNumber();

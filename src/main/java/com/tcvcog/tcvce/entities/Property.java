@@ -10,6 +10,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import java.time.LocalDateTime;
 import java.util.List;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 
 /**
  * Foundational entity for the system: Property
@@ -293,11 +294,11 @@ public class    Property
     }
     
     public java.util.Date getUnfitDateUtilStart() {
-        return convertUtilDate(unfitDateStart);
+        return DateTimeUtil.convertUtilDate(unfitDateStart);
     }
     
     public void setUnfitDateUtilStart(java.util.Date unfitDateUtilStart){
-        this.unfitDateStart = convertUtilDate(unfitDateUtilStart);
+        this.unfitDateStart = DateTimeUtil.convertUtilDate(unfitDateUtilStart);
     }
 
     /**
@@ -308,11 +309,11 @@ public class    Property
     }
     
     public java.util.Date getUnfitDateUtilStop(){
-        return convertUtilDate(unfitDateStop);
+        return DateTimeUtil.convertUtilDate(unfitDateStop);
     }
     
     public void setUnfitDateUtilStop(java.util.Date unfitDateUtilStop){
-        unfitDateStop = convertUtilDate(unfitDateUtilStop);
+        unfitDateStop = DateTimeUtil.convertUtilDate(unfitDateUtilStop);
     }
 
     /**
@@ -330,11 +331,11 @@ public class    Property
     }
     
     public void setAbandonedDateUtilStart(java.util.Date abandonedDateUtilStart){
-        abandonedDateStart = convertUtilDate(abandonedDateUtilStart);
+        abandonedDateStart = DateTimeUtil.convertUtilDate(abandonedDateUtilStart);
     }
     
     public java.util.Date getAbandonedDateUtilStart(){
-        return convertUtilDate(abandonedDateStart);
+        return DateTimeUtil.convertUtilDate(abandonedDateStart);
     }
 
     /**
@@ -345,11 +346,11 @@ public class    Property
     }
     
     public java.util.Date getAbandonedDateUtilStop(){
-        return convertUtilDate(abandonedDateStop);
+        return DateTimeUtil.convertUtilDate(abandonedDateStop);
     }
     
     public void setAbandonedDateUtilStop(java.util.Date abandonedDateUtilStop){
-        abandonedDateStop = convertUtilDate(abandonedDateUtilStop);
+        abandonedDateStop = DateTimeUtil.convertUtilDate(abandonedDateUtilStop);
     }
 
     /**
@@ -367,11 +368,11 @@ public class    Property
     }
     
     public java.util.Date getVacantDateUtilStart(){
-        return convertUtilDate(vacantDateStart);
+        return DateTimeUtil.convertUtilDate(vacantDateStart);
     }
     
     public void setVacantDateUtilStart(java.util.Date vacantStartUtilDate){
-        vacantDateStart = convertUtilDate(vacantStartUtilDate);
+        vacantDateStart = DateTimeUtil.convertUtilDate(vacantStartUtilDate);
     }
 
     /**
@@ -382,11 +383,11 @@ public class    Property
     }
     
     public java.util.Date getVacantDateUtilStop(){
-        return convertUtilDate(vacantDateStop);
+        return DateTimeUtil.convertUtilDate(vacantDateStop);
     }
     
     public void setVacantDateUtilStop(java.util.Date vacantStopUtilDate){
-        vacantDateStop = convertUtilDate(vacantStopUtilDate);
+        vacantDateStop = DateTimeUtil.convertUtilDate(vacantStopUtilDate);
     }
 
     /**

@@ -9,6 +9,8 @@ import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.Query;
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -174,7 +176,7 @@ public abstract class Report
      */
     public String getGenerationTimestampPretty() {
         if(generationTimestamp != null){
-            generationTimestampPretty = EntityUtils.getPrettyDate(generationTimestamp);
+            generationTimestampPretty = DateTimeUtil.getPrettyDate(generationTimestamp);
         }
         return generationTimestampPretty;
     }

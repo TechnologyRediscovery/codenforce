@@ -24,7 +24,8 @@ public class CECaseDataHeavy
         IFace_EventRuleGoverned,
         IFace_CredentialSigned,
         IFace_Loggable,
-        IFace_ActivatableBOB{
+        IFace_ActivatableBOB,
+        IFace_PaymentHolder {
 
     // accessed through methods specified in the interfaces
     private Property property;
@@ -36,13 +37,13 @@ public class CECaseDataHeavy
 
     private List<CEActionRequest> ceActionRequestList;
 
-    private List<MoneyCECaseFeeAssigned> feeList;
-    private List<MoneyCECaseFeePayment> paymentList;
+    private List<FeeAssigned> feeList;
+    private List<Payment> paymentList;
     
     private List<Integer> blobIDList;
     
    
-    public CECaseDataHeavy(CECase cse){
+    public CECaseDataHeavy(CECase cse) {
         if(cse != null){
             
         this.caseID = cse.caseID;
@@ -86,24 +87,12 @@ public class CECaseDataHeavy
         }
         
     }
-    
-    
 
-    
 
-   
-    
     @Override
-    public EventDomainEnum discloseEventDomain() {
-        return EventDomainEnum.CODE_ENFORCEMENT;
+    public DomainEnum discloseEventDomain() {
+        return DomainEnum.CODE_ENFORCEMENT;
     }
-    
-    
-    @Override
-    public int getBObID() {
-        return caseID;
-    }
-
 
 
     /**
@@ -276,28 +265,31 @@ public class CECaseDataHeavy
     /**
      * @return the feeList
      */
-    public List<MoneyCECaseFeeAssigned> getFeeList() {
+    public List<FeeAssigned> getFeeList() {
         return feeList;
-    }
-
-    /**
-     * @return the paymentList
-     */
-    public List<MoneyCECaseFeePayment> getPaymentList() {
-        return paymentList;
     }
 
     /**
      * @param feeList the feeList to set
      */
-    public void setFeeList(List<MoneyCECaseFeeAssigned> feeList) {
+    public void setFeeList(List<FeeAssigned> feeList) {
         this.feeList = feeList;
     }
 
     /**
+     * @return the paymentList
+     */
+    @Override
+    public List<Payment> getPaymentList() {
+        return paymentList;
+    }
+
+
+    /**
      * @param paymentList the paymentList to set
      */
-    public void setPaymentList(List<MoneyCECaseFeePayment> paymentList) {
+    @Override
+    public void setPaymentList(List<Payment> paymentList) {
         this.paymentList = paymentList;
     }
 
@@ -306,12 +298,13 @@ public class CECaseDataHeavy
      *
      * @param paymentList the paymentList to set
      */
+    @Override
     public void setPaymentListGeneral(List<Payment> paymentList) {
-        List<MoneyCECaseFeePayment> skeletonHorde = new ArrayList<>();
+        List<Payment> skeletonHorde = new ArrayList<>();
 
         for (Payment p : paymentList) {
 
-            skeletonHorde.add(new MoneyCECaseFeePayment(p));
+            skeletonHorde.add(new Payment(p));
 
         }
 

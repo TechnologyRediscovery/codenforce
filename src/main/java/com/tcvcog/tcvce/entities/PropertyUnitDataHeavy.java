@@ -17,6 +17,8 @@
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
+
 import java.util.ArrayList;
 import java.util.List;
 

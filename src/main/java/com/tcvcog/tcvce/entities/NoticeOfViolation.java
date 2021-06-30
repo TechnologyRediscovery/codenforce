@@ -17,6 +17,8 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Iterator;
@@ -158,7 +160,7 @@ public class NoticeOfViolation  extends BOb implements Serializable, Comparable<
      */
     public String getCreationTSPretty() {
         if(creationTS != null){
-            creationTSPretty = EntityUtils.getPrettyDate(creationTS);
+            creationTSPretty = DateTimeUtil.getPrettyDate(creationTS);
         }
         return creationTSPretty;
     }
@@ -168,7 +170,7 @@ public class NoticeOfViolation  extends BOb implements Serializable, Comparable<
      */
     public String getDateOfRecordPretty() {
         if(dateOfRecord != null){
-            dateOfRecordPretty = EntityUtils.getPrettyDate(dateOfRecord);
+            dateOfRecordPretty = DateTimeUtil.getPrettyDate(dateOfRecord);
         }
         return dateOfRecordPretty;
     }
@@ -178,7 +180,7 @@ public class NoticeOfViolation  extends BOb implements Serializable, Comparable<
      */
     public String getSentTSPretty() {
         if(sentTS != null){
-            sentTSPretty = EntityUtils.getPrettyDate(sentTS);
+            sentTSPretty = DateTimeUtil.getPrettyDate(sentTS);
         }
         return sentTSPretty;
     }
@@ -223,7 +225,7 @@ public class NoticeOfViolation  extends BOb implements Serializable, Comparable<
      */
     public String getReturnedTSPretty() {
         if(returnedTS != null){
-            returnedTSPretty = EntityUtils.getPrettyDate(returnedTS);
+            returnedTSPretty = DateTimeUtil.getPrettyDate(returnedTS);
             
         }
         return returnedTSPretty;
@@ -290,7 +292,7 @@ public class NoticeOfViolation  extends BOb implements Serializable, Comparable<
      */
     public String getLockedAndQueuedTSPretty() {
         if(lockedAndqueuedTS != null){
-            lockedAndQueuedTSPretty = EntityUtils.getPrettyDate(lockedAndqueuedTS);
+            lockedAndQueuedTSPretty = DateTimeUtil.getPrettyDate(lockedAndqueuedTS);
         }
         return lockedAndQueuedTSPretty;
     }
@@ -423,7 +425,7 @@ public class NoticeOfViolation  extends BOb implements Serializable, Comparable<
      * @return the dateOfRecordUtilDate
      */
     public java.util.Date getDateOfRecordUtilDate() {
-        dateOfRecordUtilDate = convertUtilDate(dateOfRecord);
+        dateOfRecordUtilDate = DateTimeUtil.convertUtilDate(dateOfRecord);
         return dateOfRecordUtilDate;
     }
 
@@ -431,7 +433,7 @@ public class NoticeOfViolation  extends BOb implements Serializable, Comparable<
      * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
      */
     public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        dateOfRecord = convertUtilDate(dateOfRecordUtilDate);
+        dateOfRecord = DateTimeUtil.convertUtilDate(dateOfRecordUtilDate);
         this.dateOfRecordUtilDate = dateOfRecordUtilDate;
     }
 

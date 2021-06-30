@@ -24,21 +24,63 @@ import java.util.List;
  * This BOb represents a fee that has actually been assigned to an entity.
  * @author Nathan Dietz
  */
-public class FeeAssigned extends BOb implements Serializable {
+public class FeeAssigned extends Fee implements Serializable {
 
-    protected int assignedFeeID;
-    protected EventDomainEnum domain;
-    protected List<Payment> paymentList; //All the payments that have been made on this fee
-    protected User assignedBy;
-    protected LocalDateTime assigned;
-    protected User waivedBy;
-    protected LocalDateTime lastModified;
-    protected double reducedBy; //Amount the template Fee is reduced by. Subtract this from the Fee's amount field
-    protected User reducedByUser;
-    protected String notes;
-    protected Fee fee; //The fee that has been assigned
+    // NOTE: It is probably better to use the fee ID for both feeassigned and fee. I don't see any reason
+    // to make them separate? So much work to do with fees!
+    private int assignedFeeID;
+
+    private DomainEnum domain;
+    // For occ (apparently)
+    private int occPeriodID;
+    private int occPeriodTypeID;
+
+    // For CE (apparently)
+    private int caseID;
+    private int codeSetElement;
+
+    private List<Payment> paymentList; //All the payments that have been made on this fee
+
+    private User assignedBy;
+    private LocalDateTime assigned;
+
+    private User waivedBy;
+
+    private LocalDateTime lastModified;
+
+    private double reducedBy; //Amount the template Fee is reduced by. Subtract this from the Fee's amount field
+    private User reducedByUser;
 
     public FeeAssigned() {
+    }
+
+    public FeeAssigned(Fee fee) {
+        super(fee);
+    }
+
+    public FeeAssigned(FeeAssigned feeAssigned) {
+        super(feeAssigned);
+
+        this.domain = feeAssigned.getDomain();
+
+        this.occPeriodID = feeAssigned.getOccPeriodID();
+        this.occPeriodTypeID = feeAssigned.getOccPeriodTypeID();
+
+        this.caseID = feeAssigned.getCaseID();
+        this.codeSetElement = feeAssigned.getCodeSetElement();
+
+        this.paymentList = feeAssigned.getPaymentList();
+
+        this.assignedBy = feeAssigned.getAssignedBy();
+        this.assigned = feeAssigned.getAssigned();
+
+        this.waivedBy = feeAssigned.getWaivedBy();
+
+        this.lastModified = feeAssigned.getLastModified();
+
+        this.reducedBy = feeAssigned.getReducedBy();
+        this.reducedByUser = feeAssigned.getReducedByUser();
+
     }
         
     public int getAssignedFeeID() {
@@ -49,11 +91,11 @@ public class FeeAssigned extends BOb implements Serializable {
         this.assignedFeeID = assignedFeeID;
     }
 
-    public EventDomainEnum getDomain() {
+    public DomainEnum getDomain() {
         return domain;
     }
 
-    public void setDomain(EventDomainEnum domain) {
+    public void setDomain(DomainEnum domain) {
         this.domain = domain;
     }
     
@@ -105,28 +147,44 @@ public class FeeAssigned extends BOb implements Serializable {
         this.reducedByUser = reducedByUser;
     }
 
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public Fee getFee() {
-        return fee;
-    }
-
-    public void setFee(Fee fee) {
-        this.fee = fee;
-    }
-
     public LocalDateTime getAssigned() {
         return assigned;
     }
 
     public void setAssigned(LocalDateTime assigned) {
         this.assigned = assigned;
+    }
+
+    public int getOccPeriodID() {
+        return occPeriodID;
+    }
+
+    public void setOccPeriodID(int occPeriodID) {
+        this.occPeriodID = occPeriodID;
+    }
+
+    public int getOccPeriodTypeID() {
+        return occPeriodTypeID;
+    }
+
+    public void setOccPeriodTypeID(int occPeriodTypeID) {
+        this.occPeriodTypeID = occPeriodTypeID;
+    }
+
+    public int getCaseID() {
+        return caseID;
+    }
+
+    public void setCaseID(int caseID) {
+        this.caseID = caseID;
+    }
+
+    public int getCodeSetElement() {
+        return codeSetElement;
+    }
+
+    public void setCodeSetElement(int codeSetElement) {
+        this.codeSetElement = codeSetElement;
     }
 
 }

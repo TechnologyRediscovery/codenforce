@@ -19,11 +19,11 @@ package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
+import com.tcvcog.tcvce.util.DateTimeUtil;
 
 /**
  *
@@ -33,7 +33,7 @@ public  class       EventCnF
         extends     BOb
         implements  Comparable<EventCnF>,
                     IFace_Loggable,
-                    IFace_ActivatableBOB{
+                    IFace_ActivatableBOB {
     
     protected int eventID;
     protected EventCategory category;
@@ -46,7 +46,7 @@ public  class       EventCnF
      * But that seemed to likely lead to more confusion since the DB
      * has two columns, since each is keyed differently
      */
-    protected EventDomainEnum domain;
+    protected DomainEnum domain;
     protected int ceCaseID;
     protected int occPeriodID;
     
@@ -54,7 +54,7 @@ public  class       EventCnF
     protected LocalDateTime timeEnd;
     
     protected User userCreator;
-    protected LocalDateTime creationts;
+    protected LocalDateTime creationTS;
     
     protected User lastUpdatedBy;
     protected LocalDateTime lastUpdatedTS;
@@ -88,14 +88,14 @@ public  class       EventCnF
         this.timeEnd = ev.timeEnd;
         
         this.userCreator = ev.userCreator;
-        this.creationts = ev.creationts;
+        this.creationTS = ev.creationTS;
         
         this.lastUpdatedBy = ev.lastUpdatedBy;
         this.lastUpdatedTS = ev.lastUpdatedTS;
         
         this.active = ev.active;
+
         this.hidden = ev.hidden;
-        
         this.notes = ev.notes;
         
         this.personList = ev.personList;
@@ -137,7 +137,7 @@ public  class       EventCnF
      * @return the creationts
      */
     public LocalDateTime getCreationts() {
-        return creationts;
+        return creationTS;
     }
 
     /**
@@ -197,7 +197,7 @@ public  class       EventCnF
      * @param creationts the creationts to set
      */
     public void setCreationts(LocalDateTime creationts) {
-        this.creationts = creationts;
+        this.creationTS = creationts;
     }
 
     /**
@@ -260,8 +260,8 @@ public  class       EventCnF
         int c = 0;
         if(this.timeStart != null && e.timeStart != null){
              c = this.timeStart.compareTo(e.timeStart);
-        } else if(this.creationts != null && e.creationts != null){
-             c = this.creationts.compareTo(e.creationts);
+        } else if(this.creationTS != null && e.creationTS != null){
+             c = this.creationTS.compareTo(e.creationTS);
         } 
         return c;
         
@@ -272,7 +272,7 @@ public  class       EventCnF
         int hash = 5;
         hash = 97 * hash + this.eventID;
         hash = 97 * hash + Objects.hashCode(this.category);
-        hash = 97 * hash + Objects.hashCode(this.creationts);
+        hash = 97 * hash + Objects.hashCode(this.creationTS);
         hash = 97 * hash + Objects.hashCode(this.description);
         hash = 97 * hash + Objects.hashCode(this.userCreator);
         hash = 97 * hash + (this.active ? 1 : 0);
@@ -303,14 +303,14 @@ public  class       EventCnF
     /**
      * @return the domain
      */
-    public EventDomainEnum getDomain() {
+    public DomainEnum getDomain() {
         return domain;
     }
 
     /**
      * @param domain the domain to set
      */
-    public void setDomain(EventDomainEnum domain) {
+    public void setDomain(DomainEnum domain) {
         this.domain = domain;
     }
 
@@ -351,9 +351,11 @@ public  class       EventCnF
 
     /**
      * @return the timeStartUtilDate
+     * @deprecated primefaces now supports LocalDateTime values
      */
+    @Deprecated
     public java.util.Date getTimeStartUtilDate() {
-        return convertUtilDate(timeStart);
+        return DateTimeUtil.convertUtilDate(timeStart);
     }
 
     /**
@@ -366,18 +368,20 @@ public  class       EventCnF
 
     /**
      * @return the timeEndUtilDate
+     * @deprecated primefaces now supports LocalDateTime values
      */
+    @Deprecated
     public java.util.Date getTimeEndUtilDate() {
-        return convertUtilDate(timeEnd);
+        return DateTimeUtil.convertUtilDate(timeEnd);
     }
     
     public String getTimeStartPretty(){
-        return EntityUtils.getPrettyDate(timeStart);
+        return DateTimeUtil.getPrettyDate(timeStart);
         
     }
 
     public String getTimeEndPretty(){
-        return EntityUtils.getPrettyDate(timeEnd);
+        return DateTimeUtil.getPrettyDate(timeEnd);
     }
     
     /**
@@ -389,9 +393,11 @@ public  class       EventCnF
 
     /**
      * @param tsud
+     * @deprecated primefaces now supports LocalDateTime values
      */
+    @Deprecated
     public void setTimeStartUtilDate(java.util.Date tsud) {
-        timeStart = convertUtilDate(tsud);
+        timeStart = DateTimeUtil.convertUtilDate(tsud);
     }
 
     /**
@@ -403,9 +409,11 @@ public  class       EventCnF
 
     /**
      * @param teud
+     * @deprecated primefaces now supports LocalDateTime values
      */
+    @Deprecated
     public void setTimeEndUtilDate(java.util.Date teud) {
-        timeEnd = convertUtilDate(teud);
+        timeEnd = DateTimeUtil.convertUtilDate(teud);
     }
 
     /**

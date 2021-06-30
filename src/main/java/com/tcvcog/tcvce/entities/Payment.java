@@ -17,6 +17,8 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.util.DateTimeUtil;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 /**
@@ -38,61 +40,37 @@ public class Payment extends BOb {
     protected User recordedBy;
     protected LocalDateTime entryTimestamp;
     protected int assignedFeeID;
-    protected EventDomainEnum domain;
+    protected DomainEnum domain;
     
    public Payment() {
-       
        notes = " ";
-       
+
        payer = new Person();
-       
+
        dateReceived = LocalDateTime.now();
-       
        dateDeposited = LocalDateTime.now();
        
        paymentType = new PaymentType();
-       
        paymentType.setPaymentTypeId(2);
        
    }
-   
-   public Payment(MoneyCECaseFeePayment p){
-       
-       this.paymentID = p.getPaymentID();
-       this.paymentType = p.getPaymentType();
-       this.dateDeposited = p.getDateDeposited();
-       this.dateReceived = p.getDateReceived();
-       this.amount = p.getAmount();
-       this.payer = p.getPayer();
-       this.referenceNum = p.getReferenceNum();
-       this.checkNum = p.getCheckNum();
-       this.cleared = p.isCleared();
-       this.notes = p.getNotes();
-       this.recordedBy = p.getRecordedBy();
-       this.entryTimestamp = p.getEntryTimestamp();
-       this.assignedFeeID = p.getAssignedFeeID();
-       this.domain = p.getDomain();
-       
-   }
-   
-   public Payment(MoneyOccPeriodFeePayment p){
-       
-       this.paymentID = p.getPaymentID();
-       this.paymentType = p.getPaymentType();
-       this.dateDeposited = p.getDateDeposited();
-       this.dateReceived = p.getDateReceived();
-       this.amount = p.getAmount();
-       this.payer = p.getPayer();
-       this.referenceNum = p.getReferenceNum();
-       this.checkNum = p.getCheckNum();
-       this.cleared = p.isCleared();
-       this.notes = p.getNotes();
-       this.recordedBy = p.getRecordedBy();
-       this.entryTimestamp = p.getEntryTimestamp();
-       this.assignedFeeID = p.getAssignedFeeID();
-       this.domain = p.getDomain();
-       
-   }
+
+    public Payment(Payment p) {
+        this.paymentID = p.getPaymentID();
+        this.paymentType = p.getPaymentType();
+        this.dateDeposited = p.getDateDeposited();
+        this.dateReceived = p.getDateReceived();
+        this.amount = p.getAmount();
+        this.payer = p.getPayer();
+        this.referenceNum = p.getReferenceNum();
+        this.checkNum = p.getCheckNum();
+        this.cleared = p.isCleared();
+        this.notes = p.getNotes();
+        this.recordedBy = p.getRecordedBy();
+        this.entryTimestamp = p.getEntryTimestamp();
+        this.assignedFeeID = p.getAssignedFeeID();
+        this.domain = p.getDomain();
+    }
 
     /**
      * @return the dateDeposited
@@ -126,28 +104,28 @@ public class Payment extends BOb {
      * @return the dateDeposited
      */
     public Date getDateDepositedUtilDate() {
-        return convertUtilDate(dateDeposited);
+        return DateTimeUtil.convertUtilDate(dateDeposited);
     }
 
     /**
      * @param dateDeposited the dateDeposited to set
      */
     public void setDateDepositedUtilDate(Date dateDeposited) {
-        this.dateDeposited = convertUtilDate(dateDeposited);
+        this.dateDeposited = DateTimeUtil.convertUtilDate(dateDeposited);
     }
 
     /**
      * @return the dateReceived
      */
     public Date getDateReceivedUtilDate() {
-        return convertUtilDate(dateReceived);
+        return DateTimeUtil.convertUtilDate(dateReceived);
     }
 
     /**
      * @param dateReceived the dateReceived to set
      */
     public void setDateReceivedUtilDate(Date dateReceived) {
-        this.dateReceived = convertUtilDate(dateReceived);
+        this.dateReceived = DateTimeUtil.convertUtilDate(dateReceived);
     }
     
     /**
@@ -286,11 +264,11 @@ public class Payment extends BOb {
         this.assignedFeeID = assignedFeeID;
     }
 
-    public EventDomainEnum getDomain() {
+    public DomainEnum getDomain() {
         return domain;
     }
 
-    public void setDomain(EventDomainEnum domain) {
+    public void setDomain(DomainEnum domain) {
         this.domain = domain;
     }
 }
