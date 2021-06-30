@@ -1,0 +1,43 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <p:panel id="inspections-panel"
+             toggleable="true"
+             widgetVar="inspections-panel-var"
+             collapsed="false"
+             header="Inspections">
+        <h:form id="inspections-form">
+            <p:commandButton id="inspections-addspace"
+                             value="New inspection space"
+                             disabled="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedTS}"
+                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                             icon="fa fa-plus"/>
+
+            <!-- this will be created dynamically in backing bean -->
+            <p:menu overlay="true" trigger="inspections-addspace">
+                <p:submenu label="Submenu">
+                    <p:menuitem value="Placeholder" oncomplete="PF('inspections-spacedetails-var').show()"/>
+                </p:submenu>
+            </p:menu>
+
+            <p:spacer height="5px"/>
+
+
+        </h:form>
+    </p:panel>
+
+    <p:dialog id="inspections-spacedetails"
+              widgetVar="inspections-spacedetails-var"
+              header="Space Details">
+        <h:form id="inspections-spacedetails-form">
+            <h5>Not implemented yet</h5>
+            <p:commandButton value="Cancel"
+                             icon="pi pi-cog"
+                             styleClass="ui-button-outlined"/>
+            <p:commandButton value="Continue"
+                             icon="pi pi-cog"/>
+        </h:form>
+    </p:dialog>
+</ui:composition>
