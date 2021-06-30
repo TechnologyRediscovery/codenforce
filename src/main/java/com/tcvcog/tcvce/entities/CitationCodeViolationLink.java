@@ -208,7 +208,7 @@ public class CitationCodeViolationLink
 
     @Override
     public String getDBTableName() {
-       return ROLE_SCHEMA.getLinkedTableName();
+       return ROLE_SCHEMA.getLinkingTableName();
     }
 
     /**

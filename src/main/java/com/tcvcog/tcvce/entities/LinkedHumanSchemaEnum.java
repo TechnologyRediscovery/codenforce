@@ -24,29 +24,92 @@ package com.tcvcog.tcvce.entities;
  */
 public enum LinkedHumanSchemaEnum {
     
-    OCCAPPLICATIONHUMAN ("occpermitapplicationhuman","OccApplicationHuman", "???", ""),  // for Jurplel to update
-    CECASEHUMAN ("humancecase", "CECaseHuman", "linkid", "cecase_caseid"), 
-    OCCPERIODHUMAN ("humanoccperiod","OccPeriodHuman", "linkid", "occperiod_periodid"), 
-    PARCELHUMAN ("humanparcel","ParcelHuman", "linkid", "parcel_parcelkey"), 
-    PARCELUNITHUMAN ("humanparcelunit","ParcelUnitHuman", "linkid", "parcelunit_unitid"), 
-    CITATIONHUMAN ("citationhuman","CitationHuman", "linkid", "citation_citationid"), 
-    EVENTHUMAN ("eventhuman","EventHuman", "linkid", "event_eventid"), 
-    MUNIHUMAN ("humanmuni","MuniHuman","linkid", "muni_municode");
+    OCCAPPLICATIONHUMAN (   
+                            "public.occpermitapplicationhuman",
+                            "OccApplicationHuman", 
+                            "???", 
+                            "",
+                            "???"
+                        ),  // for Jurplel to update
     
-    private final String LINKED_TABLE_NAME;
+    CECASEHUMAN         (   
+                            "public.humancecase", 
+                            "CECaseHuman", 
+                            "linkid", 
+                            "cecase_caseid",
+                            "humancecase_linkid_seq"
+                        ), 
+    
+    OCCPERIODHUMAN      (
+                            "public.humanoccperiod",
+                            "OccPeriodHuman", 
+                            "linkid", 
+                            "occperiod_periodid",
+                            "humanoccperiod_linkid_seq"
+                        ), 
+    
+    PARCELHUMAN         (   
+                            "public.humanparcel",
+                            "ParcelHuman", 
+                            "linkid", 
+                            "parcel_parcelkey",
+                            "humanparcel_linkid_seq"
+                        ), 
+    
+    PARCELUNITHUMAN     (   
+                            "public.humanparcelunit",
+                            "ParcelUnitHuman", 
+                            "linkid", 
+                            "parcelunit_unitid",
+                            "parcelunithuman_linkid_seq"
+                        ),
+    
+    CITATIONHUMAN       (
+                            "public.citationhuman",
+                            "CitationHuman", 
+                            "linkid", 
+                            "citation_citationid",
+                            "citationhuman_seq"
+                        ), 
+    
+    EVENTHUMAN          (
+                            "public.eventhuman",
+                            "EventHuman", 
+                            "linkid", 
+                            "event_eventid",
+                            "eventhuman_linkid_seq"
+                        ), 
+    
+    MUNIHUMAN           (
+                            "public.humanmuni",
+                            "MuniHuman",
+                            "linkid", 
+                            "muni_municode",
+                            "humanmuni_linkid_seq"
+                        );
+    
+    private final String LINKING_TABLE_NAME;
     private final String LINK_ROLE_SCHEMA_TYPE_STRING;
     private final String LINKING_TABLE_PK_FIELD;
     private final String TARGET_TABLE_FK_FIELD;
+    private final String LINKING_TABLE_SEQ_ID;
 
-    private LinkedHumanSchemaEnum(String ltn, String ts, String ltpk, String ttfk){
-        LINKED_TABLE_NAME = ltn;
+    private LinkedHumanSchemaEnum   (
+                                        String ltn, 
+                                        String ts, 
+                                        String ltpk, 
+                                        String ttfk,
+                                        String seqid
+                                    )    {
+        LINKING_TABLE_NAME = ltn;
         LINK_ROLE_SCHEMA_TYPE_STRING = ts;
         LINKING_TABLE_PK_FIELD = ltpk;
         TARGET_TABLE_FK_FIELD = ttfk;
+        LINKING_TABLE_SEQ_ID = seqid;
     }
     
-    public String getLinkedTableName(){
-        return LINKED_TABLE_NAME;
+    public String getLinkingTableName(){
+        return LINKING_TABLE_NAME;
     }
     
     public String getRoleSChemaTypeString(){
@@ -59,6 +122,10 @@ public enum LinkedHumanSchemaEnum {
     
     public String getTargetTableFKField(){
         return TARGET_TABLE_FK_FIELD;
+    }
+    
+    public String getLinkingTableSequenceID(){
+        return LINKING_TABLE_SEQ_ID;
     }
     
 }

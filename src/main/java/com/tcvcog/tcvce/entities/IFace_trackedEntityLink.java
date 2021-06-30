@@ -50,6 +50,7 @@ public interface IFace_trackedEntityLink
     public String getLinkNotes();
     
     public LinkedObjectRole getLinkedObjectRole();
+    public void setLinkedObjectRole(LinkedObjectRole lor);
     
     
     

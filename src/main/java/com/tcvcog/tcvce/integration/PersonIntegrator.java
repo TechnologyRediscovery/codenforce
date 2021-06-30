@@ -28,12 +28,12 @@ import com.tcvcog.tcvce.entities.ContactPhone;
 import com.tcvcog.tcvce.entities.ContactPhoneType;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Human;
+import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.IFace_humanListHolder;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
 import com.tcvcog.tcvce.entities.PersonType;
-import com.tcvcog.tcvce.entities.PersonWithChanges;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
@@ -50,7 +50,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * Connects Person objects to the data store
@@ -67,30 +66,24 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
-    /**
-     * Retrieval point for linked human lists
-     * @param hlh
-     * @return the passed in BOB with the linked humans and metadata assembled
-     */
-    public IFace_humanListHolder getLinkedHumans(IFace_humanListHolder hlh){
-        
-        
-        
-    }
-    
+   
     
     /**
-     * 
+     * Asks the inputted param for its linking table name and fetches
+     * related humans, building them into a nice little list
      * @param hlh
-     * @return
+     * @return a list, not empty if there are linked humans
      * @throws IntegrationException 
      */
-    public List<Integer> getHumanLinkIDList(IFace_humanListHolder hlh) throws IntegrationException{
-         Connection con = getPostgresCon();
+    public List<HumanLink> getHumanLinks(IFace_humanListHolder hlh) throws IntegrationException{
+        Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
+        if(hlh == null){
+            throw new IntegrationException("Cannot get linked humans with null list holder object!!");
+        }
         
-        Human h = null;
+        List<HumanLink> linkedHumans = new ArrayList<>();
 
         try {
             
@@ -99,7 +92,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             sb.append("createdts, createdby_userid, lastupdatedts, lastupdatedby_userid,");
             sb.append("deactivatedts, deactivatedby_userid, notes, source_sourceid  ");
             sb.append("FROM ");
-            sb.append(hlh.getLinkSchema().getLinkedTableName());
+            sb.append(hlh.getLinkSchema().getLinkingTableName());
             sb.append(" WHERE ");
             sb.append(hlh.getLinkSchema().getTargetTableFKField());
             sb.append("=?");
@@ -111,9 +104,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                // note that rs.next() is called and the cursor
-                // is advanced to the first row in the rs
-                h = generateHuman(rs);
+                linkedHumans.add(generateHumanLink(rs, getHuman(rs.getInt("human_humanid"))));
             }
 
         } catch (SQLException ex) {
@@ -124,10 +115,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return h;
-        
-        
-        
+        return linkedHumans;
         
     }
     
@@ -207,7 +195,113 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         // Ship to our SystemIntegrator for standard fields
         si.populateTrackedFields(h, rs);
         return h;
+    }
+    
+    /**
+     * Generator for HumanLink objects which are Humans connected to a BOb
+     * with connection metadata attached as a subclass, including
+     * the link source and the linked object role
+     * 
+     * @param rs containing fields for the standard linked tables
+     * @param h the human whose linked metadata is desired
+     * @return the HumanLink which is a human with link metadata attached
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
+    public HumanLink generateHumanLink(ResultSet rs, Human h) throws SQLException, IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        HumanLink hl = null;
         
+        if(rs != null && h != null){
+            hl = new HumanLink(h);
+            si.populateTrackedLinkFields(hl, rs);
+            hl.setLinkID(rs.getInt("linkid"));
+            hl.setLinkRole(si.getLinkedObjectRole(rs.getInt("linkedobjectrole_lorid")));
+        }
+        
+        return hl;
+    }
+
+    /**
+     * Creates a record in the appropriate linking table for a given human
+     * to a given human list holder object =
+     * @param humanziedBOb the object to which the human shall be linked
+     * @param hl the human to link
+     * @return the link ID of the freshly created link, 0 for incomplete links
+     * @throws IntegrationException 
+     */
+    public int insertHumanLink(IFace_humanListHolder humanziedBOb, HumanLink hl) throws IntegrationException{
+        if (humanziedBOb == null || hl == null){
+            throw new IntegrationException("Cannot link a human and a list holder with null inputs");
+        }
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        int linkid = 0;
+        
+        try {
+            
+            StringBuilder sb = new StringBuilder();
+            
+            sb.append("INSERT INTO ");
+            sb.append(humanziedBOb.getLinkSchema().getLinkingTableName());
+            sb.append(" (linkid, human_humanid,");
+            sb.append(humanziedBOb.getLinkSchema().getTargetTableFKField());
+            sb.append(", createdts, createdby_userid, lastupdatedts, lastupdatedby_userid,");
+            sb.append(" linkedobjectrole_lorid, source_sourceid)");
+            sb.append(" VALUES (DEFAULT, ?, ?, now(), ?, now(), ?, ?, ?);");
+                        
+            stmt = con.prepareStatement(sb.toString());
+            
+            stmt.setInt(1, hl.getHumanID());
+            stmt.setInt(2, humanziedBOb.getHostPK());
+            if(hl.getCreatedBy() != null){
+                stmt.setInt(3, hl.getCreatedBy().getUserID() );
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            
+            if(hl.getLastUpdatedBy()!= null){
+                stmt.setInt(4, hl.getLinkLastUpdatedBy().getUserID() );
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            if(hl.getLinkedObjectRole() != null){
+                stmt.setInt(5, hl.getLinkedObjectRole().getRoleID());
+            } else  { 
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            
+            
+            if(hl.getSource() != null){
+                stmt.setInt(6, hl.getSource().getSourceid());
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+            
+            
+
+            stmt.execute();
+
+            while (rs.next()) {
+                // note that rs.next() is called and the cursor
+                // is advanced to the first row in the rs
+                hl = generateHuman(rs);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.getPerson | Unable to retrieve person", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return linkid;
     }
     
     /**
@@ -1076,90 +1170,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         return person;
     }
 
-    /**
-     * Accepts a result set and creates a new Person object. Note that this
-     * method does not move the cursor position on the result set passed in;
-     * rather, it will create a person based on the row to which the cursor is
-     * pointing when it is passed in. The client method is responsible for
-     * managing cursor position
-     *
-     * Also note that the client method is responsible for closing the result
-     * set that is passed to this method with rs.close();
-     *
-     * @param rs the result set from which to extract data for creating a person
-     * @return the new person object created from this single row of the rs
-     */
-    private Person generatePersonFromResultSet(ResultSet rs) throws IntegrationException {
-        // Instantiates the new person object
-        Person newPerson = new Person();
-        SystemCoordinator ssc = getSystemCoordinator();
-        SystemIntegrator si = getSystemIntegrator();
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        
-        try {
-            newPerson.setPersonID(rs.getInt("personid"));
-            newPerson.setPersonType(PersonType.valueOf(rs.getString("persontype")));
-            newPerson.setMuniCode(rs.getInt("muni_municode"));
-            newPerson.setMuni(mi.getMuni(newPerson.getMuniCode()));
-            newPerson.setFirstName(rs.getString("fName"));
-            newPerson.setLastName(rs.getString("lName"));
-            newPerson.setJobTitle(rs.getString("jobtitle"));
-            
-            newPerson.setPhoneCell(rs.getString("phoneCell"));
-            newPerson.setPhoneHome(rs.getString("phoneHome"));
-            newPerson.setPhoneWork(rs.getString("phoneWork"));
-            newPerson.setEmail(rs.getString("email"));
-            newPerson.setAddressStreet(rs.getString("address_street"));
-            newPerson.setAddressCity(rs.getString("address_city"));
-
-            newPerson.setAddressState(rs.getString("address_state"));
-            newPerson.setAddressZip(rs.getString("address_zip"));
-            newPerson.setNotes(rs.getString("notes"));
-
-            if(rs.getTimestamp("lastupdated") != null){
-                newPerson.setLastUpdated(rs.getTimestamp("lastupdated").toLocalDateTime());
-            }
-            
-            if (rs.getTimestamp("expirydate") != null) {
-                newPerson.setExpiryDate(rs.getTimestamp("expirydate").toLocalDateTime());
-            }
-            newPerson.setActive(rs.getBoolean("isactive"));
-
-            newPerson.setUnder18(rs.getBoolean("isunder18"));
-            newPerson.setVerifiedByUserID(rs.getInt("humanverifiedby"));
-            newPerson.setCompositeLastName(rs.getBoolean("compositelname"));
-            newPerson.setSource(si.getBOBSource(rs.getInt("sourceid")));
-            
-            // avoiding cycles here by not storing the object
-            newPerson.setCreatorUserID(rs.getInt("creator"));
-            
-            newPerson.setBusinessEntity(rs.getBoolean("businessentity"));
-            newPerson.setMailingAddressStreet(rs.getString("mailing_address_street"));
-            newPerson.setMailingAddressCity(rs.getString("mailing_address_city"));
-            newPerson.setMailingAddressZip(rs.getString("mailing_address_zip"));
-            newPerson.setMailingAddressState(rs.getString("mailing_address_state"));
-            newPerson.setUseSeparateMailingAddress(rs.getBoolean("useseparatemailingaddr"));
-
-            newPerson.setExpiryNotes(rs.getString("expirynotes"));
-            if(!(rs.getTimestamp("creationtimestamp")==null)){
-                newPerson.setCreationTimeStamp(rs.getTimestamp("creationtimestamp").toLocalDateTime());
-            } else {
-                newPerson.setCreationTimeStamp(null);
-            }
-            newPerson.setCanExpire(rs.getBoolean("canexpire"));
-            newPerson.setLinkedUserID(rs.getInt("userlink"));
-            newPerson.setMailingAddressThirdLine(rs.getString("mailing_address_thirdline"));
-            
-            // HAVE NOT IMPLEMENTED GHOSTS AND CLONES YET!
-            
-            
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Error generating person from ResultSet", ex);
-        }
-        return newPerson;
-    } // close method
+  
     
     /**
      * We have a special type of Person which are those who have been attached to an application
@@ -1363,138 +1374,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
 
-    /**
-     * Accepts a Person object to store in the database.
-     *
-     * @deprecated replaced by humans!!!!!
-     * @param personToStore the person to store
-     * @return the unique id number assigned to the record just created in
-     * postgres through a call to currval('[sequence_name]')
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public int insertPerson(Person personToStore) throws IntegrationException {
-        int unknownPersonSourceID = Integer.parseInt(getResourceBundle(
-                Constants.DB_FIXED_VALUE_BUNDLE).getString("unknownPersonSource"));
-        System.out.println("PersonIntegrator.insertPerson");
-        Connection con = getPostgresCon();
-        System.out.println("PersonIntegrator.insertPerson | after pgcon");
-        ResultSet rs = null;
-        int lastID;
-        
-            String query = "INSERT INTO public.person(" +
-                    " personid, persontype, muni_municode, " +
-                    " fname, lname, jobtitle, " +
-                    " phonecell, phonehome, phonework, " +
-                    " email, address_street, address_city, " +
-                    " address_state, address_zip, notes, " +
-                    " lastupdated, expirydate, isactive, " +
-                    " isunder18, humanverifiedby, compositelname, " +
-                    " sourceid, creator, businessentity, " +
-                    " mailing_address_street, mailing_address_city, " +
-                    " mailing_address_zip, mailing_address_state, useseparatemailingaddr, " +
-                    " expirynotes, creationtimestamp, canexpire, userlink, mailing_address_thirdline) " +
-                    " VALUES (DEFAULT, CAST (? AS persontype), ?, " //1-2
-                    + "?, ?, ?, " + //3-5, through jobtitle
-                    " ?, ?, ?, "
-                    + "?, ?, ?, " +
-                    " ?, ?, ?, " // through notes
-                    + "?, ?, ?, " +
-                    " ?, ?, ?," // through 20
-                    + "?, ?, ?, " 
-                    + "?, ?, " // through 25, mailing_address_city
-                    + "?, ?, ?, "
-                    + "?, ?, ?, NULL, ?);"; // through 32
-
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            // default ID generated by sequence in PostGres
-
-            if (personToStore.getPersonType() != null) {
-                stmt.setString(1, personToStore.getPersonType().toString());
-            } else {
-                stmt.setNull(1, java.sql.Types.NULL);
-                
-            }
-            stmt.setInt(2, personToStore.getMuniCode());
-
-            stmt.setString(3, personToStore.getFirstName());
-            stmt.setString(4, personToStore.getLastName());
-            stmt.setString(5, personToStore.getJobTitle());
-
-            stmt.setString(6, personToStore.getPhoneCell());
-            stmt.setString(7, personToStore.getPhoneHome());
-            stmt.setString(8, personToStore.getPhoneWork());
-            
-            stmt.setString(9, personToStore.getEmail());
-            stmt.setString(10, personToStore.getAddressStreet());
-            stmt.setString(11, personToStore.getAddressCity());
-
-            stmt.setString(12, personToStore.getAddressState());
-            stmt.setString(13, personToStore.getAddressZip());
-            stmt.setString(14, personToStore.getNotes());
-            
-            // last updated
-            stmt.setTimestamp(15, java.sql.Timestamp.valueOf(LocalDateTime.now()));
-            if (personToStore.getExpiryDate() != null) {
-                stmt.setTimestamp(16, java.sql.Timestamp.valueOf(personToStore.getExpiryDate()));
-
-            } else {
-                stmt.setNull(16, java.sql.Types.NULL);
-            }
-            stmt.setBoolean(17, personToStore.isActive());
-            
-            stmt.setBoolean(18, personToStore.isUnder18());
-            stmt.setInt(19, personToStore.getVerifiedByUserID());
-            stmt.setBoolean(20, personToStore.isCompositeLastName());
-            
-            
-            if(personToStore.getSource() != null){
-                stmt.setInt(21, personToStore.getSource().getSourceid());
-            } else {
-                stmt.setInt(21, unknownPersonSourceID);
-            }
-            stmt.setInt(22, personToStore.getCreatorUserID());
-            stmt.setBoolean(23, personToStore.isBusinessEntity());
-            
-            stmt.setString(24, personToStore.getMailingAddressStreet());
-            stmt.setString(25, personToStore.getMailingAddressCity());
-            stmt.setString(26, personToStore.getMailingAddressZip());
-            stmt.setString(27, personToStore.getMailingAddressState());
-            
-            stmt.setBoolean(28, personToStore.isUseSeparateMailingAddress());
-            
-            stmt.setString(29, personToStore.getExpiryNotes());
-            stmt.setTimestamp(30, java.sql.Timestamp.valueOf(LocalDateTime.now()));
-            stmt.setBoolean(31, personToStore.isCanExpire());
-            
-//            stmt.setInt(32, personToStore.getLinkedUserID());
-
-            stmt.setString(32, personToStore.getMailingAddressThirdLine());
-            
-            stmt.execute();
-
-            // now get the most recent Unique ID added to this person to pass 
-            // to client methods who want to connect a record to this person
-            String idNumQuery = "SELECT currval('person_personIDSeq');";
-            Statement s = con.createStatement();
-            rs = s.executeQuery(idNumQuery);
-            rs.next();
-            lastID = rs.getInt("currval");
-
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error inserting new person", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-        System.out.println("PersonIntegrator.insertPerson  | returned ID " + lastID);
-        return lastID;
-
-    } // close insertPerson()
 
     /**
      * Convenience method for iterating over a List<Person> and calling
@@ -1686,122 +1565,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     
     
 
-    /**
-     * Generates a linked list of Person objects given an array of person ID
- numbers. This is accomplished by making repeated calls to the
-     * createPersonFromResultSet() method.
-     *
-     * @return a linked list of person objects that can be used for display and
-     * selection
-     * @param peopleIDs
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    
-   public List<Person> getPersonList(List<Integer> peopleIDs) throws IntegrationException {
-        ArrayList<Person> list = new ArrayList<>();
-        
-        for (int personId: peopleIDs){
-            list.add(getPerson(personId));
-        }
-        return list;
-    } // close getPersonOccApplicationList()
-
-    /**
-     * Updates a given record for a person in the database. Will throw an error
-     * if the person does not exist. Note that this method will retrieve the
-     * Person object's ID number to determine which record to update in the db
-     *  @deprecated replaced by humans
-     * @param personToUpdate the Person object with the updated data to be
-     * stored in the database. All old information will be overwritten
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public void updatePerson(Person personToUpdate) throws IntegrationException {
-        Connection con = getPostgresCon();
-        String query;
-
-        query = "UPDATE public.person\n" +
-                "   SET persontype= CAST (? AS persontype), muni_municode=?, \n" +  // 1-2
-                "	fname=?, lname=?, jobtitle=?, \n" + // 3-5
-                "	phonecell=?, phonehome=?, phonework=?, \n" + // 6-8
-                "	email=?, address_street=?, address_city=?, \n" + // 9-11
-                "	address_state=?, address_zip=?, " + // 12-13
-                "	lastupdated=now(), expirydate=?, isactive=?, \n" +  // 14-15
-                "	isunder18=?, compositelname=?, \n" + // 16-17
-                "       sourceid=?, businessentity=?, \n" + // 18-19
-                "       mailing_address_street=?, mailing_address_city=?, mailing_address_zip=?, \n" +// 20-22
-                "       mailing_address_state=?, useseparatemailingaddr=?, expirynotes=?,  \n" + // 23-25
-                "       canexpire=?, mailing_address_thirdline=?  \n" +// 26-27
-                " WHERE personid=?;";
-
-       
-        
-        
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            // default ID generated by sequence in PostGres
-            stmt.setString(1, personToUpdate.getPersonType().toString());
-            stmt.setInt(2, personToUpdate.getMuniCode());
-
-            stmt.setString(3, personToUpdate.getFirstName());
-            stmt.setString(4, personToUpdate.getLastName());
-            stmt.setString(5, personToUpdate.getJobTitle());
-
-            stmt.setString(6, personToUpdate.getPhoneCell());
-            stmt.setString(7, personToUpdate.getPhoneHome());
-            stmt.setString(8, personToUpdate.getPhoneWork());
-
-            stmt.setString(9, personToUpdate.getEmail());
-            stmt.setString(10, personToUpdate.getAddressStreet());
-            stmt.setString(11, personToUpdate.getAddressCity());
-
-            stmt.setString(12, personToUpdate.getAddressState());
-            stmt.setString(13, personToUpdate.getAddressZip());
-
-            // Last updated set with a call to now() inside postgres
-            if (personToUpdate.getExpiryDate() == null) {
-                stmt.setNull(14, java.sql.Types.NULL);
-            } else {
-                stmt.setTimestamp(14, java.sql.Timestamp.valueOf(personToUpdate.getExpiryDate()));
-            }
-            stmt.setBoolean(15, personToUpdate.isActive());
-            
-            stmt.setBoolean(16, personToUpdate.isUnder18());          
-            stmt.setBoolean(17, personToUpdate.isCompositeLastName());
-            
-             if(personToUpdate.getSource() != null){
-                stmt.setInt(18, personToUpdate.getSource().getSourceid());
-            } else {
-                stmt.setNull(18, java.sql.Types.NULL);
-            }
-            stmt.setBoolean(19, personToUpdate.isBusinessEntity());
-            
-            stmt.setString(20, personToUpdate.getMailingAddressStreet());
-            stmt.setString(21, personToUpdate.getMailingAddressCity());
-            stmt.setString(22, personToUpdate.getMailingAddressZip());
-            
-            stmt.setString(23, personToUpdate.getMailingAddressState());
-            stmt.setBoolean(24, personToUpdate.isUseSeparateMailingAddress());
-            stmt.setString(25, personToUpdate.getExpiryNotes());
-            
-            stmt.setBoolean(26, personToUpdate.isCanExpire());
-            stmt.setString(27, personToUpdate.getMailingAddressThirdLine());
-            
-            stmt.setInt(28, personToUpdate.getHumanID());
-
-            stmt.execute();
-            System.out.println("PersonIntegrator.updatePerson : Excecuted update");
-                    
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to update person");
-
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    } // close updatePerson
+   
+  
 
     /**
      * Deprecated first gen person extraction method; replaced by searchForPersons
@@ -1842,43 +1607,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
     
-    /**
-     * Dump-style retrieval for all Persons associated with a given event
-     * @param ev
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Integer> eventPersonAssembleList(EventCnF ev) throws IntegrationException {
-        Connection con = getPostgresCon();
-        
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        List<Integer> list = new ArrayList<>();
-
-        try {
-            String s = "SELECT person_personid FROM public.eventperson WHERE ceevent_eventid = ?;";
-            stmt = con.prepareStatement(s);
-            stmt.setInt(1, ev.getEventID());
-
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                list.add(rs.getInt("person_personid"));
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("PersonIntegrator.getPerson | Unable to retrieve person", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-        return list;
-
-    }
-
+  
 
     public List<Integer> getPersonHistory(int userID) throws IntegrationException {
         Connection con = getPostgresCon();
@@ -2004,41 +1733,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
     
-    
-    /**
-     * TODO: Finish!
-     * @param occPeriodID
-     * @return
-     * @throws IntegrationException 
-     */
-    public ArrayList<Person> getPersonList(int occPeriodID) throws IntegrationException{
-        ArrayList<Person> personList = new ArrayList();
-        String query =  "SELECT person_personid\n" +
-                        "  FROM public.occperiodperson WHERE period_periodid=?;";
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
- 
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, occPeriodID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                personList.add(getPerson(rs.getInt("person_personid")));
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("PersonIntegrator | Unable to retrieve person list by occ period", ex);
-        } finally{
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        
-        return personList;
-        
-    }
+   
 
     /**
      * Writes new value to the given person's note field. It's the Caller's job to 

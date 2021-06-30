@@ -25,6 +25,7 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Human;
+import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.IFace_humanListHolder;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
@@ -92,13 +93,57 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @return The BOB with Humans and their link metatadata already assembled.
      * Note the caller will probably want to cast back to the original type
      */
-    public IFace_humanListHolder assembleLinkedHumanLinks(IFace_humanListHolder hlh){
+    public List<HumanLink> assembleLinkedHumanLinks(IFace_humanListHolder hlh) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
+        List<HumanLink> hll = null;
+        
+        if(hlh != null){
+            hll = pi.getHumanLinks(hlh);
+        }
+        
+        return hll;
+    }
+    
+    
+    /**
+     * Grand staircase entrance for connecting a human holder to a human
+     * @param hlh
+     * @param hum
+     * @return
+     * @throws BObStatusException 
+     */
+    public int linkHuman(IFace_humanListHolder hlh, Human hum) throws BObStatusException{
+        if(hlh == null || hum == null){
+            throw new BObStatusException("Cannot link human with null human or human holder");
+        }
+        
+        
         
         
         
         
     }
+    
+    
+    /**
+     * Grand staircase entrance for deactivating a human holder and one of its humans
+     * @param hlh
+     * @param hum
+     * @return
+     * @throws BObStatusException 
+     */
+    public int deactivateLinkedHuman(IFace_humanListHolder hlh, HumanLink hl) throws BObStatusException{
+        if(hlh == null || hl == null){
+            throw new BObStatusException("Cannot link human with null human or human holder");
+        }
+        
+        
+        
+        
+        
+        
+    }
+    
     
     /**
      * Logic container for configuring a Human object =

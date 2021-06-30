@@ -199,9 +199,14 @@ public class        HumanLink
 
     @Override
     public LinkedObjectRole getLinkedObjectRole() {
-        return getLinkRole();
+        return linkRole;
     }
 
+    @Override
+    public void setLinkedObjectRole(LinkedObjectRole lor){
+        linkRole = lor;
+    }
+    
     /**
      * @param linkRole the linkRole to set
      */
@@ -231,13 +236,6 @@ public class        HumanLink
      */
     public int getLinkID() {
         return linkID;
-    }
-
-    /**
-     * @return the linkRole
-     */
-    public LinkedObjectRole getLinkRole() {
-        return linkRole;
     }
 
     /**

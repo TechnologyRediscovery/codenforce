@@ -144,6 +144,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             if(rs.getInt("deactivatedby_userid") != 0){
                 te.setLinkDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
             }
+            if(rs.getInt("source_sourceid") != 0){
+                te.setLinkSource(getBOBSource(rs.getInt("source_sourceid")));
+            }
             te.setLinkNotes(rs.getString("notes"));
             
         }
@@ -223,15 +226,48 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                  if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
                  if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             } // close finally
-            
         }
-        
-        
     }
     
-    
-    
-    
+    /**
+     * Retrieves a linked object role record from the DB
+     * @param roleid
+     * @return the new object or null if roleid is 0
+     */
+    public LinkedObjectRole getLinkedObjectRole(int roleid) throws IntegrationException{
+        LinkedObjectRole lor = null;
+        if(roleid != 0){
+            
+            Connection con = getPostgresCon();
+            ResultSet rs = null;
+            PreparedStatement stmt = null;
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("SELECT lorid, lorschema_schemaid, title, description,  \n" );
+            sb.append(" createdts, deactivatedts, notes\n");
+            sb.append("FROM public.linkedobjectrole WHERE lorid=?;");
+
+            try {
+                stmt = con.prepareStatement(sb.toString());
+                stmt.setInt(1, roleid);
+                
+                rs = stmt.executeQuery();
+                
+                while (rs.next()) {
+                    lor = generateLinkedObjectRole(rs);
+                    
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.toString());
+                throw new IntegrationException("unable to linked object role", ex);
+            } finally {
+                if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+                if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+                if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+            } // close finally
+        }
+        return lor;
+    }
     
     /**
      * Populates common fields among LinkedObjectRole family

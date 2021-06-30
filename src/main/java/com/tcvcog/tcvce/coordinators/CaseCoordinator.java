@@ -148,13 +148,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         PropertyCoordinator pc = getPropertyCoordinator();
         BlobIntegrator bi = getBlobIntegrator();
         BlobCoordinator bc = getBlobCoordinator();
+        PersonCoordinator persc = getPersonCoordinator();
 
         // Wrap our base class in the subclass wrapper--an odd design structure, indeed
         CECaseDataHeavy cse = new CECaseDataHeavy(cecase_getCECase(c.getCaseID()));
 
         try {
 
-            cse.setProperty(pc.getProperty(c.getParcelkey()));
+            cse.setProperty(pc.getProperty(c.getParcelKey()));
             cse.setPropertyUnit(pc.getPropertyUnit(c.getPropertyUnitID()));
 
             // PROPOSAL LIST
@@ -162,6 +163,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
             // EVENT RULE LIST
             cse.setEventRuleList(wc.rules_getEventRuleImpList(cse, cred));
+            
+            // Human list
+            cse.setHumanLinkList(persc.assembleLinkedHumanLinks(cse));
 
             // CEAR LIST
             QueryCEAR qcear = sc.initQuery(QueryCEAREnum.ATTACHED_TO_CECASE, cred);
