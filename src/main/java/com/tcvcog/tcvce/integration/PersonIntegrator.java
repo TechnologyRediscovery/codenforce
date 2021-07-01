@@ -275,21 +275,24 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
             
-            
             if(hl.getSource() != null){
                 stmt.setInt(6, hl.getSource().getSourceid());
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
-            
-            
 
             stmt.execute();
 
-            while (rs.next()) {
-                // note that rs.next() is called and the cursor
-                // is advanced to the first row in the rs
-                hl = generateHuman(rs);
+            sb = new StringBuilder();
+            sb.append("SELECT currval('");
+            sb.append(humanziedBOb.getLinkSchema().getLinkingTableSequenceID());
+            sb.append("');");
+            
+            stmt = con.prepareStatement(sb.toString());
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                linkid = rs.getInt(1);
             }
 
         } catch (SQLException ex) {
@@ -303,6 +306,76 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
         return linkid;
     }
+    
+      /**
+     * Updates a record in the appropriate linking table for a given human
+     * to a given human list holder object =
+     * @param humanziedBOb the object to which the human shall be linked
+     * @param hl the human to link
+     * @return the link ID of the freshly created link, 0 for incomplete links
+     * @throws IntegrationException 
+     */
+    public int updateHumanLink(IFace_humanListHolder humanziedBOb, HumanLink hl) throws IntegrationException{
+        if (humanziedBOb == null || hl == null){
+            throw new IntegrationException("Cannot link a human and a list holder with null inputs");
+        }
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+        int linkid = 0;
+        
+        try {
+            
+            StringBuilder sb = new StringBuilder();
+            
+            sb.append("UPDATE ");
+            sb.append(humanziedBOb.getLinkSchema().getLinkingTableName());
+            sb.append(" SET source_sourceid=?, lastupdatedts=now(), lastupdatedby_userid=?, ");
+            sb.append(" linkedobjectrole_lorid=? WHERE ");
+            sb.append(humanziedBOb.getLinkSchema().getLinkedTablePKField());
+            sb.append(" = ?;");
+                        
+            stmt = con.prepareStatement(sb.toString());
+            
+            
+            if(hl.getSource() != null){
+                stmt.setInt(1, hl.getSource().getSourceid());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            
+            if(hl.getLastUpdatedBy()!= null){
+                stmt.setInt(2, hl.getLinkLastUpdatedBy().getUserID() );
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            
+            if(hl.getLinkedObjectRole() != null){
+                stmt.setInt(3, hl.getLinkedObjectRole().getRoleID());
+            } else  { 
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(4, hl.getLinkID());
+            
+            
+            
+
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.getPerson | Unable to retrieve person", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return linkid;
+    }
+    
+    
     
     /**
      * Updates values for a given record in the human table
