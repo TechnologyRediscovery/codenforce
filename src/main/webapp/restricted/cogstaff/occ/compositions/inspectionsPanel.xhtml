@@ -37,7 +37,41 @@
                              icon="pi pi-cog"
                              styleClass="ui-button-outlined"/>
             <p:commandButton value="Continue"
-                             icon="pi pi-cog"/>
+                             icon="pi pi-cog"
+                             oncomplete="PF('inspections-spacedetails-var').hide(); PF('inspections-entryscreen-var').show()"/>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="inspections-entryscreen"
+              widgetVar="inspections-entryscreen-var"
+              header="Entry Screen">
+        <h:form id="inspections-entryscreen-form">
+            <h2>Space name</h2>
+            <h3>Category Name</h3>
+            <div class="p-grid">
+                <div class="p-col-12 p-md-4">
+                    <h4>Ordinance</h4>
+                    <ul>
+                        <li>accordian/collapsable box with ordinance description and tips of what to look for</li>
+                    </ul>
+                </div>
+                <div class="p-col-12 p-md-3">
+                    <p:selectOneButton>
+                        <f:selectItem itemLabel="Not Inspected"/>
+                        <f:selectItem itemLabel="Pass"/>
+                        <f:selectItem itemLabel="Fail"/>
+                    </p:selectOneButton>
+                    <p:selectBooleanCheckbox itemLabel="Exclude from NOV"/>
+                </div>
+                <div class="p-col">
+                    <h4>Comments:</h4>
+                    <p:inputTextarea rows="6" cols="33"/>
+                </div>
+                <div class="p-col-fixed" style="width: 3rem">
+                    <p:button icon="pi pi-plus" styleClass="rounded-button"/>
+                    <p>Add Photo</p>
+                </div>
+            </div>
         </h:form>
     </p:dialog>
 </ui:composition>
