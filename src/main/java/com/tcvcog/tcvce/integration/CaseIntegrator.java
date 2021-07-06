@@ -618,7 +618,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         cse.setCaseID(rs.getInt("caseid"));
         cse.setPublicControlCode(rs.getInt("cecasepubliccc"));
 
-        cse.setPropertyID(rs.getInt("property_propertyid"));
+        cse.setParcelKey(rs.getInt("property_propertyid"));
         cse.setPropertyUnitID(rs.getInt("propertyunit_unitid"));
         
         cse.setCaseManager(uc.user_getUser(rs.getInt("login_userid")));
@@ -1786,10 +1786,17 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @throws IntegrationException 
      */
     public void novLockAndQueueForMailing(NoticeOfViolation nov) throws IntegrationException{
+        if (nov == null){
+            throw new IntegrationException("novLockAndQueueForMailing(...): Cannot lock null NOV");
+        }
+        
         String query =  "UPDATE public.noticeofviolation\n" +
-                        "   SET lockedandqueuedformailingdate=?, lockedandqueuedformailingby=?, " +
-                        "   personid_recipient=?" +
-                        "   WHERE noticeid=?;";
+                        "   SET lockedandqueuedformailingdate=?, lockedandqueuedformailingby=?, " + // 1-2
+                        "       recipient_humanid=?, recipient_mailing=?, \n" +                          // 3-4
+                        "       fixedrecipientxferts=now(), fixedrecipientname=?, fixedrecipientbldgno=?, \n" + // 5-6
+                        "       fixedrecipientstreet=?, fixedrecipientcity=?, fixedrecipientstate=?, \n" +  // 7-9
+                        "       fixedrecipientzip=? " + // 10
+                        "   WHERE noticeid=?;"; //11
         // note that original time stamp is not altered on an update
 
         Connection con = getPostgresCon();
@@ -1800,13 +1807,23 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             
             stmt.setTimestamp(1, java.sql.Timestamp.valueOf(nov.getLockedAndqueuedTS()));
             stmt.setInt(2, nov.getLockedAndQueuedBy().getUserID());
+            
             stmt.setInt(3, nov.getRecipient().getHumanID());
-            stmt.setInt(4, nov.getNoticeID());
+            stmt.setInt(4, nov.getMailingLink().getLinkID());
+            
+            stmt.setString(5, nov.getFixedRecipientName());
+            stmt.setString(6, nov.getFixedRecipientBldgNo());
+            stmt.setString(7, nov.getFixedRecipientStreet());
+            stmt.setString(8, nov.getFixedRecipientCity());
+            stmt.setString(9, nov.getFixedRecipientState());
+            stmt.setString(10, nov.getFixedRecipientZip());
+            
+            stmt.setInt(11, nov.getNoticeID());
 
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to write NOV lock to database", ex);
+            throw new IntegrationException("novLockAndQueueForMailing(...): Unable to write NOV lock to database", ex);
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }

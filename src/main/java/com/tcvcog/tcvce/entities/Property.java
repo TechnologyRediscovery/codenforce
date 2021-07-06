@@ -13,12 +13,15 @@ import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 
 /**
  * Foundational entity for the system: Property
- * @author Ellen Baskem
+ * That is an extension of a parcel with mailing addresses and units
+ * 
+ * @author Ellen Bascomb
  */
 
 public class    Property 
         extends Parcel 
-        implements IFace_Loggable{
+        implements IFace_Loggable,
+                    IFace_ActivatableBOB{
     
     protected List<PropertyUnit> unitList;
     
@@ -35,18 +38,29 @@ public class    Property
 
     /**
      * For compatability - builds an address String
-     * from building No and street
-     * @deprecated 
-     * @return 
+     * from building No and street   
+     * @return a string rep of building no & street
      */
-
     public String getAddress(){
         if(addresses != null && !addresses.isEmpty()){
             return addresses.get(0).buildingNo + " " + addresses.get(0).street;
         } else {
-            return "No Address";
+            return "[No Address]";
         }
         
+    }
+    
+    /**
+     * Utility method for extracting the first linked mailing address in a given
+     * list of mailing address links
+     * @return 
+     */
+    public ParcelMailingAddressLink getPrimaryAddressLink(){
+        if(addresses != null && !addresses.isEmpty()){
+            return addresses.get(0);
+            
+        }
+        return null;
     }
 
 

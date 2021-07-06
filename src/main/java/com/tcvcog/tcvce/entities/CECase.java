@@ -41,7 +41,7 @@ public class        CECase
      */
     protected boolean allowForwardLinkedPublicAccess;
     
-    protected int propertyID;
+    protected int parcelKey;
     protected int propertyUnitID;
     
     protected User caseManager;
@@ -83,7 +83,7 @@ public class        CECase
         publicControlCode = input.getPublicControlCode();
         paccEnabled = input.isPaccEnabled();
         allowForwardLinkedPublicAccess = input.isAllowForwardLinkedPublicAccess();
-        propertyID = input.getp
+        parcelKey = input.getParcelKey();
         propertyUnitID = input.getPropertyUnitID();
         caseManager = input.getCaseManager();
         caseName = input.getCaseName();
@@ -106,13 +106,10 @@ public class        CECase
         eventListMaster = input.getEventList();
     }
     
-    
-
     @Override
     public String toString() {
         return caseName;
     }
-    
     
     /**
      *
@@ -491,7 +488,7 @@ public class        CECase
         hash = 53 * hash + (this.allowForwardLinkedPublicAccess ? 1 : 0);
         hash = 53 * hash + Objects.hashCode(this.caseManager);
         hash = 53 * hash + Objects.hashCode(this.caseName);
-        hash = 53 * hash + Objects.hashCode(this.propertyID);
+        hash = 53 * hash + Objects.hashCode(this.parcelKey);
         hash = 53 * hash + Objects.hashCode(this.propertyUnitID);
         hash = 53 * hash + Objects.hashCode(this.originationDate);
         hash = 53 * hash + Objects.hashCode(this.closingDate);
@@ -628,10 +625,10 @@ public class        CECase
     }
 
     /**
-     * @return the propertyID
+     * @return the parcelKey
      */
-    public int getPropertyID() {
-        return propertyID;
+    public int getParcelKey() {
+        return parcelKey;
     }
 
     /**
@@ -642,10 +639,10 @@ public class        CECase
     }
 
     /**
-     * @param propertyID the propertyID to set
+     * @param parcelKey the parcelKey to set
      */
-    public void setPropertyID(int propertyID) {
-        this.propertyID = propertyID;
+    public void setParcelKey(int parcelKey) {
+        this.parcelKey = parcelKey;
     }
 
     /**

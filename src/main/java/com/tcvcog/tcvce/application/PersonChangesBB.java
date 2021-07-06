@@ -165,7 +165,7 @@ public class PersonChangesBB
                     + " "
                     + change.getApprovedBy().getPerson().getLastName()
                     + " (ID# "
-                    + change.getApprovedBy().getHumanID()
+                    + change.getApprovedBy().getPerson().getHumanID()
                     + ")";
         } else if (change.isActive()) {
             return "No action taken yet";
@@ -196,14 +196,8 @@ public class PersonChangesBB
     public void applyChangeOrder() {
         PersonCoordinator pc = getPersonCoordinator();
 
-        try {
-            pc.implementPersonChangeOrder(currChangeOrder);
-        } catch (IntegrationException ex) {
-            System.out.println("PersonChangesBB.applyChangeOrder() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occurred while trying to update the database.", ""));
-        }
+        // TODO: adopt change orders to humanization
+//            pc.implementPersonChangeOrder(currChangeOrder);
 
         setCurrentViewOption(currentViewOption);
 

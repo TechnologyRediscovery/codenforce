@@ -102,6 +102,7 @@ public class IconBB extends BackingBeanUtils implements Serializable{
      * @return the currentIcon
      */
     public Icon getCurrentIcon() {
+        System.out.println("getCurrentIcons");
         return currentIcon;
     }
 

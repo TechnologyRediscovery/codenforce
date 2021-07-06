@@ -34,6 +34,8 @@ public class    Citation
     final static String CITATION_TABLE = "citation";
     final static String CITATION_PKFIELD = "citationid";
     
+    private int cecaseID;
+    
     /**
      * Database Key
      */
@@ -48,6 +50,7 @@ public class    Citation
      * External tracking by magistrate
      */
     private String docketNo;
+    protected User filingOfficer;
     
     private List<CitationStatusLogEntry> statusLog;
     private CourtEntity origin_courtentity;
@@ -334,6 +337,34 @@ public class    Citation
     @Override
     public int getHostPK() {
         return citationID;
+    }
+
+    /**
+     * @return the filingOfficer
+     */
+    public User getFilingOfficer() {
+        return filingOfficer;
+    }
+
+    /**
+     * @param filingOfficer the filingOfficer to set
+     */
+    public void setFilingOfficer(User filingOfficer) {
+        this.filingOfficer = filingOfficer;
+    }
+
+    /**
+     * @return the cecaseID
+     */
+    public int getCecaseID() {
+        return cecaseID;
+    }
+
+    /**
+     * @param cecaseID the cecaseID to set
+     */
+    public void setCecaseID(int cecaseID) {
+        this.cecaseID = cecaseID;
     }
 
 }

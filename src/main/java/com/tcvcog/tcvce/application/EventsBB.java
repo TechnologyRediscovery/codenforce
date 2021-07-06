@@ -1021,35 +1021,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
         
     }
     
-    /**
-     * Listener for user requests to search for a person by ID
-     * @param ev 
-     */
-    public void onPersonLookupByIDButtonChange(ActionEvent ev){
-        PersonCoordinator pc = getPersonCoordinator();
-        if(personIDForLookup == 0){
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Shall not look up person with ID of 0",
-                            "Please enter a positive, non-zero ID"));
-             return;
-            
-        }
-        try {
-            personCandidates.add(pc.getPerson(personIDForLookup));
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Located " + personCandidates.size() + " persons with this ID",
-                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
-        } catch (IntegrationException ex) {
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(),
-                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
-        }
-        
-        
-    }
+   
   
     /**
      * Listener method for changes in EventType selected by User

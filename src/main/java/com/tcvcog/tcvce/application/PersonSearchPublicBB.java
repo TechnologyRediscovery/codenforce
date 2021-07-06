@@ -94,7 +94,9 @@ public class PersonSearchPublicBB extends BackingBeanUtils implements Serializab
             bundledPersonSearchResults = new ArrayList<>();
             
             for(Person skeleton : skeletonHorde){
-                bundledPersonSearchResults.add(pic.extractPublicInfo(skeleton));
+                // TODO: Update for humanization
+                
+//                bundledPersonSearchResults.add(pic.extractPublicInfo(skeleton));
             }
             
         }

@@ -26,22 +26,16 @@
                 
 
                 <div class="addressee" style="left: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_left}px; top: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_top}px">
-                    <f:subview id="subview-addressee-normaladdress"
-                               rendered="#{!(noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress)}">
-                        <h:outputText value="#{noticeOfViolationBB.currentNotice.recipient.firstName} #{noticeOfViolationBB.currentNotice.recipient.lastName}"/>
-                        <br />
-                        <h:outputText escape="false" value="#{noticeOfViolationBB.currentNotice.recipient.addressStreet}"/>
-                        <br />
-                        <h:outputText value="#{noticeOfViolationBB.currentNotice.recipient.addressCity}, #{noticeOfViolationBB.currentNotice.recipient.addressState} #{noticeOfViolationBB.currentNotice.recipient.addressZip}"/>
-                    </f:subview>
+                    
 
-                    <f:subview id="subview-addressee-normaladdress"
-                               rendered="#{noticeOfViolationBB.currentNotice.recipient.useSeparateMailingAddress}">
-                        <h:outputText value="#{noticeOfViolationBB.currentNotice.recipient.firstName} #{noticeOfViolationBB.currentNotice.recipient.lastName}"/>
+                    <f:subview id="subview-addressee-normaladdress">
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.fixedRecipientName}"/>
                         <br />
-                        <h:outputText escape="false" value="#{noticeOfViolationBB.currentNotice.recipient.mailingAddressStreet}"/>
+                        <h:outputText escape="false" value="#{noticeOfViolationBB.currentNotice.fixedRecipientBldgNo}"/>
+                        <h:outputText escape="false" value=" "/>
+                        <h:outputText escape="false" value="#{noticeOfViolationBB.currentNotice.fixedRecipientStreet}"/>
                         <br />
-                        <h:outputText value="#{noticeOfViolationBB.currentNotice.recipient.mailingAddressCity}, #{noticeOfViolationBB.currentNotice.recipient.mailingAddressState} #{noticeOfViolationBB.currentNotice.recipient.mailingAddressZip}"/>
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.fixedRecipientCity}, #{noticeOfViolationBB.currentNotice.fixedRecipientState} #{noticeOfViolationBB.currentNotice.fixedRecipientZip}"/>
                     </f:subview>
                 </div>
 
@@ -57,10 +51,11 @@
 
                             <h:outputText  value="RE: " />
 
-                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.address} " />
-                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.address_city}, " />
-                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.address_state} " />
-                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.address_zip}" />
+                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.primaryAddressLink.buildingNo} " />
+                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.primaryAddressLink.street} " />
+                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.primaryAddressLink.city}, " />
+                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.primaryAddressLink.state} " />
+                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.primaryAddressLink.zipCode}" />
 
                             <h:outputText id="nov-prop-muni" value=" | Lot and block: #{noticeOfViolationBB.currentCase.property.lotAndBlock}" />
                             <h:outputText id="nov-prop-muni" value=" | Case ID: #{noticeOfViolationBB.currentCase.caseID}" />

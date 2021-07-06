@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -197,7 +198,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     }
     
     
-    public String onPropertyListItemSelect(Property prop){
+    public String onPropertyListItemSelect(PropertyDataHeavy prop){
         String navTo = "";
         try {
             navTo = getSessionBean().activateSessionObject(prop);

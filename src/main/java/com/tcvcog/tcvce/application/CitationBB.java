@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Citation;
+import com.tcvcog.tcvce.entities.CitationCodeViolationLink;
 import com.tcvcog.tcvce.entities.CitationStatusLogEntry;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CourtEntity;
@@ -323,12 +324,12 @@ public class CitationBB extends BackingBeanUtils implements Serializable {
 
     }
 
-    public void removeViolationFromCitation(CodeViolation v) {
+    public void removeViolationFromCitation(CitationCodeViolationLink v) {
         currentCitation.getViolationList().remove(v);
         removedViolationList.add(v);
     }
 
-    public void returnViolation(CodeViolation v) {
+    public void returnViolation(CitationCodeViolationLink v) {
         currentCitation.getViolationList().add(v);
         removedViolationList.remove(v);
     }
@@ -385,7 +386,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
 
         Citation c = currentCitation;
-        c.setUserOwner(getSessionBean().getSessUser());
+        
         try {
             cc.citation_issueCitation(c);
 

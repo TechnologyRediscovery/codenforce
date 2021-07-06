@@ -36,6 +36,9 @@ import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CodeViolationDisplayable;
 import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.Human;
+import com.tcvcog.tcvce.entities.HumanLink;
+import com.tcvcog.tcvce.entities.HumanMailingAddressLink;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.PageModeEnum;
@@ -99,8 +102,11 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private Map<String, Integer> blockCatIDMap;
     private String selectedBlockTemplate;
 
-    private List<Person> personCandidateList;
+    private List<HumanLink> personCandidateList;
     private List<Person> manualRetrievedPersonList;
+
+    private Human selectedRecipHuman;
+    private HumanMailingAddressLink selectedRecipAddr;
     
     private List<User> notifyingOfficerCandidateList;
     private User notifyingOfficerCandidateChosen;
@@ -224,7 +230,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             System.out.println(ex);
         } 
         if(pdh != null){
-            personCandidateList = pdh.getPersonList();
+            personCandidateList = pdh.getHumanLinkList();
         }
         if (personCandidateList != null) {
             System.out.println("NoticeOfViolationBuilderBB.initbean "
@@ -596,7 +602,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         CaseCoordinator caseCoord = getCaseCoordinator();
 
         try {
-            caseCoord.nov_LockAndQueue(currentCase, nov, getSessionBean().getSessUser());
+            caseCoord.nov_LockAndQueue(currentCase, nov, selectedRecipAddr,selectedRecipHuman, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice is locked and ready to be mailed!", ""));
@@ -823,10 +829,10 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     }
 
     public void checkNOVRecipient(ActionEvent ev) {
-        PersonIntegrator pi = getPersonIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
         if (recipientPersonID != 0) {
             try {
-                manualRetrievedPersonList.add(pi.getPerson(recipientPersonID));
+                manualRetrievedPersonList.add(pc.getPerson(pc.getHuman(recipientPersonID)));
                 System.out.println("NoticeOfViolationBB.checkNOVRecipient | looked up person: " + getRetrievedManualLookupPerson());
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Search complete", ""));
@@ -1283,14 +1289,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     /**
      * @return the personCandidateList
      */
-    public List<Person> getPersonCandidateList() {
+    public List<HumanLink> getPersonCandidateList() {
         return personCandidateList;
     }
 
     /**
      * @param personCandidateAL the personCandidateList to set
      */
-    public void setPersonCandidateAL(ArrayList<Person> personCandidateAL) {
+    public void setPersonCandidateAL(List<HumanLink> personCandidateAL) {
         this.personCandidateList = personCandidateAL;
     }
 
@@ -1717,6 +1723,34 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setNotifyingOfficerCandidateChosen(User notifyingOfficerCandidateChosen) {
         this.notifyingOfficerCandidateChosen = notifyingOfficerCandidateChosen;
+    }
+
+    /**
+     * @return the selectedRecipHuman
+     */
+    public Human getSelectedRecipHuman() {
+        return selectedRecipHuman;
+    }
+
+    /**
+     * @return the selectedRecipAddr
+     */
+    public HumanMailingAddressLink getSelectedRecipAddr() {
+        return selectedRecipAddr;
+    }
+
+    /**
+     * @param selectedRecipHuman the selectedRecipHuman to set
+     */
+    public void setSelectedRecipHuman(Human selectedRecipHuman) {
+        this.selectedRecipHuman = selectedRecipHuman;
+    }
+
+    /**
+     * @param selectedRecipAddr the selectedRecipAddr to set
+     */
+    public void setSelectedRecipAddr(HumanMailingAddressLink selectedRecipAddr) {
+        this.selectedRecipAddr = selectedRecipAddr;
     }
 
 }

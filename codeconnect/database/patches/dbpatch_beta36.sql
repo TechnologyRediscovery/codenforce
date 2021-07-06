@@ -354,7 +354,23 @@ ALTER TABLE parcelmailingaddress ADD COLUMN linkedobjectrole_lorid INTEGER
     CONSTRAINT parcelmailing_lorid_fk 
     REFERENCES linkedobjectrole (lorid);  
 
+  
+CREATE SEQUENCE IF NOT EXISTS humancontacted_contactconfigid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
 
+
+
+CREATE TABLE public.humancontacted 
+(
+    contactconfigid INTEGER DEFAULT nextval('humancontacted_contactconfigid_seq') PRIMARY KEY,
+    humanmailing_linkid INTEGER CONSTRAINT humancontacted_mailing_fk REFERENCES humanmailingaddress (linkid),
+    contactphone_phoneid INTEGER CONSTRAINT humancontacted_phoneid_fk REFERENCES contactphone (phoneid),
+    contactemail_emailid INTEGER CONSTRAINT humancontacted_emailid_fk REFERENCES contactemail (emailid) 
+);
 
 
 

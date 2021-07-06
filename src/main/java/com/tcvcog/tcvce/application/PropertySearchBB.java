@@ -111,7 +111,7 @@ public class PropertySearchBB extends BackingBeanUtils{
     private Person personSelected;
     private List<Person> personToAddList;
     private boolean personLinkUseID;
-    private int personIDToLink;
+    private int humanIDToLink;
 
     private ViewOptionsProposalsEnum selectedPropViewOption;
     
@@ -484,16 +484,16 @@ public class PropertySearchBB extends BackingBeanUtils{
         try {
             // based on the user's boolean button choice, either 
             // look up a person by ID or use the object
-            if (isPersonLinkUseID() &&.getHumanID()ToLink() != 0) {
+            if (isPersonLinkUseID() && humanIDToLink != 0) {
                 Person checkPer = null;
-                checkPer = persc.getPerson.getHumanID()ToLink());
+                checkPer = persc.getPerson(persc.getHuman(humanIDToLink));
                 if (checkPer != null && checkPer.getHumanID() != 0) {
                     pc.connectPersonToProperty(currentProperty, checkPer);
                     getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Connected " + checkPer.getLastName() + " to property ID " + currentProperty.getParcelKey(), ""));
                 } else {
                     getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Could not find a Person with ID " +.getHumanID()ToLink(), ""));
+                            "Could not find a Person with ID " + humanIDToLink, ""));
                     
                 }
 
@@ -1096,10 +1096,10 @@ public class PropertySearchBB extends BackingBeanUtils{
     }
 
     /**
-     * @return the personIDToLink
+     * @return the humanIDToLink
      */
-    public int.getHumanID()ToLink() {
-        return personIDToLink;
+    public int getHumanIDToLink() {
+        return humanIDToLink;
     }
 
     /**
@@ -1182,10 +1182,10 @@ public class PropertySearchBB extends BackingBeanUtils{
     }
 
     /**
-     * @param personIDToLink the personIDToLink to set
+     * @param humanIDToLink the humanIDToLink to set
      */
-    public void setPersonIDToLink(int personIDToLink) {
-        this.personIDToLink = personIDToLink;
+    public void setHumanIDToLink(int humanIDToLink) {
+        this.humanIDToLink = humanIDToLink;
     }
 
     /**

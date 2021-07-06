@@ -103,7 +103,7 @@ public class PropertyUnitChangesBB
                     + " "
                     + change.getApprovedBy().getPerson().getLastName()
                     + " (ID# "
-                    + change.getApprovedBy().getHumanID()
+                    + change.getApprovedBy().getPerson().getHumanID()
                     + ")";
         } else if(change.isActive()) {
             return "No action taken yet";

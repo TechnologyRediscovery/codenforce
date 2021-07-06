@@ -831,11 +831,6 @@
     </managed-bean>
     
     
-    <managed-bean>
-        <managed-bean-name>personPropertiesBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PersonPropertiesBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     
     
     <managed-bean>

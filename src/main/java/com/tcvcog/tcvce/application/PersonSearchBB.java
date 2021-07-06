@@ -248,19 +248,13 @@ public class PersonSearchBB extends BackingBeanUtils{
     }
 
     
+    /**
+     * TODO Adapt to humanization
+     * 
+     */
     public void loadPersonHistory(){
         PersonCoordinator pc = getPersonCoordinator();
-        try {
-            personList = pc.assemblePersonHistory(getSessionBean().getSessUser().getMyCredential());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "History was loaded!", ""));
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Could not load history, sorry", ""));
-            System.out.println(ex);
-        }
+        
         
     }
     
@@ -286,7 +280,7 @@ public class PersonSearchBB extends BackingBeanUtils{
         SystemCoordinator sc = getSystemCoordinator();
 
         try {
-            pc.personEdit(currentPerson, getSessionBean().getSessUser());
+            pc.humanEdit(currentPerson, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO, 
                      "Edits of Person saved to database!", ""));
@@ -328,7 +322,7 @@ public class PersonSearchBB extends BackingBeanUtils{
         PersonCoordinator pc = getPersonCoordinator();
         try {
             currentPerson = pc.assemblePersonDataHeavy(
-                    pc.personCreateMakeSkeleton(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni()),
+                    pc.personInit(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni()),
                     getSessionBean().getSessUser().getKeyCard());
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -336,7 +330,7 @@ public class PersonSearchBB extends BackingBeanUtils{
     }
     
     /**
-     * Action listener for creation of new person objectgs
+     * Action listener for creation of new person objects
      * @return  
      */
     public String personCreateCommit(){
@@ -344,12 +338,12 @@ public class PersonSearchBB extends BackingBeanUtils{
         SystemCoordinator sc = getSystemCoordinator();
     
         try {
-            int freshID = pc.personCreate(currentPerson, getSessionBean().getSessUser());
-            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(pc.getPerson(freshID),getSessionBean().getSessUser().getKeyCard()));
+            int freshID = pc.humanAdd(currentPerson, getSessionBean().getSessUser());
+            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(pc.getPerson(pc.getHuman(freshID)),getSessionBean().getSessUser().getKeyCard()));
                if(isConnectToActiveProperty()){
                    
                    Property property = getSessionBean().getSessProperty();
-                   pc.connectPersonToProperty(currentPerson, property);
+//                   pc.linkHuman();
                    getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Successfully added " + currentPerson.getFirstName() + " to the Database!" 
@@ -422,34 +416,7 @@ public class PersonSearchBB extends BackingBeanUtils{
         
     }
     
-    
-    public String deletePerson(){
-        System.out.println("PersonBB.deletePerson | in method");
-        PersonCoordinator pc = getPersonCoordinator();
-        
-        try {
-            pc.personNuke(currentPerson, getSessionBean().getSessUser().getMyCredential());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        currentPerson.getFirstName() + " has been permanently deleted; Goodbye " 
-                                + currentPerson.getFirstName() 
-                                + ". Search results have been cleared.", ""));
-            
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Cannot delete person." + ex.toString(), "Best not to delete folks anyway..."));
-            return "";
-            
-        } catch (AuthorizationException ex) {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        ex.getLocalizedMessage(),""));
-            return "";
-            
-        }
-        return "personSearch";
-    }
+ 
     
     
     /**

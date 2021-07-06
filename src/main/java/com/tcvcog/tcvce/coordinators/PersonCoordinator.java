@@ -109,39 +109,43 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * Grand staircase entrance for connecting a human holder to a human
      * @param hlh
      * @param hum
-     * @return
+     * @param ua the user doing the linking
+     * @return the link ID for the freshly inserted link
      * @throws BObStatusException 
      */
-    public int linkHuman(IFace_humanListHolder hlh, Human hum) throws BObStatusException{
+    public int linkHuman(IFace_humanListHolder hlh, HumanLink hum, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        
         if(hlh == null || hum == null){
             throw new BObStatusException("Cannot link human with null human or human holder");
         }
         
+        hum.setCreatedBy(ua);
+        hum.setLinkLastUpdatedBy(ua);
         
-        
-        
-        
-        
+        return pi.insertHumanLink(hlh, hum);
     }
     
     
     /**
      * Grand staircase entrance for deactivating a human holder and one of its humans
-     * @param hlh
-     * @param hum
-     * @return
+     * @param hlh the host BOB
+     * @param hl to deactivate
+     * @param ua the user doing the deactivating
      * @throws BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public int deactivateLinkedHuman(IFace_humanListHolder hlh, HumanLink hl) throws BObStatusException{
+    public void deactivateLinkedHuman(IFace_humanListHolder hlh, HumanLink hl, UserAuthorized ua) 
+            throws BObStatusException, IntegrationException{
+        
+        PersonIntegrator pi = getPersonIntegrator();
+        
         if(hlh == null || hl == null){
             throw new BObStatusException("Cannot link human with null human or human holder");
         }
-        
-        
-        
-        
-        
-        
+        hl.setLastupdatedBy(ua);
+        hl.setDeceasedBy(ua);
+        pi.deactivateHumanLink(hlh, hl);
     }
     
     
@@ -175,21 +179,23 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         if(hum != null){
             return null;
         }
+        Person p = new Person(hum);
         
-        return configurePerson(pi.getPerson(personID));
+        
+        return configurePerson(p);
     }
     
     /**
      * Utility method for building a list of Persons given a list of IDs
-     * @param pidList
+     * @param humanIDList
      * @return
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public List<Person> getPersonList(List<Integer> pidList) throws IntegrationException{
+    public List<Person> getPersonList(List<Integer> humanIDList) throws IntegrationException{
         List<Person> pList = new ArrayList<>();
-        if(pidList != null && !pidList.isEmpty()){
-            for(Integer i: pidList){
-                pList.add(getPerson(i));
+        if(humanIDList != null && !humanIDList.isEmpty()){
+            for(Integer i: humanIDList){
+                pList.add(getPerson(getHuman(i)));
             }
         }
         return pList;
@@ -269,49 +275,40 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param u
      * @throws IntegrationException 
      */
-    public void personEdit(Person p, User u) throws IntegrationException{
+    public void humanEdit(Human h, User u) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
-        pi.updatePerson(p);
+        pi.updateHuman(h);
     }
     
     /**
      * Creates skeleton or starter person for new person creation
+     * TODO: Finish my guts
+     * 
      * @param m
      * @return 
      */
-    public Person personCreateMakeSkeleton(Municipality m){
-        Person newP = new Person();
-        newP.setPersonID(0);
-        newP.setPersonType(PersonType.Public);
-        newP.setActive(true);
-        newP.setPersonID(0);
-        newP.setCanExpire(false);
+    public Person personInit(Municipality m){
+        Person newP = new Person(); 
         newP.setBusinessEntity(false);
-        newP.setCompositeLastName(false);
-        newP.setUseSeparateMailingAddress(false);
-        newP.setMuniCode(m.getMuniCode());
-        newP.setMuni(m);
-        newP.setAddressState("PA");
         return newP;
         
     }
     
     /**
      * Checks logic of incoming person objects and passes write off to Integrator
-     * @param p
+     * @param h
      * @param ua
      * @return
      * @throws IntegrationException 
      */
-    public int personCreate(Person p, UserAuthorized ua) throws IntegrationException{
+    public int humanAdd(Human h, UserAuthorized ua) throws IntegrationException{
         SystemIntegrator si = getSystemIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
        
-        p.setCreatorUserID(ua.getUserID());
-        p.setCreationTimeStamp(LocalDateTime.now());
-        p.setSource( si.getBOBSource(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+        h.setCreatedBy(ua);
+        h.setSource( si.getBOBSource(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                                 .getString("bobsourcePersonInternal"))));
-        return pi.insertPerson(p);
+        return pi.insertHuman(h);
         
     }
     
@@ -347,81 +344,8 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    /**
-     * Logic holder for pass-through calls to object connection methods on the Integrator
-     * @param person
-     * @param prop
-     * @throws IntegrationException 
-     */
-    public void connectPersonToProperty(Person person, Property prop) throws IntegrationException {
-        PersonIntegrator pi = getPersonIntegrator();
-        pi.connectPersonToProperty(person, prop);
-        
-    }
+   
     
-    
-    /**
-     * Logic holder for pass-through calls to object connection methods on the Integrator
-     * @param person
-     * @param prop
-     * @throws IntegrationException 
-     */
-    public void connectRemovePersonToProperty(Person person, Property prop) throws IntegrationException, BObStatusException {
-        if(person == null || prop == null){
-            throw new BObStatusException("Cannot remove person link if either Person or Property is NULL");
-        }
-        PersonIntegrator pi = getPersonIntegrator();
-        pi.connectRemovePersonToProperty(person, prop);
-        
-    }
-    
-    /**
-     * Logic holder for pass-through calls to object connection methods on the Integrator
-     * @param cit
-     * @param pers
-     * @throws IntegrationException 
-     */
-    public void connectPersonToCitation(Citation cit, Person pers) throws IntegrationException {
-        PersonIntegrator pi = getPersonIntegrator();
-        pi.connectPersonToCitation(cit, pers);
-        
-    }
-    
-    /**
-     * Logic holder for pass-through calls to object connection methods on the Integrator
-     * @param cit
-     * @param persList
-     * @throws IntegrationException 
-     */
-    public void connectPersonsToCitation(Citation cit, List<Person> persList) throws IntegrationException {
-        PersonIntegrator pi = getPersonIntegrator();
-        pi.connectPersonsToCitation(cit, persList);
-        
-    }
-    
-    /**
-     * Logic holder for pass-through calls to object connection methods on the Integrator
-     * @param munui
-     * @param p
-     * @throws IntegrationException 
-     */
-    public void connectPersonToMunicipality(Municipality munui, Person p) throws IntegrationException {
-        PersonIntegrator pi = getPersonIntegrator();
-        pi.connectPersonToMunicipality(munui, p);
-            
-    }
-    
-    /**
-     * Logic holder for pass-through calls to object connection methods on the Integrator
-     * @param munuiList
-     * @param p
-     * @throws IntegrationException 
-     */
-    public void connectPersonToMunicipalities(List<Municipality> munuiList, Person p) throws IntegrationException {
-        PersonIntegrator pi = getPersonIntegrator();
-        pi.connectPersonToMunicipalities(munuiList, p);
-        
-    }
     
     /**
      * Logic container method for creating a Ghost from a given Person--which
@@ -478,18 +402,21 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * Intermediary logic unit for configuring histories of Person object views
  given an authorization context
+ * 
+ *  TODO: Update for humanization
+ * 
      * @param cred
      * @return
      * @throws IntegrationException 
      */
-    public List<Person> assemblePersonHistory(Credential cred) throws IntegrationException{
+    public List<Human> assembleHumanHistory(Credential cred) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
-        List<Person> pl = new ArrayList<>();
+        List<Human> pl = new ArrayList<>();
         List<Integer> idList = null;
         if(cred != null){
             idList = pi.getPersonHistory(cred.getGoverningAuthPeriod().getUserID());
             while(!idList.isEmpty() && pl.size() <= Constants.MAX_BOB_HISTORY_SIZE){
-                pl.add(pi.getPerson(idList.remove(0)));
+//                pl.add(pi.getPerson(idList.remove(0)));
             }
         }
         return pl;
@@ -497,17 +424,17 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      *
-     * @param idNumList A list of person IDs from the database.
+     * @param hidl A list of person IDs from the database.
      * @return
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public List<Person> assemblePersonList(List<Integer> idNumList) throws IntegrationException{
+    public List<Human> assembleHumanList(List<Integer> hidl) throws IntegrationException{
         
-        ArrayList<Person> skeletonHorde = new ArrayList<>();
+        List<Human> skeletonHorde = new ArrayList<>();
         PersonIntegrator pi = getPersonIntegrator();
         
-        for (int idNum : idNumList){
-            skeletonHorde.add(pi.getPerson(idNum));
+        for (int idNum : hidl){
+            skeletonHorde.add(pi.getHuman(idNum));
         }
         return skeletonHorde;
     }
@@ -521,27 +448,15 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return personTypes;
     }
 
-   /**
-    * Logic and permissions check for main delete person method on integrator
-    * @param p
-    * @param cred
-    * @throws IntegrationException
-    * @throws AuthorizationException must be sys admin or higher
-    */
-    public void personNuke(Person p, Credential cred) throws IntegrationException, AuthorizationException{
-        PersonIntegrator pi = getPersonIntegrator();
-        if(cred.isHasSysAdminPermissions()){
-            pi.deletePerson(p);
-        } else {
-            throw new AuthorizationException("Must have sys admin permissions or higher to delete");
-        }
-    }
     
-    
-    
+    /**
+     * TODO: Finsih for humanization
+     * @param personList
+     * @return 
+     */
     public List<Person> anonymizePersonList(List<Person> personList) {
         for (Person person:personList){
-            anonymizePersonData(person);
+//            anonymizePersonData(person);
         }
         return personList; 
     }
@@ -551,19 +466,15 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * Anonymizes Person object member variables, for use in the case of a public search. The 
      * anonymized fields should still be recognizable if one knows what they are likely to be, but
      * someone without that knowledge should not be able to guess the address, phone number, email etc.
+     *
+     * TODO: Upgrade for Humanization
+     * 
+     * 
      * @param person
      * @return 
      */
     public Person anonymizePersonData(Person person){
         
-        // anonymize all but first two characters of first name
-        if(person.getFirstName() != null) {
-            StringBuilder first = new StringBuilder(person.getFirstName());
-            for (int i = 2; i < first.length() && i >=0; i++){
-                first.setCharAt(i, '*');
-            }
-            person.setFirstName(first.toString());
-        }
         
         // anonymize all but first two characters of last name
         if(person.getLastName() != null) {
@@ -571,7 +482,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
             for (int i = 2; i < last.length() && i >= 0; i++){
                 last.setCharAt(i, '*');
             }
-            person.setLastName(last.toString());
+            person.setName(last.toString());
         }
         
         // anonymize all but first three characters and the domain of an email address
@@ -580,123 +491,14 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
             for (int i = 3; i < email.length() &&  email.charAt(i) != '@' && i >= 0; i++){
                 email.setCharAt(i, '*');
             }
-            person.setEmail(email.toString());
+//            person.setEmail(email.toString());
         }
         
-        // anonymize all but last four digits of cell phone number
-        if(person.getPhoneCell() != null) {        
-            StringBuilder cellNumber = new StringBuilder(person.getPhoneCell());
-            for (int i = cellNumber.length() - 5; i >= 0; i--){
-                cellNumber.setCharAt(i, '*');
-            }
-            person.setPhoneCell(cellNumber.toString());
-        }
-
-        // anonymize all but last four digits of work phone number
-        if(person.getPhoneWork() != null) {
-            StringBuilder workNumber = new StringBuilder(person.getPhoneWork());
-            for (int i = workNumber.length() - 5; i >= 0; i--){
-                workNumber.setCharAt(i, '*');
-            }
-            person.setPhoneWork(workNumber.toString());
-        }     
-        
-        // anonymize all but last four digits of home phone number
-        if(person.getPhoneHome() != null) {
-            StringBuilder homeNumber = new StringBuilder(person.getPhoneHome());
-            for (int i = homeNumber.length() - 5; i >= 0; i--){
-                homeNumber.setCharAt(i, '*');
-            }
-            person.setPhoneHome(homeNumber.toString());      
-        }
-           
-        // anonymize all but first five characters of address
-        if(person.getAddressStreet() != null) {
-            StringBuilder address = new StringBuilder(person.getAddressStreet());
-            for (int i = 5; i < address.length() && i >= 0; i++){
-                address.setCharAt(i, '*');
-            }
-            person.setAddressStreet(address.toString());
-        }
-        
+        // anonymize a
         return person;
     }
     
-    /**
-     * Anonymizes Person object member variables, for use in the case of a public search. The 
-     * anonymized fields should still be recognizable if one knows what they are likely to be, but
-     * someone without that knowledge should not be able to guess the address, phone number, email etc.
-     * @param person
-     * @return 
-     */
-    public OccApplicationHumanLink anonymizePersonData(OccApplicationHumanLink person){
-        
-        // anonymize all but first two characters of first name
-        if(person.getFirstName() != null) {
-            StringBuilder first = new StringBuilder(person.getFirstName());
-            for (int i = 2; i < first.length() && i >=0; i++){
-                first.setCharAt(i, '*');
-            }
-            person.setFirstName(first.toString());
-        }
-        
-        // anonymize all but first two characters of last name
-        if(person.getLastName() != null) {
-            StringBuilder last = new StringBuilder(person.getLastName());
-            for (int i = 2; i < last.length() && i >= 0; i++){
-                last.setCharAt(i, '*');
-            }
-            person.setLastName(last.toString());
-        }
-        
-        // anonymize all but first three characters and the domain of an email address
-        if (person.getEmail() != null) {
-            StringBuilder email = new StringBuilder(person.getEmail());
-            for (int i = 3; i < email.length() &&  email.charAt(i) != '@' && i >= 0; i++){
-                email.setCharAt(i, '*');
-            }
-            person.setEmail(email.toString());
-        }
-        
-        // anonymize all but last four digits of cell phone number
-        if(person.getPhoneCell() != null) {        
-            StringBuilder cellNumber = new StringBuilder(person.getPhoneCell());
-            for (int i = cellNumber.length() - 5; i >= 0; i--){
-                cellNumber.setCharAt(i, '*');
-            }
-            person.setPhoneCell(cellNumber.toString());
-        }
-
-        // anonymize all but last four digits of work phone number
-        if(person.getPhoneWork() != null) {
-            StringBuilder workNumber = new StringBuilder(person.getPhoneWork());
-            for (int i = workNumber.length() - 5; i >= 0; i--){
-                workNumber.setCharAt(i, '*');
-            }
-            person.setPhoneWork(workNumber.toString());
-        }     
-        
-        // anonymize all but last four digits of home phone number
-        if(person.getPhoneHome() != null) {
-            StringBuilder homeNumber = new StringBuilder(person.getPhoneHome());
-            for (int i = homeNumber.length() - 5; i >= 0; i--){
-                homeNumber.setCharAt(i, '*');
-            }
-            person.setPhoneHome(homeNumber.toString());      
-        }
-           
-        // anonymize all but first five characters of address
-        if(person.getAddressStreet() != null) {
-            StringBuilder address = new StringBuilder(person.getAddressStreet());
-            for (int i = 5; i < address.length() && i >= 0; i++){
-                address.setCharAt(i, '*');
-            }
-            person.setAddressStreet(address.toString());
-        }
-        
-        return person;
-    }
-    
+ 
     /**
      * Attempt at archiving state of a pre-human person
      * to track changes to field names; come up with new approach
@@ -917,15 +719,22 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return sb.toString();
     }
     
+    /**
+     * TODO Upgrade for humanization
+     * @param personID
+     * @return
+     * @throws IntegrationException 
+     */
     public PersonWithChanges getPersonWithChanges(int personID) throws IntegrationException{
         
-        PersonWithChanges skeleton = new PersonWithChanges(getPerson(personID));
+//        PersonWithChanges skeleton = new PersonWithChanges(getPerson(personID));
         
         PersonIntegrator pi = getPersonIntegrator();
         
-        skeleton.setChangeOrderList(pi.getPersonChangeOrderListAll(personID));
+//        skeleton.setChangeOrderList(pi.getPersonChangeOrderListAll(personID));
         
-        return skeleton;
+        return null;
+//        return skeleton;
         
     }
     
@@ -948,105 +757,9 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         List<PersonWithChanges> skeletonHorde = new ArrayList<>();
         
         for(Integer input : personIDList){
-            
             skeletonHorde.add(getPersonWithChanges(input));
-            
         }
         
         return skeletonHorde;
-        
     }
-    
-    public void implementPersonChangeOrder(PersonChangeOrder order) throws IntegrationException {
-
-        PersonIntegrator pi = getPersonIntegrator();
-
-        //If the user added the person, their changes will already be in the database. No need to update
-        if (!order.isAdded()) {
-            Person skeleton = getPerson(order.getHumanID());
-            if (order.isRemoved()) {
-                skeleton.setActive(false); //just deactivate the person.
-            } else {
-                if (order.getFirstName() != null) {
-                    skeleton.setFirstName(order.getFirstName());
-                }
-
-                if (order.getLastName() != null) {
-                    skeleton.setLastName(order.getLastName());
-                }
-
-                if (order.getCompositeLastName() != null) {
-                    skeleton.setCompositeLastName(order.isCompositeLastName());
-                }
-
-                if (order.getPhoneCell() != null) {
-                    skeleton.setPhoneCell(order.getPhoneCell());
-                }
-
-                if (order.getPhoneHome() != null) {
-                    skeleton.setPhoneHome(order.getPhoneHome());
-                }
-
-                if (order.getPhoneWork() != null) {
-                    skeleton.setPhoneWork(order.getPhoneWork());
-                }
-
-                if (order.getEmail() != null) {
-                    skeleton.setEmail(order.getEmail());
-                }
-
-                if (order.getAddressStreet() != null) {
-                    skeleton.setAddressStreet(order.getAddressStreet());
-                }
-
-                if (order.getAddressCity() != null) {
-                    skeleton.setAddressCity(order.getAddressCity());
-                }
-
-                if (order.getAddressState() != null) {
-                    skeleton.setAddressState(order.getAddressState());
-                }
-
-                if (order.getAddressZip() != null) {
-                    skeleton.setAddressZip(order.getAddressZip());
-                }
-
-                if (order.getUseSeparateMailingAddress() != null) {
-                    skeleton.setUseSeparateMailingAddress(order.isUseSeparateMailingAddress());
-                }
-
-                if (order.getMailingAddressStreet() != null) {
-                    skeleton.setMailingAddressStreet(order.getMailingAddressStreet());
-                }
-
-                if (order.getMailingAddressThirdLine() != null) {
-                    skeleton.setMailingAddressThirdLine(order.getMailingAddressThirdLine());
-                }
-
-                if (order.getMailingAddressCity() != null) {
-                    skeleton.setMailingAddressCity(order.getMailingAddressCity());
-                }
-
-                if (order.getMailingAddressState() != null) {
-                    skeleton.setMailingAddressState(order.getMailingAddressState());
-                }
-
-                if (order.getMailingAddressZip() != null) {
-                    skeleton.setMailingAddressZip(order.getMailingAddressZip());
-                }
-            }
-
-            pi.updatePerson(skeleton);
-
-        }
-
-        // update change order now that it's been approved.
-        order.setActive(false);
-        order.setApprovedOn(Timestamp.valueOf(LocalDateTime.now()));
-        order.setApprovedBy(getSessionBean().getSessUser());
-
-        pi.updatePersonChangeOrder(order);
-
-    }
-    
 }

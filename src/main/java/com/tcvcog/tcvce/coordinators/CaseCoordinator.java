@@ -747,7 +747,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         // timestamp set by postgres
         // no closing date, by design of case flow
         newCase.setPublicControlCode(casePCC);
-        newCase.setPropertyID(p.getParcelKey());
+        newCase.setParcelKey(p.getParcelKey());
         newCase.setCaseManager(ua);
 
         return newCase;
@@ -904,7 +904,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             cse.setOriginationDate(LocalDateTime.now());
         }
 
-        if (cse.getParcelkey() == 0) {
+        if (cse.getParcelKey() == 0) {
             throw new BObStatusException("Cases must have a nonzero property id");
         }
 
@@ -1182,9 +1182,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                     ReportCECaseListStreetCECaseContainer ssc;
 
                     for(CECaseDataHeavy cse: cseList){
-                        if(!streetCaseMap.containsKey(cse.getProperty().getAddressStreet())){
+                        if(!streetCaseMap.containsKey(cse.getProperty().getPrimaryAddressLink().getStreet())){
                              ssc = new ReportCECaseListStreetCECaseContainer();
-                             ssc.setStreetName(cse.getProperty().getAddressStreet());
+                             ssc.setStreetName(cse.getProperty().getPrimaryAddressLink().getStreet());
                             switch(enm){
                                 case CLOSED:
                                     ssc.getCaseClosedList().add(cse);
@@ -1197,7 +1197,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                                     break;
                             } // close switch
                         } else {
-                            ssc = streetCaseMap.get(cse.getProperty().getAddressStreet());
+                            ssc = streetCaseMap.get(cse.getProperty().getPrimaryAddressLink().getStreet());
                             switch(enm){
                                 case CLOSED:
                                     ssc.getCaseClosedList().add(cse);
@@ -1211,7 +1211,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                             } // close switch
                         } // close if/else
                         // Write new or updated Street Case continaer to our map
-                        streetCaseMap.put(cse.getProperty().getAddressStreet(), ssc);
+                        streetCaseMap.put(cse.getProperty().getPrimaryAddressLink().getStreet(), ssc);
                     } // close for over case list
                 } // close null/emtpy check
             } // close for over enum vals
@@ -1937,30 +1937,49 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      *
      * @param c
      * @param nov
+     * @param addr
+     * @param h
      * @param ua
      * @throws BObStatusException
      * @throws IntegrationException
      * @throws EventException
      * @throws ViolationException
      */
-    public void nov_LockAndQueue(CECaseDataHeavy c, NoticeOfViolation nov, UserAuthorized ua)
+    public void nov_LockAndQueue(CECaseDataHeavy c, 
+                                 NoticeOfViolation nov, 
+                                 HumanMailingAddressLink addr,
+                                 Human h,
+                                 UserAuthorized ua)
             throws BObStatusException, IntegrationException, EventException, ViolationException {
 
-        if(c == null || nov == null || ua == null){
+        if(c == null || nov == null || ua == null || addr == null || h == null){
             throw new BObStatusException("Cannot lock notice with null case, nov, or user");
         }
         CaseIntegrator ci = getCaseIntegrator();
-        EventCoordinator evCoord = getEventCoordinator();
-        PersonCoordinator pc = getPersonCoordinator();
-        PersonIntegrator pi = getPersonIntegrator();
 
         if (nov.getLockedAndqueuedTS() == null) {
-            int ghostID = pc.createChostPerson(nov.getRecipient(), ua);
-            nov.setRecipient(pi.getPerson(ghostID));
+//            int ghostID = pc.createChostPerson(nov.getRecipient(), ua);
+//            nov.setRecipient(pi.getPerson(ghostID));
             nov.setLockedAndqueuedTS(LocalDateTime.now());
             nov.setLockedAndQueuedBy(ua);
+            
+            // Pull out values of chosen Human and associated mailing address 
+            // and inject into permament NOV fields for record keeping
+            
+            nov.setFixedAddrXferTS(LocalDateTime.now());
+            nov.setRecipHuman(h);
+            nov.setMailingLink(addr);
+            nov.setFixedRecipientName(h.getName());
+            nov.setFixedRecipientBldgNo(addr.getBuildingNo());
+            nov.setFixedRecipientStreet(addr.getStreet());
+            nov.setFixedRecipientStreet(addr.getCity());
+            nov.setFixedRecipientStreet(addr.getState());
+            nov.setFixedRecipientStreet(addr.getZipCode());
+            
             ci.novLockAndQueueForMailing(nov);
+            
             System.out.println("CaseCoordinator.novLockAndQueue | NOV locked in integrator");
+            
         } else {
             throw new BObStatusException("Notice is already locked and queued for sending");
         }
@@ -2326,7 +2345,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             throw new BObStatusException("Users must have enforcement office permissions to create a citation");
         }
         Citation cit = new Citation();
-        cit.setCeCaseNoLists(cse);
+        cit.set(cse);
         cit.setDateOfRecord(LocalDateTime.now());
         cit.setUserOwner(getSessionBean().getSessUser());
         cit.setIsActive(true);

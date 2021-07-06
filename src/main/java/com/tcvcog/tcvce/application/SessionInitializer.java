@@ -556,7 +556,7 @@ public  class       SessionInitializer
         PersonCoordinator persc = getPersonCoordinator();
         
         try {
-            sb.setSessPersonList(persc.assemblePersonHistory(cred));
+            sb.setSessPersonList(persc.assembleHumanHistory(cred));
             if(sb.getSessPersonList().isEmpty()){
                 sb.setSessPersonQueued(persc.selectDefaultPerson(cred));
             } else {

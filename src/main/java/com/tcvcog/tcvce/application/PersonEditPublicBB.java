@@ -24,7 +24,7 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
+import com.tcvcog.tcvce.entities.HumanLink;
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -68,21 +68,28 @@ public class PersonEditPublicBB extends BackingBeanUtils implements Serializable
         // THIS IS HARDCODED, DEFAULT, PUBLIC USER SHOULD BE PARAMETER
         u.setUserID(102);
         int cloneId = pi.createClone(person, u);
-        person = pi.getPerson(cloneId);
+//        person = pi.getPerson(cloneId);
         PersonCoordinator pc = getPersonCoordinator();
         person = pc.anonymizePersonData(person);
         clonePerson = person;
 //        clonePerson.setPersonType(getSessionBean().getActivePersonType());
     }
     
-    public String addCloneToApplicantPersons(OccApplicationHumanLink clone) throws IntegrationException{
+    /**
+     * TODO: Adapt to humanization
+     * 
+     * @param clone
+     * @return
+     * @throws IntegrationException 
+     */
+    public String addCloneToApplicantPersons(HumanLink clone) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         
 //        TODO: Yikes! No intergrator calls here
 //          TODO: JURPLEL please udpdate to work with MVC and humanization
 //        pi.updatePerson(clone);
         
-        getSessionBean().getSessOccPermitApplication().getAttachedPersons().add(clone);
+//        getSessionBean().getSessOccPermitApplication().getAttachedPersons().add(clone);
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
         oc.verifyOccPermitPersonsRequirement(getSessionBean().getSessOccPermitApplication());

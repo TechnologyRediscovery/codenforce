@@ -32,7 +32,8 @@ import java.util.List;
  */
 public  class       Person 
         extends     Human
-        implements  IFace_Loggable{
+        implements  IFace_Loggable,
+                    IFace_ActivatableBOB{
     
     protected List<HumanMailingAddressLink> addressList;
     protected List<ContactEmail> emailList;
@@ -48,6 +49,17 @@ public  class       Person
      */
     public Person(Person input) {
        
+        
+    }
+    
+    /**
+     * Creates a person out of a human
+     * TODO: Finish my guts
+     * @param h 
+     */
+    public Person(Human h){
+        
+        
     }
 
     /**

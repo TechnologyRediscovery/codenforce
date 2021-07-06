@@ -52,7 +52,9 @@ import java.util.Map;
 import javax.faces.application.FacesMessage;
 
 /**
- *
+ * A catch all location for database operations against tables
+ * that support Business objects across all sorts of subsystems
+ * 
  * @author ellen bascomb of apt 31y
  */
 public class SystemIntegrator extends BackingBeanUtils implements Serializable {
@@ -680,7 +682,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
           List<Integer> sidl = new ArrayList<>();
           BOBSource bs = null;
           
-          String query =    "   SELECT sourceid FROM public.bobsource;";
+          String query =    " SELECT sourceid FROM public.bobsource;";
         
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -879,6 +881,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(6, intsty.getIcon().getIconid());
             stmt.setInt(7, intsty.getClassID());
             stmt.executeUpdate();
+            
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to update Intensity", ex);

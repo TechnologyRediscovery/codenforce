@@ -26,7 +26,9 @@ public class HumanMailingAddressLink
         extends MailingAddress
         implements IFace_trackedEntityLink{
     
-    final static LinkedHumanSchemaEnum ROLE_SCHEMA = LinkedHumanSchemaEnum.MAILINGADDRESSHUMAN;
+    final static LinkedHumanSchemaEnum ROLE_SCHEMA = LinkedHumanSchemaEnum.CECASEHUMAN;
+    
+    protected int linkID;
     
     protected BOBSource linkSource;
     protected LinkedObjectRole linkRole;
@@ -43,8 +45,6 @@ public class HumanMailingAddressLink
     protected String linkNotes;
     
     public HumanMailingAddressLink(MailingAddress ma){
-        
-        
         
         this.addressID = ma.addressID;
         this.buildingNo = ma.buildingNo;
@@ -65,13 +65,13 @@ public class HumanMailingAddressLink
         this.deactivatedTS = ma.deactivatedTS;
         this.deactivatedBy = ma.deactivatedBy;
         
-        
     }
     
    
     /**
      * @return the linkSource
      */
+    @Override
     public BOBSource getLinkSource() {
         return linkSource;
     }
@@ -79,6 +79,7 @@ public class HumanMailingAddressLink
     /**
      * @param linkSource the linkSource to set
      */
+    @Override
     public void setLinkSource(BOBSource linkSource) {
         this.linkSource = linkSource;
     }
@@ -224,9 +225,28 @@ public class HumanMailingAddressLink
         return linkRole;
     }
 
-    @Override
+    
     public LinkedHumanSchemaEnum getLinkedObjectRoleSchemaEnum() {
         return ROLE_SCHEMA;
+    }
+
+    @Override
+    public void setLinkedObjectRole(LinkedObjectRole lor) {
+        linkRole = lor;
+    }
+
+    /**
+     * @return the linkID
+     */
+    public int getLinkID() {
+        return linkID;
+    }
+
+    /**
+     * @param linkID the linkID to set
+     */
+    public void setLinkID(int linkID) {
+        this.linkID = linkID;
     }
 
    
