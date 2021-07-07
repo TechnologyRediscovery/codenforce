@@ -27,7 +27,7 @@ public class HumanParcelLink
         extends Parcel
         implements IFace_trackedEntityLink{
     
-    final static LinkedHumanSchemaEnum ROLE_SCHEMA = LinkedHumanSchemaEnum.PARCELHUMAN;
+    final static LinkedObjectSchemaEnum ROLE_SCHEMA = LinkedObjectSchemaEnum.PARCELHUMAN;
     
     protected int linkID;
     protected int humanID;
@@ -232,9 +232,11 @@ public class HumanParcelLink
         return linkRole;
     }
 
+   
+
     @Override
-    public LinkedHumanSchemaEnum getLinkedObjectRoleSchemaEnum() {
-        return ROLE_SCHEMA;
+    public void setLinkedObjectRole(LinkedObjectRole lor) {
+        linkRole = lor;
     }
 
    

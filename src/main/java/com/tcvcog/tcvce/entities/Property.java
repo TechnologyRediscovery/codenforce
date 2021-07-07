@@ -6,8 +6,6 @@
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
-import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
-import java.time.LocalDateTime;
 import java.util.List;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 

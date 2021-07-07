@@ -65,7 +65,7 @@ public class    Citation
     private List<CitationCodeViolationLink> violationList;
     private List<BlobLight> blobList;
 
-    protected LinkedHumanSchemaEnum humanLinkSchemaEnum;
+    protected LinkedObjectSchemaEnum humanLinkSchemaEnum;
     protected List<HumanLink> humanLinkList;
     
     
@@ -325,12 +325,12 @@ public class    Citation
     }
 
     @Override
-    public LinkedHumanSchemaEnum getLinkSchema() {
+    public LinkedObjectSchemaEnum getLinkSchema() {
         return humanLinkSchemaEnum;
     }
 
     @Override
-    public void setLinkSchema(LinkedHumanSchemaEnum lhse) {
+    public void setLinkSchema(LinkedObjectSchemaEnum lhse) {
         humanLinkSchemaEnum = lhse;
     }
 

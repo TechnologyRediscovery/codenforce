@@ -31,7 +31,7 @@ public class        PropertyUnitDataHeavy
 
     private List<OccPeriod> periodList;
     
-    protected LinkedHumanSchemaEnum humanLinkSchemaEnum;
+    protected LinkedObjectSchemaEnum humanLinkSchemaEnum;
     protected List<HumanLink> humanLinkList;
      
     
@@ -117,12 +117,12 @@ public class        PropertyUnitDataHeavy
     }
 
     @Override
-    public LinkedHumanSchemaEnum getLinkSchema() {
+    public LinkedObjectSchemaEnum getLinkSchema() {
         return humanLinkSchemaEnum;
     }
 
     @Override
-    public void setLinkSchema(LinkedHumanSchemaEnum lhse) {
+    public void setLinkSchema(LinkedObjectSchemaEnum lhse) {
         humanLinkSchemaEnum = lhse;
     }
 

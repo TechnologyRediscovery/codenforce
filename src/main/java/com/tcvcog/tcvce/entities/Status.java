@@ -9,8 +9,10 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- *
- * @author sylvia
+ * Superclass of a family of status objects which represent
+ * the business state of an object
+ * 
+ * @author Ellen Bascomb of Apartmen 31Y
  */
 public abstract class Status implements Serializable {
     

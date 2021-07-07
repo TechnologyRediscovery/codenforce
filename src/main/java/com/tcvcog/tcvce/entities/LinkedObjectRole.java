@@ -28,7 +28,9 @@ import java.time.LocalDateTime;
  */
 public class LinkedObjectRole {
     
+    
     protected String linkingTableName;
+    protected LinkedObjectSchemaEnum schema;
     protected int roleID;
     protected String title;
     protected LocalDateTime createdTS;
@@ -145,6 +147,20 @@ public class LinkedObjectRole {
      */
     public String getLinkingTableName() {
         return linkingTableName;
+    }
+
+    /**
+     * @return the schema
+     */
+    public LinkedObjectSchemaEnum getSchema() {
+        return schema;
+    }
+
+    /**
+     * @param schema the schema to set
+     */
+    public void setSchema(LinkedObjectSchemaEnum schema) {
+        this.schema = schema;
     }
     
     

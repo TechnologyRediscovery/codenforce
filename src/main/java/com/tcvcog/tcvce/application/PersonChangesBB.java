@@ -34,7 +34,9 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
 /**
- *
+ * TODO: This class has been commented to death during
+ * the humanization and parcelization process--revisit
+ * 
  * @author Nathan Dietz
  */
 public class PersonChangesBB
@@ -88,7 +90,8 @@ public class PersonChangesBB
                             "An error occurred while trying to load information from the database.", ""));
         }
 
-        currPerson = new PersonWithChanges();
+//        currPerson = new PersonWithChanges();
+
 
         currChangeOrder = new PersonChangeOrder();
 

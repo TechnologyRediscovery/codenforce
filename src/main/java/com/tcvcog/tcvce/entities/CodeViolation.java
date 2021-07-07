@@ -85,7 +85,49 @@ public  class       CodeViolation
     protected LocalDateTime lastUpdatedTS;
     protected User lastUpdatedUser;
     
+    public CodeViolation(){
+        
+    }
     
+    public CodeViolation(CodeViolation cv){
+        this.violationID = cv.violationID;
+        this.violatedEnfElement = cv.violatedEnfElement;
+        this.ceCaseID = cv.ceCaseID;
+        this.status = cv.status;
+        this.active = cv.active;
+        this.icon = cv.icon;
+        this.ageLeadText = cv.ageLeadText;
+        this.penalty = cv.penalty;
+        this.description = cv.description;
+        this.notes = cv.notes;
+        this.dateOfRecord = cv.dateOfRecord;
+        this.dateOfRecordUtilDate = cv.dateOfRecordUtilDate;
+        this.dateOfRecordPretty = cv.dateOfRecordPretty;
+        this.creationTS = cv.creationTS;
+        this.creationTSPretty = cv.creationTSPretty;
+        this.createdBy = cv.createdBy;
+        this.allowHostCaseUpdate = cv.allowHostCaseUpdate;
+        this.allowOrdinanceUpdates = cv.allowOrdinanceUpdates;
+        this.allowDORUpdate = cv.allowDORUpdate;
+        this.allowStipCompDateUpdate = cv.allowStipCompDateUpdate;
+        this.dateOfCitation = cv.dateOfCitation;
+        this.citationIDList = cv.citationIDList;
+        this.noticeIDList = cv.noticeIDList;
+        this.stipulatedComplianceDate = cv.stipulatedComplianceDate;
+        this.actualComplianceDate = cv.actualComplianceDate;
+        this.complianceTimeStamp = cv.complianceTimeStamp;
+        this.complianceUser = cv.complianceUser;
+        this.complianceNote = cv.complianceNote;
+        this.nullifiedTS = cv.nullifiedTS;
+        this.nullifiedUser = cv.nullifiedUser;
+        this.leagacyImport = cv.leagacyImport;
+        this.blobList = cv.blobList;
+        this.complianceTFExpiryPropID = cv.complianceTFExpiryPropID;
+        this.complianceTFExpiryProp = cv.complianceTFExpiryProp;
+        this.severityIntensity = cv.severityIntensity;
+        this.lastUpdatedTS = cv.lastUpdatedTS;
+        this.lastUpdatedUser = cv.lastUpdatedUser;
+    }
     
      /**
      * @return the daysUntilStipulatedComplianceDate

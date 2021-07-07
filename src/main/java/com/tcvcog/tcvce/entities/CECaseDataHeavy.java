@@ -31,7 +31,7 @@ public class CECaseDataHeavy
     private Property property;
     private PropertyUnit propertyUnit;
     
-    protected LinkedHumanSchemaEnum humanLinkSchemaEnum;
+    protected LinkedObjectSchemaEnum humanLinkSchemaEnum;
     protected List<HumanLink> humanLinkList;
     
     private List<Proposal> proposalList;
@@ -398,12 +398,12 @@ public class CECaseDataHeavy
     }
 
     @Override
-    public LinkedHumanSchemaEnum getLinkSchema() {
+    public LinkedObjectSchemaEnum getLinkSchema() {
         return humanLinkSchemaEnum;
     }
 
     @Override
-    public void setLinkSchema(LinkedHumanSchemaEnum lhse) {
+    public void setLinkSchema(LinkedObjectSchemaEnum lhse) {
         humanLinkSchemaEnum = lhse;
     }
 

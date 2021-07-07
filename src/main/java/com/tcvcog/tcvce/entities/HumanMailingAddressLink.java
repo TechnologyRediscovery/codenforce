@@ -26,7 +26,7 @@ public class HumanMailingAddressLink
         extends MailingAddress
         implements IFace_trackedEntityLink{
     
-    final static LinkedHumanSchemaEnum ROLE_SCHEMA = LinkedHumanSchemaEnum.CECASEHUMAN;
+    final static LinkedObjectSchemaEnum ROLE_SCHEMA = LinkedObjectSchemaEnum.CECASEHUMAN;
     
     protected int linkID;
     
@@ -226,7 +226,7 @@ public class HumanMailingAddressLink
     }
 
     
-    public LinkedHumanSchemaEnum getLinkedObjectRoleSchemaEnum() {
+    public LinkedObjectSchemaEnum getLinkedObjectRoleSchemaEnum() {
         return ROLE_SCHEMA;
     }
 

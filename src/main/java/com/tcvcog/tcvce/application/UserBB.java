@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
@@ -66,7 +67,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     private String formOriNum;
     
     private Person formSelectedUserPerson;
-    private List<Person> userPersonList;
+    private List<Human> userPersonList;
     
 
     /**
@@ -312,14 +313,14 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the userPersonList
      */
-    public List<Person> getUserPersonList() {
+    public List<Human> getUserPersonList() {
         return userPersonList;
     }
 
     /**
      * @param userPersonList the userPersonList to set
      */
-    public void setUserPersonList(List<Person> userPersonList) {
+    public void setUserPersonList(List<Human> userPersonList) {
         this.userPersonList = userPersonList;
     }
 

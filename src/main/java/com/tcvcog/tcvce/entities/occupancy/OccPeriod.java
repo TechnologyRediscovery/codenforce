@@ -9,13 +9,13 @@ import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.IFace_EventHolder;
-import com.tcvcog.tcvce.entities.OccPeriodHumanLink;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
+import com.tcvcog.tcvce.entities.HumanLink;
 
 /**
  * Primary Business Object BOB for holding data about Occupancy Periods
@@ -33,7 +33,7 @@ public  class       OccPeriod
     protected int propertyUnitID;
     
     protected OccPeriodType type;
-    protected List<OccPeriodHumanLink> humans;
+    protected List<HumanLink> humans;
     
     protected OccInspection governingInspection;
     

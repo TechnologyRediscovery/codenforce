@@ -31,11 +31,11 @@ import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.FeeAssigned;
+import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -74,6 +74,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 
+ * 
+ * ?!!!!!!!!!!!!!! READ ME OR PERISH !!!!!!!!!!!!!!!!!!!!!!!!!??
+ * This class has been commented to death by Ellen Bascomb (Apartment31Y) during
+ * parcelization and needs to be resurrected with care. See documentation about
+ * parcel and property relationships post parcelization.
  *
  * @author Nathan Dietz
  */
@@ -136,7 +142,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         List<CEActionRequest> requestList = ceari.getCEActionRequestByControlCode(pacc);
 
         for (CEActionRequest cear : requestList) {
-            PublicInfoBundleCEActionRequest bundle = extractPublicInfo(cear);
+// TODO upgrade for parcelization
+//            PublicInfoBundleCEActionRequest bundle = extractPublicInfo(cear);
 
             // if the current action request is linked to a CECaseDataHeavy,
             // go grab that case and check for allowed forward access
@@ -144,10 +151,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             if (cear.getCaseID() != 0) {
                 CECase caseFromActionRequest = caseInt.getCECase(cear.getCaseID());
                 if (caseFromActionRequest.isAllowForwardLinkedPublicAccess()) {
-                    infoBundleList.add(extractPublicInfo(caseFromActionRequest));
+                    // TODO upgrade for parcelization
+//                    infoBundleList.add(extractPublicInfo(caseFromActionRequest));
                 }
             }
-            infoBundleList.add(bundle);
+// TODO upgrade for parcelization
+//            infoBundleList.add(bundle);
         }
 
         // now go and get CECaseDataHeavy bundles and add them to the list
@@ -164,7 +173,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         for (CECase c : caseList) {
             // let the extraction method deal with all the assembly logic
             // and access control issues
-            infoBundleList.add(extractPublicInfo(c));
+            // TODO upgrade for parcelization
+//            infoBundleList.add(extractPublicInfo(c));
         }
 
         //then grab OccPermitApplications
@@ -173,8 +183,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         List<OccPermitApplication> applicationList = oi.getOccPermitApplicationListByControlCode(pacc);
 
         for (OccPermitApplication opa : applicationList) {
-
-            infoBundleList.add(extractPublicInfo(opa));
+            // TODO upgrade for parcelization
+//            infoBundleList.add(extractPublicInfo(opa));
 
         }
 
@@ -183,8 +193,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         List<OccInspection> inspectionList = oii.getOccInspectionListByPACC(pacc);
 
         for (OccInspection ins : inspectionList) {
-
-            infoBundleList.add(extractPublicInfo(ins));
+            // TODO upgrade for parcelization
+//            infoBundleList.add(extractPublicInfo(ins));
 
         }
 
@@ -223,7 +233,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         if (c.isPaccEnabled()) {
             pib.setBundledCase(cse);
-            if (c.getProperty() == null || c.getProperty().isNonAddressable()) {
+            // TODO upgrade for parcelization
+            // nonaddressable compound check removed here
+            if (c.getProperty() == null ) {
                 pib.setAddressAssociated(false);
             } else {
                 pib.setAddressAssociated(true);
@@ -235,7 +247,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             for (EventCnF ev : c.getEventList()) {
                 //Only add events that are visible to the public.
                 if (ev.getCategory().getUserRankMinimumToView() <= PUBLIC_VIEW_USER_RANK) {
-                    eventBundles.add(extractPublicInfo(ev));
+                    // TODO upgrade for parcelization
+//                    eventBundles.add(extractPublicInfo(ev));
                 }
             }
 
@@ -245,7 +258,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             //We only need the unresolved ones.
             for (CodeViolation vio : c.getViolationListUnresolved()) {
-                violationBundles.add(extractPublicInfo(vio));
+            // TODO upgrade for parcelization                
+//                violationBundles.add(extractPublicInfo(vio));
             }
 
             pib.setViolationList(violationBundles);
@@ -326,7 +340,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         if (req.isPaccEnabled()) {
 
-            pib.setRequestor(extractPublicInfo(req.getRequestor()));
+            // TODO upgrade for parcelization
+//            pib.setRequestor(extractPublicInfo(req.getRequestor()));
 
             pib.setRequestProperty(extractPublicInfo(req.getRequestProperty()));
 
@@ -369,7 +384,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         Person skeleton = pc.anonymizePersonData(input.getPayer());
 
-        pib.setPayer(extractPublicInfo(skeleton));
+        // TODO upgrade for parcelization
+//        pib.setPayer(extractPublicInfo(skeleton));
 
         pib.setBundledPayment(input);
 
@@ -417,9 +433,10 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             pib.setShowDetailsPageButton(true);
         } else {
-            Person skeleton = new Person();
-            skeleton.setPersonID(input.getHumanID());
-            pib.setBundledPerson(skeleton);
+            // TODO upgrade for parcelization
+//            Person skeleton = new Person();
+//            skeleton.setPersonID(input.getHumanID());
+//            pib.setBundledPerson(skeleton);
             pib.setPaccStatusMessage("A public information bundle was found but public "
                     + "access was switched off by a code officer. Please contact your municipal office. ");
 
@@ -436,7 +453,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      * @param input
      * @return
      */
-    public PublicInfoBundlePersonOccApplication extractPublicInfo(OccApplicationHumanLink input) {
+    public PublicInfoBundlePersonOccApplication extractPublicInfo(HumanLink input) {
 
         PublicInfoBundlePersonOccApplication pib = new PublicInfoBundlePersonOccApplication();
 
@@ -449,19 +466,21 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             PersonCoordinator pc = getPersonCoordinator();
 
-            input = pc.anonymizePersonData(input);
+            /// TODO upgrade for parcelization            
+//            input = pc.anonymizePersonData(input);
 
-            pib.setBundledPerson(input);
+//            pib.setBundledPerson(input);
 
             pib.setPaccStatusMessage("Public access enabled");
             pib.setPaccEnabled(true);
 
             pib.setShowDetailsPageButton(true);
         } else {
-            OccApplicationHumanLink skeleton = new OccApplicationHumanLink();
-            skeleton.setPersonID(input.getHumanID());
-            skeleton.setApplicationID(input.getApplicationID());
-            pib.setBundledPerson(skeleton);
+/// ----------- >TODO: upgrade for parcelization <---------------------                        
+//            OccApplicationHumanLink skeleton = new OccApplicationHumanLink();
+//            skeleton.setPersonID(input.getHumanID());
+//            skeleton.setApplicationID(input.getApplicationID());
+//            pib.setBundledPerson(skeleton);
             pib.setPaccStatusMessage("A public information bundle was found but public "
                     + "access was switched off by a code officer. Please contact your municipal office. ");
 
@@ -515,7 +534,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setShowDetailsPageButton(true);
         } else {
             Property skeleton = new Property();
-            skeleton.setPropertyID(skeleton.getParcelKey());
+/// ----------- >TODO: upgrade for parcelization <---------------------                        
+// should this be parcelkey?
+            skeleton.setParcelKey(skeleton.getParcelKey());
             pib.setBundledProperty(skeleton);
             pib.setPaccStatusMessage("A public information bundle was found but public "
                     + "access was switched off by a code officer. Please contact your municipal office. ");
@@ -546,7 +567,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         if (input.isActive()) {
             OccupancyCoordinator oc = getOccupancyCoordinator();
             setPublicUser();
-            OccPeriodDataHeavy heavy = oc.assembleOccPeriodDataHeavy(input, publicUser.getMyCredential());
+            OccPeriodDataHeavy opdh = oc.assembleOccPeriodDataHeavy(input, publicUser.getMyCredential());
 
             pib.setBundledPeriod(input);
 
@@ -555,19 +576,20 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             
             ArrayList<PublicInfoBundlePerson> bundledPersons = new ArrayList<>();
 
-            if (heavy.getPersonList() != null) {
-
-                for (Person skeleton : heavy.getPersonList()) {
-
-                    bundledPersons.add(extractPublicInfo(skeleton));
-
-                }
-            }
+/// ----------- >TODO: upgrade for parcelization <---------------------                        
+//            if (opdh.getPersonList() != null) {
+//
+//                for (Person skeleton : opdh.getPersonList()) {
+//
+//                    bundledPersons.add(extractPublicInfo(skeleton));
+//
+//                }
+//            }
 
             ArrayList<PublicInfoBundleOccInspection> bundledInspections = new ArrayList<>();
 
-            if (heavy.getInspectionList() != null) {
-                for (OccInspection skeleton : (List<OccInspection>) heavy.getInspectionList()) {
+            if (opdh.getInspectionList() != null) {
+                for (OccInspection skeleton : (List<OccInspection>) opdh.getInspectionList()) {
 
                     bundledInspections.add(extractPublicInfo(skeleton));
 
@@ -575,8 +597,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             }
 
             ArrayList<PublicInfoBundleFeeAssigned> bundledFees = new ArrayList<>();
-            if (heavy.getFeeList() != null) {
-                for (FeeAssigned skeleton : heavy.getFeeList()) {
+            if (opdh.getFeeList() != null) {
+                for (FeeAssigned skeleton : opdh.getFeeList()) {
 
                     bundledFees.add(extractPublicInfo(skeleton));
 
@@ -585,8 +607,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             ArrayList<PublicInfoBundlePayment> bundledPayments = new ArrayList<>();
 
-            if (heavy.getPaymentList() != null) {
-                for (Payment skeleton : heavy.getPaymentList()) {
+            if (opdh.getPaymentList() != null) {
+                for (Payment skeleton : opdh.getPaymentList()) {
 
                     bundledPayments.add(extractPublicInfo(skeleton));
 
@@ -642,13 +664,16 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setBundledApplication(input);
 
             pib.setApplicationPropertyUnit(extractPublicInfo(input.getApplicationPropertyUnit()));
-            pib.setApplicantPerson(extractPublicInfo(input.getApplicantPerson()));
-            pib.setPreferredContact(extractPublicInfo(input.getPreferredContact()));
+            
+/// ----------- >TODO: upgrade for humanization/parcelization <--------------------                                    
+//            pib.setApplicantPerson(extractPublicInfo(input.getApplicantPerson()));
+//            pib.setPreferredContact(extractPublicInfo(input.getPreferredContact()));
+            
             pib.setConnectedPeriod(extractPublicInfo(input.getConnectedPeriod()));
 
             List<PublicInfoBundlePersonOccApplication> attachedPersonBundles = new ArrayList<>();
 
-            for (OccApplicationHumanLink p : input.getAttachedPersons()) {
+            for (HumanLink p : input.getAttachedPersons()) {
 
                 attachedPersonBundles.add(extractPublicInfo(p));
 
@@ -815,11 +840,12 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             ArrayList<PublicInfoBundlePerson> personHorde = new ArrayList<>();
 
             if (input.getPersonList() != null) {
-                for (Person skeleton : input.getPersonList()) {
+/// ----------- >TODO: upgrade for humanization/parcelization <--------------------                                                    
+//                for (Person skeleton : input.getPersonList()) {
 
-                    personHorde.add(extractPublicInfo(skeleton));
-
-                }
+//                    personHorde.add(extractPublicInfo(skeleton));
+//
+//                }
             }
 
             pib.setPersonList(personHorde);
@@ -1027,7 +1053,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             }
 
         }
-        exportable.setPersonList(personHorde);
+        
+/// ----------- >TODO: upgrade for humanization/parcelization <--------------------                                            
+//        exportable.setPersonList(personHorde);
 
         return exportable;
 
@@ -1090,20 +1118,21 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         Property unbundled = input.getBundledProperty();
         Property exportable = pc.getProperty(unbundled.getParcelKey());
 
-        exportable.setAddress(unbundled.getAddress());
-        exportable.setStatus(unbundled.getStatus());
-        exportable.setMuni(unbundled.getMuni());
-        exportable.setParID(unbundled.getParID());
-        exportable.setLotAndBlock(unbundled.getLotAndBlock());
-        exportable.setUseGroup(unbundled.getUseGroup());
-        exportable.setConstructionType(unbundled.getConstructionType());
-        exportable.setCountyCode(unbundled.getCountyCode());
-        exportable.setAddress_city(unbundled.getAddress_city());
-        exportable.setAddress_state(unbundled.getAddress_state());
-        exportable.setAddress_zip(unbundled.getAddress_zip());
-        exportable.setOwnerCode(unbundled.getOwnerCode());
-        exportable.setPropclass(unbundled.getPropclass());
-        exportable.setUseType(unbundled.getUseType());
+/// ----------- >TODO: upgrade for humanization/parcelization <--------------------                                            
+//        exportable.setAddress(unbundled.getAddress());
+//        exportable.setStatus(unbundled.getStatus());
+//        exportable.setMuni(unbundled.getMuni());
+//        exportable.setParID(unbundled.getParID());
+//        exportable.setLotAndBlock(unbundled.getLotAndBlock());
+//        exportable.setUseGroup(unbundled.getUseGroup());
+//        exportable.setConstructionType(unbundled.getConstructionType());
+//        exportable.setCountyCode(unbundled.getCountyCode());
+//        exportable.setAddress_city(unbundled.getAddress_city());
+//        exportable.setAddress_state(unbundled.getAddress_state());
+//        exportable.setAddress_zip(unbundled.getAddress_zip());
+//        exportable.setOwnerCode(unbundled.getOwnerCode());
+//        exportable.setPropclass(unbundled.getPropclass());
+//        exportable.setUseType(unbundled.getUseType());
 
         ArrayList<PropertyUnit> unitHorde = new ArrayList<>();
 
@@ -1189,7 +1218,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             }
         }
 
-        exportable.setPersonList(skeletonHorde);
+/// ----------- >TODO: upgrade for humanization/parcelization <--------------------                                            
+//        exportable.setPersonList(skeletonHorde);
 
         exportable.setInspectionList(inspectionHorde);
 
@@ -1213,83 +1243,85 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         PersonCoordinator pc = getPersonCoordinator();
         Person unbundled = input.getBundledPerson();
 
-        Person exportable = pc.getPerson(unbundled.getHumanID());
+/// ----------- >TODO: upgrade for humanization/parcelization <--------------------                                            
+//        Person exportable = pc.getPerson(unbundled.getHumanID());
 
-        if (exportable == null) {
-
-            //the person is new, so skip the comparison
-            exportable = unbundled;
-
-        } else {
+//        if (exportable == null) {
+//
+//            //the person is new, so skip the comparison
+//            exportable = unbundled;
+//
+//        } else {
             //fields are anonymized by being overwritten with asterisks. If these fields no longer contain asterisks,
             //then the field has been edited by the user.
-            if (unbundled.getFirstName() != null && !unbundled.getFirstName().contains("*")) {
-                exportable.setFirstName(unbundled.getFirstName());
-            }
+//            if (unbundled.getFirstName() != null && !unbundled.getFirstName().contains("*")) {
+//                exportable.setFirstName(unbundled.getFirstName());
+//            }
+//
+//            if (unbundled.getLastName() != null && !unbundled.getLastName().contains("*")) {
+//                exportable.setLastName(unbundled.getLastName());
+//            }
+//
+//            if (unbundled.getPhoneCell() != null && !unbundled.getPhoneCell().contains("*")) {
+//                exportable.setPhoneCell(unbundled.getPhoneCell());
+//            }
+//
+//            if (unbundled.getPhoneHome() != null && !unbundled.getPhoneHome().contains("*")) {
+//                exportable.setPhoneHome(unbundled.getPhoneHome());
+//            }
+//
+//            if (unbundled.getPhoneWork() != null && !unbundled.getPhoneWork().contains("*")) {
+//                exportable.setPhoneWork(unbundled.getPhoneWork());
+//            }
+//
+//            if (unbundled.getEmail() != null && !unbundled.getEmail().contains("*")) {
+//                exportable.setEmail(unbundled.getEmail());
+//            }
+//
+//            if (unbundled.getAddressStreet() != null && !unbundled.getAddressStreet().contains("*")) {
+//                exportable.setAddressStreet(unbundled.getAddressStreet());
+//            }
+//
+//            if (unbundled.getAddressCity() != null && !unbundled.getAddressCity().contains("*")) {
+//                exportable.setAddressCity(unbundled.getAddressCity());
+//            }
+//
+//            if (unbundled.getAddressZip() != null && !unbundled.getAddressZip().contains("*")) {
+//                exportable.setAddressZip(unbundled.getAddressZip());
+//            }
+//
+//            if (unbundled.getAddressState() != null && !unbundled.getAddressState().contains("*")) {
+//                exportable.setAddressState(unbundled.getAddressState());
+//            }
+//
+//            if (unbundled.getMailingAddressStreet() != null && !unbundled.getMailingAddressStreet().contains("*")) {
+//                exportable.setMailingAddressStreet(unbundled.getMailingAddressStreet());
+//            }
+//
+//            if (unbundled.getMailingAddressThirdLine() != null && !unbundled.getMailingAddressThirdLine().contains("*")) {
+//                exportable.setMailingAddressThirdLine(unbundled.getMailingAddressThirdLine());
+//            }
+//
+//            if (unbundled.getMailingAddressCity() != null && !unbundled.getMailingAddressCity().contains("*")) {
+//                exportable.setMailingAddressCity(unbundled.getMailingAddressCity());
+//            }
+//
+//            if (unbundled.getMailingAddressZip() != null && !unbundled.getMailingAddressZip().contains("*")) {
+//                exportable.setMailingAddressZip(unbundled.getMailingAddressZip());
+//            }
+//
+//            if (unbundled.getMailingAddressState() != null && !unbundled.getMailingAddressState().contains("*")) {
+//                exportable.setMailingAddressState(unbundled.getMailingAddressState());
+//            }
+//
+//            //The public-facing Occ Permit Application saves applicationPersonType in the person type field
+//            //You should probably make sure to preserve the original person type if you need to do that.
+//            exportable.setPersonType(unbundled.getPersonType());
 
-            if (unbundled.getLastName() != null && !unbundled.getLastName().contains("*")) {
-                exportable.setLastName(unbundled.getLastName());
-            }
+//        }
 
-            if (unbundled.getPhoneCell() != null && !unbundled.getPhoneCell().contains("*")) {
-                exportable.setPhoneCell(unbundled.getPhoneCell());
-            }
-
-            if (unbundled.getPhoneHome() != null && !unbundled.getPhoneHome().contains("*")) {
-                exportable.setPhoneHome(unbundled.getPhoneHome());
-            }
-
-            if (unbundled.getPhoneWork() != null && !unbundled.getPhoneWork().contains("*")) {
-                exportable.setPhoneWork(unbundled.getPhoneWork());
-            }
-
-            if (unbundled.getEmail() != null && !unbundled.getEmail().contains("*")) {
-                exportable.setEmail(unbundled.getEmail());
-            }
-
-            if (unbundled.getAddressStreet() != null && !unbundled.getAddressStreet().contains("*")) {
-                exportable.setAddressStreet(unbundled.getAddressStreet());
-            }
-
-            if (unbundled.getAddressCity() != null && !unbundled.getAddressCity().contains("*")) {
-                exportable.setAddressCity(unbundled.getAddressCity());
-            }
-
-            if (unbundled.getAddressZip() != null && !unbundled.getAddressZip().contains("*")) {
-                exportable.setAddressZip(unbundled.getAddressZip());
-            }
-
-            if (unbundled.getAddressState() != null && !unbundled.getAddressState().contains("*")) {
-                exportable.setAddressState(unbundled.getAddressState());
-            }
-
-            if (unbundled.getMailingAddressStreet() != null && !unbundled.getMailingAddressStreet().contains("*")) {
-                exportable.setMailingAddressStreet(unbundled.getMailingAddressStreet());
-            }
-
-            if (unbundled.getMailingAddressThirdLine() != null && !unbundled.getMailingAddressThirdLine().contains("*")) {
-                exportable.setMailingAddressThirdLine(unbundled.getMailingAddressThirdLine());
-            }
-
-            if (unbundled.getMailingAddressCity() != null && !unbundled.getMailingAddressCity().contains("*")) {
-                exportable.setMailingAddressCity(unbundled.getMailingAddressCity());
-            }
-
-            if (unbundled.getMailingAddressZip() != null && !unbundled.getMailingAddressZip().contains("*")) {
-                exportable.setMailingAddressZip(unbundled.getMailingAddressZip());
-            }
-
-            if (unbundled.getMailingAddressState() != null && !unbundled.getMailingAddressState().contains("*")) {
-                exportable.setMailingAddressState(unbundled.getMailingAddressState());
-            }
-
-            //The public-facing Occ Permit Application saves applicationPersonType in the person type field
-            //You should probably make sure to preserve the original person type if you need to do that.
-            exportable.setPersonType(unbundled.getPersonType());
-
-        }
-
-        return exportable;
+//        return exportable;
+            return null;
     }
 
     /**
@@ -1300,87 +1332,93 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      * @return
      * @throws IntegrationException
      */
-    public OccApplicationHumanLink export(PublicInfoBundlePersonOccApplication input) throws IntegrationException {
+    public HumanLink export(PublicInfoBundlePersonOccApplication input) throws IntegrationException {
         PersonIntegrator pi = getPersonIntegrator();
-        OccApplicationHumanLink unbundled = input.getBundledPerson();
+                
+                
+//        HumanLink unbundled = input.getBundledPerson();
+/// ----------- >TODO: upgrade for humanization/parcelization <--------------------                                    
+//        HumanLink exportable = pi.getPersonOccApplication(unbundled.getHumanID(), unbundled.getApplicationID());
 
-        OccApplicationHumanLink exportable = pi.getPersonOccApplication(unbundled.getHumanID(), unbundled.getApplicationID());
-
-        if (exportable == null) {
+//        if (exportable == null) {
 
             //the person is new, so skip the comparison
-            exportable = unbundled;
+//            exportable = unbundled;
 
-        } else {
+//        } else {
             //fields are anonymized by being overwritten with asterisks. If these fields no longer contain asterisks,
             //then the field has been edited by the user.
-            if (unbundled.getFirstName() != null && !unbundled.getFirstName().contains("*")) {
-                exportable.setFirstName(unbundled.getFirstName());
-            }
+            
+            /// ----------- >TODO: upgrade for humanization/parcelization <--------------------                                    
+            
+//            if (unbundled.getFirstName() != null && !unbundled.getFirstName().contains("*")) {
+//                exportable.setFirstName(unbundled.getFirstName());
+//            }
+//
+//            if (unbundled.getLastName() != null && !unbundled.getLastName().contains("*")) {
+//                exportable.setLastName(unbundled.getLastName());
+//            }
+//
+//            if (unbundled.getPhoneCell() != null && !unbundled.getPhoneCell().contains("*")) {
+//                exportable.setPhoneCell(unbundled.getPhoneCell());
+//            }
+//
+//            if (unbundled.getPhoneHome() != null && !unbundled.getPhoneHome().contains("*")) {
+//                exportable.setPhoneHome(unbundled.getPhoneHome());
+//            }
+//
+//            if (unbundled.getPhoneWork() != null && !unbundled.getPhoneWork().contains("*")) {
+//                exportable.setPhoneWork(unbundled.getPhoneWork());
+//            }
+//
+//            if (unbundled.getEmail() != null && !unbundled.getEmail().contains("*")) {
+//                exportable.setEmail(unbundled.getEmail());
+//            }
+//
+//            if (unbundled.getAddressStreet() != null && !unbundled.getAddressStreet().contains("*")) {
+//                exportable.setAddressStreet(unbundled.getAddressStreet());
+//            }
+//
+//            if (unbundled.getAddressCity() != null && !unbundled.getAddressCity().contains("*")) {
+//                exportable.setAddressCity(unbundled.getAddressCity());
+//            }
+//
+//            if (unbundled.getAddressZip() != null && !unbundled.getAddressZip().contains("*")) {
+//                exportable.setAddressZip(unbundled.getAddressZip());
+//            }
+//
+//            if (unbundled.getAddressState() != null && !unbundled.getAddressState().contains("*")) {
+//                exportable.setAddressState(unbundled.getAddressState());
+//            }
+//
+//            if (unbundled.getMailingAddressStreet() != null && !unbundled.getMailingAddressStreet().contains("*")) {
+//                exportable.setMailingAddressStreet(unbundled.getMailingAddressStreet());
+//            }
+//
+//            if (unbundled.getMailingAddressThirdLine() != null && !unbundled.getMailingAddressThirdLine().contains("*")) {
+//                exportable.setMailingAddressThirdLine(unbundled.getMailingAddressThirdLine());
+//            }
+//
+//            if (unbundled.getMailingAddressCity() != null && !unbundled.getMailingAddressCity().contains("*")) {
+//                exportable.setMailingAddressCity(unbundled.getMailingAddressCity());
+//            }
+//
+//            if (unbundled.getMailingAddressZip() != null && !unbundled.getMailingAddressZip().contains("*")) {
+//                exportable.setMailingAddressZip(unbundled.getMailingAddressZip());
+//            }
+//
+//            if (unbundled.getMailingAddressState() != null && !unbundled.getMailingAddressState().contains("*")) {
+//                exportable.setMailingAddressState(unbundled.getMailingAddressState());
+//            }
+//
+//            //The public-facing Occ Permit Application saves applicationPersonType in the person type field
+//            //You should probably make sure to preserve the original person type if you need to do that.
+//            exportable.setPersonType(unbundled.getPersonType());
 
-            if (unbundled.getLastName() != null && !unbundled.getLastName().contains("*")) {
-                exportable.setLastName(unbundled.getLastName());
-            }
+//        }
 
-            if (unbundled.getPhoneCell() != null && !unbundled.getPhoneCell().contains("*")) {
-                exportable.setPhoneCell(unbundled.getPhoneCell());
-            }
-
-            if (unbundled.getPhoneHome() != null && !unbundled.getPhoneHome().contains("*")) {
-                exportable.setPhoneHome(unbundled.getPhoneHome());
-            }
-
-            if (unbundled.getPhoneWork() != null && !unbundled.getPhoneWork().contains("*")) {
-                exportable.setPhoneWork(unbundled.getPhoneWork());
-            }
-
-            if (unbundled.getEmail() != null && !unbundled.getEmail().contains("*")) {
-                exportable.setEmail(unbundled.getEmail());
-            }
-
-            if (unbundled.getAddressStreet() != null && !unbundled.getAddressStreet().contains("*")) {
-                exportable.setAddressStreet(unbundled.getAddressStreet());
-            }
-
-            if (unbundled.getAddressCity() != null && !unbundled.getAddressCity().contains("*")) {
-                exportable.setAddressCity(unbundled.getAddressCity());
-            }
-
-            if (unbundled.getAddressZip() != null && !unbundled.getAddressZip().contains("*")) {
-                exportable.setAddressZip(unbundled.getAddressZip());
-            }
-
-            if (unbundled.getAddressState() != null && !unbundled.getAddressState().contains("*")) {
-                exportable.setAddressState(unbundled.getAddressState());
-            }
-
-            if (unbundled.getMailingAddressStreet() != null && !unbundled.getMailingAddressStreet().contains("*")) {
-                exportable.setMailingAddressStreet(unbundled.getMailingAddressStreet());
-            }
-
-            if (unbundled.getMailingAddressThirdLine() != null && !unbundled.getMailingAddressThirdLine().contains("*")) {
-                exportable.setMailingAddressThirdLine(unbundled.getMailingAddressThirdLine());
-            }
-
-            if (unbundled.getMailingAddressCity() != null && !unbundled.getMailingAddressCity().contains("*")) {
-                exportable.setMailingAddressCity(unbundled.getMailingAddressCity());
-            }
-
-            if (unbundled.getMailingAddressZip() != null && !unbundled.getMailingAddressZip().contains("*")) {
-                exportable.setMailingAddressZip(unbundled.getMailingAddressZip());
-            }
-
-            if (unbundled.getMailingAddressState() != null && !unbundled.getMailingAddressState().contains("*")) {
-                exportable.setMailingAddressState(unbundled.getMailingAddressState());
-            }
-
-            //The public-facing Occ Permit Application saves applicationPersonType in the person type field
-            //You should probably make sure to preserve the original person type if you need to do that.
-            exportable.setPersonType(unbundled.getPersonType());
-
-        }
-
-        return exportable;
+//        return exportable;
+        return null;
     }
 
     /**
@@ -1417,16 +1455,18 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         exportable.setPreferredContact(export(input.getPreferredContact()));
         exportable.setConnectedPeriod(export(input.getConnectedPeriod()));
 
-        ArrayList<OccApplicationHumanLink> personHorde = new ArrayList<>();
+        /// ----------- >TODO: upgrade for humanization/parcelization <--------------------                                    
+//        ArrayList<OccApplicationHumanLink> personHorde = new ArrayList<>();
 
-        if (input.getAttachedPersons() != null) {
-
-            for (PublicInfoBundlePersonOccApplication skeleton : input.getAttachedPersons()) {
-                personHorde.add(export(skeleton));
-            }
-        }
-
-        exportable.setAttachedPersons(personHorde);
+        
+//        if (input.getAttachedPersons() != null) {
+//
+//            for (PublicInfoBundlePersonOccApplication skeleton : input.getAttachedPersons()) {
+//                personHorde.add(export(skeleton));
+//            }
+//        }
+//
+//        exportable.setAttachedPersons(personHorde);
 
         return exportable;
 

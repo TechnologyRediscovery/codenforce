@@ -34,12 +34,9 @@ public class    CitationStatusLogEntry
     final static String CITATION_STATUS_TABLE = "citationcitationstatus";
     final static String CITATION_STATUS_PKFIELD = "citationstatusid";
     
-    private int statusID;
-    private String statusTitle;
-    private String description;
-    private Icon icon;
-    
-    private int citationStatusID;
+    private int logEntryID;
+    private int citationID;
+    private CitationStatus status;
 
     private LocalDateTime dateOfRecord;
     
@@ -76,33 +73,6 @@ public class    CitationStatusLogEntry
         this.phaseChangeRule = phaseChangeRule;
     }
 
-    /**
-     * @return the statusID
-     */
-    public int getStatusID() {
-        return statusID;
-    }
-
-    /**
-     * @return the statusTitle
-     */
-    public String getStatusTitle() {
-        return statusTitle;
-    }
-
-    /**
-     * @return the description
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * @return the icon
-     */
-    public Icon getIcon() {
-        return icon;
-    }
 
     /**
      * @return the dateOfRecord
@@ -114,38 +84,12 @@ public class    CitationStatusLogEntry
     /**
      * @return the notes
      */
+    @Override
     public String getNotes() {
         return notes;
     }
 
-    /**
-     * @param statusID the statusID to set
-     */
-    public void setStatusID(int statusID) {
-        this.statusID = statusID;
-    }
-
-    /**
-     * @param statusTitle the statusTitle to set
-     */
-    public void setStatusTitle(String statusTitle) {
-        this.statusTitle = statusTitle;
-    }
-
-    /**
-     * @param description the description to set
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * @param icon the icon to set
-     */
-    public void setIcon(Icon icon) {
-        this.icon = icon;
-    }
-
+   
     /**
      * @param dateOfRecord the dateOfRecord to set
      */
@@ -161,19 +105,7 @@ public class    CitationStatusLogEntry
         this.notes = notes;
     }
 
-    /**
-     * @return the citationStatusID
-     */
-    public int getCitationStatusID() {
-        return citationStatusID;
-    }
-
-    /**
-     * @param citationStatusID the citationStatusID to set
-     */
-    public void setCitationStatusID(int citationStatusID) {
-        this.citationStatusID = citationStatusID;
-    }
+   
 
     @Override
     public String getPKFieldName() {
@@ -182,12 +114,58 @@ public class    CitationStatusLogEntry
 
     @Override
     public int getDBKey() {
-        return citationStatusID;
+        int id = 0;
+        if(status != null){
+            return status.getStatusID();
+        }
+        return id;
     }
 
     @Override
     public String getDBTableName() {
         return CITATION_STATUS_TABLE;
+    }
+
+    /**
+     * @return the status
+     */
+    public CitationStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(CitationStatus status) {
+        this.status = status;
+    }
+
+    /**
+     * @return the citationID
+     */
+    public int getCitationID() {
+        return citationID;
+    }
+
+    /**
+     * @param citationID the citationID to set
+     */
+    public void setCitationID(int citationID) {
+        this.citationID = citationID;
+    }
+
+    /**
+     * @return the logEntryID
+     */
+    public int getLogEntryID() {
+        return logEntryID;
+    }
+
+    /**
+     * @param logEntryID the logEntryID to set
+     */
+    public void setLogEntryID(int logEntryID) {
+        this.logEntryID = logEntryID;
     }
     
 }

@@ -26,8 +26,8 @@ public interface IFace_humanListHolder {
     
     public List<HumanLink> getHumanLinkList();
     public void setHumanLinkList(List<HumanLink> hll);
-    public LinkedHumanSchemaEnum getLinkSchema();
-    public void setLinkSchema(LinkedHumanSchemaEnum lhse);
+    public LinkedObjectSchemaEnum getLinkSchema();
+    public void setLinkSchema(LinkedObjectSchemaEnum lhse);
     public int getHostPK();
     
     

@@ -17,13 +17,24 @@
 package com.tcvcog.tcvce.entities;
 
 /**
- * Specifies a single getter for acquiring the LinkedObjectRoleSchema
- * @author Ellen Bascomb of Apartment 31Y
+ * Represents enum values in either the linkedaddress or the linkedhuman 
+ * branches
+ * 
+ * @author Ellen Bascomb
  */
-
-public interface IFace_linkRoleHolder {
+public enum LinkedObjectFamilyEnum {
     
-            
-    public LinkedObjectSchemaEnum getLinkedObjectRoleSchemaEnum();
+    MAILING ("Mailing Address"),
+    HUMAN("Person");
+    
+    private final String FAMILY;
+    
+    private LinkedObjectFamilyEnum(String f){
+        FAMILY = f;
+    }
+    
+    public String getFamily(){
+        return FAMILY;
+    }
     
 }

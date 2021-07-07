@@ -26,6 +26,7 @@ public  class   ContactEmail
         extends Contact{
     
     final static String TABLE_NAME = "contactemail";
+    final static String PKFIELD = "emailid";
     
     protected int emailID;
     protected int humanID;
@@ -114,8 +115,14 @@ public  class   ContactEmail
         return emailID;
     }
 
+   
     @Override
-    public String getTableName() {
+    public String getPKFieldName() {
+        return PKFIELD;
+    }
+
+    @Override
+    public String getDBTableName() {
         return TABLE_NAME;
     }
     

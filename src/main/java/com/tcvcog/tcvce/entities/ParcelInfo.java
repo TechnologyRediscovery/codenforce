@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 /**
  * Note that we might have thought that this class should
  * extend Parcel: the tradeoff is that doing so would mean we lose
- * the TrackedEntity superclass applied to externall scraped info. Not
+ * the TrackedEntity superclass applied to externally scraped info. Not
  * extending Parcel means that we can use the TrackedEntity tools
  * easily and compose a Parcel of its Info bundles. Not extending also
  * allows us to have a list of these objects in a single Parcel, not 
@@ -32,6 +32,10 @@ import java.time.LocalDateTime;
  */
 public class ParcelInfo 
         extends TrackedEntity{
+    
+    final static String PARCELINFOTABLE = "parcelinfo";
+    final static String PARCELINFOTABLE_PKFIELD = "parcelinfoid";
+    
     
     protected PropertyUseType useType;
     protected int parcelInfoID;
@@ -535,6 +539,21 @@ public class ParcelInfo
      */
     public void setParcelInternalID(int parcelInternalID) {
         this.parcelInternalID = parcelInternalID;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return PARCELINFOTABLE_PKFIELD;
+    }
+
+    @Override
+    public int getDBKey() {
+        return parcelInfoID;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return PARCELINFOTABLE;
     }
 
    

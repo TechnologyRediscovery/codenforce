@@ -48,7 +48,7 @@ public class PublicInfoBundlePayment extends PublicInfoBundle {
      */
     public void setBundledPayment(Payment input) {
 
-        input.setPayer(new Person());       
+        input.setPayer(null);       
         input.setRecordedBy(new User());
         input.setEntryTimestamp(LocalDateTime.MIN);
         input.setNotes("*****");

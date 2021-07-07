@@ -17,6 +17,7 @@ import com.tcvcog.tcvce.entities.CodeViolationPropCECaseHeavy;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
+import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
@@ -134,21 +135,21 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         prepareQueryForRun(q);
 
         List<SearchParamsPerson> paramsList = q.getParamsList();
-        List<Person> persTempList = new ArrayList<>();
+        List<Human> hl = new ArrayList<>();
         
         for(SearchParamsPerson sp: paramsList){
-            persTempList.clear();
+            hl.clear();
 
             try {
                 List<Integer> idList = pi.searchForPersons(sp);
                 for(Integer i: idList){
-                    persTempList.add(pc.getPerson(i));
+                    hl.add(pc.getHuman(i));
                 }
             } catch (IntegrationException ex) {
                 System.out.println(ex);
                 throw new SearchException(ex);
             }
-            q.addToResults(persTempList);
+            q.addToResults(hl);
             q.appendToQueryLog(sp);
             
         } // close for over params

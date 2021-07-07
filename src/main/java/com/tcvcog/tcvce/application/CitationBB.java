@@ -378,7 +378,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable {
         Citation c = currentCitation;
         
         try {
-            cc.citation_issueCitation(c);
+            cc.citation_insertCitation(c);
 
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,

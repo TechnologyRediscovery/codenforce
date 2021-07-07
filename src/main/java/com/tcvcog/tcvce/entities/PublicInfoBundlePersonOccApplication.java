@@ -18,21 +18,21 @@ package com.tcvcog.tcvce.entities;
 
 /**
  * A wrapper class that stores a OccApplicationHumanLink that is stripped of all sensitive
- information.
+ * information.
  * Look at the JavaDocs of the PublicInfoBundle Class for more information.
  *
  * @author Nathan Dietz
  */
 public class PublicInfoBundlePersonOccApplication extends PublicInfoBundle {
     
-    private OccApplicationHumanLink bundledPerson;
+    private HumanLink bundledPerson;
     
     @Override
     public String toString(){
         return this.getClass().getName() + bundledPerson.getHumanID();
     }
 
-    public OccApplicationHumanLink getBundledPerson() {
+    public HumanLink getBundledPerson() {
         return bundledPerson;
     }
 
@@ -41,26 +41,27 @@ public class PublicInfoBundlePersonOccApplication extends PublicInfoBundle {
  bundledPerson field.
      * @param input 
      */
-    public void setBundledPerson(OccApplicationHumanLink input) {
+    public void setBundledPerson(HumanLink input) {
         
         //PersonOccPeriod and person share most of the same fields,
         //so let's use its anonymization method
         PublicInfoBundlePerson temp = new PublicInfoBundlePerson();
         
-        temp.setBundledPerson(input);
+        // TODO: Upgrade for humanization
+//        temp.setBundledPerson(input);
         
         //take it out and then transfer the OccApplicationHumanLink-specific fields
-        OccApplicationHumanLink skeleton = new OccApplicationHumanLink(temp.getBundledPerson());
+        HumanLink skeleton = new HumanLink(temp.getBundledPerson());
         
-        skeleton.setApplicant(input.isApplicant());
-        
-        skeleton.setPreferredContact(input.isPreferredContact());
-        
-        skeleton.setApplicationPersonType(input.getApplicationPersonType());
-        
-        skeleton.setLinkActive(input.isLinkActive());
-        
-        skeleton.setApplicationID(input.getApplicationID());
+//        skeleton.setApplicant(input.isApplicant());
+//        
+//        skeleton.setPreferredContact(input.isPreferredContact());
+//        
+//        skeleton.setApplicationPersonType(input.getApplicationPersonType());
+//        
+//        skeleton.setLinkActive(input.isLinkActive());
+//        
+//        skeleton.setApplicationID(input.getApplicationID());
         
         bundledPerson = input;
     }

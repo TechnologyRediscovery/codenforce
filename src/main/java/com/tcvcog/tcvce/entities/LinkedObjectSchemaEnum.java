@@ -22,14 +22,15 @@ package com.tcvcog.tcvce.entities;
  * 
  * @author sylvia
  */
-public enum LinkedHumanSchemaEnum {
+public enum LinkedObjectSchemaEnum {
     
     OCCAPPLICATIONHUMAN (   
                             "public.occpermitapplicationhuman",
                             "OccApplicationHuman", 
                             "???", 
                             "",
-                            "???"
+                            "???",
+                            LinkedObjectFamilyEnum.HUMAN
                         ),  // for Jurplel to update
     
     CECASEHUMAN         (   
@@ -37,7 +38,8 @@ public enum LinkedHumanSchemaEnum {
                             "CECaseHuman", 
                             "linkid", 
                             "cecase_caseid",
-                            "humancecase_linkid_seq"
+                            "humancecase_linkid_seq",
+                            LinkedObjectFamilyEnum.HUMAN
                         ), 
     
     OCCPERIODHUMAN      (
@@ -45,7 +47,8 @@ public enum LinkedHumanSchemaEnum {
                             "OccPeriodHuman", 
                             "linkid", 
                             "occperiod_periodid",
-                            "humanoccperiod_linkid_seq"
+                            "humanoccperiod_linkid_seq",
+                            LinkedObjectFamilyEnum.HUMAN
                         ), 
     
     PARCELHUMAN         (   
@@ -53,7 +56,8 @@ public enum LinkedHumanSchemaEnum {
                             "ParcelHuman", 
                             "linkid", 
                             "parcel_parcelkey",
-                            "humanparcel_linkid_seq"
+                            "humanparcel_linkid_seq",
+                            LinkedObjectFamilyEnum.HUMAN
                         ), 
     
     PARCELUNITHUMAN     (   
@@ -61,7 +65,8 @@ public enum LinkedHumanSchemaEnum {
                             "ParcelUnitHuman", 
                             "linkid", 
                             "parcelunit_unitid",
-                            "parcelunithuman_linkid_seq"
+                            "parcelunithuman_linkid_seq",
+                            LinkedObjectFamilyEnum.HUMAN
                         ),
     
     CITATIONHUMAN       (
@@ -69,7 +74,8 @@ public enum LinkedHumanSchemaEnum {
                             "CitationHuman", 
                             "linkid", 
                             "citation_citationid",
-                            "citationhuman_seq"
+                            "citationhuman_seq",
+                            LinkedObjectFamilyEnum.HUMAN
                         ), 
     
     EVENTHUMAN          (
@@ -77,7 +83,8 @@ public enum LinkedHumanSchemaEnum {
                             "EventHuman", 
                             "linkid", 
                             "event_eventid",
-                            "eventhuman_linkid_seq"
+                            "eventhuman_linkid_seq",
+                            LinkedObjectFamilyEnum.HUMAN
                         ), 
     
     MUNIHUMAN           (
@@ -85,27 +92,49 @@ public enum LinkedHumanSchemaEnum {
                             "MuniHuman",
                             "linkid", 
                             "muni_municode",
-                            "humanmuni_linkid_seq"
+                            "humanmuni_linkid_seq",
+                            LinkedObjectFamilyEnum.HUMAN
+                        ),
+    
+    HUMANMAILINGADDRESS (   
+                            "humanmailingaddress",
+                            "MailingaddressHuman", 
+                            "",
+                            "",
+                            "",
+                            LinkedObjectFamilyEnum.MAILING
+                        ), 
+    PARCELMAILINGADDRESS  (
+                            "parcelmailingaddress",
+                            "ParcelMailingaddress", 
+                            "", 
+                            "",
+                            "",
+                            LinkedObjectFamilyEnum.MAILING
                         );
+
     
     private final String LINKING_TABLE_NAME;
     private final String LINK_ROLE_SCHEMA_TYPE_STRING;
     private final String LINKING_TABLE_PK_FIELD;
     private final String TARGET_TABLE_FK_FIELD;
     private final String LINKING_TABLE_SEQ_ID;
+    private final LinkedObjectFamilyEnum FAMILY;
 
-    private LinkedHumanSchemaEnum   (
+    private LinkedObjectSchemaEnum   (
                                         String ltn, 
                                         String ts, 
                                         String ltpk, 
                                         String ttfk,
-                                        String seqid
+                                        String seqid,
+                                        LinkedObjectFamilyEnum fam
                                     )    {
         LINKING_TABLE_NAME = ltn;
         LINK_ROLE_SCHEMA_TYPE_STRING = ts;
         LINKING_TABLE_PK_FIELD = ltpk;
         TARGET_TABLE_FK_FIELD = ttfk;
         LINKING_TABLE_SEQ_ID = seqid;
+        FAMILY = fam;
     }
     
     public String getLinkingTableName(){
@@ -126,6 +155,10 @@ public enum LinkedHumanSchemaEnum {
     
     public String getLinkingTableSequenceID(){
         return LINKING_TABLE_SEQ_ID;
+    
+    }
+    public LinkedObjectFamilyEnum getLinkedObjectFamilyEnum(){
+        return FAMILY;
     }
     
 }

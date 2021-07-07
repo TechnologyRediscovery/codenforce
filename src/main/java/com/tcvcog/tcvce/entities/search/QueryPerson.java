@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.Person;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ public class    QueryPerson
      */
     private QueryPersonEnum query;
     private List<SearchParamsPerson> searchParamsList; 
-    private List<Person> results;
+    private List<Human> results;
 
     /**
      * Unified Query subclass constructor
@@ -77,7 +78,7 @@ public class    QueryPerson
        searchParamsList.add(sp);
    }
    
-    public void addToResults(List<Person> l){
+    public void addToResults(List<Human> l){
         results.addAll(l);
     }
     
@@ -94,12 +95,12 @@ public class    QueryPerson
     /**
      * @return the results
      */
-    public List<Person> getResults() {
+    public List<Human> getResults() {
         return results;
     }
 
     @Override
-    public List<Person> getBOBResultList() {
+    public List<Human> getBOBResultList() {
         return results;
     }
 

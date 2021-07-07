@@ -176,7 +176,7 @@ public class User implements Serializable{
     /**
      * @return the personID
      */
-    public int.getHumanID() {
+    public int getHumanID() {
         if(person != null){
             personID = person.getHumanID();
         }

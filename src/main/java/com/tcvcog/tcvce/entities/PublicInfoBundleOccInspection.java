@@ -52,7 +52,8 @@ public class PublicInfoBundleOccInspection extends PublicInfoBundle {
         
         input.setCreationTS(LocalDateTime.MIN);
         
-        input.setThirdPartyInspector(new Person());
+        // TODO: Revisit after humanization
+        input.setThirdPartyInspector(null);
         
         input.setThirdPartyApprovalBy(new User());
         

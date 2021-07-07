@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -256,11 +257,9 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
-        PropertyIntegrator propI = getPropertyIntegrator();
+        PersonCoordinator perc = getPersonCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
         UserIntegrator ui = getUserIntegrator();
-        BlobIntegrator bi = getBlobIntegrator();
-        BlobCoordinator bc = getBlobCoordinator();
         
         actionRequest.setRequestStatus(getRequestStatus(rs.getInt("status_id")));
         actionRequest.setPaccEnabled(rs.getBoolean("paccenabled"));
@@ -272,7 +271,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         actionRequest.setMuni(mi.getMuni(rs.getInt("muni_municode")));
         actionRequest.setIsAtKnownAddress(rs.getBoolean("notataddress"));
         actionRequest.setRequestProperty(pc.getProperty(rs.getInt("property_propertyID")));
-        actionRequest.setRequestor(pi.getPerson(rs.getInt("actrequestor_requestorid")));
+        actionRequest.setRequestor(perc.getPerson(perc.getHuman(rs.getInt("actrequestor_requestorid"))));
 
         actionRequest.setSubmittedTimeStamp(rs.getTimestamp("submittedtimestamp").toLocalDateTime());
         actionRequest.setDateOfRecord(rs.getTimestamp("dateofrecord").toLocalDateTime());

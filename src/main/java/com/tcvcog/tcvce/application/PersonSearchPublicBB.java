@@ -90,14 +90,15 @@ public class PersonSearchPublicBB extends BackingBeanUtils implements Serializab
         if (qp != null && !qp.getBOBResultList().isEmpty()) {
 
             PublicInfoCoordinator pic = getPublicInfoCoordinator();
-            List<Person> skeletonHorde = qp.getBOBResultList();
+//      TODO: Fix post humanization/parcelization
+//            List<Person> skeletonHorde = qp.getBOBResultList();
             bundledPersonSearchResults = new ArrayList<>();
             
-            for(Person skeleton : skeletonHorde){
+//            for(Person skeleton : skeletonHorde){
                 // TODO: Update for humanization
                 
 //                bundledPersonSearchResults.add(pic.extractPublicInfo(skeleton));
-            }
+//            }
             
         }
 

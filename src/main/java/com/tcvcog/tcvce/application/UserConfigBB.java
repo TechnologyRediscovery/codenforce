@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Person;
@@ -77,7 +78,7 @@ public class UserConfigBB extends BackingBeanUtils{
     private String formNoteText;
     private String formInvalidateRecordReason;
     
-    private List<Person> userPersonList;
+    private List<Human> userPersonList;
     protected int personIDToLink;
     protected boolean personLinkUseID;
     private Person selectedUserPerson;
@@ -897,7 +898,7 @@ public class UserConfigBB extends BackingBeanUtils{
     /**
      * @return the userPersonList
      */
-    public List<Person> getUserPersonList() {
+    public List<Human> getUserPersonList() {
         return userPersonList;
     }
 
@@ -911,7 +912,7 @@ public class UserConfigBB extends BackingBeanUtils{
     /**
      * @param userPersonList the userPersonList to set
      */
-    public void setUserPersonList(List<Person> userPersonList) {
+    public void setUserPersonList(List<Human> userPersonList) {
         this.userPersonList = userPersonList;
     }
 

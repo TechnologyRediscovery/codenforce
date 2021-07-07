@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
 import com.tcvcog.tcvce.entities.PersonType;
@@ -187,10 +188,11 @@ public class PersonSearchBB extends BackingBeanUtils{
     }
     
     public void executeQuery(ActionEvent event){
-        
+        PersonCoordinator pc = getPersonCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         try {
-            List<Person> pl = sc.runQuery(querySelected).getBOBResultList();
+            List<Person> pl = pc.assemblePersonListFromHumanList(sc.runQuery(querySelected).getBOBResultList());
+            
             if(!isAppendResultsToList()){
                 personList.clear();
             } 
@@ -201,7 +203,7 @@ public class PersonSearchBB extends BackingBeanUtils{
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + pl.size() + " results", ""));
             
-        } catch (SearchException ex) {
+        } catch (SearchException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 

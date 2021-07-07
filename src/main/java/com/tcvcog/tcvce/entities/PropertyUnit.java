@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
- *
+ * Rougly maps to a parcelunit record in the DB
  * @author ellen bascomb of apt 31y
  */
 public class    PropertyUnit 
@@ -34,6 +34,8 @@ public class    PropertyUnit
     
     protected int conditionIntensityClassID;
     protected LocalDateTime lastUpdatedTS;
+    
+    protected MailingAddress parcelMailing;
 
     public PropertyUnit() {
     }
@@ -271,6 +273,20 @@ public class    PropertyUnit
      */
     public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
         this.lastUpdatedTS = lastUpdatedTS;
+    }
+
+    /**
+     * @return the parcelMailing
+     */
+    public MailingAddress getParcelMailing() {
+        return parcelMailing;
+    }
+
+    /**
+     * @param parcelMailing the parcelMailing to set
+     */
+    public void setParcelMailing(MailingAddress parcelMailing) {
+        this.parcelMailing = parcelMailing;
     }
 
 }

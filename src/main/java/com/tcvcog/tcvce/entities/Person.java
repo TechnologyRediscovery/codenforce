@@ -39,26 +39,28 @@ public  class       Person
     protected List<ContactEmail> emailList;
     protected List<ContactPhone> phoneList;
 
-    public Person() {
-    }
+  
 
     /**
      * Method for cloning Person objects
      * 
-     * @param input The person we would like to clone
+     * @param p The person we would like to clone
      */
-    public Person(Person input) {
-       
+    public Person(Person p) {
+       super(p);
+       this.addressList = p.addressList;
+       this.emailList = p.emailList;
+       this.phoneList = p.phoneList;
         
     }
     
     /**
      * Creates a person out of a human
-     * TODO: Finish my guts
      * @param h 
      */
     public Person(Human h){
-        
+      super(h);
+      
         
     }
 

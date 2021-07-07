@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -47,6 +48,7 @@ import com.tcvcog.tcvce.entities.CodeViolationPropCECaseHeavy;
 import com.tcvcog.tcvce.entities.search.SearchParamsCodeViolation;
 import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.CitationCodeViolationLink;
+import com.tcvcog.tcvce.entities.CitationStatus;
 import com.tcvcog.tcvce.entities.ViolationStatusEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsDateRule;
 import java.io.Serializable;
@@ -2195,17 +2197,16 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 //       returnedby, notes
 //  FROM public.noticeofviolation;
 
-        PersonIntegrator pi = getPersonIntegrator();
-        UserIntegrator ui = getUserIntegrator();
         UserCoordinator uc = getUserCoordinator();
         SystemIntegrator si = getSystemIntegrator();
         EventCoordinator ec = getEventCoordinator();
+        PersonCoordinator pc = getPersonCoordinator();
         
         // the magical moment of notice instantiation
         NoticeOfViolation notice = new NoticeOfViolation();
 
         notice.setNoticeID(rs.getInt("noticeid"));
-        notice.setRecipient(pi.getPerson(rs.getInt("personid_recipient")));
+        notice.setRecipient(pc.getPerson(pc.getHuman(rs.getInt("personid_recipient"))));
         notice.setDateOfRecord(rs.getTimestamp("dateofrecord").toLocalDateTime());
 
         notice.setNoticeTextBeforeViolations(rs.getString("lettertextbeforeviolations"));
@@ -2660,60 +2661,70 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      
      /**
       * Creates a new record in the citation table and connects applicable
-      * codeviolations; TODO: the violation connection should probably be separated out
+      * code violations; TODO: the violation connection should probably be separated out
       * 
       * @param citation
+     * @return the new citation's record database primary key
       * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
       */
-    public void insertCitation(Citation citation) throws IntegrationException{
-        
-        String queryCitationTable =  "INSERT INTO public.citation(\n" +
-                        "            citationid, citationno, status_statusid, origin_courtentity_entityid, \n" +
-                        "            login_userid, dateofrecord, transtimestamp, isactive, \n" +
-                        "            notes)\n" +
+    public int insertCitation(Citation citation) throws IntegrationException, BObStatusException{
+
+        // Updated for citation overhaul as aprt of humanization
+        String insert =  "INSERT INTO public.citation(\n" +
+                        "            citationid, citationno, origin_courtentity_entityid, \n" + // 1-2
+                        "            dateofrecord, isactive, notes, \n" + // 3-4
+                        "            officialtext, docketno, createdts, createdby_userid, lastupdatedts, \n" + // 5-7
+                        "            lastupdatedby_userid)\n" + // 8
                         "    VALUES (DEFAULT, ?, ?, \n" +
-                        "            ?, ?, ?, now(), ?, \n" +
+                        "            ?, TRUE, ?, \n" +
+                        "            ?, ?, now(), ?, now(), \n" +
                         "            ?);";
         
-        String queryCitationViolationTable = "INSERT INTO public.citationviolation(\n" +
-                        "            citationviolationid, citation_citationid, codeviolation_violationid)\n" +
-                        "    VALUES (DEFAULT, ?, ?);";
         Connection con = getPostgresCon();
         PreparedStatement stmt1 = null;
-        PreparedStatement stmt2 = null;
         PreparedStatement stmtCID = null;
         ResultSet rs = null;
         
+        int lastCID = 0;
+        
         try {
-            stmt1 = con.prepareStatement(queryCitationTable);
+            
+            stmt1 = con.prepareStatement(insert);
             stmtCID = con.prepareStatement("SELECT currval('citation_citationid_seq');");
-            stmt2 = con.prepareStatement(queryCitationViolationTable);
+            
             
             stmt1.setString(1, citation.getCitationNo());
-            stmt1.setInt(2, citation.getStatus().getStatusID());
-            stmt1.setInt(3, citation.getOrigin_courtentity().getCourtEntityID());
-            stmt1.setInt(4, citation.get);
-            stmt1.setTimestamp(5, java.sql.Timestamp.valueOf(citation.getDateOfRecord()));
-            stmt1.setBoolean(6, citation.isIsActive());
-            stmt1.setString(7, citation.getNotes());
+            
+            if(citation.getOrigin_courtentity() != null){
+                stmt1.setInt(2, citation.getOrigin_courtentity().getCourtEntityID());
+            } else {
+                stmt1.setNull(2, java.sql.Types.NULL);
+            }
+            
+            if(citation.getDateOfRecord() != null){
+                stmt1.setTimestamp(3, java.sql.Timestamp.valueOf(citation.getDateOfRecord()));
+            } else {
+                stmt1.setNull(3, java.sql.Types.NULL);
+                
+            }
+            
+            stmt1.setString(4, citation.getNotes());
+            stmt1.setString(5, citation.getOfficialText());
+            stmt1.setString(6, citation.getDocketNo());
+            
+            stmt1.setInt(7, citation.getCreatedBy().getUserID());
+            stmt1.setInt(8, citation.getLastUpdatedBy().getUserID());
             
             stmt1.execute();
             
             rs = stmtCID.executeQuery();
-            int lastCID = 0;
+            
             while(rs.next()){
                  lastCID= rs.getInt(1);
             }
-            
-            ListIterator<CodeViolation> li = citation.getViolationList().listIterator();
-            
-            while(li.hasNext()){
-                stmt2.setInt(1, lastCID);
-                stmt2.setInt(2, (int) li.next().getViolationID());
-                
-                stmt2.execute();
-            }
-            
+            linkViolationsToCitation(citation, lastCID);
+           
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to insert citation into database, sorry.", ex);
@@ -2722,7 +2733,70 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt1 != null) { try { stmt1.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
+        
+        return lastCID;
     }
+    
+    
+    /**
+     * Second half of the citation insert process: linking violations to their
+     * parent citation
+     * @param cit 
+     */
+    private void linkViolationsToCitation(Citation cit, int freshID) throws IntegrationException{
+        
+        if(freshID != 0){
+            
+
+            String queryCitationViolationTable = "INSERT INTO public.citationviolation(\n" +
+                            "            citationviolationid, citation_citationid, codeviolation_violationid, \n" +
+                            "            createdts, lastupdatedts, status, createdby_userid, \n" +
+                            "            lastupdatedby_userid, notes, linksource)\n" +
+                            "    VALUES (DEFAULT, ?, ?, \n" +
+                            "            now(), now(), ?, ?, \n" +
+                            "            ?, ?, ?);";
+
+            Connection con = getPostgresCon();
+            PreparedStatement stmt = null;
+
+            try {
+
+                stmt = con.prepareStatement(queryCitationViolationTable);
+                
+                ListIterator<CitationCodeViolationLink> li = cit.getViolationList().listIterator();
+
+                while(li.hasNext()){
+                    CitationCodeViolationLink ccvl = li.next();
+                    stmt.setInt(1, freshID);
+                    stmt.setInt(2, ccvl.getViolationID());
+                    stmt.setString(3, ccvl.getCitVStatus().toString());
+                    stmt.setInt(4, cit.getCreatedBy().getUserID());
+                    stmt.setInt(5, cit.getLastUpdatedBy().getUserID());
+                    stmt.setString(6, ccvl.getNotes());
+                    if(ccvl.getLinkSource() != null){
+                        stmt.setInt(7, ccvl.getLinkSource().getSourceid());
+                    } else {
+                        stmt.setNull(7, java.sql.Types.NULL);
+                    }
+                    
+                    stmt.execute();
+                } // close while over citaiton violations
+
+            } catch (SQLException ex) {
+                System.out.println(ex.toString());
+                throw new IntegrationException("Unable to insert citation into database, sorry.", ex);
+
+            } finally{
+                 if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+                 if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            } // close finally
+        } else {
+            throw new IntegrationException("Cannot link violations to a citation with ID = 0");
+            
+        }
+        
+    }
+
     
     /**
      * Extracts a list of citation ID values given a CodeViolation ID
@@ -2989,11 +3063,197 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         return cit;
     }
     
+    
+    /**
+     * Writes a new record into the citationcitationstatus table to track
+     * the movement a given citation through the court process
+     * 
+     * @param cit to which the log entry should be attached
+     * @param csle the populated lot entry
+     * @return the fresh record ID
+     */
+    public int insertCitationStatusLogEntry(Citation cit, CitationStatusLogEntry csle) throws IntegrationException{
+        
+        if(cit == null || csle == null || csle.getStatus() == null){
+            throw new IntegrationException("cannot insert a log entry with null citation or log entry!");
+        }
+        
+        String query =  "INSERT INTO public.citationcitationstatus(\n" +
+                        "            citationstatusid, citation_citationid, citationstatus_statusid, \n" +
+                        "            dateofrecord, createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, \n" +
+                        "            notes)\n" +
+                        "    VALUES (DEFAULT, ?, ?, \n" +
+                        "            ?, now(), ?, now(), ?, \n" +
+                        "            ?);";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int freshLogID = 0;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setInt(1, cit.getCitationID());
+            stmt.setInt(2, csle.getStatus().getStatusID());
+            
+            if(csle.getDateOfRecord() != null){
+                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(csle.getDateOfRecord()));
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            
+            if(csle.getCreatedBy() != null){
+                stmt.setInt(4, csle.getCreatedBy().getUserID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            
+            if(csle.getLastUpdatedBy() != null){
+                stmt.setInt(5, csle.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            
+            stmt.setString(6, csle.getNotes());
+            
+            stmt.execute();
+            
+            String retrievalQuery = "SELECT currval('citationcitationstatus_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                 freshLogID = rs.getInt(1);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to insert citation into database, sorry.", ex);
+            
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return freshLogID;
+        
+    }
+    
+    
+    /**
+     * Writes a new record into the citationcitationstatus table to track
+     * the movement a given citation through the court process
+     * 
+     * @param cit to which the log entry should be attached
+     * @param csle the populated lot entry
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void updateStatusLogEntry(Citation cit, CitationStatusLogEntry csle) throws IntegrationException{
+        
+        if(cit == null || csle == null || csle.getStatus() == null){
+            throw new IntegrationException("cannot insert a log entry with null citation or log entry!");
+        }
+        
+        String query =  "UPDATE public.citationcitationstatus\n" +
+                        "   SET citationstatus_statusid=?, \n" +
+                        "       dateofrecord=?, lastupdatedts=now(), \n" +
+                        "       lastupdatedby_userid=?, \n" +
+                        "       notes=?\n" +
+                        " WHERE citationstatusid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setInt(1, csle.getStatus().getStatusID());
+            
+            if(csle.getDateOfRecord() != null){
+                stmt.setTimestamp(2, java.sql.Timestamp.valueOf(csle.getDateOfRecord()));
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            
+            if(csle.getLastUpdatedBy() != null){
+                stmt.setInt(3, csle.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            
+            stmt.setString(4, csle.getNotes());
+            
+            stmt.setInt(5, csle.getLogEntryID());
+                
+            stmt.executeUpdate();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to insert citation into database, sorry.", ex);
+            
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    /**
+     * Deactivates a citation status log entry
+     * @param csle
+     * @throws IntegrationException 
+     */
+    public void deactivateCitationStatusLogEntry(CitationStatusLogEntry csle) throws IntegrationException{
+          
+        if(csle == null ){
+            throw new IntegrationException("cannot deactuvate a null log entry!");
+        }
+        
+        String query =  "UPDATE public.citationcitationstatus\n" +
+                        "   SET  lastupdatedts=now(), lastupdatedby_userid=?"
+                + "         deactivatedts=now(), deactivatedby_userid=? " +
+                        " WHERE citationstatusid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            
+            if(csle.getLastUpdatedBy() != null){
+                stmt.setInt(1, csle.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            
+            if(csle.getDeactivatedBy() != null){
+                stmt.setInt(2, csle.getDeactivatedBy().getUserID());
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(3, csle.getLogEntryID());
+                
+            stmt.executeUpdate();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to deactivate citation log, sorry.", ex);
+            
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        
+    }
+    
+    
     /**
      * Creates a log of citation statuses and their dates of progression
      * through the court system; 
      * @param cit
      * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
     public List<CitationStatusLogEntry> buildCitationStatusLog(Citation cit) throws IntegrationException{
            String query =  "SELECT citationstatusid, citation_citationid, citationstatus_statusid, \n" +
@@ -3030,29 +3290,26 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
     }
     
     /**
-     * Generator method for CitationStatusLogs
+     * Generator method for CitationStatusLog Entries
      * @param rs
      * @return a single log entry
      */
     private CitationStatusLogEntry generateCitationStatusLogEntry(ResultSet rs) throws SQLException, IntegrationException{
         SystemIntegrator si = getSystemIntegrator();
-        WorkflowIntegrator wi = getWorkflowIntegrator();
         
         CitationStatusLogEntry csle = new CitationStatusLogEntry();
         
-        csle.setStatusID(rs.getInt("statusid"));
-        csle.setStatusTitle(rs.getString("statusname"));
-        csle.setDescription(rs.getString("description"));
-        csle.setIcon(si.getIcon(rs.getInt("icon_iconid")));
-        
+        csle.setLogEntryID(rs.getInt("citationstatusid"));
+        csle.setStatus(getCitationStatus(rs.getInt("statusid")));
+
         if(rs.getTimestamp("dateofrecord") != null){
             csle.setDateOfRecord(rs.getTimestamp("dateofrecord").toLocalDateTime());
         }
         
+        
         csle.setNotes(rs.getString("notes"));
-        csle.setNonStatusEditsForbidden(rs.getBoolean("editsforbidden"));
-        csle.setPhaseChangeRule(wi.rules_getEventRuleAbstract(rs.getInt("eventrule_ruleid")));
         si.populateTrackedFields(csle, rs);
+        
         return csle;
         
     }
@@ -3066,31 +3323,39 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      */
     public void updateCitation(Citation citation) throws IntegrationException{
         String query =  "UPDATE public.citation\n" +
-                        "   SET citationno=?, status_statusid=?, origin_courtentity_entityid=?, \n" +
-                        "       login_userid=?, dateofrecord=?, transtimestamp=now(), isactive=?, \n" +
-                        "       officialtext=? \n" +
+                        "   SET citationno=?, origin_courtentity_entityid=?, \n" +
+                        "       dateofrecord=?, \n" +
+                        "       notes=?, officialtext=?, docketno=?, \n" +
+                        "       lastupdatedts=now(), lastupdatedby_userid=? \n" +
                         " WHERE citationid=?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setString(1, citation.getCitationNo());
-            stmt.setInt(2, citation.getStatus().getStatusID());
-            stmt.setInt(3, citation.getOrigin_courtentity().getCourtEntityID());
-            stmt.setInt(4, citation.getUserOwner().getUserID());
-            stmt.setTimestamp(5, java.sql.Timestamp.valueOf(citation.getDateOfRecord()));
-            stmt.setBoolean(6, citation.isIsActive());
-            stmt.setString(7, citation.getOfficialText());
+            
+             stmt.setString(1, citation.getCitationNo());
+            
+            if(citation.getOrigin_courtentity() != null){
+                stmt.setInt(2, citation.getOrigin_courtentity().getCourtEntityID());
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            
+            if(citation.getDateOfRecord() != null){
+                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(citation.getDateOfRecord()));
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+                
+            }
+            
+            stmt.setString(4, citation.getNotes());
+            stmt.setString(5, citation.getOfficialText());
+            stmt.setString(6, citation.getDocketNo());
+            stmt.setInt(7, citation.getLastUpdatedBy().getUserID());
             stmt.setInt(8, citation.getCitationID());
             
             stmt.execute();
-            
-            getFacesContext().addMessage(null,
-               new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                       "Updated citation no." + citation.getCitationNo() , ""));
-
-            
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -3107,19 +3372,27 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @param citation
      * @throws IntegrationException 
      */
-    public void deleteCitation(Citation citation) throws IntegrationException{
-        String query =  "DELETE FROM public.citation\n" +
+    public void deactivateCitation(Citation citation) throws IntegrationException{
+        String query =  "UPDATE public.citation\n" +
+                        "   SET  deactivatedts=now(), deactivatedby_userid=?\n" +
                         " WHERE citationid=?;";
+        
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, citation.getCitationID());
+            if(citation.getDeactivatedBy() != null){
+                stmt.setInt(1, citation.getDeactivatedBy().getUserID());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            stmt.setInt(2, citation.getCitationID());
+            
             stmt.execute();
             
             getFacesContext().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                    "Citation has been deleted from system forever!", ""));
+                    "Citation has been deactivated!", ""));
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -3139,7 +3412,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @return
      * @throws IntegrationException 
      */
-    public CitationStatusLogEntry getCitationStatus(int statusID) throws IntegrationException{
+    public CitationStatus getCitationStatus(int statusID) throws IntegrationException{
             
         String query =  "SELECT statusid, statusname, description, icon_iconid, editsforbidden, \n" +
                         "       eventrule_ruleid "
@@ -3147,7 +3420,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        CitationStatusLogEntry cs = null;
+        CitationStatus cs = null;
         
         try {
             stmt = con.prepareStatement(query);
@@ -3177,12 +3450,12 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @return
      * @throws IntegrationException 
      */
-    public List<CitationStatusLogEntry> getCitationStatusList() throws IntegrationException{
+    public List<CitationStatus> getCitationStatusList() throws IntegrationException{
         String query =  "SELECT statusid FROM citationStatus;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        ArrayList<CitationStatusLogEntry> csList = new ArrayList<>();
+        List<CitationStatus> csList = new ArrayList<>();
         
         try {
             stmt = con.prepareStatement(query);
@@ -3191,7 +3464,6 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             
             while(rs.next()){
                 csList.add(getCitationStatus(rs.getInt("statusid")));
-                
             }
             
         } catch (SQLException ex) {
@@ -3215,17 +3487,21 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @return
      * @throws IntegrationException 
      */
-    private CitationStatusLogEntry generateCitationStatus(ResultSet rs) throws IntegrationException{
-        CitationStatusLogEntry cs = new CitationStatusLogEntry();
+    private CitationStatus generateCitationStatus(ResultSet rs) throws IntegrationException{
+        CitationStatus cs = new CitationStatus();
+        
         SystemIntegrator si = getSystemIntegrator();
         WorkflowIntegrator wi = getWorkflowIntegrator();
+        
         try {
+        
             cs.setStatusID(rs.getInt("statusid"));
             cs.setStatusTitle(rs.getString("statusname"));
             cs.setDescription(rs.getString("description"));
             cs.setIcon(si.getIcon(rs.getInt("icon_iconid")));
-            cs.setNonStatusEditsForbidden(rs.getBoolean("editsforbidden"));
-            cs.setPhaseChangeRule(wi.rules_getEventRuleAbstract(rs.getInt("eventrule_ruleid")));
+            cs.setEditsForbidden(rs.getBoolean("editsforbidden"));
+            cs.setEventRuleAbstract(wi.rules_getEventRuleAbstract(rs.getInt("eventrule_ruleid")));
+        
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("Cannot Generate citation status object, sorry", ex);
@@ -3234,11 +3510,15 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
     }
     
     /**
-     * Creates a new record n the citationstatus table
+     * Creates a new record in the citationstatus table
+     * NOTE that this is a utility method for creating a new citation status
+     * that can be applied to any citation, NOT for logging a new status of
+     * a particular citation. 
+     * 
      * @param cs
      * @throws IntegrationException 
      */
-    public void insertCitationStatus(CitationStatusLogEntry cs) throws IntegrationException{
+    public void insertCitationStatus(CitationStatus cs) throws IntegrationException{
         
         String query =  "INSERT INTO public.citationstatus(\n" +
                         "            statusid, statusname, description, icon_iconid, editsforbidden, \n" +
@@ -3252,9 +3532,9 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt.setString(1, cs.getStatusTitle());
             stmt.setString(2, cs.getDescription());
             stmt.setInt(3, cs.getIcon().getIconid());
-            stmt.setBoolean(4, cs.isNonStatusEditsForbidden());
-            if(cs.getPhaseChangeRule() != null){
-                stmt.setInt(5, cs.getPhaseChangeRule().getRuleid());
+            stmt.setBoolean(4, cs.isEditsForbidden());
+            if(cs.getEventRuleAbstract()!= null){
+                stmt.setInt(5, cs.getEventRuleAbstract().getRuleid());
                 
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
@@ -3277,7 +3557,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @param cs
      * @throws IntegrationException 
      */
-    public void deleteCitationStatus(CitationStatusLogEntry cs) throws IntegrationException{
+    public void deleteCitationStatus(CitationStatus cs) throws IntegrationException{
         
         String query = "DELETE FROM public.citationstatus WHERE statusid=?";
         Connection con = getPostgresCon();
@@ -3308,7 +3588,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @param cs
      * @throws IntegrationException 
      */
-    public void updateCitationStatus(CitationStatusLogEntry cs) throws IntegrationException{
+    public void updateCitationStatus(CitationStatus cs) throws IntegrationException{
         
         String query =  "UPDATE public.citationstatus\n" +
                         "   SET statusname=?, description=?, icon_iconid=?, editsforbidden=?, eventrule_ruleid=?\n" +
@@ -3322,9 +3602,9 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt.setString(1, cs.getStatusTitle());
             stmt.setString(2, cs.getDescription());
             stmt.setInt(3, cs.getIcon().getIconid());
-            stmt.setBoolean(4, cs.isNonStatusEditsForbidden());
-             if(cs.getPhaseChangeRule() != null){
-                stmt.setInt(5, cs.getPhaseChangeRule().getRuleid());
+            stmt.setBoolean(4, cs.isEditsForbidden());
+             if(cs.getEventRuleAbstract()!= null){
+                stmt.setInt(5, cs.getEventRuleAbstract().getRuleid());
                 
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);

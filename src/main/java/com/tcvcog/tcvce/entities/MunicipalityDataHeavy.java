@@ -68,7 +68,7 @@ public  class       MunicipalityDataHeavy
     private List<Integer> photoDocList;
     
     
-    protected LinkedHumanSchemaEnum humanLinkSchemaEnum;
+    protected LinkedObjectSchemaEnum humanLinkSchemaEnum;
     protected List<HumanLink> humanLinkList;
     
     
@@ -697,12 +697,12 @@ public  class       MunicipalityDataHeavy
     }
 
     @Override
-    public LinkedHumanSchemaEnum getLinkSchema() {
+    public LinkedObjectSchemaEnum getLinkSchema() {
         return humanLinkSchemaEnum;
     }
 
     @Override
-    public void setLinkSchema(LinkedHumanSchemaEnum lhse) {
+    public void setLinkSchema(LinkedObjectSchemaEnum lhse) {
         humanLinkSchemaEnum = lhse;
     }
 

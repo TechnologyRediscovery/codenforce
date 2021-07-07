@@ -1413,7 +1413,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             // COUNT BY Citation status
             if(!citl.isEmpty()){
                 for(Citation cit: citl){
-                    String statTitle = cit.getStatus().getStatusTitle();
+                    String statTitle = cit.getStatus().getStatus().getStatusTitle();
                     if(citStatusMap.containsKey(statTitle)){
                         Integer statCount = citStatusMap.get(statTitle) + 1;
                         citStatusMap.put(statTitle, statCount);
@@ -2339,17 +2339,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
     }
 
-    /**
-     * Logic container for retrieving the default citation status
-     * @return
-     * @throws IntegrationException 
-     */
-    private CitationStatusLogEntry citation_getStartingCitationStatus() throws IntegrationException {
-        CaseIntegrator ci = getCaseIntegrator();
-        CitationStatusLogEntry cs = ci.getCitationStatus(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString("citationInitialStatusID")));
-        return cs;
-    }
+   
 
     /**
      * Initializes a Citation object with a default start status
@@ -2412,13 +2402,136 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * sent to the proper magisterial authority
      *
      * @param c
+     * @param cvl
+     * @param creator
+     * @param issuingOfficer
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public void citation_issueCitation(Citation c) throws IntegrationException {
+    public void citation_insertCitation(    Citation c, 
+                                            List<CodeViolation> cvl,
+                                            UserAuthorized creator , 
+                                            UserAuthorized issuingOfficer) 
+                                    throws  IntegrationException, 
+                                            BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+        
+        if(     c == null 
+                || cvl == null
+                || !cvl.isEmpty()
+                || creator == null 
+                || issuingOfficer == null 
+                || c.getViolationList() == null 
+                || !c.getViolationList().isEmpty()){
+            throw new BObStatusException("Cannot issue citation with null citation, creator, issuing officer, or viol list");
+            
+        }
+        
+        c.setCreatedBy(creator);
+        c.setLastUpdatedBy(creator);
+        c.setFilingOfficer(issuingOfficer);
+        c.setViolationList(new ArrayList<>());
+        
+        // Create CitationCodeViolationLink objects to wrap each incoming CodeViolation
+        // with metadata
+        for(CodeViolation cv: cvl){
+            CitationCodeViolationLink ccvl = new CitationCodeViolationLink(cv);
+            ccvl.setCreatedBy(creator);
+            ccvl.setLinkCreatedBy(creator);
+            ccvl.setCitVStatus(getDefaultCitationViolationStatusEnumVal());
+            ccvl.setLinkSource(sc.getBObSource(Integer.parseInt(
+                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("bobsource_internalhuman"))));
+            c.getViolationList().add(ccvl);
+            
+        }
         ci.insertCitation(c);
-
     }
+    
+    /**
+     * Logic container for returning the default status of a code violation
+     * attached to a single citation
+     * @return 
+     */
+    private CitationViolationStatusEnum getDefaultCitationViolationStatusEnumVal(){
+        return CitationViolationStatusEnum.PENDING;
+        
+    }
+    
+    
+    /**
+     * Entry point for making a new citation status log entry on a 
+     * particular citation. 
+     * 
+     * @param cit to which the log entry shall be attached
+     * @param csle the log entry to link to the given citation
+     * @param ua doing the logging
+     * @return the ID of the fresh record in the citationcitationstatus table
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public int citation_makeCitationStatusLogEntry( Citation cit, 
+                                                    CitationStatusLogEntry csle, 
+                                                    UserAuthorized ua) 
+                                            throws  BObStatusException, IntegrationException{
+        if(cit == null
+                || csle == null
+                || ua == null
+                || csle.getStatus() == null){
+            throw new BObStatusException("Cannot make a log entry with null citation, log entry, or user authorized");
+            
+        }
+        CaseIntegrator ci = getCaseIntegrator();
+        
+        
+        csle.setCreatedBy(ua);
+        csle.setLastUpdatedBy(ua);
+        cit.setLastUpdatedBy(ua);
+       
+        return ci.insertCitationStatusLogEntry(cit, csle);
+        
+    }
+    
+    /**
+     * Updates a citation status log entry
+     * 
+     * @param cit
+     * @param csle
+     * @param ua
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public void citation_updateCitationStatusLogEntry(  Citation cit, 
+                                                        CitationStatusLogEntry csle, 
+                                                        UserAuthorized ua) 
+                                                throws  BObStatusException, 
+                                                        IntegrationException {
+        
+        if(cit == null || csle == null || ua == null || csle.getStatus() == null){
+            throw new BObStatusException("Cannot update citation status with null citation, log entry or its status, or user");
+        }
+        
+        CaseIntegrator ci = getCaseIntegrator();
+        csle.setLastUpdatedBy(ua);
+        
+        ci.updateStatusLogEntry(cit, csle);
+        
+    }
+
+    /**
+     * Deactivates a citation log entry
+     * 
+     * @param csle
+     * @param ua  doing the deactivating
+     */
+    public void citation_deactivateCitationStatusLogEntry(CitationStatusLogEntry csle, UserAuthorized ua){
+        
+       csle.setDeactivatedBy(ua);
+       csle.setLastUpdatedBy(ua);
+        
+    }
+    
+    
 
     /**
      * Logic intermediary for updating fields on Citations in the DB
@@ -2444,29 +2557,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public void citation_removeCitation(Citation c) throws IntegrationException, BObStatusException {
+    public void citation_removeCitation(Citation c, UserAuthorized ua) throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
         
-        if(c != null){
-            c.setDeactivatedTS(LocalDateTime.now());
-            ci.updateCitation(c);
+        if(c != null && ua != null){
+            c.setDeactivatedBy(ua);
+            ci.deactivateCitation(c);
         }
-        // Deactivated to allow for any citation to be removed
-        
-
-//        if (c.getStatus() != null && !c.getStatus().isNonStatusEditsForbidden()) {
-//            c.setIsActive(false);
-//            ci.updateCitation(c);
-//        } else {
-//            throw new BObStatusException("Cannot remove this citation at its current status");
-//        }
-
     }
 
     /**
      * Logic intermediary for updating citation status only
      *
      * @param c
+     * @deprecated  replaced by status log 
      * @throws IntegrationException
      */
     public void citation_updateCitationStatus(Citation c) throws IntegrationException {

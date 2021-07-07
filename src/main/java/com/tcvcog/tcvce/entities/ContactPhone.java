@@ -26,6 +26,7 @@ public  class   ContactPhone
         extends Contact{
     
     final static String TABLE_NAME = "contactphone";
+    final static String PKFIELD = "phoneid";
     
     
     protected int phoneID;
@@ -112,10 +113,7 @@ public  class   ContactPhone
         return phoneID;
     }
 
-    @Override
-    public String getTableName() {
-        return TABLE_NAME;
-    }
+   
 
     /**
      * @return the humanID
@@ -157,6 +155,16 @@ public  class   ContactPhone
      */
     public void setDisconnectTS(LocalDateTime disconnectTS) {
         this.disconnectTS = disconnectTS;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return PKFIELD;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return TABLE_NAME;
     }
     
 }

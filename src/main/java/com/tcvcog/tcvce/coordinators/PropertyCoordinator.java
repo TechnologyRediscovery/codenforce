@@ -571,24 +571,31 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         PropertyIntegrator pi = getPropertyIntegrator();
         prop.setLastUpdatedBy(ua);
         prop.setLastUpdatedTS(LocalDateTime.now());
-        if (checkAllDates(prop) == false) {
-            throw new BObStatusException("Date error in committing property updates; Ensure no end date is before a start date");
-
-        }
+//        if (checkAllDates(prop) == false) {
+//            throw new BObStatusException("Date error in committing property updates; Ensure no end date is before a start date");
+//
+//        }
         pi.updateProperty(prop);
 
     }
 
+    
     public boolean checkAllDates(Property prop) {
         boolean unfit, vacant, abandoned;
-        unfit = checkStartDTisBeforeEndDT(prop.getUnfitDateStart(), prop.getUnfitDateStop());
-        vacant = checkStartDTisBeforeEndDT(prop.getVacantDateStart(), prop.getVacantDateStop());
-        abandoned = checkStartDTisBeforeEndDT(prop.getAbandonedDateStart(), prop.getAbandonedDateStop());
-        if (unfit && vacant && abandoned) {
-            return true;
-        } else {
-            return false;
-        }
+
+        // TODO: humanization: these values now live on the propertydata records, not direclty on
+        // a parcel
+//        unfit = checkStartDTisBeforeEndDT(prop.getUnfitDateStart(), prop.getUnfitDateStop());
+//        vacant = checkStartDTisBeforeEndDT(prop.getVacantDateStart(), prop.getVacantDateStop());
+//        abandoned = checkStartDTisBeforeEndDT(prop.getAbandonedDateStart(), prop.getAbandonedDateStop());
+//        if (unfit && vacant && abandoned) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+
+        // short circuit logic
+        return true;
     }
 
     public boolean checkStartDTisBeforeEndDT(LocalDateTime start, LocalDateTime end) {
@@ -724,6 +731,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
     /**
      *
+     * 
+     * 
      * @param cred
      * @return
      */
@@ -742,7 +751,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                     } else {
                         Municipality m = cred.getGoverningAuthPeriod().getMuni();
                         for (Property pr : propList) {
-                            if (pr.getMuniCode() == m.getMuniCode()) {
+                            if (pr.getMuni().getMuniCode() == m.getMuniCode()) {
                                 propList.add(pr);
                             }
                         }
@@ -763,13 +772,14 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
     
     /**
+     * TODO: Update for parcelization
      * Generator method for Property objects
      * @param muni
      * @return the skelton property object with only muni set and ID of 0
      */
     public Property generatePropertySkeleton(Municipality muni) {
         Property prop = new Property();
-        prop.setPropertyID(0);
+        prop.setParcelKey(0);
         prop.setMuni(muni);
         return prop;
     }

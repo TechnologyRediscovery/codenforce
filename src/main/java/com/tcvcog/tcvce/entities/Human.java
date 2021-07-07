@@ -50,8 +50,37 @@ public  class   Human
         
         protected Integer cloneOfHumanID;
         protected String notes;
+        
+        
+    /**
+     * No arg constructor
+     */
+    public Human(){
+        
+    }
       
-
+    /**
+     * Populates human fields given a human
+     * @param h 
+     */
+    public Human(Human h){
+        if(h != null){
+            this.humanID = h.humanID;
+            this.name = h.name;
+            this.dob = h.dob;
+            this.under18 = h.under18;
+            this.jobTitle = h.jobTitle;
+            this.businessEntity = h.businessEntity;
+            this.multiHuman = h.multiHuman;
+            this.source = h.source;
+            this.deceasedDate = h.deceasedDate;
+            this.deceasedBy = h.deceasedBy;
+            this.cloneOfHumanID = h.cloneOfHumanID;
+            this.notes = h.notes;
+        }
+    }
+        
+        
     /**
      * @return the humanID
      */

@@ -24,7 +24,7 @@ import com.tcvcog.tcvce.entities.EventRuleImplementation;
 import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.IFace_CredentialSigned;
 import com.tcvcog.tcvce.entities.IFace_humanListHolder;
-import com.tcvcog.tcvce.entities.LinkedHumanSchemaEnum;
+import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeePayment;
 import com.tcvcog.tcvce.entities.Payment;
@@ -56,7 +56,7 @@ public  class       OccPeriodDataHeavy
 
     private List<OccPermitApplication> applicationList;
     
-    protected LinkedHumanSchemaEnum humanLinkSchemaEnum;
+    protected LinkedObjectSchemaEnum humanLinkSchemaEnum;
     protected List<HumanLink> humanLinkList;
     
     private List<Proposal> proposalList;
@@ -337,8 +337,8 @@ public  class       OccPeriodDataHeavy
     /**
      * @param personListApplicants the personListApplicants to set
      */
-    public void setPersonListApplicants(List<OccApplicationHumanLink> personListApplicants) {
-        this.personListApplicants = personListApplicants;
+    public void setPersonListApplicants(List<HumanLink> personListApplicants) {
+        this.humanLinkList = personListApplicants;
     }
 
     /**
@@ -449,12 +449,12 @@ public  class       OccPeriodDataHeavy
     }
 
     @Override
-    public LinkedHumanSchemaEnum getLinkSchema() {
+    public LinkedObjectSchemaEnum getLinkSchema() {
         return humanLinkSchemaEnum;
     }
 
     @Override
-    public void setLinkSchema(LinkedHumanSchemaEnum lhse) {
+    public void setLinkSchema(LinkedObjectSchemaEnum lhse) {
         humanLinkSchemaEnum = lhse;
     }
    

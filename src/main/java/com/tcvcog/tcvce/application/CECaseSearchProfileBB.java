@@ -2503,7 +2503,7 @@ public class CECaseSearchProfileBB
                 Citation c = currentCitation;
                 c.setCreatedBy(getSessionBean().getSessUser());
                 try {
-                    cc.citation_issueCitation(c);
+                    cc.citation_insertCitation(c);
 
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,

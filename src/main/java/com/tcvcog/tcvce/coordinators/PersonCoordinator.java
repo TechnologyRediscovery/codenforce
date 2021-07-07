@@ -307,13 +307,18 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Logic intermediary for Updates to the Person listing
-     * @param p
+     * @param h
      * @param u
      * @throws IntegrationException 
      */
     public void humanEdit(Human h, User u) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         pi.updateHuman(h);
+    }
+    
+    public Human humanInit(){
+        Human h = new Human();
+        return h;
     }
     
     /**
@@ -324,7 +329,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @return 
      */
     public Person personInit(Municipality m){
-        Person newP = new Person(); 
+        Person newP = new Person(humanInit()); 
         newP.setBusinessEntity(false);
         return newP;
         
@@ -473,6 +478,24 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
             skeletonHorde.add(pi.getHuman(idNum));
         }
         return skeletonHorde;
+    }
+    
+    /**
+     * Utility method for getting a list of Person objects from a list of
+     * Human objs
+     * @param hl
+     * @return a list, possibly not null, of Person objs
+     * @throws IntegrationException 
+     */
+    public List<Person> assemblePersonListFromHumanList(List<Human> hl) throws IntegrationException{
+        List<Person> pl = new ArrayList<>();
+        if(hl != null && !hl.isEmpty()){
+            for(Human h: hl){
+                pl.add(getPerson(h));
+            }
+        }
+        return pl;
+        
     }
 
     /**
