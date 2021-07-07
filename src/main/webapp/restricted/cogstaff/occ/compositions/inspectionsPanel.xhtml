@@ -32,7 +32,19 @@
               widgetVar="inspections-spacedetails-var"
               header="Space Details">
         <h:form id="inspections-spacedetails-form">
-            <h5>Not implemented yet</h5>
+            <p:outputLabel styleClass="p-d-block">Space name:</p:outputLabel>
+            <p:inputText styleClass="p-d-block"/>
+
+            <p:outputLabel styleClass="p-d-block">Location descriptor:</p:outputLabel>
+            <p:selectOneMenu>
+                <f:selectItem itemLabel="Option1" itemValue="Option1"/>
+                <f:selectItem itemLabel="Option2" itemValue="Option2"/>
+                <f:selectItem itemLabel="Option3" itemValue="Option3"/>
+            </p:selectOneMenu>
+
+            <p:outputLabel styleClass="p-d-block">Space details:</p:outputLabel>
+            <p:inputTextarea rows="6" cols="33"/>
+
             <p:commandButton value="Cancel"
                              icon="pi pi-cog"
                              styleClass="ui-button-outlined"/>
