@@ -43,35 +43,54 @@
     </p:dialog>
 
     <p:dialog id="inspections-entryscreen"
+              height="600" width="1000"
               widgetVar="inspections-entryscreen-var"
-              header="Entry Screen">
+              header="Space Name"
+              modal="true"
+              resizable="true">
         <h:form id="inspections-entryscreen-form">
-            <h2>Space name</h2>
-            <h3>Category Name</h3>
+            <div class="p-d-flex p-jc-between">
+                <h1>SPACE NAME</h1>
+                <div>
+                    <p:commandButton value="Pass All"/>
+                </div>
+                <div>
+                    <p:commandButton value="Edit Space" class="p-mr-1"/>
+                    <p:commandButton value="Remove Space"/>
+                </div>
+            </div>
+            <h2>Category Name</h2>
             <div class="p-grid">
                 <div class="p-col-12 p-md-4">
-                    <h4>Ordinance</h4>
+                    <h3>Ordinance</h3>
                     <ul>
                         <li>accordian/collapsable box with ordinance description and tips of what to look for</li>
                     </ul>
                 </div>
-                <div class="p-col-12 p-md-3">
+                <div class="p-col-12 p-md-4 p-mt-5">
                     <p:selectOneButton>
                         <f:selectItem itemLabel="Not Inspected"/>
                         <f:selectItem itemLabel="Pass"/>
                         <f:selectItem itemLabel="Fail"/>
                     </p:selectOneButton>
-                    <p:selectBooleanCheckbox itemLabel="Exclude from NOV"/>
+                    <div class="p-d-flex p-mt-2 p-jc-end">
+                        <p:selectBooleanCheckbox itemLabel="Exclude from NOV"/>
+                    </div>
                 </div>
-                <div class="p-col">
-                    <h4>Comments:</h4>
-                    <p:inputTextarea rows="6" cols="33"/>
-                </div>
-                <div class="p-col-fixed" style="width: 3rem">
-                    <p:button icon="pi pi-plus" styleClass="rounded-button"/>
-                    <p>Add Photo</p>
+                <div class="p-col-12 p-md-4">
+                    <div class="p-d-flex">
+                        <div>
+                            <p class="p-mb-0">Comments:</p>
+                            <p:inputTextarea rows="6" cols="33"/>
+                        </div>
+                        <div class="p-mx-3 p-mt-5">
+                            <p:button icon="pi pi-plus" styleClass="rounded-button"/>
+                            <p>Add Photo</p>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <p:commandButton value="Add Ordinance" icon="pi pi-plus"/>
         </h:form>
     </p:dialog>
 </ui:composition>
