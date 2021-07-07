@@ -398,7 +398,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 throw new EventException("EventCnF must have either an occupancy period ID, or CECase ID");
             }
        
-        ev.setPersonList(pc.getPersonList(pi.eventPersonAssembleList(ev)));
+        ev.setPersonList(pc.assembleLinkedHumanLinks(ev));
         
         return ev;
     }
@@ -421,16 +421,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         }
     }
     
-    public void auditEventPersonList(EventCnF ev){
-        List<Person> pl;
-        if(ev != null){
-            pl = ev.getPersonList();
-            if(pl != null && !pl.isEmpty()){
-                
-            }
-        }
-        
-    }
     
     
     /**
@@ -445,7 +435,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
     public void updateEvent(EventCnF ev, UserAuthorized ua) throws IntegrationException, EventException, BObStatusException{
-        PersonIntegrator pi = getPersonIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
         EventIntegrator ei = getEventIntegrator();
          if(ev == null || ua == null){
             throw new BObStatusException("Event and User cannot be null");
@@ -459,8 +449,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         ev.setLastUpdatedTS(LocalDateTime.now());
         ei.updateEvent(ev);
         if(ev.getPersonList() != null && !ev.getPersonList().isEmpty()){
-            pi.eventPersonClear(ev);
-            pi.eventPersonConnect(ev);
+            // TODO: Finish event persons
+            
         }
         
     }

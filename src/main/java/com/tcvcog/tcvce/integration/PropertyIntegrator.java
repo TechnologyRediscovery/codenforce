@@ -1979,7 +1979,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         try {
             stmt = con.prepareStatement(query);
             stmt.setString(1, pu.getUnitNumber());
-            stmt.setInt(2, pu.getParcelkey());
+            stmt.setInt(2, pu.getParcelKey());
             stmt.setString(3, pu.getOtherKnownAddress());
             stmt.setString(4, pu.getNotes());
             
@@ -2042,7 +2042,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         try {
             stmt = con.prepareStatement(sql);
             stmt.setString(1, pu.getUnitNumber());
-            stmt.setInt(2, pu.getParcelkey());
+            stmt.setInt(2, pu.getParcelKey());
             stmt.setString(3, pu.getOtherKnownAddress());
             stmt.setString(4, pu.getNotes());
             
@@ -2153,7 +2153,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         PropertyCoordinator pc = getPropertyCoordinator();
         
         PropertyUnitWithProp puwp = new PropertyUnitWithProp(getPropertyUnit(unitID));
-        puwp.setProperty(pc.getProperty(puwp.getParcelkey()));
+        puwp.setProperty(pc.getProperty(puwp.getParcelKey()));
         
         return puwp;
     }

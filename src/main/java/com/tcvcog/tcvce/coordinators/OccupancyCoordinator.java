@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
@@ -68,9 +69,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
-import com.tcvcog.tcvce.entities.IFace_Proposable;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
 import com.tcvcog.tcvce.entities.occupancy.OccApplicationStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
@@ -80,7 +78,6 @@ import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -187,7 +184,10 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             if (!qp.getParamsList().isEmpty()) {
                 qp.getParamsList().get(0).setOccPeriod_val(per);
             }
-            opdh.setPersonList(sc.runQuery(qp).getBOBResultList());
+            
+            // TODO: Humanization upgrade after Ben's integration
+
+//            opdh.setPersonList(sc.runQuery(qp).getBOBResultList());
 
             // EVENT LIST
             
@@ -222,7 +222,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             
             opdh.setGoverningInspection(designateGoverningInspection(opdh));
             
-        } catch (BObStatusException | SearchException | EventException | AuthorizationException | IntegrationException | ViolationException ex) {
+        } catch (BObStatusException  | EventException | AuthorizationException | IntegrationException | ViolationException ex) {
             System.out.println(ex);
         }
         
@@ -890,26 +890,29 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         if(opa.getApplicantPerson() == null){
             throw new BObStatusException("Please specify an applicant.");
         }
+        // TODO: upgrade for humanization
         
         if(opa.getPreferredContact() == null){
-            opa.setPreferredContact(opa.getApplicantPerson());
+//            opa.setPreferredContact(opa.getApplicantPerson());
         }
         
-        List<PersonType> applicationPersonTypes = new ArrayList<>();
-        for (OccApplicationHumanLink applicationPerson : opa.getAttachedPersons()) {
-            if (applicationPerson.getFirstName() == null || applicationPerson.getFirstName().contentEquals("")){
-                throw new BObStatusException("The first name field is not optional. "
-                        + "If you are filling in the name of a business, "
-                        + "please put your business\' full name in the first name field.");
-            }
-            applicationPersonTypes.add(applicationPerson.getApplicationPersonType());
-        }
+        // TODO: upgrade for humanization
         
-        for (PersonType personType : pr.getRequiredPersonTypes()) {
-            if (!applicationPersonTypes.contains(personType)) {
-                throw new BObStatusException("Please specify a(n) " + personType.getLabel());
-            }
-        }
+//        List<PersonType> applicationPersonTypes = new ArrayList<>();
+//        for (HumanLink applicationPerson : opa.getAttachedPersons()) {
+//            if (applicationPerson.getFirstName() == null || applicationPerson.getFirstName().contentEquals("")){
+//                throw new BObStatusException("The first name field is not optional. "
+//                        + "If you are filling in the name of a business, "
+//                        + "please put your business\' full name in the first name field.");
+//            }
+//            applicationPersonTypes.add(applicationPerson.getApplicationPersonType());
+//        }
+//        
+//        for (PersonType personType : pr.getRequiredPersonTypes()) {
+//            if (!applicationPersonTypes.contains(personType)) {
+//                throw new BObStatusException("Please specify a(n) " + personType.getLabel());
+//            }
+//        }
         pr.setRequirementSatisfied(true);//we've reached the end, the requirement was satisfied.
         return opa;
     }
@@ -1044,8 +1047,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
         OccupancyIntegrator oi = getOccupancyIntegrator();
         
-        List<OccApplicationHumanLink> applicationPersons = application.getAttachedPersons();
-        for (OccApplicationHumanLink person : applicationPersons) {
+        List<HumanLink> applicationPersons = application.getAttachedPersons();
+        for (HumanLink person : applicationPersons) {
 
             //see javadoc
             if (person.getHumanID() == 0){
@@ -1053,15 +1056,17 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                                                 + " Please insert persons into the database before running this method!");
             }
             
+            //: TODO update for humanization
+            
             /* If the person  is the applicantPerson on the 
             OccPermitApplication, set applicant to true*/
-            person.setApplicant(application.getApplicantPerson().getHumanID() == person.getHumanID());
+//            person.setApplicant(application.getApplicantPerson().getHumanID() == person.getHumanID());
 
             /* If the person is the preferredContact on the 
             OccPermitApplication, set preferredcontact to true */
-            person.setPreferredContact(application.getPreferredContact().getHumanID() == person.getHumanID());
+//            person.setPreferredContact(application.getPreferredContact().getHumanID() == person.getHumanID());
             
-            oi.insertOccApplicationPerson(person, application.getId());
+//            oi.insertOccApplicationPerson(person, application.getId());
             
         }
     }
@@ -1073,67 +1078,69 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         PropertyIntegrator pri = getPropertyIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
 
-        List<OccApplicationHumanLink> existingList = pi.getPersonOccApplicationListWithInactive(opa);
+        List<HumanLink> existingList = pi.getPersonOccApplicationListWithInactive(opa);
+        
+        // TODO:  Upgrade to use humanlink roles
 
-        OccApplicationHumanLink applicationPerson = new OccApplicationHumanLink();
+//        HumanLink applicationPerson = new HumanLink();
+//
+//        for (OccApplicationHumanLink existingPerson : existingList) {
+//
+//            boolean removed = true;
+//
+//            Iterator itr = opa.getAttachedPersons().iterator();
+//
+//            while (itr.hasNext()) {
+//
+//                applicationPerson = (OccApplicationHumanLink) itr.next();
+//
+//                /* If the person  is the applicantPerson on the 
+//                    OccPermitApplication, set applicant to true*/
+//                applicationPerson.setApplicant(opa.getApplicantPerson() != null && opa.getApplicantPerson().equals(applicationPerson));
+//
+//                /* If the person is the preferredContact on the 
+//                    OccPermitApplication, set preferredcontact to true */
+//                applicationPerson.setPreferredContact(opa.getPreferredContact() != null && opa.getPreferredContact().equals(applicationPerson));
+//
+//                if (applicationPerson.getHumanID() == 0) {
+//
+//                    applicationPerson.setPersonType(applicationPerson.getApplicationPersonType());
+//                    
+//                    Property prop = pc.getProperty(opa.getApplicationPropertyUnit().getParcelKey());
+//                    
+//                    applicationPerson.setMuniCode(prop.getMuni().getMuniCode());
+//                    
+//                    applicationPerson.setPersonID(pi.insertPerson(applicationPerson));
+//                    
+//                    oi.insertOccApplicationPerson(applicationPerson, opa.getId());
+//
+//                    //We've inserted this new person to the database already. 
+//                    //Let's remove them so we don't insert them every time the for loop fires
+//                    itr.remove();
+//                    break;
+//                } else if (applicationPerson.getHumanID() == existingPerson.getHumanID()) {
+//                    removed = false;
+//                    
+//                    applicationPerson.setLinkActive(true);
+//                    
+//                    pi.updatePerson(applicationPerson);
+//                    
+//                    oi.updatePersonOccPeriod(applicationPerson, opa);
+//                    
+//                    break;
+//                }
+//
+//            }
+//
+//            if (removed == true) {
+//
+//                //we never found it in the while loop above, it's been removed
+//                existingPerson.setLinkActive(false);
+//                oi.updatePersonOccPeriod(existingPerson, opa);
+//
+//            }
 
-        for (OccApplicationHumanLink existingPerson : existingList) {
-
-            boolean removed = true;
-
-            Iterator itr = opa.getAttachedPersons().iterator();
-
-            while (itr.hasNext()) {
-
-                applicationPerson = (OccApplicationHumanLink) itr.next();
-
-                /* If the person  is the applicantPerson on the 
-                    OccPermitApplication, set applicant to true*/
-                applicationPerson.setApplicant(opa.getApplicantPerson() != null && opa.getApplicantPerson().equals(applicationPerson));
-
-                /* If the person is the preferredContact on the 
-                    OccPermitApplication, set preferredcontact to true */
-                applicationPerson.setPreferredContact(opa.getPreferredContact() != null && opa.getPreferredContact().equals(applicationPerson));
-
-                if (applicationPerson.getHumanID() == 0) {
-
-                    applicationPerson.setPersonType(applicationPerson.getApplicationPersonType());
-                    
-                    Property prop = pc.getProperty(opa.getApplicationPropertyUnit().getParcelkey());
-                    
-                    applicationPerson.setMuniCode(prop.getMuni().getMuniCode());
-                    
-                    applicationPerson.setPersonID(pi.insertPerson(applicationPerson));
-                    
-                    oi.insertOccApplicationPerson(applicationPerson, opa.getId());
-
-                    //We've inserted this new person to the database already. 
-                    //Let's remove them so we don't insert them every time the for loop fires
-                    itr.remove();
-                    break;
-                } else if (applicationPerson.getHumanID() == existingPerson.getHumanID()) {
-                    removed = false;
-                    
-                    applicationPerson.setLinkActive(true);
-                    
-                    pi.updatePerson(applicationPerson);
-                    
-                    oi.updatePersonOccPeriod(applicationPerson, opa);
-                    
-                    break;
-                }
-
-            }
-
-            if (removed == true) {
-
-                //we never found it in the while loop above, it's been removed
-                existingPerson.setLinkActive(false);
-                oi.updatePersonOccPeriod(existingPerson, opa);
-
-            }
-
-        }
+//        }
 
     }
     

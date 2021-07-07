@@ -351,7 +351,7 @@ public class UserConfigBB extends BackingBeanUtils{
         if(personIDToLink != 0){
             
              try {
-                 Person p = pc.getPerson(personIDToLink);
+                 Person p = pc.getPerson(pc.getHuman(personIDToLink));
                  userAuthorizedInConfig.setPerson(p);
              } catch (IntegrationException ex) {
                 System.out.println(ex);

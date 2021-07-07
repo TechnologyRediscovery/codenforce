@@ -348,30 +348,60 @@ ALTER TABLE parcelmailingaddress ADD COLUMN linkid INTEGER NOT NULL
   
 
 ALTER TABLE public.parcelmailingaddress DROP COLUMN parcelmailingid;
--- ******** RUN LOCALLY UP TO HERE ******** 
 
 ALTER TABLE parcelmailingaddress ADD COLUMN linkedobjectrole_lorid INTEGER 
     CONSTRAINT parcelmailing_lorid_fk 
     REFERENCES linkedobjectrole (lorid);  
 
-  
-CREATE SEQUENCE IF NOT EXISTS humancontacted_contactconfigid_seq
+
+
+ALTER TABLE public.noticeofviolation ADD COLUMN recipient_humanid INTEGER CONSTRAINT nov_humanid_fk REFERENCES human (humanid);
+ALTER TABLE public.noticeofviolation ADD COLUMN recipient_mailing INTEGER CONSTRAINT nov_mailing_fk REFERENCES humanmailingaddress (linkid);
+
+ALTER TABLE public.noticeofviolation ADD COLUMN fixedrecipientxferts TIMESTAMP WITH TIME ZONE DEFAULT now();
+ALTER TABLE public.noticeofviolation ADD COLUMN fixedrecipientname TEXT;
+ALTER TABLE public.noticeofviolation ADD COLUMN fixedrecipientbldgno TEXT;
+ALTER TABLE public.noticeofviolation ADD COLUMN fixedrecipientstreet TEXT;
+ALTER TABLE public.noticeofviolation ADD COLUMN fixedrecipientcity TEXT;
+ALTER TABLE public.noticeofviolation ADD COLUMN fixedrecipientstate TEXT;
+ALTER TABLE public.noticeofviolation ADD COLUMN fixedrecipientzip TEXT;
+
+
+ALTER TABLE public.citationviolation 
+    ADD CONSTRAINT citationviol_citationid_fk FOREIGN KEY (citation_citationid) 
+    REFERENCES public.citation (citationid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+
+
+ALTER TABLE public.citationviolation RENAME COLUMN linknotes TO notes;
+-- ******** RUN LOCALLY UP TO HERE ******** 
+
+
+CREATE SEQUENCE IF NOT EXISTS citationviolationstatus_seq
     START WITH 100
     INCREMENT BY 1
     MINVALUE 100
     NO MAXVALUE
     CACHE 1;
 
-
-
-CREATE TABLE public.humancontacted 
+CREATE TABLE public.citationviolationstatus
 (
-    contactconfigid INTEGER DEFAULT nextval('humancontacted_contactconfigid_seq') PRIMARY KEY,
-    humanmailing_linkid INTEGER CONSTRAINT humancontacted_mailing_fk REFERENCES humanmailingaddress (linkid),
-    contactphone_phoneid INTEGER CONSTRAINT humancontacted_phoneid_fk REFERENCES contactphone (phoneid),
-    contactemail_emailid INTEGER CONSTRAINT humancontacted_emailid_fk REFERENCES contactemail (emailid) 
+  statusid integer NOT NULL DEFAULT nextval('citationviolationstatus_seq'::regclass),
+  statusname text NOT NULL,
+  description text NOT NULL,
+  icon_iconid integer,
+  editsforbidden boolean DEFAULT true,
+  CONSTRAINT citationstatus_statusid_pk PRIMARY KEY (statusid),
+  CONSTRAINT citationstatus_iconid_fk FOREIGN KEY (icon_iconid)
+      REFERENCES public.icon (iconid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
 );
-
+ALTER TABLE public.citationstatus
+  OWNER TO sylvia;
 
 
 

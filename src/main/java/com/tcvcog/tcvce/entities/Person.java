@@ -63,6 +63,14 @@ public  class       Person
     }
 
     /**
+     * Reverse compat method to help with humanization
+     * @return 
+     */
+    public int getPersonID(){
+        return humanID;
+    }
+    
+    /**
      * Utility method for extracting the first address
      * in the list
      * @return the address at position 0 or null if no addresses present

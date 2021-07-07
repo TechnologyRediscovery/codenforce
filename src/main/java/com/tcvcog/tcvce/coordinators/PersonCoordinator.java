@@ -84,6 +84,24 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return configureHuman(pi.getHuman(humanID));
     }
     
+    /**
+     * Creates a HumanLink from a given Human PRIOR to being
+     * written in the database. Skeleton objects are those which
+     * have an ID of 0
+     * @param hu to turn into a HumanLink
+     * @return the given Human wrapped in a Link. Null if input is null.
+     */
+    public HumanLink getHumanLinkSkeleton(Human hu){
+        if(hu != null){
+            return new HumanLink(hu);
+            
+        } else {
+            return null;
+        }
+        
+        
+    }
+    
     
     /**
      * Access point for retrieving and injecting a list of Human objects
@@ -143,7 +161,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         if(hlh == null || hl == null){
             throw new BObStatusException("Cannot link human with null human or human holder");
         }
-        hl.setLastupdatedBy(ua);
+        hl.setLastUpdatedBy(ua);
         hl.setDeceasedBy(ua);
         pi.deactivateHumanLink(hlh, hl);
     }
@@ -199,6 +217,24 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
             }
         }
         return pList;
+    }
+    
+    
+    /**
+     * Utility method for iterating over a list of HumanLinks and getting
+     * Persons and shoving them all in a list
+     * 
+     * @param humanLinkList     
+     * @return return a list, possibly with Person objs in it!
+     * @throws IntegrationException 
+     */
+    public List<Person> getPersonListFromLinkList(List<HumanLink> humanLinkList) throws IntegrationException{
+        List<Person> pl = new ArrayList<>();
+        for(HumanLink hl: humanLinkList){
+            pl.add(getPerson(hl));
+        }
+        return pl;
+        
     }
     
     /**

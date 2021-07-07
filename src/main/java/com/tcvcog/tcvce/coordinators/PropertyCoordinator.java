@@ -74,7 +74,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     private final boolean DEFAULTRENTAL = false;
 
     
-    public 
+    
     
     /**
      * Pass through for getting a property count by municode
@@ -145,8 +145,10 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                    // Person list
                    QueryPerson qp = sc.initQuery(QueryPersonEnum.PROPERTY_PERSONS, ua.getKeyCard());
                    qp.getPrimaryParams().setProperty_val(prop);
-                   pdh.setPersonList(sc.runQuery(qp).getBOBResultList());
-                   System.out.println("PropertyCoordinator.assemblePropertyDH: personlist size: " + pdh.getPersonList().size());
+                   // Fix for humanization
+                   pdh.setHumanLinkList(new ArrayList<>());
+//                   pdh.setPersonList(sc.runQuery(qp).getBOBResultList());
+//                   System.out.println("PropertyCoordinator.assemblePropertyDH: personlist size: " + pdh.getPersonList().size());
 
                    // wait on blobs
                    pdh.setBlobList(bc.getBlobLightList(bi.getBlobIDs(prop)));
@@ -339,8 +341,9 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             Matcher matNum = patNum.matcher(prop.getAddress());
 
             while (matNum.find()){
-                prop.setAddressNum(matNum.group("num"));
-                prop.setAddressStreet(matNum.group("street"));
+                // Don't need this for humanization since we're already separating out num and street
+//                prop.setAddressNum(matNum.group("num"));
+//                prop.setAddressStreet(matNum.group("street"));
             }
 
         }
@@ -360,20 +363,21 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @throws BObStatusException
      */
     public void connectPersonToProperty(PropertyDataHeavy pdh, Person pers) throws IntegrationException, BObStatusException {
-        boolean proceedWithConnect = true;
-        PersonCoordinator pc = getPersonCoordinator();
-        if (pdh != null && pers != null) {
-            for (Person p : pdh.getPersonList()) {
-                if (p.getHumanID() == pers.getHumanID()) {
-                    proceedWithConnect = false;
-                }
-            }
-        }
-        if (proceedWithConnect) {
-            pc.connectPersonToProperty(pers, pdh);
-        } else {
-            throw new BObStatusException("Person Link Already Exists");
-        }
+        // TODO: fix for humanization upgrade
+//        boolean proceedWithConnect = true;
+//        PersonCoordinator pc = getPersonCoordinator();
+//        if (pdh != null && pers != null) {
+//            for (Person p : pdh.getPersonList()) {
+//                if (p.getHumanID() == pers.getHumanID()) {
+//                    proceedWithConnect = false;
+//                }
+//            }
+//            if (proceedWithConnect) {
+//                pc.connectPersonToProperty(pers, pdh);
+//            } else {
+//                throw new BObStatusException("Person Link Already Exists");
+//            }
+//        }
 
     }
 
@@ -392,7 +396,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         PropertyIntegrator pi = getPropertyIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
 
-        pc.connectRemovePersonToProperty(pers, p);
+        // TODO: Humanization remove links
+//        pc.connectRemovePersonToProperty(pers, p);
 
         // build person link removal note
         MessageBuilderParams mbp = new MessageBuilderParams();
@@ -540,8 +545,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         SystemIntegrator si = getSystemIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
 
-        prop.setLastupdatedBy(ua);
-        prop.setBobSource(si.getBOBSource(
+        prop.setLastUpdatedBy(ua);
+        prop.setSource(si.getBOBSource(
                 Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString("bobsourcePropertyInternal"))));
         prop.setNotes(sc.formatAndAppendNote(ua,

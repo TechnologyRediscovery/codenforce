@@ -379,7 +379,7 @@ public class    SessionBean
                 sessPropertyRoute = ActivatableRouteEnum.USER_CHOSEN;
                 
                 // PERSONS
-                sessPersonList = pdh.getPersonList();
+                sessPersonList = perc.getPersonListFromLinkList(pdh.getHumanLinkList());
                 if(sessPersonList != null && !sessPersonList.isEmpty()){
                     sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
                     sessPersonRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
@@ -451,8 +451,9 @@ public class    SessionBean
                 
                 // check to see if our session Person is connected to the session property. If so, do nothing
                 // if not, figure out a property to associate with this Person and make it the sessionProperty
-                if(sessProperty != null && sessProperty.getPersonList() != null && !sessProperty.getPersonList().isEmpty()){
-                    if(!sessProperty.getPersonList().contains(sessPerson)){
+                if(sessProperty != null && sessProperty.getHumanLinkList()!= null && !sessProperty.getHumanLinkList().isEmpty()){
+                    // TODO: figure out checking a Person against a list of humanLink objects
+                    if(!sessProperty.getHumanLinkList().contains(sessPerson)){
                         QueryProperty qp = searchC.initQuery(QueryPropertyEnum.PERSONS, sessUser.getKeyCard());
                         if(qp.getParamsList() != null && !qp.getParamsList().isEmpty()){
                             qp.getParamsList().get(0).setPerson_ctl(true);
@@ -486,7 +487,7 @@ public class    SessionBean
                 
                 sessCECaseList = sessProperty.getCeCaseList();
                 
-                sessPersonList = sessProperty.getPersonList();
+                sessPersonList = perc.getPersonListFromLinkList(sessProperty.getHumanLinkList());
                 if(sessPersonList != null && !sessPersonList.isEmpty()){
                     sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
                 }

@@ -142,7 +142,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 //              PropertyIntegrator pi = getPropertyIntegrator();
 //                if (currentRequest.getRequestProperty() != null) {
 //                      try {
-//                          personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getParcelkey()).getPersonOccApplicationList();
+//                          personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getParcelKey()).getPersonOccApplicationList();
 //                      } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
 //                          System.out.println(ex);
 //                      }

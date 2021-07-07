@@ -34,7 +34,7 @@ public abstract class   TrackedEntity
     protected LocalDateTime createdTS;
     protected User createdBy;
     protected LocalDateTime lastUpdatedTS;
-    protected User lastupdatedBy;
+    protected User lastUpdatedBy;
     protected LocalDateTime deactivatedTS;
     protected User deactivatedBy;
     
@@ -72,10 +72,10 @@ public abstract class   TrackedEntity
     }
 
     /**
-     * @return the lastupdatedBy
+     * @return the lastUpdatedBy
      */
     public User getLastUpdatedBy() {
-        return lastupdatedBy;
+        return lastUpdatedBy;
     }
 
     /**
@@ -116,10 +116,10 @@ public abstract class   TrackedEntity
     }
 
     /**
-     * @param lastupdatedBy the lastupdatedBy to set
+     * @param lastUpdatedBy the lastUpdatedBy to set
      */
-    public void setLastupdatedBy(User lastupdatedBy) {
-        this.lastupdatedBy = lastupdatedBy;
+    public void setLastUpdatedBy(User lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
     }
 
     /**

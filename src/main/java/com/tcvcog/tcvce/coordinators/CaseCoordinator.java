@@ -357,7 +357,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         if (cse != null) {
             csepuh = new CECasePropertyUnitHeavy(cse);
-            csepuh.setProperty(pc.getProperty(cse.getParcelkey()));
+            csepuh.setProperty(pc.getProperty(cse.getParcelKey()));
             if (cse.getPropertyUnitID() != 0) {
                 csepuh.setPropUnit(pc.getPropertyUnit(cse.getPropertyUnitID()));
             }
@@ -2313,10 +2313,30 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public Citation citation_getCitation(int citationID) throws IntegrationException {
         CaseIntegrator ci = getCaseIntegrator();
         Citation cit = ci.getCitation(citationID);
-        cit.setViolationList(ci.getCodeViolations(ci.getCodeViolationsByCitation(cit)));
+         
+        return citation_configureCitation(cit);
 
+    }
+    
+    /**
+     * Logic method for getting citations all set up
+     * @param cit
+     * @return 
+     */
+    private Citation citation_configureCitation(Citation cit) throws IntegrationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
+
+        cit.setViolationList(ci.getCodeViolationsByCitation(cit));
+        cit.setStatusLog(ci.buildCitationStatusLog(cit));
+        cit.setHumanLinkList(pc.assembleLinkedHumanLinks(cit));
+        
+        // TODO: populate citation with events and blobs--but this can cycle, so be careful
+     
+       
+        
         return cit;
-
+        
     }
 
     /**
@@ -2334,24 +2354,26 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     /**
      * Initializes a Citation object with a default start status
      *
-     * @param ua
+     * @param creator
      * @param cse
+     * @param citingOfficer
      * @return
      * @throws BObStatusException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public Citation citation_getCitationSkeleton(UserAuthorized ua, CECase cse) throws BObStatusException, IntegrationException {
-        if (!ua.getKeyCard().isHasEnfOfficialPermissions()) {
+    public Citation citation_getCitationSkeleton(CECase cse, UserAuthorized creator, UserAuthorized citingOfficer) throws BObStatusException, IntegrationException {
+        if (!creator.getKeyCard().isHasEnfOfficialPermissions()) {
             throw new BObStatusException("Users must have enforcement office permissions to create a citation");
         }
         Citation cit = new Citation();
-        cit.set(cse);
+        
+        cit.setCreatedBy(creator);
+        cit.setFilingOfficer(citingOfficer);
         cit.setDateOfRecord(LocalDateTime.now());
-        cit.setUserOwner(getSessionBean().getSessUser());
-        cit.setIsActive(true);
-        cit.setStatus(citation_getStartingCitationStatus());
         cit.setOrigin_courtentity(getSessionBean().getSessMuni().getCourtEntities().get(0));
+        
         List<CodeViolation> cvlst = new ArrayList<>();
+        
         if (cse.getViolationList() != null && !cse.getViolationList().isEmpty()) {
             for (CodeViolation v : cse.getViolationList()) {
                 if (v.getActualComplianceDate() == null) {
@@ -2360,57 +2382,31 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 }
             }
         }
-        cit.setViolationList(cvlst);
+        cit.setViolationList(buildCitationCodeViolationLinkSkeletonLiset(cvlst));
+        
 
         return cit;
 
     }
-
     /**
-     * Called to create a new citation for a given List of CodeViolation objects
-     *
-     * @param violationList
-     * @return
+     * Convenience method for injecting a code violation into a CitationCodeViolation
+     *  for skeltons to play with in their bellies
+     * @param cvl
+     * @return 
      */
-    public Citation citation_generateNewCitation(List<CodeViolation> violationList) {
-        Citation newCitation = new Citation();
-        List<CodeViolation> al = new ArrayList<>();
-        ListIterator<CodeViolation> li = violationList.listIterator();
-        CodeViolation cv;
-
-        StringBuilder notesBuilder = new StringBuilder();
-        notesBuilder.append("Failure to comply with the following ordinances:\n");
-
-        while (li.hasNext()) {
-
-            cv = li.next();
-            System.out.println("CaseCoordinator.generateNewCitation | linked list item: "
-                    + cv.getDescription());
-
-            // build a nice note section that lists the elements cited
-            notesBuilder.append("* Chapter ");
-            notesBuilder.append(cv.getCodeViolated().getOrdchapterNo());
-            notesBuilder.append(":");
-            notesBuilder.append(cv.getCodeViolated().getOrdchapterTitle());
-            notesBuilder.append(", Section ");
-            notesBuilder.append(cv.getCodeViolated().getOrdSecNum());
-            notesBuilder.append(":");
-            notesBuilder.append(cv.getCodeViolated().getOrdSecTitle());
-            notesBuilder.append(", Subsection ");
-            notesBuilder.append(cv.getCodeViolated().getOrdSubSecNum());
-            notesBuilder.append(": ");
-            notesBuilder.append(cv.getCodeViolated().getOrdSubSecTitle());
-            notesBuilder.append("\n\n");
-
-            al.add(cv);
-
+    private List<CitationCodeViolationLink> buildCitationCodeViolationLinkSkeletonLiset(List<CodeViolation> cvl){
+        List<CitationCodeViolationLink> ccvl = new ArrayList<>();
+        if(cvl != null){
+            for(CodeViolation cv: cvl){
+                ccvl.add(new CitationCodeViolationLink((cv)));
+            }
         }
-        newCitation.setViolationList(al);
-        newCitation.setNotes(notesBuilder.toString());
-
-        return newCitation;
+        
+        return ccvl;
+        
     }
-
+    
+    
     /**
      * Logic intermediary for recording that a Citation has been issued, meaning
      * sent to the proper magisterial authority
@@ -2452,7 +2448,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         CaseIntegrator ci = getCaseIntegrator();
         
         if(c != null){
-            c.setIsActive(false);
+            c.setDeactivatedTS(LocalDateTime.now());
             ci.updateCitation(c);
         }
         // Deactivated to allow for any citation to be removed

@@ -110,11 +110,11 @@ public  class Parcel
     }
 
     /**
-     * @param lastupdatedBy the lastupdatedBy to set
+     * @param lastupdatedBy the lastUpdatedBy to set
      */
     @Override
-    public void setLastupdatedBy(User lastupdatedBy) {
-        this.lastupdatedBy = lastupdatedBy;
+    public void setLastUpdatedBy(User lastupdatedBy) {
+        this.lastUpdatedBy = lastupdatedBy;
     }
 
    

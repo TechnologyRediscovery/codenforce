@@ -31,10 +31,10 @@ public class CitationCodeViolationLink
         extends CodeViolation
         implements IFace_trackedEntityLink{
     
-    final static LinkedHumanSchemaEnum ROLE_SCHEMA = LinkedHumanSchemaEnum.CITATIONCODEVIOLATION;
+  
     
     protected int citationViolationID;
-    protected LinkedObjectRole linkRole;
+//    protected LinkedObjectRole linkRole;
     
     protected CitationViolationStatusEnum citVStatus;
     
@@ -51,6 +51,49 @@ public class CitationCodeViolationLink
     
     protected String linkNotes;
 
+    
+    public CitationCodeViolationLink(CodeViolation cv){
+        this.violationID = cv.violationID;
+        this.violatedEnfElement = cv.violatedEnfElement;
+        this.ceCaseID = cv.ceCaseID;
+        this.status = cv.status;
+        this.active = cv.active;
+        this.icon = cv.icon;
+        this.ageLeadText = cv.ageLeadText;
+        this.penalty = cv.penalty;
+        this.description = cv.description;
+        this.notes = cv.notes;
+        this.dateOfRecord = cv.dateOfRecord;
+        this.dateOfRecordUtilDate = cv.dateOfRecordUtilDate;
+        this.dateOfRecordPretty = cv.dateOfRecordPretty;
+        this.creationTS = cv.creationTS;
+        this.creationTSPretty = cv.creationTSPretty;
+        this.createdBy = cv.createdBy;
+        this.allowHostCaseUpdate = cv.allowHostCaseUpdate;
+        this.allowOrdinanceUpdates = cv.allowOrdinanceUpdates;
+        this.allowDORUpdate = cv.allowDORUpdate;
+        this.allowStipCompDateUpdate = cv.allowStipCompDateUpdate;
+        this.dateOfCitation = cv.dateOfCitation;
+        this.citationIDList = cv.citationIDList;
+        this.noticeIDList = cv.noticeIDList;
+        this.stipulatedComplianceDate = cv.stipulatedComplianceDate;
+        this.actualComplianceDate = cv.actualComplianceDate;
+        this.complianceTimeStamp = cv.complianceTimeStamp;
+        this.complianceUser = cv.complianceUser;
+        this.complianceNote = cv.complianceNote;
+        this.nullifiedTS = cv.nullifiedTS;
+        this.nullifiedUser = cv.nullifiedUser;
+        this.leagacyImport = cv.leagacyImport;
+        this.blobList = cv.blobList;
+        this.complianceTFExpiryPropID = cv.complianceTFExpiryPropID;
+        this.complianceTFExpiryProp = cv.complianceTFExpiryProp;
+        this.severityIntensity = cv.severityIntensity;
+        this.lastUpdatedTS = cv.lastUpdatedTS;
+        this.lastUpdatedUser = cv.lastUpdatedUser;
+        
+        
+    }
+    
     /**
      * @return the citVStatus
      */
@@ -61,6 +104,7 @@ public class CitationCodeViolationLink
     /**
      * @return the linkSource
      */
+    @Override
     public BOBSource getLinkSource() {
         return linkSource;
     }
@@ -196,19 +240,10 @@ public class CitationCodeViolationLink
         return linkDeactivatedTS != null;
     }
 
-    @Override
-    public String getPKFieldName() {
-        return ROLE_SCHEMA.getLinkedTablePKField();
-    }
 
     @Override
     public int getDBKey() {
         return citationViolationID;
-    }
-
-    @Override
-    public String getDBTableName() {
-       return ROLE_SCHEMA.getLinkingTableName();
     }
 
     /**
@@ -225,21 +260,29 @@ public class CitationCodeViolationLink
         this.citationViolationID = citationViolationID;
     }
 
-    /**
-     * @param linkRole the linkRole to set
-     */
-    public void setLinkRole(LinkedObjectRole linkRole) {
-        this.linkRole = linkRole;
-    }
+   
 
     @Override
     public LinkedObjectRole getLinkedObjectRole() {
-        return linkRole;
+        throw new UnsupportedOperationException("Not supported on citations; use status insetad."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    
+
+    @Override
+    public void setLinkedObjectRole(LinkedObjectRole lor) {
+        throw new UnsupportedOperationException("Not supported on citations; use status insetad."); //To change body of generated methods, choose Tools | Templates.
+//        linkRole = lor;
     }
 
     @Override
-    public LinkedHumanSchemaEnum getLinkedObjectRoleSchemaEnum() {
-        return ROLE_SCHEMA;
+    public String getPKFieldName() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getDBTableName() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     

@@ -72,7 +72,7 @@ public  class       EventCnF
     protected boolean hidden;
     protected String notes;
     
-    protected List<Person> personList;
+    protected List<HumanLink> personList;
     
     public EventCnF(){
         
@@ -246,14 +246,14 @@ public  class       EventCnF
     /**
      * @return the personList
      */
-    public List<Person> getPersonList() {
+    public List<HumanLink> getPersonList() {
         return personList;
     }
 
     /**
      * @param personList the personList to set
      */
-    public void setPersonList(List<Person> personList) {
+    public void setPersonList(List<HumanLink> personList) {
         this.personList = personList;
     }
 

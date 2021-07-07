@@ -28,7 +28,7 @@ public class PropertyUnitWithProp extends PropertyUnit {
         if(prop != null){
 
             this.unitID = prop.getUnitID();
-            this.parcelKey = prop.getParcelkey();
+            this.parcelKey = prop.getParcelKey();
             this.unitNumber = prop.getUnitNumber();
 
             this.notes = prop.getNotes();

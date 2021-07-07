@@ -211,17 +211,7 @@ public class CitationBB extends BackingBeanUtils implements Serializable {
      * Delegated from the mode button router
      */
     public void onModeInsertInit() {
-        CaseCoordinator cc = getCaseCoordinator();
-        
-        try {
-            currentCitation = cc.citation_getCitationSkeleton(getSessionBean().getSessUser(), currentCase);
-        } catch (BObStatusException | IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-            
-        }
+
     }
 
     /**

@@ -1071,10 +1071,11 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
      * Listener method for adding the selected person to a queue
      * @param ev 
      */
-    public void queueSelectedPerson(ActionEvent ev) {
+    public void queueSelectedHuman(ActionEvent ev) {
         EventCoordinator ec = getEventCoordinator();
+        PersonCoordinator pc = getPersonCoordinator();
         if (getPersonSelected() != null) {
-            getCurrentEvent().getPersonList().add(getPersonSelected());
+            getCurrentEvent().getPersonList().add(pc.getHumanLinkSkeleton(getPersonSelected()));
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,

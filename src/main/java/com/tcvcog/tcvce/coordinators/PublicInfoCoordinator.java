@@ -1583,7 +1583,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 
                 PropertyCoordinator pc = getPropertyCoordinator();
                 
-                currentProp = pc.getProperty(dbApplication.getApplicationPropertyUnit().getParcelkey());
+                currentProp = pc.getProperty(dbApplication.getApplicationPropertyUnit().getParcelKey());
                 
                 objectKind = "Occupancy Permit Application";
                 

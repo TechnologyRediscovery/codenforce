@@ -63,7 +63,7 @@ public class PropertyFilesBB
         try {
             Blob blob = getBlobCoordinator().getPhotoBlob(blobID);
             if(blob.getType().getTypeEnum()== BlobTypeEnum.PHOTO){
-//                getBlobIntegrator().removePropertyBlobLink(blobID, currProp.getParcelkey());
+//                getBlobIntegrator().removePropertyBlobLink(blobID, currProp.getParcelKey());
             }
         }
         catch (IntegrationException | BlobException ex) {

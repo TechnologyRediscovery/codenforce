@@ -61,7 +61,7 @@ public class HumanMailingAddressLink
         this.createdTS = ma.createdTS;
         this.createdBy = ma.createdBy;
         this.lastUpdatedTS = ma.lastUpdatedTS;
-        this.lastupdatedBy = ma.lastupdatedBy;
+        this.lastUpdatedBy = ma.lastUpdatedBy;
         this.deactivatedTS = ma.deactivatedTS;
         this.deactivatedBy = ma.deactivatedBy;
         

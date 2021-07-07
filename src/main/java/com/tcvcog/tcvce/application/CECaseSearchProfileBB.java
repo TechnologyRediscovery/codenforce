@@ -52,6 +52,7 @@ import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
@@ -181,9 +182,9 @@ public class CECaseSearchProfileBB
     
     private int eventDurationFormField;
     
-    private List<Person> eventPersonCandidates;
-    private int eventPersonIDForLookup;
-    private Person eventPersonSelected;
+    private List<Human> eventHumanCandidates;
+    private int eventHumanIDForLookup;
+    private Human eventHumanSelected;
     
     private String formEventNoteText;
     
@@ -356,7 +357,7 @@ public class CECaseSearchProfileBB
             eventTypeSelected = getEventTypeCandidates().get(0);
             eventCategoryCandidates.addAll(getTypeCatMap().get(eventTypeSelected));
         }
-        eventPersonCandidates = new ArrayList<>();
+        eventHumanCandidates = new ArrayList<>();
         
         updateNewEventFieldsWithCatChange = true;
         
@@ -2193,9 +2194,9 @@ public class CECaseSearchProfileBB
      * @param ev 
      */
     public void queueSelectedPerson(ActionEvent ev) {
-        EventCoordinator ec = getEventCoordinator();
-        if (eventPersonSelected != null) {
-            getCurrentEvent().getPersonList().add(eventPersonSelected);
+        PersonCoordinator pc = getPersonCoordinator();
+        if (eventHumanSelected != null) {
+            getCurrentEvent().getPersonList().add(pc.getHumanLinkSkeleton(eventHumanSelected));
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -2325,7 +2326,7 @@ public class CECaseSearchProfileBB
           CaseCoordinator cc = getCaseCoordinator();
         
         try {
-            currentCitation = cc.citation_getCitationSkeleton(getSessionBean().getSessUser(), currentCase);
+            currentCitation = cc.citation_getCitationSkeleton(currentCase, getSessionBean().getSessUser(), getSessionBean().getSessUser());
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -3051,22 +3052,22 @@ public class CECaseSearchProfileBB
     /**
      * @return the eventPersonCandidates
      */
-    public List<Person> getEventPersonCandidates() {
-        return eventPersonCandidates;
+    public List<Human> getEventPersonCandidates() {
+        return eventHumanCandidates;
     }
 
     /**
-     * @return the eventPersonIDForLookup
+     * @return the eventHumanIDForLookup
      */
-    public int getEventPersonIDForLookup() {
-        return eventPersonIDForLookup;
+    public int getEventHumanIDForLookup() {
+        return eventHumanIDForLookup;
     }
 
     /**
      * @return the eventPersonSelected
      */
-    public Person getEventPersonSelected() {
-        return eventPersonSelected;
+    public Human getEventPersonSelected() {
+        return eventHumanSelected;
     }
 
     /**
@@ -3121,22 +3122,22 @@ public class CECaseSearchProfileBB
     /**
      * @param eventPersonCandidates the eventPersonCandidates to set
      */
-    public void setEventPersonCandidates(List<Person> eventPersonCandidates) {
-        this.eventPersonCandidates = eventPersonCandidates;
+    public void setEventPersonCandidates(List<Human> eventPersonCandidates) {
+        this.eventHumanCandidates = eventPersonCandidates;
     }
 
     /**
-     * @param eventPersonIDForLookup the eventPersonIDForLookup to set
+     * @param eventHumanIDForLookup the eventHumanIDForLookup to set
      */
-    public void setEventPersonIDForLookup(int eventPersonIDForLookup) {
-        this.eventPersonIDForLookup = eventPersonIDForLookup;
+    public void setEventHumanIDForLookup(int eventHumanIDForLookup) {
+        this.eventHumanIDForLookup = eventHumanIDForLookup;
     }
 
     /**
      * @param eventPersonSelected the eventPersonSelected to set
      */
     public void setEventPersonSelected(Person eventPersonSelected) {
-        this.eventPersonSelected = eventPersonSelected;
+        this.eventHumanSelected = eventPersonSelected;
     }
 
     /**

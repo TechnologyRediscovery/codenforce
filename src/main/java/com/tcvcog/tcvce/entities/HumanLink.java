@@ -61,7 +61,7 @@ public class        HumanLink
         this.createdTS = h.createdTS;
         this.createdBy = h.createdBy;
         this.lastUpdatedTS = h.lastUpdatedTS;
-        this.lastupdatedBy = h.lastupdatedBy;
+        this.lastUpdatedBy = h.lastUpdatedBy;
         this.deactivatedTS = h.deactivatedTS;
         this.deactivatedBy = h.deactivatedBy;
     }

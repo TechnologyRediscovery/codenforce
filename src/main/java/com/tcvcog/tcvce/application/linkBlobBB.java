@@ -60,26 +60,11 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
     
    
     
+    /**
+     * TODO: FInish bloblinking 
+     */
     public void linkBlobToPerson() {
-        BlobIntegrator bi = getBlobIntegrator();
-        PersonIntegrator pi = getPersonIntegrator();
-        
-        try{
-            pi.getPerson.getHumanID();
-        }catch(IntegrationException e){
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR
-                            ,"Unable to find Person with that ID. " , ""));
-            return;
-        }
-        
-        try {
-            bi.linkPhotoBlobToPerson(selectedBlobID,.getHumanID());
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR
-                            ,"Failed to link file to Person. Sorry! " , ""));
-        }
+       
     }
     
     public String navToDash() {
@@ -132,7 +117,7 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the personID
      */
-    public int.getHumanID() {
+    public int getHumanID() {
         return personID;
     }
 

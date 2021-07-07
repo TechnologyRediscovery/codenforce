@@ -94,7 +94,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 ti.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
             }
             if(rs.getInt("lastupdatedby_userid") != 0){
-                ti.setLastupdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+                ti.setLastUpdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
             }
             
             if(rs.getTimestamp("deactivatedts") != null){

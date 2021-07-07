@@ -46,6 +46,8 @@ import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CodeViolationPropCECaseHeavy;
 import com.tcvcog.tcvce.entities.search.SearchParamsCodeViolation;
 import com.tcvcog.tcvce.entities.BlobLight;
+import com.tcvcog.tcvce.entities.CitationCodeViolationLink;
+import com.tcvcog.tcvce.entities.ViolationStatusEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsDateRule;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -733,7 +735,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ceCase.getPublicControlCode());
-            stmt.setInt(2, ceCase.getParcelkey());
+            stmt.setInt(2, ceCase.getParcelKey());
             if(ceCase.getPropertyUnitID() != 0) {
                 stmt.setInt(3, ceCase.getPropertyUnitID());
             } else { 
@@ -834,7 +836,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ceCase.getPublicControlCode());
-            stmt.setInt(2, ceCase.getParcelkey());
+            stmt.setInt(2, ceCase.getParcelKey());
             if(ceCase.getPropertyUnitID() != 0){
                 stmt.setInt(3, ceCase.getPropertyUnitID());
             } else {
@@ -2690,7 +2692,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt1.setString(1, citation.getCitationNo());
             stmt1.setInt(2, citation.getStatus().getStatusID());
             stmt1.setInt(3, citation.getOrigin_courtentity().getCourtEntityID());
-            stmt1.setInt(4, citation.getUserOwner().getUserID());
+            stmt1.setInt(4, citation.get);
             stmt1.setTimestamp(5, java.sql.Timestamp.valueOf(citation.getDateOfRecord()));
             stmt1.setBoolean(6, citation.isIsActive());
             stmt1.setString(7, citation.getNotes());
@@ -2900,16 +2902,15 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @return
      * @throws IntegrationException 
      */
-    public List<Integer> getCodeViolationsByCitation(Citation cid) throws IntegrationException{
+    public List<CitationCodeViolationLink> getCodeViolationsByCitation(Citation cid) throws IntegrationException{
         
-        String query =  "SELECT codeviolation_violationid FROM public.citationviolation 	\n" +
-                        "	INNER JOIN public.citation ON citation.citationid = citationviolation.citation_citationid\n" +
-                        "	INNER JOIN public.codeviolation on codeviolation.violationid = citationviolation.codeviolation_violationid\n" +
-                        "	WHERE citation.citationid=?;";
+        String query =  "SELECT citationviolationid, citation_citationid, codeviolation_violationid, \n" +
+                        "       createdts, lastupdatedts, deactivatedts, status, createdby_userid, \n" +
+                        "       lastupdatedby_userid, deactivatedby_userid, notes, linksource WHERE citation.citationid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        List<Integer> idl = new ArrayList<>();
+        List<CitationCodeViolationLink> cvll = new ArrayList<>();
         
         try {
             stmt = con.prepareStatement(query);
@@ -2917,7 +2918,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                idl.add(rs.getInt("codeviolation_violationid"));
+                cvll.add(generateCitationViolationLink(rs));
                 
             }
             
@@ -2930,27 +2931,29 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return idl;
+        return cvll;
     }
     
+   
     /**
-     * Utility method for grabbing code violations given a list of Integers
-     * which are Violation ID numbers
-     * @param vidList
-     * @return the List, possibly containing codeViolations.
+     * Generator of a subclass of CodeViolation: a code violation attached to a citation
+     * @param rs
+     * @return
+     * @throws SQLException
      * @throws IntegrationException 
      */
-    public List<CodeViolation> getCodeViolations(List<Integer> vidList) throws IntegrationException{
-        List<CodeViolation> cvList = new ArrayList<>();
-        if(vidList != null && !vidList.isEmpty()){
-            for(Integer i: vidList){
-                cvList.add(getCodeViolation(i));
-            }
-        }
-        return cvList;
+    private CitationCodeViolationLink generateCitationViolationLink(ResultSet rs) throws SQLException, IntegrationException{
+        CaseCoordinator cc = getCaseCoordinator();
+        SystemIntegrator si = getSystemIntegrator();
+        CitationCodeViolationLink cvl = new CitationCodeViolationLink(cc.violation_getCodeViolation(rs.getInt("codeviolation_violationid")));
         
+        si.populateTrackedLinkFields(cvl, rs);
+        cvl.setCitationViolationID(rs.getInt("citationviolationid"));
+        cvl.setStatus(ViolationStatusEnum.valueOf(rs.getString("status")));
         
+        return cvl;
     }
+    
     
     /**
      * Internal generator method for creating a Citation from a ResultSet with 

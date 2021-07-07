@@ -253,7 +253,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         OccPermitApplication occpermitapp = oc.initOccPermitApplication();
         getSessionBean().setSessOccPermitApplication(occpermitapp);
 
-        getSessionBean().setOccPermitAppActiveProp(pi.getProperty(getSessionBean().getSessProperty().getParcelkey()));
+        getSessionBean().setOccPermitAppActiveProp(pi.getProperty(getSessionBean().getSessProperty().getParcelKey()));
 
         if (prop.getUnitList().size() == 1) {
             List<PropertyUnit> propertyUnitList = prop.getUnitList();
