@@ -2304,6 +2304,19 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
+     * Logic passthrough for acquiring a list of all possible citation statuses
+     * that can be attached to a CitationStatusLogEntry
+     * 
+     * @return 
+     */
+    public List<CitationStatus> citation_getCitationStatusList() throws IntegrationException{
+       CaseIntegrator ci = getCaseIntegrator();
+       return ci.getCitationStatusList();
+        
+        
+    }
+    
+    /**
      * Getter for Citation objects
      *
      * @param citationID
@@ -2409,17 +2422,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public void citation_insertCitation(    Citation c, 
-                                            List<CodeViolation> cvl,
                                             UserAuthorized creator , 
-                                            UserAuthorized issuingOfficer) 
+                                            User issuingOfficer) 
                                     throws  IntegrationException, 
                                             BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
         
         if(     c == null 
-                || cvl == null
-                || !cvl.isEmpty()
                 || creator == null 
                 || issuingOfficer == null 
                 || c.getViolationList() == null 
@@ -2428,6 +2438,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             
         }
         
+        // TODO: Implement logic to check if the user passed in for issuing officer has
+        // sufficient rank to to do so (i.e. CEO or better)
+        
         c.setCreatedBy(creator);
         c.setLastUpdatedBy(creator);
         c.setFilingOfficer(issuingOfficer);
@@ -2435,7 +2448,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
         // Create CitationCodeViolationLink objects to wrap each incoming CodeViolation
         // with metadata
-        for(CodeViolation cv: cvl){
+        for(CodeViolation cv: c.getViolationList()){
             CitationCodeViolationLink ccvl = new CitationCodeViolationLink(cv);
             ccvl.setCreatedBy(creator);
             ccvl.setLinkCreatedBy(creator);

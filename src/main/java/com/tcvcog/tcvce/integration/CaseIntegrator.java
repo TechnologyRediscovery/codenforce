@@ -3446,7 +3446,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
     }
     
     /**
-     * Buyilds a complete list of possible citation statuses
+     * Builds a complete list of possible citation statuses
      * @return
      * @throws IntegrationException 
      */

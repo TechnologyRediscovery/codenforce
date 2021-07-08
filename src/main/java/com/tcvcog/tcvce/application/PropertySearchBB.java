@@ -431,7 +431,7 @@ public class PropertySearchBB extends BackingBeanUtils{
         currentProperty.setNotes(sc.appendNoteBlock(mbp));
         try {
             currentProperty.setLastUpdatedTS(LocalDateTime.now());
-            pc.editProperty(currentProperty, getSessionBean().getSessUser());
+            pc.updateParcel(currentProperty, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Succesfully appended note!", ""));
@@ -519,20 +519,22 @@ public class PropertySearchBB extends BackingBeanUtils{
     
     /**
      * Listener for user requests to remove a link between property and person
+     * TODO: Fix during parcelization
+     * 
      * @param p
      * @return 
      */
     public String onPersonConnectRemoveButtonChange(Person p){
         PropertyCoordinator pc = getPropertyCoordinator();
-        try {
-            pc.connectRemovePersonToProperty(currentProperty, p, getSessionBean().getSessUser());
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            "Removed property-person link and created documentation note.", ""));
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Could not remove link from property to person, sorry!", ""));
-        }
+//        try {
+//            pc.connectRemovePersonToProperty(currentProperty, p, getSessionBean().getSessUser());
+//            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+//                            "Removed property-person link and created documentation note.", ""));
+//        } catch (IntegrationException | BObStatusException ex) {
+//            System.out.println(ex);
+//            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+//                            "Could not remove link from property to person, sorry!", ""));
+//        }
         
         
         return "propertySearch";
@@ -594,7 +596,7 @@ public class PropertySearchBB extends BackingBeanUtils{
         SystemCoordinator sc = getSystemCoordinator();
         int newID;
         try {
-            newID = pc.addProperty(currentProperty, getSessionBean().getSessUser());
+            newID = pc.addParcel(currentProperty, getSessionBean().getSessUser());
             getSessionBean().setSessProperty(pc.getPropertyDataHeavy(newID, getSessionBean().getSessUser()));
             sc.logObjectView(getSessionBean().getSessUser(), currentProperty);
             getFacesContext().addMessage(null,
@@ -621,7 +623,7 @@ public class PropertySearchBB extends BackingBeanUtils{
         SystemCoordinator sc = getSystemCoordinator();
         try {
 //            currentProperty.setAbandonedDateStart(pc.configureDateTime(currentProperty.getAbandonedDateStart().to));
-            pc.editProperty(currentProperty, getSessionBean().getSessUser());
+            pc.updateParcel(currentProperty, getSessionBean().getSessUser());
             getSessionBean().setSessProperty(currentProperty);
             sc.logObjectView(getSessionBean().getSessUser(), currentProperty);
             getFacesContext().addMessage(null,

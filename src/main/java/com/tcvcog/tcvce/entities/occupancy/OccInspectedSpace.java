@@ -98,16 +98,13 @@ public class OccInspectedSpace
     /**
      *
      * @return
+     * @throws java.lang.CloneNotSupportedException
      */
     @Override
-    public Object clone() {
+    public Object clone() throws CloneNotSupportedException {
         
-        try { 
             OccInspectedSpace ois = (OccInspectedSpace) super.clone();
             return ois;
-        } catch (CloneNotSupportedException ex) {
-            return null;
-        }
     }
     
     public List<CodeElement> getInspectedCodeElementsWithoutShell(){

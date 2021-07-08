@@ -32,6 +32,7 @@ import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
+import com.tcvcog.tcvce.entities.Parcel;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -73,7 +74,12 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     private final String DEFAULTUNITNUMBER = "-1";
     private final boolean DEFAULTRENTAL = false;
 
-    
+     /**
+     * Creates a new instance of PropertyUnitCoordinator
+     */
+    public PropertyCoordinator() {
+    }
+
     
     
     /**
@@ -129,7 +135,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
                    // check list and see if it's emtpy; 
                    if (pdh.getPropInfoCaseList() == null) {
-                       pdh.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
+                       pdh.setPropInfoCaseList(new ArrayList<>());
                    }
 
                    if (pdh.getPropInfoCaseList().isEmpty()) {
@@ -315,14 +321,13 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param p
      * @return
      */
-    public Property configureProperty(Property p) {
-        if (p.getUnitList() == null) {
-            p.setUnitList(new ArrayList<>());
-        }
+    public Property configureProperty(Property p) throws IntegrationException {
+        PropertyIntegrator pi = getPropertyIntegrator();
+        
+        p.setUnitList(pi.getPropertyUnitList(p));
+        p.setAddresses(pi.getMailingAddressListByParcel(p.getParcelKey()));
         
         parseAddress(p);
-        
-
         return p;
     }
     
@@ -381,50 +386,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
     }
 
-    /**
-     * Logic pass through for removals of property and person connections and I
-     * create a note documenting the removal and post to property
-     *
-     * @param p
-     * @param pers
-     * @param ua the user requesting the link removal for note
-     * @throws IntegrationException
-     * @throws BObStatusException
-     */
-    public void connectRemovePersonToProperty(Property p, Person pers, UserAuthorized ua) throws IntegrationException, BObStatusException {
-        PersonCoordinator pc = getPersonCoordinator();
-        PropertyIntegrator pi = getPropertyIntegrator();
-        SystemCoordinator sc = getSystemCoordinator();
-
-        // TODO: Humanization remove links
-//        pc.connectRemovePersonToProperty(pers, p);
-
-        // build person link removal note
-        MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.setUser(ua);
-        StringBuilder sb = new StringBuilder();
-        sb.append("Removal of link between Property at ");
-        sb.append(p.getAddress());
-        sb.append(" in ");
-        sb.append(p.getMuni().getMuniName());
-        sb.append(" (ID:");
-        sb.append(p.getParcelKey());
-        sb.append(")");
-        sb.append(" and Person ");
-        sb.append(pers.getFirstName());
-        sb.append(" ");
-        sb.append(pers.getLastName());
-        sb.append(" (ID:");
-        sb.append(pers.getHumanID());
-        sb.append(") ");
-        mbp.setNewMessageContent(sb.toString());
-        mbp.setExistingContent(p.getNotes());
-        mbp.setIncludeCredentialSig(false);
-        p.setNotes(sc.appendNoteBlock(mbp));
-        // commit person link removal note
-        pi.updateProperty(p);
-
-    }
+   
 
     public LocalDateTime configureDateTime(Date date) {
         return new java.sql.Timestamp(date.getTime()).toLocalDateTime();
@@ -532,50 +494,44 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     }
 
     /**
-     * Primary pathway for the creation of new records in the property
-     * table--the biggie!!
+     * Primary pathway for the creation of new records in the parcel
+     * table 
      *
-     * @param prop
+     * @param pcl
      * @param ua
      * @return
      * @throws IntegrationException
      */
-    public int addProperty(Property prop, UserAuthorized ua) throws IntegrationException {
+    public int addParcel(Parcel pcl, UserAuthorized ua) throws IntegrationException {
         PropertyIntegrator pi = getPropertyIntegrator();
         SystemIntegrator si = getSystemIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
 
-        prop.setLastUpdatedBy(ua);
-        prop.setSource(si.getBOBSource(
+        pcl.setCreatedBy(ua);
+        pcl.setLastUpdatedBy(ua);
+        pcl.setSource(si.getBOBSource(
                 Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString("bobsourcePropertyInternal"))));
-        prop.setNotes(sc.formatAndAppendNote(ua,
-                ua.getMyCredential(),
-                "Property created",
-                prop.getNotes()));
+        
         // this controller class passes the new property to insert
         // over to the data model to be written into the Database
-        return pi.insertProperty(prop);
+        return pi.insertParcel(pcl);
+        
 
     }
 
     /**
      * Logic container for property updates
      *
-     * @param prop
+     * @param pcl
      * @param ua
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public void editProperty(Property prop, UserAuthorized ua) throws IntegrationException, BObStatusException {
+    public void updateParcel(Parcel pcl, UserAuthorized ua) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
-        prop.setLastUpdatedBy(ua);
-        prop.setLastUpdatedTS(LocalDateTime.now());
-//        if (checkAllDates(prop) == false) {
-//            throw new BObStatusException("Date error in committing property updates; Ensure no end date is before a start date");
-//
-//        }
-        pi.updateProperty(prop);
+        pcl.setLastUpdatedBy(ua);
+        pi.updateParcel(pcl);
 
     }
 
@@ -653,14 +609,19 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
     /**
      * Logic intervention method for retrievals of simple properties from the DB
-     *
-     * @param propID
+     * Updated to reflect parcelization in which there's no "propertyID" but 
+     * rather a parcel ID that's internal to codeNforce and a countyParID
+     * 
+     * @param parcelID
      * @return
      * @throws IntegrationException
      */
-    public Property getProperty(int propID) throws IntegrationException {
+    public Property getProperty(int parcelID) throws IntegrationException {
         PropertyIntegrator pi = getPropertyIntegrator();
-        return configureProperty(pi.getProperty(propID));
+        Parcel par = pi.getParcel(parcelID);
+        Property p = new Property(par);
+        
+        return configureProperty(p);
 
     }
 
@@ -764,12 +725,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return propList;
     }
 
-    /**
-     * Creates a new instance of PropertyUnitCoordinator
-     */
-    public PropertyCoordinator() {
-    }
-
+   
     
     /**
      * TODO: Update for parcelization
@@ -778,7 +734,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @return the skelton property object with only muni set and ID of 0
      */
     public Property generatePropertySkeleton(Municipality muni) {
-        Property prop = new Property();
+        Property prop = new Property(new Parcel());
         prop.setParcelKey(0);
         prop.setMuni(muni);
         return prop;
@@ -844,7 +800,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         prop.setUnitList(listTwo);
 
         // mark parent property as updated now
-        editProperty(prop, getSessionBean().getSessUser());
+        updateParcel(prop, getSessionBean().getSessUser());
 
         return listTwo;
 

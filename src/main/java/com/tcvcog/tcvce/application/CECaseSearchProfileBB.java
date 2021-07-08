@@ -42,6 +42,7 @@ import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.CaseStageEnum;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CitationCodeViolationLink;
+import com.tcvcog.tcvce.entities.CitationStatus;
 import com.tcvcog.tcvce.entities.CitationStatusLogEntry;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeViolation;
@@ -85,17 +86,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
-import javax.faces.event.ValueChangeEvent;
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.SelectEvent;
 
 /**
- *
+ * Primary backing bean for the Code Enforcement case 
  * @author sylvia
  */
 public class CECaseSearchProfileBB
@@ -201,7 +198,7 @@ public class CECaseSearchProfileBB
      *              Citation jazz
     /*******************************************************/
     private Citation currentCitation;
-    private List<CitationStatusLogEntry> citationStatusList;
+    private List<CitationStatus> citationStatusList;
     private List<CourtEntity> courtEntityList;
 
     private boolean issueCitationDisabled;
@@ -210,6 +207,8 @@ public class CECaseSearchProfileBB
     
     private List<CodeViolation> removedViolationList;
     private String citationEditEventDescription;
+    
+    private User citationIssuingOfficer;
     
     
     
@@ -363,10 +362,9 @@ public class CECaseSearchProfileBB
         
         // Citation stuff
         
-        CaseIntegrator caseInt = getCaseIntegrator();
         CourtEntityIntegrator cei = getCourtEntityIntegrator();
         try {
-            citationStatusList = caseInt.getCitationStatusList();
+            citationStatusList = cc.citation_getCitationStatusList();
             courtEntityList = cei.getCourtEntityList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -2353,7 +2351,7 @@ public class CECaseSearchProfileBB
     public String onCitationRemoveCommitButtonChange() {
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            cc.citation_removeCitation(currentCitation);
+            cc.citation_removeCitation(currentCitation, getSessionBean().getSessUser());
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -2493,7 +2491,7 @@ public class CECaseSearchProfileBB
     /**
      * Listener for user requests to issue a citation
      *
-     * @return
+     * @return page nav
      */
     public String onCitationAddCommitButtonChange() {
         System.out.println("CitationBB.IssueCitation");
@@ -2501,14 +2499,14 @@ public class CECaseSearchProfileBB
         if(currentCitation != null){
 
                 Citation c = currentCitation;
-                c.setCreatedBy(getSessionBean().getSessUser());
+                
                 try {
-                    cc.citation_insertCitation(c);
+                    cc.citation_insertCitation(c,getSessionBean().getSessUser(),citationIssuingOfficer);
 
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,
                                     "New citation added to database!", ""));
-                } catch (IntegrationException ex) {
+                } catch (IntegrationException | BObStatusException ex) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                     "Unable to issue citation due to a database integration error", ""));
@@ -3227,7 +3225,7 @@ public class CECaseSearchProfileBB
     /**
      * @return the citationStatusList
      */
-    public List<CitationStatusLogEntry> getCitationStatusList() {
+    public List<CitationStatus> getCitationStatusList() {
         return citationStatusList;
     }
 
@@ -3283,7 +3281,7 @@ public class CECaseSearchProfileBB
     /**
      * @param citationStatusList the citationStatusList to set
      */
-    public void setCitationStatusList(List<CitationStatusLogEntry> citationStatusList) {
+    public void setCitationStatusList(List<CitationStatus> citationStatusList) {
         this.citationStatusList = citationStatusList;
     }
 
@@ -3355,6 +3353,20 @@ public class CECaseSearchProfileBB
      */
     public void setCurrentBlob(BlobLight currentBlob) {
         this.currentBlob = currentBlob;
+    }
+
+    /**
+     * @return the citationIssuingOfficer
+     */
+    public User getCitationIssuingOfficer() {
+        return citationIssuingOfficer;
+    }
+
+    /**
+     * @param citationIssuingOfficer the citationIssuingOfficer to set
+     */
+    public void setCitationIssuingOfficer(User citationIssuingOfficer) {
+        this.citationIssuingOfficer = citationIssuingOfficer;
     }
 
    

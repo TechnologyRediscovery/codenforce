@@ -358,12 +358,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         // now connect people to event that has already been logged
         event = ec.getEvent(insertedEventID);
-
-
-        if (event.getEventID() != 0 && event.getPersonList() != null && !event.getPersonList().isEmpty()) {
-            pi.eventPersonConnect(event);
-        }
-
+    
         
         return insertedEventID;
 

@@ -310,8 +310,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         CaseCoordinator cc = getCaseCoordinator();
         cear = cc.cear_getInititalizedCEActionRequest();
         cear.setMuni(selectedMuni);
-        cear.setBlobList(new ArrayList<BlobLight>());
-        cear.setRequestProperty(new Property());
+        cear.setBlobList(new ArrayList<>());
+        cear.setRequestProperty(null);
         getSessionBean().setSessCEAR(cear);
         getSessionBean().getNavStack().pushCurrentPage();
         return "chooseProperty";

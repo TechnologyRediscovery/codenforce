@@ -1154,13 +1154,6 @@
         <managed-bean-class>com.tcvcog.tcvce.application.CECaseAddBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>    
-
-
-    <managed-bean>
-        <managed-bean-name>citationBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CitationBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>noticeOfViolationBB</managed-bean-name>

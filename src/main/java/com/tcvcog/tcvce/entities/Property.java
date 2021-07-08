@@ -28,9 +28,10 @@ public class    Property
     
     /**
      * Creates a new instance of Property
+     * @param par
      */
-    public Property() {
-      
+    public Property(Parcel par) {
+      super(par);
     }
 
 

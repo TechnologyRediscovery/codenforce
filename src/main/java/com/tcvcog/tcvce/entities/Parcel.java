@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Models a parcel as seen from Allegheny County
@@ -39,6 +40,21 @@ public  class Parcel
     protected String notes;
     
     protected ParcelInfo parcelInfo;
+    
+    public Parcel(){
+        
+    }
+    
+    public Parcel(Parcel p){
+        
+        this.parcelKey = p.parcelKey;
+        this.countyParcelID = p.countyParcelID;
+        this.lotAndBlock = p.lotAndBlock;
+        this.muni = p.muni;
+        this.source = p.source;
+        this.notes = p.notes;
+        this.parcelInfo = p.parcelInfo;
+    }
     
 
     /**
@@ -191,5 +207,20 @@ public  class Parcel
         return TABLE_NAME;
     }
 
+    /**
+     * @return the parcelInfo
+     */
+    public ParcelInfo getParcelInfo() {
+        return parcelInfo;
+    }
+
+    /**
+     * @param parcelInfo the parcelInfo to set
+     */
+    public void setParcelInfo(ParcelInfo parcelInfo) {
+        this.parcelInfo = parcelInfo;
+    }
+
+   
     
 }

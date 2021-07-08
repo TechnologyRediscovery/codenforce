@@ -77,7 +77,7 @@ public class PropertyCreateBB
         SystemCoordinator sc = getSystemCoordinator();
         int freshID = 0;
         try {
-            freshID = pc.addProperty(prop, ua);
+            freshID = pc.addParcel(prop, ua);
             prop = pc.getProperty(freshID); 
             getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(prop, ua));
             sc.logObjectView(ua, prop);
