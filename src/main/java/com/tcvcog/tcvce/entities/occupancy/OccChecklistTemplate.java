@@ -28,6 +28,11 @@ import java.util.Objects;
  * set of code elements is used to populate the list of OccInspectedSpaceElements
  * insdie the OccInspectedSpace container
  * 
+ * This represents "In Chalfant, we inspect A,B outside and C,D inside, 
+ * and A,B,C,D in "whole house"
+ * 
+ * 
+ * 
  * @author Eric Darsow
  */
 public class OccChecklistTemplate  {

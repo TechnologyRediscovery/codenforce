@@ -9,6 +9,73 @@
              collapsed="false"
              header="Inspections">
         <h:form id="inspections-form">
+            
+            
+            
+            <!-- Should be "Start new inspection" -->
+            
+            <!--
+            
+            Dialog TODO 1: (or series)
+            
+            
+            You'll need an intermediate box to provide a list of 
+            OccChecklistTemplate objects that you'll get from 
+            
+            public List<OccChecklistTemplate> getOccChecklistTemplatelist() throws IntegrationException {
+            
+            Need a drop down of User objects to select "Inspector" (imagine a 
+            secretary filling out the inspection for an officer" so it's not 
+            the UserAuthorized from the BackingBean
+            
+            You'll get a list of User objects from
+            
+            this is on the UserCoordinator
+            public List<User> user_assembleUserListForSearch(User usr) if you need one
+            
+            Your occ period is your current period
+            
+            WHen this dialog is done, you can make the call to 
+            public OccInspection inspectionAction_commenceOccupancyInspection
+            
+            
+            ** THEN build a new dialog with these displayed in UI:repeats
+            Dialog todo 2:
+            
+            Two different lists:
+            List 1 (possibly left side) Has a list of 
+            OccSpaceTypeInspectionDirective
+            objects that live in an 
+            OccChecklistTemplate
+            That lives inside the OccInspection
+            
+            
+            BUTTON IN THE MIDDLE between these lists called
+            "Inspect selected space type"
+            
+            That passes the chosen item from List 1 to 
+            the method 
+            public OccInspection inspectionAction_commenceSpaceInspection(
+            
+            On the OccupancyCoordinator
+            WHICH WILL Give you back a properly configured
+            OccInspectedSpace inside your OccInspection
+            ANd now shows up in list 2
+            
+           
+            List 2: List of OccInspectedSpace on the OccInspection
+            you got from the previous call
+            Clicking on items from this list gives you the lovely UI you already built
+            
+            
+            
+            
+            
+
+            Button called "configure property's spaces"
+            that brings up the Space Details
+            
+            -->
             <p:commandButton id="inspections-addspace"
                              value="New inspection space"
                              disabled="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedTS}"
