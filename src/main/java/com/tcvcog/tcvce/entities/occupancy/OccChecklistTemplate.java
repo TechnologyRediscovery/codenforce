@@ -31,6 +31,11 @@ import java.util.Objects;
  * Represents all of the checklist items that could ever be
  * inspected in a given municipality.
  * 
+ * This represents "In Chalfant, we inspect A,B outside and C,D inside, 
+ * and A,B,C,D in "whole house"
+ * 
+ * 
+ * 
  * @author Eric Darsow
  */
 
