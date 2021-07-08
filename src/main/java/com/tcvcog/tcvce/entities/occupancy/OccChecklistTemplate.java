@@ -26,15 +26,20 @@ import java.util.Objects;
  * Represents a set of space types and their associated code elements
  * that are SET TO BE inspected in each. When an occupancy inspection is underway, this
  * set of code elements is used to populate the list of OccInspectedSpaceElements
- * insdie the OccInspectedSpace container
+ * inside the OccInspectedSpace container
+ *
+ * Represents all of the checklist items that could ever be
+ * inspected in a given municipality.
  * 
  * @author Eric Darsow
  */
+
+
 public class OccChecklistTemplate  {
     
     // note we have a lexicon switch here: in the DB, this object is
     // derived from an inspectionchecklist row. In Javaland, we make
-    // a ChecklistTemplate object that contains data from sevearl tables
+    // a ChecklistTemplate object that contains data from several tables
     private int inspectionChecklistID;
     private Municipality muni;
     private String title;
