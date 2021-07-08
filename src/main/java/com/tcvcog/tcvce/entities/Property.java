@@ -33,6 +33,12 @@ public class    Property
     public Property(Parcel par) {
       super(par);
     }
+    
+    public Property(Property prop){
+        super(prop);
+        this.unitList = prop.unitList;
+        this.addresses = prop.addresses;
+    }
 
 
     /**

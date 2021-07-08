@@ -28,10 +28,10 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
-import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -142,7 +142,9 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             System.out.println(ex);
         }
         
-        searchPerson = new Person();
+//  ----->  TODO: Update for Humanization/Parcelization <------
+        // this was changed from new Person() to null
+        searchPerson = null;
         
         /***********************************
               LOAD PROPERTY AND MUNI
@@ -509,7 +511,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                 spp.setEmail_ctl(true);
                 spp.setEmail_val(searchPerson.getEmail());
                 spp.setPhoneNumber_ctl(true);
-                spp.setPhoneNumber_val(searchPerson.getPhoneCell());
+                //  ----->  TODO: Update for Humanization/Parcelization <------
+//                spp.setPhoneNumber_val(searchPerson.getPhoneCell());
                 spp.setAddress_streetNum_ctl(true);
                 spp.setAddress_streetNum_val(searchPerson.getAddressStreet());
                 sc.runQuery(qp);
@@ -529,12 +532,13 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         if (qp != null && !qp.getBOBResultList().isEmpty()) {
 
             PublicInfoCoordinator pic = getPublicInfoCoordinator();
-            List<Person> skeletonHorde = qp.getBOBResultList();
+            //  ----->  TODO: Update for Humanization/Parcelization <------
+//            List<Person> skeletonHorde = qp.getBOBResultList();
             personSearchResults = new ArrayList<>();
-
-            for (Person skeleton : skeletonHorde) {
-                personSearchResults.add(pic.extractPublicInfo(skeleton));
-            }
+//
+//            for (Person skeleton : skeletonHorde) {
+//                personSearchResults.add(pic.extractPublicInfo(skeleton));
+//            }
 
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -555,7 +559,9 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         //Set their type to Other, as we're not concerned with their overall type
         //The system might say they're law enforcement, owner, etc.
         //But in an occupancy context, they could be a tenant, manager, etc.
-        person.getBundledPerson().setPersonType(PersonType.Other);
+        
+//  ----->  TODO: Update for Humanization/Parcelization <------
+//        person.getBundledPerson().setPersonType(PersonType.Other);
 
         for (PublicInfoBundlePerson test : attachedPersons) {
 
@@ -593,7 +599,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     public String addANewPerson() {
 
         PublicInfoBundlePerson skeleton = new PublicInfoBundlePerson();
-        skeleton.setBundledPerson(new Person());
+        //  ----->  TODO: Update for Humanization/Parcelization <------
+//        skeleton.setBundledPerson(new Person());
 
         attachedPersons.add(skeleton);
 
@@ -715,10 +722,13 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         //An application we'll use to test if the person requirements have been met.
         OccPermitApplication temp = new OccPermitApplication();
 
-        List<OccApplicationHumanLink> unbundledPersons = new ArrayList<>();
+        //  ----->  TODO: Update for Humanization/Parcelization <------
+        List<HumanLink> unbundledPersons = new ArrayList<>();
         
         for (PublicInfoBundlePerson p : attachedPersons) {
-            unbundledPersons.add(new OccApplicationHumanLink(p.getBundledPerson()));
+            //  ----->  TODO: Update for Humanization/Parcelization <------
+            // SHouldn't be making a new human link here--ask coordinator
+//            unbundledPersons.add(new HumanLink(p.getBundledPerson()));
         }
 
         temp.setAttachedPersons(unbundledPersons);
@@ -978,7 +988,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         List<PersonChangeOrder> changeList = new ArrayList<>();
 
-        List<OccApplicationHumanLink> currentPersonList = new ArrayList<>();
+        List<HumanLink> currentPersonList = new ArrayList<>();
 
         List<Person> existingPersonList = new ArrayList<>();
 
@@ -989,9 +999,11 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         Person changedby = pic.export(applicant);
 
         if (changedby.getHumanID() == 0) {
+            
+            //  ----->  TODO: Update for Humanization/Parcelization <------
             //Getting from the database failed. We'll have to insert it.
-            changedby.setMuniCode(getSessionBean().getSessMuniQueued().getMuniCode());
-            changedby.setPersonID(pi.insertPerson(changedby));
+//            changedby.setMuniCode(getSessionBean().getSessMuniQueued().getMuniCode());
+//            changedby.setPersonID(pi.insertPerson(changedby));
         }
 
         //Let's set the applicant on the current application.
@@ -1008,9 +1020,10 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             if (contactUnbundled.getHumanID() == 0) {
                 //Getting from the database failed. We'll have to insert it.
-                contactUnbundled.setMuniCode(getSessionBean().getSessMuniQueued().getMuniCode());
+                //  ----->  TODO: Update for Humanization/Parcelization <------
+//                contactUnbundled.setMuniCode(getSessionBean().getSessMuniQueued().getMuniCode());
 
-                contactUnbundled.setPersonID(pi.insertPerson(contactUnbundled));
+//                contactUnbundled.setPersonID(pi.insertPerson(contactUnbundled));
             }
         }
 
@@ -1019,15 +1032,17 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         //Export the workingPropUnits list from PublicInfoBundles to PersonOccPeriods. This should preserve changes made by the user.
         for (PublicInfoBundlePerson bundle : attachedPersons) {
-            currentPersonList.add(new OccApplicationHumanLink(pic.export(bundle))); //This must be a OccApplicationHumanLink in order to store the person type data in the correct field.
+            //  ----->  TODO: Update for Humanization/Parcelization <------
+//            currentPersonList.add(new OccApplicationHumanLink(pic.export(bundle))); //This must be a OccApplicationHumanLink in order to store the person type data in the correct field.
         }
 
         //Grab the persons that are currently in the database
-        for (Person p : currentPersonList) {
-            existingPersonList.add(pi.getPerson(p.getHumanID()));
-        }
+        //  ----->  TODO: Update for Humanization/Parcelization <------
+//        for (Person p : currentPersonList) {
+//            existingPersonList.add(pi.getPerson(p.getHumanID()));
+//        }
 
-        for (OccApplicationHumanLink workingPerson : currentPersonList) {
+        for (HumanLink workingPerson : currentPersonList) {
 
             //Intialize change order so it's ready to receive edits.
             PersonChangeOrder skeleton = new PersonChangeOrder();
@@ -1050,7 +1065,8 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                     //this block fires if the person ID already exists in our database. The person is an existing one that may have been changed
                     skeleton.setAdded(false);
 
-                    skeleton = new PersonChangeOrder(existingPerson, workingPerson); //This constructor will compare the two.
+                    //  ----->  TODO: Update for Humanization/Parcelization <------
+//                    skeleton = new PersonChangeOrder(existingPerson, workingPerson); //This constructor will compare the two.
 
                     break; //for optimization
 
@@ -1061,37 +1077,43 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
                 //This person was not found in the database. They might be our applicant or preferred contact, 
                 //so let's compare the two.
-                skeleton = new PersonChangeOrder(changedby, workingPerson);
+                //  ----->  TODO: Update for Humanization/Parcelization <------
+//                skeleton = new PersonChangeOrder(changedby, workingPerson);
 
                 if (!skeleton.changedOccured()) {
                     //there were no differences between the applicant and the person we're looking at right now.
                     //It's the applicant, so let's set the ID to reflect that
-                    workingPerson.setPersonID(changedby.getHumanID());
+                    //  ----->  TODO: Update for Humanization/Parcelization <------
+//                    workingPerson.setPersonID(changedby.getHumanID());
                 } else {
 
                     //It wasn't the applicant, so let's try the preferred contact
-                    skeleton = new PersonChangeOrder(contactUnbundled, workingPerson);
+                    //  ----->  TODO: Update for Humanization/Parcelization <------
+//                    skeleton = new PersonChangeOrder(contactUnbundled, workingPerson);
 
                     if (!skeleton.changedOccured()) {
                         //there were no differences between the preferred contact and the person we're looking at right now.
                         //It's the preferred contact, so let's set the ID to reflect that
-                        workingPerson.setPersonID(contactUnbundled.getHumanID());
+                        //  ----->  TODO: Update for Humanization/Parcelization <------
+//                        workingPerson.setPersonID(contactUnbundled.getHumanID());
                     } else {
                     
                         //This person does not exist in our database
                         //And it's not the applicant or contact
                         //which we inserted at the beginning of this metho
                         //insert it into the database
-                        workingPerson.setMuniCode(getSessionBean().getSessMuniQueued().getMuniCode());
+                        //  ----->  TODO: Update for Humanization/Parcelization <------
+//                        workingPerson.setMuniCode(getSessionBean().getSessMuniQueued().getMuniCode());
 
-                        workingPerson.setPersonID(pi.insertPerson(workingPerson));
+//                        workingPerson.setPersonID(pi.insertPerson(workingPerson));
                         
                     }
                        
                 }
                 
                 //Create a change order and insert it into the database.
-                skeleton = new PersonChangeOrder(workingPerson);
+                //  ----->  TODO: Update for Humanization/Parcelization <------
+//                skeleton = new PersonChangeOrder(workingPerson);
 
             }
             
@@ -1126,89 +1148,91 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
         //First let's get a new list of persons and transport over the user's changes
         List<PublicInfoBundlePerson> bundledPersons = new ArrayList<>();
+        
+        //  ----->  TODO: Update for Humanization/Parcelization <------
+//
+//        for (Person donor : currentApplication.getAttachedPersons()) {
+//
+//            PublicInfoBundlePerson bundle = pic.extractPublicInfo(new Person(donor));
+//
+//            //extractPublicInfo() would erase alot of the user's changes. Let's manually bring them over
+//            
+//            bundle.getBundledPerson().setFirstName(donor.getFirstName());
+//
+//            bundle.getBundledPerson().setLastName(donor.getLastName());
+//
+//            bundle.getBundledPerson().setPersonType(donor.getPersonType());
+//
+//            bundle.getBundledPerson().setPhoneCell(donor.getPhoneCell());
+//
+//            bundle.getBundledPerson().setPhoneHome(donor.getPhoneHome());
+//
+//            bundle.getBundledPerson().setPhoneWork(donor.getPhoneWork());
+//
+//            bundle.getBundledPerson().setEmail(donor.getEmail());
+//
+//            bundle.getBundledPerson().setAddressStreet(donor.getAddressStreet());
+//
+//            bundle.getBundledPerson().setAddressCity(donor.getAddressCity());
+//
+//            bundle.getBundledPerson().setAddressState(donor.getAddressState());
+//
+//            bundle.getBundledPerson().setAddressZip(donor.getAddressZip());
+//
+//            bundle.getBundledPerson().setBusinessEntity(donor.isBusinessEntity());
+//
+//            bundle.getBundledPerson().setUnder18(donor.isUnder18());
+//
+//            bundle.getBundledPerson().setUseSeparateMailingAddress(donor.isUseSeparateMailingAddress());
+//
+//            bundle.getBundledPerson().setMailingAddressStreet(donor.getMailingAddressStreet());
+//
+//            bundle.getBundledPerson().setMailingAddressThirdLine(donor.getMailingAddressThirdLine());
+//
+//            bundle.getBundledPerson().setMailingAddressCity(donor.getMailingAddressCity());
+//
+//            bundle.getBundledPerson().setMailingAddressState(donor.getMailingAddressState());
+//
+//            bundle.getBundledPerson().setMailingAddressZip(donor.getMailingAddressZip());
+//
+//            bundledPersons.add(bundle);
 
-        for (Person donor : currentApplication.getAttachedPersons()) {
+//        }
 
-            PublicInfoBundlePerson bundle = pic.extractPublicInfo(new Person(donor));
-
-            //extractPublicInfo() would erase alot of the user's changes. Let's manually bring them over
-            
-            bundle.getBundledPerson().setFirstName(donor.getFirstName());
-
-            bundle.getBundledPerson().setLastName(donor.getLastName());
-
-            bundle.getBundledPerson().setPersonType(donor.getPersonType());
-
-            bundle.getBundledPerson().setPhoneCell(donor.getPhoneCell());
-
-            bundle.getBundledPerson().setPhoneHome(donor.getPhoneHome());
-
-            bundle.getBundledPerson().setPhoneWork(donor.getPhoneWork());
-
-            bundle.getBundledPerson().setEmail(donor.getEmail());
-
-            bundle.getBundledPerson().setAddressStreet(donor.getAddressStreet());
-
-            bundle.getBundledPerson().setAddressCity(donor.getAddressCity());
-
-            bundle.getBundledPerson().setAddressState(donor.getAddressState());
-
-            bundle.getBundledPerson().setAddressZip(donor.getAddressZip());
-
-            bundle.getBundledPerson().setBusinessEntity(donor.isBusinessEntity());
-
-            bundle.getBundledPerson().setUnder18(donor.isUnder18());
-
-            bundle.getBundledPerson().setUseSeparateMailingAddress(donor.isUseSeparateMailingAddress());
-
-            bundle.getBundledPerson().setMailingAddressStreet(donor.getMailingAddressStreet());
-
-            bundle.getBundledPerson().setMailingAddressThirdLine(donor.getMailingAddressThirdLine());
-
-            bundle.getBundledPerson().setMailingAddressCity(donor.getMailingAddressCity());
-
-            bundle.getBundledPerson().setMailingAddressState(donor.getMailingAddressState());
-
-            bundle.getBundledPerson().setMailingAddressZip(donor.getMailingAddressZip());
-
-            bundledPersons.add(bundle);
-
-        }
-
-        getSessionBean().setOccPermitAttachedPersons(bundledPersons);
+//        getSessionBean().setOccPermitAttachedPersons(bundledPersons);
 
         //Now, let's refresh the unit list.
         List<PublicInfoBundlePropertyUnit> bundledUnits = new ArrayList<>();
 
-        for (PropertyUnit donor : newUnitList) {
-
-            try {
-
-                PublicInfoBundlePropertyUnit bundle = pic.extractPublicInfo(new PropertyUnit(donor));
-
-                bundle.getBundledUnit().setUnitNumber(donor.getUnitNumber());
-
-                bundle.getBundledUnit().setRentalNotes(donor.getRentalNotes());
-
-                bundle.getBundledUnit().setNotes(donor.getNotes());
-
-                bundledUnits.add(bundle);
-
-            } catch (IntegrationException | AuthorizationException
-                    | BObStatusException | EventException | SearchException ex) {
-                System.out.println("OccPermitApplicationBB.refreshUnitsAndPersons() | ERROR: " + ex);
-
-                //Oh no it failed. Let's just directly put the donor in.
-                //Some info will be lost but not the ID, which is more important
-                PublicInfoBundlePropertyUnit bundle = new PublicInfoBundlePropertyUnit();
-
-                bundle.setBundledUnit(donor);
-
-                bundledUnits.add(bundle);
-            }
-        }
-
-        getSessionBean().getOccPermitAppActiveProp().setUnitList(bundledUnits);
+//        for (PropertyUnit donor : newUnitList) {
+//
+//            try {
+//
+//                PublicInfoBundlePropertyUnit bundle = pic.extractPublicInfo(new PropertyUnit(donor));
+//
+//                bundle.getBundledUnit().setUnitNumber(donor.getUnitNumber());
+//
+//                bundle.getBundledUnit().setRentalNotes(donor.getRentalNotes());
+//
+//                bundle.getBundledUnit().setNotes(donor.getNotes());
+//
+//                bundledUnits.add(bundle);
+//
+//            } catch (IntegrationException | AuthorizationException
+//                    | BObStatusException | EventException | SearchException ex) {
+//                System.out.println("OccPermitApplicationBB.refreshUnitsAndPersons() | ERROR: " + ex);
+//
+//                //Oh no it failed. Let's just directly put the donor in.
+//                //Some info will be lost but not the ID, which is more important
+//                PublicInfoBundlePropertyUnit bundle = new PublicInfoBundlePropertyUnit();
+//
+//                bundle.setBundledUnit(donor);
+//
+//                bundledUnits.add(bundle);
+//            }
+//        }
+//
+//        getSessionBean().getOccPermitAppActiveProp().setUnitList(bundledUnits);
 
     }
 

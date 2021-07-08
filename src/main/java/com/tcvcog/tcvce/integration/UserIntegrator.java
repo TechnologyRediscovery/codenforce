@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
@@ -145,6 +146,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     private User generateUser(ResultSet rs) throws IntegrationException, SQLException{
         User user = new User();
         PersonIntegrator pi = getPersonIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
         MunicipalityCoordinator mc = getMuniCoordinator();
         
         
@@ -154,7 +156,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             user.setNotes(rs.getString("notes"));
             user.setPersonID(rs.getInt("personlink"));
             if(rs.getInt("personlink") != 0){
-                user.setPerson(pi.getPerson(rs.getInt("personlink")));
+                user.setPerson(pc.getPerson(pc.getHuman(rs.getInt("personlink"))));
             }
             // line 2 of SELECT
             user.setCreatedByUserId(rs.getInt("createdby"));

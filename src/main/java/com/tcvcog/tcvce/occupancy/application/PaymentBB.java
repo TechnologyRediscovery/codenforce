@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventDomainEnum;
 import com.tcvcog.tcvce.entities.FeeAssigned;
+import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.MoneyOccPeriodFeeAssigned;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
@@ -304,7 +305,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select a fee to assign this payment to.", " "));
-            selectedPayment.setPayer(new Person());
+            selectedPayment.setPayer(new Person(new Human()));
             return "";
         }
 
@@ -494,7 +495,9 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         PersonCoordinator pc = getPersonCoordinator();
 
         try {
-            selectedPayment.setPayer(pc.getPerson(personID));
+            //  ----->  TODO: Update for Humanization/Parcelization <------
+            // double check this setter's input
+            selectedPayment.setPayer(pc.getPerson(pc.getHuman(personID)));
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,

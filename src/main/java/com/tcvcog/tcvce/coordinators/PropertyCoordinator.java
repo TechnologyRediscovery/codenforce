@@ -51,7 +51,6 @@ import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
-import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;

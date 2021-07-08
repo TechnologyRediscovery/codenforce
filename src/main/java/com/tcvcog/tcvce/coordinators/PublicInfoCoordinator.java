@@ -533,13 +533,13 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             pib.setShowDetailsPageButton(true);
         } else {
-            Property skeleton = new Property();
+//            Property skeleton = new Property();
 /// ----------- >TODO: upgrade for parcelization <---------------------                        
 // should this be parcelkey?
-            skeleton.setParcelKey(skeleton.getParcelKey());
-            pib.setBundledProperty(skeleton);
-            pib.setPaccStatusMessage("A public information bundle was found but public "
-                    + "access was switched off by a code officer. Please contact your municipal office. ");
+//            skeleton.setParcelKey(skeleton.getParcelKey());
+//            pib.setBundledProperty(skeleton);
+//            pib.setPaccStatusMessage("A public information bundle was found but public "
+//                    + "access was switched off by a code officer. Please contact your municipal office. ");
 
         }
 

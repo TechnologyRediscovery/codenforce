@@ -27,11 +27,11 @@ import java.util.regex.Pattern;
 public class AddressParse {
     
     public static void main(String[] args) {
-        Property prop = new Property();
-        prop.setAddress("1237 MORRELLE AVE");
-        parseAddress(prop);
-        prop.setAddress("889A 4th st BEACHwood.");
-        parseAddress(prop);
+//        Property prop = new Property();
+//        prop.setAddress("1237 MORRELLE AVE");
+//        parseAddress(prop);
+//        prop.setAddress("889A 4th st BEACHwood.");
+//        parseAddress(prop);
         
     }
     

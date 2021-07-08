@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
@@ -1614,6 +1615,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         Payment newPayment = new Payment();
 
         PersonIntegrator pi = getPersonIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
 
         UserIntegrator ui = getUserIntegrator();
 
@@ -1642,7 +1644,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
                 newPayment.setEntryTimestamp(null);
             }
             newPayment.setAmount(rs.getDouble("amount"));
-            newPayment.setPayer(pi.getPerson(rs.getInt("payer_personid")));
+            // Updated for humanization
+            newPayment.setPayer(pc.getPerson(pc.getHuman(rs.getInt("payer_personid"))));
             newPayment.setReferenceNum(rs.getString("referencenum"));
             newPayment.setCheckNum(rs.getInt("checkno"));
             newPayment.setCleared(rs.getBoolean("cleared"));

@@ -20,13 +20,15 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
+import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PublicInfoBundleOccPermitApplication;
@@ -479,6 +481,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         UserIntegrator ui = getUserIntegrator();
         OccPermit permit = new OccPermit();
         PersonIntegrator pi = getPersonIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
 
         permit.setPermitID(rs.getInt("permitid"));
         permit.setPeriodID(rs.getInt("occperiod_periodid"));
@@ -489,7 +492,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         }
 
         permit.setIssuedBy(ui.getUser(rs.getInt("issuedby_userid")));
-        permit.setIssuedTo(pi.getPerson(rs.getInt("issuedto_personid")));
+        
+        permit.setIssuedTo(pc.getPerson(pc.getHuman(rs.getInt("issuedto_personid"))));
 
         permit.setPermitAdditionalText(rs.getString("permitadditionaltext"));
         permit.setNotes(rs.getString("notes"));
@@ -1025,9 +1029,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             int adults = 0;
             int youth = 0;
                     
-                    for(Person p : application.getAttachedPersons()){
+                    for(Human h : application.getAttachedPersons()){
                         
-                        if(p.isUnder18()){
+                        if(h.isUnder18()){
                             youth++;
                         } else {
                             adults++;
@@ -1151,17 +1155,18 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             if(occpermitapp.getConnectedPeriod() != null)
             {
             
-                occpermitapp.setAttachedPersons(new ArrayList<OccApplicationHumanLink>());
+                occpermitapp.setAttachedPersons(new ArrayList<>());
                 
-                for (OccApplicationHumanLink skeleton : pi.getPersonOccApplicationList(occpermitapp)) {
+                for (HumanLink skeleton : pi.getPersonOccApplicationList(occpermitapp)) {
 
-                    if (skeleton.isApplicant()){
-                        occpermitapp.setApplicantPerson(skeleton);
-                    }
-
-                    if(skeleton.isPreferredContact()){
-                        occpermitapp.setPreferredContact(skeleton);
-                    }
+    //  ----->  TODO: Update for Humanization/Parcelization <------
+//                    if (skeleton.isApplicant()) {
+//                        occpermitapp.setApplicantPerson(skeleton);
+//                    }
+//
+//                    if(skeleton.isPreferredContact()){
+//                        occpermitapp.setPreferredContact(skeleton);
+//                    }
 
                     occpermitapp.getAttachedPersons().add(skeleton);
 
@@ -1568,7 +1573,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
      * @param applicationID
      * @throws IntegrationException
      */
-    public void insertOccApplicationPerson(OccApplicationHumanLink person, int applicationID) throws IntegrationException {
+    public void insertOccApplicationPerson(HumanLink person, int applicationID) throws IntegrationException {
 
         String query = "INSERT INTO public.occpermitapplicationperson(occpermitapplication_applicationid, "
                 + "person_personid, applicant, preferredcontact, active, applicationpersontype)\n"
@@ -1581,9 +1586,10 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setInt(1, applicationID);
             stmt.setInt(2, person.getHumanID());
 
-            stmt.setBoolean(3, person.isApplicant());
-            stmt.setBoolean(4, person.isPreferredContact());
-            stmt.setString(5, person.getApplicationPersonType().name());
+//  ----->  TODO: Update for Humanization/Parcelization <------
+//            stmt.setBoolean(3, person.isApplicant());
+//            stmt.setBoolean(4, person.isPreferredContact());
+//            stmt.setString(5, person.getApplicationPersonType().name());
             
             stmt.execute();
             } catch (SQLException ex) {
@@ -1596,7 +1602,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             }
     }
     
-    public void updatePersonOccPeriod(OccApplicationHumanLink input, OccPermitApplication app) throws IntegrationException{
+    public void updatePersonOccPeriod(HumanLink input, OccPermitApplication app) throws IntegrationException{
         Connection con = getPostgresCon();
         String query = "UPDATE occpermitapplicationperson "
                 + "SET applicant = ?, preferredcontact = ?, applicationpersontype = ?::persontype, active = ? "
@@ -1605,10 +1611,12 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setBoolean(1, input.isApplicant());
-            stmt.setBoolean(2, input.isPreferredContact());
-            stmt.setString(3, input.getApplicationPersonType().name());
-            stmt.setBoolean(4, input.isLinkActive());
+
+//  ----->  TODO: Update for Humanization/Parcelization <------
+//            stmt.setBoolean(1, input.isApplicant());
+//            stmt.setBoolean(2, input.isPreferredContact());
+//            stmt.setString(3, input.getApplicationPersonType().name());
+//            stmt.setBoolean(4, input.isLinkActive());
             stmt.setInt(5, input.getHumanID());
             stmt.setInt(6, app.getId());
             stmt.execute();

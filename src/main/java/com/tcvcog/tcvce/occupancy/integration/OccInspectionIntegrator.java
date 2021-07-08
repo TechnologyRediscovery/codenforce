@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.occupancy.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeElement;
@@ -1939,6 +1940,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
         UserIntegrator ui = getUserIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
 
         ins.setInspectionID(rs.getInt("inspectionid"));
         ins.setOccPeriodID(rs.getInt("occperiod_periodid"));
@@ -1948,7 +1950,8 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         ins.setEnablePacc(rs.getBoolean("enablepacc"));
         ins.setNotes(rs.getString("notes"));
         if (rs.getInt("thirdpartyinspector_personid") != 0) {
-            ins.setThirdPartyInspector(pi.getPerson(rs.getInt("thirdpartyinspector_personid")));
+            
+            ins.setThirdPartyInspector(pc.getPerson(pc.getHuman(rs.getInt("thirdpartyinspector_personid"))));
         }
         if (rs.getTimestamp("thirdpartyinspectorapprovalts") != null) {
             ins.setThirdPartyInspectorApprovalTS(rs.getTimestamp("thirdpartyinspectorapprovalts").toLocalDateTime());

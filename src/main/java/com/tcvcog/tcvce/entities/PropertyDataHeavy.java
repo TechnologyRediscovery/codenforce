@@ -46,8 +46,8 @@ public  class       PropertyDataHeavy
     
     private String credentialSignature;
     
-    public PropertyDataHeavy(){
-        
+    public PropertyDataHeavy(Property prop){
+        super(prop);
     }
     
     /**
@@ -57,6 +57,7 @@ public  class       PropertyDataHeavy
      * @param cred 
      */
     public PropertyDataHeavy(Property prop, Credential cred){
+        super(prop);
         
         this.credentialSignature = cred.getSignature();
          
@@ -65,13 +66,6 @@ public  class       PropertyDataHeavy
         
     }
     
-
-    public PropertyDataHeavy(Property prop){
-
-        this.unitList = prop.getUnitList();
-        
-        
-    }
     
     /**
      * @return the credentialSignature

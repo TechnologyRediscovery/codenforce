@@ -30,7 +30,7 @@ import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.OccApplicationHumanLink;
+import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -95,7 +95,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     private List<OccPermitApplication> applicationList;
 
     private List<PropertyUnit> unitList;
-    private List<OccApplicationHumanLink> attachedPersons;
+    private List<HumanLink> attachedPersons;
 
     private String internalNoteText;
     private String externalNoteText;
@@ -119,7 +119,9 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         unitAlreadyDetermined = getSessionBean().isUnitDetermined();
 
-        searchPerson = new Person();
+        //  ----->  TODO: Update for Humanization/Parcelization <------
+//        searchPerson = new Person();
+        searchPerson = null;
 
         try {
             PropertyCoordinator pc = getPropertyCoordinator();
@@ -370,7 +372,8 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
                 spp.setEmail_ctl(true);
                 spp.setEmail_val(searchPerson.getEmail());
                 spp.setPhoneNumber_ctl(true);
-                spp.setPhoneNumber_val(searchPerson.getPhoneCell());
+                //  ----->  TODO: Update for Humanization/Parcelization <------
+//                spp.setPhoneNumber_val(searchPerson.getPhoneCell());
                 spp.setAddress_streetNum_ctl(true);
                 spp.setAddress_streetNum_val(searchPerson.getAddressStreet());
                 sc.runQuery(qp);
@@ -389,12 +392,13 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         if (qp != null && !qp.getBOBResultList().isEmpty()) {
 
-            List<Person> skeletonHorde = qp.getBOBResultList();
+            //  ----->  TODO: Update for Humanization/Parcelization <------
+//            List<Person> skeletonHorde = qp.getBOBResultList();
             personSearchResults = new ArrayList<>();
 
-            for (Person skeleton : skeletonHorde) {
-                personSearchResults.add(skeleton);
-            }
+//            for (Person skeleton : skeletonHorde) {
+//                personSearchResults.add(skeleton);
+//            }
 
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -407,20 +411,20 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     public void addPersonToApplication(Person person) {
 
         boolean duplicateFlag = false;
-
-        person.setPersonType(PersonType.Other);
-
-        for (Person test : attachedPersons) {
-
-            if (test.getHumanID() == person.getHumanID()) {
-
-                duplicateFlag = true;
-
-                break;
-
-            }
-
-        }
+//  ----->  TODO: Update for Humanization/Parcelization <------
+//        person.setPersonType(PersonType.Other);
+//
+//        for (Person test : attachedPersons) {
+//
+//            if (test.getHumanID() == person.getHumanID()) {
+//
+//                duplicateFlag = true;
+//
+//                break;
+//
+//            }
+//
+//        }
 
         if (duplicateFlag) {
 
@@ -428,19 +432,20 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
                     "You already attached that person to the application.", ""));
 
         } else {
-
-            attachedPersons.add(new OccApplicationHumanLink(person));
+//  ----->  TODO: Update for Humanization/Parcelization <------
+//            attachedPersons.add(new OccApplicationHumanLink(person));
 
         }
     }
 
-    public void removePersonFromApplication(OccApplicationHumanLink person) {
+    public void removePersonFromApplication(HumanLink person) {
         attachedPersons.remove(person);
     }
 
     public String addANewPerson() {
 
-        attachedPersons.add(new OccApplicationHumanLink());
+        //  ----->  TODO: Update for Humanization/Parcelization <------
+//        attachedPersons.add(new HumanLink());
 
         return "";
     }
@@ -764,9 +769,9 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
         List<Person> skeletonHorde = new ArrayList<>();
         
-        for(OccApplicationHumanLink skeleton : selectedApplication.getAttachedPersons()){
-            
-            skeletonHorde.add(skeleton);
+        for(HumanLink skeleton : selectedApplication.getAttachedPersons()){
+            //  ----->  TODO: Update for Humanization/Parcelization <------
+//            skeletonHorde.add(skeleton);
             
         }
         
@@ -1170,11 +1175,11 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
 
     }
 
-    public List<OccApplicationHumanLink> getAttachedPersons() {
+    public List<HumanLink> getAttachedPersons() {
         return attachedPersons;
     }
 
-    public void setAttachedPersons(List<OccApplicationHumanLink> attachedPersons) {
+    public void setAttachedPersons(List<HumanLink> attachedPersons) {
         this.attachedPersons = attachedPersons;
     }
 
