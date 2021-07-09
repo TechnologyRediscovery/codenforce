@@ -36,7 +36,6 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import org.omg.CORBA.CurrentHolder;
 
 /**
  * Backing Bean serving 

@@ -20,7 +20,12 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Think of a space type as "Outside the house" and "Inside the house"
+ * and potentially also "The whole house"
+ * 
+ * The linking of ordinances into OccInspectedSpace can 
+ * 
+ * and an OccInspection has
  * @author sylvia
  */
 public class OccSpaceTypeInspectionDirective extends OccSpaceType {

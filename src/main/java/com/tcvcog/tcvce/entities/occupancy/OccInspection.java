@@ -29,6 +29,15 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * This whole class represents a "clipboard," where each item in the inspectedSpaceList
+ * represents a sheet of paper listing all the code elements that were inspected in that particular space
+ * and of that particular type with its own injected location descriptor.
+ *
+ * Every sheet of paper i.e. an element in the inspectedSpaceList can only be of one space type--that space type
+ * lives inside of the OccInspectedSpace, and that space type was birthed from an OccSpaceTypeInspectionDirective.
+ *
+ * It is this object that gets passed to the "inspectionaction" methods on the occ coordinator to house the logic for
+ * setting the right member variables on OccInspectedSpace and their OccInspectedSpaceElement classes.
  *
  * @author Adam Gutonski and Sylvia
  */
