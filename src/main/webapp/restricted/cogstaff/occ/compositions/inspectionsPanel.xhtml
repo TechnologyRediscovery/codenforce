@@ -76,24 +76,104 @@
             that brings up the Space Details
             
             -->
-            <p:commandButton id="inspections-addspace"
+            <p:commandButton id="inspections-newbutton"
                              value="New inspection"
                              disabled="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedTS}"
                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                             icon="fa fa-plus"/>
-
-            <!-- this will be created dynamically in backing bean -->
-            <p:menu overlay="true" trigger="inspections-addspace">
-                <p:submenu label="Submenu">
-                    <p:menuitem value="Placeholder" oncomplete="PF('inspections-spacedetails-var').show()"/>
-                </p:submenu>
-            </p:menu>
+                             icon="fa fa-plus"
+                             oncomplete="PF('inspections-selectchecklist-var').show()"
+                             actionListener="#{occInspectionsBB.clearSelections}"
+                             update="inspections-selectchecklist inspections-selectinspector"/>
 
             <p:spacer height="5px"/>
 
 
         </h:form>
     </p:panel>
+
+    <p:dialog id="inspections-selectchecklist"
+              height="600" width="1000"
+              widgetVar="inspections-selectchecklist-var"
+              header="Choose Checklist"
+              modal="true"
+              resizable="true">
+        <h:form id="inspections-selectchecklist-form">
+            <p:dataTable id="inspections-selectchecklist-dt"
+                         var="checklist" value="#{occInspectionsBB.checklistTemplateList}"
+                         rowKey="#{checklist.inspectionChecklistID}"
+                         selection="#{occInspectionsBB.selectedChecklistTemplate}"
+                         stripedRows="true">
+                <p:ajax event="rowSelect" update=":inspections-selectchecklist-form:inspections-selectchecklist-continuebutton"/>
+                <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                <p:column headerText="Title">
+                    <h:outputText value="#{checklist.title}"/>
+                </p:column>
+
+                <p:column headerText="Description">
+                    <h:outputText value="#{checklist.description}"/>
+                </p:column>
+
+                <p:column headerText="Municipality">
+                    <h:outputText value="#{checklist.muni.muniName}"/>
+                </p:column>
+
+                <p:column headerText="Code Source">
+                    <h:outputText value="#{checklist.governingCodeSource.sourceName}"/>
+                </p:column>
+            </p:dataTable>
+
+            <p:spacer height="5px"/>
+
+            <div class="p-d-flex p-jc-end">
+                <p:commandButton value="Cancel"
+                                 icon="pi pi-times"
+                                 class="ui-button-outlined p-mr-1"
+                                 oncomplete="PF('inspections-selectchecklist-var').hide()"/>
+                <p:commandButton id="inspections-selectchecklist-continuebutton"
+                                 value="Continue"
+                                 disabled="#{occInspectionsBB.selectedChecklistTemplate.inspectionChecklistID == 0}"
+                                 icon="pi pi-arrow-right"
+                                 oncomplete="PF('inspections-selectchecklist-var').hide(); PF('inspections-selectinspector-var').show()"/>
+            </div>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="inspections-selectinspector"
+              width="600"
+              widgetVar="inspections-selectinspector-var"
+              header="Select Inspector"
+              modal="true"
+              resizable="true">
+        <h:form id="inspections-selectinspector-form">
+            <p:selectOneListbox id="inspections-selectinspector-listbox"
+                                scrollHeight="600"
+                                value="#{occInspectionsBB.selectedInspector}"
+                                var="u" filter="true" filterMatchMode="contains"
+                                converter="userConverter">
+                <p:ajax update="inspections-selectinspector-continuebutton"/>
+                <f:selectItems value="#{occInspectionsBB.userList}" var="user"
+                               itemLabel="#{user.person.firstName} #{user.person.lastName} #{user.username}"
+                               itemValue="#{user}"/>
+                <p:column>
+                    <h:outputText value="#{u.person.firstName} #{u.person.lastName} (#{u.username})"/>
+                </p:column>
+            </p:selectOneListbox>
+
+            <p:spacer height="5px"/>
+
+            <div class="p-d-flex p-jc-end">
+                <p:commandButton value="Back"
+                                 icon="pi pi-arrow-left"
+                                 class="ui-button-outlined p-mr-1"
+                                 oncomplete="PF('inspections-selectinspector-var').hide(); PF('inspections-selectchecklist-var').show();"/>
+                <p:commandButton id="inspections-selectinspector-continuebutton"
+                                 value="Continue"
+                                 disabled="#{occInspectionsBB.selectedInspector.userID == 0}"
+                                 icon="pi pi-arrow-right"
+                                 oncomplete="PF('inspections-selectinspector-var').hide(); PF('inspections-spacedetails-var').show()"/>
+            </div>
+        </h:form>
+    </p:dialog>
 
     <p:dialog id="inspections-spacedetails"
               widgetVar="inspections-spacedetails-var"
@@ -114,12 +194,18 @@
             <p:outputLabel styleClass="p-d-block">Space details:</p:outputLabel>
             <p:inputTextarea rows="6" cols="33"/>
 
-            <p:commandButton value="Cancel"
-                             icon="pi pi-cog"
-                             styleClass="ui-button-outlined"/>
-            <p:commandButton value="Continue"
-                             icon="pi pi-cog"
-                             oncomplete="PF('inspections-spacedetails-var').hide(); PF('inspections-entryscreen-var').show()"/>
+            <p:spacer height="5px"/>
+
+            <div class="p-d-flex p-jc-end">
+                <p:commandButton value="Back"
+                                 icon="pi pi-arrow-left"
+                                 class="ui-button-outlined p-mr-1"
+                                 oncomplete="PF('inspections-spacedetails-var').hide(); PF('inspections-selectinspector-var').show();"/>
+                <p:commandButton id="inspections-selectinspector-continuebutton"
+                                 value="Continue"
+                                 icon="pi pi-arrow-right"
+                                 oncomplete="PF('inspections-spacedetails-var').hide(); PF('inspections-entryscreen-var').show()"/>
+            </div>
         </h:form>
     </p:dialog>
 
