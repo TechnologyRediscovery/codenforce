@@ -92,13 +92,14 @@
     </p:panel>
 
     <p:dialog id="inspections-selectchecklist"
-              height="600" width="1000"
+              width="1000"
               widgetVar="inspections-selectchecklist-var"
               header="Choose Checklist"
               modal="true"
               resizable="true">
         <h:form id="inspections-selectchecklist-form">
             <p:dataTable id="inspections-selectchecklist-dt"
+                         scrollHeight="600"
                          var="checklist" value="#{occInspectionsBB.checklistTemplateList}"
                          rowKey="#{checklist.inspectionChecklistID}"
                          selection="#{occInspectionsBB.selectedChecklistTemplate}"
