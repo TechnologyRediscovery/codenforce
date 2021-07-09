@@ -77,7 +77,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             
         } catch (SQLException ex) {
             //System.out.println(ex);
-            throw new IntegrationException("Error retrieving blob. ", ex);
+            throw new IntegrationException("BlobIntegrator.getPhotoBlobLight: Error retrieving blob. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
@@ -118,7 +118,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } catch (SQLException ex) {
             System.out.println(ex);
             //System.out.println(ex);
-            throw new IntegrationException("Error retrieving blob. ", ex);
+            throw new IntegrationException("BlobIntegrator.getPhotoBlobLightWithoutMetadata: Error retrieving blob. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
@@ -194,7 +194,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             
         } catch (SQLException ex) {
             //System.out.println(ex);
-            throw new IntegrationException("Error retrieving blob. ", ex);
+            throw new IntegrationException("BlobIntegrator.getPDFBlobLight: Error retrieving blob. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
@@ -235,7 +235,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } catch (SQLException ex) {
             System.out.println(ex);
             //System.out.println(ex);
-            throw new IntegrationException("Error retrieving blob. ", ex);
+            throw new IntegrationException("BlobIntegrator.getPDFBlobLightWithoutMetadata: Error retrieving blob. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }

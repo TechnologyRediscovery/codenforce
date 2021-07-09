@@ -300,7 +300,7 @@ public  class       SessionInitializer
                             initSubsystem_V_Event(cred, ss);
                             break;
                         case VI_OCCPERIOD:
-                            initSubsystem_VI_OccPeriod(cred, ss, sb.getSessMuni());
+                            initSubsystem_VI_OccPeriod(cred, ss);
                             break;
                         case VII_CECASE:
                             initSubsystem_VII_CECase(ua, ss);
@@ -613,7 +613,7 @@ public  class       SessionInitializer
      * @param ss under current configuration
      * @throws SessionException for all initialization issues
      */
-    private void initSubsystem_VI_OccPeriod(Credential cred, SubSysEnum ss, MunicipalityDataHeavy mdh) throws SessionException{
+    private void initSubsystem_VI_OccPeriod(Credential cred, SubSysEnum ss) throws SessionException{
         SearchCoordinator sc = getSearchCoordinator();
         OccupancyCoordinator occCord = getOccupancyCoordinator();
         MunicipalityCoordinator mc = getMuniCoordinator();

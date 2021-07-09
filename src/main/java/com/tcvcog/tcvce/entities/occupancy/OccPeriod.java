@@ -69,42 +69,46 @@ public  class       OccPeriod
     }
 
     public OccPeriod(OccPeriod otherPeriod) {
-        this.periodID = otherPeriod.getPeriodID();
-        this.propertyUnitID = otherPeriod.getPropertyUnitID();
+        if(otherPeriod != null){
 
-        this.type = otherPeriod.getType();
+            this.periodID = otherPeriod.getPeriodID();
+            this.propertyUnitID = otherPeriod.getPropertyUnitID();
 
-        this.governingInspection = otherPeriod.getGoverningInspection();
+            this.type = otherPeriod.getType();
 
-        this.manager = otherPeriod.getManager();
+            this.governingInspection = otherPeriod.getGoverningInspection();
 
-        this.periodTypeCertifiedBy = otherPeriod.getPeriodTypeCertifiedBy();
-        this.periodTypeCertifiedTS = otherPeriod.getPeriodTypeCertifiedTS();
-        this.eventList = otherPeriod.getEventList();
+            this.manager = otherPeriod.getManager();
 
-        this.source = otherPeriod.getSource();
-        this.createdBy = otherPeriod.getCreatedBy();
-        this.createdTS = otherPeriod.getCreatedTS();
+            this.periodTypeCertifiedBy = otherPeriod.getPeriodTypeCertifiedBy();
+            this.periodTypeCertifiedTS = otherPeriod.getPeriodTypeCertifiedTS();
+            this.eventList = otherPeriod.getEventList();
 
-        this.startDate = otherPeriod.getStartDate();
-        this.startDateCertifiedBy = otherPeriod.getStartDateCertifiedBy();
-        this.startDateCertifiedTS = otherPeriod.getStartDateCertifiedTS();
+            this.source = otherPeriod.getSource();
+            this.createdBy = otherPeriod.getCreatedBy();
+            this.createdTS = otherPeriod.getCreatedTS();
 
-        this.endDate = otherPeriod.getEndDate();
-        this.endDateCertifiedBy = otherPeriod.getEndDateCertifiedBy();
-        this.endDateCertifiedTS = otherPeriod.getEndDateCertifiedTS();
+            this.startDate = otherPeriod.getStartDate();
+            this.startDateCertifiedBy = otherPeriod.getStartDateCertifiedBy();
+            this.startDateCertifiedTS = otherPeriod.getStartDateCertifiedTS();
 
-        this.authorizedBy = otherPeriod.getAuthorizedBy();
-        this.authorizedTS = otherPeriod.getAuthorizedTS();
+            this.endDate = otherPeriod.getEndDate();
+            this.endDateCertifiedBy = otherPeriod.getEndDateCertifiedBy();
+            this.endDateCertifiedTS = otherPeriod.getEndDateCertifiedTS();
 
-        this.overrideTypeConfig = otherPeriod.isOverrideTypeConfig();
+            this.authorizedBy = otherPeriod.getAuthorizedBy();
+            this.authorizedTS = otherPeriod.getAuthorizedTS();
 
-        this.notes = otherPeriod.getNotes();
+            this.overrideTypeConfig = otherPeriod.isOverrideTypeConfig();
 
-        this.active = otherPeriod.isActive();
+            this.notes = otherPeriod.getNotes();
 
-        this.lastUpdatedBy = otherPeriod.getLastUpdatedBy();
-        this.lastUpdatedTS = otherPeriod.getLastUpdatedTS();
+            this.active = otherPeriod.isActive();
+
+            this.lastUpdatedBy = otherPeriod.getLastUpdatedBy();
+            this.lastUpdatedTS = otherPeriod.getLastUpdatedTS();
+        }
+
     }
 
 

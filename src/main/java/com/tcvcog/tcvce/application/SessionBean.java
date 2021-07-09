@@ -516,10 +516,11 @@ public class    SessionBean
 
 
                 // Set person--copied from CECase
-                sessPersonList = sessProperty.getPersonList();
-                if(sessPersonList != null && !sessPersonList.isEmpty()){
-                    sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
-                }
+                // TODO: OCC BUILD 1: Turned off to get build working
+//                sessPersonList = sessProperty.getPersonList();
+//                if(sessPersonList != null && !sessPersonList.isEmpty()){
+//                    sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
+//                }
 
 
                 // Set CECase

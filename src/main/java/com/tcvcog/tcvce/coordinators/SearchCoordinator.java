@@ -344,7 +344,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 vList.addAll(ci.searchForCodeViolations(params));
                 q.addToResults(vList);
             } catch (IntegrationException | BObStatusException ex) {
-                throw new SearchException("Exception during search: " + ex.toString());
+                throw new SearchException("Exception violation during search: " + ex.toString());
             }
             // add each batch of OccPeriod objects from the SearchParam run to our
             // ongoing list

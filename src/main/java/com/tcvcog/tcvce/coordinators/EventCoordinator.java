@@ -396,7 +396,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 throw new EventException("EventCnF must have either an occupancy period ID, or CECase ID");
             }
        
-        ev.setPersonList(pc.getPersonList(pi.eventPersonAssembleList(ev)));
+//            TODO: Disabled for merge with JURPLEL
+//        ev.setPersonList(pc.getPersonList(pi.eventPersonAssembleList(ev)));
         
         return ev;
     }

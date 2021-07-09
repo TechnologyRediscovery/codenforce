@@ -45,7 +45,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
 /**
- * @author Ellen Bascomb
+ * @author Ellen Bascomb, JURPLEL
  */
 public class OccPeriodSearchWorkflowBB
         extends BackingBeanUtils {
@@ -97,6 +97,7 @@ public class OccPeriodSearchWorkflowBB
         SessionBean sb = getSessionBean();
 
         currentOccPeriod = sb.getSessOccPeriod();
+        
         lastSavedOccPeriod = new OccPeriod(currentOccPeriod);
         PropertyIntegrator pi = getPropertyIntegrator();
 
