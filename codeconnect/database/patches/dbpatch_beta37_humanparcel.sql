@@ -110,7 +110,8 @@ INSERT INTO public.mailingstate(
 
 
 
-CREATE OR REPLACE FUNCTION public.migratepropertytoparcel(creationrobotuser INTEGER)
+CREATE OR REPLACE FUNCTION public.migratepropertytoparcel(creationrobotuser INTEGER,
+														  defaultsource INTEGER	)
   	RETURNS integer AS
 
 $BODY$
@@ -118,6 +119,10 @@ $BODY$
 	 	pr RECORD;
 	 	deacts TIMESTAMP WITH TIME ZONE;
 	 	deacuser INTEGER;
+	 	extractedbldg TEXT;
+	 	extractedsstreet TEXT;
+	 	maid INTEGER;
+
 	BEGIN
 		RAISE NOTICE 'starting property migration...';
 		FOR pr IN SELECT 		propertyid, municipality_municode, parid, lotandblock, address, 
@@ -183,26 +188,46 @@ $BODY$
 						);
 
 
-			-- DEAL with "None" in phone columns, and empty strings
+
+
+			-- parse address into street and bldgno 
+			-- write street into mailingstreet
+			-- fetch fresh street id
+
 
 			EXECUTE format('INSERT INTO public.mailingaddress(
-            addressid, addressnum, street, unitno, city, state, zipcode, 
-            pobox, verifiedts, source_sourceid, createdts, createdby_userid, 
-            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
-            notes)
-			    VALUES (%I, %I, %I, %I, %I, %I, %I, 
-			            %I, %I, %I, %I, %I, 
-			            %I, %I, %I, %I, 
-			            %I);
-			'
+						            addressid, bldgno, unitno, street_streetid, verifiedts, verifiedby_userid, 
+						            verifiedsource_sourceid, source_sourceid, createdts, createdby_userid, 
+						            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
+						            notes)
+						    VALUES (DEFAULT, %I, %I, %I, %I, %I, 
+						            %I, %I, %I, %I, 
+						            %I, %I, %I, %I, 
+						            %I);
+							'
+
+
+			);
+
+			SELECT currval('mailingaddress_addressid_seq') INTO currval INTO maid;
+
+			EXECUTE format('INSERT INTO public.parcelmailingaddress(
+							            mailingparcel_parcelid, mailingparcel_mailingid, source_sourceid, 
+							            createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
+							            deactivatedts, deactivatedby_userid, notes, linkid, linkedobjectrole_lorid)
+							    VALUES (%I, %I, %I, 
+							            now(), %I, now(), %I, 
+							            NULL, NULL, NULL, DEFAULT, %I);',
+
+						            	maid, pr.propertyid, defaultsource,
+						            	creationrobotuser, creationrobotuser, 
+
 
 
 			);
 
 
 
-			-- TODO: deal with ghosts in current person table which are what
-			-- NOVs point to: extract their data and inject into new fixed fields!!
 		END LOOP;
 		RETURN 1;
 	END;
