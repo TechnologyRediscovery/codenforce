@@ -91,7 +91,7 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.toggleOccPeriodAuthorization}"
                                            rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}"
                                            value="Unauthorized"
-                                           update="occperiod-status-form occperiod-permits-form"
+                                           update="occperiod-status-form occperiod-permits-form inspections-form"
                                            disabled="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy
                                                         || empty occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy
                                                         || empty occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy}">
@@ -106,7 +106,7 @@
                                            actionListener="#{occPeriodSearchWorkflowBB.toggleOccPeriodAuthorization}"
                                            rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}"
                                            value="Authorized"
-                                           update="occperiod-status-form occperiod-permits-form">
+                                           update="occperiod-status-form occperiod-permits-form inspections-form">
                                 <f:param name="fieldtocertify" value="authorization"/>
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"

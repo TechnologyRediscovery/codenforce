@@ -16,7 +16,6 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;

@@ -1,0 +1,263 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <p:panel id="inspections-panel"
+             toggleable="true"
+             widgetVar="inspections-panel-var"
+             collapsed="false"
+             header="Inspections">
+        <h:form id="inspections-form">
+            
+            
+            
+            <!-- Should be "Start new inspection" -->
+            
+            <!--
+            
+            Dialog TODO 1: (or series)
+            
+            
+            You'll need an intermediate box to provide a list of 
+            OccChecklistTemplate objects that you'll get from 
+            
+            public List<OccChecklistTemplate> getOccChecklistTemplatelist() throws IntegrationException {
+            
+            Need a drop down of User objects to select "Inspector" (imagine a 
+            secretary filling out the inspection for an officer" so it's not 
+            the UserAuthorized from the BackingBean
+            
+            You'll get a list of User objects from
+            
+            this is on the UserCoordinator
+            public List<User> user_assembleUserListForSearch(User usr) if you need one
+            
+            Your occ period is your current period
+            
+            WHen this dialog is done, you can make the call to 
+            public OccInspection inspectionAction_commenceOccupancyInspection
+            
+            
+            ** THEN build a new dialog with these displayed in UI:repeats
+            Dialog todo 2:
+            
+            Two different lists:
+            List 1 (possibly left side) Has a list of 
+            OccSpaceTypeInspectionDirective
+            objects that live in an 
+            OccChecklistTemplate
+            That lives inside the OccInspection
+            
+            
+            BUTTON IN THE MIDDLE between these lists called
+            "Inspect selected space type"
+            
+            That passes the chosen item from List 1 to 
+            the method 
+            public OccInspection inspectionAction_commenceSpaceInspection(
+            
+            On the OccupancyCoordinator
+            WHICH WILL Give you back a properly configured
+            OccInspectedSpace inside your OccInspection
+            ANd now shows up in list 2
+            
+           
+            List 2: List of OccInspectedSpace on the OccInspection
+            you got from the previous call
+            Clicking on items from this list gives you the lovely UI you already built
+            
+            
+            
+            
+            
+
+            Button called "configure property's spaces"
+            that brings up the Space Details
+            
+            -->
+            <p:commandButton id="inspections-newbutton"
+                             value="New inspection"
+                             disabled="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedTS}"
+                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                             icon="fa fa-plus"
+                             oncomplete="PF('inspections-selectchecklist-var').show()"
+                             actionListener="#{occInspectionsBB.clearSelections}"
+                             update="inspections-selectchecklist inspections-selectinspector"/>
+
+            <p:spacer height="5px"/>
+
+
+        </h:form>
+    </p:panel>
+
+    <p:dialog id="inspections-selectchecklist"
+              height="600" width="1000"
+              widgetVar="inspections-selectchecklist-var"
+              header="Choose Checklist"
+              modal="true"
+              resizable="true">
+        <h:form id="inspections-selectchecklist-form">
+            <p:dataTable id="inspections-selectchecklist-dt"
+                         var="checklist" value="#{occInspectionsBB.checklistTemplateList}"
+                         rowKey="#{checklist.inspectionChecklistID}"
+                         selection="#{occInspectionsBB.selectedChecklistTemplate}"
+                         stripedRows="true">
+                <p:ajax event="rowSelect" update=":inspections-selectchecklist-form:inspections-selectchecklist-continuebutton"/>
+                <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                <p:column headerText="Title">
+                    <h:outputText value="#{checklist.title}"/>
+                </p:column>
+
+                <p:column headerText="Description">
+                    <h:outputText value="#{checklist.description}"/>
+                </p:column>
+
+                <p:column headerText="Municipality">
+                    <h:outputText value="#{checklist.muni.muniName}"/>
+                </p:column>
+
+                <p:column headerText="Code Source">
+                    <h:outputText value="#{checklist.governingCodeSource.sourceName}"/>
+                </p:column>
+            </p:dataTable>
+
+            <p:spacer height="5px"/>
+
+            <div class="p-d-flex p-jc-end">
+                <p:commandButton value="Cancel"
+                                 icon="pi pi-times"
+                                 class="ui-button-outlined p-mr-1"
+                                 oncomplete="PF('inspections-selectchecklist-var').hide()"/>
+                <p:commandButton id="inspections-selectchecklist-continuebutton"
+                                 value="Continue"
+                                 disabled="#{occInspectionsBB.selectedChecklistTemplate.inspectionChecklistID == 0}"
+                                 icon="pi pi-arrow-right"
+                                 oncomplete="PF('inspections-selectchecklist-var').hide(); PF('inspections-selectinspector-var').show()"/>
+            </div>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="inspections-selectinspector"
+              width="600"
+              widgetVar="inspections-selectinspector-var"
+              header="Select Inspector"
+              modal="true"
+              resizable="true">
+        <h:form id="inspections-selectinspector-form">
+            <p:selectOneListbox id="inspections-selectinspector-listbox"
+                                scrollHeight="600"
+                                value="#{occInspectionsBB.selectedInspector}"
+                                var="u" filter="true" filterMatchMode="contains"
+                                converter="userConverter">
+                <p:ajax update="inspections-selectinspector-continuebutton"/>
+                <f:selectItems value="#{occInspectionsBB.userList}" var="user"
+                               itemLabel="#{user.person.firstName} #{user.person.lastName} #{user.username}"
+                               itemValue="#{user}"/>
+                <p:column>
+                    <h:outputText value="#{u.person.firstName} #{u.person.lastName} (#{u.username})"/>
+                </p:column>
+            </p:selectOneListbox>
+
+            <p:spacer height="5px"/>
+
+            <div class="p-d-flex p-jc-end">
+                <p:commandButton value="Back"
+                                 icon="pi pi-arrow-left"
+                                 class="ui-button-outlined p-mr-1"
+                                 oncomplete="PF('inspections-selectinspector-var').hide(); PF('inspections-selectchecklist-var').show();"/>
+                <p:commandButton id="inspections-selectinspector-continuebutton"
+                                 value="Continue"
+                                 disabled="#{occInspectionsBB.selectedInspector.userID == 0}"
+                                 icon="pi pi-arrow-right"
+                                 oncomplete="PF('inspections-selectinspector-var').hide(); PF('inspections-spacedetails-var').show()"/>
+            </div>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="inspections-spacedetails"
+              widgetVar="inspections-spacedetails-var"
+              header="Space Details"
+              modal="true"
+              resizable="true">
+        <h:form id="inspections-spacedetails-form">
+            <p:outputLabel styleClass="p-d-block">Space name:</p:outputLabel>
+            <p:inputText styleClass="p-d-block"/>
+
+            <p:outputLabel styleClass="p-d-block">Location descriptor:</p:outputLabel>
+            <p:selectOneMenu>
+                <f:selectItem itemLabel="Option1" itemValue="Option1"/>
+                <f:selectItem itemLabel="Option2" itemValue="Option2"/>
+                <f:selectItem itemLabel="Option3" itemValue="Option3"/>
+            </p:selectOneMenu>
+
+            <p:outputLabel styleClass="p-d-block">Space details:</p:outputLabel>
+            <p:inputTextarea rows="6" cols="33"/>
+
+            <p:spacer height="5px"/>
+
+            <div class="p-d-flex p-jc-end">
+                <p:commandButton value="Back"
+                                 icon="pi pi-arrow-left"
+                                 class="ui-button-outlined p-mr-1"
+                                 oncomplete="PF('inspections-spacedetails-var').hide(); PF('inspections-selectinspector-var').show();"/>
+                <p:commandButton id="inspections-selectinspector-continuebutton"
+                                 value="Continue"
+                                 icon="pi pi-arrow-right"
+                                 oncomplete="PF('inspections-spacedetails-var').hide(); PF('inspections-entryscreen-var').show()"/>
+            </div>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="inspections-entryscreen"
+              height="600" width="1000"
+              widgetVar="inspections-entryscreen-var"
+              header="Space Name"
+              modal="true"
+              resizable="true">
+        <h:form id="inspections-entryscreen-form">
+            <div class="p-d-flex p-jc-between">
+                <h1>SPACE NAME</h1>
+                <div>
+                    <p:commandButton value="Pass All"/>
+                </div>
+                <div>
+                    <p:commandButton value="Edit Space" class="p-mr-1"/>
+                    <p:commandButton value="Remove Space"/>
+                </div>
+            </div>
+            <h2>Category Name</h2>
+            <div class="p-grid">
+                <div class="p-col-12 p-md-4">
+                    <h3>Ordinance</h3>
+                    <ul>
+                        <li>accordian/collapsable box with ordinance description and tips of what to look for</li>
+                    </ul>
+                </div>
+                <div class="p-col-12 p-md-4 p-mt-5">
+                    <p:selectOneButton>
+                        <f:selectItem itemLabel="Not Inspected"/>
+                        <f:selectItem itemLabel="Pass"/>
+                        <f:selectItem itemLabel="Fail"/>
+                    </p:selectOneButton>
+                    <div class="p-d-flex p-mt-2 p-jc-end">
+                        <p:selectBooleanCheckbox itemLabel="Exclude from NOV"/>
+                    </div>
+                </div>
+                <div class="p-col-12 p-md-4">
+                    <div class="p-d-flex">
+                        <div>
+                            <p class="p-mb-0">Comments:</p>
+                            <p:inputTextarea rows="6" cols="33"/>
+                        </div>
+                        <div class="p-mx-3 p-mt-5">
+                            <p:button icon="pi pi-plus" styleClass="rounded-button"/>
+                            <p>Add Photo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:commandButton value="Add Ordinance" icon="pi pi-plus"/>
+        </h:form>
+    </p:dialog>
+</ui:composition>

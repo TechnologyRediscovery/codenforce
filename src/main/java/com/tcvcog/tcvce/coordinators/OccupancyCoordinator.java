@@ -671,6 +671,14 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     }
 
     /**
+     * STEP 1 of occupancy process. THe UI must give the user a list of
+     * OccChecklistTemplate objects
+     * 
+     * Residential House
+     * Commericial Building
+     * 
+     * 
+     * Under that 
      * Supervises the creation of a new Occupancy Inspection object in the
      * database. The designed flow would be the backing bean calls
      * getOccInspectionSkeleton() and sets member variables on there and then
@@ -1205,8 +1213,14 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return evList;
     }
 
-    //adding xiaohong Checklistbuilder
-    //check
+    
+    /**
+     * Call me when the backing bean loads to get a list of possible
+     * inspections to carry out such as "Commercial building" or 
+     * "residential"
+     * @return
+     * @throws IntegrationException 
+     */
     public List<OccChecklistTemplate> getOccChecklistTemplatelist() throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         return oii.getOccChecklistTemplatelist();

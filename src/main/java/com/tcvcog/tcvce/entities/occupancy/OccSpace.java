@@ -22,6 +22,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * This represents the checklist that says, like, in kitchens, we inspect code elements A and B.
+ *
  *
  * @author Eric Darsow echocharliedelta@protonmail.com
  */
@@ -30,6 +32,8 @@ public class OccSpace extends BackingBeanUtils implements Serializable {
     protected int spaceID;
     protected int occSpaceTypeID;
     protected String name;
+
+    // Holds whether or not this has to be wrapped in an OccInspectedSpace
     protected boolean required;
     protected String description;
     

@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
  * @author sylvia
  */
 public class OccSpaceElement extends CodeElement {
+    
     protected int spaceElementID;
     
     public OccSpaceElement(CodeElement ele){

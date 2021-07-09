@@ -972,8 +972,8 @@
     </managed-bean>
     
     <managed-bean>
-        <managed-bean-name>occInspectionBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccInspectionBB</managed-bean-class>
+        <managed-bean-name>occInspectionsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccInspectionsBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
