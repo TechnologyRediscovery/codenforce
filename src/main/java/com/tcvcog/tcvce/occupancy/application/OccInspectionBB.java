@@ -71,7 +71,7 @@ import javax.faces.event.ActionEvent;
  object of the OccInspection
  * 
  * 
- * @author Ellen Bascomb
+ * @author Ellen Bascomb and JURPLEL
  */
 public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     

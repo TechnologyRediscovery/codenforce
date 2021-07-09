@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2018 Turtle Creek Valley
-Council of Governments, PA
+ * Copyright (C) Technology Rediscovery LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

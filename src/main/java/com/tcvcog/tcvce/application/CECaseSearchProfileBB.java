@@ -1762,7 +1762,7 @@ public class CECaseSearchProfileBB
             
             this.currentCase.getBlobList().add(freshBlob);
             this.getBlobList().add(blob);
-        } catch (IntegrationException | IOException | NoSuchElementException | BlobException | BlobTypeException ex) {
+        } catch (IntegrationException | IOException  | BlobException | BlobTypeException ex) {
             System.out.println("cecaseSearchProfileBB.onBlobUploadCommitButtonChange | upload failed! " + ex);
             System.out.println(ex);
         } 
