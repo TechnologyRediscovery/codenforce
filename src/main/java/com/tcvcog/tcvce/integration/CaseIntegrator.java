@@ -45,6 +45,7 @@ import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.CodeViolationPropCECaseHeavy;
 import com.tcvcog.tcvce.entities.search.SearchParamsCodeViolation;
 import com.tcvcog.tcvce.entities.BlobLight;
+import com.tcvcog.tcvce.entities.search.SearchParamsDateRule;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -212,9 +213,22 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                      stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
                 }
                 
+                // adapted to possible use of date rule list
                 if(params.isDate_startEnd_ctl()){
-                    stmt.setTimestamp(++paramCounter, params.getDateStart_val_sql());
-                    stmt.setTimestamp(++paramCounter, params.getDateEnd_val_sql());
+                    if(params.getDateRuleList() != null && !params.getDateRuleList().isEmpty()){
+                        for(SearchParamsDateRule dr: params.getDateRuleList()){
+                            if(dr.isDate_null_ctl()){
+                                // no injection needed
+                                System.out.println("CaseIntegrator.searchForCases: Found null date rule; no injection: " + params.getFilterName());
+                            } else { // inject dates
+                                stmt.setTimestamp(++paramCounter, java.sql.Timestamp.valueOf(dr.getDate_start_val()));
+                                stmt.setTimestamp(++paramCounter, java.sql.Timestamp.valueOf(dr.getDate_end_val()));
+                            }
+                        }
+                    } else { // legacy no date rule list
+                        stmt.setTimestamp(++paramCounter, params.getDateStart_val_sql());
+                        stmt.setTimestamp(++paramCounter, params.getDateEnd_val_sql());
+                    }
                  }
                 
                 if (params.isUser_ctl()) {
@@ -1388,13 +1402,13 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         } 
         
         List<BlobLight> blobList = new ArrayList<>();
-        try {
-            for(int id : bi.photosAttachedToViolation(v.getViolationID())){
-                blobList.add(bc.getPhotoBlobLight(id));
-            }
-        } catch (BlobException ex){
-            throw new IntegrationException("An error occurred while retrieving blobs for a Code Violation", ex);
-        }
+//        try {
+//            for(int id : bi.getBlobsByCECase(v.getViolationID())){
+//                blobList.add(bc.getBlobLight(id));
+//            }
+//        } catch (BlobException ex){
+//            throw new IntegrationException("An error occurred while retrieving blobs for a Code Violation", ex);
+//        }
         v.setBlobList(blobList);
         
         return v;
@@ -1442,11 +1456,16 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
     /**
      * Queries for all violation attached to a specific CECase
-     * @param caseID
+     * @param cse
      * @return
      * @throws IntegrationException 
      */
-    public List<Integer> getCodeViolations(int caseID) throws IntegrationException {
+    public List<Integer> getCodeViolations(CECase cse) throws IntegrationException, BObStatusException {
+        if(cse == null){
+            throw new BObStatusException("Cannot get violations by case with null case!");
+            
+        }
+        
         String query = "SELECT violationid FROM codeviolation WHERE cecase_caseid = ?";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -1455,7 +1474,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, caseID);
+            stmt.setInt(1, cse.getCaseID());
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -1482,13 +1501,13 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @param c
      * @return
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public List<Integer> getCodeViolationIDList(CECaseDataHeavy c) throws IntegrationException {
-        return getCodeViolations(c.getCaseID());
+    public List<Integer> getCodeViolationIDList(CECaseDataHeavy c) throws IntegrationException, BObStatusException {
+        return getCodeViolations(c);
     }
     
     /**
-<<<<<<< HEAD
      * TODO: NADGIT Fix the BlobList References
      * @param cv
      * @return
@@ -1528,8 +1547,6 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         return vBlobList;
     }
        /**
-=======
->>>>>>> a01039519cc9dcdb19b4e1d3c77d944f30f6bf5c
      * Updates only the notes field on codeviolation table
      * 
      * @param viol
@@ -1583,11 +1600,11 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                         "            noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
                         "            dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
                         "            lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
-                        "            returnedby, notes, creationby, printstyle_styleid)\n" +
+                        "            returnedby, notes, creationby, printstyle_styleid, notifyingofficer_userid)\n" +
                         "    VALUES (DEFAULT, ?, ?, now(), \n" +
                         "            ?, NULL, NULL, ?, ?, \n" +
                         "            NULL, NULL, NULL, \n" +
-                        "            NULL, ?, ?, ?);";
+                        "            NULL, ?, ?, ?, ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -1608,6 +1625,12 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                 stmt.setInt(8, notice.getStyle().getStyleID());
             } else {
                 stmt.setNull(8, java.sql.Types.NULL);
+            }
+            
+             if(notice.getNotifyingOfficer() != null){
+                stmt.setInt(9, notice.getNotifyingOfficer().getUserID());
+            } else {
+                stmt.setNull(9, java.sql.Types.NULL);
             }
                     
             stmt.execute();
@@ -1893,7 +1916,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         String query = "UPDATE public.noticeofviolation\n"
                 + "   SET lettertextbeforeviolations=?, \n" +
                 "       dateofrecord=?, personid_recipient=?, \n" +
-                "       lettertextafterviolations=?"
+                "       lettertextafterviolations=?, notifyingofficer_userid=?"
                 + " WHERE noticeid=?;";
         // note that original time stamp is not altered on an update
 
@@ -1907,7 +1930,12 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt.setTimestamp(2, java.sql.Timestamp.valueOf(notice.getDateOfRecord()));
             stmt.setInt(3, notice.getRecipient().getPersonID());
             stmt.setString(4, notice.getNoticeTextAfterViolations());
-            stmt.setInt(5, notice.getNoticeID());
+            if(notice.getNotifyingOfficer() != null){
+                stmt.setInt(5, notice.getNotifyingOfficer().getUserID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            stmt.setInt(6, notice.getNoticeID());
 
             stmt.executeUpdate();
             
@@ -2031,7 +2059,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         String query =  "SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
                         "       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
                         "       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
-                        "       returnedby, notes, creationby, printstyle_styleid, active, followupevent_eventid \n" +
+                        "       returnedby, notes, creationby, printstyle_styleid, active, followupevent_eventid, notifyingofficer_userid \n" +
                         "  FROM public.noticeofviolation WHERE noticeid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -2149,6 +2177,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
         PersonIntegrator pi = getPersonIntegrator();
         UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         SystemIntegrator si = getSystemIntegrator();
         EventCoordinator ec = getEventCoordinator();
         
@@ -2164,21 +2193,21 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         notice.setNoticeTextAfterViolations(rs.getString("lettertextafterviolations"));
 
         notice.setCreationTS(rs.getTimestamp("creationtimestamp").toLocalDateTime());
-        notice.setCreationBy(ui.getUser(rs.getInt("creationby")));
+        notice.setCreationBy(uc.user_getUser(rs.getInt("creationby")));
         
         if (rs.getTimestamp("lockedandqueuedformailingdate") != null) {
             notice.setLockedAndqueuedTS(rs.getTimestamp("lockedandqueuedformailingdate").toLocalDateTime());
-            notice.setLockedAndQueuedBy(ui.getUser(rs.getInt("lockedandqueuedformailingby")));
+            notice.setLockedAndQueuedBy(uc.user_getUser(rs.getInt("lockedandqueuedformailingby")));
         }
         
         if (rs.getTimestamp("sentdate") != null) {
             notice.setSentTS(rs.getTimestamp("sentdate").toLocalDateTime());
-            notice.setSentBy(ui.getUser(rs.getInt("sentby")));
+            notice.setSentBy(uc.user_getUser(rs.getInt("sentby")));
         } 
         
         if (rs.getTimestamp("returneddate") != null) {
             notice.setReturnedTS(rs.getTimestamp("returneddate").toLocalDateTime());
-            notice.setReturnedBy(ui.getUser(rs.getInt("returnedby")));
+            notice.setReturnedBy(uc.user_getUser(rs.getInt("returnedby")));
         } 
         
         notice.setStyle(si.getPrintStyle(rs.getInt("printstyle_styleid")));
@@ -2189,6 +2218,10 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         }
         
         notice.setActive(rs.getBoolean("active"));
+        
+        if(rs.getInt("notifyingofficer_userid") != 0){
+            notice.setNotifyingOfficer(uc.user_getUser(rs.getInt("notifyingofficer_userid")));
+        }
 
         return notice;
 
@@ -2847,17 +2880,15 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @return
      * @throws IntegrationException 
      */
-    public List<Integer> getCodeViolations(Citation cid) throws IntegrationException{
+    public List<Integer> getCodeViolationsByCitation(Citation cid) throws IntegrationException{
         
         String query =  "SELECT codeviolation_violationid FROM public.citationviolation 	\n" +
                         "	INNER JOIN public.citation ON citation.citationid = citationviolation.citation_citationid\n" +
                         "	INNER JOIN public.codeviolation on codeviolation.violationid = citationviolation.codeviolation_violationid\n" +
                         "	WHERE citation.citationid=?;";
         Connection con = getPostgresCon();
-        CaseIntegrator ci = getCaseIntegrator();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        List<CodeViolation> violationList = new ArrayList<>();
         List<Integer> idl = new ArrayList<>();
         
         try {

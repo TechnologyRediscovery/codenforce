@@ -12,39 +12,69 @@
         <title>Report</title>
     </h:head>
     <h:body style="font-family: sans-serif">
-         <ui:insert name="report-header">
-                <f:view id="report-header">
-                <div class="flexing-box-topbar">
-                        <div class="logoBox">
+        <ui:insert name="report-header">
+            <f:view id="report-header">
+
+                <div class="ui-g">
+                    <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-value-vertical">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
                             <div class="logo-image-wrapper">
-                                <h:graphicImage value="/images/tcvcog_logo_inverted.jpg" height="50"/>
+                                <h:graphicImage value="/images/Logo-N_Font.png" height="50"/>
                             </div>
-                            <div class="logo-title-wrapper">
-                                <div class="report-title">
-                                    <h:outputText id="report-title-ot"  value="#{reportingBB.currentReport.title}"/> 
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                <h:outputText value="Creator:" />
+                            </div>
+                            <div class="ui-g-8 ui-md-8 ui-lg-8 restrict-data-field-value-vertical">
+                                <div class="creator-name">
+                                    <h:outputText id="report-creator-ot"  value="#{reportingBB.currentReport.creator.person.firstName} #{reportingBB.currentReport.creator.person.lastName} "/>
                                 </div>
-                                <div class="report-title-sub">
-                                    
-                                     <h:outputText id="report-subtitle-ot"  value="#{reportingBB.currentReport.muni.muniName}, #{reportingBB.currentReport.muni.address_state}"/> 
-                                    
+                                <div class="creator-id">
+                                    <h:outputText id="report-creator-cred-ot"  value="#{reportingBB.currentReport.creator.username} (ID:#{reportingBB.currentReport.creator.userID}) "/>
+                                </div>
+                                <div class="creator-ts">
+                                    <h:outputText id="report-timestamp-ot"  value="#{reportingBB.currentReport.generationTimestampPretty}"/>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="ui-g-8 ui-md-8 ui-lg-8 restrict-data-field" style="text-align: right;">
+
+                        <div class="restrict-data-field-value-vertical">
+
+                            <div class="report-title">
+                                <h:outputText id="report-title-ot"  value="#{reportingBB.currentReport.title}"/> 
+                            </div>
+                            <div class="report-title-sub">
+
+                                <h:outputText id="report-subtitle-ot"  value="#{reportingBB.currentReport.muni.muniName}, #{reportingBB.currentReport.muni.address_state}"/> 
+
+                            </div>
+                            <div class="report-period-label">
+                                <h:outputText value="Reporting Period:" />
+                            </div>
+                            <div class="report-period-val">
+                                <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_start_val)}" />
+                                <h:outputText value=" to " />
+                                <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)}" />
+                            </div>
+                            <div class="report-notes">
+                                <h:outputText id="report-notes-ot"  value="Notes: #{reportingBB.currentReport.notes}"/>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                        
-                    
-                    </f:view>
+            </f:view>
         </ui:insert>
-        
+
         <div class="flexing-box-pagecontent" style="font-family: sans-serif;">
             <ui:insert name="print-content">
-                
+
                 <p>I am the not content in the template content placeholder. I am not aware of any way for this particular element to ever be displayed to anybody.</p>
-                
+
             </ui:insert>
         </div>
-
-
     </h:body>
 </html>
 

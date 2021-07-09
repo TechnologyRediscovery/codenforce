@@ -174,9 +174,7 @@ public class UserAuthorized extends User{
      * @return the muniAuthPeriodsMap
      */
     public Map<Municipality, List<UserMuniAuthPeriod>> getMuniAuthPeriodsMap() {
-        if(muniAuthPeriodsMap != null){
-            System.out.println("UserAuthorized.getMuniAuthPeriodsMap SIZE: " + muniAuthPeriodsMap.keySet().size());
-        }
+       
         return muniAuthPeriodsMap;
     }
 

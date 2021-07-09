@@ -184,10 +184,16 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             opdh.setPersonList(sc.runQuery(qp).getBOBResultList());
 
             // EVENT LIST
+            
+            
             QueryEvent qe = sc.initQuery(QueryEventEnum.OCCPERIOD, cred);
             if (!qe.getParamsList().isEmpty()) {
                 qe.getParamsList().get(0).setEventDomainPK_val(per.getPeriodID());
             }
+            // Model after CECase
+            EventCoordinator evc = getEventCoordinator();
+            evc.getEventList(opdh);
+            
             opdh.setEventList(ec.downcastEventCnFPropertyUnitHeavy(qe.getBOBResultList()));
 
             // PROPOSAL LIST
@@ -267,6 +273,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      */
     public OccPeriod configureOccPeriod(OccPeriod period)
             throws EventException, AuthorizationException, IntegrationException, BObStatusException, ViolationException {
+        
+        
+        
         return period;
         
     }
@@ -1086,6 +1095,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         PersonIntegrator pi = getPersonIntegrator();
         OccupancyIntegrator oi = getOccupancyIntegrator();
         PropertyIntegrator pri = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
 
         List<PersonOccApplication> existingList = pi.getPersonOccApplicationListWithInactive(opa);
 
@@ -1113,7 +1123,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
                     applicationPerson.setPersonType(applicationPerson.getApplicationPersonType());
                     
-                    Property prop = pri.getProperty(opa.getApplicationPropertyUnit().getPropertyID());
+                    Property prop = pc.getProperty(opa.getApplicationPropertyUnit().getPropertyID());
                     
                     applicationPerson.setMuniCode(prop.getMuni().getMuniCode());
                     

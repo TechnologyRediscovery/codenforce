@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
@@ -30,7 +31,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.BlobType;
+import com.tcvcog.tcvce.entities.BlobTypeEnum;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CodeViolationDisplayable;
@@ -42,6 +43,8 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.TextBlock;
+import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.util.DateTimeUtil;
@@ -99,6 +102,9 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
     private List<Person> personCandidateList;
     private List<Person> manualRetrievedPersonList;
+    
+    private List<User> notifyingOfficerCandidateList;
+    private User notifyingOfficerCandidateChosen;
 
     private boolean personLookupUseID;
     private Person retrievedManualLookupPerson;
@@ -192,6 +198,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         }
       
         nov_createNoticeFollowupEvent = true;
+        
+        UserCoordinator uc = getUserCoordinator();
+        try {
+            notifyingOfficerCandidateList = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
+        } catch (AuthorizationException | IntegrationException ex) {
+            System.out.println(ex );
+        } 
+        
         
         
     } // close initbean
@@ -607,6 +621,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
     }
     
+    /**
+     * Listener for user requests to update the NOV's notifying officer
+     * @param usr 
+     */
+    public void changeNotifyingOfficer(){
+        currentNotice.setNotifyingOfficer(notifyingOfficerCandidateChosen);
+        
+    }
 
     /**
      * Internal logic container for beginning the user creation change process
@@ -618,7 +640,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         NoticeOfViolation nov;
         refreshCurrentCase();
         try {
-            nov = cc.nov_GetNewNOVSkeleton(currentCase, getSessionBean().getSessMuni());
+            nov = cc.nov_GetNewNOVSkeleton(currentCase, getSessionBean().getSessMuni(), getSessionBean().getSessUser());
             nov.setCreationBy(getSessionBean().getSessUser());
             currentNotice = nov;
             getSessionBean().setSessNotice(currentNotice);
@@ -1097,13 +1119,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | File: " + ev.getFile().getFileName() + " Type: " + ev.getFile().getContentType());
 
         BlobCoordinator blobc = getBlobCoordinator();
+        BlobIntegrator blobi = getBlobIntegrator();
         try {
-            Blob blob = blobc.getNewBlob();  //init new blob
+            Blob blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
             
 //            blob.setBytes(ev.getFile().getContents());  // set bytes  
             
             blob.setFilename(ev.getFile().getFileName());
-            blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
+            blob.setMuni(getSessionBean().getSessMuni());
             blob.setDescription("Header image for Notices of Violation in " + getSessionBean().getSessMuni().getMuniName() + " as of " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             // Write to DB
             blob = blobc.storeBlob(blob);
@@ -1128,10 +1151,10 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
         Blob blob = null;
         try {
-            blob = blobc.getNewBlob();  //init new blob
+            blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
             // TODO Upgrade on PF https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
 //                blob.setBytes(ev.getFile().getContents());  // set bytes  
-            blob.setType(BlobType.PHOTO);
+            blob.setType(blobi.getBlobType(BlobTypeEnum.PHOTO.getTypeID()));
             blob.setFilename(ev.getFile().getFileName());
 
 
@@ -1667,6 +1690,34 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setNov_createNoticeFollowupEvent(boolean nov_createNoticeFollowupEvent) {
         this.nov_createNoticeFollowupEvent = nov_createNoticeFollowupEvent;
+    }
+
+    /**
+     * @return the notifyingOfficerCandidateList
+     */
+    public List<User> getNotifyingOfficerCandidateList() {
+        return notifyingOfficerCandidateList;
+    }
+
+    /**
+     * @param notifyingOfficerCandidateList the notifyingOfficerCandidateList to set
+     */
+    public void setNotifyingOfficerCandidateList(List<User> notifyingOfficerCandidateList) {
+        this.notifyingOfficerCandidateList = notifyingOfficerCandidateList;
+    }
+
+    /**
+     * @return the notifyingOfficerCandidateChosen
+     */
+    public User getNotifyingOfficerCandidateChosen() {
+        return notifyingOfficerCandidateChosen;
+    }
+
+    /**
+     * @param notifyingOfficerCandidateChosen the notifyingOfficerCandidateChosen to set
+     */
+    public void setNotifyingOfficerCandidateChosen(User notifyingOfficerCandidateChosen) {
+        this.notifyingOfficerCandidateChosen = notifyingOfficerCandidateChosen;
     }
 
 }

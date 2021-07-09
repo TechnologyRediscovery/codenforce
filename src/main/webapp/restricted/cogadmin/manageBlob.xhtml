@@ -170,7 +170,7 @@
                                             <p:dataTable id="blob-search-results-table"
                                                          var="blob"
                                                          value="#{manageBlobBB.blobList}"
-                                                         rowKey="#{blob.blobID}"
+                                                         rowKey="#{blob.photoDocID}"
                                                          tableStyleClass="primeDataTable"
                                                          draggableRows="false" draggableColumns="true"
                                                          tabindex="6"
@@ -179,7 +179,7 @@
                                                          >
 
                                                 <p:column headerText="ID:">
-                                                    <h:outputText value="#{blob.blobID}"/>
+                                                    <h:outputText value="#{bphotoDocIDobID}"/>
                                                 </p:column>
 
                                                 <p:column headerText="Upload timestamp:">

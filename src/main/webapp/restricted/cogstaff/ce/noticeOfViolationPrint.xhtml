@@ -145,62 +145,20 @@
                     </div>
 
                     <div class="signature">
-                        <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.firstName}" />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficer.person.firstName}" />
                         <h:outputText value=" " />
-                        <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.lastName}" />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficer.person.lastName}" />
                         <br />
-                        <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.jobTitle}" />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficer.person.jobTitle}" />
                         <br />
-                        <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.phoneWork}" />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficer.person.phoneWork}" />
                         <br />
-                        <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.email}" />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficer.person.email}" />
                     </div>
 
                 </div>
 
-                <f:subview id="subview-violation-photos"
-                           rendered="true">
-                    <div class="violation-photo-attachments">
-                        <h2>Attachments: photographs of code violations</h2>
-                        <p:dataScroller id="violations-photos-ds"
-                                        value="#{noticeOfViolationBB.currentNotice.violationList}"
-                                        var="v">
-                            <h4>Photos of code violation:
-                                
-                                    <h:outputText    value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
-                                    <h:outputText    value="#{v.violatedEnfElement.ordSubSecTitle}" />
-
-                            </h4>
-                            <p:dataTable
-                                    id="photoTable"
-                                    var="photo"
-                                    value="#{v.blobList}"
-                                    rowKey="#{photo.blobID}"
-                                    tableStyleClass="primeDataTable"
-                                    draggableRows="false" tabindex="6">
-                                    <p:column width="70%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Photo"/>
-                                        </f:facet>
-                                        <p:graphicImage width="100%" value="#{blobCoordinator.image}">
-                                            <f:param name="blobID" value="#{photo.blobID}"/>
-                                        </p:graphicImage>
-                                    </p:column>
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Description"/>
-                                        </f:facet>
-                                        <p:inputTextarea id="desc" value="#{photo.description}"
-                                                         style="width: 100%;" tabindex="5" required="true" styleClass="inputText">
-                                            <p:ajax />
-                                        </p:inputTextarea>
-                                    </p:column>
-
-                                </p:dataTable>
-
-                        </p:dataScroller>
-                    </div>
-                </f:subview>
+               
             </div>
         </f:view>
     </h:body>

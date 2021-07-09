@@ -655,17 +655,17 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             BlobCoordinator blobc = getBlobCoordinator();
             BlobIntegrator bi = getBlobIntegrator();
             
-            Blob blob = blobc.getNewBlob();
+            Blob blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());
             // TODO: PF upgrade: https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
             
             //blob.setBytes(ev.getFile().getContents());
             
             blob.setFilename(ev.getFile().getFileName());
-            blob.setMunicode(getSessionBean().getSessMuni().getMuniCode());
+            blob.setMuni(getSessionBean().getSessMuni());
             
             currentViolation.getBlobList().add(blobc.storeBlob(blob));
             
-            bi.linkBlobToViolation(blob.getBlobID(), currentViolation.getViolationID());
+            bi.linkBlobToViolation(blob.getPhotoDocID(), currentViolation.getViolationID());
             
         } catch (IntegrationException | IOException | BlobTypeException ex) {
             System.out.println("ViolationAddBB.handlePhotoUpload | upload failed! " + ex);
@@ -774,7 +774,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
     public void onPhotoUpdateDescription(Blob blob){
         BlobIntegrator bi = getBlobIntegrator();
         try {
-            bi.updatePhotoBlobDescription(blob);
+            bi.updatePhotoDocMetadata(blob);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully updated photo description", ""));
@@ -808,8 +808,8 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
             try { 
                 // commit and link
                 
-                bi.commitPhotograph(photo.getBlobID());
-                bi.linkBlobToViolation(photo.getBlobID(), currentViolation.getViolationID());
+                bi.commitPhotograph(photo.getPhotoDocID());
+                bi.linkBlobToViolation(photo.getPhotoDocID(), currentViolation.getViolationID());
                 
             } catch (IntegrationException ex) {
                 System.out.println(ex.toString());

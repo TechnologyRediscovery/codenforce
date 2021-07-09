@@ -764,6 +764,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         if (role == RoleType.EnforcementOfficial || u.getRole() == RoleType.Developer) {
             typeList.add(EventType.Action);
             typeList.add(EventType.Timeline);
+            typeList.add(EventType.Origination);
         }
         if (role != RoleType.MuniReader) {
             typeList.add(EventType.Communication);

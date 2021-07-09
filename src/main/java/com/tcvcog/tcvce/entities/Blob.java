@@ -16,28 +16,38 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.time.LocalDateTime;
+
 /**
  * This implementation of Blob inherits the descriptive fields from BlobLight, 
  * but also holds the binary data of the file itself.
- * @author noah
+ * 
+ * @author noah and NADGIT and Ellen Bascom
  */
 public class Blob  extends BlobLight {
+    
+    private byte[] bytes;
+    private LocalDateTime blobUploadedTS;
+    private User blobUploadedBy;
+    
 
     public Blob(){
     }
     
-    public Blob(BlobLight input){
-        blobID = input.getBlobID();
-        bytesID = input.getBytesID();
-        type = input.getType();
-        description = input.getDescription();
-        filename = input.getFilename();
-        timestamp = input.getTimestamp();
-        uploadPersonID = input.getUploadPersonID();
-        
+    public Blob(BlobLight bl){
+        this.photoDocID = bl.photoDocID;
+        this.description = bl.description;
+        this.committed = bl.committed;
+        this.bytesID = bl.bytesID;
+        this.type = bl.type;
+        this.title = bl.title;
+        this.muni = bl.muni;
+        this.createdTS = bl.createdTS;
+        this.createdBy = bl.createdBy;
+        this.blobMetadata = bl.blobMetadata;
     }
     
-    private byte[] bytes;
+    
     
     /**
      * @return the bytes
@@ -50,7 +60,44 @@ public class Blob  extends BlobLight {
      * @param bytes the bytes to set
      */
     public void setBytes(byte[] bytes) {
-        this.bytes = bytes;
+       this.bytes = bytes;
     }
-    
+    /**
+     * @return the filename
+     */
+    /**
+     * @param filename the filename to set
+     */
+
+    /**
+     * @return the blobUploadedTS
+     */
+    public LocalDateTime getBlobUploadedTS() {
+        return blobUploadedTS;
+    }
+
+    /**
+     * @return the blobUploadedBy
+     */
+    public User getBlobUploadedBy() {
+        return blobUploadedBy;
+    }
+
+    /**
+     * @param blobUploadedTS the blobUploadedTS to set
+     */
+    public void setBlobUploadedTS(LocalDateTime blobUploadedTS) {
+        this.blobUploadedTS = blobUploadedTS;
+    }
+
+    /**
+     * @param blobUploadedBy the blobUploadedBy to set
+     */
+    public void setBlobUploadedBy(User blobUploadedBy) {
+        this.blobUploadedBy = blobUploadedBy;
+    }
+
+  
+
+  
 }

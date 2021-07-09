@@ -40,8 +40,12 @@
                                             header="Activity in #{sessionBean.sessMuni.muniName}" >
                                     <h:form id="event-bar-form">
                                         
-                                        <p:pieChart id="event-bar"
-                                                    model="#{missionControlBB.pieEvents}" />
+                                        <ui:remove>
+                                            
+                                            <p:pieChart id="event-bar"
+                                                        rendered="false"
+                                                        model="#{missionControlBB.pieEvents}" />
+                                        </ui:remove>
                                     </h:form>
                                     
                                     <h:form id="event-search-form">

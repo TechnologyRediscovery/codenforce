@@ -18,7 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities;
 
 /**
- *
+ * The master enum for code enforcement case status
  * @author ellen bascomb of apt 31y
  */
 public enum CasePhaseEnum {
@@ -45,7 +45,7 @@ public enum CasePhaseEnum {
                                         true,
                                         true),
     
-    InsideComplianceWindow      (   "Inside violation complaince window", 
+    InsideComplianceWindow      (   "Inside violation compliance window", 
                                     "Allow time for violation resolution; monitor property for intensifications",
                                     "howto-insidetimeframe",
                                         3, 

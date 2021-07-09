@@ -27,6 +27,10 @@ public class    PropertyPublic
     
     protected String address;
     
+    // Pre-Humanization migration
+    protected String addressNum;
+    protected String addressStreet;
+    
     protected PropertyStatus status;
     
     protected Municipality muni;
@@ -207,6 +211,34 @@ public class    PropertyPublic
      */
     public void setPropclass(String propclass) {
         this.propclass = propclass;
+    }
+
+    /**
+     * @return the addressStreet
+     */
+    public String getAddressStreet() {
+        return addressStreet;
+    }
+
+    /**
+     * @param addressStreet the addressStreet to set
+     */
+    public void setAddressStreet(String addressStreet) {
+        this.addressStreet = addressStreet;
+    }
+
+    /**
+     * @return the addressNum
+     */
+    public String getAddressNum() {
+        return addressNum;
+    }
+
+    /**
+     * @param addressNum the addressNum to set
+     */
+    public void setAddressNum(String addressNum) {
+        this.addressNum = addressNum;
     }
 
 

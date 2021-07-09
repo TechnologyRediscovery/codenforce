@@ -28,7 +28,9 @@ import java.util.List;
  *
  * @author ellen bascomb of apt 31y
  */
-public class NoticeOfViolation  extends BOb implements Serializable, Comparable<NoticeOfViolation> {
+public  class NoticeOfViolation  
+        extends BOb 
+        implements Serializable, Comparable<NoticeOfViolation> {
     
     private int noticeID;
     private Person recipient;
@@ -48,6 +50,8 @@ public class NoticeOfViolation  extends BOb implements Serializable, Comparable<
     private LocalDateTime creationTS;
     private String creationTSPretty;
     private User creationBy;
+    
+    private User notifyingOfficer;
     
     private int headerImageID;
     
@@ -548,6 +552,20 @@ public class NoticeOfViolation  extends BOb implements Serializable, Comparable<
      */
     public void setFollowupEventDaysRequest(int followupEventDaysRequest) {
         this.followupEventDaysRequest = followupEventDaysRequest;
+    }
+
+    /**
+     * @return the notifyingOfficer
+     */
+    public User getNotifyingOfficer() {
+        return notifyingOfficer;
+    }
+
+    /**
+     * @param notifyingOfficer the notifyingOfficer to set
+     */
+    public void setNotifyingOfficer(User notifyingOfficer) {
+        this.notifyingOfficer = notifyingOfficer;
     }
 
    

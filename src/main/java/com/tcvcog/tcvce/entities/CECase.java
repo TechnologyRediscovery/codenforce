@@ -74,6 +74,8 @@ public class        CECase
     protected List<EventCnF> eventList;
     protected List<EventCnF> eventListMaster;
     
+
+    
     public CECase(){
         
     }
@@ -275,6 +277,26 @@ public class        CECase
             }
         }
         return dispCits;
+    }
+    
+    /**
+     * Sorts through this case's citations and returns only those
+     * not in draft state
+     * @return 
+     */
+    public List<Citation> assembleCitationListNonDrafts(){
+        List<Citation> citl = new ArrayList<>();
+        if(citationList != null && !citationList.isEmpty()){
+            System.out.println("CECase.assembleCitationListNonDraft: list size" + citationList.size());
+            for(Citation cit: citationList){
+                // look for citations which are not in draft state
+                if(cit.getStatus().isNonStatusEditsForbidden()){
+                    citl.add(cit);
+                    System.out.println("CECase.assembleCitationListNonDraft: found non-draft citation ID " + cit.getCitationID());
+                }
+            }
+        }
+        return citl;
     }
 
    
@@ -487,6 +509,15 @@ public class        CECase
         return hash;
     }
 
+    /**
+     * Cases are equal if they have the same ID;
+     * CAUTION: Since only IDs are the only input
+     * to equality, cases whose contents may be different
+     * will still be equal if they are keyed the same.
+     * 
+     * @param obj
+     * @return 
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -712,10 +743,6 @@ public class        CECase
     }
 
    
-    public List<EventCnF> getEventListMaster() {
-        return eventListMaster;
-    }
-
     @Override
     public void setEventList(List<EventCnF> eventList) {
         this.eventList = eventList;
@@ -743,5 +770,6 @@ public class        CECase
             statusAssignmentLog = sb.toString();
         }
     }
-    
+
+   
 }

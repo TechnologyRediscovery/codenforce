@@ -47,7 +47,11 @@ public class QueryCECase
         }
     }
     
-      @Override
+    /**
+     * Spits back the first param in the list
+     * @return 
+     */
+    @Override
     public SearchParamsCECase getPrimaryParams() {
         if(searchParamsList != null && !searchParamsList.isEmpty()){
             return searchParamsList.get(0);

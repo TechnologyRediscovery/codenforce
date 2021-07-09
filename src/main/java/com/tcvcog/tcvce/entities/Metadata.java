@@ -33,7 +33,7 @@ public class Metadata implements Serializable{
     
     private int bytesID;
 
-    private BlobType type;
+    private BlobTypeEnum type;
     private Map<MetadataKey, String> properties;
     
     /**
@@ -139,11 +139,11 @@ public class Metadata implements Serializable{
         this.bytesID = bytesID;
     }
 
-    public BlobType getType() {
+    public BlobTypeEnum getType() {
         return type;
     }
 
-    public void setType(BlobType type) {
+    public void setType(BlobTypeEnum type) {
         this.type = type;
     }
     

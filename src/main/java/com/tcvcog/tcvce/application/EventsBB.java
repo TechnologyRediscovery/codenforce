@@ -70,6 +70,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     @PostConstruct
     public void initBean() {
         SessionBean sb = getSessionBean();
+
         EventCoordinator ec = getEventCoordinator();
 
         // Default events list filter mode

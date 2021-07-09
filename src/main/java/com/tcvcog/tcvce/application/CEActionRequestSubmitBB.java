@@ -414,7 +414,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
             //save the description to the database.
             try {
-                bi.updatePhotoBlobDescription(b);
+                bi.updatePhotoDocMetadata(b);
             } catch (IntegrationException ex) {
                 System.out.println("CEActionRequestSubmitBB.savePhotosAndContinue() | ERROR: " + ex);
             }
@@ -509,11 +509,11 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         BlobCoordinator blobc = getBlobCoordinator();
         Blob blob = null;
         try {
-            blob = blobc.getNewBlob();  //init new blob
+            blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
             // TODO: PF migration https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
 //            blob.setBytes(ev.getFile().getContents());  // set bytes
             blob.setFilename(ev.getFile().getFileName());
-            blob.setMunicode(currentRequest.getMuni().getMuniCode());
+            blob.setMuni(currentRequest.getMuni());
 
             blob = blobc.storeBlob(blob);
         } catch (IntegrationException | IOException | BlobTypeException ex) {
@@ -603,7 +603,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
             for (BlobLight blob : currentRequest.getBlobList()) {
                 try {
-                    blobI.linkPhotoBlobToActionRequest(blob.getBlobID(), sb.getSessCEAR().getRequestID());
+                    blobI.linkPhotoBlobToActionRequest(blob.getPhotoDocID(), sb.getSessCEAR().getRequestID());
                 } catch (IntegrationException ex) {
                     System.out.println(ex);
                 }

@@ -137,20 +137,6 @@ h4{
     color: #00b5ec;
 }
 
-.report-title{
-    font-size: 1.3em;
-    font-weight: bold;
-    color: #cde162;
-
-}
-
-.report-title-sub{
-    font-size: 1.1em;
-    color: #00b5ec;
-    font-style: italic;
-
-}
-
 
 .darkFont{
     color:#163F8A;
@@ -444,6 +430,151 @@ div.headerLink a:before, a:visited{
 
 
 /* ----------- Printing and reports-------- */
+
+
+.report-trailblaze-headerbox{
+    margin-top:10px;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: flex-start;
+    
+    
+}
+
+.report-trailblaze-headerbox div{
+    color: white;
+    font-size: 1.5em;
+    padding: 10px;
+    border-bottom: 6px solid #2bb3e9;
+    
+    
+}
+
+.report-trailblaze-headerbox-title{
+    font-weight: bold;
+    background: #2bb3e9;
+    border: none;
+    clear: none;
+    margin-right: 0px;
+    flex-grow: 1;
+    
+}
+
+.report-trailblaze-headerbox-tail {
+    background: white;
+    clear: none;
+    margin-left: 0px;
+    flex-grow: 3;
+    
+}
+
+.report-trailblaze-objecttitle {
+    
+    
+    
+}
+
+.report-trailblaze-datalabel {
+    
+}
+
+.report-trailblaze-datavalue {
+    
+    
+}
+
+.report-kpi-aggregate-container{
+    
+    
+}
+
+.report-tb-kpi-icon{
+    
+    
+}
+
+.report-tb-kpi-title{
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.report-tb-kpi-value{
+    margin-bottom: 8px;
+    font-size: 1.5em;
+    
+}
+
+.report-pie-title{
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    
+}
+
+
+
+.report-legend-item{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 8px;
+}
+
+.report-legend-colorbox{
+    margin-right: 8px;
+    
+    
+}
+
+.report-legend-title{
+    margin-right: 8px;
+    font-size: 1.2em;
+    
+}
+
+.report-legend-count{
+    font-size: 1.2em;
+    
+}
+
+.report-legend-perc{
+    
+    
+}
+
+.report-icon{
+    
+    margin-right: 8px;
+}
+
+.report-pie-container{
+      display: block; 
+      width: 600px;
+}
+
+
+.cases-report-citations-2cols{
+    width: 50%;
+    border: none;
+    vertical-align: top;
+}
+
+
+.report-title{
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #cde162;
+
+}
+
+.report-title-sub{
+    font-size: 1.1em;
+    color: #00b5ec;
+    font-style: italic;
+
+}
+
 
 .printing-page-break-before{
     page-break-before: always;
@@ -1090,12 +1221,6 @@ body .ui-datepicker .ui-picker-down{
     margin: 0px;
 }
 
-.cases-report-citations-2cols{
-    width: 50%;
-    border: none;
-    vertical-align: top;
-}
-
 
 .object-info-box thead{
     text-align: left;
@@ -1342,6 +1467,7 @@ gridTd-bignum{
 .link-button{
     display: inline-block;
     padding: 5px;
+    text-decoration: none;
     
 }
 
@@ -2793,6 +2919,7 @@ input{
     width: 100%;
     padding-top: 1px;
     margin-bottom: 1px;
+    font-family: sans-serif;
 }
 
 .restrict-main-contents-io-title{

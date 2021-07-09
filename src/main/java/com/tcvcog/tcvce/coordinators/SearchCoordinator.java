@@ -31,6 +31,7 @@ import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -400,9 +401,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 //    ***************************** UTILITIES **********************************
 //    --------------------------------------------------------------------------
     
-    
-    
-    
     /**
      * Chooses the default date field to search for any subclass of our SearchParams
      * family of objects
@@ -467,16 +465,40 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
              }
             
             // ****************************
-            // **         DATES          **
+            // **         DATES          
+            // ** UPDATED TO CHECK FOR DATE RULE LIST**
             // ****************************
             if (params.isDate_startEnd_ctl()) {
-                params.appendSQL("AND ");
-                if(params.getDate_field() != null && params.getDate_field().extractDateFieldString() != null){
-                    params.appendSQL(params.getDate_field().extractDateFieldString());
-                } else {
-                    params.appendSQL(selectDefaultDateFieldString(params));
+                if(params.getDateRuleList() != null && !params.getDateRuleList().isEmpty()){
+                    // we've got date rules in a list
+                    for(SearchParamsDateRule dr: params.getDateRuleList()){
+                        params.appendSQL("AND ");
+                        if(dr.getDate_field() != null && dr.getDate_field().extractDateFieldString() != null){
+                            params.appendSQL(dr.getDate_field().extractDateFieldString());
+                        } else {
+                            // add process for adapting to date rule list
+                            params.appendSQL(selectDefaultDateFieldString(params));
+                        }
+                        if(dr.isDate_null_ctl()){
+                            if(dr.isDate_null_val()){
+                                params.appendSQL(" IS NULL ");
+                            } else {
+                                params.appendSQL(" IS NOT NULL ");
+                            }
+                        } else {
+                            params.appendSQL(" BETWEEN ? AND ? ");
+                        }
+                    }
+                } else { // start legacy date
+                    params.appendSQL("AND ");
+                    if(params.getDate_field() != null && params.getDate_field().extractDateFieldString() != null){
+                        params.appendSQL(params.getDate_field().extractDateFieldString());
+                    } else {
+                        params.appendSQL(selectDefaultDateFieldString(params));
+                    }
+                    params.appendSQL(" BETWEEN ? AND ? ");
+                    
                 }
-                params.appendSQL(" BETWEEN ? AND ? ");
             } 
 
             // ****************************
@@ -627,13 +649,17 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
+    /**
+     * Debugging only
+     * @param q 
+     */
     private void logQueryRun(Query q){
-        System.out.println("****** QUERY RESULT ******");
-        if(q.getBOBResultList() != null){
-            System.out.println("SearchCoordinator.logQueryRun | result size: " + q.getBOBResultList().size());
-        }
-        System.out.print("Query type: ");
-        System.out.println(q.getClass().getTypeName());
+//        System.out.println("****** QUERY RESULT ******");
+//        if(q.getBOBResultList() != null){
+//            System.out.println("SearchCoordinator.logQueryRun | result size: " + q.getBOBResultList().size());
+//        }
+//        System.out.print("Query type: ");
+//        System.out.println(q.getClass().getTypeName());
         
     }
     
@@ -658,7 +684,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             }
             
             sp.setLimitResultCount_rtMin(RoleType.EnforcementOfficial);
-            sp.setLimitResultCount_ctl(true);
+            sp.setLimitResultCount_ctl(false);
             sp.setLimitResultCount_val(RESULT_COUNT_LIMIT_DEFAULT);
             
             sp.setActive_rtMin(RoleType.MuniStaff);
@@ -859,7 +885,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 paramsList.add(genParams_CECase_openedInDateRange(params, cred));
                 break;
             case OPEN_ASOFENDDATE:
-                paramsList.add(genParams_ceCase_openAsOf(params, cred));
+                System.out.println("SearchCoordinator.initQuery(CECase): oened_ASOFENDDATE");
+                paramsList.add(genParams_ceCase_openAsOfEOR_butClosedBeforeToday(params, cred));
+                params = genParams_ceCase_initParams(cred);
+                paramsList.add(genParams_ceCase_openBeforeSOR_notClosed(params, cred));
+                
                 break;
             case CLOSED_CASES:
                 paramsList.add(genParams_CECase_closedInDateRange(params, cred));
@@ -1224,7 +1254,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         // Shared param #6
         params.setLimitResultCount_rtMin(RoleType.EnforcementOfficial);
-        params.setLimitResultCount_ctl(true);
+        params.setLimitResultCount_ctl(false);
         params.setLimitResultCount_val(RESULT_COUNT_LIMIT_DEFAULT);
 
         // Shared param #7
@@ -1928,8 +1958,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return params;
     }
     
-    public SearchParamsCECase genParams_ceCase_openAsOf(SearchParamsCECase params, Credential cred){
-        params.setFilterName("Finds cases that were open on a given report end date");
+    public SearchParamsCECase genParams_ceCase_openAsOfEOR_butClosedBeforeToday(SearchParamsCECase params, Credential cred){
+        params.setFilterName("Finds cases that were open on a given report end date, perhaps closed before now()");
         
         // STANDARD SWITCHES
         params.setActive_ctl(true);
@@ -1943,19 +1973,93 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         // SPECIFIC TO THIS QUERY
         params.setDate_startEnd_ctl(true);
-        params.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATION_DOFRECORD);
-        params.setDate_relativeDates_ctl(false);
+        params.setDateRuleList(new ArrayList<>());
         
-        // start a long time ago
-        params.setDate_start_val(LocalDateTime.now().minusYears(100));
-        // go up til stop date of query
-        params.setDate_end_val(params.getDate_end_val());
+        SearchParamsDateRule drOpen = genParams_getDateRule();
         
-        // but make sure they are open cases
-        params.setCaseOpen_ctl(true);
-        params.setCaseOpen_val(true);
+        drOpen.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATION_DOFRECORD);
+        drOpen.setDate_start_val(LocalDateTime.of(1970, 1, 1, 0, 0));
+        
+        // CLIENT METHOD TODO:
+        // set first list element to end of report
+        drOpen.setDate_end_val(null);
+        
+        params.getDateRuleList().add(drOpen);
+        
+        SearchParamsDateRule drClose = genParams_getDateRule();
+        drClose.setDate_field(SearchParamsCECaseDateFieldsEnum.CLOSE);
+        
+        // CLIENT METHOD TODO:
+        // client sets this second list element to end of report
+        drClose.setDate_start_val(null);
+        drClose.setDate_end_val(LocalDateTime.now());
+        params.getDateRuleList().add(drClose);
+        
+        // don't touch this, let dates do it
+        params.setCaseOpen_ctl(false);
+        params.setCaseOpen_val(false);
         
         return params;
+    }
+    
+    /**
+     * Parameter config to grab cases that were opened
+     * between epoch and START of report, and still open
+     * Used in conjunction with those opened before END of report
+     * and closed between END of report and now
+     * @param params
+     * @param cred
+     * @return 
+     */
+    public SearchParamsCECase genParams_ceCase_openBeforeSOR_notClosed(SearchParamsCECase params, Credential cred){
+        params.setFilterName("Finds cases that were opened from EPOCH to SOR and have null closed date");
+        
+        // STANDARD SWITCHES
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+        params.setPersonInfoCase_ctl(true);
+        params.setPersonInfoCase_val(false);
+        
+        params.setPropInfoCase_ctl(true);
+        params.setPropInfoCase_val(false);
+        
+        // SPECIFIC TO THIS QUERY
+        params.setDate_startEnd_ctl(true);
+        params.setDateRuleList(new ArrayList<>());
+        
+        SearchParamsDateRule drOpen = genParams_getDateRule();
+        
+        drOpen.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATION_DOFRECORD);
+        drOpen.setDate_start_val(LocalDateTime.of(1970, 1, 1, 0, 0));
+        
+        // set first list element START OF REPORTING PERIOD
+        // CLIENT METHOD TODO: SET ME
+        drOpen.setDate_end_val(null);
+        
+        params.getDateRuleList().add(drOpen);
+        
+        SearchParamsDateRule notClosed = genParams_getDateRule();
+        notClosed.setDate_field(SearchParamsCECaseDateFieldsEnum.CLOSE);
+        
+        // NO CLOSING DATE
+        notClosed.setDate_null_ctl(true);
+        notClosed.setDate_null_val(true);
+        params.getDateRuleList().add(notClosed);
+        
+        // don't touch this, let dates do it
+        params.setCaseOpen_ctl(false);
+        params.setCaseOpen_val(false);
+        
+        return params;
+    }
+    
+    /**
+     * Factory method for date rule objects
+     * @return 
+     */
+    public SearchParamsDateRule genParams_getDateRule(){
+        return new SearchParamsDateRule();
     }
     
     /* --------------------------------------------

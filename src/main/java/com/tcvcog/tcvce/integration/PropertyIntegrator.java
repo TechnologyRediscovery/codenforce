@@ -101,6 +101,13 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     }
     
     
+    /**
+     * Primary retrieval method for properties by ID; should ONLY be called by
+     * the PropertyCoordinator!!!
+     * @param propertyID
+     * @return
+     * @throws IntegrationException 
+     */
     public Property getProperty(int propertyID) throws IntegrationException {
         Property p = new Property();
         PropertyCoordinator pc = getPropertyCoordinator();
@@ -1310,10 +1317,10 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @throws IntegrationException 
      */
     public PropertyUnitWithProp getPropertyUnitWithProp(int unitID) throws IntegrationException{
-        PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         
         PropertyUnitWithProp puwp = new PropertyUnitWithProp(getPropertyUnit(unitID));
-        puwp.setProperty(pi.getProperty(puwp.getPropertyID()));
+        puwp.setProperty(pc.getProperty(puwp.getPropertyID()));
         
         return puwp;
     }

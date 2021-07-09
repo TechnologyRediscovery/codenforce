@@ -22,13 +22,70 @@
 
                         <div class="mainContainer">
 
+                            
+                             <div class="page-links">
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#propinfo-panel-info">property info</a>
+                                </div>
+                                <h:outputText value=" | " />
+                                
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#prop-cases-panel">
+                                        <h:outputText value="code enf cases (#{propertySearchBB.currentProperty.ceCaseList.size()})" />
+                                    </a>
+                                </div>
+                                <h:outputText value=" | " />
+                                
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#prop-units-panel">
+                                        <h:outputText value="units (#{propertySearchBB.currentProperty.unitWithListsList.size()})" />
+                                    </a>
+                                </div>
+                                <h:outputText value=" | " />
+                                
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#prop-persons-panel">
+                                        <h:outputText value="persons (#{propertySearchBB.currentProperty.personList.size()})" />
+                                    </a>
+                                </div>
+                               
+                                <h:outputText value=" | " />
+                                
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#prop-events-panel">
+                                        <h:outputText value="events (#{propertySearchBB.currentProperty.completeEventList.size()})" />
+                                    </a>
+                                </div>
+                                <h:outputText value=" | " />
+                                
+                                
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#propinfo-notes-panel">notes</a>
+                                </div>
+                                <h:outputText value=" | " />
+                                
+                                
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#prop-blobs-panel">docs and photos</a>
+                                </div>
+                                <h:outputText value=" | " />
+                                
+                                
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#prop-extinfo-panel">external data</a>
+                                </div>
+                                
+                                
+                                
+                               
+                            </div>
+                            
+                            
                             <!-- DATA CONTAINER -->
                             <div class="ui-g data-container">
 
                                 <!-- LIST DATA CONTAINER --> 
-                                <div class="ui-g-12 ui-md-4 ui-lg-4 list-data-container">
-
-
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 list-data-container">
 
                                     <!-- PANEL CONTAINER -->
                                     <p:panel id="prop-search-query-panel"
@@ -315,7 +372,7 @@
                                 </div>
 
                                 <!-- OBJECT DATA CONTAINER --> 
-                                <div class="ui-g-12 ui-md-8 ui-lg-8 object-data-container">
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 object-data-container">
 
 
                                     <p:outputPanel id = "prop-lists-outpanel" >
@@ -802,6 +859,128 @@
                                         </p:panel>
 
 
+                                    <p:panel id="prop-blobs-panel"
+                                             toggleable="true"
+                                             collapsed="false"
+                                             header="Files and Photos"
+                                             rendered="true"
+                                             >
+
+                                        <h:form id="prop-blobs-form">
+
+                                            <p:commandButton    id="prop-blob-add-button"
+                                                                ajax="true"
+                                                                styleClass="noFill button-size-small"
+                                                                actionListener="#{propertySearchBB.onBlobAddButtonChange}"
+                                                                oncomplete="PF('prop-blobs-dialog-var').show()"
+                                                                value="Add Photos or Documents"
+                                                                icon="fa fa-upload"
+                                                                />
+
+                                            <p:spacer height="5px" />
+
+                                            <p:dataTable
+                                                id="prop-blobs-table"
+                                                var="blob"
+                                                value="#{propertySearchBB.currentProperty.blobList}"
+                                                rowKey="#{blob.blobID}"
+                                                tableStyleClass="primeDataTable"
+                                                resizableColumns="true"
+                                                draggableRows="false" tabindex="6">
+
+                                                <p:column width="15%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="File Type"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{blob.type.title}"/>
+                                                    <!-- type icon here -->
+                                                </p:column>
+
+                                                <p:column width="15%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="IDs"/>
+                                                    </f:facet>
+                                                    <h:outputText value="linkID: #{blob.photoDocID}"/>
+                                                    <br/>
+                                                    <h:outputText value="bytesID: #{blob.bytesID}"/>
+                                                    
+                                                </p:column>
+
+                                                <p:column width="45%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Info"/>
+                                                    </f:facet>
+                                                    <div class="rowExpansion">
+                                                        <h:outputText value="title: #{blob.title}"/>
+                                                        <br/>
+                                                        <h:outputText value="descr: #{blob.description}"/>
+                                                        <br/>
+                                                        <h:outputText value="filename: #{blob.filename}"/>
+                                                        <br/>
+                                                        <h:outputText value="created: #{propertySearchBB.getPrettyDateNoTime(blob.createdTS)}"/>
+                                                    </div>
+                                                </p:column>
+
+
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Actions"/>
+                                                    </f:facet>
+                                                    <p:commandButton 
+                                                        value="View in tab" 
+                                                        ajax="false"
+                                                        icon="fa fa-eye" 
+                                                        styleClass="ui-button-outlined">
+                                                        <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blob)}"
+                                                                        contentDisposition="inline"
+                                                                        />
+                                                    </p:commandButton>
+                                                    <br/>
+                                                    <p:commandButton 
+                                                        value="Download" 
+                                                        ajax="false"
+                                                        icon="fa fa-arrow-down" 
+                                                        styleClass="ui-button-outlined">
+                                                        <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blob)}"
+                                                                        />
+                                                    </p:commandButton>
+                                                    <br/>
+                                                     <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink      id="blob-update-button"
+                                                                            ajax="true"
+                                                                            styleClass="noFill button-size-small"
+                                                                            action="#{propertySearchBB.onBlobSelectButtonChange(blob)}"
+                                                                            value="edit"
+                                                                            oncomplete="PF('blob-edit-dialog-var').show()"
+                                                                            update="blob-edit-dialog
+                                                                            blob-edit-form"
+                                                                            />
+                                                    </div>
+                                                    
+                                                    
+                                                     <h:outputText value="&nbsp;&nbsp;|" />
+                                                     <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink      id="blob-remove-button"
+                                                                            ajax="true"
+                                                                            styleClass="noFill button-size-small"
+                                                                            action="#{propertySearchBB.onBlobRemoveInitButtonChange(blob)}"
+                                                                            value="remove"
+                                                                            oncomplete="PF('blob-remove-dialog-var').show()"
+                                                                            update="blob-remove-dialog
+                                                                            blob-remove-form"
+                                                                            />
+                                                        
+                                                        
+                                                    </div>
+                                                    
+                                                </p:column>
+                                            </p:dataTable>
+                                        </h:form>
+                                    </p:panel>
+
+
                                         <p:panel id="prop-workflow-panel"
                                                  toggleable="true"
                                                  widgetVar="prop-workflow-panel-var"
@@ -1167,6 +1346,165 @@
                         </div>
 
                     </p:outputPanel>
+                    
+                    
+
+                    <p:dialog   id="prop-blobs-dialog"
+                                height="600" width="800"
+                                widgetVar="prop-blobs-dialog-var"
+                                responsive="true"
+                                modal="true"
+                                resizable="true"
+                                closable="true"
+                                closeOnEscape="true"
+                                header="Photos and Documents on #{propertySearchBB.currentProperty.address} (#{propertySearchBB.currentProperty.muni.muniName})"
+                                rendered="true"
+                                > 
+
+                        <h:form id="case-blobs-start-form" enctype="multipart/form-data">
+                            <h2>Photos/Docs related to this property (10 max)</h2>
+                            <p>Allowed file types: pdf, jpeg, png, gif</p>
+
+                            <p:fileUpload 
+                                mode="advanced" 
+                                update="prop-blobs-form:prop-blobs-table"
+                                listener="#{propertySearchBB.onBlobUploadCommitButtonChange}"
+                                multiple="true"
+                                fileLimit="100"
+                                sizeLimit="99999999999" 
+                                allowTypes="/(\.|\/)(jpe?g|JPG|JPE?G|png|PNG|pdf|PDF)$/"
+                                rendered="true"
+                                oncomplete="PF('prop-blobs-dialog-var').hide()"/>    
+                        </h:form>
+
+
+                    </p:dialog>
+
+
+                    <p:dialog   id="blob-edit-dialog"
+                                height="600" width="800"
+                                widgetVar="blob-edit-dialog-var"
+                                responsive="true"
+                                modal="true"
+                                resizable="true"
+                                closable="true"
+                                closeOnEscape="true"
+                                header="Edit photo/document (LinkID: #{propertySearchBB.currentBlob.photoDocID})"
+                                rendered="true"
+                                > 
+
+                        <h:form id="blob-edit-form" >
+                            
+                            
+                                <div class="ui-g data_container_nested_restrict">
+                                    
+
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                        <div class="restrict-main-contents-io-title" >
+                                            <h:outputLabel for="blob-edit-title-it">
+                                                <h:outputText value="Title"/>
+                                            </h:outputLabel>
+                                        </div>
+
+                                        <div class="restrict-main-contents-io-content" >
+                                            <p:inputText  id="blob-edit-title-it" 
+                                                          value="#{propertySearchBB.currentBlob.title}" 
+                                                          tabindex="1" 
+                                                          required="false" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                        <div class="restrict-main-contents-io-title" >
+                                            <h:outputLabel for="blob-edit-descr-it">
+                                                <h:outputText value="Description"/>
+                                            </h:outputLabel>
+                                        </div>
+
+                                        <div class="restrict-main-contents-io-content" >
+                                            <p:inputText  id="blob-edit-descr-it" 
+                                                          value="#{propertySearchBB.currentBlob.description}" 
+                                                          tabindex="2" 
+                                                          required="false" />
+                                        </div>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                        
+                                        <p:commandButton    id="blob-edit-commit-cb"
+                                                            ajax="true" 
+                                                            actionListener="#{propertySearchBB.onBlobUpdateMetadata}"
+                                                            oncomplete="PF('blob-edit-dialog-var').hide()"
+                                                            value="Save changes"  
+                                                            tabindex="3"
+                                                            styleClass="inline-button"
+                                                            icon="fa fa-floppy-o"
+                                                            update="prop-blobs-form:prop-blobs-table
+                                                            form-messages-global"/>
+                                        
+                                    </div>
+
+                                </div>
+                            
+                            
+                        </h:form>
+                           
+
+                    </p:dialog>
+                    
+                    
+
+                    <p:dialog   id="blob-remove-dialog"
+                                height="400" width="600"
+                                widgetVar="blob-remove-dialog-var"
+                                responsive="true"
+                                modal="true"
+                                resizable="true"
+                                closable="true"
+                                closeOnEscape="true"
+                                header="Remove photo or document"
+                                > 
+
+                        <h:form id="blob-remove-form">
+
+                            <div class="ui-g data_container_nested_restrict">
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                                    <div class="restrict-data-field-label-inline" >
+
+                                        <h:outputLabel  for="blob-remove-button">
+                                            <h:outputText value="This operation removes the link between this blob and this property; the file remains in the DB" />
+                                        </h:outputLabel>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+
+                                    <div class="restrict-main-contents-io-button red_button">
+                                        <p:commandButton 
+                                            id="blob-remove-button"
+                                            icon="fa fa-trash"
+                                            ajax="true"
+                                            actionListener="#{propertySearchBB.onBlobRemoveCommitButtonChange}"
+                                            value="Remove Photo/Doc ID:#{propertySearchBB.currentBlob.photoDocID}"
+                                            update="prop-blobs-form:prop-blobs-table
+                                                            form-messages-global"
+                                            oncomplete="PF('blob-remove-dialog-var).hide();"
+                                            />
+                                    </div>
+                                    <div class="restrict-main-contents-io-button gray_button">
+                                        <p:commandButton    id="blob-remove-cancel-button"
+                                                            ajax="true"  
+                                                            tabindex="27"
+                                                            value="Cancel"
+                                                            icon="fa fa-stop"
+                                                            immediate="true"
+                                                            process="@none"
+                                                            onclick="PF('blob-remove-dialog-var').hide()"
+                                                            />
+                                    </div>
+                                </div>
+                            </div>
+                        </h:form>
+                    </p:dialog>
+
                     
                     <p:dialog id="prop-addupdate-dialog"
                               header="#{propertySearchBB.currentProperty.propertyID == 0 ? 'New property record':propertySearchBB.currentProperty.address}"
@@ -1552,7 +1890,7 @@
 
                             <p>Caution: This action is like 'delete'; we have to dig the record back out by
                                 hand if you goof.</p>
-                            <p:commandButton icon="fa fa-stop"
+                            <p:commandButton icon="fa fa-trash"
                                              ajax="false"
                                              action="#{propertySearchBB.onRemoveButtonChange()}"
                                              value="Permanently remove property ID:#{propertySearchBB.currentProperty.propertyID}"

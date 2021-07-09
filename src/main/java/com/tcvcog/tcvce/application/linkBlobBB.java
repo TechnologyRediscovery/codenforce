@@ -58,28 +58,7 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void linkBlobToProperty() {
-        BlobIntegrator bi = getBlobIntegrator();
-        PropertyIntegrator pi = getPropertyIntegrator();
-        
-        try{
-            pi.getProperty(propertyID);
-        }catch(IntegrationException e){
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR
-                            ,"Unable to find Property with that ID. " , ""));
-            return;
-        }
-        
-        try {
-            bi.linkPhotoBlobToProperty(selectedBlobID, propertyID);
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR
-                            ,"Failed to link file to Property. Sorry! " , ""));
-        }
-        
-    }
+   
     
     public void linkBlobToPerson() {
         BlobIntegrator bi = getBlobIntegrator();
