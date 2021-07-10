@@ -62,7 +62,7 @@
             OccInspectedSpace inside your OccInspection
             ANd now shows up in list 2
             
-           
+
             List 2: List of OccInspectedSpace on the OccInspection
             you got from the previous call
             Clicking on items from this list gives you the lovely UI you already built
@@ -78,7 +78,7 @@
             -->
             <p:commandButton id="inspections-newbutton"
                              value="New inspection"
-                             disabled="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedTS}"
+                             disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedTS}"
                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                              icon="fa fa-plus"
                              oncomplete="PF('inspections-selectchecklist-var').show()"
@@ -119,7 +119,7 @@
                 </p:column>
 
                 <p:column headerText="Code Source">
-                    <h:outputText value="#{checklist.governingCodeSource.sourceName}"/>
+                    <h:outputText value="#{checklist.governingCodeSource.sourceName} (#{checklist.governingCodeSource.sourceYear})"/>
                 </p:column>
             </p:dataTable>
 
@@ -171,7 +171,57 @@
                                  value="Continue"
                                  disabled="#{occInspectionsBB.selectedInspector.userID == 0}"
                                  icon="pi pi-arrow-right"
-                                 oncomplete="PF('inspections-selectinspector-var').hide(); PF('inspections-spacedetails-var').show()"/>
+                                 actionListener="#{occInspectionsBB.initSkeletonInspection}"
+                                 update="inspections-selecttypes"
+                                 oncomplete="PF('inspections-selectinspector-var').hide(); PF('inspections-selecttypes-var').show()"/>
+            </div>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="inspections-selecttypes"
+              width="800"
+              widgetVar="inspections-selecttypes-var"
+              header="Select "
+              modal="true"
+              resizable="true">
+        <h:form id="inspections-selecttypes-form">
+            <p:dataTable id="inspections-selecttypes-dt"
+                         scrollHeight="600"
+                         var="space" value="#{occInspectionsBB.inspectionSpaceList}"
+                         rowKey="#{space.spaceID}"
+                         selection="#{occInspectionsBB.selectedSpace}"
+                         stripedRows="true">
+                <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                <p:column headerText="Name">
+                    <h:outputText value="#{space.name}"/>
+                </p:column>
+                <p:column headerText="Description">
+                    <h:outputText value="#{space.description}"/>
+                </p:column>
+                <p:column headerText="Type">
+                    <h:outputText value="#{space.type.spaceTypeTitle}"/>
+                    <h:panelGroup id="inspections-selecttypes-dt-spacetypeinfoicon">
+                        <i class="p-ml-1 pi pi-info-circle"/>
+                    </h:panelGroup>
+                    <p:tooltip for="inspections-selecttypes-dt-spacetypeinfoicon" value="#{space.type.spaceTypeDescription}" position="right"/>
+                </p:column>
+                <p:column headerText="Required">
+                        <i class="#{space.required ? 'pi pi-star' : ''}"/>
+                </p:column>
+            </p:dataTable>
+
+            <p:spacer height="5px"/>
+
+            <div class="p-d-flex p-jc-end">
+                <p:commandButton value="Back"
+                                 icon="pi pi-arrow-left"
+                                 class="ui-button-outlined p-mr-1"
+                                 oncomplete="PF('inspections-selecttypes-var').hide(); PF('inspections-selectinspector-var').show();"/>
+                <p:commandButton id="inspections-selecttypes-continuebutton"
+                                 value="Continue"
+                                 disabled="#{occInspectionsBB.selectedInspector.userID == 0}"
+                                 icon="pi pi-arrow-right"
+                                 oncomplete="PF('inspections-selecttypes-var').hide(); PF('inspections-spacedetails-var').show()"/>
             </div>
         </h:form>
     </p:dialog>
@@ -201,7 +251,7 @@
                 <p:commandButton value="Back"
                                  icon="pi pi-arrow-left"
                                  class="ui-button-outlined p-mr-1"
-                                 oncomplete="PF('inspections-spacedetails-var').hide(); PF('inspections-selectinspector-var').show();"/>
+                                 oncomplete="PF('inspections-spacedetails-var').hide(); PF('inspections-selecttypes-var').show();"/>
                 <p:commandButton id="inspections-selectinspector-continuebutton"
                                  value="Continue"
                                  icon="pi pi-arrow-right"
