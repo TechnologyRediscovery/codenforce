@@ -47,8 +47,7 @@ public class OccInspectedSpace
     private ViewOptionsOccChecklistItemsEnum viewSetting;
     
     private OccLocationDescriptor location;
-    private OccSpaceType type;
-    
+
     private User addedToChecklistBy;
     private LocalDateTime addedToChecklistTS;
     
@@ -61,7 +60,7 @@ public class OccInspectedSpace
     
     public OccInspectedSpace(OccSpace spc){
         this.spaceID = spc.getSpaceID();
-        this.occSpaceTypeID = spc.getOccSpaceTypeID();
+        this.type = spc.getType();
         this.name = spc.getName();
         this.required = spc.isRequired();
         
@@ -167,21 +166,6 @@ public class OccInspectedSpace
         this.type = spaceType;
     }
 
-   
-
-    /**
-     * @return the type
-     */
-    public OccSpaceType getType() {
-        return type;
-    }
-
-    /**
-     * @param type the type to set
-     */
-    public void setType(OccSpaceType type) {
-        this.type = type;
-    }
 
     /**
      * @return the addedToChecklistBy

@@ -165,7 +165,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         try {
             stmt = con.prepareStatement(query);
             stmt.setString(1, space.getName());
-            stmt.setInt(2, space.getOccSpaceTypeID());
+            stmt.setInt(2, space.getType().getSpaceTypeID());
             stmt.setBoolean(3, space.isRequired());
             stmt.setString(4, space.getDescription());
 
@@ -204,7 +204,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         try {
             stmt = con.prepareStatement(query);
             stmt.setString(1, space.getName());
-            stmt.setInt(2, space.getOccSpaceTypeID());
+            stmt.setInt(2, space.getType().getSpaceTypeID());
             stmt.setBoolean(3, space.isRequired());
             stmt.setString(4, space.getDescription());
 
@@ -328,7 +328,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         OccSpace space = new OccSpace();
         space.setSpaceID(rs.getInt("spaceid"));
         space.setName(rs.getString("name"));
-        space.setOccSpaceTypeID(rs.getInt("spacetype_id"));
+        space.setType(getOccSpaceType(rs.getInt("spacetype_id")));
         space.setDescription(rs.getString("description"));
         space = populateSpaceWithCodeElements(space);
         return space;
@@ -844,7 +844,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         OccInspectedSpace inSpace = new OccInspectedSpace(getOccSpace(rs.getInt("occspace_spaceid")));
         inSpace.setInspectedSpaceID(rs.getInt("inspectedspaceid"));
         inSpace.setLocation(getLocationDescriptor(rs.getInt("occlocationdescription_descid")));
-        inSpace.setSpaceType(getSpaceType(inSpace.getOccSpaceTypeID()));
+        inSpace.setSpaceType(getSpaceType(inSpace.getType().getSpaceTypeID()));
         inSpace.setAddedToChecklistBy(ui.getUser(rs.getInt("addedtochecklistby_userid")));
         inSpace.setInspectionID(rs.getInt("occinspection_inspectionid"));
         
@@ -2507,7 +2507,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             stmt = con.prepareStatement(query);
             stmt.setInt(1, oc.getSpaceID());
             stmt.setString(2, oc.getName());
-            stmt.setInt(3, oc.getOccSpaceTypeID());
+            stmt.setInt(3, oc.getType().getSpaceTypeID());
             stmt.setBoolean(4, oc.isRequired());
             stmt.setString(5, oc.getDescription());
             stmt.setInt(6, oc.getSpaceID());

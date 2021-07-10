@@ -17,7 +17,6 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.BOb;
-import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.util.DateTimeUtil;
@@ -56,7 +55,7 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     private List<OccInspectedSpace> inspectedSpaceList;
     private List<OccInspectedSpace> inspectedSpaceListVisible;
     private ViewOptionsOccChecklistItemsEnum viewSetting;
-    private boolean includeEmtpySpaces;
+    private boolean includeEmptySpaces;
     
     private int pacc;
     private boolean enablePacc;
@@ -97,7 +96,7 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
             ois.setViewSetting(viewSetting);
             ois.configureVisibleElementList();
             if(!ois.getInspectedElementListVisible().isEmpty()
-                    || (ois.getInspectedElementListVisible().isEmpty() && includeEmtpySpaces)){
+                    || (ois.getInspectedElementListVisible().isEmpty() && includeEmptySpaces)){
                 inspectedSpaceListVisible.add(ois);
             }
         } // close for over inspectedspaces
@@ -563,15 +562,15 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     /**
      * @return the includeEmtpySpaces
      */
-    public boolean isIncludeEmtpySpaces() {
-        return includeEmtpySpaces;
+    public boolean isIncludeEmptySpaces() {
+        return includeEmptySpaces;
     }
 
     /**
-     * @param includeEmtpySpaces the includeEmtpySpaces to set
+     * @param includeEmptySpaces the includeEmtpySpaces to set
      */
-    public void setIncludeEmtpySpaces(boolean includeEmtpySpaces) {
-        this.includeEmtpySpaces = includeEmtpySpaces;
+    public void setIncludeEmptySpaces(boolean includeEmptySpaces) {
+        this.includeEmptySpaces = includeEmptySpaces;
     }
 
     
