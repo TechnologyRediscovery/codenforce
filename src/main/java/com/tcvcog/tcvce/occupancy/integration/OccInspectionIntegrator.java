@@ -330,6 +330,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         space.setName(rs.getString("name"));
         space.setType(getOccSpaceType(rs.getInt("spacetype_id")));
         space.setDescription(rs.getString("description"));
+        space.setRequired(rs.getBoolean("required"));
         space = populateSpaceWithCodeElements(space);
         return space;
     }
