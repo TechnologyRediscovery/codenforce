@@ -191,6 +191,7 @@
                          rowKey="#{space.spaceID}"
                          selection="#{occInspectionsBB.selectedSpace}"
                          stripedRows="true">
+                <p:ajax event="rowSelect" update=":inspections-selecttypes-form:inspections-selecttypes-continuebutton"/>
                 <p:column selectionMode="single" style="width:16px;text-align:center"/>
                 <p:column headerText="Name">
                     <h:outputText value="#{space.name}"/>
@@ -219,8 +220,9 @@
                                  oncomplete="PF('inspections-selecttypes-var').hide(); PF('inspections-selectinspector-var').show();"/>
                 <p:commandButton id="inspections-selecttypes-continuebutton"
                                  value="Continue"
-                                 disabled="#{occInspectionsBB.selectedInspector.userID == 0}"
+                                 disabled="#{occInspectionsBB.selectedSpace.spaceID == 0}"
                                  icon="pi pi-arrow-right"
+                                 update="inspections-spacedetails"
                                  oncomplete="PF('inspections-selecttypes-var').hide(); PF('inspections-spacedetails-var').show()"/>
             </div>
         </h:form>
@@ -233,17 +235,23 @@
               resizable="true">
         <h:form id="inspections-spacedetails-form">
             <p:outputLabel styleClass="p-d-block">Space name:</p:outputLabel>
-            <p:inputText styleClass="p-d-block"/>
+            <p:inputText styleClass="p-d-block" value="#{occInspectionsBB.selectedSpace.name}">
+                <p:ajax update="inspections-spacedetails-continuebutton"/>
+            </p:inputText>
 
             <p:outputLabel styleClass="p-d-block">Location descriptor:</p:outputLabel>
-            <p:selectOneMenu>
-                <f:selectItem itemLabel="Option1" itemValue="Option1"/>
-                <f:selectItem itemLabel="Option2" itemValue="Option2"/>
-                <f:selectItem itemLabel="Option3" itemValue="Option3"/>
+            <p:selectOneMenu selected="#{occInspectionsBB.selectedLocDescriptor}" converter="occLocationDescriptorConverter"
+                             var="ld" filter="true" filterMatchMode="contains">
+                <p:ajax update="inspections-spacedetails-continuebutton"/>
+                <f:selectItems value="#{occInspectionsBB.locDescriptorList}" var="locdep"
+                               itemLabel="#{locdep.locationDescription}" itemValue="#{locdep}"/>
+                <p:column>
+                    <h:outputText value="#{ld.locationDescription}"/>
+                </p:column>
             </p:selectOneMenu>
 
             <p:outputLabel styleClass="p-d-block">Space details:</p:outputLabel>
-            <p:inputTextarea rows="6" cols="33"/>
+            <p:inputTextarea rows="6" cols="33" value="#{occInspectionsBB.selectedSpace.description}"/>
 
             <p:spacer height="5px"/>
 
@@ -252,7 +260,7 @@
                                  icon="pi pi-arrow-left"
                                  class="ui-button-outlined p-mr-1"
                                  oncomplete="PF('inspections-spacedetails-var').hide(); PF('inspections-selecttypes-var').show();"/>
-                <p:commandButton id="inspections-selectinspector-continuebutton"
+                <p:commandButton id="inspections-spacedetails-continuebutton"
                                  value="Continue"
                                  icon="pi pi-arrow-right"
                                  oncomplete="PF('inspections-spacedetails-var').hide(); PF('inspections-entryscreen-var').show()"/>

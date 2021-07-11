@@ -7,6 +7,8 @@ import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.*;
+import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
@@ -22,6 +24,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
     private List<OccChecklistTemplate> checklistTemplateList;
     private List<User> userList;
+    private List<OccLocationDescriptor> locDescriptorList;
 
     private List<OccSpace> inspectionSpaceList;
 
@@ -30,6 +33,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     private User selectedInspector;
 
     private OccSpace selectedSpace;
+    private OccLocationDescriptor selectedLocDescriptor;
 
     private OccInspection skeletonInspection;
 
@@ -39,6 +43,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         // Initialize list of checklist templates
         initChecklistTemplates();
         initUserList();
+        initLocDescriptorList();
     }
 
     /**
@@ -62,6 +67,22 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
         // TODO: probably shouldn't pass null here...
         userList = uc.user_assembleUserListForSearch(null);
+    }
+
+    /**
+     * Gets the list of all possible location descriptors and sets locDescriptorList
+     */
+    public void initLocDescriptorList() {
+        // TODO: MVC violation--never do this! I just copied this from OccInspectionBB and can't be bothered to do it properly.
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+
+        locDescriptorList = new ArrayList<>();
+        try {
+            locDescriptorList.add(oii.getLocationDescriptor(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("locationdescriptor_implyfromspacename"))));
+        } catch (IntegrationException ex) {
+            System.out.println("Failed to acquire list of location descriptors:" + ex);
+        }
     }
 
     /**
@@ -115,6 +136,11 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         inspectionSpaceList = occSpaces;
     }
 
+    void addSelectedSpaceToSkeletonInspection() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+//        oc.inspectionAction_commenceSpaceInspection();
+    }
+
     /**
      * Clears all parameters that might be selected during the inspection flow
      * so that one may start fresh. May be called, for example, by a button to start the flow.
@@ -122,6 +148,8 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     public void clearSelections() {
         setSelectedChecklistTemplate(new OccChecklistTemplate());
         setSelectedInspector(new User());
+        setSelectedSpace(new OccSpace());
+        setSelectedLocDescriptor(new OccLocationDescriptor());
     }
 
     // getters & setters below you know the drill
@@ -132,6 +160,10 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
     public List<User> getUserList() {
         return userList;
+    }
+
+    public List<OccLocationDescriptor> getLocDescriptorList() {
+        return locDescriptorList;
     }
 
     public List<OccSpace> getInspectionSpaceList() {
@@ -160,6 +192,14 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
     public void setSelectedSpace(OccSpace selectedSpace) {
         this.selectedSpace = selectedSpace;
+    }
+
+    public OccLocationDescriptor getSelectedLocDescriptor() {
+        return selectedLocDescriptor;
+    }
+
+    public void setSelectedLocDescriptor(OccLocationDescriptor selectedLocDescriptor) {
+        this.selectedLocDescriptor = selectedLocDescriptor;
     }
 
     public OccInspection getSkeletonInspection() {
