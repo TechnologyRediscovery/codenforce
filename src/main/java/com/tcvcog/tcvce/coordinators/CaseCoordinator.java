@@ -1949,7 +1949,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             throw new BObStatusException("Cannot lock notice with null case, nov, or user");
         }
         CaseIntegrator ci = getCaseIntegrator();
-        EventCoordinator evCoord = getEventCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
         PersonIntegrator pi = getPersonIntegrator();
 
@@ -1964,19 +1963,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             throw new BObStatusException("Notice is already locked and queued for sending");
         }
      
-        // Deactivated notice event for lock and queue--only for mailing
-//        EventCnF noticeEvent = evCoord.initEvent(c, evCoord.initEventCategory(Integer.parseInt(getResourceBundle(
-//                Constants.EVENT_CATEGORY_BUNDLE).getString("noticeQueued"))));
-//        
-//        String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeQueuedEventDesc");
-//        
-//        noticeEvent.setDescription(queuedNoticeEventNotes);
-//        noticeEvent.setUserCreator(ua);
-//        
-//        ArrayList<Person> persList = new ArrayList();
-//        persList.add(nov.getRecipient());
-//        noticeEvent.setPersonList(persList);
-//        evCoord.addEvent(noticeEvent, c, ua);
+        
     }
     
     
@@ -2043,11 +2030,43 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws EventException
      * @throws IntegrationException
      */
-    public void nov_markAsSent(CECaseDataHeavy ceCase, NoticeOfViolation nov, User user) throws BObStatusException, EventException, IntegrationException {
+    public void nov_markAsSent(CECaseDataHeavy ceCase, NoticeOfViolation nov, UserAuthorized user) throws BObStatusException, EventException, IntegrationException {
+        
         CaseIntegrator ci = getCaseIntegrator();
+        
         nov.setSentTS(LocalDateTime.now());
         nov.setSentBy(user);
         ci.novRecordMailing(nov);
+        
+        nov_logNOVSentEvent(ceCase, nov, user);
+        
+    }
+    
+    /**
+     * 
+     * @param ceCase
+     * @param nov
+     * @param user
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    private void nov_logNOVSentEvent(CECaseDataHeavy ceCase, NoticeOfViolation nov, UserAuthorized user) 
+            throws IntegrationException, BObStatusException, EventException{
+        EventCoordinator evCoord = getEventCoordinator();
+        
+        
+        EventCnF noticeEvent = evCoord.initEvent(ceCase, evCoord.initEventCategory(Integer.parseInt(getResourceBundle(
+                Constants.EVENT_CATEGORY_BUNDLE).getString("noticeMailed"))));
+        
+        String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeMailedEventDesc");
+        
+        noticeEvent.setDescription(queuedNoticeEventNotes);
+        noticeEvent.setUserCreator(user);
+        
+        evCoord.addEvent(noticeEvent, ceCase, user);
+        
+        
+        
     }
 
     /**

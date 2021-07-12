@@ -659,9 +659,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             System.out.println(ex);
             throw new IntegrationException("Error inserting new authorization period", ex);
         } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+            if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
     }
