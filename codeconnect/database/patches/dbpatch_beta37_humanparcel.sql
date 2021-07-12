@@ -84,7 +84,6 @@ CREATE TABLE mailingaddress
     (
         addressid               INTEGER PRIMARY KEY DEFAULT nextval('mailingaddress_addressid_seq'),
         bldgno	                TEXT NOT NULL,
-        unitno 					TEXT,
         street_streetid         INTEGER NOT NULL CONSTRAINT mailingaddress_streetid_fk REFERENCES mailingstreet (streetid),
         verifiedts              TIMESTAMP WITH TIME ZONE,
         verifiedby_userid       INTEGER CONSTRAINT mailingaddress_createdby_userid_fk REFERENCES login (userid),     
@@ -107,6 +106,57 @@ INSERT INTO public.mailingstate(
 
 
 
+-- Manually clear the -1/2 addresses and the R/W street names
+
+CREATE OR REPLACE FUNCTION public.extractbuildingno(addr TEXT	)
+  	RETURNS TEXT AS
+
+$BODY$
+	DECLARE
+	 	extractedbldg TEXT;
+
+	BEGIN
+		IF addr ILIKE '%/%'
+		THEN -- we've got a XX 1/2 street
+			extractedbldg := substring(addr from '\d+\W\d/\d');
+		ELSE 
+			extractedbldg := substring(addr from '\d+');
+
+
+		RETURN trim(both from extractedbldg);
+	END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+
+
+CREATE OR REPLACE FUNCTION public.extractstreet(addr TEXT	)
+  	RETURNS TEXT AS
+
+$BODY$
+	DECLARE
+	 	extractedstreet TEXT;
+
+	BEGIN
+		BEGIN
+		IF addr ILIKE '%/%'
+		THEN -- we've got a XX 1/2 street
+			extractedstreet := substring(addr from '\d+\W\d/\d(.*)');
+		ELSE 
+			extractedstreet := substring(addr from '\d+\W(.*)');
+
+
+		RETURN trim(both from extractedstreet);
+	END;
+		RETURN 1;
+	END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.migratepersontohuman()
+  OWNER TO sylvia;
 
 
 
@@ -121,6 +171,13 @@ $BODY$
 	 	deacuser INTEGER;
 	 	extractedbldg TEXT;
 	 	extractedsstreet TEXT;
+	 	addr_range TEXT;
+	 	addr_range_start TEXT;
+	 	addr_range_end TEXT;
+	 	addr_range_start_no TEXT;
+	 	addr_range_end_no TEXT;
+	 	addr_range_cursor INTEGER;
+	 	addr_range_arr INTEGER[];
 	 	maid INTEGER;
 
 	BEGIN
@@ -188,15 +245,35 @@ $BODY$
 						);
 
 
-
-
 			-- parse address into street and bldgno 
 			-- write street into mailingstreet
 			-- fetch fresh street id
 
+			-- extract addresses with a - in there somewhere
+			SELECT address, substring(address from '\d+\W-\d+') FROM property WHERE address SIMILAR TO '%-%' INTO addr_range;
+
+			IF 
+				addr_range IS NOT NULL
+			THEN -- build range
+				addr_range_start := substring(addr_range from '\d+');
+				addr_range_end := substring(addr_range from '\d+\W-(\d+)');
+				addr_range_start_no := CAST (addr_range_start AS INTEGER);
+				addr_range_end_no := CAST (addr_range_end AS INTEGER);
+				addr_range_cursor := addr_range_start_no;
+				WHILE
+					addr_range_cursor <= addr_range_end_no
+				LOOP
+					array_append(addr_range_arr, addr_range_cursor);
+
+				END LOOP;
+
+			ELSE
+				NULL;  -- do nothing if we don't have an actual range
+
+
 
 			EXECUTE format('INSERT INTO public.mailingaddress(
-						            addressid, bldgno, unitno, street_streetid, verifiedts, verifiedby_userid, 
+						            addressid, bldgno, street_streetid, verifiedts, verifiedby_userid, 
 						            verifiedsource_sourceid, source_sourceid, createdts, createdby_userid, 
 						            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
 						            notes)
@@ -331,5 +408,5 @@ ALTER FUNCTION public.migratepersontohuman()
 
 --IF datepublished IS NULL the patch is still open and receiving changes
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (36, 'database/patches/dbpatch_beta37.sql',NULL, 'ecd', 'Human and Parcel migration');
+    VALUES (37, 'database/patches/dbpatch_beta37.sql',NULL, 'ecd', 'Human and Parcel migration');
 
