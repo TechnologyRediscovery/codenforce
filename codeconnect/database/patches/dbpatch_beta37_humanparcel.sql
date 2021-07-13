@@ -24,6 +24,7 @@ CREATE TABLE public.mailingstate
 
 
 
+
 CREATE SEQUENCE IF NOT EXISTS mailingzipcode_zipcodeid_seq
     START WITH 100
     INCREMENT BY 1
@@ -37,6 +38,9 @@ CREATE TABLE public.mailingzipcode
 	zipcode  		TEXT NOT NULL,
 	state_stateid 	INTEGER CONSTRAINT mailingzipcode_stateid_fk REFERENCES mailingstate (stateid)
 );
+
+INSERT INTO public.mailingzipcode(zipcodeid, zipcode, state_stateid)
+	VALUES (88, 99999, 100 );
 
 
 CREATE SEQUENCE IF NOT EXISTS mailingcity_cityid_seq
@@ -54,6 +58,13 @@ CREATE TABLE public.mailingcity
 	zipcode_zipcodeid INTEGER CONSTRAINT mailingcity_zipcodeid_fk REFERENCES mailingzipcode (zipcodeid)
 
 );
+
+
+INSERT INTO public.mailingcity(
+            cityid, name, namevariantsarr, zipcode_zipcodeid)
+    VALUES (9, 'COGCity', NULL, 88);
+
+
 
 
 
@@ -121,6 +132,7 @@ $BODY$
 			extractedbldg := substring(addr from '\d+\W\d/\d');
 		ELSE 
 			extractedbldg := substring(addr from '\d+');
+		END IF;
 
 
 		RETURN trim(both from extractedbldg);
@@ -140,28 +152,28 @@ $BODY$
 	 	extractedstreet TEXT;
 
 	BEGIN
-		BEGIN
 		IF addr ILIKE '%/%'
 		THEN -- we've got a XX 1/2 street
 			extractedstreet := substring(addr from '\d+\W\d/\d(.*)');
 		ELSE 
 			extractedstreet := substring(addr from '\d+\W(.*)');
 
-
+		END IF;
 		RETURN trim(both from extractedstreet);
-	END;
 		RETURN 1;
 	END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION public.migratepersontohuman()
-  OWNER TO sylvia;
+
 
 
 
 CREATE OR REPLACE FUNCTION public.migratepropertytoparcel(creationrobotuser INTEGER,
-														  defaultsource INTEGER	)
+														  defaultsource INTEGER,
+													  	  cityid INTEGER,
+													  	  municodetarget INTEGER,
+												  	  	  parceladdr_lorid INTEGER	)
   	RETURNS integer AS
 
 $BODY$
@@ -174,16 +186,19 @@ $BODY$
 	 	addr_range TEXT;
 	 	addr_range_start TEXT;
 	 	addr_range_end TEXT;
-	 	addr_range_start_no TEXT;
-	 	addr_range_end_no TEXT;
+	 	addr_range_start_no INTEGER;
+	 	addr_range_end_no INTEGER;
 	 	addr_range_cursor INTEGER;
 	 	addr_range_arr TEXT[];
+	 	bldgno INTEGER;
 	 	maid INTEGER; -- mailing address ID
 	 	current_street_id INTEGER;
+	 	buildingcount INTEGER;
 
 	BEGIN
+	buildingcount := 0;
 		RAISE NOTICE 'starting property migration...';
-		FOR pr IN SELECT 		propertyid, municipality_municode, parid, lotandblock, address, 
+		FOR pr IN SELECT 		format('propertyid, municipality_municode, parid, lotandblock, address, 
 						       usegroup, constructiontype, countycode, notes, addr_city, addr_state, 
 						       addr_zip, ownercode, propclass, lastupdated, lastupdatedby, locationdescription, 
 						       bobsource_sourceid, unfitdatestart, unfitdatestop, unfitby_userid, 
@@ -191,10 +206,9 @@ $BODY$
 						       vacantdatestop, vacantby_userid, condition_intensityclassid, 
 						       landbankprospect_intensityclassid, landbankheld, active, nonaddressable, 
 						       usetype_typeid, creationts
-						  FROM public.property
-
+						  FROM public.property WHERE municipality_municode=%I',municodetarget)
 		 
-		LOOP
+		LOOP -- over properties in legacy table
 			
 			-- check for deactivation
 			IF NOT pr.active 
@@ -220,7 +234,6 @@ $BODY$
 
 	            ); 
 
-
 			EXECUTE format('INSERT INTO public.parcelinfo(
 					            parcelinfoid, parcel_parcelkey, usegroup, constructiontype, countycode, 
 					            notes, ownercode, propclass, locationdescription, bobsource_sourceid, 
@@ -236,39 +249,40 @@ $BODY$
 					            %I, %I, %I, 
 					            %I, %I, %I, %I, %I, 
 					            %I, %I, %I, %I);',
-				            pr.propertyid, pr.usegroup, pr.constructiontype, pr.countycode
-				            pr.ownercode, pr.propclass, pr.bobsource_sourceid
+				            pr.propertyid, pr.usegroup, pr.constructiontype, pr.countycode,
+				            pr.ownercode, pr.propclass, pr.bobsource_sourceid,
 				            pr.unfitdatestart, pr.unfitdatestop, pr.unfitby_userid, pr.abandoneddatestart, 
 			            	pr.abandoneddatestop, pr.abandonedby_userid, pr.vacantdatestart, pr.vacantdatestop, 
-			            	pr.vacantby_userid, pr.condition_intensityclassid, pr.landbankprospect_intensityclassid
-			            	pr.landbankheld, pr.nonaddressable, pr.usetype_typeid, pr.creationts, creationrobotuser
+			            	pr.vacantby_userid, pr.condition_intensityclassid, pr.landbankprospect_intensityclassid,
+			            	pr.landbankheld, pr.nonaddressable, pr.usetype_typeid, pr.creationts, creationrobotuser,
 			            	pr.creationts, creationrobotuser, deacts, deacuser
 						);
-
 
 			-- parse address into street and bldgno 
 			extractedstreet := extractstreet(pr.address);
 			-- See if street is in the table already, if so, get its ID
 			
-			SELECT cityid FROM public.mailingcity WHERE name ILIKE extractedstreet INTO current_street_id;
+			SELECT streetid FROM public.mailingstreet WHERE name ILIKE extractedstreet INTO current_street_id;
+			
 			IF FOUND
-			THEN
+			THEN -- we have an existing street
+				NULL; -- we'll use the current_street_id for all the address writes
 
-			ELSE
-
+			ELSE -- we don't have a record of this street, so write it and grab its ID
+				-- write street into mailingstreet
+				EXECUTE format('INSERT INTO public.mailingstreet(
+								            streetid, name, namevariantsarr, muni_municode, city_cityid, 
+								            notes)
+								    VALUES (DEFAULT, %I, %I, %I, %I, 
+								            %I);',
+								            		  extractedstreet, NULL, municodetarget, cityid,
+					            		    NULL);
+				-- fetch fresh street id
+				SELECT currval('mailingstreet_streetid_seq') INTO current_street_id;
 			END IF;
 
-
-
-
-			-- write street into mailingstreet
-
-
-
-			-- fetch fresh street id
-
 			-- extract addresses with a - in there somewhere
-			SELECT address, substring(address from '\d+\W-\d+') FROM property WHERE address SIMILAR TO '%-%' INTO addr_range;
+			addr_range := substring(pr.address from '\d+\W-\d+');
 
 			IF 
 				addr_range IS NOT NULL
@@ -278,73 +292,64 @@ $BODY$
 				addr_range_start_no := CAST (addr_range_start AS INTEGER);
 				addr_range_end_no := CAST (addr_range_end AS INTEGER);
 				addr_range_cursor := addr_range_start_no;
-				WHILE
+				WHILE  
 					addr_range_cursor <= addr_range_end_no
 				LOOP
 
-					array_append(addr_range_arr, addr_range_cursor);
+					SELECT array_append(addr_range_arr, addr_range_cursor);
 					-- step up by 2 building nos per even/odd numbering schema
 					addr_range_cursor := addr_range_cursor + 2; 
 
 				END LOOP;
 
 			ELSE -- NORMAL building no
-				array_append(addr_range_arr, );
+				addr_range := extractbuildingno(pr.address);
+				SELECT array_append(addr_range_arr, addr_range);
 				
 			END IF;
 
-			FOREACH num IN addr_range_arr
-			LOOP
-
-
-
+			FOREACH bldgno IN ARRAY addr_range_arr
+			LOOP -- over each address in the array
 				EXECUTE format('INSERT INTO public.mailingaddress(
 							            addressid, bldgno, street_streetid, verifiedts, verifiedby_userid, 
 							            verifiedsource_sourceid, source_sourceid, createdts, createdby_userid, 
-							            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
-							            notes)
-							    VALUES (DEFAULT, %I, %I, %I, %I, %I, 
+							            lastupdatedts, lastupdatedby_userid, notes)
+							    VALUES (DEFAULT, %I, %I, %I, %I, 
 							            %I, %I, %I, %I, 
-							            %I, %I, %I, %I, 
-							            %I);
-								'
+							            %I, %I, %I);',
+							                     bldgno, current_street_id, NULL, NULL,
+					                    NULL, defaultsource, now(), creationrobotuser,
+					                    now(), creationrobotuser, 'Created during parcel migration JUL-21');
+				buildingcount := buildingcount + 1;
 
+				-- get our fresh mailing address ID
+				SELECT currval('mailingaddress_addressid_seq') INTO maid;
 
-				);
+				-- Connect our current parcel with each
+				EXECUTE format('INSERT INTO public.parcelmailingaddress(
+								            mailingparcel_parcelid, mailingparcel_mailingid, source_sourceid, 
+								            createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
+								            deactivatedts, deactivatedby_userid, notes, linkid, linkedobjectrole_lorid)
+								    VALUES (%I, %I, %I, 
+								            now(), %I, now(), %I, 
+								            NULL, NULL, %I, DEFAULT, %I);',
 
+							            	pr.propertyid, maid, defaultsource,
+							            	creationrobotuser, creationrobotuser, 
+            								'Created during parcel migration JUL-21', parceladdr_lorid);
 
+			END LOOP; -- over each building Number extracted from the original property address 
+		END LOOP; -- over properties in the legacy table
 
+		addr_range_arr := ARRAY[]; -- clear array for next iteration
+		addr_range := NULL;
 
-
-
-			END LOOP;
-			SELECT currval('mailingaddress_addressid_seq') INTO currval INTO maid;
-
-			EXECUTE format('INSERT INTO public.parcelmailingaddress(
-							            mailingparcel_parcelid, mailingparcel_mailingid, source_sourceid, 
-							            createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
-							            deactivatedts, deactivatedby_userid, notes, linkid, linkedobjectrole_lorid)
-							    VALUES (%I, %I, %I, 
-							            now(), %I, now(), %I, 
-							            NULL, NULL, NULL, DEFAULT, %I);',
-
-						            	maid, pr.propertyid, defaultsource,
-						            	creationrobotuser, creationrobotuser, 
-
-
-
-			);
-
-
-
-		END LOOP;
-		RETURN 1;
+		RETURN buildingcount;
 	END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION public.migratepersontohuman()
-  OWNER TO sylvia;
+
 
 
 
