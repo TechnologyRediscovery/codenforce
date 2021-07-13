@@ -170,15 +170,16 @@ $BODY$
 	 	deacts TIMESTAMP WITH TIME ZONE;
 	 	deacuser INTEGER;
 	 	extractedbldg TEXT;
-	 	extractedsstreet TEXT;
+	 	extractedstreet TEXT;
 	 	addr_range TEXT;
 	 	addr_range_start TEXT;
 	 	addr_range_end TEXT;
 	 	addr_range_start_no TEXT;
 	 	addr_range_end_no TEXT;
 	 	addr_range_cursor INTEGER;
-	 	addr_range_arr INTEGER[];
-	 	maid INTEGER;
+	 	addr_range_arr TEXT[];
+	 	maid INTEGER; -- mailing address ID
+	 	current_street_id INTEGER;
 
 	BEGIN
 		RAISE NOTICE 'starting property migration...';
@@ -246,7 +247,24 @@ $BODY$
 
 
 			-- parse address into street and bldgno 
+			extractedstreet := extractstreet(pr.address);
+			-- See if street is in the table already, if so, get its ID
+			
+			SELECT cityid FROM public.mailingcity WHERE name ILIKE extractedstreet INTO current_street_id;
+			IF FOUND
+			THEN
+
+			ELSE
+
+			END IF;
+
+
+
+
 			-- write street into mailingstreet
+
+
+
 			-- fetch fresh street id
 
 			-- extract addresses with a - in there somewhere
@@ -263,29 +281,43 @@ $BODY$
 				WHILE
 					addr_range_cursor <= addr_range_end_no
 				LOOP
+
 					array_append(addr_range_arr, addr_range_cursor);
+					-- step up by 2 building nos per even/odd numbering schema
+					addr_range_cursor := addr_range_cursor + 2; 
 
 				END LOOP;
 
-			ELSE
-				NULL;  -- do nothing if we don't have an actual range
+			ELSE -- NORMAL building no
+				array_append(addr_range_arr, );
+				
+			END IF;
+
+			FOREACH num IN addr_range_arr
+			LOOP
 
 
 
-			EXECUTE format('INSERT INTO public.mailingaddress(
-						            addressid, bldgno, street_streetid, verifiedts, verifiedby_userid, 
-						            verifiedsource_sourceid, source_sourceid, createdts, createdby_userid, 
-						            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
-						            notes)
-						    VALUES (DEFAULT, %I, %I, %I, %I, %I, 
-						            %I, %I, %I, %I, 
-						            %I, %I, %I, %I, 
-						            %I);
-							'
+				EXECUTE format('INSERT INTO public.mailingaddress(
+							            addressid, bldgno, street_streetid, verifiedts, verifiedby_userid, 
+							            verifiedsource_sourceid, source_sourceid, createdts, createdby_userid, 
+							            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
+							            notes)
+							    VALUES (DEFAULT, %I, %I, %I, %I, %I, 
+							            %I, %I, %I, %I, 
+							            %I, %I, %I, %I, 
+							            %I);
+								'
 
 
-			);
+				);
 
+
+
+
+
+
+			END LOOP;
 			SELECT currval('mailingaddress_addressid_seq') INTO currval INTO maid;
 
 			EXECUTE format('INSERT INTO public.parcelmailingaddress(
