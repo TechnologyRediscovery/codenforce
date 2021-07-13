@@ -24,7 +24,6 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
     private List<OccChecklistTemplate> checklistTemplateList;
     private List<User> userList;
-    private List<OccLocationDescriptor> locDescriptorList;
 
     private List<OccSpace> inspectionSpaceList;
 
@@ -43,7 +42,6 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         // Initialize list of checklist templates
         initChecklistTemplates();
         initUserList();
-        initLocDescriptorList();
     }
 
     /**
@@ -67,22 +65,6 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
         // TODO: probably shouldn't pass null here...
         userList = uc.user_assembleUserListForSearch(null);
-    }
-
-    /**
-     * Gets the list of all possible location descriptors and sets locDescriptorList
-     */
-    public void initLocDescriptorList() {
-        // TODO: MVC violation--never do this! I just copied this from OccInspectionBB and can't be bothered to do it properly.
-        OccInspectionIntegrator oii = getOccInspectionIntegrator();
-
-        locDescriptorList = new ArrayList<>();
-        try {
-            locDescriptorList.add(oii.getLocationDescriptor(
-                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("locationdescriptor_implyfromspacename"))));
-        } catch (IntegrationException ex) {
-            System.out.println("Failed to acquire list of location descriptors:" + ex);
-        }
     }
 
     /**
@@ -155,6 +137,8 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         setSelectedInspector(new User());
         setSelectedSpace(new OccSpace());
         setSelectedLocDescriptor(new OccLocationDescriptor());
+
+        skeletonInspection = null;
     }
 
     // getters & setters below you know the drill
@@ -165,10 +149,6 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
     public List<User> getUserList() {
         return userList;
-    }
-
-    public List<OccLocationDescriptor> getLocDescriptorList() {
-        return locDescriptorList;
     }
 
     public List<OccSpace> getInspectionSpaceList() {

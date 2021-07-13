@@ -22,10 +22,7 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * This whole class represents a "clipboard," where each item in the inspectedSpaceList
@@ -100,6 +97,20 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
                 inspectedSpaceListVisible.add(ois);
             }
         } // close for over inspectedspaces
+    }
+
+    public List<OccLocationDescriptor> getAllUniqueLocationDescriptors() {
+        Set<OccLocationDescriptor> locationDescriptors = new HashSet();
+
+        for (OccInspectedSpace inspectedSpace : inspectedSpaceList) {
+            locationDescriptors.add(inspectedSpace.getLocation());
+            System.out.println("A:" + inspectedSpace.getInspectedSpaceID());
+            locationDescriptors.addAll(inspectedSpace.getAllUniqueLocationDescriptors());
+        }
+
+        List<OccLocationDescriptor> locationDescriptorList = new ArrayList();
+        locationDescriptorList.addAll(locationDescriptors);
+        return locationDescriptorList;
     }
     
     /**

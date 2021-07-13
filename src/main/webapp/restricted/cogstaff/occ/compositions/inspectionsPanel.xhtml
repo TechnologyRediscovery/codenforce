@@ -241,7 +241,7 @@
                              converter="occLocationDescriptorConverter"
                              var="ld" filter="true" filterMatchMode="contains">
                 <p:ajax update="inspections-spacedetails-continuebutton"/>
-                <f:selectItems value="#{occInspectionsBB.locDescriptorList}" var="locdep"
+                <f:selectItems value="#{occInspectionsBB.skeletonInspection.allUniqueLocationDescriptors}" var="locdep"
                                itemLabel="#{locdep.locationDescription}" itemValue="#{locdep}"/>
                 <p:column>
                     <h:outputText value="#{ld.locationDescription}"/>

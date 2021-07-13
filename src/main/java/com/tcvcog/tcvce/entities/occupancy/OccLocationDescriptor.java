@@ -96,12 +96,6 @@ public class OccLocationDescriptor {
         if (this.locationID != other.locationID) {
             return false;
         }
-        if (this.buildingFloorNo != other.buildingFloorNo) {
-            return false;
-        }
-        if (!Objects.equals(this.locationDescription, other.locationDescription)) {
-            return false;
-        }
         return true;
     }
     

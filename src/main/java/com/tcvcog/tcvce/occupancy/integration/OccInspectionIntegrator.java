@@ -1005,6 +1005,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return insertedLocDescID;
     }
 
+    public List<OccLocationDescriptor> getLocationDescriptorsByInspection(OccInspection inspection) {
+        //
+
+        return new ArrayList();
+    }
+
     public OccLocationDescriptor getLocationDescriptor(int descriptorID) throws IntegrationException {
         String query_spaceIDs = "SELECT locationdescriptionid, description, buildingfloorno\n"
                 + "  FROM public.occlocationdescriptor WHERE locationdescriptionid = ?;";
