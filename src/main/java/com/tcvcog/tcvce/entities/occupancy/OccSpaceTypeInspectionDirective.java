@@ -38,6 +38,11 @@ public class OccSpaceTypeInspectionDirective extends OccSpaceType {
      //xiaohong add
     protected boolean selected;
 
+    public OccSpaceTypeInspectionDirective() {
+
+    }
+
+
     public OccSpaceTypeInspectionDirective(OccSpaceType type){
         this.spaceTypeID = type.getSpaceTypeID();
         this.spaceTypeTitle = type.getSpaceTypeTitle();

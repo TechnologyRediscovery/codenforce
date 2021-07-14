@@ -31,11 +31,11 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     private OccChecklistTemplate selectedChecklistTemplate;
     private User selectedInspector;
 
+    private OccSpaceTypeInspectionDirective selectedType;
     private OccSpace selectedSpace;
     private OccLocationDescriptor selectedLocDescriptor;
 
-    private OccInspection skeletonInspection;
-
+    private OccInspection selectedInspection;
 
     @PostConstruct
     public void initBean() {
@@ -68,27 +68,28 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * Initializes empty OccInspection object to build. Requires checklist template and inspector to be selected.
+     * Creates empty inspection object for the current occupancy period.
      */
-    public void initSkeletonInspection() {
+    public void createInspection() {
         if (selectedChecklistTemplate == null) {
-            System.out.println("Can't initialize skeleton inspection: selected checklist template is null");
+            System.out.println("Can't initialize new OccInspection: selected checklist template is null");
             return;
         } else if (selectedInspector == null) {
-            System.out.println("Can't initialize skeleton inspection: selected inspector is null");
+            System.out.println("Can't initialize new OccInspection: selected inspector is null");
             return;
         }
 
-        OccPeriod occPeriod = getSessionBean().getSessOccPeriod();
+        OccPeriodDataHeavy occPeriod = getSessionBean().getSessOccPeriod();
 
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            skeletonInspection = oc.inspectionAction_commenceOccupancyInspection(null, selectedChecklistTemplate, occPeriod, selectedInspector);
-        } catch (InspectionException | IntegrationException ex) {
-            System.out.println("Failed to initialize skeleton OccInspection object: " + ex);
-        }
+            OccInspection newInspection = oc.inspectionAction_commenceOccupancyInspection(null, selectedChecklistTemplate, occPeriod, selectedInspector);
 
-        initInspectionSpaceList();
+            occPeriod.getInspectionList().add(newInspection);
+            getSessionBean().setSessOccPeriod(occPeriod);
+        } catch (InspectionException | IntegrationException ex) {
+            System.out.println("Failed to create new OccInspection: " + ex);
+        }
     }
 
     /**
@@ -96,20 +97,20 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
      * That doesn't really make sense but basically we're getting the list of all the spaces that this inspection could include.
      */
     public void initInspectionSpaceList() {
-        if (skeletonInspection == null) {
-            System.out.println("Can't initialize inspection space list: skeleton inspection object is null");
+        if (selectedInspection == null) {
+            System.out.println("Can't initialize inspection space list: selected inspection object is null");
             return;
-        } else if (skeletonInspection.getChecklistTemplate() == null) {
-            System.out.println("Can't initialize inspection space list: skeleton inspection object's checklist template object is null");
+        } else if (selectedInspection.getChecklistTemplate() == null) {
+            System.out.println("Can't initialize inspection space list: selected inspection object's checklist template object is null");
             return;
-        }  else if (skeletonInspection.getChecklistTemplate().getOccSpaceTypeTemplateList() == null) {
-            System.out.println("Can't initialize inspection space list: skeleton inspection object's checklist template's occ space type list is null");
+        }  else if (selectedInspection.getChecklistTemplate().getOccSpaceTypeTemplateList() == null) {
+            System.out.println("Can't initialize inspection space list: selected inspection object's checklist template's occ space type list is null");
             return;
         }
 
         List<OccSpace> occSpaces = new ArrayList<>();
 
-        for (OccSpaceTypeInspectionDirective type : skeletonInspection.getChecklistTemplate().getOccSpaceTypeTemplateList()) {
+        for (OccSpaceTypeInspectionDirective type : selectedInspection.getChecklistTemplate().getOccSpaceTypeTemplateList()) {
             if (type.getSpaceList() != null) {
                 occSpaces.addAll(type.getSpaceList());
             }
@@ -120,12 +121,12 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
     void addSelectedSpaceToSkeletonInspection() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        try {
-            // TODO: Maybe its important that i'm not passing a user or OccInspectionStatusEnum but i think its fine.
-            skeletonInspection = oc.inspectionAction_commenceSpaceInspection(skeletonInspection, null, selectedSpace, null, selectedLocDescriptor);
-        } catch (IntegrationException ex) {
-            System.out.println("Failed to add selected space to skeleton inspection object: " + ex);
-        }
+//        try {
+//            // TODO: Maybe its important that i'm not passing a user or OccInspectionStatusEnum but i think its fine.
+//            skeletonInspection = oc.inspectionAction_commenceSpaceInspection(skeletonInspection, null, selectedSpace, null, selectedLocDescriptor);
+//        } catch (IntegrationException ex) {
+//            System.out.println("Failed to add selected space to skeleton inspection object: " + ex);
+//        }
     }
 
     /**
@@ -135,10 +136,10 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     public void clearSelections() {
         setSelectedChecklistTemplate(new OccChecklistTemplate());
         setSelectedInspector(new User());
+
+        setSelectedType(new OccSpaceTypeInspectionDirective());
         setSelectedSpace(new OccSpace());
         setSelectedLocDescriptor(new OccLocationDescriptor());
-
-        skeletonInspection = null;
     }
 
     // getters & setters below you know the drill
@@ -171,6 +172,14 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         this.selectedInspector = selectedInspector;
     }
 
+    public OccSpaceTypeInspectionDirective getSelectedType() {
+        return selectedType;
+    }
+
+    public void setSelectedType(OccSpaceTypeInspectionDirective selectedType) {
+        this.selectedType = selectedType;
+    }
+
     public OccSpace getSelectedSpace() {
         return selectedSpace;
     }
@@ -187,8 +196,11 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         this.selectedLocDescriptor = selectedLocDescriptor;
     }
 
-    public OccInspection getSkeletonInspection() {
-        return skeletonInspection;
+    public OccInspection getSelectedInspection() {
+        return selectedInspection;
     }
 
+    public void setSelectedInspection(OccInspection selectedInspection) {
+        this.selectedInspection = selectedInspection;
+    }
 }

@@ -280,28 +280,28 @@ public  class       OccPeriodDataHeavy
     /**
      * @return the proposalList
      */
-    public List getProposalList() {
+    public List<Proposal> getProposalList() {
         return proposalList;
     }
 
     /**
      * @return the inspectionList
      */
-    public List getInspectionList() {
+    public List<OccInspection> getInspectionList() {
         return inspectionList;
     }
 
     /**
      * @return the permitList
      */
-    public List getPermitList() {
+    public List<OccPermit> getPermitList() {
         return permitList;
     }
 
     /**
      * @return the blobIDList
      */
-    public List getBlobIDList() {
+    public List<Integer> getBlobIDList() {
         return blobIDList;
     }
 

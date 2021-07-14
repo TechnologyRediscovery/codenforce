@@ -86,6 +86,54 @@
 
             <p:spacer height="5px"/>
 
+            <p:dataTable id="inspections-table"
+                         var="inspection"
+                         value="#{sessionBean.sessOccPeriod.inspectionList}"
+                         rowKey="#{inspection.inspectionID}"
+                         reflow="true">
+                <p:column style="width:2rem">
+                    <p:rowToggler/>
+                </p:column>
+                <p:column headerText="ID">
+                    <h:outputText value="#{inspection.inspectionID}"/>
+                </p:column>
+                <p:column headerText="Spaces">
+                    <h:outputText value="#{inspection.inspectedSpaceListSize} spaces"/>
+                </p:column>
+                <p:column headerText="Action">
+                    <p:commandLink ajax="true"
+                                   style="color:blue;"
+                                   actionListener="#{occInspectionsBB.clearSelections}"
+                                   oncomplete="PF('inspections-selecttype-var').show()"
+                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                   update="inspections-selecttype-form"
+                                   value="Add space">
+                        <f:actionListener binding="#{occInspectionsBB.setSelectedInspection(inspection)}"/>
+                    </p:commandLink>
+                </p:column>
+                <p:rowExpansion>
+                    <p:dataTable var="inspectedSpace"
+                                 value="#{inspection.inspectedSpaceList}"
+                                 rowKey="#{inspectedSpace.inspectedSpaceID}"
+                                 reflow="true">
+                        <p:column headerText="ID">
+                            <h:outputText value="#{inspectedSpace.inspectedSpaceID}"/>
+                        </p:column>
+                        <p:column headerText="Type">
+                            <h:outputText value="#{inspectedSpace.type.spaceTypeTitle}"/>
+                            <h:panelGroup id="inspections-selectspace-dt-spacetypeinfoicon">
+                                <i class="p-ml-1 pi pi-info-circle"/>
+                            </h:panelGroup>
+                            <p:tooltip for="inspections-selectspace-dt-spacetypeinfoicon"
+                                       value="#{inspectedSpace.type.spaceTypeDescription}" position="right"/>
+                        </p:column>
+                        <p:column headerText="Name">
+                            <h:outputText value="#{inspectedSpace.name}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:rowExpansion>
+            </p:dataTable>
+
         </h:form>
     </p:panel>
 
@@ -164,12 +212,55 @@
                                  class="ui-button-outlined p-mr-1"
                                  oncomplete="PF('inspections-selectinspector-var').hide(); PF('inspections-selectchecklist-var').show();"/>
                 <p:commandButton id="inspections-selectinspector-continuebutton"
-                                 value="Continue"
+                                 value="Finish"
                                  disabled="#{occInspectionsBB.selectedInspector.userID == 0}"
+                                 icon="pi pi-check"
+                                 actionListener="#{occInspectionsBB.createInspection}"
+                                 update="inspections-form:inspections-table"
+                                 oncomplete="PF('inspections-selectinspector-var').hide()"/>
+            </f:facet>
+        </p:dialog>
+    </h:form>
+
+    <h:form id="inspections-selecttype-form">
+        <p:dialog id="inspections-selecttype"
+                  width="800"
+                  widgetVar="inspections-selecttype-var"
+                  header="Select Type"
+                  modal="true"
+                  resizable="true">
+
+            <p:dataTable id="inspections-selecttype-dt"
+                         scrollHeight="600"
+                         var="type" value="#{occInspectionsBB.selectedInspection.checklistTemplate.occSpaceTypeTemplateList}"
+                         rowKey="#{type.spaceTypeID}"
+                         selection="#{occInspectionsBB.selectedType}"
+                         stripedRows="true">
+                <p:ajax event="rowSelect"
+                        update=":inspections-selecttype-form:inspections-selecttype-continuebutton"/>
+                <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                <p:column headerText="Name">
+                    <h:outputText value="#{type.spaceTypeTitle}"/>
+                </p:column>
+                <p:column headerText="Description">
+                    <h:outputText value="#{type.spaceTypeDescription}"/>
+                </p:column>
+                <p:column headerText="Required">
+                    <i class="#{space.required ? 'pi pi-star' : ''}"/>
+                </p:column>
+            </p:dataTable>
+
+            <f:facet name="footer">
+                <p:commandButton value="Cancel"
+                                 icon="pi pi-times"
+                                 class="ui-button-outlined p-mr-1"
+                                 oncomplete="PF('inspections-selecttype-var').hide()"/>
+                <p:commandButton id="inspections-selecttype-continuebutton"
+                                 value="Continue"
+                                 disabled="#{occInspectionsBB.selectedType.spaceTypeID == 0}"
                                  icon="pi pi-arrow-right"
-                                 actionListener="#{occInspectionsBB.initSkeletonInspection}"
                                  update="inspections-selectspace-form"
-                                 oncomplete="PF('inspections-selectinspector-var').hide(); PF('inspections-selectspace-var').show()"/>
+                                 oncomplete="PF('inspections-selecttype-var').hide(); PF('inspections-selectspace-var').show()"/>
             </f:facet>
         </p:dialog>
     </h:form>
@@ -184,7 +275,7 @@
 
             <p:dataTable id="inspections-selectspace-dt"
                          scrollHeight="600"
-                         var="space" value="#{occInspectionsBB.inspectionSpaceList}"
+                         var="space" value="#{occInspectionsBB.selectedType.spaceList}"
                          rowKey="#{space.spaceID}"
                          selection="#{occInspectionsBB.selectedSpace}"
                          stripedRows="true">
@@ -197,14 +288,6 @@
                 <p:column headerText="Description">
                     <h:outputText value="#{space.description}"/>
                 </p:column>
-                <p:column headerText="Type">
-                    <h:outputText value="#{space.type.spaceTypeTitle}"/>
-                    <h:panelGroup id="inspections-selectspace-dt-spacetypeinfoicon">
-                        <i class="p-ml-1 pi pi-info-circle"/>
-                    </h:panelGroup>
-                    <p:tooltip for="inspections-selectspace-dt-spacetypeinfoicon"
-                               value="#{space.type.spaceTypeDescription}" position="right"/>
-                </p:column>
                 <p:column headerText="Required">
                     <i class="#{space.required ? 'pi pi-star' : ''}"/>
                 </p:column>
@@ -214,13 +297,13 @@
                 <p:commandButton value="Back"
                                  icon="pi pi-arrow-left"
                                  class="ui-button-outlined p-mr-1"
-                                 oncomplete="PF('inspections-selectspace-var').hide(); PF('inspections-selectinspector-var').show();"/>
+                                 oncomplete="PF('inspections-selectspace-var').hide(); PF('inspections-selecttype-var').show();"/>
                 <p:commandButton id="inspections-selectspace-continuebutton"
                                  value="Continue"
                                  disabled="#{occInspectionsBB.selectedSpace.spaceID == 0}"
                                  icon="pi pi-arrow-right"
                                  update="inspections-spacedetails-form"
-                                 oncomplete="PF('inspections-selectspace-var').hide(); PF('inspections-spacedetails-var').show()"/>
+                                 oncomplete="PF('inspections-selectspace-var').hide(); PF('inspections-spacedetails-var').show();"/>
             </f:facet>
         </p:dialog>
     </h:form>
@@ -241,7 +324,7 @@
                              converter="occLocationDescriptorConverter"
                              var="ld" filter="true" filterMatchMode="contains">
                 <p:ajax update="inspections-spacedetails-continuebutton"/>
-                <f:selectItems value="#{occInspectionsBB.skeletonInspection.allUniqueLocationDescriptors}" var="locdep"
+                <f:selectItems value="#{occInspectionsBB.selectedInspection.allUniqueLocationDescriptors}" var="locdep"
                                itemLabel="#{locdep.locationDescription}" itemValue="#{locdep}"/>
                 <p:column>
                     <h:outputText value="#{ld.locationDescription}"/>
@@ -287,7 +370,7 @@
                 <div class="p-col-12 p-md-4">
                     <h3>Ordinance</h3>
                     <ul>
-                        <li>accordian/collapsable box with ordinance description and tips of what to look for</li>
+                        <li>accordion/collapsable box with ordinance description and tips of what to look for</li>
                     </ul>
                 </div>
                 <div class="p-col-12 p-md-4 p-mt-5">

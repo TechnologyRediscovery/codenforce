@@ -112,6 +112,17 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
         locationDescriptorList.addAll(locationDescriptors);
         return locationDescriptorList;
     }
+
+    /**
+     * @return the size of the inspectedSpaceList
+     */
+    public int getInspectedSpaceListSize() {
+        int size = 0;
+        if (inspectedSpaceList != null)
+            size = inspectedSpaceList.size();
+
+        return size;
+    }
     
     /**
      * @return the inspectionID
