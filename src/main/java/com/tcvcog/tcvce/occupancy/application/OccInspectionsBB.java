@@ -35,6 +35,8 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     private OccSpace selectedSpace;
     private OccLocationDescriptor selectedLocDescriptor;
 
+    private OccInspectedSpace selectedInspectedSpace;
+
     private OccInspection selectedInspection;
 
     @PostConstruct
@@ -119,14 +121,19 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         inspectionSpaceList = occSpaces;
     }
 
-    void addSelectedSpaceToSkeletonInspection() {
+    public void addSelectedSpaceToSelectedInspection() {
+        if (selectedInspection == null) {
+            System.out.println("Can't initialize add space to inspection: selected inspection object is null");
+            return;
+        }
         OccupancyCoordinator oc = getOccupancyCoordinator();
-//        try {
-//            // TODO: Maybe its important that i'm not passing a user or OccInspectionStatusEnum but i think its fine.
-//            skeletonInspection = oc.inspectionAction_commenceSpaceInspection(skeletonInspection, null, selectedSpace, null, selectedLocDescriptor);
-//        } catch (IntegrationException ex) {
-//            System.out.println("Failed to add selected space to skeleton inspection object: " + ex);
-//        }
+        try {
+            // Maybe its important that i'm not passing a user or OccInspectionStatusEnum but i think its fine.
+            selectedInspection = oc.inspectionAction_commenceSpaceInspection(selectedInspection, selectedInspection.getInspector(), selectedSpace, null, selectedLocDescriptor);
+
+        } catch (IntegrationException ex) {
+            System.out.println("Failed to add selected space to skeleton inspection object: " + ex);
+        }
     }
 
     /**

@@ -291,7 +291,17 @@
                 <p:column headerText="Required">
                     <i class="#{space.required ? 'pi pi-star' : ''}"/>
                 </p:column>
+                <p:column headerText="Required">
+                    <p:commandLink style="color:blue;"
+                                   oncomplete="PF('inspections-editspace-var').show()"
+                                   value="Edit"/>
+                </p:column>
             </p:dataTable>
+
+            <p:spacer height="5px"/>
+
+            <p:commandButton value="New space"
+                             icon="pi pi-plus"/>
 
             <f:facet name="footer">
                 <p:commandButton value="Back"
@@ -299,37 +309,38 @@
                                  class="ui-button-outlined p-mr-1"
                                  oncomplete="PF('inspections-selectspace-var').hide(); PF('inspections-selecttype-var').show();"/>
                 <p:commandButton id="inspections-selectspace-continuebutton"
-                                 value="Continue"
+                                 value="Add to inspection"
                                  disabled="#{occInspectionsBB.selectedSpace.spaceID == 0}"
-                                 icon="pi pi-arrow-right"
-                                 update="inspections-spacedetails-form"
-                                 oncomplete="PF('inspections-selectspace-var').hide(); PF('inspections-spacedetails-var').show();"/>
+                                 icon="pi pi-plus"
+                                 actionListener="#{occInspectionsBB.addSelectedSpaceToSelectedInspection}"
+                                 update="inspections-form:inspections-table"
+                                 oncomplete="PF('inspections-selectspace-var').hide()"/>
             </f:facet>
         </p:dialog>
     </h:form>
 
-    <h:form id="inspections-spacedetails-form">
-        <p:dialog id="inspections-spacedetails"
-                  widgetVar="inspections-spacedetails-var"
+    <h:form id="inspections-editspace-form">
+        <p:dialog id="inspections-editspace"
+                  widgetVar="inspections-editspace-var"
                   header="Space Details"
                   modal="true"
                   resizable="true">
             <p:outputLabel styleClass="p-d-block">Space name:</p:outputLabel>
             <p:inputText styleClass="p-d-block" value="#{occInspectionsBB.selectedSpace.name}">
-                <p:ajax update="inspections-spacedetails-continuebutton"/>
+                <p:ajax update="inspections-editspace-continuebutton"/>
             </p:inputText>
 
-            <p:outputLabel styleClass="p-d-block">Location descriptor:</p:outputLabel>
-            <p:selectOneMenu selected="#{occInspectionsBB.selectedLocDescriptor}"
-                             converter="occLocationDescriptorConverter"
-                             var="ld" filter="true" filterMatchMode="contains">
-                <p:ajax update="inspections-spacedetails-continuebutton"/>
-                <f:selectItems value="#{occInspectionsBB.selectedInspection.allUniqueLocationDescriptors}" var="locdep"
-                               itemLabel="#{locdep.locationDescription}" itemValue="#{locdep}"/>
-                <p:column>
-                    <h:outputText value="#{ld.locationDescription}"/>
-                </p:column>
-            </p:selectOneMenu>
+<!--            <p:outputLabel styleClass="p-d-block">Location descriptor:</p:outputLabel>-->
+<!--            <p:selectOneMenu selected="#{occInspectionsBB.selectedLocDescriptor}"-->
+<!--                             converter="occLocationDescriptorConverter"-->
+<!--                             var="ld" filter="true" filterMatchMode="contains">-->
+<!--                <p:ajax update="inspections-editspace-continuebutton"/>-->
+<!--                <f:selectItems value="#{occInspectionsBB.selectedInspection.allUniqueLocationDescriptors}" var="locdep"-->
+<!--                               itemLabel="#{locdep.locationDescription}" itemValue="#{locdep}"/>-->
+<!--                <p:column>-->
+<!--                    <h:outputText value="#{ld.locationDescription}"/>-->
+<!--                </p:column>-->
+<!--            </p:selectOneMenu>-->
 
             <p:outputLabel styleClass="p-d-block">Space details:</p:outputLabel>
             <p:inputTextarea rows="6" cols="33" value="#{occInspectionsBB.selectedSpace.description}"/>
@@ -338,12 +349,12 @@
                 <p:commandButton value="Back"
                                  icon="pi pi-arrow-left"
                                  class="ui-button-outlined p-mr-1"
-                                 oncomplete="PF('inspections-spacedetails-var').hide(); PF('inspections-selectspace-var').show();"/>
-                <p:commandButton id="inspections-spacedetails-continuebutton"
+                                 oncomplete="PF('inspections-editspace-var').hide(); PF('inspections-selectspace-var').show();"/>
+                <p:commandButton id="inspections-editspace-continuebutton"
                                  value="Continue"
                                  icon="pi pi-arrow-right"
                                  update="inspections-entryscreen-form"
-                                 oncomplete="PF('inspections-spacedetails-var').hide(); PF('inspections-entryscreen-var').show()"/>
+                                 oncomplete="PF('inspections-editspace-var').hide(); PF('inspections-entryscreen-var').show()"/>
             </f:facet>
         </p:dialog>
     </h:form>
@@ -365,37 +376,39 @@
                     <p:commandButton value="Remove Space"/>
                 </div>
             </div>
-            <h2>Category Name</h2>
-            <div class="p-grid">
-                <div class="p-col-12 p-md-4">
-                    <h3>Ordinance</h3>
-                    <ul>
-                        <li>accordion/collapsable box with ordinance description and tips of what to look for</li>
-                    </ul>
-                </div>
-                <div class="p-col-12 p-md-4 p-mt-5">
-                    <p:selectOneButton>
-                        <f:selectItem itemLabel="Not Inspected"/>
-                        <f:selectItem itemLabel="Pass"/>
-                        <f:selectItem itemLabel="Fail"/>
-                    </p:selectOneButton>
-                    <div class="p-d-flex p-mt-2 p-jc-end">
-                        <p:selectBooleanCheckbox itemLabel="Exclude from NOV"/>
+            <p:repeat value="#{occInspectionsBB.selectedSpace.inspectedSpaceList}" var="product">
+                <div class="p-grid">
+                    <div class="p-col-12 p-md-4">
+                        <h3>Ordinance</h3>
+                        <h3><h:outputText value="§108:; §§1.1 Unsafe Structures"/></h3>
+                        <ul>
+                            <li>accordion/collapsable box with ordinance description and tips of what to look for</li>
+                        </ul>
                     </div>
-                </div>
-                <div class="p-col-12 p-md-4">
-                    <div class="p-d-flex">
-                        <div>
-                            <p class="p-mb-0">Comments:</p>
-                            <p:inputTextarea rows="6" cols="33"/>
-                        </div>
-                        <div class="p-mx-3 p-mt-5">
-                            <p:button icon="pi pi-plus" styleClass="rounded-button"/>
-                            <p>Add Photo</p>
+                    <div class="p-col-12 p-md-4 p-mt-5">
+                        <p:selectOneButton>
+                            <f:selectItem itemLabel="Not Inspected"/>
+                            <f:selectItem itemLabel="Pass"/>
+                            <f:selectItem itemLabel="Fail"/>
+                        </p:selectOneButton>
+                        <div class="p-d-flex p-mt-2 p-jc-end">
+                            <p:selectBooleanCheckbox itemLabel="Exclude from NOV"/>
                         </div>
                     </div>
+                    <div class="p-col-12 p-md-4">
+                        <div class="p-d-flex">
+                            <div>
+                                <p class="p-mb-0">Comments:</p>
+                                <p:inputTextarea rows="6" cols="33"/>
+                            </div>
+                            <div class="p-mx-3 p-mt-5">
+                                <p:button icon="pi pi-plus" styleClass="rounded-button"/>
+                                <p>Add Photo</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </p:repeat>
             <p:commandButton value="Add Ordinance" icon="pi pi-plus"/>
         </p:dialog>
     </h:form>
