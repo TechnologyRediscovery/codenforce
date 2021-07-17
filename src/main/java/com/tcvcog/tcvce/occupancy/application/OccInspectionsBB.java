@@ -35,7 +35,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     private OccSpace selectedSpace;
     private OccLocationDescriptor selectedLocDescriptor;
 
-    private OccInspectedSpace selectedInspectedSpace;
+    private OccLocationDescriptor skeletonLocationDescriptor;
 
     private OccInspection selectedInspection;
 
@@ -121,6 +121,25 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         inspectionSpaceList = occSpaces;
     }
 
+    public void initSkeletonLocDescriptor() {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        skeletonLocationDescriptor = oc.getOccLocationDescriptorSkeleton();
+    }
+
+    public void createLocDescriptor() {
+        if (skeletonLocationDescriptor == null) {
+            System.out.println("Can't create new loc descriptor: skeleton location descriptor object is null");
+            return;
+        }
+
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.addNewLocationDescriptor(skeletonLocationDescriptor);
+        } catch (IntegrationException ex) {
+            System.out.println("Failed to add skeleton location descriptor: " + ex);
+        }
+    }
+
     public void addSelectedSpaceToSelectedInspection() {
         if (selectedInspection == null) {
             System.out.println("Can't initialize add space to inspection: selected inspection object is null");
@@ -137,8 +156,8 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * Clears all parameters that might be selected during the inspection flow
-     * so that one may start fresh. May be called, for example, by a button to start the flow.
+     * Clears all parameters that might be selected during an inspection flow
+     * so that one may start completely fresh. May be called, for example, by a button to start a flow.
      */
     public void clearSelections() {
         setSelectedChecklistTemplate(new OccChecklistTemplate());
@@ -201,6 +220,11 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
     public void setSelectedLocDescriptor(OccLocationDescriptor selectedLocDescriptor) {
         this.selectedLocDescriptor = selectedLocDescriptor;
+    }
+
+
+    public OccLocationDescriptor getSkeletonLocationDescriptor() {
+        return skeletonLocationDescriptor;
     }
 
     public OccInspection getSelectedInspection() {

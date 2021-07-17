@@ -293,7 +293,9 @@
                 </p:column>
                 <p:column headerText="Required">
                     <p:commandLink style="color:blue;"
+                                   actionListener="#{occInspectionsBB.setSelectedSpace(space)}"
                                    oncomplete="PF('inspections-editspace-var').show()"
+                                   update="inspections-editspace-form"
                                    value="Edit"/>
                 </p:column>
             </p:dataTable>
@@ -303,14 +305,39 @@
             <p:commandButton value="New space"
                              icon="pi pi-plus"/>
 
+            <p:spacer height="5px"/>
+
+            <p:outputLabel styleClass="p-d-block">Location descriptor:</p:outputLabel>
+            <div class="p-grid">
+                <div class="p-col-12 p-md-6">
+                    <p:selectOneMenu selected="#{occInspectionsBB.selectedLocDescriptor}"
+                                     converter="occLocationDescriptorConverter"
+                                     var="ld" filter="true" filterMatchMode="contains">
+                        <p:ajax update="inspections-selectspace-continuebutton"/>
+                        <f:selectItems value="#{occInspectionsBB.selectedInspection.allUniqueLocationDescriptors}" var="locdep"
+                                       itemLabel="#{locdep.locationDescription}" itemValue="#{locdep}"/>
+                        <p:column>
+                            <h:outputText value="#{ld.locationDescription}"/>
+                        </p:column>
+                    </p:selectOneMenu>
+                </div>
+                <div class="p-col-12 p-md-6">
+                    <p:commandButton value="New location descriptor"
+                                     actionListener="#{occInspectionsBB.initSkeletonLocDescriptor}"
+                                     update="inspections-addlocdesc-form"
+                                     oncomplete="PF('inspections-addlocdesc-var').show()"
+                                     icon="pi pi-plus"/>
+                </div>
+            </div>
+
             <f:facet name="footer">
                 <p:commandButton value="Back"
                                  icon="pi pi-arrow-left"
                                  class="ui-button-outlined p-mr-1"
-                                 oncomplete="PF('inspections-selectspace-var').hide(); PF('inspections-selecttype-var').show();"/>
+                                 oncomplete="PF('inspections-selectspace-var').hide(); PF('inspections-selecttype-var').show()"/>
                 <p:commandButton id="inspections-selectspace-continuebutton"
                                  value="Add to inspection"
-                                 disabled="#{occInspectionsBB.selectedSpace.spaceID == 0}"
+                                 disabled="#{occInspectionsBB.selectedSpace.spaceID == 0 or occInspectionsBB.selectedLocDescriptor.locationID == 0}"
                                  icon="pi pi-plus"
                                  actionListener="#{occInspectionsBB.addSelectedSpaceToSelectedInspection}"
                                  update="inspections-form:inspections-table"
@@ -322,39 +349,49 @@
     <h:form id="inspections-editspace-form">
         <p:dialog id="inspections-editspace"
                   widgetVar="inspections-editspace-var"
-                  header="Space Details"
+                  header="Edit Space"
                   modal="true"
+                  closable="false"
                   resizable="true">
             <p:outputLabel styleClass="p-d-block">Space name:</p:outputLabel>
-            <p:inputText styleClass="p-d-block" value="#{occInspectionsBB.selectedSpace.name}">
-                <p:ajax update="inspections-editspace-continuebutton"/>
-            </p:inputText>
+            <p:inputText styleClass="p-d-block" value="#{occInspectionsBB.selectedSpace.name}"/>
 
-<!--            <p:outputLabel styleClass="p-d-block">Location descriptor:</p:outputLabel>-->
-<!--            <p:selectOneMenu selected="#{occInspectionsBB.selectedLocDescriptor}"-->
-<!--                             converter="occLocationDescriptorConverter"-->
-<!--                             var="ld" filter="true" filterMatchMode="contains">-->
-<!--                <p:ajax update="inspections-editspace-continuebutton"/>-->
-<!--                <f:selectItems value="#{occInspectionsBB.selectedInspection.allUniqueLocationDescriptors}" var="locdep"-->
-<!--                               itemLabel="#{locdep.locationDescription}" itemValue="#{locdep}"/>-->
-<!--                <p:column>-->
-<!--                    <h:outputText value="#{ld.locationDescription}"/>-->
-<!--                </p:column>-->
-<!--            </p:selectOneMenu>-->
-
-            <p:outputLabel styleClass="p-d-block">Space details:</p:outputLabel>
+            <p:outputLabel styleClass="p-d-block">Space description:</p:outputLabel>
             <p:inputTextarea rows="6" cols="33" value="#{occInspectionsBB.selectedSpace.description}"/>
 
             <f:facet name="footer">
-                <p:commandButton value="Back"
-                                 icon="pi pi-arrow-left"
-                                 class="ui-button-outlined p-mr-1"
-                                 oncomplete="PF('inspections-editspace-var').hide(); PF('inspections-selectspace-var').show();"/>
                 <p:commandButton id="inspections-editspace-continuebutton"
-                                 value="Continue"
-                                 icon="pi pi-arrow-right"
-                                 update="inspections-entryscreen-form"
-                                 oncomplete="PF('inspections-editspace-var').hide(); PF('inspections-entryscreen-var').show()"/>
+                                 value="Ok"
+                                 icon="pi pi-check"
+                                 update="inspections-selectspace-form:inspections-selectspace-dt
+                                         inspections-selectspace-form:inspections-selectspace-continuebutton"
+                                 oncomplete="PF('inspections-editspace-var').hide()"/>
+            </f:facet>
+        </p:dialog>
+    </h:form>
+
+    <h:form id="inspections-addlocdesc-form">
+        <p:dialog id="inspections-addlocdesc"
+                  widgetVar="inspections-addlocdesc-var"
+                  header="Add Location Descriptor"
+                  modal="true"
+                  resizable="true">
+
+            <p:outputLabel styleClass="p-d-block">Location description:</p:outputLabel>
+            <p:inputTextarea rows="6" cols="33" value="#{occInspectionsBB.skeletonLocationDescriptor.locationDescription}">
+                <p:ajax update="inspections-addlocdesc-continuebutton"/>
+            </p:inputTextarea>
+
+            <f:facet name="footer">
+                <p:commandButton value="Cancel"
+                                 icon="pi pi-times"
+                                 oncomplete="PF('inspections-addlocdesc-var').hide()"/>
+                <p:commandButton id="inspections-addlocdesc-continuebutton"
+                                 value="Add"
+                                 disabled="#{empty occInspectionsBB.skeletonLocationDescriptor.locationDescription}"
+                                 icon="pi pi-plus"
+                                 actionListener="#{occInspectionsBB.createLocDescriptor}"
+                                 oncomplete="PF('inspections-addlocdesc-var').hide()"/>
             </f:facet>
         </p:dialog>
     </h:form>
