@@ -377,10 +377,15 @@
                   modal="true"
                   resizable="true">
 
-            <p:outputLabel styleClass="p-d-block">Location description:</p:outputLabel>
-            <p:inputTextarea rows="6" cols="33" value="#{occInspectionsBB.skeletonLocationDescriptor.locationDescription}">
+            <p:outputLabel for="inspections-locdesc-input" styleClass="p-d-block">Location description:</p:outputLabel>
+            <p:inputTextarea id="inspections-locdesc-input"
+                    rows="6" cols="33" value="#{occInspectionsBB.skeletonLocationDescriptor.locationDescription}">
                 <p:ajax update="inspections-addlocdesc-continuebutton"/>
             </p:inputTextarea>
+
+            <p:outputLabel for="inspections-floornumber-input" styleClass="p-d-block">Building floor number:</p:outputLabel>
+            <p:inputNumber id="inspections-floornumber-input"
+                           value="#{occInspectionsBB.skeletonLocationDescriptor.buildingFloorNo}"/>
 
             <f:facet name="footer">
                 <p:commandButton value="Cancel"

@@ -104,7 +104,6 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
 
         for (OccInspectedSpace inspectedSpace : inspectedSpaceList) {
             locationDescriptors.add(inspectedSpace.getLocation());
-            System.out.println("A:" + inspectedSpace.getInspectedSpaceID());
             locationDescriptors.addAll(inspectedSpace.getAllUniqueLocationDescriptors());
         }
 
