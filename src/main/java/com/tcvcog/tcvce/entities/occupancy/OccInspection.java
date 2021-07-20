@@ -62,7 +62,6 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     private LocalDateTime passedInspectionTS;
     
     private LocalDateTime effectiveDateOfRecord;
-    protected java.util.Date effectiveDateOfRecordUtilDate;
     
     private LocalDateTime creationTS;
     
@@ -341,10 +340,6 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     public LocalDateTime getPassedInspectionTS() {
         return passedInspectionTS;
     }
-    
-    public String getPassedInspectionTSPretty(){
-        return DateTimeUtil.getPrettyDate(passedInspectionTS);
-    }
 
     /**
      * @param passedInspectionTS the passedInspectionTS to set
@@ -358,10 +353,6 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
      */
     public LocalDateTime getEffectiveDateOfRecord() {
         return effectiveDateOfRecord;
-    }
-    
-    public String getEffectiveDateOfRecordPretty(){
-        return DateTimeUtil.getPrettyDate(effectiveDateOfRecord);
     }
 
     /**
@@ -458,23 +449,6 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
             return false;
         }
         return true;
-    }
-
-    /**
-     * @return the effectiveDateOfRecordUtilDate
-     */
-    public java.util.Date getEffectiveDateOfRecordUtilDate() {
-        effectiveDateOfRecordUtilDate = DateTimeUtil.convertUtilDate(effectiveDateOfRecord);
-        
-        return effectiveDateOfRecordUtilDate;
-    }
-
-    /**
-     * @param effectiveDateOfRecordUtilDate the effectiveDateOfRecordUtilDate to set
-     */
-    public void setEffectiveDateOfRecordUtilDate(java.util.Date effectiveDateOfRecordUtilDate) {
-        this.effectiveDateOfRecordUtilDate = effectiveDateOfRecordUtilDate;
-        effectiveDateOfRecord = DateTimeUtil.convertUtilDate(effectiveDateOfRecordUtilDate);
     }
 
     /**

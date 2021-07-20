@@ -100,7 +100,7 @@
                 <p:column headerText="Spaces">
                     <h:outputText value="#{inspection.inspectedSpaceListSize} spaces"/>
                 </p:column>
-                <p:column headerText="Action">
+                <p:column headerText="Actions">
                     <p:commandLink ajax="true"
                                    style="color:blue;"
                                    actionListener="#{occInspectionsBB.clearSelections}"
@@ -129,6 +129,17 @@
                         </p:column>
                         <p:column headerText="Name">
                             <h:outputText value="#{inspectedSpace.name}"/>
+                        </p:column>
+                        <p:column headerText="Actions">
+                            <p:commandLink ajax="true"
+                                           style="color:blue;"
+                                           actionListener="#{occInspectionsBB.clearSelections}"
+                                           oncomplete="PF('inspections-entryscreen-var').show()"
+                                           rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                           update="inspections-entryscreen-form"
+                                           value="Edit">
+                                <f:actionListener binding="#{occInspectionsBB.setSelectedInspectedSpace(inspectedSpace)}"/>
+                            </p:commandLink>
                         </p:column>
                     </p:dataTable>
                 </p:rowExpansion>
@@ -335,9 +346,10 @@
                                  icon="pi pi-arrow-left"
                                  class="ui-button-outlined p-mr-1"
                                  oncomplete="PF('inspections-selectspace-var').hide(); PF('inspections-selecttype-var').show()"/>
+
+<!--                             disabled="!{occInspectionsBB.selectedSpace.spaceID == 0 or occInspectionsBB.selectedLocDescriptor.locationID == 0}"-->
                 <p:commandButton id="inspections-selectspace-continuebutton"
                                  value="Add to inspection"
-                                 disabled="#{occInspectionsBB.selectedSpace.spaceID == 0 or occInspectionsBB.selectedLocDescriptor.locationID == 0}"
                                  icon="pi pi-plus"
                                  actionListener="#{occInspectionsBB.addSelectedSpaceToSelectedInspection}"
                                  update="inspections-form:inspections-table"
@@ -409,7 +421,7 @@
                   modal="true"
                   resizable="true">
             <div class="p-d-flex p-jc-between">
-                <h1>SPACE NAME</h1>
+                <h1><h:outputText value="#{occInspectionsBB.selectedInspectedSpace.name}"/></h1>
                 <div>
                     <p:commandButton value="Pass All"/>
                 </div>
@@ -418,20 +430,19 @@
                     <p:commandButton value="Remove Space"/>
                 </div>
             </div>
-            <p:repeat value="#{occInspectionsBB.selectedSpace.inspectedSpaceList}" var="product">
+            <p:repeat value="#{occInspectionsBB.selectedInspectedSpace.inspectedElementListVisible}" var="spaceElement">
                 <div class="p-grid">
                     <div class="p-col-12 p-md-4">
-                        <h3>Ordinance</h3>
-                        <h3><h:outputText value="§108:; §§1.1 Unsafe Structures"/></h3>
+                        <h3><h:outputText value="§#{spaceElement.ordSecNum}:#{spaceElement.ordSecTitle}; §§#{spaceElement.ordSubSecNum} #{spaceElement.ordSubSecTitle}"/></h3>
                         <ul>
-                            <li>accordion/collapsable box with ordinance description and tips of what to look for</li>
+                            <li><h:outputText value="#{spaceElement.ordTechnicalText}"/></li>
                         </ul>
                     </div>
                     <div class="p-col-12 p-md-4 p-mt-5">
-                        <p:selectOneButton>
-                            <f:selectItem itemLabel="Not Inspected"/>
-                            <f:selectItem itemLabel="Pass"/>
-                            <f:selectItem itemLabel="Fail"/>
+                        <p:selectOneButton id="inspections-entryscreen-statussel" value="#{spaceElement.statusEnum}" unselectable="false">
+                            <!-- Strangely this element needs to update itself to call the setter -->
+                            <p:ajax update="inspections-entryscreen-statussel"/>
+                            <f:selectItems value="#{occInspectionsBB.statuses}" var="status" itemLabel="#{status.label}"/>
                         </p:selectOneButton>
                         <div class="p-d-flex p-mt-2 p-jc-end">
                             <p:selectBooleanCheckbox itemLabel="Exclude from NOV"/>

@@ -7,8 +7,6 @@ import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.*;
-import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
-import com.tcvcog.tcvce.util.Constants;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
@@ -27,7 +25,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
     private List<OccSpace> inspectionSpaceList;
 
-    // Form items
+    // Form items--these need organized
     private OccChecklistTemplate selectedChecklistTemplate;
     private User selectedInspector;
 
@@ -38,6 +36,8 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     private OccLocationDescriptor skeletonLocationDescriptor;
 
     private OccInspection selectedInspection;
+
+    private OccInspectedSpace selectedInspectedSpace;
 
     @PostConstruct
     public void initBean() {
@@ -148,11 +148,15 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             // Maybe its important that i'm not passing a user or OccInspectionStatusEnum but i think its fine.
-            selectedInspection = oc.inspectionAction_commenceSpaceInspection(selectedInspection, selectedInspection.getInspector(), selectedSpace, null, selectedLocDescriptor);
+            selectedInspection = oc.inspectionAction_commenceSpaceInspection(selectedInspection, selectedInspection.getInspector(), selectedSpace, null, null);
 
         } catch (IntegrationException ex) {
             System.out.println("Failed to add selected space to skeleton inspection object: " + ex);
         }
+    }
+
+    public OccInspectionStatusEnum[] getStatuses() {
+        return OccInspectionStatusEnum.values();
     }
 
     /**
@@ -222,7 +226,6 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         this.selectedLocDescriptor = selectedLocDescriptor;
     }
 
-
     public OccLocationDescriptor getSkeletonLocationDescriptor() {
         return skeletonLocationDescriptor;
     }
@@ -233,5 +236,13 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
     public void setSelectedInspection(OccInspection selectedInspection) {
         this.selectedInspection = selectedInspection;
+    }
+
+    public OccInspectedSpace getSelectedInspectedSpace() {
+        return selectedInspectedSpace;
+    }
+
+    public void setSelectedInspectedSpace(OccInspectedSpace selectedInspectedSpace) {
+        this.selectedInspectedSpace = selectedInspectedSpace;
     }
 }
