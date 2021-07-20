@@ -321,7 +321,7 @@
             <p:outputLabel styleClass="p-d-block">Location descriptor:</p:outputLabel>
             <div class="p-grid">
                 <div class="p-col-12 p-md-6">
-                    <p:selectOneMenu selected="#{occInspectionsBB.selectedLocDescriptor}"
+                    <p:selectOneMenu value="#{occInspectionsBB.selectedLocDescriptor}"
                                      converter="occLocationDescriptorConverter"
                                      var="ld" filter="true" filterMatchMode="contains">
                         <p:ajax update="inspections-selectspace-continuebutton"/>
