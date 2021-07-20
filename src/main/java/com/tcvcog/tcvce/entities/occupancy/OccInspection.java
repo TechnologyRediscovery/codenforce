@@ -17,16 +17,12 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.BOb;
-import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * This whole class represents a "clipboard," where each item in the inspectedSpaceList
@@ -56,7 +52,7 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     private List<OccInspectedSpace> inspectedSpaceList;
     private List<OccInspectedSpace> inspectedSpaceListVisible;
     private ViewOptionsOccChecklistItemsEnum viewSetting;
-    private boolean includeEmtpySpaces;
+    private boolean includeEmptySpaces;
     
     private int pacc;
     private boolean enablePacc;
@@ -66,7 +62,6 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     private LocalDateTime passedInspectionTS;
     
     private LocalDateTime effectiveDateOfRecord;
-    protected java.util.Date effectiveDateOfRecordUtilDate;
     
     private LocalDateTime creationTS;
     
@@ -97,10 +92,34 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
             ois.setViewSetting(viewSetting);
             ois.configureVisibleElementList();
             if(!ois.getInspectedElementListVisible().isEmpty()
-                    || (ois.getInspectedElementListVisible().isEmpty() && includeEmtpySpaces)){
+                    || (ois.getInspectedElementListVisible().isEmpty() && includeEmptySpaces)){
                 inspectedSpaceListVisible.add(ois);
             }
         } // close for over inspectedspaces
+    }
+
+    public List<OccLocationDescriptor> getAllUniqueLocationDescriptors() {
+        Set<OccLocationDescriptor> locationDescriptors = new HashSet();
+
+        for (OccInspectedSpace inspectedSpace : inspectedSpaceList) {
+            locationDescriptors.add(inspectedSpace.getLocation());
+            locationDescriptors.addAll(inspectedSpace.getAllUniqueLocationDescriptors());
+        }
+
+        List<OccLocationDescriptor> locationDescriptorList = new ArrayList();
+        locationDescriptorList.addAll(locationDescriptors);
+        return locationDescriptorList;
+    }
+
+    /**
+     * @return the size of the inspectedSpaceList
+     */
+    public int getInspectedSpaceListSize() {
+        int size = 0;
+        if (inspectedSpaceList != null)
+            size = inspectedSpaceList.size();
+
+        return size;
     }
     
     /**
@@ -321,10 +340,6 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     public LocalDateTime getPassedInspectionTS() {
         return passedInspectionTS;
     }
-    
-    public String getPassedInspectionTSPretty(){
-        return DateTimeUtil.getPrettyDate(passedInspectionTS);
-    }
 
     /**
      * @param passedInspectionTS the passedInspectionTS to set
@@ -338,10 +353,6 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
      */
     public LocalDateTime getEffectiveDateOfRecord() {
         return effectiveDateOfRecord;
-    }
-    
-    public String getEffectiveDateOfRecordPretty(){
-        return DateTimeUtil.getPrettyDate(effectiveDateOfRecord);
     }
 
     /**
@@ -438,23 +449,6 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
             return false;
         }
         return true;
-    }
-
-    /**
-     * @return the effectiveDateOfRecordUtilDate
-     */
-    public java.util.Date getEffectiveDateOfRecordUtilDate() {
-        effectiveDateOfRecordUtilDate = DateTimeUtil.convertUtilDate(effectiveDateOfRecord);
-        
-        return effectiveDateOfRecordUtilDate;
-    }
-
-    /**
-     * @param effectiveDateOfRecordUtilDate the effectiveDateOfRecordUtilDate to set
-     */
-    public void setEffectiveDateOfRecordUtilDate(java.util.Date effectiveDateOfRecordUtilDate) {
-        this.effectiveDateOfRecordUtilDate = effectiveDateOfRecordUtilDate;
-        effectiveDateOfRecord = DateTimeUtil.convertUtilDate(effectiveDateOfRecordUtilDate);
     }
 
     /**
@@ -563,15 +557,15 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     /**
      * @return the includeEmtpySpaces
      */
-    public boolean isIncludeEmtpySpaces() {
-        return includeEmtpySpaces;
+    public boolean isIncludeEmptySpaces() {
+        return includeEmptySpaces;
     }
 
     /**
-     * @param includeEmtpySpaces the includeEmtpySpaces to set
+     * @param includeEmptySpaces the includeEmtpySpaces to set
      */
-    public void setIncludeEmtpySpaces(boolean includeEmtpySpaces) {
-        this.includeEmtpySpaces = includeEmtpySpaces;
+    public void setIncludeEmptySpaces(boolean includeEmptySpaces) {
+        this.includeEmptySpaces = includeEmptySpaces;
     }
 
     

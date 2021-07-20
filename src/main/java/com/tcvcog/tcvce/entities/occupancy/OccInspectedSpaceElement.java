@@ -347,6 +347,15 @@ public class OccInspectedSpaceElement
         }
     }
 
-    
-    
+    /**
+     * Not boring! These are getters and setter wrappers for the status parameter that take and give raw enums
+     *
+     **/
+    public OccInspectionStatusEnum getStatusEnum() {
+        return getStatus().getStatusEnum();
+    }
+
+    public void setStatusEnum(OccInspectionStatusEnum statusEnum) {
+        setStatus(new OccInspectableStatus(statusEnum));
+    }
 }

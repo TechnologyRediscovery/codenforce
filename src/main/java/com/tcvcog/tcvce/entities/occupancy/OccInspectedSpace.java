@@ -22,10 +22,7 @@ import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Subclass of Space: stores inspection-specific data about each space element
@@ -47,8 +44,7 @@ public class OccInspectedSpace
     private ViewOptionsOccChecklistItemsEnum viewSetting;
     
     private OccLocationDescriptor location;
-    private OccSpaceType type;
-    
+
     private User addedToChecklistBy;
     private LocalDateTime addedToChecklistTS;
     
@@ -61,7 +57,7 @@ public class OccInspectedSpace
     
     public OccInspectedSpace(OccSpace spc){
         this.spaceID = spc.getSpaceID();
-        this.occSpaceTypeID = spc.getOccSpaceTypeID();
+        this.type = spc.getType();
         this.name = spc.getName();
         this.required = spc.isRequired();
         
@@ -93,6 +89,19 @@ public class OccInspectedSpace
                     inspectedElementListVisible.add(oise);
             }
         }
+    }
+
+    public List<OccLocationDescriptor> getAllUniqueLocationDescriptors() {
+        Set<OccLocationDescriptor> locationDescriptors = new HashSet();
+
+        for (OccInspectedSpaceElement inspectedSpaceElement : inspectedElementList) {
+            System.out.println("A:" + inspectedSpaceElement.getInspectedSpaceID());
+            locationDescriptors.add(inspectedSpaceElement.getLocation());
+        }
+
+        List<OccLocationDescriptor> locationDescriptorList = new ArrayList();
+        locationDescriptorList.addAll(locationDescriptors);
+        return locationDescriptorList;
     }
     
     /**
@@ -167,21 +176,6 @@ public class OccInspectedSpace
         this.type = spaceType;
     }
 
-   
-
-    /**
-     * @return the type
-     */
-    public OccSpaceType getType() {
-        return type;
-    }
-
-    /**
-     * @param type the type to set
-     */
-    public void setType(OccSpaceType type) {
-        this.type = type;
-    }
 
     /**
      * @return the addedToChecklistBy

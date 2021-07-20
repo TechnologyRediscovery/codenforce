@@ -16,8 +16,6 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
-import java.util.List;
-
 /**
  * Mapped to fields of the spacetype table
  * @author EC Darsow

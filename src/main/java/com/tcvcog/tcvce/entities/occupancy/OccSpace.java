@@ -17,7 +17,7 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.entities.CodeElement;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -30,8 +30,9 @@ import java.util.List;
 public class OccSpace extends BackingBeanUtils implements Serializable {
     
     protected int spaceID;
-    protected int occSpaceTypeID;
     protected String name;
+
+    protected OccSpaceType type;
 
     // Holds whether or not this has to be wrapped in an OccInspectedSpace
     protected boolean required;
@@ -80,6 +81,20 @@ public class OccSpace extends BackingBeanUtils implements Serializable {
     }
 
     /**
+     * @return the type
+     */
+    public OccSpaceType getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(OccSpaceType type) {
+        this.type = type;
+    }
+
+    /**
      * @return the required
      */
     public boolean isRequired() {
@@ -91,20 +106,6 @@ public class OccSpace extends BackingBeanUtils implements Serializable {
      */
     public void setRequired(boolean required) {
         this.required = required;
-    }
-
-    /**
-     * @return the occSpaceTypeID
-     */
-    public int getOccSpaceTypeID() {
-        return occSpaceTypeID;
-    }
-
-    /**
-     * @param occSpaceTypeID the occSpaceTypeID to set
-     */
-    public void setOccSpaceTypeID(int occSpaceTypeID) {
-        this.occSpaceTypeID = occSpaceTypeID;
     }
 
     /**

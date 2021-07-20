@@ -814,14 +814,14 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
         // With a fully built inspected space, we can record our start of inspection in the DB
         inspSpace = inspecInt.recordCommencementOfSpaceInspection(inspSpace, inspection);
-        System.out.println("OccucpancyCoordinator.inpectionAction_commenceSpaceInspection | commenced inspecting of space");
+        System.out.println("OccupancyCoordinator.inspectionAction_commenceSpaceInspection | commenced inspecting of space");
 
         // now use our convenience method to record Inspection of the space's individual elements
         inspecInt.recordInspectionOfSpaceElements(inspSpace, inspection);
 
         // check sequence by retrieving new inspected space and displaying info
         inspSpace = inspecInt.getInspectedSpace(inspSpace.getSpaceID());
-        System.out.println("OccucpancyCoordinator.inpectionAction_commenceSpaceInspection | retrievedInspectedSpaceid= " + inspSpace);
+        System.out.println("OccupancyCoordinator.inspectionAction_commenceSpaceInspection | retrievedInspectedSpaceid= " + inspSpace);
         
         return inspection;
     }
@@ -1288,7 +1288,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public void addNewChecklistSpace(OccSpace os, OccSpaceTypeInspectionDirective ost) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         int spacetypeid = ost.getSpaceTypeID();
-        os.setOccSpaceTypeID(spacetypeid);
+        os.setType(oii.getSpaceType(spacetypeid));
         //Inserting space
         oii.insertSpace(os);
     }
