@@ -52,7 +52,17 @@ public class OccChecklistTemplate  {
     private boolean active;
     private CodeSource governingCodeSource;
     
+    /**
+     * @deprecated  replaced by a list of space types
+     */
     private List<OccSpaceTypeInspectionDirective> occSpaceTypeTemplateList;
+    
+    /**
+     * When one of these is chosen during the inspection process, we pass the chosen
+     * item to our coorodinator's inspectionAction_commenceSpaceInspection method
+     * 
+     */
+    protected List<OccSpaceType> occSpaceTypeList;
 
     /**
      * @return the muni
@@ -201,6 +211,20 @@ public class OccChecklistTemplate  {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the occSpaceTypeList
+     */
+    public List<OccSpaceType> getOccSpaceTypeList() {
+        return occSpaceTypeList;
+    }
+
+    /**
+     * @param occSpaceTypeList the occSpaceTypeList to set
+     */
+    public void setOccSpaceTypeList(List<OccSpaceType> occSpaceTypeList) {
+        this.occSpaceTypeList = occSpaceTypeList;
     }
 
   

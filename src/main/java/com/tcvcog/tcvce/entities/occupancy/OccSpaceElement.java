@@ -22,12 +22,24 @@ import com.tcvcog.tcvce.entities.CodeSource;
 import java.time.LocalDateTime;
 
 /**
- *
+ * Represents a specific ordinance that MIGHT be inspected
+ * when its host OccSpaceType is chosen during an inspection
+ * i.e. The SpaceType is kitchen
+ * And it has inside it a couple of elements to inspect:
+ *  1) Drain traps
+ * 2) GFCI outlets
+ * 3) Exhaust fan
+ * 
+ * 
+ * This is a wrapper of a CodeElement and basically holds just a 
+ * required flag.
+ * 
  * @author sylvia
  */
 public class OccSpaceElement extends CodeElement {
     
     protected int spaceElementID;
+    protected boolean requiredForInspection;
     
     public OccSpaceElement(CodeElement ele){
         this.elementID = ele.getElementID();
@@ -97,6 +109,20 @@ public class OccSpaceElement extends CodeElement {
      */
     public void setSpaceElementID(int spaceElementID) {
         this.spaceElementID = spaceElementID;
+    }
+
+    /**
+     * @return the requiredForInspection
+     */
+    public boolean isRequiredForInspection() {
+        return requiredForInspection;
+    }
+
+    /**
+     * @param requiredForInspection the requiredForInspection to set
+     */
+    public void setRequiredForInspection(boolean requiredForInspection) {
+        this.requiredForInspection = requiredForInspection;
     }
 
    

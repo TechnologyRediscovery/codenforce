@@ -27,6 +27,7 @@ import java.util.Objects;
  * 
  * and an OccInspection has
  * @author sylvia
+ * @deprecated  replaced by an OccSpaceType that has a list of CodeElement to inspect
  */
 public class OccSpaceTypeInspectionDirective extends OccSpaceType {
 

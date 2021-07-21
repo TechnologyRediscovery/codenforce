@@ -16,6 +16,9 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.entities.CodeElement;
+import java.util.List;
+
 /**
  * Mapped to fields of the spacetype table
  * @author EC Darsow
@@ -25,6 +28,8 @@ public class OccSpaceType {
     protected String spaceTypeTitle;
     protected String spaceTypeDescription;
     protected boolean required;
+    
+    List<CodeElement> codeElementList;
 
     /**
      * @return the spaceTypeID

@@ -743,7 +743,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @param inspection The current inspection
      * @param u The current user--not necessarily the official Inspector of the
      * OccInspection
-     * @param spc The OccSpace pulled from the OccInspectionTemplate list
+     * @param ost The space type which will have a list of SpaceElements inside it
      * @param initialStatus
      * @param loc A populated location descriptor for this Space. Can be an
      * existing location or an new one
@@ -753,7 +753,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      */
     public OccInspection inspectionAction_commenceSpaceInspection(OccInspection inspection,
             User u,
-            OccSpace spc,
+            OccSpaceType ost,
             OccInspectionStatusEnum initialStatus,
             OccLocationDescriptor loc)
             throws IntegrationException {

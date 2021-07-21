@@ -1,7 +1,9 @@
 -- Occupancy inspection refactor for inspeection UI by JURPLEL
 
 
-ALTER TABLE public.occspaceelement
+ALTER TABLE occspaceelement RENAME TO occspacetypeelement;
+
+ALTER TABLE public.occspacetypeelement
 	ADD COLUMN occpacetype_typeid INTEGER CONSTRAINT occpsacelement_typeid_fk REFERENCES public.occspacetype (spacetypeid);
 
 ALTER TABLE public.occspaceelement DROP COLUMN space_id;
@@ -70,7 +72,8 @@ CREATE TABLE public.occinspectioncause
 	causeid 		INTEGER PRIMARY KEY DEFAULT nextval('occinspectioncause_causeid_seq'),
 	title 			TEXT NOT NULL,
 	description 	TEXT,
-	notes 			TEXT
+	notes 			TEXT,
+	active 			BOOLEAN DEFAULT true
 );
 
 ALTER TABLE public.occinspection 
@@ -94,7 +97,8 @@ CREATE TABLE public.occinspectiondetermination
 	title 			TEXT NOT NULL,
 	description 	TEXT,
 	notes 			TEXT,
-	eventcat_catid 	INTEGER CONSTRAINT occinspectiondetermination_eventcat_fk REFERENCES eventcategory (categoryid)
+	eventcat_catid 	INTEGER CONSTRAINT occinspectiondetermination_eventcat_fk REFERENCES eventcategory (categoryid),
+	active 			BOOLEAN DEFAULT true
 );
 
 ALTER TABLE public.occinspection 
@@ -131,7 +135,8 @@ CREATE TABLE public.occphotorequirement
 	title 			TEXT NOT NULL,
 	description 	TEXT,
 	notes 			TEXT,
-	required 		BOOLEAN
+	required 		BOOLEAN,
+	active 			BOOLEAN DEFAULT true
 );
 
 CREATE TABLE public.occchecklistphotorequirement
