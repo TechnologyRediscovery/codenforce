@@ -1,5 +1,14 @@
 -- Occupancy inspection refactor for inspeection UI by JURPLEL
 
+
+-- ****************************************************************************
+-- RUN THIS CREATE TYPE BY ITSELF!
+-- CREATE TYPE occinspectionphototype AS ENUM ('PassDocumentation','FailDocumentation','GeneralDocumentation','Other','Unused');
+
+-- ****************************************************************************
+
+
+
 ALTER TABLE occspacetype RENAME TO occhecklistspacetype;
 
 ALTER TABLE occspaceelement RENAME TO occchecklistspacetypeelement;
@@ -40,6 +49,9 @@ ALTER TABLE public.occinspectedspace
 
 ALTER TABLE public.occinspectedspaceelement
 	ADD COLUMN migratetocecaseonfail BOOLEAN DEFAULT TRUE;
+
+ALTER TABLE public.occinspectedspaceelement
+	RENAME COLUMN spaceelement_elementid TO occchecklistspacetypeelement_elementid;
 
 
 
@@ -173,9 +185,9 @@ CREATE TABLE public.occchecklistphotorequirement
 	occchecklist_checklistid 	INTEGER NOT NULL,
 	occphotorequirement_reqid 	INTEGER NOT NULL,
 	CONSTRAINT occchecklistphotorequirement_pk_comp PRIMARY KEY (occchecklist_checklistid, occphotorequirement_reqid),
-	CONSTRAINT occchecklistphotorequirement_checklist_fk FOREIGN KEY 
+	CONSTRAINT occchecklistphotorequirement_checklist_fk FOREIGN KEY (occphotorequirement_reqid)
 		REFERENCES public.occchecklist (checklistid),
-	CONSTRAINT occchecklistphotorequirement_requirement_fk FOREIGN KEY 
+	CONSTRAINT occchecklistphotorequirement_requirement_fk FOREIGN KEY (occchecklist_checklistid)
 		REFERENCES public.occphotorequirement (requirementid)
 
 );
@@ -197,12 +209,6 @@ CREATE TABLE public.occinspectionphotodoc
 );
 
 DROP TABLE public.occinspectedspaceelementpdfdoc;
-
--- ****************************************************************************
--- RUN THIS CREATE TYPE BY ITSELF!
--- CREATE TYPE occinspectionphototype AS ENUM ('PassDocumentation','FailDocumentation','GeneralDocumentation','Other','Unused');
-
--- ****************************************************************************
 
 ALTER TABLE public.occinspectedspaceelementphotodoc ADD COLUMN phototype occinspectionphototype;
 

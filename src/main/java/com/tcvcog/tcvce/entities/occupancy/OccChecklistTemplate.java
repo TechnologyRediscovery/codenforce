@@ -52,10 +52,6 @@ public class OccChecklistTemplate  {
     private boolean active;
     private CodeSource governingCodeSource;
     
-    /**
-     * @deprecated  replaced by a list of space types
-     */
-    private List<OccSpaceTypeInspectionDirective> occSpaceTypeTemplateList;
     
     /**
      * When one of these is chosen during the inspection process, we pass the chosen

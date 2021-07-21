@@ -47,7 +47,7 @@ public class OccInspectedSpaceElement
     
     private boolean required;
     private User overrideRequiredFlag_thisElementNotInspectedBy;
-    private String notes;
+    private String inspectionnotes;
     
     private List<BlobLight> blobList;
     private OccLocationDescriptor location;
@@ -96,10 +96,10 @@ public class OccInspectedSpaceElement
     }
 
     /**
-     * @return the notes
+     * @return the inspectionnotes
      */
-    public String getNotes() {
-        return notes;
+    public String getInspectionnotes() {
+        return inspectionnotes;
     }
 
     /**
@@ -117,10 +117,10 @@ public class OccInspectedSpaceElement
     }
 
     /**
-     * @param notes the notes to set
+     * @param inspectionnotes the inspectionnotes to set
      */
-    public void setNotes(String notes) {
-        this.notes = notes;
+    public void setInspectionnotes(String inspectionnotes) {
+        this.inspectionnotes = inspectionnotes;
     }
 
 
@@ -232,7 +232,7 @@ public class OccInspectedSpaceElement
         hash = 97 * hash + Objects.hashCode(this.complianceGrantedBy);
         hash = 97 * hash + (this.required ? 1 : 0);
         hash = 97 * hash + Objects.hashCode(this.overrideRequiredFlag_thisElementNotInspectedBy);
-        hash = 97 * hash + Objects.hashCode(this.notes);
+        hash = 97 * hash + Objects.hashCode(this.inspectionnotes);
         hash = 97 * hash + Objects.hashCode(this.location);
         hash = 97 * hash + this.failureIntensityClassID;
         return hash;
@@ -266,7 +266,7 @@ public class OccInspectedSpaceElement
         if (this.failureIntensityClassID != other.failureIntensityClassID) {
             return false;
         }
-        if (!Objects.equals(this.notes, other.notes)) {
+        if (!Objects.equals(this.inspectionnotes, other.inspectionnotes)) {
             return false;
         }
         if (!Objects.equals(this.lastInspectedTS, other.lastInspectedTS)) {

@@ -2158,4 +2158,10 @@
         <managed-bean-class>com.tcvcog.tcvce.application.BlobRetrieveBB</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
+    <managed-bean>
+        <description>For building an inspection checklist</description>
+        <managed-bean-name>occChecklistIntegrator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.integration.OccChecklistIntegrator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
 </faces-config>

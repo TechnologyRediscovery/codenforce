@@ -413,14 +413,14 @@ public  class       CodeElement
     /**
      * @return the notes
      */
-    public String getNotes() {
+    public String getInspectionnotes() {
         return notes;
     }
 
     /**
      * @param notes the notes to set
      */
-    public void setNotes(String notes) {
+    public void setInspectionnotes(String notes) {
         this.notes = notes;
     }
 

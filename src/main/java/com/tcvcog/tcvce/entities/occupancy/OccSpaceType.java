@@ -16,7 +16,6 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
-import com.tcvcog.tcvce.entities.CodeElement;
 import java.util.List;
 
 /**
@@ -29,7 +28,7 @@ public class OccSpaceType {
     protected String spaceTypeDescription;
     protected boolean required;
     
-    List<CodeElement> codeElementList;
+    List<OccSpaceElement> codeElementList;
 
     /**
      * @return the spaceTypeID

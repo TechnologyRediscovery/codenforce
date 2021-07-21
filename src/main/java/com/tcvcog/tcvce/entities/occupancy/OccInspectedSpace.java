@@ -39,6 +39,8 @@ public class OccInspectedSpace
     
     private int inspectedSpaceID;
     
+    protected OccSpaceType spaceType;
+    
     private List<OccInspectedSpaceElement> inspectedElementList;
     private List<OccInspectedSpaceElement> inspectedElementListVisible;
     private ViewOptionsOccChecklistItemsEnum viewSetting;

@@ -174,7 +174,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         inspectedElementAddValueCandidateList = Arrays.asList(OccInspectionStatusEnum.values());
         
         try {
-            inspectionTemplateCandidateList = oii.getChecklistTemplateList(getSessionBean().getSessMuni());
+            inspectionTemplateCandidateList = occChecklistIntegrator.getChecklistTemplateList(getSessionBean().getSessMuni(), this);
             reportConfigOccInspec =
                     oc.getOccInspectionReportConfigDefault(
                             currentInspection,
@@ -692,12 +692,12 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
          OccInspectionIntegrator oii = getOccInspectionIntegrator();
          if(currentInSpcEl != null){
             StringBuilder sb = new StringBuilder();
-            if(currentInSpcEl.getNotes() !=null){
-                sb.append(currentInSpcEl.getNotes());
+            if(currentInSpcEl.getInspectionnotes() !=null){
+                sb.append(currentInSpcEl.getInspectionnotes());
                 sb.append("****************<br />");
             }
             sb.append(formNoteText);
-            currentInSpcEl.setNotes(sb.toString());
+       setInspectionnotesrentInSpcEl.setNotes(sb.toString());
            try {
                oii.updateInspectedSpaceElement(currentInSpcEl);
                 getFacesContext().addMessage(null,

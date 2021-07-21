@@ -65,6 +65,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
+import com.tcvcog.tcvce.occupancy.integration.OccChecklistIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.DateTimeUtil;
 
@@ -122,6 +123,7 @@ public class        BackingBeanUtils
     
     private OccInspectionIntegrator occInspectionIntegrator;
     private OccupancyIntegrator occupancyIntegrator;
+    protected OccChecklistIntegrator occChecklistIntegrator;
     private PaymentIntegrator paymentIntegrator;
     private PaymentCoordinator paymentCoordinator;
     private OccupancyCoordinator occupancyCoordinator;
@@ -927,6 +929,26 @@ public class        BackingBeanUtils
      */
     public void setMuniCoordinator(MunicipalityCoordinator muniCoordinator) {
         this.muniCoordinator = muniCoordinator;
+    }
+
+    /**
+     * @return the occChecklistIntegrator
+     */
+    public OccChecklistIntegrator getOccChecklistIntegrator() {
+           FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{occChecklistIntegrator}", OccChecklistIntegrator.class);
+        occChecklistIntegrator = (OccChecklistIntegrator) ve.getValue(context.getELContext());
+        
+        
+        return occChecklistIntegrator;
+    }
+
+    /**
+     * @param occChecklistIntegrator the occChecklistIntegrator to set
+     */
+    public void setOccChecklistIntegrator(OccChecklistIntegrator occChecklistIntegrator) {
+        this.occChecklistIntegrator = occChecklistIntegrator;
     }
 
        

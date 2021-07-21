@@ -521,7 +521,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(11, java.sql.Types.NULL);
             }
-            stmt.setString(12, element.getNotes());
+            stmt.setString(12, element.getInspectionnotes());
             stmt.setInt(13, element.getLegacyID());
             
             stmt.setString(14, element.getOrdSubSubSecNum());
@@ -607,7 +607,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(11, java.sql.Types.NULL);
             }
-            stmt.setString(12, element.getNotes());
+            stmt.setString(12, element.getInspectionnotes());
             stmt.setInt(13, element.getLegacyID());
             stmt.setString(14, element.getOrdSubSubSecNum());
             stmt.setBoolean(15, element.isUseInjectedValues());

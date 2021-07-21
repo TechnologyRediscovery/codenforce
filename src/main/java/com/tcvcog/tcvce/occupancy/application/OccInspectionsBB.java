@@ -23,13 +23,24 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     private List<OccChecklistTemplate> checklistTemplateList;
     private List<User> userList;
 
+    /**
+     * @deprecated remove me!
+     */
     private List<OccSpace> inspectionSpaceList;
 
     // Form items--these need organized
     private OccChecklistTemplate selectedChecklistTemplate;
     private User selectedInspector;
 
+    /**
+     * @deprecated remove me!
+     */
     private OccSpaceTypeInspectionDirective selectedType;
+    
+    /**
+     * @deprecated remove me!
+     * We'll select a space type instead
+     */
     private OccSpace selectedSpace;
     private OccLocationDescriptor selectedLocDescriptor;
 

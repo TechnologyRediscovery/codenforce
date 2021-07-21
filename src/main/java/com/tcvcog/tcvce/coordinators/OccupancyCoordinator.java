@@ -718,7 +718,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             }
             inspec.setOccPeriodID(period.getPeriodID());
             if (tem == null) {
-                inspec.setChecklistTemplate(oii.getChecklistTemplate(period.getType().getChecklistID()));
+                inspec.setChecklistTemplate(occChecklistIntegrator.getChecklistTemplate(period.getType().getChecklistID(), this));
             } else {
                 inspec.setChecklistTemplate(tem);
             }
@@ -1232,12 +1232,12 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      */
     public List<OccChecklistTemplate> getOccChecklistTemplatelist() throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-        return oii.getOccChecklistTemplatelist();
+        return occChecklistIntegrator.getOccChecklistTemplatelist(this);
     }
     
     public List<OccSpaceTypeInspectionDirective> getOccSpaceTypeList(int checklistid) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-        return oii.getOccInspecTemplateSpaceTypeList(checklistid);
+        return occChecklistIntegrator.getOccInspecTemplateSpaceTypeList(checklistid, this);
     }
     
     public OccSpaceTypeInspectionDirective getOccSpaceTypeSkeleton() {
@@ -1249,10 +1249,10 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         OccSpaceType st = (OccSpaceType) os;
         //Inserting occspacetype table
         oii.insertSpaceType(st);
-        int currentSpaceTypeId = oii.getLastInsertSpaceTypeid();
+        int currentSpaceTypeId = occChecklistIntegrator.getLastInsertSpaceTypeid(this);
         os.setSpaceTypeID(currentSpaceTypeId);
         //Inserting occchecklistspacetype table
-        oii.insertOccChecklistSpaceType(checklistid, os);
+        occChecklistIntegrator.insertOccChecklistSpaceType(checklistid, os, this);
         
     }
     
@@ -1260,24 +1260,24 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         OccSpaceType st = (OccSpaceType) os;
         //Updating occspacetype table
-        oii.updateSpaceType(st);
+        occChecklistIntegrator.updateSpaceType(st, this);
         //Updating occchecklistspacetype table
-        oii.updateOccChecklistSpaceType(os);
+        occChecklistIntegrator.updateOccChecklistSpaceType(os, this);
     }
     
     public void deleteChecklistSpacetype(OccSpaceTypeInspectionDirective os) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         
         for (OccSpace oss : os.getSpaceList()) {
-            oii.detachElement(oss.getSpaceID());
+            occChecklistIntegrator.detachElement(oss.getSpaceID(), this);
         }
         OccSpaceType st = (OccSpaceType) os;
         //Deleting occspace table
         oii.detachSpacefromSpaceType(st);
         //Deleting occchecklistspacetype table
-        oii.deleteOccChecklistSpaceType(st);
+        occChecklistIntegrator.deleteOccChecklistSpaceType(st, this);
         //Deleting occspacetype table
-        oii.deleteSpaceType(st);
+        occChecklistIntegrator.deleteSpaceType(st, this);
         
     }
     
@@ -1288,7 +1288,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public void addNewChecklistSpace(OccSpace os, OccSpaceTypeInspectionDirective ost) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         int spacetypeid = ost.getSpaceTypeID();
-        os.setType(oii.getSpaceType(spacetypeid));
+        os.setType(occChecklistIntegrator.getSpaceType(spacetypeid, this));
         //Inserting space
         oii.insertSpace(os);
     }
@@ -1302,9 +1302,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public void deleteChecklistSpace(OccSpace os) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         
-        oii.detachElement(os.getSpaceID());
+        occChecklistIntegrator.detachElement(os.getSpaceID(), this);
         //Deleting space
-        oii.deleteSpace(os);
+        occChecklistIntegrator.deleteSpace(os, this);
     }
     
     public OccSpaceElement getOccSpaceElementSkeleton() {
@@ -1315,14 +1315,14 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
         CodeElement ce = ci.getCodeElement(elementid);
-        oii.detachCodeElementFromSpace(os, ce);
+        occChecklistIntegrator.detachCodeElementFromSpace(os, ce, this);
     }
     
     public void createChecklistElement(OccSpace os, int elementid) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
         CodeElement ce = ci.getCodeElement(elementid);
-        oii.attachCodeElementToSpace(os, ce);
+        occChecklistIntegrator.attachCodeElementToSpace(os, ce, this);
     }
     
     public List<OccSpace> getSpacelist(int spacetypeid) throws IntegrationException {
@@ -1337,12 +1337,12 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     
     public OccChecklistTemplate getChecklistTemplate(int checklistid) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-        return oii.getChecklistTemplate(checklistid);
+        return occChecklistIntegrator.getChecklistTemplate(checklistid, this);
     }
     
     public OccSpaceTypeInspectionDirective getSpaceType(int spacetypeid) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-        return oii.getOccInspecTemplateSpaceType(spacetypeid);
+        return occChecklistIntegrator.getOccInspecTemplateSpaceType(spacetypeid, this);
     }
     
 } // close class

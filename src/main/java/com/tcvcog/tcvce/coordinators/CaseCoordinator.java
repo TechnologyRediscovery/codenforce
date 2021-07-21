@@ -3028,7 +3028,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         ece.setDefaultViolationDescription(defFindings); 
         MessageBuilderParams mbp = new MessageBuilderParams();
         mbp.setUser(ua);
-        mbp.setExistingContent(ece.getNotes());
+        mbp.setExistingContent(ece.getInspectionnotes());
         
         StringBuilder sb = new StringBuilder();
         sb.append("Default findings changed to: ");
@@ -3037,7 +3037,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         sb.append(ece.getDefaultViolationDescription());
         mbp.setNewMessageContent(sb.toString());
         
-        ece.setNotes(sc.appendNoteBlock(mbp));
+        ece.setInspectionnotes(sc.appendNoteBlock(mbp));
         ci.updateCodeElement(ece);
         
         
