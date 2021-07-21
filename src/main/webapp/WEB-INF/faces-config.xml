@@ -958,6 +958,12 @@
         <managed-bean-class>com.tcvcog.tcvce.coordinators.OccupancyCoordinator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>occInspectionCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.coordinators.OccInspectionCoordinator</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>inspectionChecklistIntegrator</managed-bean-name>
@@ -1689,11 +1695,6 @@
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.PaymentBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-    <managed-bean>
-        <managed-bean-name>dashboardDataBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccInspectionBB</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-    </managed-bean>
     
     
     <managed-bean>
@@ -2100,17 +2101,6 @@
         
         
     </navigation-rule>
-    
-    
-    
-    
-    
-    
-    <managed-bean>
-        <managed-bean-name>dashboardDataBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccInspectionBB</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>navMenuBean</managed-bean-name>

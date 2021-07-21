@@ -16,23 +16,13 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.BlobCoordinator;
-import com.tcvcog.tcvce.coordinators.SearchCoordinator;
-import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
-import com.tcvcog.tcvce.coordinators.CodeCoordinator;
-import com.tcvcog.tcvce.coordinators.DataCoordinator;
-import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
-import com.tcvcog.tcvce.coordinators.PersonCoordinator;
-import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
-import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
-import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.coordinators.*;
+
 import java.io.Serializable;
 import javax.faces.context.FacesContext;
 import javax.faces.application.Application;
 import java.sql.Connection;
-import com.tcvcog.tcvce.coordinators.UserCoordinator;
+
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
@@ -55,9 +45,6 @@ import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 // system integrators
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
-import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
-import com.tcvcog.tcvce.coordinators.PDFCoordinator;
-import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -120,13 +107,16 @@ public class        BackingBeanUtils
     private PublicInfoCoordinator publicInfoCoordinator;
     private PersonCoordinator personCoordinator;
     private PropertyCoordinator propertyCoordinator;
-    
-    private OccInspectionIntegrator occInspectionIntegrator;
+
     private OccupancyIntegrator occupancyIntegrator;
-    protected OccChecklistIntegrator occChecklistIntegrator;
+    private OccInspectionIntegrator occInspectionIntegrator;
+    private OccChecklistIntegrator occChecklistIntegrator;
+
+    private OccupancyCoordinator occupancyCoordinator;
+    private OccInspectionCoordinator occInspectionCoordinator;
+
     private PaymentIntegrator paymentIntegrator;
     private PaymentCoordinator paymentCoordinator;
-    private OccupancyCoordinator occupancyCoordinator;
     private DataCoordinator dataCoordinator;
     
     private BlobCoordinator blobCoordinator;
@@ -807,12 +797,31 @@ public class        BackingBeanUtils
     }
 
     /**
-     * @param occupancyCoordiator the occupancyCoordiator to set
+     * @param occupancyCoordiator the occupancyCoordinator to set
      */
     public void setOccupancyCoordinator(OccupancyCoordinator occupancyCoordiator) {
         this.occupancyCoordinator = occupancyCoordiator;
     }
-/**
+
+    /**
+     * @return the occupancyCoordinator
+     */
+    public OccInspectionCoordinator getOccInspectionCoordinator() {
+        FacesContext context = getFacesContext();
+        ValueExpression ve = context.getApplication().getExpressionFactory()
+                .createValueExpression(context.getELContext(), "#{occInspectionCoordinator}", OccInspectionCoordinator.class);
+        occInspectionCoordinator = (OccInspectionCoordinator) ve.getValue(context.getELContext());
+        return occInspectionCoordinator;
+    }
+
+    /**
+     * @param occInspectionCoordinator the occInspectionCoordinator to set
+     */
+    public void setOccInspectionCoordinator(OccInspectionCoordinator occInspectionCoordinator) {
+        this.occInspectionCoordinator = occInspectionCoordinator;
+    }
+
+    /**
      * @return the systemCoordinator
      */
     public SystemCoordinator getSystemCoordinator() {

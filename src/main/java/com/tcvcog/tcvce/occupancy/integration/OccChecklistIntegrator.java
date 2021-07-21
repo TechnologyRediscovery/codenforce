@@ -47,7 +47,7 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
      * @return an instance of List, perhaps with checklists
      * @throws IntegrationException 
      */
-    public List<OccChecklistTemplate> getOccChecklistTemplatelist(Municipality muni) throws IntegrationException {
+    public List<OccChecklistTemplate> getOccChecklistTemplateList(Municipality muni) throws IntegrationException {
         List<OccChecklistTemplate> checklistList = new ArrayList<>();
         StringBuilder sb = new StringBuilder(); 
         sb.append("SELECT checklistid FROM public.occchecklist ");

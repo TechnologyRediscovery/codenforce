@@ -22,20 +22,13 @@ import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CodeElement;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.CodeSource;
-import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
-import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
-import com.tcvcog.tcvce.entities.occupancy.OccSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceType;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceTypeInspectionDirective;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
@@ -50,7 +43,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * The master Inspection integrator for methods 
@@ -173,7 +165,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         OccInspectedSpace inSpace = new OccInspectedSpace(getOccSpace(rs.getInt("occspace_spaceid")));
         inSpace.setInspectedSpaceID(rs.getInt("inspectedspaceid"));
         inSpace.setLocation(getLocationDescriptor(rs.getInt("occlocationdescription_descid")));
-        inSpace.setSpaceType(occChecklistIntegrator.getSpaceType(inSpace.getType().getSpaceTypeID(), this));
+        inSpace.setType(getOccChecklistIntegrator().getSpaceType(inSpace.getType().getSpaceTypeID(), this));
         inSpace.setAddedToChecklistBy(ui.getUser(rs.getInt("addedtochecklistby_userid")));
         inSpace.setInspectionID(rs.getInt("occinspection_inspectionid"));
         
@@ -694,7 +686,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
         // Now use the SpaceType to make a SpaceTypeTemplate that contains
         // variables for configuring SpacTypes when they are actually inspected
-        OccSpaceTypeInspectionDirective directive = new OccSpaceTypeInspectionDirective(occChecklistIntegrator.getOccSpaceType(rs.getInt("spacetype_typeid"), this));
+        OccSpaceTypeInspectionDirective directive = new OccSpaceTypeInspectionDirective(getOccChecklistIntegrator().getOccSpaceType(rs.getInt("spacetype_typeid"), this));
         directive.setOverrideSpaceTypeRequired(rs.getBoolean("overridespacetyperequired"));
         directive.setOverrideSpaceTypeRequiredValue(rs.getBoolean("overridespacetyperequiredvalue"));
         directive.setOverrideSpaceTypeRequireAllSpaces(rs.getBoolean("overridespacetyperequireallspaces"));
@@ -709,37 +701,6 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         type.setSpaceTypeDescription(rs.getString("description"));
         type.setRequired(rs.getBoolean("required"));
         return type;
-    }
-
-    public List<OccSpace> getOccSpaceList(int spaceTypeID) throws IntegrationException {
-        String query = "SELECT spaceid, name, spacetype_id, required, description\n"
-                + "  FROM public.occspace WHERE spacetype_id=?";
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        List<OccSpace> spaceList = new ArrayList<>();
-
-        try {
-
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, spaceTypeID);
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                spaceList.add(generateOccSpace(rs));
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot get space type", ex);
-
-        } finally {
-              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-        return spaceList;
     }
 
     public void insertSpaceType(OccSpaceType spaceType) throws IntegrationException {
@@ -907,7 +868,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         }
 
         // now set the big lists
-        ins.setChecklistTemplate(occChecklistIntegrator.getChecklistTemplate(rs.getInt("occchecklist_checklistlistid"), this));
+        ins.setChecklistTemplate(getOccChecklistIntegrator().getChecklistTemplate(rs.getInt("occchecklist_checklistlistid"), this));
         ins.setInspectedSpaceList(getInspectedSpaceList(ins.getInspectionID()));
 
         ins.setActive(rs.getBoolean("active"));
