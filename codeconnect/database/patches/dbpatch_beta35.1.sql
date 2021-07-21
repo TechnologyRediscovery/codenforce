@@ -1,21 +1,30 @@
 -- Occupancy inspection refactor for inspeection UI by JURPLEL
 
+ALTER TABLE occspacetype RENAME TO occhecklistspacetype;
 
-ALTER TABLE occspaceelement RENAME TO occspacetypeelement;
+ALTER TABLE occspaceelement RENAME TO occchecklistspacetypeelement;
 
-ALTER TABLE public.occspacetypeelement
-	ADD COLUMN occpacetype_typeid INTEGER CONSTRAINT occpsacelement_typeid_fk REFERENCES public.occspacetype (spacetypeid);
+ALTER TABLE public.occchecklistspacetypeelement
+	ADD COLUMN checklistspacetype_typeid INTEGER 
+	CONSTRAINT occchecklistspacetypeelement_checklistspacetype_typeid_fk REFERENCES public.occchecklistspacetype (checklistspacetypeid);
 
 ALTER TABLE public.occspaceelement DROP COLUMN space_id;
 
+-- replaced with occspacetypeelement
 DROP TABLE public.occspace CASCADE;
 
+ALTER TABLE occchecklist ADD COLUMN createdts TIMESTAMP WITH TIME ZONE;
+
+
+-- overly complex logic:drop 
 ALTER TABLE public.occchecklistspacetype
 	DROP COLUMN overridespacetyperequired;
 
+-- overly complex logic:drop 
 ALTER TABLE public.occchecklistspacetype
 	DROP COLUMN overridespacetyperequiredvalue;
 
+-- overly complex logic:drop 
 ALTER TABLE public.occchecklistspacetype
 	DROP COLUMN overridespacetyperequireallspaces;
 
@@ -39,11 +48,32 @@ ALTER TABLE public.occinspection
 	ADD COLUMN followupto_inspectionid INTEGER 
 	CONSTRAINT occinspection_followupto_fk REFERENCES occinspection (inspectionid);
 
+ALTER TABLE public.occinspection 
+	ADD COLUMN deactivatedts TIMESTAMP WITH TIME ZONE;
+
+ALTER TABLE public.occinspection 
+	ADD COLUMN deactivatedts TIMESTAMP WITH TIME ZONE;
+
+ALTER TABLE public.occinspection 
+	ADD COLUMN deactivatedby_userid INTEGER 
+	CONSTRAINT occinspection_deactivatedby_fk REFERENCES login (userid);
+
+
+
 ALTER TABLE public.occinspection
 	RENAME COLUMN notes TO notespreinspection;
 
 ALTER TABLE public.occinspection ADD COLUMN timestart TIMESTAMP WITH TIME ZONE;
 ALTER TABLE public.occinspection ADD COLUMN timeend TIMESTAMP WITH TIME ZONE;
+
+-- replaced with standard deactivatedts and deactivatedby_userid
+ALTER TABLE public.occinspection DROP COLUMN active;
+ALTER TABLE public.occinspection ADD COLUMN createdby_userid INTEGER 
+	CONSTRAINT occinspection_creationby_fk REFERENCES login (userid);
+
+ALTER TABLE public.occinspection ADD COLUMN lastupdatedts TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.occinspection ADD COLUMN lastupdatedby_userid INTEGER 
+	CONSTRAINT occinspection_lastupdatedby_fk REFERENCES login (userid);
 
 
 
@@ -81,9 +111,6 @@ ALTER TABLE public.occinspection
 	CONSTRAINT occinspection_cause_fk REFERNECES occinspectioncause (causeid);
 
 
-
-
-
 CREATE SEQUENCE IF NOT EXISTS occinspection_determination_seq
     START WITH 100
     INCREMENT BY 1
@@ -119,6 +146,8 @@ ALTER TABLE public.occinspection DROP COLUMN passedinspection_userid;
 ALTER TABLE public.occinspection DROP COLUMN passedinspectionts;
 
 ALTER TABLE public.occinspection ADD COLUMN remarks TEXT;
+
+
 ALTER TABLE public.occinspection ADD COLUMN generalcomments TEXT;
 
 
