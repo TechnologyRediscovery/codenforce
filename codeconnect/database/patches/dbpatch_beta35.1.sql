@@ -120,7 +120,7 @@ CREATE TABLE public.occinspectioncause
 
 ALTER TABLE public.occinspection 
 	ADD COLUMN cause_causeid INTEGER 
-	CONSTRAINT occinspection_cause_fk REFERNECES occinspectioncause (causeid);
+	CONSTRAINT occinspection_cause_fk REFERENCES occinspectioncause (causeid);
 
 
 CREATE SEQUENCE IF NOT EXISTS occinspection_determination_seq

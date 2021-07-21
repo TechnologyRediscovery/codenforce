@@ -169,11 +169,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
     private OccInspectedSpace generateOccInspectedSpace(ResultSet rs) throws SQLException, IntegrationException {
         UserIntegrator ui = getUserIntegrator();
-
-        OccInspectedSpace inSpace = new OccInspectedSpace(getOccSpace(rs.getInt("occspace_spaceid")));
+        OccChecklistIntegrator oci = getOccChecklistIntegrator();
+        
+        OccInspectedSpace inSpace = new OccInspectedSpace((rs.getInt("occspace_spaceid")));
         inSpace.setInspectedSpaceID(rs.getInt("inspectedspaceid"));
         inSpace.setLocation(getLocationDescriptor(rs.getInt("occlocationdescription_descid")));
-        inSpace.setSpaceType(occChecklistIntegrator.getSpaceType(inSpace.getType().getSpaceTypeID(), this));
+        inSpace.setSpaceType(oci.getOccSpaceType(rs.getInt("")));
         inSpace.setAddedToChecklistBy(ui.getUser(rs.getInt("addedtochecklistby_userid")));
         inSpace.setInspectionID(rs.getInt("occinspection_inspectionid"));
         
@@ -690,81 +691,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     }
 
 
-    private OccSpaceTypeInspectionDirective generateOccSpaceTypeInspectionDirective(ResultSet rs) throws IntegrationException, SQLException {
-
-        // Now use the SpaceType to make a SpaceTypeTemplate that contains
-        // variables for configuring SpacTypes when they are actually inspected
-        OccSpaceTypeInspectionDirective directive = new OccSpaceTypeInspectionDirective(occChecklistIntegrator.getOccSpaceType(rs.getInt("spacetype_typeid"), this));
-        directive.setOverrideSpaceTypeRequired(rs.getBoolean("overridespacetyperequired"));
-        directive.setOverrideSpaceTypeRequiredValue(rs.getBoolean("overridespacetyperequiredvalue"));
-        directive.setOverrideSpaceTypeRequireAllSpaces(rs.getBoolean("overridespacetyperequireallspaces"));
-        directive.setSpaceList(getOccSpaceList(directive.getSpaceTypeID()));
-        return directive;
-    }
-
-    private OccSpaceType generateOccSpaceType(ResultSet rs) throws SQLException, IntegrationException {
-        OccSpaceType type = new OccSpaceType();
-        type.setSpaceTypeID(rs.getInt("spacetypeid"));
-        type.setSpaceTypeTitle(rs.getString("spacetitle"));
-        type.setSpaceTypeDescription(rs.getString("description"));
-        type.setRequired(rs.getBoolean("required"));
-        return type;
-    }
-
-    public List<OccSpace> getOccSpaceList(int spaceTypeID) throws IntegrationException {
-        String query = "SELECT spaceid, name, spacetype_id, required, description\n"
-                + "  FROM public.occspace WHERE spacetype_id=?";
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        List<OccSpace> spaceList = new ArrayList<>();
-
-        try {
-
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, spaceTypeID);
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                spaceList.add(generateOccSpace(rs));
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot get space type", ex);
-
-        } finally {
-              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-        return spaceList;
-    }
-
-    public void insertSpaceType(OccSpaceType spaceType) throws IntegrationException {
-        String query = "INSERT INTO public.occspacetype(\n"
-                + "         spacetypeid, spacetitle, description, required) \n"
-                + "    VALUES (DEFAULT, ?, ?, ?)";
-
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setString(1, spaceType.getSpaceTypeTitle());
-            stmt.setString(2, spaceType.getSpaceTypeDescription());
-            stmt.setBoolean(3, spaceType.isRequired());
-            stmt.execute();
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot insert SpaceType", ex);
-        } finally {
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             
-        } // close finally
-
-    }
+ 
 
 
     public List<OccInspection> getOccInspectionList(OccPeriod op) throws IntegrationException {
