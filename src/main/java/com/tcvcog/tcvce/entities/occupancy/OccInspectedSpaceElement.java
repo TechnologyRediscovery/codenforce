@@ -30,55 +30,62 @@ import java.util.Objects;
  *
  * @author ellen bascomb of apt 31y
  */
-public class OccInspectedSpaceElement 
-        extends OccSpaceElement 
-        implements Serializable, Comparable<OccInspectedSpaceElement>, IFace_BlobHolder{
-    
+public class OccInspectedSpaceElement
+        extends OccSpaceElement
+        implements Serializable, Comparable<OccInspectedSpaceElement>, IFace_BlobHolder {
+
     private int inspectedSpaceElementID;
-    
-      // Here lies the remains of composition replaced by inheritance! 2-AUG-19 on occbeta
+
+    // Here lies the remains of composition replaced by inheritance! 2-AUG-19 on occbeta
 //    private OccSpaceElement spaceElement;
-    
+
     private LocalDateTime lastInspectedTS;
     private User lastInspectedBy;
-    
+
     private LocalDateTime complianceGrantedTS;
     private User complianceGrantedBy;
-    
+
     private boolean required;
     private User overrideRequiredFlag_thisElementNotInspectedBy;
-    private String inspectionnotes;
-    
+    private String inspectionNotes;
+
     private List<BlobLight> blobList;
     private OccLocationDescriptor location;
     private int failureIntensityClassID;
     private OccInspectableStatus status;
-   
-    
+
     /**
      * For advanced checklist object management in the UI
      * since the occinspectedspaceelement records know about entries in the
-     * inspectedspace table 
+     * inspectedspace table
      */
     private int inspectedSpaceID;
 
-    /**
-     * Constructor used when injecting these objects into the DB
-     * @param ele 
-     */
-    public OccInspectedSpaceElement(CodeElement ele) {
-        super(ele);
+    public OccInspectedSpaceElement() { }
+
+    public OccInspectedSpaceElement(CodeElement codeElement) {
+        super(codeElement);
     }
-    
-    /**
-     *
-     * @param ele
-     * @param spElID
-     */
-    public OccInspectedSpaceElement(CodeElement ele, int spElID){
-        super(ele);
-        this.spaceElementID = spElID;
-        
+
+    public OccInspectedSpaceElement(OccSpaceElement occSpaceElement) {
+        super(occSpaceElement);
+    }
+
+    public OccInspectedSpaceElement(OccInspectedSpaceElement occInspectedSpaceElement) {
+        super(occInspectedSpaceElement);
+        this.inspectedSpaceElementID = occInspectedSpaceElement.getInspectedSpaceElementID();
+        this.lastInspectedTS = occInspectedSpaceElement.getLastInspectedTS();
+        this.lastInspectedBy = occInspectedSpaceElement.getLastInspectedBy();
+        this.complianceGrantedTS = occInspectedSpaceElement.getComplianceGrantedTS();
+        this.complianceGrantedBy = occInspectedSpaceElement.getComplianceGrantedBy();
+        this.required = occInspectedSpaceElement.isRequired();
+        this.overrideRequiredFlag_thisElementNotInspectedBy = occInspectedSpaceElement.getOverrideRequiredFlag_thisElementNotInspectedBy();
+        this.inspectionNotes = occInspectedSpaceElement.getInspectionNotes();
+        this.blobList = occInspectedSpaceElement.getBlobList();
+        this.location = occInspectedSpaceElement.getLocation();
+        this.failureIntensityClassID = occInspectedSpaceElement.getFailureIntensityClassID();
+        this.status = occInspectedSpaceElement.getStatus();
+        this.inspectedSpaceID = occInspectedSpaceElement.getInspectedSpaceID();
     }
 
     /**
@@ -98,8 +105,8 @@ public class OccInspectedSpaceElement
     /**
      * @return the inspectionnotes
      */
-    public String getInspectionnotes() {
-        return inspectionnotes;
+    public String getInspectionNotes() {
+        return inspectionNotes;
     }
 
     /**
@@ -117,10 +124,10 @@ public class OccInspectedSpaceElement
     }
 
     /**
-     * @param inspectionnotes the inspectionnotes to set
+     * @param inspectionNotes the inspectionnotes to set
      */
-    public void setInspectionnotes(String inspectionnotes) {
-        this.inspectionnotes = inspectionnotes;
+    public void setInspectionNotes(String inspectionNotes) {
+        this.inspectionNotes = inspectionNotes;
     }
 
 
@@ -232,7 +239,7 @@ public class OccInspectedSpaceElement
         hash = 97 * hash + Objects.hashCode(this.complianceGrantedBy);
         hash = 97 * hash + (this.required ? 1 : 0);
         hash = 97 * hash + Objects.hashCode(this.overrideRequiredFlag_thisElementNotInspectedBy);
-        hash = 97 * hash + Objects.hashCode(this.inspectionnotes);
+        hash = 97 * hash + Objects.hashCode(this.inspectionNotes);
         hash = 97 * hash + Objects.hashCode(this.location);
         hash = 97 * hash + this.failureIntensityClassID;
         return hash;
@@ -266,7 +273,7 @@ public class OccInspectedSpaceElement
         if (this.failureIntensityClassID != other.failureIntensityClassID) {
             return false;
         }
-        if (!Objects.equals(this.inspectionnotes, other.inspectionnotes)) {
+        if (!Objects.equals(this.inspectionNotes, other.inspectionNotes)) {
             return false;
         }
         if (!Objects.equals(this.lastInspectedTS, other.lastInspectedTS)) {

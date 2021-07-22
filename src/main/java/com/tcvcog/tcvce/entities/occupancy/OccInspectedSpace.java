@@ -75,10 +75,6 @@ public class OccInspectedSpace
         this.inspectionID = getInspectionID();
     }
 
-    public void absorbOccSpaceElements(List<OccSpaceElement> elements) {
-
-    }
-
     public void configureVisibleElementList() {
         inspectedElementListVisible.clear();
         for(Iterator<OccInspectedSpaceElement> itEle = inspectedElementList.iterator(); itEle.hasNext(); ){

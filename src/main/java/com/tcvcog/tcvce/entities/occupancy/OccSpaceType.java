@@ -87,5 +87,11 @@ public class OccSpaceType {
     }
 
 
-    
+    public List<OccSpaceElement> getCodeElementList() {
+        return codeElementList;
+    }
+
+    public void setCodeElementList(List<OccSpaceElement> codeElementList) {
+        this.codeElementList = codeElementList;
+    }
 }

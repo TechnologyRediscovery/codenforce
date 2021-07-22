@@ -67,6 +67,7 @@ import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 
 import java.util.Iterator;
+import java.util.stream.Collectors;
 
 /**
  * King of all business logic implementation for the entire Occupancy object
@@ -722,95 +723,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return inspec;
     }
 
-    /**
-     * Called by the backing bean when the user selects a space to start
-     * inspecting.
-     *
-     * @param inspection    The current inspection
-     * @param u             The current user--not necessarily the official Inspector of the
-     *                      OccInspection
-     * @param ost           The space type which will have a list of SpaceElements inside it
-     * @param initialStatus
-     * @param loc           A populated location descriptor for this Space. Can be an
-     *                      existing location or an new one
-     * @return Containing a List of InspectedCodeElement objects ready to be
-     * evaluated
-     * @throws IntegrationException
-     */
-    public OccInspection inspectionAction_commenceSpaceInspection(OccInspection inspection,
-                                                                  User u,
-                                                                  OccSpaceType ost,
-                                                                  OccInspectionStatusEnum initialStatus,
-                                                                  OccLocationDescriptor loc) throws IntegrationException {
-
-        OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
-
-        OccInspectedSpace inspSpace = new OccInspectedSpace();
-        // then configure the OccInspectedSpace for first insertion
-        inspSpace.setLocation(loc);
-        inspSpace.setAddedToChecklistBy(u);
-        inspSpace.setAddedToChecklistTS(LocalDateTime.now());
-        // We are inspecting all the code elements associated with this space in the checklist template
-        ListIterator<OccSpaceElement> elementIterator = spc.getSpaceElementList().listIterator();
-        OccInspectedSpaceElement inspEle; // Holds our new objects as we add them to the list
-        List<OccInspectedSpaceElement> inElementList = new ArrayList<>();
-
-        // wrap each CodeElement in this space in a InspectedCodeElement blanket to keep it warm
-        while (elementIterator.hasNext()) {
-            OccSpaceElement ele = elementIterator.next();
-            // Create an OccInspectedElement by by passing in a CodeElement using the special constructor
-            inspEle = new OccInspectedSpaceElement(ele, ele.getSpaceElementID());
-            if (initialStatus == null) {
-                initialStatus = OccInspectionStatusEnum.NOTINSPECTED;
-            }
-            switch (initialStatus) {
-                case FAIL:
-                    inspEle.setLastInspectedBy(u);
-                    inspEle.setLastInspectedTS(LocalDateTime.now());
-                    break;
-                case NOTINSPECTED:
-                    inspEle.setLastInspectedBy(null);
-                    inspEle.setLastInspectedTS(null);
-                    break;
-                case PASS:
-                    inspEle.setLastInspectedBy(u);
-                    inspEle.setLastInspectedTS(LocalDateTime.now());
-                    inspEle.setComplianceGrantedBy(u);
-                    inspEle.setComplianceGrantedTS(LocalDateTime.now());
-                    break;
-                default:
-                    inspEle.setLastInspectedBy(null);
-                    inspEle.setLastInspectedTS(null);
-
-            }
-            inElementList.add(inspEle);
-            // each element in this space gets a reference to the same OccLocationDescriptor object
-            if (loc == null) {
-                inspSpace.setLocation(inspecInt.getLocationDescriptor(Integer.parseInt(
-                        getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                                .getString("locationdescriptor_implyfromspacename"))));
-            } else {
-                inspSpace.setLocation(loc);
-            }
-        }
-
-        // Critical moment of injecting an new (i.e. ID-less) InspectedElement into its OccInspectedSpace
-        inspSpace.setInspectedElementList(inElementList);
-
-        // With a fully built inspected space, we can record our start of inspection in the DB
-        inspSpace = inspecInt.recordCommencementOfSpaceInspection(inspSpace, inspection);
-        System.out.println("OccupancyCoordinator.inspectionAction_commenceSpaceInspection | commenced inspecting of space");
-
-        // now use our convenience method to record Inspection of the space's individual elements
-        inspecInt.recordInspectionOfSpaceElements(inspSpace, inspection);
-
-        // check sequence by retrieving new inspected space and displaying info
-        inspSpace = inspecInt.getInspectedSpace(inspSpace.getSpaceID());
-        System.out.println("OccupancyCoordinator.inspectionAction_commenceSpaceInspection | retrievedInspectedSpaceid= " + inspSpace);
-
-        return inspection;
-    }
-
     public void inspectionAction_updateSpaceElementData(OccInspection inspection) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
 
@@ -1222,7 +1134,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     }
 
     public OccSpaceElement getOccSpaceElementSkeleton() {
-        return new OccSpaceElement(new CodeElement());
+        return new OccSpaceElement();
     }
 
     public OccChecklistTemplate getChecklistTemplate(int checklistID) throws IntegrationException {

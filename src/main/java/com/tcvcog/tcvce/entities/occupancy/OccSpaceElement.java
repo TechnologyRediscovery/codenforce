@@ -17,9 +17,6 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.CodeElement;
-import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
-import com.tcvcog.tcvce.entities.CodeSource;
-import java.time.LocalDateTime;
 
 /**
  * Represents a specific ordinance that MIGHT be inspected
@@ -40,62 +37,19 @@ public class OccSpaceElement extends CodeElement {
     
     protected int spaceElementID;
     protected boolean requiredForInspection;
-    
-    public OccSpaceElement(CodeElement ele){
-        this.elementID = ele.getElementID();
 
-        this.guideEntry = ele.getGuideEntry();
-        this.guideEntryID = ele.getGuideEntryID();
-        this.source = ele.getSource();
+    public OccSpaceElement() {}
 
-        this.ordchapterNo = ele.getOrdchapterNo();
-
-        this.ordchapterTitle = ele.getOrdchapterTitle();
-        this.ordSecNum = ele.getOrdSecNum();
-        this.ordSecTitle = ele.getOrdSecTitle();
-
-        this.ordSubSecNum = ele.getOrdSecNum();
-        this.ordSubSecTitle = ele.getOrdSubSecTitle();
-        this.ordTechnicalText = ele.getOrdTechnicalText();
-
-        this.ordHumanFriendlyText = ele.getOrdHumanFriendlyText();
-        this.isActive = ele.isIsActive();
-
-        this.resourceURL = ele.getResourceURL();
-
-        this.headerString = ele.getHeaderString();
-        
+    public OccSpaceElement(CodeElement codeElement) {
+        super(codeElement);
     }
-    
-    public OccSpaceElement(CodeElement ele, int spcEleID){
-        this.elementID = ele.getElementID();
 
-        this.guideEntry = ele.getGuideEntry();
-        this.guideEntryID = ele.getGuideEntryID();
-        this.source = ele.getSource();
-
-        this.ordchapterNo = ele.getOrdchapterNo();
-
-        this.ordchapterTitle = ele.getOrdchapterTitle();
-        this.ordSecNum = ele.getOrdSecNum();
-        this.ordSecTitle = ele.getOrdSecTitle();
-
-        this.ordSubSecNum = ele.getOrdSecNum();
-        this.ordSubSecTitle = ele.getOrdSubSecTitle();
-        this.ordTechnicalText = ele.getOrdTechnicalText();
-
-        this.ordHumanFriendlyText = ele.getOrdHumanFriendlyText();
-        this.isActive = ele.isIsActive();
-
-        this.resourceURL = ele.getResourceURL();
-
-        this.headerString = ele.getHeaderString();
-        
-        
-        this.spaceElementID=spcEleID;
-        
+    public OccSpaceElement(OccSpaceElement occSpaceElement) {
+        super(occSpaceElement);
+        this.spaceElementID = occSpaceElement.getSpaceElementID();
+        this.requiredForInspection = occSpaceElement.isRequiredForInspection();
     }
-    
+
 
     /**
      * @return the spaceElementID
