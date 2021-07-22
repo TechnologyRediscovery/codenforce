@@ -16,47 +16,43 @@
  */
 package com.tcvcog.tcvce.util;
 
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectionCause;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
-/**
- * Converter to convert between String representations of OccPeriodType objects
- * and object types
- * @author echocharliedelta
- */
-@FacesConverter(value="occPeriodTypeConverter")
-public class OccPeriodTypeConverter extends EntityConverter implements Converter {
-    
+@FacesConverter(value="occInspectionCauseConverter")
+public class OccInspectionCauseConverter extends EntityConverter implements Converter {
+
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
         if(titleS.isEmpty()) {
-            return null; 
+            return null;
         }
-        OccPeriodType o = (OccPeriodType) this.getViewMap(fc).get(titleS);
+        OccInspectionCause o = (OccInspectionCause) this.getViewMap(fc).get(titleS);
         return o;
     }
 
     @Override
     public String getAsString(FacesContext fc, UIComponent uic, Object o) {
-        
-        if (o == null){
+
+        if (o == null) {
             return "";
         }
-        
-        OccPeriodType opt = (OccPeriodType) o;
+
+        OccInspectionCause opt = (OccInspectionCause) o;
         String title = opt.getTitle();
         if (title != null){
             this.getViewMap(fc).put(title,o);
             return title;
-            
+
         } else {
-            return "OccPeriodTypeConverter error";
+            return "OccInspectionCauseConverter error";
         }
-        
-        
+
+
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

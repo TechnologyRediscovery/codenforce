@@ -798,7 +798,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         ins.setPacc(rs.getInt("publicaccesscc"));
 
         ins.setEnablePacc(rs.getBoolean("enablepacc"));
-        ins.setNotes(rs.getString("notes"));
+        ins.setNotesPreInspection(rs.getString("notes"));
         if (rs.getInt("thirdpartyinspector_personid") != 0) {
             ins.setThirdPartyInspector(pi.getPerson(rs.getInt("thirdpartyinspector_personid")));
         }
@@ -850,7 +850,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             stmt.setInt(2, occInsp.getPacc());
 
             stmt.setBoolean(3, occInsp.isEnablePacc());
-            stmt.setString(4, occInsp.getNotes());
+            stmt.setString(4, occInsp.getNotesPreInspection());
             if (occInsp.getThirdPartyInspector() != null) {
                 stmt.setInt(5, occInsp.getThirdPartyInspector().getPersonID());
             } else {
@@ -975,7 +975,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             stmt.setInt(3, occInsp.getPacc());
 
             stmt.setBoolean(4, occInsp.isEnablePacc());
-            stmt.setString(5, occInsp.getNotes());
+            stmt.setString(5, occInsp.getNotesPreInspection());
             if (occInsp.getThirdPartyInspector() != null) {
                 stmt.setInt(6, occInsp.getThirdPartyInspector().getPersonID());
             } else {

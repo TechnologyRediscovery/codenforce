@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Adam Gutonski 
+ * Copyright (C) 2021 Technology Rediscovery LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@ package com.tcvcog.tcvce.entities.occupancy;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -40,10 +40,23 @@ import java.util.*;
 public class OccInspection extends BOb implements Comparable<OccInspection> {
     
     private int inspectionID;
+
+    /** ID for inspection that this inspection is a follow up to (if any) **/
+    private int followUpToInspectionID;
+
     private User inspector;
+
+    private User createdBy;
+    private LocalDateTime creationTS;
+
+    private User lastUpdatedBy;
+    private LocalDateTime lastUpdatedTS;
+
+    /** ID for the OccPeriod that this OccInspection is for **/
     private int occPeriodID;
-    
+
     private boolean active;
+
     
     // This template object provides us the raw lists of uninspected
     // space types, from which we extract a list of Spaces and their CodeElements
@@ -63,8 +76,6 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     
     private LocalDateTime effectiveDateOfRecord;
     
-    private LocalDateTime creationTS;
-    
     private int maxOccupantsAllowed;
     private int numBedrooms;
     private int numBathrooms;
@@ -73,7 +84,17 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     private LocalDateTime thirdPartyInspectorApprovalTS;
     private User thirdPartyApprovalBy;
 
-    private String notes; 
+    private String notesPreInspection;
+
+    private OccInspectionDetermination determination;
+    private User determinationBy;
+    private LocalDateTime determinationTS;
+
+
+    private String remarks;
+    private String generalComments;
+
+    private OccInspectionCause cause;
     
     public OccInspection(){
         inspectedSpaceList = new ArrayList<>();
@@ -140,15 +161,15 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     /**
      * @return the notes
      */
-    public String getNotes() {
-        return notes;
+    public String getNotesPreInspection() {
+        return notesPreInspection;
     }
 
     /**
-     * @param notes the notes to set
+     * @param notesPreInspection the notes to set
      */
-    public void setNotes(String notes) {
-        this.notes = notes;
+    public void setNotesPreInspection(String notesPreInspection) {
+        this.notesPreInspection = notesPreInspection;
     }
 
     /**
@@ -381,7 +402,7 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
         hash = 53 * hash + Objects.hashCode(this.thirdPartyInspector);
         hash = 53 * hash + Objects.hashCode(this.thirdPartyInspectorApprovalTS);
         hash = 53 * hash + Objects.hashCode(this.thirdPartyApprovalBy);
-        hash = 53 * hash + Objects.hashCode(this.notes);
+        hash = 53 * hash + Objects.hashCode(this.notesPreInspection);
         return hash;
     }
 
@@ -418,7 +439,7 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
         if (this.numBathrooms != other.numBathrooms) {
             return false;
         }
-        if (!Objects.equals(this.notes, other.notes)) {
+        if (!Objects.equals(this.notesPreInspection, other.notesPreInspection)) {
             return false;
         }
         if (!Objects.equals(this.inspector, other.inspector)) {

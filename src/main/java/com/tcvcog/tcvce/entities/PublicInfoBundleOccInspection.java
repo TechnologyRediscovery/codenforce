@@ -56,7 +56,7 @@ public class PublicInfoBundleOccInspection extends PublicInfoBundle {
         
         input.setThirdPartyApprovalBy(new User());
         
-        input.setNotes("*****");
+        input.setNotesPreInspection("*****");
         
         bundledInspection = input;
     }
