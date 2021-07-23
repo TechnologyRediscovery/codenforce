@@ -1202,4 +1202,135 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         det.setDeterminationID(newDeterminationID);
         return det;
     }
+
+    public OccInspectionCause getCause(int causeID) throws IntegrationException {
+        OccInspectionCause cause = null;
+
+        String query = " SELECT causeid, title, description, notes, active \n"
+                + "  FROM public.occinspectioncause WHERE causeid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, causeID);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                cause = generateCause(rs);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get OccInspectionCause", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return cause;
+    }
+
+    private OccInspectionCause generateCause(ResultSet rs) throws SQLException {
+        OccInspectionCause cause = new OccInspectionCause();
+
+        cause.setCauseID(rs.getInt("causeid"));
+
+        cause.setTitle(rs.getString("title"));
+        cause.setDescription(rs.getString("description"));
+
+        cause.setNotes(rs.getString("notes"));
+
+        cause.setActive(rs.getBoolean("active"));
+
+        return cause;
+    }
+
+    public void updateCause(OccInspectionCause cause) throws IntegrationException {
+        String sql = "UPDATE public.occinspectioncause\n"
+                + "   SET title=?, description=?, notes=?, active=? \n"
+                + " WHERE causeid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(sql);
+            stmt.setString(1, cause.getTitle());
+            stmt.setString(2, cause.getDescription());
+
+            stmt.setString(3, cause.getNotes());
+
+            stmt.setBoolean(4, cause.isActive());
+
+            stmt.setInt(5, cause.getCauseID());
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update occinspectioncause record", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        }
+    }
+
+    public void deleteCause(OccInspectionCause cause) throws IntegrationException {
+        String query = "DELETE FROM public.occinspectioncause\n" + " WHERE causeid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, cause.getCauseID());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot delete occ inspection cause--probably because another" + "part of the database has a reference item.", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+
+        } // close finally
+    }
+
+    public OccInspectionCause insertCause(OccInspectionCause cause) throws IntegrationException {
+        String query = "INSERT INTO public.occinspectioncause(\n"
+                + "            causeid, title, description, notes, active)\n"
+                + "    VALUES (DEFAULT, ?, ?, ?, ?);";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        int newCauseID = 0;
+        try {
+            stmt = con.prepareStatement(query);
+
+            stmt.setString(1, cause.getTitle());
+            stmt.setString(2, cause.getDescription());
+
+            stmt.setString(3, cause.getNotes());
+
+            stmt.setBoolean(4, cause.isActive());
+
+            stmt.execute();
+            String retrievalQuery = "SELECT currval('occinspectioncause_causeid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                newCauseID = rs.getInt(1);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert OccInspectionCause", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        }
+        cause.setCauseID(newCauseID);
+        return cause;
+    }
 }

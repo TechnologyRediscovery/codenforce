@@ -34,6 +34,15 @@ public class OccInspectionDetermination {
 
     public OccInspectionDetermination() {}
 
+    public OccInspectionDetermination(OccInspectionDetermination occInspectionDetermination) {
+        this.determinationID = occInspectionDetermination.getDeterminationID();
+        this.title = occInspectionDetermination.getTitle();
+        this.description = occInspectionDetermination.getDescription();
+        this.notes = occInspectionDetermination.getNotes();
+        this.eventCategory = occInspectionDetermination.getEventCategory();
+        this.active = occInspectionDetermination.isActive();
+    }
+
     public int getDeterminationID() {
         return determinationID;
     }

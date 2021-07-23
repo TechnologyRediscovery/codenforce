@@ -29,6 +29,14 @@ public class OccInspectionCause {
 
     public OccInspectionCause() {}
 
+    public OccInspectionCause(OccInspectionCause occInspectionCause) {
+        this.causeID = occInspectionCause.getCauseID();
+        this.title = occInspectionCause.getTitle();
+        this.description = occInspectionCause.getDescription();
+        this.notes = occInspectionCause.getNotes();
+        this.active = occInspectionCause.isActive();
+    }
+
     public int getCauseID() {
         return causeID;
     }
