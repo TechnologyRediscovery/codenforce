@@ -22,16 +22,8 @@ import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
-import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
-import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.occupancy.OccSpaceType;
-import com.tcvcog.tcvce.integration.BlobIntegrator;
-import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.integration.UserIntegrator;
+import com.tcvcog.tcvce.entities.occupancy.*;
+import com.tcvcog.tcvce.integration.*;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -1061,7 +1053,153 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
         } // close finally
     }
-    
 
+    public OccInspectionDetermination getDetermination(int determinationID) throws IntegrationException {
+        OccInspectionDetermination determination = null;
 
+        String query = " SELECT determinationid, title, description, notes, eventcat_catid, active \n"
+                + "  FROM public.occinspectiondetermination WHERE determinationid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, determinationID);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                determination = generateDetermination(rs);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get OccInspectionDetermination", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return determination;
+    }
+
+    private OccInspectionDetermination generateDetermination(ResultSet rs) throws IntegrationException, SQLException {
+        EventIntegrator ei = new EventIntegrator();
+
+        OccInspectionDetermination det = new OccInspectionDetermination();
+
+        det.setDeterminationID(rs.getInt("determinationid"));
+
+        det.setTitle(rs.getString("title"));
+        det.setDescription(rs.getString("description"));
+
+        det.setNotes(rs.getString("notes"));
+
+        if (rs.getInt("eventcat_catid") != 0) {
+            det.setEventCategory(ei.getEventCategory(rs.getInt("eventcat_catid")));
+        }
+
+        det.setActive(rs.getBoolean("active"));
+
+        return det;
+    }
+
+    public void updateDetermination(OccInspectionDetermination det) throws IntegrationException {
+        String sql = "UPDATE public.occinspectiondetermination\n"
+                + "   SET title=?, description=?, notes=?, eventcat_catid=?, active=? \n"
+                + " WHERE determinationid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(sql);
+            stmt.setString(1, det.getTitle());
+            stmt.setString(2, det.getDescription());
+
+            stmt.setString(3, det.getNotes());
+
+            if (det.getEventCategory() != null) {
+                stmt.setInt(4, det.getEventCategory().getCategoryID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+
+            stmt.setBoolean(5, det.isActive());
+
+            stmt.setInt(6, det.getDeterminationID());
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update occinspectiondetermination record", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        }
+    }
+
+    public void deleteDetermination(OccInspectionDetermination det) throws IntegrationException {
+        String query = "DELETE FROM public.occinspectiondetermination\n" + " WHERE determinationid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, det.getDeterminationID());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot delete occ inspection determination--probably because another" + "part of the database has a reference item.", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+
+        } // close finally
+    }
+
+    public OccInspectionDetermination insertDetermination(OccInspectionDetermination det) throws IntegrationException {
+        String query = "INSERT INTO public.occinspectiondetermination(\n"
+                + "            determinationid, title, description, notes, eventcat_catid, active)\n"
+                + "    VALUES (DEFAULT, ?, ?, ?, ?, ?);";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        int newDeterminationID = 0;
+        try {
+            stmt = con.prepareStatement(query);
+
+            stmt.setString(1, det.getTitle());
+            stmt.setString(2, det.getDescription());
+
+            stmt.setString(3, det.getNotes());
+
+            if (det.getEventCategory() != null) {
+                stmt.setInt(4, det.getEventCategory().getCategoryID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+
+            stmt.setBoolean(5, det.isActive());
+
+            stmt.execute();
+                String retrievalQuery = "SELECT currval('occinspection_determination_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                newDeterminationID = rs.getInt(1);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert OccInspectionDetermination", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        }
+        det.setDeterminationID(newDeterminationID);
+        return det;
+    }
 }
