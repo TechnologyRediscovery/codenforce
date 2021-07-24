@@ -223,9 +223,9 @@
                                  class="ui-button-outlined p-mr-1"
                                  oncomplete="PF('inspections-selectinspector-var').hide(); PF('inspections-selectchecklist-var').show();"/>
                 <p:commandButton id="inspections-selectinspector-continuebutton"
-                                 value="Finish"
+                                 value="Create"
                                  disabled="#{occInspectionsBB.selectedInspector.userID == 0}"
-                                 icon="pi pi-check"
+                                 icon="pi pi-plus"
                                  actionListener="#{occInspectionsBB.createInspection}"
                                  update="inspections-form:inspections-table"
                                  oncomplete="PF('inspections-selectinspector-var').hide()"/>

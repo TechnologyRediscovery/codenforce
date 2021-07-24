@@ -1,6 +1,7 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.application.SessionBean;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.InspectionException;
@@ -46,12 +47,13 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
      * variable checklistTemplates to its value.
      */
     public void initChecklistTemplates() {
-//        OccupancyCoordinator oc = getOccupancyCoordinator();
-//        try {
-//            checklistTemplateList = oc.getOccChecklistTemplateList();
-//        } catch (IntegrationException ex) {
-//            System.out.println("Failed to acquire list of checklist templates:" + ex);
-//        }
+        SessionBean sb = getSessionBean();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            checklistTemplateList = oc.getOccChecklistTemplateList(sb.getSessMuni());
+        } catch (IntegrationException ex) {
+            System.out.println("Failed to acquire list of checklist templates:" + ex);
+        }
     }
 
     /**
