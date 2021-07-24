@@ -746,7 +746,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         OccInspection inspection = null;
 
         String query = " SELECT inspectionid, occperiod_periodid, inspector_userid, publicaccesscc, \n"
-                + "       enablepacc, notes, thirdpartyinspector_personid, thirdpartyinspectorapprovalts, \n"
+                + "       enablepacc, notespreinspection, thirdpartyinspector_personid, thirdpartyinspectorapprovalts, \n"
                 + "       thirdpartyinspectorapprovalby, passedinspection_userid, maxoccupantsallowed, \n"
                 + "       numbedrooms, numbathrooms, passedinspectionts, occchecklist_checklistlistid, \n"
                 + "       effectivedate, active, creationts \n"
@@ -790,7 +790,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         ins.setPacc(rs.getInt("publicaccesscc"));
 
         ins.setEnablePacc(rs.getBoolean("enablepacc"));
-        ins.setNotesPreInspection(rs.getString("notes"));
+        ins.setNotesPreInspection(rs.getString("notespreinspection"));
         if (rs.getInt("thirdpartyinspector_personid") != 0) {
             ins.setThirdPartyInspector(pi.getPerson(rs.getInt("thirdpartyinspector_personid")));
         }
@@ -829,7 +829,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     public void updateOccInspection(OccInspection occInsp) throws IntegrationException {
         String sql = "UPDATE public.occinspection\n"
                 + "   SET inspector_userid=?, publicaccesscc=?, \n"
-                + "       enablepacc=?, notes=?, thirdpartyinspector_personid=?, thirdpartyinspectorapprovalts=?, \n"
+                + "       enablepacc=?, notespreinspection=?, thirdpartyinspector_personid=?, thirdpartyinspectorapprovalts=?, \n"
                 + "       thirdpartyinspectorapprovalby=?, passedinspection_userid=?, maxoccupantsallowed=?, \n"
                 + "       numbedrooms=?, numbathrooms=?, passedinspectionts=?, occchecklist_checklistlistid=?, \n"
                 + "       effectivedate=?, active=?\n"
@@ -947,7 +947,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     public OccInspection insertOccInspection(OccInspection occInsp) throws IntegrationException {
         String query = "INSERT INTO public.occinspection(\n"
                 + "            inspectionid, occperiod_periodid, inspector_userid, publicaccesscc, \n"
-                + "            enablepacc, notes, thirdpartyinspector_personid, thirdpartyinspectorapprovalts, \n"
+                + "            enablepacc, notespreinspection, thirdpartyinspector_personid, thirdpartyinspectorapprovalts, \n"
                 + "            thirdpartyinspectorapprovalby, passedinspection_userid, maxoccupantsallowed, \n"
                 + "            numbedrooms, numbathrooms, passedinspectionts, occchecklist_checklistlistid, \n"
                 + "            effectivedate, active, creationts)\n"
@@ -1057,7 +1057,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     public OccInspectionDetermination getDetermination(int determinationID) throws IntegrationException {
         OccInspectionDetermination determination = null;
 
-        String query = " SELECT determinationid, title, description, notes, eventcat_catid, active \n"
+        String query = " SELECT determinationid, title, description, notespreinspection, eventcat_catid, active \n"
                 + "  FROM public.occinspectiondetermination WHERE determinationid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
