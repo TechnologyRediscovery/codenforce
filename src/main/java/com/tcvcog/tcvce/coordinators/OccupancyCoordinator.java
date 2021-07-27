@@ -563,9 +563,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             } else {
                 Collections.sort(inspectionList);
                 for (OccInspection ins : inspectionList) {
-                    if (ins.isActive()) {
-                        selIns = ins;
-                    }
+                    // TODO: if you are refactoring this, isActive used to be checked here!
+                    selIns = ins;
                 }
             }
         }

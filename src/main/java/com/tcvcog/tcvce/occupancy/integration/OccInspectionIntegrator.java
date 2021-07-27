@@ -747,9 +747,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
         String query = " SELECT inspectionid, occperiod_periodid, inspector_userid, publicaccesscc, \n"
                 + "       enablepacc, notespreinspection, thirdpartyinspector_personid, thirdpartyinspectorapprovalts, \n"
-                + "       thirdpartyinspectorapprovalby, passedinspection_userid, maxoccupantsallowed, \n"
-                + "       numbedrooms, numbathrooms, passedinspectionts, occchecklist_checklistlistid, \n"
-                + "       effectivedate, active, creationts \n"
+                + "       thirdpartyinspectorapprovalby, maxoccupantsallowed, numbedrooms, numbathrooms, \n"
+                + "       occchecklist_checklistlistid, effectivedate, creationts, followupto_inspectionid, \n"
+                + "       deactivatedts, deactivatedby_userid, timestart, timeend, \n"
+                + "       createdby_userid, lastupdatedts, lastupdatedby_userid, determination_detid, \n"
+                + "       determinationby_userid, determinationts, remarks, generalcomments, \n"
+                + "       cause_causeid \n"
                 + "  FROM public.occinspection WHERE inspectionid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -801,26 +804,60 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         if (rs.getInt("thirdpartyinspectorapprovalby") != 0) {
             ins.setThirdPartyApprovalBy(ui.getUser(rs.getInt("thirdpartyinspectorapprovalby")));
         }
-        if (rs.getInt("passedinspection_userid") != 0) {
-            ins.setPassedInspectionCertifiedBy(ui.getUser(rs.getInt("passedinspection_userid")));
-        }
         ins.setMaxOccupantsAllowed(rs.getInt("maxoccupantsallowed"));
-
         ins.setNumBedrooms(rs.getInt("numbedrooms"));
         ins.setNumBathrooms(rs.getInt("numbathrooms"));
 
-        if (rs.getTimestamp("effectivedate") != null) {
-            ins.setEffectiveDateOfRecord(rs.getTimestamp("effectivedate").toLocalDateTime());
-        }
 
         // now set the big lists
         ins.setChecklistTemplate(getOccChecklistIntegrator().getChecklistTemplate(rs.getInt("occchecklist_checklistlistid")));
         ins.setInspectedSpaceList(getInspectedSpaceList(ins.getInspectionID()));
 
-        ins.setActive(rs.getBoolean("active"));
-
+        if (rs.getTimestamp("effectivedate") != null) {
+            ins.setEffectiveDateOfRecord(rs.getTimestamp("effectivedate").toLocalDateTime());
+        }
         if (rs.getTimestamp("creationts") != null) {
             ins.setCreationTS(rs.getTimestamp("creationts").toLocalDateTime());
+        }
+        ins.setFollowUpToInspectionID(rs.getInt("followupto_inspectionid"));
+
+        if (rs.getTimestamp("deactivatedts") != null) {
+            ins.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+        }
+        if (rs.getInt("deactivatedby_userid") != 0) {
+            ins.setDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
+        }
+        if (rs.getTimestamp("timestart") != null) {
+            ins.setTimeStart(rs.getTimestamp("timestart").toLocalDateTime());
+        }
+        if (rs.getTimestamp("timeend") != null) {
+            ins.setTimeEnd(rs.getTimestamp("timeend").toLocalDateTime());
+        }
+
+        if (rs.getInt("createdby_userid") != 0) {
+            ins.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+        }
+        if (rs.getTimestamp("lastupdatedts") != null) {
+            ins.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+        }
+        if (rs.getInt("lastupdatedby_userid") != 0) {
+            ins.setLastUpdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+        }
+        if (rs.getInt("determination_detid") != 0) {
+            ins.setDetermination(getDetermination(rs.getInt("determination_detid")));
+        }
+
+        if (rs.getInt("determinationby_userid") != 0) {
+            ins.setLastUpdatedBy(ui.getUser(rs.getInt("determinationby_userid")));
+        }
+        if (rs.getTimestamp("determinationts") != null) {
+            ins.setDeterminationTS(rs.getTimestamp("determinationts").toLocalDateTime());
+        }
+        ins.setRemarks(rs.getString("remarks"));
+        ins.setGeneralComments(rs.getString("generalcomments"));
+
+        if (rs.getInt("cause_causeid") != 0) {
+            ins.setCause(getCause(rs.getInt("cause_causeid")));
         }
 
         return ins;
@@ -830,10 +867,13 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         String sql = "UPDATE public.occinspection\n"
                 + "   SET inspector_userid=?, publicaccesscc=?, \n"
                 + "       enablepacc=?, notespreinspection=?, thirdpartyinspector_personid=?, thirdpartyinspectorapprovalts=?, \n"
-                + "       thirdpartyinspectorapprovalby=?, passedinspection_userid=?, maxoccupantsallowed=?, \n"
-                + "       numbedrooms=?, numbathrooms=?, passedinspectionts=?, occchecklist_checklistlistid=?, \n"
-                + "       effectivedate=?, active=?\n"
+                + "       thirdpartyinspectorapprovalby=?, maxoccupantsallowed=?, numbedrooms=?, numbathrooms=?, \n"
+                + "       occchecklist_checklistlistid=?, effectivedate=?, followupto_inspectionid=?, \n"
+                + "       deactivatedts=?, deactivatedby_userid=?, timestart=?, timeend=?, \n"
+                + "       lastupdatedts=?, lastupdatedby_userid=?, determination_detid=?, determinationby_userid=?, \n"
+                + "       determinationts=?, remarks=?, generalcomments=?, cause_causeid=?\n"
                 + " WHERE inspectionid=?;";
+
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         try {
@@ -853,42 +893,88 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
+
             if (occInsp.getThirdPartyApprovalBy() != null) {
                 stmt.setInt(7, occInsp.getThirdPartyApprovalBy().getUserID());
             } else {
                 stmt.setNull(7, java.sql.Types.NULL);
             }
-            if (occInsp.getPassedInspectionCertifiedBy() != null) {
-                stmt.setInt(8, occInsp.getPassedInspectionCertifiedBy().getUserID());
+            stmt.setInt(8, occInsp.getMaxOccupantsAllowed());
+            stmt.setInt(9, occInsp.getNumBedrooms());
+            stmt.setInt(10, occInsp.getNumBathrooms());
+
+            if (occInsp.getChecklistTemplate() != null) {
+                stmt.setInt(11, occInsp.getChecklistTemplate().getInspectionChecklistID());
             } else {
-                stmt.setNull(8, java.sql.Types.NULL);
+                stmt.setNull(11, java.sql.Types.NULL);
             }
-
-            stmt.setInt(9, occInsp.getMaxOccupantsAllowed());
-            stmt.setInt(10, occInsp.getNumBedrooms());
-            stmt.setInt(11, occInsp.getNumBathrooms());
-
-            if (occInsp.getPassedInspectionTS() != null) {
-                stmt.setTimestamp(12, java.sql.Timestamp.valueOf(occInsp.getPassedInspectionTS()));
+            if (occInsp.getEffectiveDateOfRecord() != null) {
+                stmt.setTimestamp(12, java.sql.Timestamp.valueOf(occInsp.getEffectiveDateOfRecord()));
             } else {
                 stmt.setNull(12, java.sql.Types.NULL);
             }
-
-            if (occInsp.getChecklistTemplate() != null) {
-                stmt.setInt(13, occInsp.getChecklistTemplate().getInspectionChecklistID());
+            if (occInsp.getFollowUpToInspectionID() != 0) {
+                stmt.setInt(13, occInsp.getFollowUpToInspectionID());
             } else {
                 stmt.setNull(13, java.sql.Types.NULL);
             }
 
-            if (occInsp.getEffectiveDateOfRecord() != null) {
-                stmt.setTimestamp(14, java.sql.Timestamp.valueOf(occInsp.getEffectiveDateOfRecord()));
+            if (occInsp.getDeactivatedTS() != null) {
+                stmt.setTimestamp(14, java.sql.Timestamp.valueOf(occInsp.getDeactivatedTS()));
             } else {
                 stmt.setNull(14, java.sql.Types.NULL);
             }
+            if (occInsp.getDeactivatedBy() != null) {
+                stmt.setInt(15, occInsp.getDeactivatedBy().getUserID());
+            } else {
+                stmt.setNull(15, java.sql.Types.NULL);
+            }
+            if (occInsp.getTimeStart() != null) {
+                stmt.setTimestamp(16, java.sql.Timestamp.valueOf(occInsp.getTimeStart()));
+            } else {
+                stmt.setNull(16, java.sql.Types.NULL);
+            }
+            if (occInsp.getTimeEnd() != null) {
+                stmt.setTimestamp(17, java.sql.Timestamp.valueOf(occInsp.getTimeEnd()));
+            } else {
+                stmt.setNull(17, java.sql.Types.NULL);
+            }
 
-            stmt.setBoolean(15, occInsp.isActive());
+            if (occInsp.getLastUpdatedTS() != null) {
+                stmt.setTimestamp(20, java.sql.Timestamp.valueOf(occInsp.getLastUpdatedTS()));
+            } else {
+                stmt.setNull(20, java.sql.Types.NULL);
+            }
+            if (occInsp.getLastUpdatedBy() != null) {
+                stmt.setInt(21, occInsp.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(21, java.sql.Types.NULL);
+            }
+            if (occInsp.getDetermination() != null) {
+                stmt.setInt(22, occInsp.getDetermination().getDeterminationID());
+            } else {
+                stmt.setNull(22, java.sql.Types.NULL);
+            }
+            if (occInsp.getDeterminationBy() != null) {
+                stmt.setInt(23, occInsp.getDeterminationBy().getUserID());
+            } else {
+                stmt.setNull(23, java.sql.Types.NULL);
+            }
 
-            stmt.setInt(16, occInsp.getInspectionID());
+            if (occInsp.getDeterminationTS() != null) {
+                stmt.setTimestamp(24, java.sql.Timestamp.valueOf(occInsp.getDeterminationTS()));
+            } else {
+                stmt.setNull(24, java.sql.Types.NULL);
+            }
+            stmt.setString(25, occInsp.getRemarks());
+            stmt.setString(26, occInsp.getGeneralComments());
+            if (occInsp.getCause() != null) {
+                stmt.setInt(27, occInsp.getCause().getCauseID());
+            } else {
+                stmt.setNull(27, java.sql.Types.NULL);
+            }
+
+            stmt.setInt(28, occInsp.getInspectionID());
 
             stmt.executeUpdate();
         } catch (SQLException ex) {
@@ -948,14 +1034,21 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         String query = "INSERT INTO public.occinspection(\n"
                 + "            inspectionid, occperiod_periodid, inspector_userid, publicaccesscc, \n"
                 + "            enablepacc, notespreinspection, thirdpartyinspector_personid, thirdpartyinspectorapprovalts, \n"
-                + "            thirdpartyinspectorapprovalby, passedinspection_userid, maxoccupantsallowed, \n"
-                + "            numbedrooms, numbathrooms, passedinspectionts, occchecklist_checklistlistid, \n"
-                + "            effectivedate, active, creationts)\n"
+                + "            thirdpartyinspectorapprovalby, maxoccupantsallowed, numbedrooms, numbathrooms, \n"
+                + "            occchecklist_checklistlistid, effectivedate, creationts, followupto_inspectionid, \n"
+                + "            deactivatedts, deactivatedby_userid, timestart, timeend, \n"
+                + "            createdby_userid, lastupdatedts, lastupdatedby_userid, determination_detid, \n"
+                + "            determinationby_userid, determinationts, remarks, generalcomments, \n"
+                + "            cause_causeid)\n"
                 + "    VALUES (DEFAULT, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
-                + "            ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
-                + "            ?, ?, now());";
+                + "            ?, ?, now(), ?, \n"
+                + "            ?, ?, ?, ?, \n"
+                + "            ?, ?, ?, ?, \n"
+                + "            ?, ?, ?, ?, \n"
+                + "            ?);";
+
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -984,33 +1077,85 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             } else {
                 stmt.setNull(8, java.sql.Types.NULL);
             }
-            if (occInsp.getPassedInspectionCertifiedBy() != null) {
-                stmt.setInt(9, occInsp.getPassedInspectionCertifiedBy().getUserID());
+            stmt.setInt(9, occInsp.getMaxOccupantsAllowed());
+            stmt.setInt(10, occInsp.getNumBedrooms());
+            stmt.setInt(11, occInsp.getNumBathrooms());
+            
+            if (occInsp.getChecklistTemplate() != null) {
+                stmt.setInt(12, occInsp.getChecklistTemplate().getInspectionChecklistID());
             } else {
-                stmt.setNull(9, java.sql.Types.NULL);
+                stmt.setNull(12, java.sql.Types.NULL);
             }
-            stmt.setInt(10, occInsp.getMaxOccupantsAllowed());
-
-            stmt.setInt(11, occInsp.getNumBedrooms());
-            stmt.setInt(12, occInsp.getNumBathrooms());
-            if (occInsp.getPassedInspectionTS() != null) {
-                stmt.setTimestamp(13, java.sql.Timestamp.valueOf(occInsp.getPassedInspectionTS()));
+            if (occInsp.getEffectiveDateOfRecord() != null) {
+                stmt.setTimestamp(13, java.sql.Timestamp.valueOf(occInsp.getEffectiveDateOfRecord()));
             } else {
                 stmt.setNull(13, java.sql.Types.NULL);
             }
-            if (occInsp.getChecklistTemplate() != null) {
-                stmt.setInt(14, occInsp.getChecklistTemplate().getInspectionChecklistID());
+            if (occInsp.getFollowUpToInspectionID() != 0) {
+                stmt.setInt(14, occInsp.getFollowUpToInspectionID());
             } else {
                 stmt.setNull(14, java.sql.Types.NULL);
             }
-
-            if (occInsp.getEffectiveDateOfRecord() != null) {
-                stmt.setTimestamp(15, java.sql.Timestamp.valueOf(occInsp.getEffectiveDateOfRecord()));
+            if (occInsp.getDeactivatedTS() != null) {
+                stmt.setTimestamp(15, java.sql.Timestamp.valueOf(occInsp.getDeactivatedTS()));
             } else {
                 stmt.setNull(15, java.sql.Types.NULL);
             }
+            if (occInsp.getDeactivatedBy() != null) {
+                stmt.setInt(16, occInsp.getDeactivatedBy().getUserID());
+            } else {
+                stmt.setNull(16, java.sql.Types.NULL);
+            }
+            if (occInsp.getTimeStart() != null) {
+                stmt.setTimestamp(17, java.sql.Timestamp.valueOf(occInsp.getTimeStart()));
+            } else {
+                stmt.setNull(17, java.sql.Types.NULL);
+            }
+            if (occInsp.getTimeEnd() != null) {
+                stmt.setTimestamp(18, java.sql.Timestamp.valueOf(occInsp.getTimeEnd()));
+            } else {
+                stmt.setNull(18, java.sql.Types.NULL);
+            }
 
-            stmt.setBoolean(16, occInsp.isActive());
+            if (occInsp.getCreatedBy() != null) {
+                stmt.setInt(19, occInsp.getCreatedBy().getUserID());
+            } else {
+                stmt.setNull(19, java.sql.Types.NULL);
+            }
+            if (occInsp.getLastUpdatedTS() != null) {
+                stmt.setTimestamp(20, java.sql.Timestamp.valueOf(occInsp.getLastUpdatedTS()));
+            } else {
+                stmt.setNull(20, java.sql.Types.NULL);
+            }
+            if (occInsp.getLastUpdatedBy() != null) {
+                stmt.setInt(21, occInsp.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(21, java.sql.Types.NULL);
+            }
+            if (occInsp.getDetermination() != null) {
+                stmt.setInt(22, occInsp.getDetermination().getDeterminationID());
+            } else {
+                stmt.setNull(22, java.sql.Types.NULL);
+            }
+
+            if (occInsp.getDeterminationBy() != null) {
+                stmt.setInt(23, occInsp.getDeterminationBy().getUserID());
+            } else {
+                stmt.setNull(23, java.sql.Types.NULL);
+            }
+            if (occInsp.getDeterminationTS() != null) {
+                stmt.setTimestamp(24, java.sql.Timestamp.valueOf(occInsp.getDeterminationTS()));
+            } else {
+                stmt.setNull(24, java.sql.Types.NULL);
+            }
+            stmt.setString(25, occInsp.getRemarks());
+            stmt.setString(26, occInsp.getGeneralComments());
+
+            if (occInsp.getCause() != null) {
+                stmt.setInt(27, occInsp.getCause().getCauseID());
+            } else {
+                stmt.setNull(27, java.sql.Types.NULL);
+            }
 
             stmt.execute();
             String retrievalQuery = "SELECT currval('occupancyinspectionid_seq');";
