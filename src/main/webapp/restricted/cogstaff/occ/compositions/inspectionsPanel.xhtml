@@ -241,38 +241,38 @@
                   modal="true"
                   resizable="true">
 
-<!--            <p:dataTable id="inspections-selecttype-dt"-->
-<!--                         scrollHeight="600"-->
-<!--                         var="type" value="#{occInspectionsBB.selectedInspection.checklistTemplate.occSpaceTypeTemplateList}"-->
-<!--                         rowKey="#{type.spaceTypeID}"-->
-<!--                         selection="!{occInspectionsBB.selectedType}"-->
-<!--                         stripedRows="true">-->
-<!--                <p:ajax event="rowSelect"-->
-<!--                        update=":inspections-selecttype-form:inspections-selecttype-continuebutton"/>-->
-<!--                <p:column selectionMode="single" style="width:16px;text-align:center"/>-->
-<!--                <p:column headerText="Name">-->
-<!--                    <h:outputText value="#{type.spaceTypeTitle}"/>-->
-<!--                </p:column>-->
-<!--                <p:column headerText="Description">-->
-<!--                    <h:outputText value="#{type.spaceTypeDescription}"/>-->
-<!--                </p:column>-->
-<!--                <p:column headerText="Required">-->
-<!--                    <i class="#{space.required ? 'pi pi-star' : ''}"/>-->
-<!--                </p:column>-->
-<!--            </p:dataTable>-->
+            <p:dataTable id="inspections-selecttype-dt"
+                         scrollHeight="600"
+                         var="type" value="#{occInspectionsBB.selectedInspection.checklistTemplate.occSpaceTypeList}"
+                         rowKey="#{type.spaceTypeID}"
+                         selection="!{occInspectionsBB.selectedType}"
+                         stripedRows="true">
+                <p:ajax event="rowSelect"
+                        update=":inspections-selecttype-form:inspections-selecttype-continuebutton"/>
+                <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                <p:column headerText="Name">
+                    <h:outputText value="#{type.spaceTypeTitle}"/>
+                </p:column>
+                <p:column headerText="Description">
+                    <h:outputText value="#{type.spaceTypeDescription}"/>
+                </p:column>
+                <p:column headerText="Required">
+                    <i class="#{space.required ? 'pi pi-star' : ''}"/>
+                </p:column>
+            </p:dataTable>
 
-<!--            <f:facet name="footer">-->
-<!--                <p:commandButton value="Cancel"-->
-<!--                                 icon="pi pi-times"-->
-<!--                                 class="ui-button-outlined p-mr-1"-->
-<!--                                 oncomplete="PF('inspections-selecttype-var').hide()"/>-->
-<!--                <p:commandButton id="inspections-selecttype-continuebutton"-->
-<!--                                 value="Continue"-->
-<!--                                 disabled="!{occInspectionsBB.selectedType.spaceTypeID == 0}"-->
-<!--                                 icon="pi pi-arrow-right"-->
-<!--                                 update="inspections-selectspace-form"-->
-<!--                                 oncomplete="PF('inspections-selecttype-var').hide(); PF('inspections-selectspace-var').show()"/>-->
-<!--            </f:facet>-->
+            <f:facet name="footer">
+                <p:commandButton value="Cancel"
+                                 icon="pi pi-times"
+                                 class="ui-button-outlined p-mr-1"
+                                 oncomplete="PF('inspections-selecttype-var').hide()"/>
+                <p:commandButton id="inspections-selecttype-continuebutton"
+                                 value="Continue"
+                                 disabled="!{occInspectionsBB.selectedType.spaceTypeID == 0}"
+                                 icon="pi pi-arrow-right"
+                                 update="inspections-selectspace-form"
+                                 oncomplete="PF('inspections-selecttype-var').hide(); PF('inspections-selectspace-var').show()"/>
+            </f:facet>
         </p:dialog>
     </h:form>
 

@@ -11,6 +11,7 @@ import com.tcvcog.tcvce.entities.occupancy.*;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -84,6 +85,9 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         try {
             OccInspection newInspection = oc.inspectionAction_commenceOccupancyInspection(null, selectedChecklistTemplate, occPeriod, selectedInspector);
 
+            if (occPeriod.getInspectionList() == null) {
+                occPeriod.setInspectionList(new ArrayList());
+            }
             occPeriod.getInspectionList().add(newInspection);
             getSessionBean().setSessOccPeriod(occPeriod);
         } catch (InspectionException | IntegrationException ex) {
