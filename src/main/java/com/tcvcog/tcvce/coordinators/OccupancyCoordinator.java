@@ -149,11 +149,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
         OccupancyIntegrator oi = getOccupancyIntegrator();
         BlobIntegrator bi = getBlobIntegrator();
-        OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
         PaymentIntegrator pai = getPaymentIntegrator();
         WorkflowCoordinator chc = getWorkflowCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         EventCoordinator ec = getEventCoordinator();
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
 
         OccPeriodDataHeavy opdh = new OccPeriodDataHeavy(per);
 
@@ -194,7 +194,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             opdh.setEventRuleList(chc.rules_getEventRuleImpList(opdh, cred));
 
             // INSPECTION LIST
-            opdh.setInspectionList(inspecInt.getOccInspectionList(opdh));
+
+            opdh.setInspectionList(oic.getOccInspectionsFromOccPeriod(opdh));
 
             // FEE AND PAYMENT LIST
             opdh.setPaymentListGeneral(pai.getPaymentList(opdh));
@@ -296,110 +297,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 //                // TODO: Finish
 //            }
 //        }
-    }
-
-    public OccInspection configureOccInspection(OccInspection inspection) {
-        boolean allSpacesPassed = true;
-        if (inspection != null) {
-            for (OccInspectedSpace inSpace : inspection.getInspectedSpaceList()) {
-                if (configureOccInspectedSpace(inSpace).getStatus().getStatusEnum() == OccInspectionStatusEnum.FAIL
-                        || configureOccInspectedSpace(inSpace).getStatus().getStatusEnum() == OccInspectionStatusEnum.NOTINSPECTED) {
-                    allSpacesPassed = false;
-                }
-            }
-            inspection.setReadyForPassedCertification(allSpacesPassed);
-            if (!inspection.getInspectedSpaceList().isEmpty()) {
-                Collections.sort(inspection.getInspectedSpaceList());
-                Collections.reverse(inspection.getInspectedSpaceList());
-            }
-        }
-        return inspection;
-    }
-
-    public OccInspectedSpace configureOccInspectedSpace(OccInspectedSpace inSpace) {
-        SystemIntegrator si = getSystemIntegrator();
-        boolean atLeastOneElementInspected = false;
-        boolean allElementsPass = true;
-
-        for (OccInspectedSpaceElement inSpaceEle : inSpace.getInspectedElementList()) {
-            configureOccInspectedSpaceElement(inSpaceEle);
-            if (inSpaceEle.getStatus().getStatusEnum() == OccInspectionStatusEnum.FAIL) {
-                allElementsPass = false;
-            } else if (inSpaceEle.getLastInspectedTS() != null) {
-                atLeastOneElementInspected = true;
-            }
-        }
-
-        int iconID = 0;
-        try {
-            if (!atLeastOneElementInspected) {
-
-                inSpace.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.NOTINSPECTED));
-                iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString(OccInspectionStatusEnum.NOTINSPECTED.getIconPropertyLookup()));
-                inSpace.getStatus().setIcon(si.getIcon(iconID));
-//                System.out.println("OccupancyCoordinator.configureOccInspectedSpace | NOTINSPEC inspectedSpaceID: " + inSpace.getInspectedSpaceID());
-
-            } else if (atLeastOneElementInspected && !allElementsPass) {
-
-                inSpace.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.FAIL));
-                iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString(OccInspectionStatusEnum.FAIL.getIconPropertyLookup()));
-                inSpace.getStatus().setIcon(si.getIcon(iconID));
-//                System.out.println("OccupancyCoordinator.configureOccInspectedSpace | FAIL inspectedSpaceID: " + inSpace.getInspectedSpaceID());
-
-            } else {
-
-                inSpace.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.PASS));
-                iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString(OccInspectionStatusEnum.PASS.getIconPropertyLookup()));
-                inSpace.getStatus().setIcon(si.getIcon(iconID));
-//                System.out.println("OccupancyCoordinator.configureOccInspectedSpace | PASS inspectedSpaceID: " + inSpace.getInspectedSpaceID());
-            }
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-
-        Collections.sort(inSpace.getInspectedElementList());
-        return inSpace;
-
-    }
-
-    public OccInspectedSpaceElement configureOccInspectedSpaceElement(OccInspectedSpaceElement inSpaceEle) {
-        SystemIntegrator si = getSystemIntegrator();
-
-        int iconID = 0;
-
-        try {
-            if (inSpaceEle.getLastInspectedBy() != null && inSpaceEle.getComplianceGrantedTS() == null) {
-
-                inSpaceEle.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.FAIL));
-                iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString(OccInspectionStatusEnum.FAIL.getIconPropertyLookup()));
-                inSpaceEle.getStatus().setIcon(si.getIcon(iconID));
-
-//                System.out.println("OccupancyCoordinator.configureOccInspectedSpaceEleement | FAIL inspectedSpaceElementID: " + inSpaceEle.getInspectedSpaceID());
-            } else if (inSpaceEle.getLastInspectedBy() != null && inSpaceEle.getComplianceGrantedTS() != null) {
-
-                inSpaceEle.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.PASS));
-                iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString(OccInspectionStatusEnum.PASS.getIconPropertyLookup()));
-                inSpaceEle.getStatus().setIcon(si.getIcon(iconID));
-//                System.out.println("OccupancyCoordinator.configureOccInspectedSpaceEleement | PASS inspectedSpaceElementID: " + inSpaceEle.getInspectedSpaceID());
-
-            } else {
-
-                inSpaceEle.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.NOTINSPECTED));
-                iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString(OccInspectionStatusEnum.NOTINSPECTED.getIconPropertyLookup()));
-                inSpaceEle.getStatus().setIcon(si.getIcon(iconID));
-//                System.out.println("OccupancyCoordinator.configureOccInspectedSpaceEleement | NOT INSPECTED inspectedSpaceElementID: " + inSpaceEle.getInspectedSpaceID());
-
-            }
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        return inSpaceEle;
     }
 
     public List<EventType> getPermittedEventTypes(OccPeriod op, UserAuthorized u) {
@@ -662,69 +559,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         System.out.println("OccupancyCoordinator.insertNewOccPeriod | freshid: " + freshOccPeriodID);
 
         return freshOccPeriodID;
-    }
-
-    /**
-     * STEP 1 of occupancy process. THe UI must give the user a list of
-     * OccChecklistTemplate objects
-     * <p>
-     * Residential House
-     * Commericial Building
-     * <p>
-     * <p>
-     * Under that
-     * Supervises the creation of a new Occupancy Inspection object in the
-     * database. The designed flow would be the backing bean calls
-     * getOccInspectionSkeleton() and sets member variables on there and then
-     * passes it into this method.
-     *
-     * @param in     A skeleton of an OccInspection without an ID number
-     * @param tem
-     * @param period the OccPeriod to which the OccInspection should be linked
-     * @param user   The current user who will become the Inspector
-     * @return An OccInspection object with the ID given in the DB and a
-     * configured Template inside
-     * @throws InspectionException
-     * @throws IntegrationException
-     */
-    public OccInspection inspectionAction_commenceOccupancyInspection(OccInspection in,
-                                                                      OccChecklistTemplate tem,
-                                                                      OccPeriod period,
-                                                                      User user) throws InspectionException, IntegrationException {
-        OccInspectionIntegrator oii = getOccInspectionIntegrator();
-        OccChecklistIntegrator oci = getOccChecklistIntegrator();
-        OccInspection inspec = null;
-
-        if (period.getType().isActive() && period.getType().isInspectable()) {
-
-            if (in != null) {
-                inspec = in;
-            } else {
-                inspec = new OccInspection();
-            }
-            inspec.setOccPeriodID(period.getPeriodID());
-            if (tem == null) {
-                inspec.setChecklistTemplate(oci.getChecklistTemplate(period.getType().getChecklistID()));
-            } else {
-                inspec.setChecklistTemplate(tem);
-            }
-            inspec.setInspector(user);
-            inspec.setPacc(generateControlCodeFromTime(user.getHomeMuniID()));
-//            if (muni.isEnablePublicOccInspectionTODOs()) {
-//                inspec.setEnablePacc(true);
-//            } else {
-//                inspec.setEnablePacc(false);
-//            }
-            inspec = oii.insertOccInspection(inspec);
-        } else {
-            throw new InspectionException("Occ period either inactive or uninspectable");
-        }
-        return inspec;
-    }
-
-    public void inspectionAction_updateSpaceElementData(OccInspection inspection) throws IntegrationException {
-        OccInspectionIntegrator oii = getOccInspectionIntegrator();
-
     }
 
     /**

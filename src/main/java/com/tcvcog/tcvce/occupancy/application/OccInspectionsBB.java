@@ -2,6 +2,7 @@ package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.SessionBean;
+import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.InspectionException;
@@ -81,9 +82,9 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
         OccPeriodDataHeavy occPeriod = getSessionBean().getSessOccPeriod();
 
-        OccupancyCoordinator oc = getOccupancyCoordinator();
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
         try {
-            OccInspection newInspection = oc.inspectionAction_commenceOccupancyInspection(null, selectedChecklistTemplate, occPeriod, selectedInspector);
+            OccInspection newInspection = oic.inspectionAction_commenceOccupancyInspection(null, selectedChecklistTemplate, occPeriod, selectedInspector);
 
             if (occPeriod.getInspectionList() == null) {
                 occPeriod.setInspectionList(new ArrayList());

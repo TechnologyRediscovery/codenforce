@@ -101,8 +101,8 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             System.out.println("OccInspectionIntegrator.getInspectedSpace | called with spaceid=0");
             return inspectedSpace;
         }
-        String querySpace = "SELECT inspectedspaceid, occspace_spaceid, occinspection_inspectionid, \n"
-                + "       occlocationdescription_descid, addedtochecklistby_userid, addedtochecklistts \n"
+        String querySpace = "SELECT inspectedspaceid, occinspection_inspectionid, \n"
+                + "       occlocationdescription_descid, addedtochecklistby_userid, addedtochecklistts, occchecklistspacetype_chklstspctypid \n"
                 + "  FROM public.occinspectedspace WHERE inspectedspaceid=?;";
         String queryElements
                 = "SELECT occinspectedspaceelement.inspectedspaceelementid\n"
@@ -125,6 +125,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             }
             stmt = con.prepareStatement(queryElements);
             if (inspectedSpace != null) {
+                System.out.println("inspectedSpace.getInspectedSpaceID(): " + inspectedSpace.getInspectedSpaceID());
                 stmt.setInt(1, inspectedSpace.getInspectedSpaceID());
                 rs = stmt.executeQuery();
                 while (rs.next()) {
@@ -157,7 +158,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         inSpace.setInspectedSpaceID(rs.getInt("inspectedspaceid"));
         inSpace.setLocation(getLocationDescriptor(rs.getInt("occlocationdescription_descid")));
 
-        inSpace.setType(oci.getOccSpaceType(rs.getInt("")));
+        inSpace.setType(oci.getOccSpaceType(rs.getInt("occchecklistspacetype_chklstspctypid")));
 
         inSpace.setAddedToChecklistBy(ui.getUser(rs.getInt("addedtochecklistby_userid")));
         inSpace.setInspectionID(rs.getInt("occinspection_inspectionid"));
@@ -172,12 +173,13 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
     public OccInspectedSpaceElement getInspectedSpaceElement(int eleID) throws IntegrationException {
         String query_spaceIDs = "SELECT inspectedspaceelementid, notes, locationdescription_id, lastinspectedby_userid, \n"
-                + "       lastinspectedts, compliancegrantedby_userid, compliancegrantedts, \n"
-                + "       inspectedspace_inspectedspaceid, overriderequiredflagnotinspected_userid, \n"
-                + "       spaceelement_elementid, occinspectedspaceelement.required, failureseverity_intensityclassid, "
-                + "       occspaceelement.codeelement_id, occspaceelement.spaceelementid \n"
-                + "  FROM public.occinspectedspaceelement INNER JOIN public.occspaceelement ON (spaceelement_elementid = spaceelementid)\n"
-                + "  WHERE inspectedspaceelementid=?;";
+                + "lastinspectedts, compliancegrantedby_userid, compliancegrantedts, \n"
+                + "inspectedspace_inspectedspaceid, overriderequiredflagnotinspected_userid, \n"
+                + "occchecklistspacetypeelement_elementid, occinspectedspaceelement.required, failureseverity_intensityclassid, migratetocecaseonfail, occchecklistspacetypeelement.codeelement_id \n"
+                + "FROM public.occinspectedspaceelement INNER JOIN public.occchecklistspacetypeelement ON (occchecklistspacetypeelement_elementid = spaceelementid) \n"
+                + "WHERE inspectedspaceelementid=?;";
+
+        System.out.println("getInspectedSpaceElement grabbing OccInspectedSpaceElement w/ ID: " + eleID);
 
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -220,7 +222,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         OccInspectedSpaceElement inspectedEle
                 = new OccInspectedSpaceElement(ci.getCodeElement(rs.getInt("codeelement_id")));
 
-        inspectedEle.setInspectedSpaceElementID(rs.getInt("inspectedspaceelementid"));
+        inspectedEle.setInspectedSpaceElementID(rs.getInt("occchecklistspacetypeelement_elementid"));
 
         inspectedEle.setInspectionNotes(rs.getString("notes"));
         inspectedEle.setLocation(getLocationDescriptor(rs.getInt("locationdescription_id")));
@@ -239,12 +241,15 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         inspectedEle.setRequired(rs.getBoolean("required"));
         inspectedEle.setFailureIntensityClassID(rs.getInt("failureseverity_intensityclassid"));
 
-        try{
+        inspectedEle.setMigrateToCaseOnFail(rs.getBoolean("migratetocecaseonfail"));
+
+        try {
             List<Integer> idList = bi.photosAttachedToInspectedSpaceElement(inspectedEle.getInspectedSpaceElementID());
             inspectedEle.setBlobList(bc.getBlobLightList(idList));
         } catch(BlobException ex){
             throw new IntegrationException("An error occurred while trying to retrieve blobs for a OccInspectedSpaceElement", ex);
         }
+        System.out.println("Returning element with ID of: " + rs.getInt("occchecklistspacetypeelement_elementid"));
         return inspectedEle;
     }
 
@@ -674,9 +679,9 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         } // close finally
     }
 
-    public List<OccInspection> getOccInspectionList(OccPeriod op) throws IntegrationException {
+    public List<Integer> getOccInspectionList(OccPeriod op) throws IntegrationException {
 
-        List<OccInspection> inspecList = new ArrayList<>();
+        List<Integer> inspecIDList = new ArrayList<>();
 
         String query = "SELECT inspectionid FROM occinspection WHERE occperiod_periodid=? ";
         Connection con = getPostgresCon();
@@ -690,7 +695,9 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                inspecList.add(getOccInspection(rs.getInt("inspectionid")));
+                inspecIDList.add(rs.getInt("inspectionid"));
+                System.out.println("Found inspection ID: " + rs.getInt("inspectionid"));
+                System.out.println("...with the period ID: " + op.getPeriodID());
             }
 
         } catch (SQLException ex) {
@@ -703,7 +710,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
-        return inspecList;
+        return inspecIDList;
 
     }
 
@@ -778,7 +785,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
-        return oc.configureOccInspection(inspection);
+        return inspection;
     }
 
     private OccInspection generateOccInspection(ResultSet rs) throws IntegrationException, SQLException {

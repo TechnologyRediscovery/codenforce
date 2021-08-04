@@ -54,6 +54,8 @@ public class OccInspectedSpaceElement
     private int failureIntensityClassID;
     private OccInspectableStatus status;
 
+    private boolean migrateToCaseOnFail;
+
     /**
      * For advanced checklist object management in the UI
      * since the occinspectedspaceelement records know about entries in the
@@ -341,6 +343,14 @@ public class OccInspectedSpaceElement
      */
     public void setStatus(OccInspectableStatus status) {
         this.status = status;
+    }
+
+    public boolean isMigrateToCaseOnFail() {
+        return migrateToCaseOnFail;
+    }
+
+    public void setMigrateToCaseOnFail(boolean migrateToCaseOnFail) {
+        this.migrateToCaseOnFail = migrateToCaseOnFail;
     }
 
     @Override
