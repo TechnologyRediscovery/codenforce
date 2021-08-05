@@ -442,7 +442,6 @@ CREATE TABLE public.personhumanmigrationlog
 
 CREATE OR REPLACE FUNCTION public.migratepersontohuman(creationrobotuser INTEGER,
 														  defaultsource INTEGER,
-													  	  cityid INTEGER,
 													  	  municodetarget INTEGER,
 													  	  parcel_human_lorid INTEGER,
 													  	  human_mailing_lorid INTEGER)
@@ -464,7 +463,7 @@ $BODY$
 	 	address_freshid INTEGER;
 	 	pers_newaddr_street TEXT;
 	 	pers_newaddr_bldgno TEXT;
-
+	 	human_dupid INTEGER;
 
 	BEGIN
 		RAISE NOTICE '**** BEGIN PERSON TO HUMAN MIGRATION ****';
@@ -482,241 +481,258 @@ $BODY$
 		       referenceperson, rawname, cleanname, multientity
 		  			FROM public.person WHERE muni_municode = municodetarget
 		 
-			LOOP
+			LOOP -- over legacy person records
 				RAISE NOTICE 'ITERATION: personid: %, lname: %', pr.personid, pr.lname;
+				
+				IF (pr.lname IS NULL OR pr.lname = '') AND (pr.fname IS NULL OR pr.fname = '')
+					THEN
+						RAISE NOTICE 'found null or empty last AND first name; skipping person';
+						CONTINUE;
+				END IF;
+
 				--concat name
 				IF pr.fname IS NOT NULL
-				THEN
-					fullname := pr.fname || ' ' || pr.lname; 
-				ELSE 
-					fullname = pr.lname;
+					THEN
+						fullname := pr.fname || ' ' || pr.lname; 
+					ELSE 
+						fullname := pr.lname;
 				END IF;
 
-				-- check for deactivation
-				IF NOT pr.isactive 
-				THEN 
-					deacts := now();
-					deacuser := 99; -- the cogbot
-				ELSE
-					deacts := NULL;
-					deacuser := NULL;
-				END IF;
+				RAISE NOTICE 'FULL name for personid % is %', pr.personid, fullname;
 
-				-- our new humanid is our old person id
-				fresh_human_id := pr.personid;
+				SELECT humanid INTO human_dupid FROM human WHERE name ILIKE fullname;
 
-				EXECUTE format('INSERT INTO public.human(
-	            humanid, name, dob, under18, jobtitle, businessentity, multihuman, 
-	            source_sourceid, deceaseddate, deceasedby_userid, cloneof_humanid, 
-	            createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
-	            deactivatedts, deactivatedby_userid, notes)
-				    VALUES (%L, %L, NULL, %L, %L, %L, %L, 
-				            %L, NULL, NULL, NULL, 
-				            %L, %L, %L, %L, 
-				            %L, %L, %L);', 
-			               fresh_human_id, fullname, pr.isunder18, pr.jobtitle, pr.multientity,
-			               pr.sourceid, 
-			               pr.creationtimestamp, pr.creator, pr.lastupdated, pr.creator, 
-			               deacts, deacuser, pr.notes
+				IF NOT FOUND -- no duplicate based on name only
+					THEN  -- go ahead and write our new human records
+						RAISE NOTICE 'NO DUP FOUND FOR %; writing new human', fullname;
+						-- check for deactivation
+						IF NOT pr.isactive 
+							THEN 
+								deacts := now();
+								deacuser := 99; -- the cogbot
+							ELSE
+								deacts := NULL;
+								deacuser := NULL;
+						END IF;
 
-	            ); 
+						-- our new humanid is our old person id
+						fresh_human_id := pr.personid;
 
-	            human_rec_count := human_rec_count + 1;
+						EXECUTE format('INSERT INTO public.human(
+			            humanid, name, dob, under18, jobtitle, businessentity, multihuman, 
+			            source_sourceid, deceaseddate, deceasedby_userid, cloneof_humanid, 
+			            createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
+			            deactivatedts, deactivatedby_userid, notes)
+						    VALUES (%L, %L, NULL, %L, %L, FALSE, %L, 
+						            %L, NULL, NULL, NULL, 
+						            %L, %L, %L, %L, 
+						            %L, %L, %L);', 
+					               fresh_human_id, fullname, pr.isunder18, pr.jobtitle, pr.multientity,
+					               pr.sourceid, 
+					               pr.creationtimestamp, pr.creator, pr.lastupdated, pr.creator, 
+					               deacts, deacuser, pr.notes
 
-				-- DEAL with "None" in phone columns, and empty strings
+			            ); 
 
-				IF pr.phonecell IS NOT NULL AND pr.phonecell <> '' AND pr.phonecell <> 'None'			
-				THEN
-					EXECUTE format('INSERT INTO public.contactphone(
-								            phoneid, human_humanid, phonenumber, phoneext, phonetype_typeid, 
-								            disconnectts, disconnect_userid, createdts, createdby_userid, 
-								            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
-								            notes)
-								    VALUES (DEFAULT, %L, %L, NULL, 100, 
-								            NULL, NULL, now(), %L, 
-								            now(), %L, NULL, NULL, 
-								            ''Created during person-human migration JUL-2021'');', 
-								            		fresh_human_id, pr.phonecell, 
-								            					creationrobotuser,
-					            					creationrobotuser)
-				ELSE
-					NULL; -- don't write any records
-				END IF;
+			            human_rec_count := human_rec_count + 1;
 
+						-- DEAL with "None" in phone columns, and empty strings
 
-				IF pr.phonehome IS NOT NULL AND pr.phonehome <> '' AND pr.phonehome <> 'None'			
-				THEN
-					EXECUTE format('INSERT INTO public.contactphone(
-								            phoneid, human_humanid, phonenumber, phoneext, phonetype_typeid, 
-								            disconnectts, disconnect_userid, createdts, createdby_userid, 
-								            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
-								            notes)
-								    VALUES (DEFAULT, %L, %L, NULL, 101, 
-								            NULL, NULL, now(), %L, 
-								            now(), %L, NULL, NULL, 
-								            ''Created during person-human migration JUL-2021'');', 
-								            		fresh_human_id, pr.phonehome, 
-								            					creationrobotuser,
-					            					creationrobotuser)
-				ELSE
-					NULL; -- don't write any records
-				END IF;
+						IF pr.phonecell IS NOT NULL AND pr.phonecell <> '' AND pr.phonecell <> 'None'			
+							THEN
+								EXECUTE format('INSERT INTO public.contactphone(
+											            phoneid, human_humanid, phonenumber, phoneext, phonetype_typeid, 
+											            disconnectts, disconnect_userid, createdts, createdby_userid, 
+											            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
+											            notes)
+											    VALUES (DEFAULT, %L, %L, NULL, 100, 
+											            NULL, NULL, now(), %L, 
+											            now(), %L, NULL, NULL, 
+											            ''Created during person-human migration JUL-2021'');', 
+											            		fresh_human_id, pr.phonecell, 
+											            					creationrobotuser,
+								            					creationrobotuser);
+							ELSE
+								NULL; -- don't write any records
+						END IF;
 
 
-				IF pr.phonework IS NOT NULL AND pr.phonework <> '' AND pr.phonework <> 'None'			
-				THEN
-					EXECUTE format('INSERT INTO public.contactphone(
-								            phoneid, human_humanid, phonenumber, phoneext, phonetype_typeid, 
-								            disconnectts, disconnect_userid, createdts, createdby_userid, 
-								            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
-								            notes)
-								    VALUES (DEFAULT, %L, %L, NULL, 102, 
-								            NULL, NULL, now(), %L, 
-								            now(), %L, NULL, NULL, 
-								            ''Created during person-human migration JUL-2021'');', 
-								            		fresh_human_id, pr.phonework, 
-								            					creationrobotuser,
-					            					creationrobotuser)
-				ELSE
-					NULL; -- don't write any records
-				END IF;
-				
-				IF pr.email IS NOT NULL AND pr.email <> '' AND pr.email <> 'None'			
-				
-				THEN
-					EXECUTE format('INSERT INTO public.contactemail(
-						            emailid, human_humanid, emailaddress, bouncets, createdts, createdby_userid, 
-						            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
-						            notes)
-						    VALUES (DEFAULT, %L, %L, NULL, now(), %L, 
-						            now(), %L, NULL, NULL, 
-						            ''Created during person to human migration JUL-2021'');
-									);', 
-				            		fresh_human_id, pr.email, creationrobotuser,
-	            					creationrobotuser)
-				ELSE
-					NULL; -- don't write any records
-				END IF;
+						IF pr.phonehome IS NOT NULL AND pr.phonehome <> '' AND pr.phonehome <> 'None'			
+							THEN
+								EXECUTE format('INSERT INTO public.contactphone(
+											            phoneid, human_humanid, phonenumber, phoneext, phonetype_typeid, 
+											            disconnectts, disconnect_userid, createdts, createdby_userid, 
+											            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
+											            notes)
+											    VALUES (DEFAULT, %L, %L, NULL, 101, 
+											            NULL, NULL, now(), %L, 
+											            now(), %L, NULL, NULL, 
+											            ''Created during person-human migration JUL-2021'');', 
+											            		fresh_human_id, pr.phonehome, 
+											            					creationrobotuser,
+								            					creationrobotuser);
+							ELSE
+								NULL; -- don't write any records
+						END IF;
 
 
-				-- use existing property-person links to connect our new human to existing parcels
-				FOR prop_pers_rec IN SELECT property_propertyid, person_personid, creationts
-									 	 FROM public.propertyperson
-									 	 WHERE person_personid = pr.personid
-			 		LOOP -- begin iterating over property person records
-			 			
-			 			-- Link this human to an existing parcel
-
-			 			SELECT parcelkey INTO parcel_rec FROM parcel WHERE parcelkey = prop_pers_rec.property_propertyid;
-			 			IF FOUND
-			 			THEN -- link human and parcel
-			 			-- NOTE that we used the old property PK as the new parcel PK so this linking should be straightforward
-
-			 				EXECUTE format('INSERT INTO public.parcelhuman(
-											            human_humanid, parcel_parcelkey, source_sourceid, role_roleid, 
-											            createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
-											            deactivatedts, deactivatedby_userid, notes)
-											    VALUES (%L, %L, %L, %L, 
-											            now(), %L, now(), %L, 
-											            NULL, NULL, 'Created during person-human migration AUG 2021');',
-									            		fresh_human_id, parcel_rec.parcelkey, defaultsource, parcel_human_lorid,
-							            				creationrobotuser, creationrobotuser
-				            				);
-
-			 			-- If no parcel exists, write record to migrationlog table
-
-
-
-
-			 		END LOOP; -- end iteration over property-person records 
-
-		 			-- Next, check if this person's address is one of those linked any of the parcels to which he/she is connected, if so, do nothing
-		 			-- but if their address is not associated with parcel in our current muni, then make a new record in the mailingaddress
-		 			-- family and connect this fresh_human to a fresh address
-
-
-		 			SELECT  addressid INTO mailing_rec
-						FROM public.mailingaddress 
-						INNER JOIN public.parcelmailingaddress 
-							ON (mailingparcel_mailingid = addressid)
-						WHERE mailingparcel_parcelid = parcel_rec.parcelkey
-							AND bldgno ILIKE extractbuildingno(pr.addressstreet); -- NOTE: We're playing fast and loose
-							-- with address matching: if the building numbers are the same, we assume it's the same address
-							-- and don't write a new mailingaddress record. EDGE cases of folks having a separate mailing
-							-- whose building numbers is exactly the same as their linked parcel are not addressed.
-
-					IF FOUND
-						THEN -- we've already got a link between the person and that person's address
-							NULL;
-						ELSE 	-- we don't have a mailing address that matches the person record's mailing address, 
-								-- So write a new address and link it to our fresh human
-
-							SELECT id INTO citystatezip_rec
-								FROM mailingcitystatezip WHERE zip_code = pr.address_zip AND list_type_id = 1;
-
-							IF FOUND
-								THEN --we've got a real zip code to attach to our new street
-									-- Write new street and address records
-									EXECUTE format('
-										INSERT INTO public.mailingstreet(
-									            streetid, name, namevariantsarr, citystatezip_cszipid, notes, 
-									            pobox)
-									    VALUES (DEFAULT, %L, NULL, %L, ''Created during pers-human migration AUG-2021'', 
-								    	        NULL);',
-								    	        extractstreet(pr.address_street), citystatezip_rec.id, 
-					    	        );
-
-					    	        -- Now get our fresh street ID for writing our building Number
-					    	        SELECT currval('mailingstreet_streetid_seq') INTO street_freshid;
-
-					    	        -- with a street PK, we're ready to write to the mailingaddress base table
-					    	        EXECUTE format('
-					    	        	INSERT INTO public.mailingaddress(
-									            addressid, bldgno, street_streetid, verifiedts, verifiedby_userid, 
-									            verifiedsource_sourceid, source_sourceid, createdts, createdby_userid, 
+						IF pr.phonework IS NOT NULL AND pr.phonework <> '' AND pr.phonework <> 'None'			
+							THEN
+								EXECUTE format('INSERT INTO public.contactphone(
+											            phoneid, human_humanid, phonenumber, phoneext, phonetype_typeid, 
+											            disconnectts, disconnect_userid, createdts, createdby_userid, 
+											            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
+											            notes)
+											    VALUES (DEFAULT, %L, %L, NULL, 102, 
+											            NULL, NULL, now(), %L, 
+											            now(), %L, NULL, NULL, 
+											            ''Created during person-human migration JUL-2021'');', 
+											            		fresh_human_id, pr.phonework, 
+											            					creationrobotuser,
+								            					creationrobotuser);
+							ELSE
+								NULL; -- don't write any records
+						END IF;
+						
+						IF pr.email IS NOT NULL AND pr.email <> '' AND pr.email <> 'None'			
+						
+							THEN
+								EXECUTE format('INSERT INTO public.contactemail(
+									            emailid, human_humanid, emailaddress, bouncets, createdts, createdby_userid, 
 									            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
 									            notes)
-									    VALUES (DEFAULT, %L, %L, NULL, NULL 
-									            NULL, %L, now(), %L, 
+									    VALUES (DEFAULT, %L, %L, NULL, now(), %L, 
 									            now(), %L, NULL, NULL, 
-									            ''Created during person-human migration'');',
-									            extractbuildingno(pr.address_street), street_freshid,
-									            defaultsource, creationrobotuser,
-									            creationrobotuser
-					    	        	);
-
-					    	        SELECT currval('mailingaddress_addressid_seq') INTO address_freshid;
-
-					    	        -- Now that we know the ID of the fresh mailing, we can link our fresh human via the old personid
-					    	        -- to this new address we just got
-					    	        EXECUTE format('INSERT INTO public.humanmailingaddress(
-												            humanmailing_humanid, humanmailing_addressid, source_sourceid, 
-												            role_roleid, createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
-												            deactivatedts, deactivatedby_userid, notes, linkid)
-												    VALUES (%L, %L, %L, 
-												            %L, now(), %L, now(), %L, 
-												            NULL, NULL, ''Created during person-human migration AUG 2021'', DEFAULT);',
-												            pr.personid, address_freshid, defaultsource,
-												            human_mailing_lorid, creationrobotuser, creationrobotuser);
-
-								ELSE -- malformed ZIP on legacy person, meaning we cannot write a new address
-									EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
-													            logentryid, human_humanid, person_personid, error_code, notes, ts)
-													    VALUES (DEFAULT, %L, %L, %L, ''ZIP NOT FOUND FROM PERSON ENTRY'', now());',
-													    pr.personid, pr.personid, 3 
-													)
-							END IF; -- end check for legitimate zipcode found on old person address
-
-					END IF; -- end check for existing address connection between person's parcel and ONE of that parcel's addresses
+									            ''Created during person to human migration JUL-2021'');
+												);', 
+							            		fresh_human_id, pr.email, creationrobotuser,
+				            					creationrobotuser);
+							ELSE
+								NULL; -- don't write any records
+						END IF;
 
 
+						-- use existing property-person links to connect our new human to existing parcels
+						FOR prop_pers_rec IN SELECT property_propertyid, person_personid, creationts
+											 	 FROM public.propertyperson
+											 	 WHERE person_personid = pr.personid
+					 		LOOP -- begin iterating over property person records
+					 			
+					 			-- Link this human to an existing parcel
+
+					 			SELECT parcelkey INTO parcel_rec FROM parcel WHERE parcelkey = prop_pers_rec.property_propertyid;
+					 			IF FOUND
+						 			THEN -- link human and parcel
+						 			-- NOTE that we used the old property PK as the new parcel PK so this linking should be straightforward
+
+						 				EXECUTE format('INSERT INTO public.parcelhuman(
+														            human_humanid, parcel_parcelkey, source_sourceid, role_roleid, 
+														            createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
+														            deactivatedts, deactivatedby_userid, notes)
+														    VALUES (%L, %L, %L, %L, 
+														            now(), %L, now(), %L, 
+														            NULL, NULL, ''Created during person-human migration AUG 2021'');',
+												            		fresh_human_id, parcel_rec.parcelkey, defaultsource, parcel_human_lorid,
+										            				creationrobotuser, creationrobotuser
+							            				);
+						 				RAISE NOTICE 'Linked parcel with PK % to Human with PK %', parcel_rec.parcelkey, fresh_human_id;
+
+						 			-- If no parcel exists, write record to migrationlog table
+						 			ELSE
+						 				NULL;
+				 				END IF;
+					 		END LOOP; -- end iteration over property-person records 
+
+				 			-- Next, check if this person's address is one of those linked any of the parcels to which he/she is connected, if so, do nothing
+				 			-- but if their address is not associated with parcel in our current muni, then make a new record in the mailingaddress
+				 			-- family and connect this fresh_human to a fresh address
+
+				 			SELECT  addressid INTO mailing_rec
+								FROM public.mailingaddress 
+								INNER JOIN public.parcelmailingaddress 
+									ON (mailingparcel_mailingid = addressid)
+								WHERE mailingparcel_parcelid = parcel_rec.parcelkey
+									AND bldgno ILIKE extractbuildingno(pr.address_street); -- NOTE: We're playing fast and loose
+									-- with address matching: if the building numbers are the same, we assume it's the same address
+									-- and don't write a new mailingaddress record. EDGE cases of folks having a separate mailing
+									-- whose building numbers is exactly the same as their linked parcel are not addressed.
+
+							IF FOUND
+								THEN -- we've already got a link between the person and that person's address
+									RAISE NOTICE 'Fresh human has legacy address already linked to a parcel: moving on';
+									NULL;
+								ELSE 	-- we don't have a mailing address that matches the person record's mailing address, 
+										-- So write a new address and link it to our fresh human
+
+									SELECT id INTO citystatezip_rec
+										FROM mailingcitystatezip WHERE zip_code = pr.address_zip AND list_type_id = 1;
+
+									IF FOUND
+										THEN --we've got a real zip code to attach to our new street
+										RAISE NOTICE 'Fresh human has address with legimite ZIP %', citystatezip_rec.id;
+											-- Write new street and address records
+											EXECUTE format('
+												INSERT INTO public.mailingstreet(
+											            streetid, name, namevariantsarr, citystatezip_cszipid, notes, 
+											            pobox)
+											    VALUES (DEFAULT, %L, NULL, %L, ''Created during pers-human migration AUG-2021'', 
+										    	        NULL);',
+										    	        extractstreet(pr.address_street), citystatezip_rec.id
+							    	        );
+
+							    	        -- Now get our fresh street ID for writing our building Number
+							    	        SELECT currval('mailingstreet_streetid_seq') INTO street_freshid;
+
+							    	        -- with a street PK, we're ready to write to the mailingaddress base table
+							    	        EXECUTE format('
+							    	        	INSERT INTO public.mailingaddress(
+											            addressid, bldgno, street_streetid, verifiedts, verifiedby_userid, 
+											            verifiedsource_sourceid, source_sourceid, createdts, createdby_userid, 
+											            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
+											            notes)
+											    VALUES (DEFAULT, %L, %L, NULL, NULL 
+											            NULL, %L, now(), %L, 
+											            now(), %L, NULL, NULL, 
+											            ''Created during person-human migration'');',
+											            extractbuildingno(pr.address_street), street_freshid,
+											            defaultsource, creationrobotuser,
+											            creationrobotuser
+							    	        	);
+
+							    	        SELECT currval('mailingaddress_addressid_seq') INTO address_freshid;
+
+							    	        -- Now that we know the ID of the fresh mailing, we can link our fresh human via the old personid
+							    	        -- to this new address we just got
+							    	        EXECUTE format('INSERT INTO public.humanmailingaddress(
+														            humanmailing_humanid, humanmailing_addressid, source_sourceid, 
+														            role_roleid, createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
+														            deactivatedts, deactivatedby_userid, notes, linkid)
+														    VALUES (%L, %L, %L, 
+														            %L, now(), %L, now(), %L, 
+														            NULL, NULL, ''Created during person-human migration AUG 2021'', DEFAULT);',
+														            pr.personid, address_freshid, defaultsource,
+														            human_mailing_lorid, creationrobotuser, creationrobotuser);
+
+										ELSE -- malformed ZIP on legacy person, meaning we cannot write a new address
+											EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
+															            logentryid, human_humanid, person_personid, error_code, notes, ts)
+															    VALUES (DEFAULT, %L, %L, %L, ''ZIP NOT FOUND FROM PERSON ENTRY'', now());',
+															    pr.personid, pr.personid, 3 
+															);
+									END IF; -- end check for legitimate zipcode found on old person address
+							END IF; -- end check for existing address connection between person's parcel and ONE of that parcel's addresses
+					ELSE  -- Record duplicate person found, don't write new humans, just write to log
+						RAISE NOTICE 'Fresh human has address with MALFORMED ZIP: logging';
+						EXECUTE format('INSERT INTO public.personhumanmigrationlog(
+									            logentryid, human_humanid, person_personid, error_code, notes, ts)
+									    VALUES (DEFAULT, NULL, %L, 2, ''DUP PERSON; SKIPPING NEW HUMAN'', now());',
+								    		pr.personid
+									    );
+				END IF; -- over duplicate check of person records
 				-- TODO: deal with ghosts in current person table which are what
 				-- NOVs point to: extract their data and inject into new fixed fields!!
 
-
-
-
-
+				RAISE NOTICE 'END PERSON RECORD';
 		END LOOP; -- over legacy person table records
 
 		RETURN human_rec_count;
@@ -724,8 +740,7 @@ $BODY$
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION public.migratepersontohuman()
-  OWNER TO sylvia;
+
 
 
 
