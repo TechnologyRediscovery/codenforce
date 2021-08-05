@@ -1297,7 +1297,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             li.setValue(i);
             li.setTitle(vse.getLabel());
             legend.add(li);
-            
         }
         
         rpt.setPieViolLegend(legend);
@@ -1348,6 +1347,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                         statMap.put(CasePhaseEnum.TimeframeExpiredNotCited.getLabel(), statCount);
                     }
                 }
+                
                 if(cse.getStatusBundle().getPhase().getStage() == CaseStageEnum.Citation){
                     Integer statCount = statMap.get(CaseStageEnum.Citation.getLabel());
                     statCount += 1;
