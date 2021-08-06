@@ -143,7 +143,7 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
 
         return size;
     }
-    
+
     /**
      * @return the inspectionID
      */

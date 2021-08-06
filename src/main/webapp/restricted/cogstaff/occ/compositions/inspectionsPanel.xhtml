@@ -97,10 +97,25 @@
                 <p:column headerText="ID">
                     <h:outputText value="#{inspection.inspectionID}"/>
                 </p:column>
+                <p:column headerText="Inspector">
+                    <h:outputText value="#{inspection.inspector.username}"/>
+                    <h:panelGroup id="inspections-table-inspecterinfoicon">
+                        <i class="p-ml-1 pi pi-info-circle"/>
+                    </h:panelGroup>
+                    <p:tooltip for="inspections-table-inspecterinfoicon"
+                               value="#{inspection.inspector.person.firstName} #{inspection.inspector.person.lastName}" position="right"/>
+                </p:column>
                 <p:column headerText="Spaces">
-                    <h:outputText value="#{inspection.inspectedSpaceListSize} spaces"/>
+                    <h:outputText value="#{inspection.inspectedSpaceListSize} space(s)"/>
                 </p:column>
                 <p:column headerText="Actions">
+                    <p:commandLink ajax="true"
+                                   style="color:blue;"
+                                   actionListener="#{occInspectionsBB.setSelectedInspection(inspection)}"
+                                   oncomplete="PF('inspections-inspectiondetails-var').show()"
+                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                   update="inspections-inspectiondetails-form"
+                                   value="View"/> |
                     <p:commandLink ajax="true"
                                    style="color:blue;"
                                    actionListener="#{occInspectionsBB.clearSelections}"
@@ -112,6 +127,7 @@
                     </p:commandLink>
                 </p:column>
                 <p:rowExpansion>
+
                     <p:dataTable var="inspectedSpace"
                                  value="#{inspection.inspectedSpaceList}"
                                  rowKey="#{inspectedSpace.inspectedSpaceID}"
@@ -126,9 +142,6 @@
                             </h:panelGroup>
                             <p:tooltip for="inspections-selectspace-dt-spacetypeinfoicon"
                                        value="#{inspectedSpace.type.spaceTypeDescription}" position="right"/>
-                        </p:column>
-                        <p:column headerText="Name">
-                            <h:outputText value="#{inspectedSpace.name}"/>
                         </p:column>
                         <p:column headerText="Actions">
                             <p:commandLink ajax="true"
@@ -148,6 +161,11 @@
         </h:form>
     </p:panel>
 
+    <!-- Dialogs -->
+
+    <!-- Inspection Creation Flow -->
+
+    <!-- Checklist selection dialog used in inspection creation flow -->
     <h:form id="inspections-selectchecklist-form">
         <p:dialog id="inspections-selectchecklist"
                   width="1000"
@@ -196,6 +214,8 @@
         </p:dialog>
     </h:form>
 
+
+    <!-- Inspector selection dialog used in inspection creation flow -->
     <h:form id="inspections-selectinspector-form">
         <p:dialog id="inspections-selectinspector"
                   width="600"
@@ -233,6 +253,11 @@
         </p:dialog>
     </h:form>
 
+
+    <!-- Space add flow -->
+    <!-- (Currently a bit defunct) -->
+
+    <!-- Type selection used in space add flow -->
     <h:form id="inspections-selecttype-form">
         <p:dialog id="inspections-selecttype"
                   width="800"
@@ -276,6 +301,7 @@
         </p:dialog>
     </h:form>
 
+    <!-- Actual space(?) selection used in space add flow -->
     <h:form id="inspections-selectspace-form">
         <p:dialog id="inspections-selectspace"
                   width="800"
@@ -359,6 +385,101 @@
         </p:dialog>
     </h:form>
 
+    <!-- Independent dialogs that are not necessarily used in a flow -->
+
+    <!-- Dialog to view details of an OccInspection -->
+    <h:form id="inspections-inspectiondetails-form">
+        <p:dialog id="inspections-inspectiondetails"
+                  width="800"
+                  height="600"
+                  widgetVar="inspections-inspectiondetails-var"
+                  header="Inspection Details"
+                  modal="true"
+                  resizable="true">
+            <p:panel id="inspections-inspectiondetails-generalpanel"
+                     toggleable="true"
+                     collapsed="false"
+                     header="General">
+                <div class="p-grid">
+                    <div class="p-col-6">ID</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.inspectionID}</div>
+                    <div class="p-col-6">Follow up to inspection ID</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.followUpToInspectionID}</div>
+                    <div class="p-col-6">Inspector</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.inspector.person.firstName}
+                        #{occInspectionsBB.selectedInspection.inspector.person.lastName}
+                        (#{occInspectionsBB.selectedInspection.inspector.username})</div>
+                    <p:divider/>
+                    <div class="p-col-6">Created by</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.createdBy.person.firstName}
+                        #{occInspectionsBB.selectedInspection.createdBy.person.lastName}
+                        (#{occInspectionsBB.selectedInspection.createdBy.username}) at
+                        #{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.creationTS)}</div>
+                    <div class="p-col-6">Last updated by</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.lastUpdatedBy.person.firstName}
+                        #{occInspectionsBB.selectedInspection.lastUpdatedBy.person.lastName}
+                        (#{occInspectionsBB.selectedInspection.lastUpdatedBy.username}) at
+                        #{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.lastUpdatedTS)}</div>
+                    <div class="p-col-6">Deactivated by</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.deactivatedBy.person.firstName}
+                        #{occInspectionsBB.selectedInspection.deactivatedBy.person.lastName}
+                        (#{occInspectionsBB.selectedInspection.deactivatedBy.username}) at
+                        #{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.deactivatedTS)}</div>
+                </div>
+            </p:panel>
+            <p:panel id="inspections-inspectiondetails-inspectionpanel"
+                     toggleable="true"
+                     collapsed="false"
+                     header="Inspection">
+                <div class="p-grid">
+                    <div class="p-col-6">Start time:</div>
+                    <div class="p-col-6">#{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.timeStart)}</div>
+                    <div class="p-col-6">End time:</div>
+                    <div class="p-col-6">#{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.timeEnd)}</div>
+                    <p:divider/>
+                    <div class="p-col-6">Max occupants allowed:</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.maxOccupantsAllowed}</div>
+                    <div class="p-col-6">Number of bedrooms:</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.numBedrooms}</div>
+                    <div class="p-col-6">Number of bathrooms:</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.numBathrooms}</div>
+                    <p:divider/>
+                    <div class="p-col-6">Third party inspector:</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.thirdPartyInspector.person.firstName}
+                        #{occInspectionsBB.selectedInspection.thirdPartyInspector.person.lastName}
+                        (#{occInspectionsBB.selectedInspection.thirdPartyInspector.username})</div>
+                    <div class="p-col-6">Third party inspector approval:</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.person.firstName}
+                        #{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.person.lastName}
+                        (#{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.username}) at
+                        #{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.thirdPartyInspectorApprovalTS)}</div>
+                </div>
+            </p:panel>
+            <p:panel id="inspections-inspectiondetails-causepanel"
+                     toggleable="true"
+                     collapsed="false"
+                     header="Cause">
+            </p:panel>
+            <p:panel id="inspections-inspectiondetails-determinationpanel"
+                     toggleable="true"
+                     collapsed="false"
+                     header="Determination">
+            </p:panel>
+            <p:panel id="inspections-inspectiondetails-notespanel"
+                     toggleable="true"
+                     collapsed="false"
+                     header="Notes">
+            </p:panel>
+            <f:facet name="footer">
+                <p:commandButton id="inspections-inspectiondetails-okbutton"
+                                 value="Ok"
+                                 icon="pi pi-check"
+                                 oncomplete="PF('inspections-inspectiondetails-var').hide()"/>
+            </f:facet>
+        </p:dialog>
+    </h:form>
+
+    <!-- Currently not working and not realized dialog for editing of an OccInspectedSpace's basic info -->
     <h:form id="inspections-editspace-form">
         <p:dialog id="inspections-editspace"
                   widgetVar="inspections-editspace-var"
@@ -383,6 +504,7 @@
         </p:dialog>
     </h:form>
 
+    <!-- Dialog used for adding new location descriptors. Yep, it's pretty defunct. -->
     <h:form id="inspections-addlocdesc-form">
         <p:dialog id="inspections-addlocdesc"
                   widgetVar="inspections-addlocdesc-var"
@@ -414,6 +536,7 @@
         </p:dialog>
     </h:form>
 
+    <!-- Barely realized form that should show stats for one OccInspectedSpace(?) and all of its ordinances -->
     <h:form id="inspections-entryscreen-form">
         <p:dialog id="inspections-entryscreen"
                   height="600" width="1000"
