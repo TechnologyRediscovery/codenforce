@@ -111,18 +111,20 @@
                 <p:column headerText="Actions">
                     <p:commandLink ajax="true"
                                    style="color:blue;"
-                                   actionListener="#{occInspectionsBB.setSelectedInspection(inspection)}"
-                                   oncomplete="PF('inspections-inspectiondetails-var').show()"
-                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                   update="inspections-inspectiondetails-form"
-                                   value="View"/> |
-                    <p:commandLink ajax="true"
-                                   style="color:blue;"
                                    actionListener="#{occInspectionsBB.clearSelections}"
                                    oncomplete="PF('inspections-selecttype-var').show()"
                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                    update="inspections-selecttype-form"
-                                   value="Add space">
+                                   value="Add space"> |
+                        <f:actionListener binding="#{occInspectionsBB.setSelectedInspection(inspection)}"/>
+                    </p:commandLink>
+                    <p:commandLink ajax="true"
+                                   style="color:blue;"
+                                   actionListener="#{occInspectionsBB.clearSelections}"
+                                   oncomplete="PF('inspections-inspectiondetails-var').show()"
+                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                   update="inspections-inspectiondetails-form"
+                                   value="Details">
                         <f:actionListener binding="#{occInspectionsBB.setSelectedInspection(inspection)}"/>
                     </p:commandLink>
                 </p:column>
@@ -396,19 +398,45 @@
                   header="Inspection Details"
                   modal="true"
                   resizable="true">
+            <p:commandButton id="inspections-inspectiondetails-editbutton"
+                             value="#{occInspectionsBB.editMode ? 'Done' : 'Edit'}"
+                             disabled="#{!empty occInspectionsBB.selectedInspection.deactivatedBy}"
+                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                             icon="fa #{occInspectionsBB.editMode ? 'fa-check' : 'fa-pencil'}"
+                             actionListener="#{occInspectionsBB.toggleEditMode}"
+                             oncomplete="PF('inspections-inspectiondetails-var').show()"
+                             update="inspections-inspectiondetails-form"/>
+
+            <p:spacer height="5px"/>
+
             <p:panel id="inspections-inspectiondetails-generalpanel"
                      toggleable="true"
                      collapsed="false"
                      header="General">
+
                 <div class="p-grid">
                     <div class="p-col-6">ID</div>
                     <div class="p-col-6">#{occInspectionsBB.selectedInspection.inspectionID}</div>
                     <div class="p-col-6">Follow up to inspection ID</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.followUpToInspectionID}</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.followUpToInspectionID}"/>
+                        <p:inputText rendered="#{occInspectionsBB.editMode}"  value="#{occInspectionsBB.selectedInspection.followUpToInspectionID}"/>
+                    </div>
                     <div class="p-col-6">Inspector</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.inspector.person.firstName}
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.inspector.person.firstName}
                         #{occInspectionsBB.selectedInspection.inspector.person.lastName}
-                        (#{occInspectionsBB.selectedInspection.inspector.username})</div>
+                        (#{occInspectionsBB.selectedInspection.inspector.username})"/>
+                        <p:selectOneMenu rendered="#{occInspectionsBB.editMode}"
+                                         value="#{occInspectionsBB.selectedInspection.inspector}"
+                                         filter="true"
+                                         filterMatchMode="contains"
+                                         converter="userConverter">
+                            <f:selectItems value="#{occInspectionsBB.userList}" var="user"
+                                           itemLabel="#{user.person.firstName} #{user.person.lastName} #{user.username}"
+                                           itemValue="#{user}"/>
+                        </p:selectOneMenu>
+                    </div>
                     <p:divider/>
                     <div class="p-col-6">Created by</div>
                     <div class="p-col-6">#{occInspectionsBB.selectedInspection.createdBy.person.firstName}
@@ -432,23 +460,38 @@
                      collapsed="false"
                      header="Inspection">
                 <div class="p-grid">
-                    <div class="p-col-6">Start time:</div>
-                    <div class="p-col-6">#{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.timeStart)}</div>
-                    <div class="p-col-6">End time:</div>
-                    <div class="p-col-6">#{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.timeEnd)}</div>
+                    <div class="p-col-6">Start time</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.timeStart)}"/>
+                        <p:calendar rendered="#{occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.timeStart}" pattern="MM/dd/yyyy HH:mm" mask="true"/>
+                    </div>
+                    <div class="p-col-6">End time</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.timeEnd)}"/>
+                        <p:calendar rendered="#{occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.timeEnd}" pattern="MM/dd/yyyy HH:mm" mask="true"/>
+                    </div>
                     <p:divider/>
-                    <div class="p-col-6">Max occupants allowed:</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.maxOccupantsAllowed}</div>
-                    <div class="p-col-6">Number of bedrooms:</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.numBedrooms}</div>
-                    <div class="p-col-6">Number of bathrooms:</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.numBathrooms}</div>
+                    <div class="p-col-6">Max occupants allowed</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.maxOccupantsAllowed}"/>
+                        <p:inputText rendered="#{occInspectionsBB.editMode}"  value="#{occInspectionsBB.selectedInspection.maxOccupantsAllowed}"/>
+                    </div>
+                    <div class="p-col-6">Number of bedrooms</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.numBedrooms}"/>
+                        <p:inputText rendered="#{occInspectionsBB.editMode}"  value="#{occInspectionsBB.selectedInspection.numBedrooms}"/>
+                    </div>
+                    <div class="p-col-6">Number of bathrooms</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.numBathrooms}"/>
+                        <p:inputText rendered="#{occInspectionsBB.editMode}"  value="#{occInspectionsBB.selectedInspection.numBathrooms}"/>
+                    </div>
                     <p:divider/>
-                    <div class="p-col-6">Third party inspector:</div>
+                    <div class="p-col-6">Third party inspector</div>
                     <div class="p-col-6">#{occInspectionsBB.selectedInspection.thirdPartyInspector.person.firstName}
                         #{occInspectionsBB.selectedInspection.thirdPartyInspector.person.lastName}
                         (#{occInspectionsBB.selectedInspection.thirdPartyInspector.username})</div>
-                    <div class="p-col-6">Third party inspector approval:</div>
+                    <div class="p-col-6">Third party inspector approval</div>
                     <div class="p-col-6">#{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.person.firstName}
                         #{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.person.lastName}
                         (#{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.username}) at
@@ -459,21 +502,57 @@
                      toggleable="true"
                      collapsed="false"
                      header="Cause">
+                <div class="p-grid">
+                    <div class="p-col-6">Cause ID</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.cause.causeID}</div>
+                    <div class="p-col-6">Title</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.cause.title}</div>
+                    <div class="p-col-6">Description</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.cause.description}</div>
+                    <div class="p-col-6">Notes</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.cause.notes}</div>
+                    <div class="p-col-6">Active</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.cause.active ? "Yes" : "No"}</div>
+                </div>
             </p:panel>
             <p:panel id="inspections-inspectiondetails-determinationpanel"
                      toggleable="true"
                      collapsed="false"
                      header="Determination">
+                <div class="p-grid">
+                    <div class="p-col-6">Determination ID</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.determinationID}</div>
+                    <div class="p-col-6">Title</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.title}</div>
+                    <div class="p-col-6">Description</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.description}</div>
+                    <div class="p-col-6">Notes</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.notes}</div>
+                    <div class="p-col-6">Event Category</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.eventCategory.eventCategoryTitle}<br/>
+                                         #{occInspectionsBB.selectedInspection.determination.eventCategory.eventCategoryDesc}</div>
+                    <div class="p-col-6">Active</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.active ? "Yes" : "No"}</div>
+                </div>
             </p:panel>
             <p:panel id="inspections-inspectiondetails-notespanel"
                      toggleable="true"
                      collapsed="false"
                      header="Notes">
+                <div class="p-col-6">Pre-inspection notes</div>
+                <div class="p-col-6">#{occInspectionsBB.selectedInspection.notesPreInspection}</div>
+                <div class="p-col-6">Remarks</div>
+                <div class="p-col-6">#{occInspectionsBB.selectedInspection.remarks}</div>
+                <div class="p-col-6">General Comments</div>
+                <div class="p-col-6">#{occInspectionsBB.selectedInspection.generalComments}</div>
             </p:panel>
             <f:facet name="footer">
-                <p:commandButton id="inspections-inspectiondetails-okbutton"
-                                 value="Ok"
-                                 icon="pi pi-check"
+                <p:commandButton value="Cancel"
+                                 icon="pi pi-times"
+                                 oncomplete="PF('inspections-inspectiondetails-var').hide()"/>
+                <p:commandButton id="inspections-inspectiondetails-savebutton"
+                                 value="Save"
+                                 icon="pi pi-save"
                                  oncomplete="PF('inspections-inspectiondetails-var').hide()"/>
             </f:facet>
         </p:dialog>

@@ -37,6 +37,8 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
     private OccInspectedSpace selectedInspectedSpace;
 
+    private boolean editMode;
+
     @PostConstruct
     public void initBean() {
         // Initialize list of checklist templates
@@ -197,5 +199,17 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
     public void setSelectedInspectedSpace(OccInspectedSpace selectedInspectedSpace) {
         this.selectedInspectedSpace = selectedInspectedSpace;
+    }
+
+    public boolean isEditMode() {
+        return editMode;
+    }
+
+    public void setEditMode(boolean editMode) {
+        this.editMode = editMode;
+    }
+
+    public void toggleEditMode() {
+        editMode = !editMode;
     }
 }
