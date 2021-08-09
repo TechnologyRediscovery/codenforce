@@ -150,14 +150,24 @@ CREATE OR REPLACE FUNCTION public.extractstreet(addr TEXT	)
 $BODY$
 	DECLARE
 	 	extractedstreet TEXT;
+	 	re_matches RECORD;
 
 	BEGIN
 		IF addr ILIKE '%/%'
 		THEN -- we've got a XX 1/2 street
 			extractedstreet := substring(addr from '\d+\W\d/\d(.*)');
 		ELSE 
-			extractedstreet := substring(addr from '\d+\W(.*)');
-
+			IF addr ILIKE'%-%'
+				THEN --we've got an address range
+					SELECT regexp_matches(addr, '\w-\w') INTO re_matches;
+					IF NOT FOUND
+						THEN -- we've got an address range and not a unit range
+							extractedstreet := substring(addr from '\d+\W?-\d+\W(.*)');
+						ELSE -- we've likely got a unit range, so skip
+							RAISE NOTICE 'found unit range in address; skipping: %', addr;
+				ELSE -- no address range
+					extractedstreet := substring(addr from '\d+\W(.*)');
+			END IF; -- range check
 		END IF;
 		RETURN trim(both from extractedstreet);
 		RETURN 1;
@@ -165,6 +175,36 @@ $BODY$
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
+
+
+CREATE TABLE public.parcelmigrationlogerrorcode
+(
+	code 	INTEGER PRIMARY KEY,
+	descr 	TEXT NOT NULL,
+	fatal 	BOOLEAN DEFAULT TRUE
+);
+
+INSERT INTO public.parcelmigrationlogerrorcode(
+		code, descr, fatal)
+	VALUES (1, 'Invalid address', TRUE);
+
+CREATE SEQUENCE IF NOT EXISTS parcelmigrationlog_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE public.parcelmigrationlog
+(
+	logentryid 		INTEGER DEFAULT nextval('parcelmigrationlog_seq') PRIMARY KEY,
+	property_id 		INTEGER CONSTRAINT parcelmigrationlog_propid_fk REFERENCES property (propertyid),
+	parcel_id 			INTEGER CONSTRAINT parcelmigrationlog_parcelid_fk REFERENCES parcel (parcelkey),
+	error_code 		INTEGER CONSTRAINT parcelmigration_errorcode	REFERENCES parcelmigrationlogerrorcode (code),
+	notes 			TEXT,
+	ts 				TIMESTAMP WITH TIME ZONE NOT NULL
+);
 
 
 
@@ -190,7 +230,7 @@ $BODY$
 	 	addr_range_end_no INTEGER;
 	 	addr_range_cursor INTEGER;
 	 	addr_range_arr TEXT[];
-	 	bldgno INTEGER;
+	 	bldgno TEXT;
 	 	maid INTEGER; -- mailing address ID
 	 	current_street_id INTEGER;
 	 	buildingcount INTEGER;
@@ -289,89 +329,94 @@ $BODY$
 			SELECT streetid FROM public.mailingstreet WHERE name ILIKE extractedstreet INTO current_street_id;
 			
 			RAISE NOTICE 'PropID: %; Has street % been found? Street ID: %', pr.address, extractedstreet, current_street_id;
+			IF extractedstreet IS NOT NULL
+				THEN
+					IF FOUND
+					THEN -- we have an existing street
+						NULL; -- we'll use the current_street_id for all the address writes
 
-			IF FOUND
-			THEN -- we have an existing street
-				NULL; -- we'll use the current_street_id for all the address writes
-
-			ELSE -- we don't have a record of this street, so write it and grab its ID
-				-- write street into mailingstreet
-				EXECUTE format('INSERT INTO public.mailingstreet(
-								            streetid, name, namevariantsarr, muni_municode, city_cityid, 
-								            notes)
-								    VALUES (DEFAULT, %L, NULL, %L, %L, 
-								            NULL);',
-								            		  extractedstreet, municodetarget, cityid);
-				-- fetch fresh street id
-				SELECT currval('mailingstreet_streetid_seq') INTO current_street_id;
-			END IF;
-			
-		
-			
-			-- extract addresses with a - in there somewhere
-			addr_range := substring(pr.address from '\d+\W?-\d+');
-			RAISE NOTICE 'FOUND RANGE ADDRESS: %', addr_range;
-
-			IF 
-				addr_range IS NOT NULL
-			THEN -- build range
-				addr_range_start := substring(addr_range from '\d+');
-				addr_range_end := substring(addr_range from '\d+\W?-(\d+)');
-				addr_range_start_no := CAST (addr_range_start AS INTEGER);
-				addr_range_end_no := CAST (addr_range_end AS INTEGER);
-				addr_range_cursor := addr_range_start_no;
-				WHILE  
-					addr_range_cursor <= addr_range_end_no
-				LOOP
-					addr_range_arr := array_append(addr_range_arr, addr_range_cursor::text);
-					RAISE NOTICE 'ADDR RANGE CURSOR VAL: %; ARRAY STATUS: % ', addr_range_cursor, addr_range_arr;
-					-- step up by 2 building nos per even/odd numbering schema
-					addr_range_cursor := addr_range_cursor + 2; 
-
-				END LOOP;
-
-			ELSE -- NORMAL building no
-				extractedbldg := extractbuildingno(pr.address);
-				RAISE NOTICE 'FOUND NORMAL BUILDING pr.address: %, extracted no: %', pr.address, extractedbldg;
-				addr_range_arr := array_append(addr_range_arr, extractedbldg);
+					ELSE -- we don't have a record of this street, so write it and grab its ID
+						-- write street into mailingstreet
+						EXECUTE format('INSERT INTO public.mailingstreet(
+										            	streetid, name, namevariantsarr, citystatezip_cszipid, notes, 
+		            									pobox)
+										    VALUES (DEFAULT, %L, NULL, %L, ''Migration AUG-2021'', 
+										            NULL);',
+										            		  extractedstreet, cityid);
+						-- fetch fresh street id
+						SELECT currval('mailingstreet_streetid_seq') INTO current_street_id;
+					END IF;
+					
 				
-			END IF;
+					
+					-- extract addresses with a - in there somewhere
+					addr_range := substring(pr.address from '\d+\W?-\d+');
+					RAISE NOTICE 'FOUND RANGE ADDRESS: %', addr_range;
 
-			RAISE NOTICE 'INSERTING MAILING ADDRESSES ARRAY: % ', addr_range_arr;
+					IF 
+						addr_range IS NOT NULL
+					THEN -- build range
+						addr_range_start := substring(addr_range from '\d+');
+						addr_range_end := substring(addr_range from '\d+\W?-(\d+)');
+						addr_range_start_no := CAST (addr_range_start AS INTEGER);
+						addr_range_end_no := CAST (addr_range_end AS INTEGER);
+						addr_range_cursor := addr_range_start_no;
+						WHILE  
+							addr_range_cursor <= addr_range_end_no
+						LOOP
+							addr_range_arr := array_append(addr_range_arr, addr_range_cursor::text);
+							RAISE NOTICE 'ADDR RANGE CURSOR VAL: %; ARRAY STATUS: % ', addr_range_cursor, addr_range_arr;
+							-- step up by 2 building nos per even/odd numbering schema
+							addr_range_cursor := addr_range_cursor + 2; 
 
-			FOREACH bldgno IN ARRAY addr_range_arr
-			LOOP -- over each address in the array
-				RAISE NOTICE 'INSERTING BLDG NO: %', bldgno;
-				EXECUTE format('INSERT INTO public.mailingaddress(
-							            addressid, bldgno, street_streetid, verifiedts, verifiedby_userid, 
-							            verifiedsource_sourceid, source_sourceid, createdts, createdby_userid, 
-							            lastupdatedts, lastupdatedby_userid, notes)
-							    VALUES (DEFAULT, %L, %L, NULL, NULL, 
-							            NULL, %L, %L, %L, 
-							            %L, %L, ''Created during parcel migration JUL-21'');',
-							                     bldgno, current_street_id,
-					                     defaultsource, now(), creationrobotuser,
-					                    now(), creationrobotuser);
-				buildingcount := buildingcount + 1;
+						END LOOP;
 
-				-- get our fresh mailing address ID
-				SELECT currval('mailingaddress_addressid_seq') INTO maid;
+					ELSE -- NORMAL building no
+						extractedbldg := extractbuildingno(pr.address);
+						RAISE NOTICE 'FOUND NORMAL BUILDING pr.address: %, extracted no: %', pr.address, extractedbldg;
+						addr_range_arr := array_append(addr_range_arr, extractedbldg);
+						
+					END IF;
 
-				-- Connect our current parcel with each
-				EXECUTE format('INSERT INTO public.parcelmailingaddress(
-								            mailingparcel_parcelid, mailingparcel_mailingid, source_sourceid, 
-								            createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
-								            deactivatedts, deactivatedby_userid, notes, linkid, linkedobjectrole_lorid)
-								    VALUES (%L, %L, %L, 
-								            now(), %L, now(), %L, 
-								            NULL, NULL, ''Created during parcel migration JUL-21'', DEFAULT, %L);',
+					RAISE NOTICE 'INSERTING MAILING ADDRESSES ARRAY: % ', addr_range_arr;
 
-							            	pr.propertyid, maid, defaultsource,
-							            	creationrobotuser, creationrobotuser, 
-            								parceladdr_lorid);
-				RAISE NOTICE 'LinkID complete: % ', maid;
+					FOREACH bldgno IN ARRAY addr_range_arr
+					LOOP -- over each address in the array
+						RAISE NOTICE 'INSERTING BLDG NO: %', bldgno;
+						EXECUTE format('INSERT INTO public.mailingaddress(
+									            addressid, bldgno, street_streetid, verifiedts, verifiedby_userid, 
+									            verifiedsource_sourceid, source_sourceid, createdts, createdby_userid, 
+									            lastupdatedts, lastupdatedby_userid, notes)
+									    VALUES (DEFAULT, %L, %L, NULL, NULL, 
+									            NULL, %L, %L, %L, 
+									            %L, %L, ''Created during parcel migration JUL-21'');',
+									                     bldgno, current_street_id,
+							                     defaultsource, now(), creationrobotuser,
+							                    now(), creationrobotuser);
+						buildingcount := buildingcount + 1;
 
-			END LOOP; -- over each building Number extracted from the original property address 
+						-- get our fresh mailing address ID
+						SELECT currval('mailingaddress_addressid_seq') INTO maid;
+
+						-- Connect our current parcel with each
+						EXECUTE format('INSERT INTO public.parcelmailingaddress(
+										            mailingparcel_parcelid, mailingparcel_mailingid, source_sourceid, 
+										            createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
+										            deactivatedts, deactivatedby_userid, notes, linkid, linkedobjectrole_lorid)
+										    VALUES (%L, %L, %L, 
+										            now(), %L, now(), %L, 
+										            NULL, NULL, ''Created during parcel migration JUL-21'', DEFAULT, %L);',
+									            	pr.propertyid, maid, defaultsource,
+									            	creationrobotuser, creationrobotuser, 
+		            								parceladdr_lorid);
+						RAISE NOTICE 'LinkID complete: % ', maid;
+					END LOOP; -- over each building Number extracted from the original property address 
+				ELSE -- we don't have a well formed street
+					EXECUTE format('INSERT INTO public.parcelmigrationlog(
+								            logentryid, property_id, parcel_id, error_code, notes, ts)
+								    VALUES (DEFAULT, %L, NULL, 1, ''IMPROPERLY FORMED ADDRESS'', now());',
+								    pr.propertyid);
+				END IF; -- check of malformed property
 		END LOOP; -- over properties in the legacy table
 		RETURN buildingcount;
 	END;
@@ -420,8 +465,6 @@ INSERT INTO public.personhumanmigrationlogerrorcode(
 		code, descr, fatal)
 	VALUES (3, 'Malformed zipcode in legacy person record', FALSE);
 
-
-
 CREATE SEQUENCE IF NOT EXISTS personhumanmigrationlog_seq
     START WITH 100
     INCREMENT BY 1
@@ -459,6 +502,7 @@ $BODY$
 	 	parcel_rec RECORD;
 	 	mailing_rec RECORD;
 	 	citystatezip_rec RECORD;
+	 	street_freshstreetname TEXT;
 	 	street_freshid INTEGER;
 	 	address_freshid INTEGER;
 	 	pers_newaddr_street TEXT;
@@ -533,6 +577,8 @@ $BODY$
 					               deacts, deacuser, pr.notes
 
 			            ); 
+
+			            RAISE NOTICE 'Fresh human record ID: %', fresh_human_id;
 
 			            human_rec_count := human_rec_count + 1;
 
@@ -670,48 +716,62 @@ $BODY$
 									IF FOUND
 										THEN --we've got a real zip code to attach to our new street
 										RAISE NOTICE 'Fresh human has address with legimite ZIP %', citystatezip_rec.id;
-											-- Write new street and address records
-											EXECUTE format('
-												INSERT INTO public.mailingstreet(
-											            streetid, name, namevariantsarr, citystatezip_cszipid, notes, 
-											            pobox)
-											    VALUES (DEFAULT, %L, NULL, %L, ''Created during pers-human migration AUG-2021'', 
-										    	        NULL);',
-										    	        extractstreet(pr.address_street), citystatezip_rec.id
-							    	        );
+										street_freshstreetname := extractstreet(pr.address_street);
+										RAISE NOTICE 'Extracted street from fresh address: % ', street_freshstreetname;
+										
+										IF street_freshstreetname IS NOT NULL
+											THEN
+												-- Write new street and address records
+												EXECUTE format('
+													INSERT INTO public.mailingstreet(
+												            streetid, name, namevariantsarr, citystatezip_cszipid, notes, 
+												            pobox)
+												    VALUES (DEFAULT, %L, NULL, %L, ''Created during pers-human migration AUG-2021'', 
+											    	        NULL);',
+											    	        street_freshstreetname, citystatezip_rec.id
+								    	        );
 
-							    	        -- Now get our fresh street ID for writing our building Number
-							    	        SELECT currval('mailingstreet_streetid_seq') INTO street_freshid;
+								    	        -- Now get our fresh street ID for writing our building Number
+								    	        SELECT currval('mailingstreet_streetid_seq') INTO street_freshid;
 
-							    	        -- with a street PK, we're ready to write to the mailingaddress base table
-							    	        EXECUTE format('
-							    	        	INSERT INTO public.mailingaddress(
-											            addressid, bldgno, street_streetid, verifiedts, verifiedby_userid, 
-											            verifiedsource_sourceid, source_sourceid, createdts, createdby_userid, 
-											            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
-											            notes)
-											    VALUES (DEFAULT, %L, %L, NULL, NULL 
-											            NULL, %L, now(), %L, 
-											            now(), %L, NULL, NULL, 
-											            ''Created during person-human migration'');',
-											            extractbuildingno(pr.address_street), street_freshid,
-											            defaultsource, creationrobotuser,
-											            creationrobotuser
-							    	        	);
+								    	        -- with a street PK, we're ready to write to the mailingaddress base table
+								    	        EXECUTE format('
+								    	        	INSERT INTO public.mailingaddress(
+												            addressid, bldgno, street_streetid, verifiedts, verifiedby_userid, 
+												            verifiedsource_sourceid, source_sourceid, createdts, createdby_userid, 
+												            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
+												            notes)
+												    VALUES (DEFAULT, %L, %L, NULL, NULL 
+												            NULL, %L, now(), %L, 
+												            now(), %L, NULL, NULL, 
+												            ''Created during person-human migration'');',
+												            extractbuildingno(pr.address_street), street_freshid,
+												            defaultsource, creationrobotuser,
+												            creationrobotuser
+								    	        	);
 
-							    	        SELECT currval('mailingaddress_addressid_seq') INTO address_freshid;
+								    	        SELECT currval('mailingaddress_addressid_seq') INTO address_freshid;
 
-							    	        -- Now that we know the ID of the fresh mailing, we can link our fresh human via the old personid
-							    	        -- to this new address we just got
-							    	        EXECUTE format('INSERT INTO public.humanmailingaddress(
-														            humanmailing_humanid, humanmailing_addressid, source_sourceid, 
-														            role_roleid, createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
-														            deactivatedts, deactivatedby_userid, notes, linkid)
-														    VALUES (%L, %L, %L, 
-														            %L, now(), %L, now(), %L, 
-														            NULL, NULL, ''Created during person-human migration AUG 2021'', DEFAULT);',
-														            pr.personid, address_freshid, defaultsource,
-														            human_mailing_lorid, creationrobotuser, creationrobotuser);
+								    	        -- Now that we know the ID of the fresh mailing, we can link our fresh human via the old personid
+								    	        -- to this new address we just got
+								    	        EXECUTE format('INSERT INTO public.humanmailingaddress(
+															            humanmailing_humanid, humanmailing_addressid, source_sourceid, 
+															            role_roleid, createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
+															            deactivatedts, deactivatedby_userid, notes, linkid)
+															    VALUES (%L, %L, %L, 
+															            %L, now(), %L, now(), %L, 
+															            NULL, NULL, ''Created during person-human migration AUG 2021'', DEFAULT);',
+															            pr.personid, address_freshid, defaultsource,
+															            human_mailing_lorid, creationrobotuser, creationrobotuser);
+							    	        ELSE -- could not extract street
+							    	        	RAISE NOTICE 'COULD NOT EXTRACT STREET; SKIPPING NEW ADDRESS INSERT ';
+												EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
+																            logentryid, human_humanid, person_personid, error_code, notes, ts)
+																    VALUES (DEFAULT, %L, %L, %L, ''FAILED TO PARSE NON PARCEL LINKED ADDRESS'', now());',
+																    pr.personid, pr.personid, 3 
+																);
+											END IF;
+
 
 										ELSE -- malformed ZIP on legacy person, meaning we cannot write a new address
 											EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
