@@ -127,13 +127,17 @@ $BODY$
 	 	extractedbldg TEXT;
 
 	BEGIN
-		IF addr ILIKE '%/%'
-		THEN -- we've got a XX 1/2 street
-			extractedbldg := substring(addr from '\d+\W\d/\d');
-		ELSE 
-			extractedbldg := substring(addr from '\d+');
-		END IF;
-
+		IF addr ILIKE '%PO BOX%'
+			THEN 
+				extractedbldg := substring(addr from '[Pp][Oo]\s[Bb][Oo][Xx]\s\d+');
+			ELSE
+				IF addr ILIKE '%/%'
+				THEN -- we've got a XX 1/2 street
+					extractedbldg := substring(addr from '\d+\W\d/\d');
+				ELSE 
+					extractedbldg := substring(addr from '\d+');
+				END IF; -- fractions
+		END IF; -- PO boxes
 
 		RETURN trim(both from extractedbldg);
 	END;
@@ -153,24 +157,30 @@ $BODY$
 	 	re_matches RECORD;
 
 	BEGIN
-		IF addr ILIKE '%/%'
-		THEN -- we've got a XX 1/2 street
-			extractedstreet := substring(addr from '\d+\W\d/\d(.*)');
-		ELSE 
-			IF addr ILIKE'%-%'
-				THEN --we've got an address range
-					SELECT regexp_matches(addr, '\w-\w') INTO re_matches;
-					IF NOT FOUND
-						THEN -- we've got an address range and not a unit range
-							extractedstreet := substring(addr from '\d+\W?-\d+\W(.*)');
-						ELSE -- we've likely got a unit range, so skip
-							RAISE NOTICE 'found unit range in address; skipping: %', addr;
-				ELSE -- no address range
-					extractedstreet := substring(addr from '\d+\W(.*)');
-			END IF; -- range check
-		END IF;
+		IF addr ILIKE '%PO BOX%'
+			THEN
+				RETURN 'PO BOX';
+			ELSE
+				IF addr ILIKE '%/%'
+					THEN -- we've got a XX 1/2 street
+						extractedstreet := substring(addr from '\d+\W\d/\d\W?(.*)');
+					ELSE 
+						IF addr ILIKE'%-%'
+							THEN --we've got a range of some sort
+								SELECT regexp_matches(addr, '\w-\w') INTO re_matches;
+								IF NOT FOUND
+									THEN -- we've got an address range and not a unit range
+										extractedstreet := substring(addr from '\d+\W?-\d+\W(.*)');
+									ELSE -- we've likely got a unit range, so skip
+										RAISE NOTICE 'found unit range in address; skipping: %', addr;
+										RETURN NULL;
+								END IF;
+							ELSE -- no address range
+								extractedstreet := substring(addr from '\d+\W(.*)');
+						END IF; -- range check
+				END IF; -- fraction check
+		END IF; -- box box
 		RETURN trim(both from extractedstreet);
-		RETURN 1;
 	END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
@@ -207,6 +217,7 @@ CREATE TABLE public.parcelmigrationlog
 );
 
 
+ALTER TABLE mailingstreet ADD COLUMN createdts TIMESTAMP WITH TIME ZONE DEFAULT now();
 
 
 CREATE OR REPLACE FUNCTION public.migratepropertytoparcel(creationrobotuser INTEGER,
@@ -326,7 +337,7 @@ $BODY$
 			extractedstreet := extractstreet(pr.address);
 			-- See if street is in the table already, if so, get its ID
 			
-			SELECT streetid FROM public.mailingstreet WHERE name ILIKE extractedstreet INTO current_street_id;
+			SELECT streetid FROM public.mailingstreet WHERE name ILIKE extractedstreet AND citystatezip_cszipid = cityid INTO current_street_id;
 			
 			RAISE NOTICE 'PropID: %; Has street % been found? Street ID: %', pr.address, extractedstreet, current_street_id;
 			IF extractedstreet IS NOT NULL
@@ -465,6 +476,18 @@ INSERT INTO public.personhumanmigrationlogerrorcode(
 		code, descr, fatal)
 	VALUES (3, 'Malformed zipcode in legacy person record', FALSE);
 
+INSERT INTO public.personhumanmigrationlogerrorcode(
+		code, descr, fatal)
+	VALUES (4, 'Person without first and last name', TRUE);
+
+INSERT INTO public.personhumanmigrationlogerrorcode(
+		code, descr, fatal)
+	VALUES (5, 'Human - parcel link failure', TRUE);
+
+INSERT INTO public.personhumanmigrationlogerrorcode(
+		code, descr, fatal)
+	VALUES (6, 'Non-parcel address error: cannot parse street', TRUE);
+
 CREATE SEQUENCE IF NOT EXISTS personhumanmigrationlog_seq
     START WITH 100
     INCREMENT BY 1
@@ -483,6 +506,12 @@ CREATE TABLE public.personhumanmigrationlog
 );
 
 
+ALTER TABLE public.humanmailingaddress DROP COLUMN role_roleid;
+ALTER TABLE public.humanmailingaddress ADD COLUMN linkedobjectrole_lorid INTEGER 
+	CONSTRAINT humanmailingaddress_lorid_fk REFERENCES linkedobjectrole (lorid);
+
+DROP TABLE humanmailingrole;
+
 CREATE OR REPLACE FUNCTION public.migratepersontohuman(creationrobotuser INTEGER,
 														  defaultsource INTEGER,
 													  	  municodetarget INTEGER,
@@ -496,6 +525,7 @@ $BODY$
 	 	prop_pers_rec RECORD;
 	 	fullname TEXT;
 	 	fresh_human_id INTEGER;
+	 	current_human_id INTEGER;
 	 	deacts TIMESTAMP WITH TIME ZONE;
 	 	deacuser INTEGER;
 	 	human_rec_count INTEGER;
@@ -530,23 +560,32 @@ $BODY$
 				
 				IF (pr.lname IS NULL OR pr.lname = '') AND (pr.fname IS NULL OR pr.fname = '')
 					THEN
-						RAISE NOTICE 'found null or empty last AND first name; skipping person';
+
+						RAISE NOTICE 'found null or empty last AND first name; skipping person and LOGGING;';
+						EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
+																            logentryid, human_humanid, person_personid, error_code, notes, ts)
+																    VALUES (DEFAULT, NULL, %L, %L, ''EMTPY NAME'', now());',
+																    pr.personid, 4 
+																);
 						CONTINUE;
 				END IF;
 
 				--concat name
 				IF pr.fname IS NOT NULL
 					THEN
-						fullname := pr.fname || ' ' || pr.lname; 
+						fullname := trim(both from pr.fname) || ' ' || trim(both from pr.lname); 
 					ELSE 
-						fullname := pr.lname;
+						fullname := trim(both from pr.lname);
 				END IF;
 
 				RAISE NOTICE 'FULL name for personid % is %', pr.personid, fullname;
 
-				SELECT humanid INTO human_dupid FROM human WHERE name ILIKE fullname;
+				-- Check for duplicate person in human table
+				SELECT humanid INTO human_dupid FROM human WHERE trim(both from human.name) = trim(both from fullname);
 
-				IF NOT FOUND -- no duplicate based on name only
+				RAISE NOTICE 'DUP CHECK: HUMAN_DUPID: % ', human_dupid;
+
+				IF human_dupid IS NULL OR human_dupid = 0 -- no duplicate based on name only
 					THEN  -- go ahead and write our new human records
 						RAISE NOTICE 'NO DUP FOUND FOR %; writing new human', fullname;
 						-- check for deactivation
@@ -569,16 +608,18 @@ $BODY$
 			            deactivatedts, deactivatedby_userid, notes)
 						    VALUES (%L, %L, NULL, %L, %L, FALSE, %L, 
 						            %L, NULL, NULL, NULL, 
-						            %L, %L, %L, %L, 
+						            now(), %L, now(), %L, 
 						            %L, %L, %L);', 
-					               fresh_human_id, fullname, pr.isunder18, pr.jobtitle, pr.multientity,
+					               fresh_human_id, trim(both from fullname), pr.isunder18, pr.jobtitle, pr.multientity,
 					               pr.sourceid, 
-					               pr.creationtimestamp, pr.creator, pr.lastupdated, pr.creator, 
+					               pr.creator, pr.creator, 
 					               deacts, deacuser, pr.notes
 
 			            ); 
 
 			            RAISE NOTICE 'Fresh human record ID: %', fresh_human_id;
+			            -- Now move our cursor to our new fresh human
+			            current_human_id := fresh_human_id; -- NOTE if we have a dupe, current_human_id is not updated
 
 			            human_rec_count := human_rec_count + 1;
 
@@ -586,6 +627,7 @@ $BODY$
 
 						IF pr.phonecell IS NOT NULL AND pr.phonecell <> '' AND pr.phonecell <> 'None'			
 							THEN
+								--RAISE NOTICE 'PHONE CELL FOUND: %', pr.phonecell;
 								EXECUTE format('INSERT INTO public.contactphone(
 											            phoneid, human_humanid, phonenumber, phoneext, phonetype_typeid, 
 											            disconnectts, disconnect_userid, createdts, createdby_userid, 
@@ -599,12 +641,14 @@ $BODY$
 											            					creationrobotuser,
 								            					creationrobotuser);
 							ELSE
-								NULL; -- don't write any records
+								--RAISE NOTICE 'NO VALID PHONE CELL FOUND; NOT WRITING RECORD';
+								NULL; -- don't write any phone records
 						END IF;
 
 
 						IF pr.phonehome IS NOT NULL AND pr.phonehome <> '' AND pr.phonehome <> 'None'			
 							THEN
+								--RAISE NOTICE 'PHONE HOME FOUND: %', pr.phonehome;
 								EXECUTE format('INSERT INTO public.contactphone(
 											            phoneid, human_humanid, phonenumber, phoneext, phonetype_typeid, 
 											            disconnectts, disconnect_userid, createdts, createdby_userid, 
@@ -617,13 +661,15 @@ $BODY$
 											            		fresh_human_id, pr.phonehome, 
 											            					creationrobotuser,
 								            					creationrobotuser);
-							ELSE
+							ELSE -- duplicate
+								--RAISE NOTICE 'NO VALID PHONE HOME FOUND; NOT WRITING RECORD';
 								NULL; -- don't write any records
 						END IF;
 
 
 						IF pr.phonework IS NOT NULL AND pr.phonework <> '' AND pr.phonework <> 'None'			
 							THEN
+								--RAISE NOTICE 'PHONE WORK FOUND: %', pr.phonework;
 								EXECUTE format('INSERT INTO public.contactphone(
 											            phoneid, human_humanid, phonenumber, phoneext, phonetype_typeid, 
 											            disconnectts, disconnect_userid, createdts, createdby_userid, 
@@ -637,12 +683,14 @@ $BODY$
 											            					creationrobotuser,
 								            					creationrobotuser);
 							ELSE
+								--RAISE NOTICE 'NO VALID PHONE WORK FOUND; NOT WRITING RECORD';
 								NULL; -- don't write any records
 						END IF;
 						
 						IF pr.email IS NOT NULL AND pr.email <> '' AND pr.email <> 'None'			
 						
 							THEN
+								--RAISE NOTICE 'EMAIL: WRITING RECORD % ', pr.email;
 								EXECUTE format('INSERT INTO public.contactemail(
 									            emailid, human_humanid, emailaddress, bouncets, createdts, createdby_userid, 
 									            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
@@ -654,141 +702,154 @@ $BODY$
 							            		fresh_human_id, pr.email, creationrobotuser,
 				            					creationrobotuser);
 							ELSE
+								--RAISE NOTICE 'EMAIL: NO VALID EMAIL FOUND, SKIPPING';
 								NULL; -- don't write any records
 						END IF;
 
-
-						-- use existing property-person links to connect our new human to existing parcels
-						FOR prop_pers_rec IN SELECT property_propertyid, person_personid, creationts
-											 	 FROM public.propertyperson
-											 	 WHERE person_personid = pr.personid
-					 		LOOP -- begin iterating over property person records
-					 			
-					 			-- Link this human to an existing parcel
-
-					 			SELECT parcelkey INTO parcel_rec FROM parcel WHERE parcelkey = prop_pers_rec.property_propertyid;
-					 			IF FOUND
-						 			THEN -- link human and parcel
-						 			-- NOTE that we used the old property PK as the new parcel PK so this linking should be straightforward
-
-						 				EXECUTE format('INSERT INTO public.parcelhuman(
-														            human_humanid, parcel_parcelkey, source_sourceid, role_roleid, 
-														            createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
-														            deactivatedts, deactivatedby_userid, notes)
-														    VALUES (%L, %L, %L, %L, 
-														            now(), %L, now(), %L, 
-														            NULL, NULL, ''Created during person-human migration AUG 2021'');',
-												            		fresh_human_id, parcel_rec.parcelkey, defaultsource, parcel_human_lorid,
-										            				creationrobotuser, creationrobotuser
-							            				);
-						 				RAISE NOTICE 'Linked parcel with PK % to Human with PK %', parcel_rec.parcelkey, fresh_human_id;
-
-						 			-- If no parcel exists, write record to migrationlog table
-						 			ELSE
-						 				NULL;
-				 				END IF;
-					 		END LOOP; -- end iteration over property-person records 
-
-				 			-- Next, check if this person's address is one of those linked any of the parcels to which he/she is connected, if so, do nothing
-				 			-- but if their address is not associated with parcel in our current muni, then make a new record in the mailingaddress
-				 			-- family and connect this fresh_human to a fresh address
-
-				 			SELECT  addressid INTO mailing_rec
-								FROM public.mailingaddress 
-								INNER JOIN public.parcelmailingaddress 
-									ON (mailingparcel_mailingid = addressid)
-								WHERE mailingparcel_parcelid = parcel_rec.parcelkey
-									AND bldgno ILIKE extractbuildingno(pr.address_street); -- NOTE: We're playing fast and loose
-									-- with address matching: if the building numbers are the same, we assume it's the same address
-									-- and don't write a new mailingaddress record. EDGE cases of folks having a separate mailing
-									-- whose building numbers is exactly the same as their linked parcel are not addressed.
-
-							IF FOUND
-								THEN -- we've already got a link between the person and that person's address
-									RAISE NOTICE 'Fresh human has legacy address already linked to a parcel: moving on';
-									NULL;
-								ELSE 	-- we don't have a mailing address that matches the person record's mailing address, 
-										-- So write a new address and link it to our fresh human
-
-									SELECT id INTO citystatezip_rec
-										FROM mailingcitystatezip WHERE zip_code = pr.address_zip AND list_type_id = 1;
-
-									IF FOUND
-										THEN --we've got a real zip code to attach to our new street
-										RAISE NOTICE 'Fresh human has address with legimite ZIP %', citystatezip_rec.id;
-										street_freshstreetname := extractstreet(pr.address_street);
-										RAISE NOTICE 'Extracted street from fresh address: % ', street_freshstreetname;
-										
-										IF street_freshstreetname IS NOT NULL
-											THEN
-												-- Write new street and address records
-												EXECUTE format('
-													INSERT INTO public.mailingstreet(
-												            streetid, name, namevariantsarr, citystatezip_cszipid, notes, 
-												            pobox)
-												    VALUES (DEFAULT, %L, NULL, %L, ''Created during pers-human migration AUG-2021'', 
-											    	        NULL);',
-											    	        street_freshstreetname, citystatezip_rec.id
-								    	        );
-
-								    	        -- Now get our fresh street ID for writing our building Number
-								    	        SELECT currval('mailingstreet_streetid_seq') INTO street_freshid;
-
-								    	        -- with a street PK, we're ready to write to the mailingaddress base table
-								    	        EXECUTE format('
-								    	        	INSERT INTO public.mailingaddress(
-												            addressid, bldgno, street_streetid, verifiedts, verifiedby_userid, 
-												            verifiedsource_sourceid, source_sourceid, createdts, createdby_userid, 
-												            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
-												            notes)
-												    VALUES (DEFAULT, %L, %L, NULL, NULL 
-												            NULL, %L, now(), %L, 
-												            now(), %L, NULL, NULL, 
-												            ''Created during person-human migration'');',
-												            extractbuildingno(pr.address_street), street_freshid,
-												            defaultsource, creationrobotuser,
-												            creationrobotuser
-								    	        	);
-
-								    	        SELECT currval('mailingaddress_addressid_seq') INTO address_freshid;
-
-								    	        -- Now that we know the ID of the fresh mailing, we can link our fresh human via the old personid
-								    	        -- to this new address we just got
-								    	        EXECUTE format('INSERT INTO public.humanmailingaddress(
-															            humanmailing_humanid, humanmailing_addressid, source_sourceid, 
-															            role_roleid, createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
-															            deactivatedts, deactivatedby_userid, notes, linkid)
-															    VALUES (%L, %L, %L, 
-															            %L, now(), %L, now(), %L, 
-															            NULL, NULL, ''Created during person-human migration AUG 2021'', DEFAULT);',
-															            pr.personid, address_freshid, defaultsource,
-															            human_mailing_lorid, creationrobotuser, creationrobotuser);
-							    	        ELSE -- could not extract street
-							    	        	RAISE NOTICE 'COULD NOT EXTRACT STREET; SKIPPING NEW ADDRESS INSERT ';
-												EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
-																            logentryid, human_humanid, person_personid, error_code, notes, ts)
-																    VALUES (DEFAULT, %L, %L, %L, ''FAILED TO PARSE NON PARCEL LINKED ADDRESS'', now());',
-																    pr.personid, pr.personid, 3 
-																);
-											END IF;
-
-
-										ELSE -- malformed ZIP on legacy person, meaning we cannot write a new address
-											EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
-															            logentryid, human_humanid, person_personid, error_code, notes, ts)
-															    VALUES (DEFAULT, %L, %L, %L, ''ZIP NOT FOUND FROM PERSON ENTRY'', now());',
-															    pr.personid, pr.personid, 3 
-															);
-									END IF; -- end check for legitimate zipcode found on old person address
-							END IF; -- end check for existing address connection between person's parcel and ONE of that parcel's addresses
 					ELSE  -- Record duplicate person found, don't write new humans, just write to log
-						RAISE NOTICE 'Fresh human has address with MALFORMED ZIP: logging';
+						current_human_id := human_dupid;
+						RAISE NOTICE 'DUPLICATE HUMAN FOUND: logging and using already inserted humanid % ', current_human_id  ;
 						EXECUTE format('INSERT INTO public.personhumanmigrationlog(
 									            logentryid, human_humanid, person_personid, error_code, notes, ts)
-									    VALUES (DEFAULT, NULL, %L, 2, ''DUP PERSON; SKIPPING NEW HUMAN'', now());',
-								    		pr.personid
+									    VALUES (DEFAULT, NULL, %L, 2, %L, now());',
+								    		pr.personid, 'DUPLICATE RECORD FOR fullname ' || fullname
 									    );
+
 				END IF; -- over duplicate check of person records
+
+				-- use existing property-person links to connect our new human to existing parcels
+				FOR prop_pers_rec IN SELECT property_propertyid, person_personid, creationts
+									 	 FROM public.propertyperson
+									 	 WHERE person_personid = pr.personid
+			 		LOOP -- begin iterating over property person records
+			 			
+			 			-- Link this human to an existing parcel
+
+			 			SELECT parcelkey INTO parcel_rec FROM parcel WHERE parcelkey = prop_pers_rec.property_propertyid;
+			 			IF FOUND
+				 			THEN -- link human and parcel
+				 			-- NOTE that we used the old property PK as the new parcel PK so this linking should be straightforward
+
+				 				EXECUTE format('INSERT INTO public.humanparcel(
+								                       linkid, human_humanid, parcel_parcelkey, source_sourceid, createdts, 
+											            createdby_userid, lastupdatedts, lastupdatedby_userid, deactivatedts, 
+											            deactivatedby_userid, notes, linkedobjectrole_lorid)
+												    VALUES (DEFAULT, %L, %L, %L, now(), 
+												    		%L, now(), %L, NULL,
+												            NULL, ''Created during person-human migration AUG 2021'', %L);',
+										            		current_human_id, parcel_rec.parcelkey, defaultsource, 
+								            				creationrobotuser, creationrobotuser,
+								            				parcel_human_lorid
+					            				);
+				 				RAISE NOTICE 'Linked parcel with PK % to Human with PK %', parcel_rec.parcelkey, current_human_id;
+
+				 			-- If no parcel exists, write record to migrationlog table
+				 			ELSE
+				 				EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
+													            logentryid, human_humanid, person_personid, error_code, notes, ts)
+													    VALUES (DEFAULT, %L, %L, %L, %L, now());',
+													    pr.personid, pr.personid, 5, 
+													    'UNABLE TO LINK PARCEL ' ||  parcel_rec.parcelkey || ' TO HUMAN ' || current_human_id
+													);
+		 				END IF;
+			 		END LOOP; -- end iteration over property-person records 
+
+		 			-- Next, check if this person's address is one of those linked any of the parcels to which he/she is connected, if so, do nothing
+		 			-- but if their address is not associated with parcel in our current muni, then make a new record in the mailingaddress
+		 			-- family and connect this fresh_human to a fresh address
+
+		 			SELECT  addressid INTO mailing_rec
+						FROM public.mailingaddress 
+						INNER JOIN public.parcelmailingaddress 
+							ON (mailingparcel_mailingid = addressid)
+						WHERE mailingparcel_parcelid = parcel_rec.parcelkey
+							AND bldgno ILIKE extractbuildingno(pr.address_street); -- NOTE: We're playing fast and loose
+							-- with address matching: if the building numbers are the same, we assume it's the same address
+							-- and don't write a new mailingaddress record. EDGE cases of folks having a separate mailing
+							-- whose building numbers is exactly the same as their linked parcel are not addressed.
+							-- THE PO box parsing process potentially makes this fraught so beware!
+
+					IF FOUND
+						THEN -- we've already got a link between the person and that person's address
+							RAISE NOTICE 'Fresh human has legacy address already linked to a parcel: moving on';
+							NULL;
+						ELSE 	-- we don't have a mailing address that matches the person record's mailing address, 
+								-- So write a new address and link it to our fresh human
+
+							SELECT id INTO citystatezip_rec
+								FROM mailingcitystatezip WHERE zip_code = pr.address_zip AND list_type_id = 1;
+
+							IF FOUND
+								THEN --we've got a real zip code to attach to our new street
+								RAISE NOTICE 'Fresh human has address with legimite ZIP %', citystatezip_rec.id;
+								street_freshstreetname := extractstreet(pr.address_street);
+								RAISE NOTICE 'Extracted street from fresh address: % ', street_freshstreetname;
+								
+								IF street_freshstreetname IS NOT NULL
+									THEN
+										-- Write new street and address records
+										EXECUTE format('
+											INSERT INTO public.mailingstreet(
+										            streetid, name, namevariantsarr, citystatezip_cszipid, notes, 
+										            pobox)
+										    VALUES (DEFAULT, %L, NULL, %L, ''Created during pers-human migration AUG-2021'', 
+									    	        NULL);',
+									    	        street_freshstreetname, citystatezip_rec.id
+						    	        );
+
+						    	        -- Now get our fresh street ID for writing our building Number
+						    	        SELECT currval('mailingstreet_streetid_seq') INTO street_freshid;
+
+						    	        -- with a street PK, we're ready to write to the mailingaddress base table
+						    	        EXECUTE format('
+						    	        	INSERT INTO public.mailingaddress(
+										            addressid, bldgno, street_streetid, verifiedts, verifiedby_userid, 
+										            verifiedsource_sourceid, source_sourceid, createdts, createdby_userid, 
+										            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
+										            notes)
+										    VALUES (DEFAULT, %L, %L, NULL, NULL, 
+										            NULL, %L, now(), %L, 
+										            now(), %L, NULL, NULL, 
+										            ''Created during person-human migration'');',
+										            extractbuildingno(pr.address_street), street_freshid,
+										            defaultsource, creationrobotuser,
+										            creationrobotuser
+						    	        	);
+
+						    	        SELECT currval('mailingaddress_addressid_seq') INTO address_freshid;
+
+						    	        -- Now that we know the ID of the fresh mailing, we can link our fresh human via the old personid
+						    	        -- to this new address we just made and got an ID for
+						    	        EXECUTE format('INSERT INTO public.humanmailingaddress(
+													            humanmailing_humanid, humanmailing_addressid, source_sourceid, 
+													            createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
+													            deactivatedts, deactivatedby_userid, notes, linkid, linkedobjectrole_lorid)
+													    VALUES (%L, %L, %L, 
+													            now(), %L, now(), %L, 
+													            NULL, NULL, ''Created during person-human migration AUG 2021'', DEFAULT, %L);',
+													            current_human_id, address_freshid, defaultsource,
+													            creationrobotuser, creationrobotuser, human_mailing_lorid);
+					    	        ELSE -- could not extract street
+					    	        	RAISE NOTICE 'COULD NOT EXTRACT STREET; SKIPPING NEW ADDRESS INSERT ';
+										EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
+														            logentryid, human_humanid, person_personid, error_code, notes, ts)
+														    VALUES (DEFAULT, %L, %L, %L, %L, now());',
+														    current_human_id, pr.personid, 6,
+														    'Street parsing failure on: ' ||  pr.address_street
+														);
+									END IF;
+
+
+								ELSE -- malformed ZIP on legacy person, meaning we cannot write a new address
+									EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
+													            logentryid, human_humanid, person_personid, error_code, notes, ts)
+													    VALUES (DEFAULT, %L, %L, %L, %L, now());',
+													    current_human_id, pr.personid, 3, 
+													    'Zip not found in master file: ' || pr.address_zip
+													);
+							END IF; -- end check for legitimate zipcode found on old person address
+					END IF; -- end check for existing address connection between person's parcel and ONE of that parcel's addresses
+
 				-- TODO: deal with ghosts in current person table which are what
 				-- NOVs point to: extract their data and inject into new fixed fields!!
 
