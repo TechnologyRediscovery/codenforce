@@ -155,6 +155,7 @@ $BODY$
 	DECLARE
 	 	extractedstreet TEXT;
 	 	re_matches RECORD;
+	 	validationstring TEXT;
 
 	BEGIN
 		IF addr ILIKE '%PO BOX%'
@@ -180,7 +181,14 @@ $BODY$
 						END IF; -- range check
 				END IF; -- fraction check
 		END IF; -- box box
-		RETURN trim(both from extractedstreet);
+		validationstring := regexp_replace(extractedstreet, '\s+$','');
+		-- check work for null, and empty strings and single spaces
+		IF validationstring IS NOT NULL AND validationstring <> '' AND validationstring <> ' '
+			THEN
+				RETURN validationstring;
+			ELSE
+				RETURN NULL;
+		END IF; --validation
 	END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
@@ -274,7 +282,6 @@ $BODY$
 				deacuser := NULL;
 			END IF;
 
-						
 			-- TRY manual string concatenation method
 
 			EXECUTE 'INSERT INTO public.parcel(
@@ -305,9 +312,6 @@ $BODY$
 					|| ',' 
 	              	|| quote_nullable(pr.lotandblock) 	
 					|| ');';
-	           
-
-		
 
 			EXECUTE format('INSERT INTO public.parcelinfo(
 					            parcelinfoid, parcel_parcelkey, usegroup, constructiontype, countycode, 
@@ -334,16 +338,20 @@ $BODY$
 						);
 
 			-- parse address into street and bldgno 
-			extractedstreet := extractstreet(pr.address);
+			extractedstreet := trim(both from extractstreet(pr.address));
 			-- See if street is in the table already, if so, get its ID
 			
-			SELECT streetid FROM public.mailingstreet WHERE name ILIKE extractedstreet AND citystatezip_cszipid = cityid INTO current_street_id;
+			SELECT streetid INTO current_street_id
+				FROM public.mailingstreet 
+				WHERE name ILIKE '%'||extractedstreet||'%'
+					AND citystatezip_cszipid = cityid; -- only look for existing street matches within the zip of this muni
 			
 			RAISE NOTICE 'PropID: %; Has street % been found? Street ID: %', pr.address, extractedstreet, current_street_id;
 			IF extractedstreet IS NOT NULL
 				THEN
 					IF FOUND
 					THEN -- we have an existing street
+
 						NULL; -- we'll use the current_street_id for all the address writes
 
 					ELSE -- we don't have a record of this street, so write it and grab its ID
@@ -351,14 +359,12 @@ $BODY$
 						EXECUTE format('INSERT INTO public.mailingstreet(
 										            	streetid, name, namevariantsarr, citystatezip_cszipid, notes, 
 		            									pobox)
-										    VALUES (DEFAULT, %L, NULL, %L, ''Migration AUG-2021'', 
+										    VALUES (DEFAULT, %L, NULL, %L, %L, 
 										            NULL);',
-										            		  extractedstreet, cityid);
+										            		  trim(both from extractedstreet), cityid, 'MIGRATION AUG-2021; Raw addr: ' || pr.address );
 						-- fetch fresh street id
 						SELECT currval('mailingstreet_streetid_seq') INTO current_street_id;
 					END IF;
-					
-				
 					
 					-- extract addresses with a - in there somewhere
 					addr_range := substring(pr.address from '\d+\W?-\d+');
@@ -400,10 +406,10 @@ $BODY$
 									            lastupdatedts, lastupdatedby_userid, notes)
 									    VALUES (DEFAULT, %L, %L, NULL, NULL, 
 									            NULL, %L, %L, %L, 
-									            %L, %L, ''Created during parcel migration JUL-21'');',
+									            %L, %L, %L);',
 									                     bldgno, current_street_id,
 							                     defaultsource, now(), creationrobotuser,
-							                    now(), creationrobotuser);
+							                    now(), creationrobotuser, 'MIGRATION AUG-2021; Raw Addr: ' || pr.address);
 						buildingcount := buildingcount + 1;
 
 						-- get our fresh mailing address ID
@@ -782,24 +788,33 @@ $BODY$
 							IF FOUND
 								THEN --we've got a real zip code to attach to our new street
 								RAISE NOTICE 'Fresh human has address with legimite ZIP %', citystatezip_rec.id;
-								street_freshstreetname := extractstreet(pr.address_street);
+								street_freshstreetname := trim(both from extractstreet(pr.address_street));
 								RAISE NOTICE 'Extracted street from fresh address: % ', street_freshstreetname;
-								
+
 								IF street_freshstreetname IS NOT NULL
-									THEN
-										-- Write new street and address records
-										EXECUTE format('
-											INSERT INTO public.mailingstreet(
-										            streetid, name, namevariantsarr, citystatezip_cszipid, notes, 
-										            pobox)
-										    VALUES (DEFAULT, %L, NULL, %L, ''Created during pers-human migration AUG-2021'', 
-									    	        NULL);',
-									    	        street_freshstreetname, citystatezip_rec.id
-						    	        );
+									THEN -- we have successfully extracted a street name
 
-						    	        -- Now get our fresh street ID for writing our building Number
-						    	        SELECT currval('mailingstreet_streetid_seq') INTO street_freshid;
+										SELECT streetid INTO street_freshid 
+											FROM mailingstreet 
+											WHERE citystatezip_cszipid = citystatezip_rec.id
+												AND trim(both from street_freshstreetname) ILIKE '%'|| mailingstreet.name ||'%';
 
+										IF street_freshid IS NULL OR street_freshid = 0
+											THEN -- no existing street with this same zip, so write new street
+
+												-- Write new street and address records	
+												EXECUTE format('
+													INSERT INTO public.mailingstreet(
+												            streetid, name, namevariantsarr, citystatezip_cszipid, notes, 
+												            pobox)
+												    VALUES (DEFAULT, %L, NULL, %L, %L, 
+											    	        NULL);',
+											    	        trim(both from street_freshstreetname), citystatezip_rec.id, 'Migration AUG-2021; Raw addr: '|| pr.address_street
+								    	        );
+
+								    	        -- Now get our fresh street ID for writing our building Number
+								    	        SELECT currval('mailingstreet_streetid_seq') INTO street_freshid;
+						    	        END IF; -- possibly write new street
 						    	        -- with a street PK, we're ready to write to the mailingaddress base table
 						    	        EXECUTE format('
 						    	        	INSERT INTO public.mailingaddress(
@@ -810,10 +825,11 @@ $BODY$
 										    VALUES (DEFAULT, %L, %L, NULL, NULL, 
 										            NULL, %L, now(), %L, 
 										            now(), %L, NULL, NULL, 
-										            ''Created during person-human migration'');',
+										            %L);',
 										            extractbuildingno(pr.address_street), street_freshid,
 										            defaultsource, creationrobotuser,
-										            creationrobotuser
+										            creationrobotuser,
+										            'Migration AUG-2021: Raw addr: ' || pr.address_street
 						    	        	);
 
 						    	        SELECT currval('mailingaddress_addressid_seq') INTO address_freshid;
