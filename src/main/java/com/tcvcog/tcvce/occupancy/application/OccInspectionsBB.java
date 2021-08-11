@@ -1,6 +1,8 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.application.SessionBean;
+import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.InspectionException;
@@ -10,6 +12,7 @@ import com.tcvcog.tcvce.entities.occupancy.*;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,6 +37,8 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
     private OccInspectedSpace selectedInspectedSpace;
 
+    private boolean editMode;
+
     @PostConstruct
     public void initBean() {
         // Initialize list of checklist templates
@@ -46,12 +51,13 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
      * variable checklistTemplates to its value.
      */
     public void initChecklistTemplates() {
-//        OccupancyCoordinator oc = getOccupancyCoordinator();
-//        try {
-//            checklistTemplateList = oc.getOccChecklistTemplateList();
-//        } catch (IntegrationException ex) {
-//            System.out.println("Failed to acquire list of checklist templates:" + ex);
-//        }
+        SessionBean sb = getSessionBean();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            checklistTemplateList = oc.getOccChecklistTemplateList(sb.getSessMuni());
+        } catch (IntegrationException ex) {
+            System.out.println("Failed to acquire list of checklist templates:" + ex);
+        }
     }
 
     /**
@@ -78,10 +84,13 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
         OccPeriodDataHeavy occPeriod = getSessionBean().getSessOccPeriod();
 
-        OccupancyCoordinator oc = getOccupancyCoordinator();
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
         try {
-            OccInspection newInspection = oc.inspectionAction_commenceOccupancyInspection(null, selectedChecklistTemplate, occPeriod, selectedInspector);
+            OccInspection newInspection = oic.inspectionAction_commenceOccupancyInspection(null, selectedChecklistTemplate, occPeriod, selectedInspector);
 
+            if (occPeriod.getInspectionList() == null) {
+                occPeriod.setInspectionList(new ArrayList());
+            }
             occPeriod.getInspectionList().add(newInspection);
             getSessionBean().setSessOccPeriod(occPeriod);
         } catch (InspectionException | IntegrationException ex) {
@@ -190,5 +199,17 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
     public void setSelectedInspectedSpace(OccInspectedSpace selectedInspectedSpace) {
         this.selectedInspectedSpace = selectedInspectedSpace;
+    }
+
+    public boolean isEditMode() {
+        return editMode;
+    }
+
+    public void setEditMode(boolean editMode) {
+        this.editMode = editMode;
+    }
+
+    public void toggleEditMode() {
+        editMode = !editMode;
     }
 }

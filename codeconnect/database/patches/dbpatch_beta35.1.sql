@@ -17,7 +17,7 @@ ALTER TABLE public.occchecklistspacetypeelement
 	ADD COLUMN checklistspacetype_typeid INTEGER 
 	CONSTRAINT occchecklistspacetypeelement_checklistspacetype_typeid_fk REFERENCES public.occchecklistspacetype (checklistspacetypeid);
 
-ALTER TABLE public.occspaceelement DROP COLUMN space_id;
+ALTER TABLE public.occchecklistspacetypeelement DROP COLUMN space_id;
 
 -- replaced with occspacetypeelement
 DROP TABLE public.occspace CASCADE;
