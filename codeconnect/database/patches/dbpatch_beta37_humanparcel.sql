@@ -139,7 +139,7 @@ $BODY$
 				END IF; -- fractions
 		END IF; -- PO boxes
 
-		RETURN trim(both from extractedbldg);
+		RETURN regexp_replace(extractedbldg, '\s+$',''); 
 	END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
@@ -181,7 +181,7 @@ $BODY$
 						END IF; -- range check
 				END IF; -- fraction check
 		END IF; -- box box
-		validationstring := regexp_replace(extractedstreet, '\s+$','');
+		validationstring := regexp_replace(extractedstreet, '\s\u180e\u200B\u200C\u200D\u2060\uFEFF\u00a0+$','');
 		-- check work for null, and empty strings and single spaces
 		IF validationstring IS NOT NULL AND validationstring <> '' AND validationstring <> ' '
 			THEN
@@ -788,8 +788,8 @@ $BODY$
 							IF FOUND
 								THEN --we've got a real zip code to attach to our new street
 								RAISE NOTICE 'Fresh human has address with legimite ZIP %', citystatezip_rec.id;
-								street_freshstreetname := trim(both from extractstreet(pr.address_street));
-								RAISE NOTICE 'Extracted street from fresh address: % ', street_freshstreetname;
+								street_freshstreetname := trim(both from regexp_replace(extractstreet(pr.address_street), '[\s\u180e\u200B\u200C\u200D\u2060\uFEFF\u00a0]+$',''));
+								RAISE NOTICE 'Extracted street from fresh address: %|<-SPACE CHECK', street_freshstreetname;
 
 								IF street_freshstreetname IS NOT NULL
 									THEN -- we have successfully extracted a street name
@@ -797,7 +797,7 @@ $BODY$
 										SELECT streetid INTO street_freshid 
 											FROM mailingstreet 
 											WHERE citystatezip_cszipid = citystatezip_rec.id
-												AND trim(both from street_freshstreetname) ILIKE '%'|| mailingstreet.name ||'%';
+												AND mailingstreet.name ILIKE '%'|| street_freshstreetname || '%';
 
 										IF street_freshid IS NULL OR street_freshid = 0
 											THEN -- no existing street with this same zip, so write new street
@@ -809,7 +809,7 @@ $BODY$
 												            pobox)
 												    VALUES (DEFAULT, %L, NULL, %L, %L, 
 											    	        NULL);',
-											    	        trim(both from street_freshstreetname), citystatezip_rec.id, 'Migration AUG-2021; Raw addr: '|| pr.address_street
+											    	        street_freshstreetname, citystatezip_rec.id, 'Migration AUG-2021; Raw addr: '|| pr.address_street
 								    	        );
 
 								    	        -- Now get our fresh street ID for writing our building Number
@@ -886,4 +886,6 @@ $BODY$
 --IF datepublished IS NULL the patch is still open and receiving changes
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
     VALUES (37, 'database/patches/dbpatch_beta37.sql',NULL, 'ecd', 'Human and Parcel migration');
+
+
 
