@@ -55,7 +55,7 @@ From this page, you can:
 
 6. Scroll down and select 'Create new notice draft'.
 
-![screenshot](img/nov6.png)
+![screenshot](img/novcreatenewnotice.png)
 
 7. The view the NOV, select 'Preview Draft'. This will cause the NOV to open in another browser tab. From here, you can print or save as a PDF.
 
