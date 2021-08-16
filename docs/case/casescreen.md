@@ -124,7 +124,3 @@ If you made a mistake in the type or category, please delete the event and creat
 
 ![screenshot](img/edit.png)
 
-
-
-Authored by EW
-
