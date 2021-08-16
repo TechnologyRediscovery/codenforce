@@ -33,6 +33,45 @@ From this page, you can:
 ![screenshot](img/recordviolation.png)
 
 
+## Prepare a Notice of Violation
+
+1. From the dashboard, select the property case that the NOV is being built from. Select 'View'.
+
+![screenshot](img/nov1.png)
+
+2. Select 'New Notice of Violation'.
+
+![screenshot](img/nov2.png)
+
+3. Choose a Notice of Violation Template. This template has the prefilled text body to create the NOV. Select 'Create Draft'.
+
+![screenshot](img/nov3.png)
+
+4. Confirm Date of Record, choose addressee, and choose notifying officer.
+
+5. Scroll down to review. Prefillled NOV body will display and the code violations will populate. Click remove if any should not be included.
+
+![screenshot](img/nov5.png)
+
+6. Scroll down and select 'Create new notice draft'.
+
+![screenshot](img/nov6.png)
+
+7. The view the NOV, select 'Preview Draft'. This will cause the NOV to open in another browser tab. From here, you can print or save as a PDF.
+
+8. After the NOV has been printed, select 'Finalize and Lock'. After this, the NOV cannot be changed. This is a record of the final mailed copy. 
+
+![screenshot](img/nov7.png)
+
+9. Select 'Record Mailing' (located next to the 'Finalize and Lock' selection).
+
+![screenshot](img/nov8.png)
+
+To Remove the NOV, Reset the mailing status, or Mark the notice as returned, select 'Details' under the Actions column.
+
+![screenshot](img/nov10.png)
+
+
 ## Log an Event
 
 This space allows you to log any type of introduction, communication, interaction, meeting or other event that happened throughout the timeline of the violation. 
