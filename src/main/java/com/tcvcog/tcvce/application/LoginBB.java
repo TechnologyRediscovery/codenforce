@@ -51,7 +51,11 @@ public class LoginBB extends BackingBeanUtils {
         
     }
     
-    
+    /**
+     * Listener for user clicks to the "login to mission control"
+     * button on systemHome.xhtml
+     * @return 
+     */
      public String loginToMissionControl(){
          System.out.println("LoginBB.loginToMissionControl");
          System.out.print("External User: ");

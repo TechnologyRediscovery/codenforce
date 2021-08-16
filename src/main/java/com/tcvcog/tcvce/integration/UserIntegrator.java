@@ -72,7 +72,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         String query =  "   SELECT userid, username, notes, personlink, \n" +
                         "       createdby, createdts, nologinvirtualonly, \n" +
                         "       deactivatedts, deactivated_userid, lastupdatedts, homemuni \n" +
-                        "  FROM public.login WHERE userid = ?;";
+                        "  FROM public.login WHERE userid = ?;";   
         
         PreparedStatement stmt = null;
         

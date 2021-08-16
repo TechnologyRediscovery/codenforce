@@ -5,65 +5,6 @@
 -- *************
 
 
-CREATE SEQUENCE IF NOT EXISTS mailingstate_stateid_seq
-    START WITH 100
-    INCREMENT BY 1
-    MINVALUE 100
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE TABLE public.mailingstate
-(
-	stateid 		INTEGER DEFAULT nextval('mailingstate_stateid_seq') PRIMARY KEY ,
-	statemalecode 	INTEGER,
-	postalabbrev	TEXT NOT NULL,
-	name 			TEXT,
-	namevariantsarr TEXT[]
-
-);
-
-
-
-
-CREATE SEQUENCE IF NOT EXISTS mailingzipcode_zipcodeid_seq
-    START WITH 100
-    INCREMENT BY 1
-    MINVALUE 100
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE TABLE public.mailingzipcode
-(
-	zipcodeid 		INTEGER DEFAULT nextval('mailingzipcode_zipcodeid_seq') PRIMARY KEY ,
-	zipcode  		TEXT NOT NULL,
-	state_stateid 	INTEGER CONSTRAINT mailingzipcode_stateid_fk REFERENCES mailingstate (stateid)
-);
-
-INSERT INTO public.mailingzipcode(zipcodeid, zipcode, state_stateid)
-	VALUES (88, 99999, 100 );
-
-
-CREATE SEQUENCE IF NOT EXISTS mailingcity_cityid_seq
-    START WITH 100
-    INCREMENT BY 1
-    MINVALUE 100
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE TABLE public.mailingcity
-(
-	cityid 	 		INTEGER DEFAULT nextval('mailingcity_cityid_seq') PRIMARY KEY ,
-	name 			TEXT NOT NULL,
-	namevariantsarr TEXT[],
-	zipcode_zipcodeid INTEGER CONSTRAINT mailingcity_zipcodeid_fk REFERENCES mailingzipcode (zipcodeid)
-
-);
-
-
-INSERT INTO public.mailingcity(
-            cityid, name, namevariantsarr, zipcode_zipcodeid)
-    VALUES (9, 'COGCity', NULL, 88);
-
 
 
 
@@ -86,6 +27,9 @@ CREATE TABLE public.mailingstreet
 	
 
 );
+
+ALTER TABLE mailingstreet ADD COLUMN createdts TIMESTAMP WITH TIME ZONE DEFAULT now();
+
 
 
 DROP TABLE public.mailingaddress CASCADE;
@@ -110,10 +54,6 @@ CREATE TABLE mailingaddress
 
     );
 
-
-INSERT INTO public.mailingstate(
-            stateid, statemalecode, postalabbrev, name, namevariantsarr)
-    VALUES (DEFAULT, NULL, 'PA','Pennsylviania', NULL);
 
 
 
@@ -223,9 +163,6 @@ CREATE TABLE public.parcelmigrationlog
 	notes 			TEXT,
 	ts 				TIMESTAMP WITH TIME ZONE NOT NULL
 );
-
-
-ALTER TABLE mailingstreet ADD COLUMN createdts TIMESTAMP WITH TIME ZONE DEFAULT now();
 
 
 CREATE OR REPLACE FUNCTION public.migratepropertytoparcel(creationrobotuser INTEGER,
@@ -518,11 +455,11 @@ ALTER TABLE public.humanmailingaddress ADD COLUMN linkedobjectrole_lorid INTEGER
 
 DROP TABLE humanmailingrole;
 
-CREATE OR REPLACE FUNCTION public.migratepersontohuman(creationrobotuser INTEGER,
-														  defaultsource INTEGER,
-													  	  municodetarget INTEGER,
-													  	  parcel_human_lorid INTEGER,
-													  	  human_mailing_lorid INTEGER)
+CREATE OR REPLACE FUNCTION public.migratepersontohuman(		creationrobotuser INTEGER,
+															defaultsource INTEGER,
+														  	municodetarget INTEGER,
+														  	parcel_human_lorid INTEGER,
+														  	human_mailing_lorid INTEGER)
   	RETURNS integer AS
 
 $BODY$

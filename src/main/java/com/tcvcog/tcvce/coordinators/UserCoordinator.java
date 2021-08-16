@@ -321,7 +321,6 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                 }
             }
             return tempMap;
-            
         }
     
     /**
@@ -669,7 +668,6 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
     public UserAuthorized auth_getPublicUserAuthorized() throws IntegrationException{
-        UserIntegrator ui = getUserIntegrator();
         UserAuthorized ua = null;
         int publicUserID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                     .getString("publicuserid"));
