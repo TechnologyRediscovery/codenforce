@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Adam Gutonski
+ * Copyright (C) 2021 Technology Rediscovery LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,5 +87,11 @@ public class OccSpaceType {
     }
 
 
-    
+    public List<OccSpaceElement> getCodeElementList() {
+        return codeElementList;
+    }
+
+    public void setCodeElementList(List<OccSpaceElement> codeElementList) {
+        this.codeElementList = codeElementList;
+    }
 }

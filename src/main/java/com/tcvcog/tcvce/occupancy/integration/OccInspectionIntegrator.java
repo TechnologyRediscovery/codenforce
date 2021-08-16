@@ -22,25 +22,8 @@ import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.CodeElement;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.CodeSource;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
-import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
-import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
-import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
-import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.occupancy.OccSpace;
-import com.tcvcog.tcvce.entities.occupancy.OccSpaceElement;
-import com.tcvcog.tcvce.entities.occupancy.OccSpaceType;
-import com.tcvcog.tcvce.entities.occupancy.OccSpaceTypeInspectionDirective;
-import com.tcvcog.tcvce.integration.BlobIntegrator;
-import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.integration.UserIntegrator;
+import com.tcvcog.tcvce.entities.occupancy.*;
+import com.tcvcog.tcvce.integration.*;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -50,7 +33,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * The master Inspection integrator for methods 
@@ -119,8 +101,8 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             System.out.println("OccInspectionIntegrator.getInspectedSpace | called with spaceid=0");
             return inspectedSpace;
         }
-        String querySpace = "SELECT inspectedspaceid, occspace_spaceid, occinspection_inspectionid, \n"
-                + "       occlocationdescription_descid, addedtochecklistby_userid, addedtochecklistts \n"
+        String querySpace = "SELECT inspectedspaceid, occinspection_inspectionid, \n"
+                + "       occlocationdescription_descid, addedtochecklistby_userid, addedtochecklistts, occchecklistspacetype_chklstspctypid \n"
                 + "  FROM public.occinspectedspace WHERE inspectedspaceid=?;";
         String queryElements
                 = "SELECT occinspectedspaceelement.inspectedspaceelementid\n"
@@ -143,6 +125,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             }
             stmt = con.prepareStatement(queryElements);
             if (inspectedSpace != null) {
+                System.out.println("inspectedSpace.getInspectedSpaceID(): " + inspectedSpace.getInspectedSpaceID());
                 stmt.setInt(1, inspectedSpace.getInspectedSpaceID());
                 rs = stmt.executeQuery();
                 while (rs.next()) {
@@ -171,10 +154,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         UserIntegrator ui = getUserIntegrator();
         OccChecklistIntegrator oci = getOccChecklistIntegrator();
         
-        OccInspectedSpace inSpace = new OccInspectedSpace((rs.getInt("occspace_spaceid")));
+        OccInspectedSpace inSpace = new OccInspectedSpace();
         inSpace.setInspectedSpaceID(rs.getInt("inspectedspaceid"));
         inSpace.setLocation(getLocationDescriptor(rs.getInt("occlocationdescription_descid")));
-        inSpace.setSpaceType(oci.getOccSpaceType(rs.getInt("")));
+
+        inSpace.setType(oci.getOccSpaceType(rs.getInt("occchecklistspacetype_chklstspctypid")));
+
         inSpace.setAddedToChecklistBy(ui.getUser(rs.getInt("addedtochecklistby_userid")));
         inSpace.setInspectionID(rs.getInt("occinspection_inspectionid"));
         
@@ -188,12 +173,13 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
     public OccInspectedSpaceElement getInspectedSpaceElement(int eleID) throws IntegrationException {
         String query_spaceIDs = "SELECT inspectedspaceelementid, notes, locationdescription_id, lastinspectedby_userid, \n"
-                + "       lastinspectedts, compliancegrantedby_userid, compliancegrantedts, \n"
-                + "       inspectedspace_inspectedspaceid, overriderequiredflagnotinspected_userid, \n"
-                + "       spaceelement_elementid, occinspectedspaceelement.required, failureseverity_intensityclassid, "
-                + "       occspaceelement.codeelement_id, occspaceelement.spaceelementid \n"
-                + "  FROM public.occinspectedspaceelement INNER JOIN public.occspaceelement ON (spaceelement_elementid = spaceelementid)\n"
-                + "  WHERE inspectedspaceelementid=?;";
+                + "lastinspectedts, compliancegrantedby_userid, compliancegrantedts, \n"
+                + "inspectedspace_inspectedspaceid, overriderequiredflagnotinspected_userid, \n"
+                + "occchecklistspacetypeelement_elementid, occinspectedspaceelement.required, failureseverity_intensityclassid, migratetocecaseonfail, occchecklistspacetypeelement.codeelement_id \n"
+                + "FROM public.occinspectedspaceelement INNER JOIN public.occchecklistspacetypeelement ON (occchecklistspacetypeelement_elementid = spaceelementid) \n"
+                + "WHERE inspectedspaceelementid=?;";
+
+        System.out.println("getInspectedSpaceElement grabbing OccInspectedSpaceElement w/ ID: " + eleID);
 
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -234,11 +220,11 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         BlobCoordinator bc = getBlobCoordinator();
 
         OccInspectedSpaceElement inspectedEle
-                = new OccInspectedSpaceElement(ci.getCodeElement(rs.getInt("codeelement_id")), rs.getInt("spaceelementid"));
+                = new OccInspectedSpaceElement(ci.getCodeElement(rs.getInt("codeelement_id")));
 
-        inspectedEle.setInspectedSpaceElementID(rs.getInt("inspectedspaceelementid"));
+        inspectedEle.setInspectedSpaceElementID(rs.getInt("occchecklistspacetypeelement_elementid"));
 
-        inspectedEle.setInspectionnotes(rs.getString("notes"));
+        inspectedEle.setInspectionNotes(rs.getString("notes"));
         inspectedEle.setLocation(getLocationDescriptor(rs.getInt("locationdescription_id")));
         inspectedEle.setLastInspectedBy(ui.getUser(rs.getInt("lastinspectedby_userid")));
 
@@ -255,12 +241,15 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         inspectedEle.setRequired(rs.getBoolean("required"));
         inspectedEle.setFailureIntensityClassID(rs.getInt("failureseverity_intensityclassid"));
 
-        try{
+        inspectedEle.setMigrateToCaseOnFail(rs.getBoolean("migratetocecaseonfail"));
+
+        try {
             List<Integer> idList = bi.photosAttachedToInspectedSpaceElement(inspectedEle.getInspectedSpaceElementID());
             inspectedEle.setBlobList(bc.getBlobLightList(idList));
         } catch(BlobException ex){
             throw new IntegrationException("An error occurred while trying to retrieve blobs for a OccInspectedSpaceElement", ex);
         }
+        System.out.println("Returning element with ID of: " + rs.getInt("occchecklistspacetypeelement_elementid"));
         return inspectedEle;
     }
 
@@ -385,7 +374,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         int insertedInspSpaceID = 0;
         try {
             stmt = con.prepareStatement(sql);
-            stmt.setInt(1, spc.getSpaceID());
+            stmt.setInt(1, spc.getInspectedSpaceID());
             stmt.setInt(2, inspection.getInspectionID());
             if (spc.getLocation() != null) {
                 stmt.setInt(3, spc.getLocation().getLocationID());
@@ -482,7 +471,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             // for each inspected element, build and execute and insert
             stmt = con.prepareStatement(sql);
 
-            stmt.setString(1, inspElement.getInspectionnotes());
+            stmt.setString(1, inspElement.getInspectionNotes());
             int locID;
             if (inSpace.getLocation() != null) {
                 if (inSpace.getLocation().getLocationID() == 0) {
@@ -565,7 +554,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         try {
             stmt = con.prepareStatement(sql);
 
-            stmt.setString(1, inspElement.getInspectionnotes());
+            stmt.setString(1, inspElement.getInspectionNotes());
 
             if (inspElement.getLastInspectedBy() != null) {
                 stmt.setInt(2, inspElement.getLastInspectedBy().getUserID());
@@ -629,7 +618,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, inspSpace.getSpaceID());
+            stmt.setInt(1, inspSpace.getInspectedSpaceID());
             stmt.setInt(2, inspection.getInspectionID());
             stmt.setInt(3, inspSpace.getLocation().getLocationID());
 
@@ -654,12 +643,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         try {
             // first remove inspected space elements
             stmt = con.prepareStatement(sqlDeleteInsSpaceElement);
-            stmt.setInt(1, is.getSpaceID());
+            stmt.setInt(1, is.getInspectedSpaceID());
             stmt.execute();
 
             // then remove the inspected space
             stmt = con.prepareStatement(sqlDeleteInsSpace);
-            stmt.setInt(1, is.getSpaceID());
+            stmt.setInt(1, is.getInspectedSpaceID());
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -690,13 +679,9 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         } // close finally
     }
 
+    public List<Integer> getOccInspectionList(OccPeriod op) throws IntegrationException {
 
- 
-
-
-    public List<OccInspection> getOccInspectionList(OccPeriod op) throws IntegrationException {
-
-        List<OccInspection> inspecList = new ArrayList<>();
+        List<Integer> inspecIDList = new ArrayList<>();
 
         String query = "SELECT inspectionid FROM occinspection WHERE occperiod_periodid=? ";
         Connection con = getPostgresCon();
@@ -710,7 +695,9 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                inspecList.add(getOccInspection(rs.getInt("inspectionid")));
+                inspecIDList.add(rs.getInt("inspectionid"));
+                System.out.println("Found inspection ID: " + rs.getInt("inspectionid"));
+                System.out.println("...with the period ID: " + op.getPeriodID());
             }
 
         } catch (SQLException ex) {
@@ -723,7 +710,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
-        return inspecList;
+        return inspecIDList;
 
     }
 
@@ -766,10 +753,13 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         OccInspection inspection = null;
 
         String query = " SELECT inspectionid, occperiod_periodid, inspector_userid, publicaccesscc, \n"
-                + "       enablepacc, notes, thirdpartyinspector_personid, thirdpartyinspectorapprovalts, \n"
-                + "       thirdpartyinspectorapprovalby, passedinspection_userid, maxoccupantsallowed, \n"
-                + "       numbedrooms, numbathrooms, passedinspectionts, occchecklist_checklistlistid, \n"
-                + "       effectivedate, active, creationts \n"
+                + "       enablepacc, notespreinspection, thirdpartyinspector_personid, thirdpartyinspectorapprovalts, \n"
+                + "       thirdpartyinspectorapprovalby, maxoccupantsallowed, numbedrooms, numbathrooms, \n"
+                + "       occchecklist_checklistlistid, effectivedate, creationts, followupto_inspectionid, \n"
+                + "       deactivatedts, deactivatedby_userid, timestart, timeend, \n"
+                + "       createdby_userid, lastupdatedts, lastupdatedby_userid, determination_detid, \n"
+                + "       determinationby_userid, determinationts, remarks, generalcomments, \n"
+                + "       cause_causeid \n"
                 + "  FROM public.occinspection WHERE inspectionid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -795,7 +785,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
 
-        return oc.configureOccInspection(inspection);
+        return inspection;
     }
 
     private OccInspection generateOccInspection(ResultSet rs) throws IntegrationException, SQLException {
@@ -810,7 +800,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         ins.setPacc(rs.getInt("publicaccesscc"));
 
         ins.setEnablePacc(rs.getBoolean("enablepacc"));
-        ins.setNotes(rs.getString("notes"));
+        ins.setNotesPreInspection(rs.getString("notespreinspection"));
         if (rs.getInt("thirdpartyinspector_personid") != 0) {
             ins.setThirdPartyInspector(pi.getPerson(rs.getInt("thirdpartyinspector_personid")));
         }
@@ -821,26 +811,60 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         if (rs.getInt("thirdpartyinspectorapprovalby") != 0) {
             ins.setThirdPartyApprovalBy(ui.getUser(rs.getInt("thirdpartyinspectorapprovalby")));
         }
-        if (rs.getInt("passedinspection_userid") != 0) {
-            ins.setPassedInspectionCertifiedBy(ui.getUser(rs.getInt("passedinspection_userid")));
-        }
         ins.setMaxOccupantsAllowed(rs.getInt("maxoccupantsallowed"));
-
         ins.setNumBedrooms(rs.getInt("numbedrooms"));
         ins.setNumBathrooms(rs.getInt("numbathrooms"));
+
+
+        // now set the big lists
+        ins.setChecklistTemplate(getOccChecklistIntegrator().getChecklistTemplate(rs.getInt("occchecklist_checklistlistid")));
+        ins.setInspectedSpaceList(getInspectedSpaceList(ins.getInspectionID()));
 
         if (rs.getTimestamp("effectivedate") != null) {
             ins.setEffectiveDateOfRecord(rs.getTimestamp("effectivedate").toLocalDateTime());
         }
-
-        // now set the big lists
-        ins.setChecklistTemplate(occChecklistIntegrator.getChecklistTemplate(rs.getInt("occchecklist_checklistlistid"), this));
-        ins.setInspectedSpaceList(getInspectedSpaceList(ins.getInspectionID()));
-
-        ins.setActive(rs.getBoolean("active"));
-
         if (rs.getTimestamp("creationts") != null) {
             ins.setCreationTS(rs.getTimestamp("creationts").toLocalDateTime());
+        }
+        ins.setFollowUpToInspectionID(rs.getInt("followupto_inspectionid"));
+
+        if (rs.getTimestamp("deactivatedts") != null) {
+            ins.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+        }
+        if (rs.getInt("deactivatedby_userid") != 0) {
+            ins.setDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
+        }
+        if (rs.getTimestamp("timestart") != null) {
+            ins.setTimeStart(rs.getTimestamp("timestart").toLocalDateTime());
+        }
+        if (rs.getTimestamp("timeend") != null) {
+            ins.setTimeEnd(rs.getTimestamp("timeend").toLocalDateTime());
+        }
+
+        if (rs.getInt("createdby_userid") != 0) {
+            ins.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+        }
+        if (rs.getTimestamp("lastupdatedts") != null) {
+            ins.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+        }
+        if (rs.getInt("lastupdatedby_userid") != 0) {
+            ins.setLastUpdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+        }
+        if (rs.getInt("determination_detid") != 0) {
+            ins.setDetermination(getDetermination(rs.getInt("determination_detid")));
+        }
+
+        if (rs.getInt("determinationby_userid") != 0) {
+            ins.setLastUpdatedBy(ui.getUser(rs.getInt("determinationby_userid")));
+        }
+        if (rs.getTimestamp("determinationts") != null) {
+            ins.setDeterminationTS(rs.getTimestamp("determinationts").toLocalDateTime());
+        }
+        ins.setRemarks(rs.getString("remarks"));
+        ins.setGeneralComments(rs.getString("generalcomments"));
+
+        if (rs.getInt("cause_causeid") != 0) {
+            ins.setCause(getCause(rs.getInt("cause_causeid")));
         }
 
         return ins;
@@ -849,11 +873,14 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     public void updateOccInspection(OccInspection occInsp) throws IntegrationException {
         String sql = "UPDATE public.occinspection\n"
                 + "   SET inspector_userid=?, publicaccesscc=?, \n"
-                + "       enablepacc=?, notes=?, thirdpartyinspector_personid=?, thirdpartyinspectorapprovalts=?, \n"
-                + "       thirdpartyinspectorapprovalby=?, passedinspection_userid=?, maxoccupantsallowed=?, \n"
-                + "       numbedrooms=?, numbathrooms=?, passedinspectionts=?, occchecklist_checklistlistid=?, \n"
-                + "       effectivedate=?, active=?\n"
+                + "       enablepacc=?, notespreinspection=?, thirdpartyinspector_personid=?, thirdpartyinspectorapprovalts=?, \n"
+                + "       thirdpartyinspectorapprovalby=?, maxoccupantsallowed=?, numbedrooms=?, numbathrooms=?, \n"
+                + "       occchecklist_checklistlistid=?, effectivedate=?, followupto_inspectionid=?, \n"
+                + "       deactivatedts=?, deactivatedby_userid=?, timestart=?, timeend=?, \n"
+                + "       lastupdatedts=?, lastupdatedby_userid=?, determination_detid=?, determinationby_userid=?, \n"
+                + "       determinationts=?, remarks=?, generalcomments=?, cause_causeid=?\n"
                 + " WHERE inspectionid=?;";
+
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         try {
@@ -862,7 +889,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             stmt.setInt(2, occInsp.getPacc());
 
             stmt.setBoolean(3, occInsp.isEnablePacc());
-            stmt.setString(4, occInsp.getNotes());
+            stmt.setString(4, occInsp.getNotesPreInspection());
             if (occInsp.getThirdPartyInspector() != null) {
                 stmt.setInt(5, occInsp.getThirdPartyInspector().getPersonID());
             } else {
@@ -873,42 +900,88 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
+
             if (occInsp.getThirdPartyApprovalBy() != null) {
                 stmt.setInt(7, occInsp.getThirdPartyApprovalBy().getUserID());
             } else {
                 stmt.setNull(7, java.sql.Types.NULL);
             }
-            if (occInsp.getPassedInspectionCertifiedBy() != null) {
-                stmt.setInt(8, occInsp.getPassedInspectionCertifiedBy().getUserID());
+            stmt.setInt(8, occInsp.getMaxOccupantsAllowed());
+            stmt.setInt(9, occInsp.getNumBedrooms());
+            stmt.setInt(10, occInsp.getNumBathrooms());
+
+            if (occInsp.getChecklistTemplate() != null) {
+                stmt.setInt(11, occInsp.getChecklistTemplate().getInspectionChecklistID());
             } else {
-                stmt.setNull(8, java.sql.Types.NULL);
+                stmt.setNull(11, java.sql.Types.NULL);
             }
-
-            stmt.setInt(9, occInsp.getMaxOccupantsAllowed());
-            stmt.setInt(10, occInsp.getNumBedrooms());
-            stmt.setInt(11, occInsp.getNumBathrooms());
-
-            if (occInsp.getPassedInspectionTS() != null) {
-                stmt.setTimestamp(12, java.sql.Timestamp.valueOf(occInsp.getPassedInspectionTS()));
+            if (occInsp.getEffectiveDateOfRecord() != null) {
+                stmt.setTimestamp(12, java.sql.Timestamp.valueOf(occInsp.getEffectiveDateOfRecord()));
             } else {
                 stmt.setNull(12, java.sql.Types.NULL);
             }
-
-            if (occInsp.getChecklistTemplate() != null) {
-                stmt.setInt(13, occInsp.getChecklistTemplate().getInspectionChecklistID());
+            if (occInsp.getFollowUpToInspectionID() != 0) {
+                stmt.setInt(13, occInsp.getFollowUpToInspectionID());
             } else {
                 stmt.setNull(13, java.sql.Types.NULL);
             }
 
-            if (occInsp.getEffectiveDateOfRecord() != null) {
-                stmt.setTimestamp(14, java.sql.Timestamp.valueOf(occInsp.getEffectiveDateOfRecord()));
+            if (occInsp.getDeactivatedTS() != null) {
+                stmt.setTimestamp(14, java.sql.Timestamp.valueOf(occInsp.getDeactivatedTS()));
             } else {
                 stmt.setNull(14, java.sql.Types.NULL);
             }
+            if (occInsp.getDeactivatedBy() != null) {
+                stmt.setInt(15, occInsp.getDeactivatedBy().getUserID());
+            } else {
+                stmt.setNull(15, java.sql.Types.NULL);
+            }
+            if (occInsp.getTimeStart() != null) {
+                stmt.setTimestamp(16, java.sql.Timestamp.valueOf(occInsp.getTimeStart()));
+            } else {
+                stmt.setNull(16, java.sql.Types.NULL);
+            }
+            if (occInsp.getTimeEnd() != null) {
+                stmt.setTimestamp(17, java.sql.Timestamp.valueOf(occInsp.getTimeEnd()));
+            } else {
+                stmt.setNull(17, java.sql.Types.NULL);
+            }
 
-            stmt.setBoolean(15, occInsp.isActive());
+            if (occInsp.getLastUpdatedTS() != null) {
+                stmt.setTimestamp(20, java.sql.Timestamp.valueOf(occInsp.getLastUpdatedTS()));
+            } else {
+                stmt.setNull(20, java.sql.Types.NULL);
+            }
+            if (occInsp.getLastUpdatedBy() != null) {
+                stmt.setInt(21, occInsp.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(21, java.sql.Types.NULL);
+            }
+            if (occInsp.getDetermination() != null) {
+                stmt.setInt(22, occInsp.getDetermination().getDeterminationID());
+            } else {
+                stmt.setNull(22, java.sql.Types.NULL);
+            }
+            if (occInsp.getDeterminationBy() != null) {
+                stmt.setInt(23, occInsp.getDeterminationBy().getUserID());
+            } else {
+                stmt.setNull(23, java.sql.Types.NULL);
+            }
 
-            stmt.setInt(16, occInsp.getInspectionID());
+            if (occInsp.getDeterminationTS() != null) {
+                stmt.setTimestamp(24, java.sql.Timestamp.valueOf(occInsp.getDeterminationTS()));
+            } else {
+                stmt.setNull(24, java.sql.Types.NULL);
+            }
+            stmt.setString(25, occInsp.getRemarks());
+            stmt.setString(26, occInsp.getGeneralComments());
+            if (occInsp.getCause() != null) {
+                stmt.setInt(27, occInsp.getCause().getCauseID());
+            } else {
+                stmt.setNull(27, java.sql.Types.NULL);
+            }
+
+            stmt.setInt(28, occInsp.getInspectionID());
 
             stmt.executeUpdate();
         } catch (SQLException ex) {
@@ -967,15 +1040,22 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     public OccInspection insertOccInspection(OccInspection occInsp) throws IntegrationException {
         String query = "INSERT INTO public.occinspection(\n"
                 + "            inspectionid, occperiod_periodid, inspector_userid, publicaccesscc, \n"
-                + "            enablepacc, notes, thirdpartyinspector_personid, thirdpartyinspectorapprovalts, \n"
-                + "            thirdpartyinspectorapprovalby, passedinspection_userid, maxoccupantsallowed, \n"
-                + "            numbedrooms, numbathrooms, passedinspectionts, occchecklist_checklistlistid, \n"
-                + "            effectivedate, active, creationts)\n"
+                + "            enablepacc, notespreinspection, thirdpartyinspector_personid, thirdpartyinspectorapprovalts, \n"
+                + "            thirdpartyinspectorapprovalby, maxoccupantsallowed, numbedrooms, numbathrooms, \n"
+                + "            occchecklist_checklistlistid, effectivedate, creationts, followupto_inspectionid, \n"
+                + "            deactivatedts, deactivatedby_userid, timestart, timeend, \n"
+                + "            createdby_userid, lastupdatedts, lastupdatedby_userid, determination_detid, \n"
+                + "            determinationby_userid, determinationts, remarks, generalcomments, \n"
+                + "            cause_causeid)\n"
                 + "    VALUES (DEFAULT, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
-                + "            ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
-                + "            ?, ?, now());";
+                + "            ?, ?, now(), ?, \n"
+                + "            ?, ?, ?, ?, \n"
+                + "            ?, ?, ?, ?, \n"
+                + "            ?, ?, ?, ?, \n"
+                + "            ?);";
+
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -987,7 +1067,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             stmt.setInt(3, occInsp.getPacc());
 
             stmt.setBoolean(4, occInsp.isEnablePacc());
-            stmt.setString(5, occInsp.getNotes());
+            stmt.setString(5, occInsp.getNotesPreInspection());
             if (occInsp.getThirdPartyInspector() != null) {
                 stmt.setInt(6, occInsp.getThirdPartyInspector().getPersonID());
             } else {
@@ -1004,33 +1084,85 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             } else {
                 stmt.setNull(8, java.sql.Types.NULL);
             }
-            if (occInsp.getPassedInspectionCertifiedBy() != null) {
-                stmt.setInt(9, occInsp.getPassedInspectionCertifiedBy().getUserID());
+            stmt.setInt(9, occInsp.getMaxOccupantsAllowed());
+            stmt.setInt(10, occInsp.getNumBedrooms());
+            stmt.setInt(11, occInsp.getNumBathrooms());
+            
+            if (occInsp.getChecklistTemplate() != null) {
+                stmt.setInt(12, occInsp.getChecklistTemplate().getInspectionChecklistID());
             } else {
-                stmt.setNull(9, java.sql.Types.NULL);
+                stmt.setNull(12, java.sql.Types.NULL);
             }
-            stmt.setInt(10, occInsp.getMaxOccupantsAllowed());
-
-            stmt.setInt(11, occInsp.getNumBedrooms());
-            stmt.setInt(12, occInsp.getNumBathrooms());
-            if (occInsp.getPassedInspectionTS() != null) {
-                stmt.setTimestamp(13, java.sql.Timestamp.valueOf(occInsp.getPassedInspectionTS()));
+            if (occInsp.getEffectiveDateOfRecord() != null) {
+                stmt.setTimestamp(13, java.sql.Timestamp.valueOf(occInsp.getEffectiveDateOfRecord()));
             } else {
                 stmt.setNull(13, java.sql.Types.NULL);
             }
-            if (occInsp.getChecklistTemplate() != null) {
-                stmt.setInt(14, occInsp.getChecklistTemplate().getInspectionChecklistID());
+            if (occInsp.getFollowUpToInspectionID() != 0) {
+                stmt.setInt(14, occInsp.getFollowUpToInspectionID());
             } else {
                 stmt.setNull(14, java.sql.Types.NULL);
             }
-
-            if (occInsp.getEffectiveDateOfRecord() != null) {
-                stmt.setTimestamp(15, java.sql.Timestamp.valueOf(occInsp.getEffectiveDateOfRecord()));
+            if (occInsp.getDeactivatedTS() != null) {
+                stmt.setTimestamp(15, java.sql.Timestamp.valueOf(occInsp.getDeactivatedTS()));
             } else {
                 stmt.setNull(15, java.sql.Types.NULL);
             }
+            if (occInsp.getDeactivatedBy() != null) {
+                stmt.setInt(16, occInsp.getDeactivatedBy().getUserID());
+            } else {
+                stmt.setNull(16, java.sql.Types.NULL);
+            }
+            if (occInsp.getTimeStart() != null) {
+                stmt.setTimestamp(17, java.sql.Timestamp.valueOf(occInsp.getTimeStart()));
+            } else {
+                stmt.setNull(17, java.sql.Types.NULL);
+            }
+            if (occInsp.getTimeEnd() != null) {
+                stmt.setTimestamp(18, java.sql.Timestamp.valueOf(occInsp.getTimeEnd()));
+            } else {
+                stmt.setNull(18, java.sql.Types.NULL);
+            }
 
-            stmt.setBoolean(16, occInsp.isActive());
+            if (occInsp.getCreatedBy() != null) {
+                stmt.setInt(19, occInsp.getCreatedBy().getUserID());
+            } else {
+                stmt.setNull(19, java.sql.Types.NULL);
+            }
+            if (occInsp.getLastUpdatedTS() != null) {
+                stmt.setTimestamp(20, java.sql.Timestamp.valueOf(occInsp.getLastUpdatedTS()));
+            } else {
+                stmt.setNull(20, java.sql.Types.NULL);
+            }
+            if (occInsp.getLastUpdatedBy() != null) {
+                stmt.setInt(21, occInsp.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(21, java.sql.Types.NULL);
+            }
+            if (occInsp.getDetermination() != null) {
+                stmt.setInt(22, occInsp.getDetermination().getDeterminationID());
+            } else {
+                stmt.setNull(22, java.sql.Types.NULL);
+            }
+
+            if (occInsp.getDeterminationBy() != null) {
+                stmt.setInt(23, occInsp.getDeterminationBy().getUserID());
+            } else {
+                stmt.setNull(23, java.sql.Types.NULL);
+            }
+            if (occInsp.getDeterminationTS() != null) {
+                stmt.setTimestamp(24, java.sql.Timestamp.valueOf(occInsp.getDeterminationTS()));
+            } else {
+                stmt.setNull(24, java.sql.Types.NULL);
+            }
+            stmt.setString(25, occInsp.getRemarks());
+            stmt.setString(26, occInsp.getGeneralComments());
+
+            if (occInsp.getCause() != null) {
+                stmt.setInt(27, occInsp.getCause().getCauseID());
+            } else {
+                stmt.setNull(27, java.sql.Types.NULL);
+            }
 
             stmt.execute();
             String retrievalQuery = "SELECT currval('occupancyinspectionid_seq');";
@@ -1073,7 +1205,284 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
         } // close finally
     }
-    
 
+    public OccInspectionDetermination getDetermination(int determinationID) throws IntegrationException {
+        OccInspectionDetermination determination = null;
 
+        String query = " SELECT determinationid, title, description, notespreinspection, eventcat_catid, active \n"
+                + "  FROM public.occinspectiondetermination WHERE determinationid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, determinationID);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                determination = generateDetermination(rs);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get OccInspectionDetermination", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return determination;
+    }
+
+    private OccInspectionDetermination generateDetermination(ResultSet rs) throws IntegrationException, SQLException {
+        EventIntegrator ei = new EventIntegrator();
+
+        OccInspectionDetermination det = new OccInspectionDetermination();
+
+        det.setDeterminationID(rs.getInt("determinationid"));
+
+        det.setTitle(rs.getString("title"));
+        det.setDescription(rs.getString("description"));
+
+        det.setNotes(rs.getString("notes"));
+
+        if (rs.getInt("eventcat_catid") != 0) {
+            det.setEventCategory(ei.getEventCategory(rs.getInt("eventcat_catid")));
+        }
+
+        det.setActive(rs.getBoolean("active"));
+
+        return det;
+    }
+
+    public void updateDetermination(OccInspectionDetermination det) throws IntegrationException {
+        String sql = "UPDATE public.occinspectiondetermination\n"
+                + "   SET title=?, description=?, notes=?, eventcat_catid=?, active=? \n"
+                + " WHERE determinationid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(sql);
+            stmt.setString(1, det.getTitle());
+            stmt.setString(2, det.getDescription());
+
+            stmt.setString(3, det.getNotes());
+
+            if (det.getEventCategory() != null) {
+                stmt.setInt(4, det.getEventCategory().getCategoryID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+
+            stmt.setBoolean(5, det.isActive());
+
+            stmt.setInt(6, det.getDeterminationID());
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update occinspectiondetermination record", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        }
+    }
+
+    public void deleteDetermination(OccInspectionDetermination det) throws IntegrationException {
+        String query = "DELETE FROM public.occinspectiondetermination\n" + " WHERE determinationid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, det.getDeterminationID());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot delete occ inspection determination--probably because another" + "part of the database has a reference item.", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+
+        } // close finally
+    }
+
+    public OccInspectionDetermination insertDetermination(OccInspectionDetermination det) throws IntegrationException {
+        String query = "INSERT INTO public.occinspectiondetermination(\n"
+                + "            determinationid, title, description, notes, eventcat_catid, active)\n"
+                + "    VALUES (DEFAULT, ?, ?, ?, ?, ?);";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        int newDeterminationID = 0;
+        try {
+            stmt = con.prepareStatement(query);
+
+            stmt.setString(1, det.getTitle());
+            stmt.setString(2, det.getDescription());
+
+            stmt.setString(3, det.getNotes());
+
+            if (det.getEventCategory() != null) {
+                stmt.setInt(4, det.getEventCategory().getCategoryID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+
+            stmt.setBoolean(5, det.isActive());
+
+            stmt.execute();
+                String retrievalQuery = "SELECT currval('occinspection_determination_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                newDeterminationID = rs.getInt(1);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert OccInspectionDetermination", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        }
+        det.setDeterminationID(newDeterminationID);
+        return det;
+    }
+
+    public OccInspectionCause getCause(int causeID) throws IntegrationException {
+        OccInspectionCause cause = null;
+
+        String query = " SELECT causeid, title, description, notes, active \n"
+                + "  FROM public.occinspectioncause WHERE causeid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, causeID);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                cause = generateCause(rs);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get OccInspectionCause", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return cause;
+    }
+
+    private OccInspectionCause generateCause(ResultSet rs) throws SQLException {
+        OccInspectionCause cause = new OccInspectionCause();
+
+        cause.setCauseID(rs.getInt("causeid"));
+
+        cause.setTitle(rs.getString("title"));
+        cause.setDescription(rs.getString("description"));
+
+        cause.setNotes(rs.getString("notes"));
+
+        cause.setActive(rs.getBoolean("active"));
+
+        return cause;
+    }
+
+    public void updateCause(OccInspectionCause cause) throws IntegrationException {
+        String sql = "UPDATE public.occinspectioncause\n"
+                + "   SET title=?, description=?, notes=?, active=? \n"
+                + " WHERE causeid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(sql);
+            stmt.setString(1, cause.getTitle());
+            stmt.setString(2, cause.getDescription());
+
+            stmt.setString(3, cause.getNotes());
+
+            stmt.setBoolean(4, cause.isActive());
+
+            stmt.setInt(5, cause.getCauseID());
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update occinspectioncause record", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        }
+    }
+
+    public void deleteCause(OccInspectionCause cause) throws IntegrationException {
+        String query = "DELETE FROM public.occinspectioncause\n" + " WHERE causeid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, cause.getCauseID());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot delete occ inspection cause--probably because another" + "part of the database has a reference item.", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+
+        } // close finally
+    }
+
+    public OccInspectionCause insertCause(OccInspectionCause cause) throws IntegrationException {
+        String query = "INSERT INTO public.occinspectioncause(\n"
+                + "            causeid, title, description, notes, active)\n"
+                + "    VALUES (DEFAULT, ?, ?, ?, ?);";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        int newCauseID = 0;
+        try {
+            stmt = con.prepareStatement(query);
+
+            stmt.setString(1, cause.getTitle());
+            stmt.setString(2, cause.getDescription());
+
+            stmt.setString(3, cause.getNotes());
+
+            stmt.setBoolean(4, cause.isActive());
+
+            stmt.execute();
+            String retrievalQuery = "SELECT currval('occinspectioncause_causeid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                newCauseID = rs.getInt(1);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert OccInspectionCause", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        }
+        cause.setCauseID(newCauseID);
+        return cause;
+    }
 }

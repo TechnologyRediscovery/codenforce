@@ -34,7 +34,7 @@ public class OccSpaceTypeInspectionDirective extends OccSpaceType {
     protected boolean overrideSpaceTypeRequired;
     protected boolean overrideSpaceTypeRequiredValue;
     protected boolean overrideSpaceTypeRequireAllSpaces;
-    protected List<OccSpace> spaceList;
+//    protected List<OccSpace> spaceList;
     
      //xiaohong add
     protected boolean selected;
@@ -103,19 +103,19 @@ public class OccSpaceTypeInspectionDirective extends OccSpaceType {
         this.overrideSpaceTypeRequireAllSpaces = overrideSpaceTypeRequireAllSpaces;
     }
 
-    /**
-     * @return the spaceList
-     */
-    public List<OccSpace> getSpaceList() {
-        return spaceList;
-    }
+//    /**
+//     * @return the spaceList
+//     */
+//    public List<OccSpace> getSpaceList() {
+//        return spaceList;
+//    }
 
-    /**
-     * @param spaceList the spaceList to set
-     */
-    public void setSpaceList(List<OccSpace> spaceList) {
-        this.spaceList = spaceList;
-    }
+//    /**
+//     * @param spaceList the spaceList to set
+//     */
+//    public void setSpaceList(List<OccSpace> spaceList) {
+//        this.spaceList = spaceList;
+//    }
 
     @Override
     public int hashCode() {
@@ -123,7 +123,6 @@ public class OccSpaceTypeInspectionDirective extends OccSpaceType {
         hash = 97 * hash + (this.overrideSpaceTypeRequired ? 1 : 0);
         hash = 97 * hash + (this.overrideSpaceTypeRequiredValue ? 1 : 0);
         hash = 97 * hash + (this.overrideSpaceTypeRequireAllSpaces ? 1 : 0);
-        hash = 97 * hash + Objects.hashCode(this.spaceList);
         return hash;
     }
 
@@ -146,9 +145,6 @@ public class OccSpaceTypeInspectionDirective extends OccSpaceType {
             return false;
         }
         if (this.overrideSpaceTypeRequireAllSpaces != other.overrideSpaceTypeRequireAllSpaces) {
-            return false;
-        }
-        if (!Objects.equals(this.spaceList, other.spaceList)) {
             return false;
         }
         return true;

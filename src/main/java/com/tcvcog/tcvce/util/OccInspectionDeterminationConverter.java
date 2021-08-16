@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 ellen bascomb of apt 31y
+ * Copyright (C) 2021 Technology Rediscovery LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,47 +16,43 @@
  */
 package com.tcvcog.tcvce.util;
 
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
-import com.tcvcog.tcvce.entities.occupancy.OccSpaceTypeInspectionDirective;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectionDetermination;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
-/**
- *
- * @author Dominic Pimpinella
- */
-@FacesConverter(value="OccSpaceTypeInspectionDirectiveConverter")
-public class OccSpaceTypeInspectionDirectiveConverter extends EntityConverter implements Converter {
+@FacesConverter(value="occInspectionDeterminationConverter")
+public class OccInspectionDeterminationConverter extends EntityConverter implements Converter {
 
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
-        if (titleS.isEmpty()) {
+        if(titleS.isEmpty()) {
             return null;
         }
-        OccSpaceTypeInspectionDirective o = (OccSpaceTypeInspectionDirective) this.getViewMap(fc).get(titleS);
-        
+        OccInspectionDetermination o = (OccInspectionDetermination) this.getViewMap(fc).get(titleS);
         return o;
     }
 
     @Override
     public String getAsString(FacesContext fc, UIComponent uic, Object o) {
 
-        if (o == null) {
+        if (o == null){
             return "";
         }
 
-        OccSpaceTypeInspectionDirective u = (OccSpaceTypeInspectionDirective) o;
-        String title = u.getSpaceTypeTitle();
-        if (title  != null) {
-            this.getViewMap(fc).put(title , o);
-            return title ;
+        OccInspectionDetermination opt = (OccInspectionDetermination) o;
+        String title = opt.getTitle();
+        if (title != null){
+            this.getViewMap(fc).put(title,o);
+            return title;
 
         } else {
-            return "user converter error";
+            return "OccInspectionDeterminationConverter error";
         }
 
+
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

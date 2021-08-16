@@ -47,7 +47,7 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
      * @return an instance of List, perhaps with checklists
      * @throws IntegrationException 
      */
-    public List<OccChecklistTemplate> getOccChecklistTemplatelist(Municipality muni) throws IntegrationException {
+    public List<OccChecklistTemplate> getOccChecklistTemplateList(Municipality muni) throws IntegrationException {
         List<OccChecklistTemplate> checklistList = new ArrayList<>();
         StringBuilder sb = new StringBuilder(); 
         sb.append("SELECT checklistid FROM public.occchecklist ");
@@ -231,7 +231,7 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
      */
     public OccSpaceType getOccSpaceType(int spaceTypeID) throws IntegrationException {
         OccSpaceType spaceType = null;
-        String query = "SELECT spacetypeid, spacetitle, description, required\n" + "  FROM public.occspacetype WHERE spacetypeid=?;";
+        String query = "SELECT checklistspacetypeid, checklist_id, required, spacetype_typeid, notes\n" + "  FROM public.occchecklistspacetype WHERE checklistspacetypeid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -257,7 +257,9 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
     }
 
     public void updateSpaceType(OccSpaceType spaceType) throws IntegrationException {
-        String query = "UPDATE public.occspacetype\n" + "   SET spacetitle=?, description=?, required=?\n" + " WHERE spacetypeid=?;";
+        String query = "UPDATE public.occchecklistspacetype\n" +
+                "SET checklist_id=?, required=?, spacetype_typeid=?, notes=?\n" +
+                "WHERE spacetypeid=?";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         try {
@@ -280,9 +282,9 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
   
 
     public void insertSpaceType(OccSpaceType spaceType) throws IntegrationException {
-        String query = "INSERT INTO public.occspacetype(\n"
-                + "         spacetypeid, spacetitle, description, required) \n"
-                + "    VALUES (DEFAULT, ?, ?, ?)";
+        String query = "INSERT INTO public.occchecklistspacetype\n" +
+                "(checklist_id, required, spacetype_typeid, notes)"
+                + "    VALUES(DEFAULT, ?, ?, ?)";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -305,15 +307,17 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
 
     private OccSpaceType generateOccSpaceType(ResultSet rs) throws SQLException, IntegrationException {
         OccSpaceType type = new OccSpaceType();
-        type.setSpaceTypeID(rs.getInt("spacetypeid"));
-        type.setSpaceTypeTitle(rs.getString("spacetitle"));
-        type.setSpaceTypeDescription(rs.getString("description"));
+        type.setSpaceTypeID(rs.getInt("checklistspacetypeid"));
+        // no checklist id field yet
         type.setRequired(rs.getBoolean("required"));
+        type.setSpaceTypeID(rs.getInt("spacetype_typeid"));
+        // no notes field yet
+        // also other useless fields are present
         return type;
     }    
     
     public void deleteSpaceType(OccSpaceType spaceType) throws IntegrationException {
-        String query = "DELETE FROM public.occspacetype\n" + " WHERE spacetypeid= ?;";
+        String query = "DELETE FROM public.occchecklistspacetype\n" + " WHERE spacetypeid= ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         try {
@@ -425,7 +429,6 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
         chkList.setMuni(mi.getMuni(rs.getInt("muni_municode")));
         chkList.setActive(rs.getBoolean("active"));
         chkList.setGoverningCodeSource(ci.getCodeSource(rs.getInt("governingcodesource_sourceid")));
-        chkList.setOccSpaceTypeTemplateList(getOccInspecTemplateSpaceTypeList(chkList.getInspectionChecklistID()));
         return chkList;
     }
 
@@ -466,7 +469,7 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
     }
 
     public OccSpaceType getSpaceType(int spacetypeid) throws IntegrationException {
-        String query = "SELECT spacetypeid, spacetitle, description, required\n" + " FROM public.occspacetype WHERE spacetypeid = ?;";
+        String query = "SELECT spacetypeid, spacetitle, description, required\n" + " FROM public.occchecklistspacetype WHERE spacetypeid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -539,7 +542,7 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
  
     public int getLastInsertSpaceTypeid(OccInspectionIntegrator occInspectionIntegrator) {
         int lastInsertSpaceTypeid = 0;
-        String query = "SELECT spacetypeid\n" + "  FROM public.occspacetype\n" + "  ORDER BY spacetypeid DESC\n" + "  LIMIT 1;";
+        String query = "SELECT spacetypeid\n" + "  FROM public.occchecklistspacetype\n" + "  ORDER BY spacetypeid DESC\n" + "  LIMIT 1;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;

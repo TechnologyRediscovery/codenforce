@@ -47,8 +47,8 @@ public class EnforcableCodeElement
         this.ordSubSubSecNum = ele.ordSubSubSecNum;
         this.ordTechnicalText = ele.ordTechnicalText;
         this.ordHumanFriendlyText = ele.ordHumanFriendlyText;
-        this.isActive = ele.isActive;
-        this.useInjectedValues = ele.useInjectedValues;
+        this.active = ele.active;
+        this.usingInjectedValues = ele.usingInjectedValues;
         this.resourceURL = ele.resourceURL;
         this.notes = ele.notes;
         this.legacyID = ele.legacyID;

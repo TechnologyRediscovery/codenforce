@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2018 Turtle Creek Valley
-Council of Governments, PA
+ * Copyright (C) 2021 Technology Rediscovery LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +16,6 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.util;
 
-import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -62,7 +59,4 @@ public class OccPeriodTypeConverter extends EntityConverter implements Converter
         
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-           
-    
-    
 }

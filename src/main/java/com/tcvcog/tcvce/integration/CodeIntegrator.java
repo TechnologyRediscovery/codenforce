@@ -19,7 +19,6 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
-import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import java.io.Serializable;
@@ -38,8 +37,6 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
-import javax.faces.application.FacesMessage;
 
 /**
  *
@@ -397,7 +394,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         e.setOrdTechnicalText(rs.getString("ordtechnicaltext"));
 
         e.setOrdHumanFriendlyText(rs.getString("ordhumanfriendlytext"));
-        e.setUseInjectedValues(rs.getBoolean("useinjectedvalues"));
+        e.setUsingInjectedValues(rs.getBoolean("useinjectedvalues"));
 
         e.setResourceURL(rs.getString("resourceurl"));
 
@@ -521,11 +518,11 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(11, java.sql.Types.NULL);
             }
-            stmt.setString(12, element.getInspectionnotes());
+            stmt.setString(12, element.getNotes());
             stmt.setInt(13, element.getLegacyID());
             
             stmt.setString(14, element.getOrdSubSubSecNum());
-            stmt.setBoolean(15, element.isUseInjectedValues());
+            stmt.setBoolean(15, element.isUsingInjectedValues());
             
             if(element.getCreatedBy() != null){
                 stmt.setInt(16, element.getCreatedBy().getUserID());
@@ -607,10 +604,10 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(11, java.sql.Types.NULL);
             }
-            stmt.setString(12, element.getInspectionnotes());
+            stmt.setString(12, element.getNotes());
             stmt.setInt(13, element.getLegacyID());
             stmt.setString(14, element.getOrdSubSubSecNum());
-            stmt.setBoolean(15, element.isUseInjectedValues());
+            stmt.setBoolean(15, element.isUsingInjectedValues());
                         
             if(element.getLastupdatedBy() != null){
                 stmt.setInt(16, element.getLastupdatedBy().getUserID());

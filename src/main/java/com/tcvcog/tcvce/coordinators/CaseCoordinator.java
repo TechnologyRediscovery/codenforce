@@ -38,13 +38,10 @@ import com.tcvcog.tcvce.entities.search.QueryCEAR;
 import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
-import com.tcvcog.tcvce.entities.search.QueryCodeViolation;
-import com.tcvcog.tcvce.entities.search.QueryCodeViolationEnum;
 import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECaseDateFieldsEnum;
-import com.tcvcog.tcvce.entities.search.SearchParamsCodeViolation;
 import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
@@ -70,10 +67,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import org.primefaces.model.charts.ChartData;
@@ -3028,7 +3022,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         ece.setDefaultViolationDescription(defFindings); 
         MessageBuilderParams mbp = new MessageBuilderParams();
         mbp.setUser(ua);
-        mbp.setExistingContent(ece.getInspectionnotes());
+        mbp.setExistingContent(ece.getNotes());
         
         StringBuilder sb = new StringBuilder();
         sb.append("Default findings changed to: ");
@@ -3037,7 +3031,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         sb.append(ece.getDefaultViolationDescription());
         mbp.setNewMessageContent(sb.toString());
         
-        ece.setInspectionnotes(sc.appendNoteBlock(mbp));
+        ece.setNotes(sc.appendNoteBlock(mbp));
         ci.updateCodeElement(ece);
         
         

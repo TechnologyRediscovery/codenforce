@@ -16,7 +16,6 @@
  */
 package com.tcvcog.tcvce.coordinators;
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -38,14 +37,7 @@ import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -102,7 +94,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      */
     public String user_generateRandomPassword_SECURITYCRITICAL(){
         java.math.BigInteger bigInt = new BigInteger(1024, new Random());
-        String randB64 = Base64.encode(bigInt.toByteArray());
+        String randB64 = Base64.getEncoder().encodeToString(bigInt.toByteArray());
         System.out.println("Randomly generated BigInt: " + randB64);
         StringBuilder sb = new StringBuilder();
         sb.append(randB64.substring(0,3));

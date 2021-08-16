@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2018 Turtle Creek Valley
-Council of Governments, PA
+ * Copyright (C) 2021 Technology Rediscovery LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,53 +16,43 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.util;
 
-import com.tcvcog.tcvce.entities.CourtEntity;
-import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.occupancy.OccSpace;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectionCause;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
-/**
- * Converter to convert between String representations of Municipalities 
- * and object s
- * @author echocharliedelta
- */
-@FacesConverter(value="occSpaceConverter")
-public class OccSpaceConverter extends EntityConverter implements Converter {
-    
-     @Override
+@FacesConverter(value="occInspectionCauseConverter")
+public class OccInspectionCauseConverter extends EntityConverter implements Converter {
+
+    @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
         if(titleS.isEmpty()) {
-            return null; 
+            return null;
         }
-        OccSpace o = (OccSpace) this.getViewMap(fc).get(titleS);
+        OccInspectionCause o = (OccInspectionCause) this.getViewMap(fc).get(titleS);
         return o;
     }
 
     @Override
     public String getAsString(FacesContext fc, UIComponent uic, Object o) {
-        
-        if (o == null){
+
+        if (o == null) {
             return "";
         }
-        
-        OccSpace ost = (OccSpace) o;
-        String title = ost.getName();
+
+        OccInspectionCause opt = (OccInspectionCause) o;
+        String title = opt.getTitle();
         if (title != null){
-            this.getViewMap(fc).put(title, ost);
+            this.getViewMap(fc).put(title,o);
             return title;
-            
+
         } else {
-            return "error convertering space ";
+            return "OccInspectionCauseConverter error";
         }
-        
-        
+
+
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    
-    
 }

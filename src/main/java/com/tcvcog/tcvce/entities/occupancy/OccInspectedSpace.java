@@ -32,14 +32,12 @@ import java.util.*;
  * 
  * @author ellen bascomb of apt 31y, Technology Rediscovery LLC 
  */
-public class OccInspectedSpace 
-        extends OccSpace 
-        implements Serializable, Cloneable, Comparable<OccInspectedSpace>{
+public class OccInspectedSpace
+        implements Serializable, Cloneable, Comparable<OccInspectedSpace> {
 
-    
     private int inspectedSpaceID;
     
-    protected OccSpaceType spaceType;
+    protected OccSpaceType type;
     
     private List<OccInspectedSpaceElement> inspectedElementList;
     private List<OccInspectedSpaceElement> inspectedElementListVisible;
@@ -56,18 +54,28 @@ public class OccInspectedSpace
     //with an inspected space.
     private int inspectionID;
     
-    
-    public OccInspectedSpace(OccSpace spc){
-        this.spaceID = spc.getSpaceID();
-        this.type = spc.getType();
-        this.name = spc.getName();
-        this.required = spc.isRequired();
-        
-        inspectedElementListVisible = new ArrayList<>();
-        viewSetting = ViewOptionsOccChecklistItemsEnum.ALL_ITEMS;
+
+    public OccInspectedSpace() {}
+
+    public OccInspectedSpace(OccInspectedSpace space) {
+        this.inspectedSpaceID = space.getInspectedSpaceID();
+        this.type = space.getType();
+
+        this.inspectedElementList = space.getInspectedElementList();
+        this.inspectedElementListVisible = space.getInspectedElementListVisible();
+        this.viewSetting = space.getViewSetting();
+
+        this.location = space.getLocation();
+
+        this.addedToChecklistBy = space.getAddedToChecklistBy();
+        this.addedToChecklistTS = space.getAddedToChecklistTS();
+
+        this.status = space.getStatus();
+
+        this.inspectionID = getInspectionID();
     }
-    
-    public void configureVisibleElementList(){
+
+    public void configureVisibleElementList() {
         inspectedElementListVisible.clear();
         for(Iterator<OccInspectedSpaceElement> itEle = inspectedElementList.iterator(); itEle.hasNext(); ){
             OccInspectedSpaceElement oise = itEle.next();
@@ -106,22 +114,7 @@ public class OccInspectedSpace
         return locationDescriptorList;
     }
     
-    /**
-     *
-     * @return
-     */
-    @Override
-    public Object clone() {
-        
-        try { 
-            OccInspectedSpace ois = (OccInspectedSpace) super.clone();
-            return ois;
-        } catch (CloneNotSupportedException ex) {
-            return null;
-        }
-    }
-    
-    public List<CodeElement> getInspectedCodeElementsWithoutShell(){
+    public List<CodeElement> getInspectedCodeElementsWithoutShell() {
         List<CodeElement> eleList = new ArrayList<>();
         if(inspectedElementList != null){
             Iterator<OccInspectedSpaceElement> iter = inspectedElementList.iterator();
@@ -165,17 +158,17 @@ public class OccInspectedSpace
     /**
      * @return the spaceType
      */
-    public OccSpaceType getSpaceType() {
+    public OccSpaceType getType() {
         return type;
     }
 
   
 
     /**
-     * @param spaceType the spaceType to set
+     * @param type the spaceType to set
      */
-    public void setSpaceType(OccSpaceType spaceType) {
-        this.type = spaceType;
+    public void setType(OccSpaceType type) {
+        this.type = type;
     }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Adam Gutonski 
+ * Copyright (C) 2021 Technology Rediscovery LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@ package com.tcvcog.tcvce.entities.occupancy;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -40,10 +40,26 @@ import java.util.*;
 public class OccInspection extends BOb implements Comparable<OccInspection> {
     
     private int inspectionID;
+
+    /** ID for inspection that this inspection is a follow up to (if any) **/
+    private int followUpToInspectionID;
+
     private User inspector;
+
+    private User createdBy;
+    private LocalDateTime creationTS;
+
+    private User lastUpdatedBy;
+    private LocalDateTime lastUpdatedTS;
+
+    private User deactivatedBy;
+    private LocalDateTime deactivatedTS;
+
+    private LocalDateTime timeStart;
+    private LocalDateTime timeEnd;
+
+    /** ID for the OccPeriod that this OccInspection is for **/
     private int occPeriodID;
-    
-    private boolean active;
     
     // This template object provides us the raw lists of uninspected
     // space types, from which we extract a list of Spaces and their CodeElements
@@ -58,12 +74,8 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     private boolean enablePacc;
     
     private boolean readyForPassedCertification;
-    private User passedInspectionCertifiedBy;
-    private LocalDateTime passedInspectionTS;
     
     private LocalDateTime effectiveDateOfRecord;
-    
-    private LocalDateTime creationTS;
     
     private int maxOccupantsAllowed;
     private int numBedrooms;
@@ -73,9 +85,19 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     private LocalDateTime thirdPartyInspectorApprovalTS;
     private User thirdPartyApprovalBy;
 
-    private String notes; 
+    private String notesPreInspection;
+
+    private OccInspectionDetermination determination;
+    private User determinationBy;
+    private LocalDateTime determinationTS;
+
+
+    private String remarks;
+    private String generalComments;
+
+    private OccInspectionCause cause;
     
-    public OccInspection(){
+    public OccInspection() {
         inspectedSpaceList = new ArrayList<>();
         inspectedSpaceListVisible = new ArrayList<>();
         viewSetting = ViewOptionsOccChecklistItemsEnum.ALL_ITEMS;
@@ -85,7 +107,7 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
         inspectedSpaceList.add(spc);
     }
     
-    public void configureVisibleSpaceElementList(){
+    public void configureVisibleSpaceElementList() {
         inspectedSpaceListVisible.clear();
         for(Iterator<OccInspectedSpace> it = inspectedSpaceList.iterator(); it.hasNext(); ){
             OccInspectedSpace ois = it.next(); 
@@ -121,7 +143,7 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
 
         return size;
     }
-    
+
     /**
      * @return the inspectionID
      */
@@ -140,15 +162,15 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     /**
      * @return the notes
      */
-    public String getNotes() {
-        return notes;
+    public String getNotesPreInspection() {
+        return notesPreInspection;
     }
 
     /**
-     * @param notes the notes to set
+     * @param notesPreInspection the notes to set
      */
-    public void setNotes(String notes) {
-        this.notes = notes;
+    public void setNotesPreInspection(String notesPreInspection) {
+        this.notesPreInspection = notesPreInspection;
     }
 
     /**
@@ -227,20 +249,6 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
      */
     public void setOccPeriodID(int occPeriodID) {
         this.occPeriodID = occPeriodID;
-    }
-
-    /**
-     * @return the passedInspectionCertifiedBy
-     */
-    public User getPassedInspectionCertifiedBy() {
-        return passedInspectionCertifiedBy;
-    }
-
-    /**
-     * @param passedInspectionCertifiedBy the passedInspectionCertifiedBy to set
-     */
-    public void setPassedInspectionCertifiedBy(User passedInspectionCertifiedBy) {
-        this.passedInspectionCertifiedBy = passedInspectionCertifiedBy;
     }
 
     /**
@@ -335,20 +343,6 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     }
 
     /**
-     * @return the passedInspectionTS
-     */
-    public LocalDateTime getPassedInspectionTS() {
-        return passedInspectionTS;
-    }
-
-    /**
-     * @param passedInspectionTS the passedInspectionTS to set
-     */
-    public void setPassedInspectionTS(LocalDateTime passedInspectionTS) {
-        this.passedInspectionTS = passedInspectionTS;
-    }
-
-    /**
      * @return the effectiveDateOfRecord
      */
     public LocalDateTime getEffectiveDateOfRecord() {
@@ -362,109 +356,21 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
         this.effectiveDateOfRecord = effectiveDateOfRecord;
     }
 
+    // These are generated by intellij--sorry for the format but it does what you expect
+
     @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 53 * hash + this.inspectionID;
-        hash = 53 * hash + Objects.hashCode(this.inspector);
-        hash = 53 * hash + this.occPeriodID;
-        hash = 53 * hash + Objects.hashCode(this.checklistTemplate);
-        hash = 53 * hash + Objects.hashCode(this.inspectedSpaceList);
-        hash = 53 * hash + this.pacc;
-        hash = 53 * hash + (this.enablePacc ? 1 : 0);
-        hash = 53 * hash + Objects.hashCode(this.passedInspectionCertifiedBy);
-        hash = 53 * hash + Objects.hashCode(this.passedInspectionTS);
-        hash = 53 * hash + Objects.hashCode(this.effectiveDateOfRecord);
-        hash = 53 * hash + this.maxOccupantsAllowed;
-        hash = 53 * hash + this.numBedrooms;
-        hash = 53 * hash + this.numBathrooms;
-        hash = 53 * hash + Objects.hashCode(this.thirdPartyInspector);
-        hash = 53 * hash + Objects.hashCode(this.thirdPartyInspectorApprovalTS);
-        hash = 53 * hash + Objects.hashCode(this.thirdPartyApprovalBy);
-        hash = 53 * hash + Objects.hashCode(this.notes);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OccInspection that = (OccInspection) o;
+        return inspectionID == that.inspectionID && followUpToInspectionID == that.followUpToInspectionID && occPeriodID == that.occPeriodID && includeEmptySpaces == that.includeEmptySpaces && pacc == that.pacc && enablePacc == that.enablePacc && readyForPassedCertification == that.readyForPassedCertification && maxOccupantsAllowed == that.maxOccupantsAllowed && numBedrooms == that.numBedrooms && numBathrooms == that.numBathrooms && Objects.equals(inspector, that.inspector) && Objects.equals(createdBy, that.createdBy) && Objects.equals(creationTS, that.creationTS) && Objects.equals(lastUpdatedBy, that.lastUpdatedBy) && Objects.equals(lastUpdatedTS, that.lastUpdatedTS) && Objects.equals(checklistTemplate, that.checklistTemplate) && Objects.equals(inspectedSpaceList, that.inspectedSpaceList) && Objects.equals(inspectedSpaceListVisible, that.inspectedSpaceListVisible) && viewSetting == that.viewSetting && Objects.equals(effectiveDateOfRecord, that.effectiveDateOfRecord) && Objects.equals(thirdPartyInspector, that.thirdPartyInspector) && Objects.equals(thirdPartyInspectorApprovalTS, that.thirdPartyInspectorApprovalTS) && Objects.equals(thirdPartyApprovalBy, that.thirdPartyApprovalBy) && Objects.equals(notesPreInspection, that.notesPreInspection) && Objects.equals(determination, that.determination) && Objects.equals(determinationBy, that.determinationBy) && Objects.equals(determinationTS, that.determinationTS) && Objects.equals(remarks, that.remarks) && Objects.equals(generalComments, that.generalComments) && Objects.equals(cause, that.cause);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final OccInspection other = (OccInspection) obj;
-        if (this.inspectionID != other.inspectionID) {
-            return false;
-        }
-        if (this.occPeriodID != other.occPeriodID) {
-            return false;
-        }
-        if (this.pacc != other.pacc) {
-            return false;
-        }
-        if (this.enablePacc != other.enablePacc) {
-            return false;
-        }
-        if (this.maxOccupantsAllowed != other.maxOccupantsAllowed) {
-            return false;
-        }
-        if (this.numBedrooms != other.numBedrooms) {
-            return false;
-        }
-        if (this.numBathrooms != other.numBathrooms) {
-            return false;
-        }
-        if (!Objects.equals(this.notes, other.notes)) {
-            return false;
-        }
-        if (!Objects.equals(this.inspector, other.inspector)) {
-            return false;
-        }
-        if (!Objects.equals(this.checklistTemplate, other.checklistTemplate)) {
-            return false;
-        }
-        if (!Objects.equals(this.inspectedSpaceList, other.inspectedSpaceList)) {
-            return false;
-        }
-        if (!Objects.equals(this.passedInspectionCertifiedBy, other.passedInspectionCertifiedBy)) {
-            return false;
-        }
-        if (!Objects.equals(this.passedInspectionTS, other.passedInspectionTS)) {
-            return false;
-        }
-        if (!Objects.equals(this.effectiveDateOfRecord, other.effectiveDateOfRecord)) {
-            return false;
-        }
-        if (!Objects.equals(this.thirdPartyInspector, other.thirdPartyInspector)) {
-            return false;
-        }
-        if (!Objects.equals(this.thirdPartyInspectorApprovalTS, other.thirdPartyInspectorApprovalTS)) {
-            return false;
-        }
-        if (!Objects.equals(this.thirdPartyApprovalBy, other.thirdPartyApprovalBy)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(inspectionID, followUpToInspectionID, inspector, createdBy, creationTS, lastUpdatedBy, lastUpdatedTS, occPeriodID, checklistTemplate, inspectedSpaceList, inspectedSpaceListVisible, viewSetting, includeEmptySpaces, pacc, enablePacc, readyForPassedCertification, effectiveDateOfRecord, maxOccupantsAllowed, numBedrooms, numBathrooms, thirdPartyInspector, thirdPartyInspectorApprovalTS, thirdPartyApprovalBy, notesPreInspection, determination, determinationBy, determinationTS, remarks, generalComments, cause);
     }
 
-    /**
-     * @return the active
-     */
-    public boolean isActive() {
-        return active;
-    }
-
-    /**
-     * @param active the active to set
-     */
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-    
     /**
      * Utility method for determining which date to use for comparison.
      * Note that inspections that haven't been approved probably won't have an
@@ -550,7 +456,7 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
      * @param viewSetting the viewSetting to set
      */
     public void setViewSetting(ViewOptionsOccChecklistItemsEnum viewSetting) {
-        
+
         this.viewSetting = viewSetting;
     }
 
@@ -568,5 +474,115 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
         this.includeEmptySpaces = includeEmptySpaces;
     }
 
-    
+    public int getFollowUpToInspectionID() {
+        return followUpToInspectionID;
+    }
+
+    public void setFollowUpToInspectionID(int followUpToInspectionID) {
+        this.followUpToInspectionID = followUpToInspectionID;
+    }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public User getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(User lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    public LocalDateTime getLastUpdatedTS() {
+        return lastUpdatedTS;
+    }
+
+    public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
+        this.lastUpdatedTS = lastUpdatedTS;
+    }
+
+    public User getDeactivatedBy() {
+        return deactivatedBy;
+    }
+
+    public void setDeactivatedBy(User deactivatedBy) {
+        this.deactivatedBy = deactivatedBy;
+    }
+
+    public LocalDateTime getDeactivatedTS() {
+        return deactivatedTS;
+    }
+
+    public void setDeactivatedTS(LocalDateTime deactivatedTS) {
+        this.deactivatedTS = deactivatedTS;
+    }
+
+    public OccInspectionDetermination getDetermination() {
+        return determination;
+    }
+
+    public void setDetermination(OccInspectionDetermination determination) {
+        this.determination = determination;
+    }
+
+    public User getDeterminationBy() {
+        return determinationBy;
+    }
+
+    public void setDeterminationBy(User determinationBy) {
+        this.determinationBy = determinationBy;
+    }
+
+    public LocalDateTime getDeterminationTS() {
+        return determinationTS;
+    }
+
+    public void setDeterminationTS(LocalDateTime determinationTS) {
+        this.determinationTS = determinationTS;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public String getGeneralComments() {
+        return generalComments;
+    }
+
+    public void setGeneralComments(String generalComments) {
+        this.generalComments = generalComments;
+    }
+
+    public OccInspectionCause getCause() {
+        return cause;
+    }
+
+    public void setCause(OccInspectionCause cause) {
+        this.cause = cause;
+    }
+
+    public LocalDateTime getTimeStart() {
+        return timeStart;
+    }
+
+    public void setTimeStart(LocalDateTime timeStart) {
+        this.timeStart = timeStart;
+    }
+
+    public LocalDateTime getTimeEnd() {
+        return timeEnd;
+    }
+
+    public void setTimeEnd(LocalDateTime timeEnd) {
+        this.timeEnd = timeEnd;
+    }
 }

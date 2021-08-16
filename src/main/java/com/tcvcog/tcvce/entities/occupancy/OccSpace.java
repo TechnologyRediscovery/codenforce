@@ -26,6 +26,7 @@ import java.util.List;
  *
  *
  * @author Eric Darsow echocharliedelta@protonmail.com
+ * @deprecated
  */
 public class OccSpace extends BackingBeanUtils implements Serializable {
     

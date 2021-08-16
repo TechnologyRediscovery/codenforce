@@ -23,11 +23,11 @@ import java.time.LocalDateTime;
  *
  * @author ellen bascomb of apt 31y
  */
-public  class       CodeElement 
-        extends     BOb{
+public class CodeElement
+        extends BOb {
     
     protected int elementID;
-    
+
     protected CodeElementGuideEntry guideEntry;
     protected int guideEntryID;
     protected CodeSource source;
@@ -46,8 +46,8 @@ public  class       CodeElement
     protected String ordTechnicalText;
     
     protected String ordHumanFriendlyText;
-    protected boolean isActive;
-    protected boolean useInjectedValues;
+    protected boolean active;
+    protected boolean usingInjectedValues;
     
     protected String resourceURL;
     
@@ -62,11 +62,38 @@ public  class       CodeElement
     protected User lastupdatedBy;
     protected LocalDateTime deactivatedTS;
     protected User deactivatedBy;
-    
 
-    
-    
-    
+    public CodeElement() {}
+
+    public CodeElement(CodeElement codeElement) {
+        this.elementID = codeElement.getElementID();
+        this.guideEntry = codeElement.getGuideEntry();
+        this.guideEntryID = codeElement.getGuideEntryID();
+        this.source = codeElement.getSource();
+        this.ordchapterNo = codeElement.getOrdchapterNo();
+        this.ordchapterTitle = codeElement.getOrdchapterTitle();
+        this.ordSecNum = codeElement.getOrdSecNum();
+        this.ordSecTitle = codeElement.getOrdSecTitle();
+        this.ordSubSecNum = codeElement.getOrdSubSecNum();
+        this.ordSubSecTitle = codeElement.getOrdSubSecTitle();
+        this.ordSubSubSecNum = codeElement.getOrdSubSubSecNum();
+        this.ordTechnicalText = codeElement.getOrdTechnicalText();
+        this.ordHumanFriendlyText = codeElement.getOrdHumanFriendlyText();
+        this.active = codeElement.isActive();
+        this.usingInjectedValues = codeElement.isUsingInjectedValues();
+        this.resourceURL = codeElement.getResourceURL();
+        this.notes = codeElement.getNotes();
+        this.legacyID = codeElement.getLegacyID();
+        this.headerString = codeElement.getHeaderString();
+        this.createdTS = codeElement.getCreatedTS();
+        this.createdBy = codeElement.getCreatedBy();
+        this.lastUpdatedTS = codeElement.getLastUpdatedTS();
+        this.lastupdatedBy = codeElement.getLastupdatedBy();
+        this.deactivatedTS = codeElement.getDeactivatedTS();
+        this.deactivatedBy = codeElement.getDeactivatedBy();
+    }
+
+
     /**
      * @return the createdTS
      */
@@ -286,15 +313,15 @@ public  class       CodeElement
     /**
      * @return the isActive
      */
-    public boolean isIsActive() {
-        return isActive;
+    public boolean isActive() {
+        return active;
     }
 
     /**
      * @param isActive the isActive to set
      */
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
+    public void setActive(boolean isActive) {
+        this.active = isActive;
     }
 
 
@@ -399,28 +426,28 @@ public  class       CodeElement
     /**
      * @return the useInjectedValues
      */
-    public boolean isUseInjectedValues() {
-        return useInjectedValues;
+    public boolean isUsingInjectedValues() {
+        return usingInjectedValues;
     }
 
     /**
-     * @param useInjectedValues the useInjectedValues to set
+     * @param usingInjectedValues the useInjectedValues to set
      */
-    public void setUseInjectedValues(boolean useInjectedValues) {
-        this.useInjectedValues = useInjectedValues;
+    public void setUsingInjectedValues(boolean usingInjectedValues) {
+        this.usingInjectedValues = usingInjectedValues;
     }
 
     /**
      * @return the notes
      */
-    public String getInspectionnotes() {
+    public String getNotes() {
         return notes;
     }
 
     /**
      * @param notes the notes to set
      */
-    public void setInspectionnotes(String notes) {
+    public void setNotes(String notes) {
         this.notes = notes;
     }
 

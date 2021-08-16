@@ -119,20 +119,6 @@ public class OccChecklistTemplate  {
     }
 
     /**
-     * @return the occSpaceTypeTemplateList
-     */
-    public List<OccSpaceTypeInspectionDirective> getOccSpaceTypeTemplateList() {
-        return occSpaceTypeTemplateList;
-    }
-
-    /**
-     * @param occSpaceTypeTemplateList the occSpaceTypeTemplateList to set
-     */
-    public void setOccSpaceTypeTemplateList(List<OccSpaceTypeInspectionDirective> occSpaceTypeTemplateList) {
-        this.occSpaceTypeTemplateList = occSpaceTypeTemplateList;
-    }
-
-    /**
      * @return the inspectionChecklistID
      */
     public int getInspectionChecklistID() {
@@ -169,7 +155,6 @@ public class OccChecklistTemplate  {
         hash = 79 * hash + Objects.hashCode(this.description);
         hash = 79 * hash + (this.active ? 1 : 0);
         hash = 79 * hash + Objects.hashCode(this.governingCodeSource);
-        hash = 79 * hash + Objects.hashCode(this.occSpaceTypeTemplateList);
         return hash;
     }
 
@@ -201,9 +186,6 @@ public class OccChecklistTemplate  {
             return false;
         }
         if (!Objects.equals(this.governingCodeSource, other.governingCodeSource)) {
-            return false;
-        }
-        if (!Objects.equals(this.occSpaceTypeTemplateList, other.occSpaceTypeTemplateList)) {
             return false;
         }
         return true;
