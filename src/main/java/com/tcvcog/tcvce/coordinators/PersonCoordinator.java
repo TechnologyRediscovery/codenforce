@@ -110,6 +110,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param hlh BOB implementing this interface
      * @return The BOB with Humans and their link metatadata already assembled.
      * Note the caller will probably want to cast back to the original type
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public List<HumanLink> assembleLinkedHumanLinks(IFace_humanListHolder hlh) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();

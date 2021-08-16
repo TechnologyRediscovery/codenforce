@@ -375,7 +375,55 @@ ALTER TABLE public.citationviolation
 
 
 ALTER TABLE public.citationviolation RENAME COLUMN linknotes TO notes;
+
+
+ALTER TABLE public.citationstatus ADD COLUMN courtentity_entityid INTEGER
+    CONSTRAINT citationstatus_courtentityid_fk
+    REFERENCES public.courtentity (entityid);
+
+CREATE SEQUENCE IF NOT EXISTS citationdocketno_docketid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE public.citationdocketno
+(
+    docketid              INTEGER PRIMARY KEY,
+    docketno              TEXT NOT NULL,
+    dateofrecord          TIMESTAMP WITH TIME ZONE NOT NULL,
+    courtentity_entityid   INTEGER NOT NULL CONSTRAINT citationdocketno_courtentityid_fk REFERENCES public.courtentity (entityid),
+    createdts               TIMESTAMP WITH TIME ZONE NOT NULL,
+    createdby_userid        INTEGER CONSTRAINT docketno_createdby_userid_fk REFERENCES login (userid),     
+    lastupdatedts           TIMESTAMP WITH TIME ZONE,
+    lastupdatedby_userid    INTEGER CONSTRAINT docketno_lastupdatedby_userid_fk REFERENCES login (userid),
+    deactivatedts           TIMESTAMP WITH TIME ZONE,
+    deactivatedby_userid    INTEGER CONSTRAINT docketno_deactivatedby_userid_fk REFERENCES login (userid),   
+    notes                   TEXT
+);
+
+
+CREATE SEQUENCE IF NOT EXISTS citationdockethuman_linkid_seq
+    START WITH 100
+    INCREMENT BY 1
+    MINVALUE 100
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE public.citationdocketnohuman
+(
+    linkid                  INTEGER PRIMARY KEY DEFAULT nextval('citationdockethuman_linkid_seq'),
+    docketno_docketid       INTEGER NOT NULL CONSTRAINT citationdocketnohuman_docketid_fk REFERENCES public.citationdocketno (docketid),
+    citationhuman_linkid    INTEGER NOT NULL CONSTRAINT citationdocketnohuman_humanlinkid_fk REFERENCES public.citationhuman (linkid),
+    notes                   TEXT
+);
+
+ALTER TABLE citation DROP COLUMN docketno;
+
+
 -- ******** RUN LOCALLY UP TO HERE ******** 
+
 
 
 

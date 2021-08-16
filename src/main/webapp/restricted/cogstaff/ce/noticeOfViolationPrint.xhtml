@@ -24,9 +24,7 @@
                     </p:graphicImage>
                 </div>
                 
-
                 <div class="addressee" style="left: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_left}px; top: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_top}px">
-                    
 
                     <f:subview id="subview-addressee-normaladdress">
                         <h:outputText value="#{noticeOfViolationBB.currentNotice.fixedRecipientName}"/>
@@ -40,7 +38,6 @@
                 </div>
 
                 <div class="nov-letter-text" style="margin-top:#{noticeOfViolationBB.currentNotice.style.nov_text_margin_top}px">
-
 
                     <div class="date-of-record">
                         <h:outputText id="date-of-record-ot" value="#{noticeOfViolationBB.getPrettyDateNoTime(noticeOfViolationBB.currentNotice.dateOfRecord)}" />
@@ -103,6 +100,7 @@
                                     <h:outputText    value="#{v.violatedEnfElement.ordSubSecTitle}" />
 
                                 </h:panelGroup>
+                                
                                 <h:panelGroup>
                                     <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTd" 
                                                     rendered="#{v.includeOrdinanceText}">
@@ -152,7 +150,6 @@
                     </div>
 
                 </div>
-
                
             </div>
         </f:view>

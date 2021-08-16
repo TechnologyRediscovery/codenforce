@@ -50,6 +50,7 @@ import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
+import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
@@ -2289,11 +2290,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return fully-baked citation objects
      * @throws IntegrationException 
      */
-    private List<Citation> citation_getCitationList(CECase cse) throws IntegrationException{
-        CaseIntegrator ci = getCaseIntegrator();
+    private List<Citation> citation_getCitationList(CECase cse) throws IntegrationException, BObStatusException{
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
         List<Citation> citList = new ArrayList<>();
         if(cse!= null){
-            List<Integer> citIDList = ci.getCitations(cse);
+            List<Integer> citIDList = cei.getCitations(cse);
             if(citIDList != null && !citIDList.isEmpty()){
                 for(Integer i: citIDList){
                     citList.add(citation_getCitation(i));
@@ -2310,8 +2311,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return 
      */
     public List<CitationStatus> citation_getCitationStatusList() throws IntegrationException{
-       CaseIntegrator ci = getCaseIntegrator();
-       return ci.getCitationStatusList();
+       CourtEntityIntegrator cei = getCourtEntityIntegrator();
+       return cei.getCitationStatusList();
         
         
     }
@@ -2323,9 +2324,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException
      */
-    public Citation citation_getCitation(int citationID) throws IntegrationException {
-        CaseIntegrator ci = getCaseIntegrator();
-        Citation cit = ci.getCitation(citationID);
+    public Citation citation_getCitation(int citationID) throws IntegrationException, BObStatusException {
+        if(citationID == 0){
+            throw new BObStatusException("Cannot get citation with an ID of 0");
+            
+        }
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        Citation cit = cei.getCitation(citationID);
          
         return citation_configureCitation(cit);
 
@@ -2336,13 +2341,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param cit
      * @return 
      */
-    private Citation citation_configureCitation(Citation cit) throws IntegrationException{
-        CaseIntegrator ci = getCaseIntegrator();
+    private Citation citation_configureCitation(Citation cit) throws IntegrationException, BObStatusException{
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
         PersonCoordinator pc = getPersonCoordinator();
 
-        cit.setViolationList(ci.getCodeViolationsByCitation(cit));
-        cit.setStatusLog(ci.buildCitationStatusLog(cit));
+        cit.setViolationList(cei.getCodeViolationsByCitation(cit));
+        cit.setStatusLog(cei.buildCitationStatusLog(cit));
         cit.setHumanLinkList(pc.assembleLinkedHumanLinks(cit));
+        cit.setDocketNos(cei.getCitationDocketRecords(cit));
         
         // TODO: populate citation with events and blobs--but this can cycle, so be careful
      
@@ -2415,20 +2421,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * sent to the proper magisterial authority
      *
      * @param c
-     * @param cvl
      * @param creator
      * @param issuingOfficer
+     * @return 
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public void citation_insertCitation(    Citation c, 
+    public int citation_insertCitation(    Citation c, 
                                             UserAuthorized creator , 
                                             User issuingOfficer) 
                                     throws  IntegrationException, 
                                             BObStatusException {
-        CaseIntegrator ci = getCaseIntegrator();
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
-        
+        int freshID = 0;
         if(     c == null 
                 || creator == null 
                 || issuingOfficer == null 
@@ -2458,7 +2464,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             c.getViolationList().add(ccvl);
             
         }
-        ci.insertCitation(c);
+        freshID = cei.insertCitation(c);
+        cei.linkViolationsToCitation(cei.getCitation(freshID));
+        return freshID;
+        
     }
     
     /**
@@ -2494,14 +2503,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             throw new BObStatusException("Cannot make a log entry with null citation, log entry, or user authorized");
             
         }
-        CaseIntegrator ci = getCaseIntegrator();
-        
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
         
         csle.setCreatedBy(ua);
         csle.setLastUpdatedBy(ua);
         cit.setLastUpdatedBy(ua);
        
-        return ci.insertCitationStatusLogEntry(cit, csle);
+        return cei.insertCitationStatusLogEntry(cit, csle);
         
     }
     
@@ -2524,10 +2532,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             throw new BObStatusException("Cannot update citation status with null citation, log entry or its status, or user");
         }
         
-        CaseIntegrator ci = getCaseIntegrator();
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
         csle.setLastUpdatedBy(ua);
         
-        ci.updateStatusLogEntry(cit, csle);
+        cei.updateStatusLogEntry(cit, csle);
         
     }
 
@@ -2538,7 +2546,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param ua  doing the deactivating
      */
     public void citation_deactivateCitationStatusLogEntry(CitationStatusLogEntry csle, UserAuthorized ua){
-        
        csle.setDeactivatedBy(ua);
        csle.setLastUpdatedBy(ua);
         
@@ -2554,9 +2561,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public void citation_updateCitation(Citation c) throws IntegrationException, BObStatusException {
-        CaseIntegrator ci = getCaseIntegrator();
+      CourtEntityIntegrator cei = getCourtEntityIntegrator();
         if (c.getStatus() != null) {
-            ci.updateCitation(c);
+            cei.updateCitation(c);
         } else {
             throw new BObStatusException("Cannot update this citation at its current status");
         }
@@ -2571,26 +2578,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public void citation_removeCitation(Citation c, UserAuthorized ua) throws IntegrationException, BObStatusException {
-        CaseIntegrator ci = getCaseIntegrator();
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
         
         if(c != null && ua != null){
             c.setDeactivatedBy(ua);
-            ci.deactivateCitation(c);
+            cei.deactivateCitation(c);
         }
     }
 
-    /**
-     * Logic intermediary for updating citation status only
-     *
-     * @param c
-     * @deprecated  replaced by status log 
-     * @throws IntegrationException
-     */
-    public void citation_updateCitationStatus(Citation c) throws IntegrationException {
-        CaseIntegrator ci = getCaseIntegrator();
-        ci.updateCitation(c);
-
-    }
+   
 
     /**
      * Updates only the notes field on Citation
@@ -2883,11 +2879,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     private CodeViolation violation_configureCodeViolation(CodeViolation cv) throws IntegrationException {
         SystemIntegrator si = getSystemIntegrator();
         CaseIntegrator ci = getCaseIntegrator();
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
         
         // TODO: NADGIT photo stuff
 //        cv.setBlobList(ci.loadViolationPhotoList(cv));
         
-        cv.setCitationIDList(ci.getCitations(cv.getViolationID()));
+        cv.setCitationIDList(cei.getCitationIDsByViolation(cv.getViolationID()));
         cv.setNoticeIDList(ci.novGetNOVIDList(cv));
         
         // nullification overrides all

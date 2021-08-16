@@ -78,6 +78,15 @@ public enum LinkedObjectSchemaEnum {
                             LinkedObjectFamilyEnum.HUMAN
                         ), 
     
+    CITATIONDCKETHUMAN       (
+                            "public.citationdockethuman",
+                            "CitationDocketHuman", 
+                            "linkid", 
+                            "docketno_docketid",
+                            "citationdockethuman_linkid_seq",
+                            LinkedObjectFamilyEnum.HUMAN
+                        ), 
+    
     EVENTHUMAN          (
                             "public.eventhuman",
                             "EventHuman", 

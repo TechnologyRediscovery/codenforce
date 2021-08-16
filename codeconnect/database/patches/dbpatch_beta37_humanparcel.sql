@@ -139,7 +139,7 @@ $BODY$
 				END IF; -- fractions
 		END IF; -- PO boxes
 
-		RETURN regexp_replace(extractedbldg, '\s+$',''); 
+		RETURN unifyspacesandtrim(extractedbldg);
 	END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
@@ -181,7 +181,7 @@ $BODY$
 						END IF; -- range check
 				END IF; -- fraction check
 		END IF; -- box box
-		validationstring := regexp_replace(extractedstreet, '\s\u180e\u200B\u200C\u200D\u2060\uFEFF\u00a0+$','');
+		validationstring := unifyspacesandtrim(extractedstreet);
 		-- check work for null, and empty strings and single spaces
 		IF validationstring IS NOT NULL AND validationstring <> '' AND validationstring <> ' '
 			THEN
@@ -290,7 +290,7 @@ $BODY$
 						            notes, muni_municode, lotandblock)  VALUES ('
 					|| pr.propertyid
 					|| ',' 
-					|| quote_nullable(pr.parid)
+					|| quote_nullable(unifyspacesandtrim(pr.parid))
 					|| ',' 
 					|| quote_nullable(pr.bobsource_sourceid)
 					|| ',' 
@@ -306,7 +306,7 @@ $BODY$
 					|| ',' 
 	                || quote_nullable(deacuser)
 					|| ',' 
-	              	|| quote_nullable(pr.notes)
+	              	|| quote_nullable(unifyspacesandtrim(pr.notes))
 					|| ',' 
 	              	|| pr.municipality_municode
 					|| ',' 
@@ -338,7 +338,7 @@ $BODY$
 						);
 
 			-- parse address into street and bldgno 
-			extractedstreet := trim(both from extractstreet(pr.address));
+			extractedstreet := extractstreet(pr.address);
 			-- See if street is in the table already, if so, get its ID
 			
 			SELECT streetid INTO current_street_id
@@ -361,7 +361,7 @@ $BODY$
 		            									pobox)
 										    VALUES (DEFAULT, %L, NULL, %L, %L, 
 										            NULL);',
-										            		  trim(both from extractedstreet), cityid, 'MIGRATION AUG-2021; Raw addr: ' || pr.address );
+										            		  unifyspacesandtrim(extractedstreet), cityid, 'MIGRATION AUG-2021; Raw addr: ' || pr.address );
 						-- fetch fresh street id
 						SELECT currval('mailingstreet_streetid_seq') INTO current_street_id;
 					END IF;
@@ -407,7 +407,7 @@ $BODY$
 									    VALUES (DEFAULT, %L, %L, NULL, NULL, 
 									            NULL, %L, %L, %L, 
 									            %L, %L, %L);',
-									                     bldgno, current_street_id,
+									                      unifyspacesandtrim(bldgno), current_street_id,
 							                     defaultsource, now(), creationrobotuser,
 							                    now(), creationrobotuser, 'MIGRATION AUG-2021; Raw Addr: ' || pr.address);
 						buildingcount := buildingcount + 1;
@@ -537,6 +537,7 @@ $BODY$
 	 	human_rec_count INTEGER;
 	 	parcel_rec RECORD;
 	 	mailing_rec RECORD;
+	 	zip_parsed TEXT;
 	 	citystatezip_rec RECORD;
 	 	street_freshstreetname TEXT;
 	 	street_freshid INTEGER;
@@ -579,15 +580,15 @@ $BODY$
 				--concat name
 				IF pr.fname IS NOT NULL
 					THEN
-						fullname := trim(both from pr.fname) || ' ' || trim(both from pr.lname); 
+						fullname := unifyspacesandtrim(pr.fname) || ' ' || unifyspacesandtrim(pr.lname); 
 					ELSE 
-						fullname := trim(both from pr.lname);
+						fullname := unifyspacesandtrim(pr.lname);
 				END IF;
 
 				RAISE NOTICE 'FULL name for personid % is %', pr.personid, fullname;
 
 				-- Check for duplicate person in human table
-				SELECT humanid INTO human_dupid FROM human WHERE trim(both from human.name) = trim(both from fullname);
+				SELECT humanid INTO human_dupid FROM human WHERE unifyspacesandtrim(human.name) = fullname;
 
 				RAISE NOTICE 'DUP CHECK: HUMAN_DUPID: % ', human_dupid;
 
@@ -616,10 +617,10 @@ $BODY$
 						            %L, NULL, NULL, NULL, 
 						            now(), %L, now(), %L, 
 						            %L, %L, %L);', 
-					               fresh_human_id, trim(both from fullname), pr.isunder18, pr.jobtitle, pr.multientity,
+					               fresh_human_id, fullname, pr.isunder18, unifyspacesandtrim(pr.jobtitle), pr.multientity,
 					               pr.sourceid, 
 					               pr.creator, pr.creator, 
-					               deacts, deacuser, pr.notes
+					               deacts, deacuser, unifyspacesandtrim(pr.notes)
 
 			            ); 
 
@@ -643,7 +644,7 @@ $BODY$
 											            NULL, NULL, now(), %L, 
 											            now(), %L, NULL, NULL, 
 											            ''Created during person-human migration JUL-2021'');', 
-											            		fresh_human_id, pr.phonecell, 
+											            		fresh_human_id, unifyspacesandtrim(pr.phonecell), 
 											            					creationrobotuser,
 								            					creationrobotuser);
 							ELSE
@@ -664,7 +665,7 @@ $BODY$
 											            NULL, NULL, now(), %L, 
 											            now(), %L, NULL, NULL, 
 											            ''Created during person-human migration JUL-2021'');', 
-											            		fresh_human_id, pr.phonehome, 
+											            		fresh_human_id, unifyspacesandtrim(pr.phonehome), 
 											            					creationrobotuser,
 								            					creationrobotuser);
 							ELSE -- duplicate
@@ -685,7 +686,7 @@ $BODY$
 											            NULL, NULL, now(), %L, 
 											            now(), %L, NULL, NULL, 
 											            ''Created during person-human migration JUL-2021'');', 
-											            		fresh_human_id, pr.phonework, 
+											            		fresh_human_id, unifyspacesandtrim(pr.phonework), 
 											            					creationrobotuser,
 								            					creationrobotuser);
 							ELSE
@@ -705,7 +706,7 @@ $BODY$
 									            now(), %L, NULL, NULL, 
 									            ''Created during person to human migration JUL-2021'');
 												);', 
-							            		fresh_human_id, pr.email, creationrobotuser,
+							            		fresh_human_id, unifyspacesandtrim(pr.email), creationrobotuser,
 				            					creationrobotuser);
 							ELSE
 								--RAISE NOTICE 'EMAIL: NO VALID EMAIL FOUND, SKIPPING';
@@ -782,13 +783,17 @@ $BODY$
 						ELSE 	-- we don't have a mailing address that matches the person record's mailing address, 
 								-- So write a new address and link it to our fresh human
 
-							SELECT id INTO citystatezip_rec
-								FROM mailingcitystatezip WHERE zip_code = pr.address_zip AND list_type_id = 1;
+							zip_parsed := cnf_parsezipcode(pr.address_zip);								
+							SELECT id 
+								FROM mailingcitystatezip 
+								WHERE zip_code = zip_parsed AND list_type_id = 1 
+								INTO citystatezip_rec;
+
 
 							IF FOUND
 								THEN --we've got a real zip code to attach to our new street
-								RAISE NOTICE 'Fresh human has address with legimite ZIP %', citystatezip_rec.id;
-								street_freshstreetname := trim(both from regexp_replace(extractstreet(pr.address_street), '[\s\u180e\u200B\u200C\u200D\u2060\uFEFF\u00a0]+$',''));
+								RAISE NOTICE 'Fresh human has address with legitimite ZIP %', citystatezip_rec.id;
+								street_freshstreetname := extractstreet(pr.address_street);
 								RAISE NOTICE 'Extracted street from fresh address: %|<-SPACE CHECK', street_freshstreetname;
 
 								IF street_freshstreetname IS NOT NULL
@@ -797,7 +802,7 @@ $BODY$
 										SELECT streetid INTO street_freshid 
 											FROM mailingstreet 
 											WHERE citystatezip_cszipid = citystatezip_rec.id
-												AND mailingstreet.name ILIKE '%'|| street_freshstreetname || '%';
+												AND mailingstreet.name ILIKE street_freshstreetname;
 
 										IF street_freshid IS NULL OR street_freshid = 0
 											THEN -- no existing street with this same zip, so write new street
@@ -809,7 +814,7 @@ $BODY$
 												            pobox)
 												    VALUES (DEFAULT, %L, NULL, %L, %L, 
 											    	        NULL);',
-											    	        street_freshstreetname, citystatezip_rec.id, 'Migration AUG-2021; Raw addr: '|| pr.address_street
+											    	        street_freshstreetname, citystatezip_rec.id, 'Migration pers-hum AUG-2021; Raw addr: '|| pr.address_street
 								    	        );
 
 								    	        -- Now get our fresh street ID for writing our building Number
@@ -857,6 +862,7 @@ $BODY$
 
 
 								ELSE -- malformed ZIP on legacy person, meaning we cannot write a new address
+								RAISE NOTICE 'ZIP NOT FOUND: % ', zip_parsed;
 									EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
 													            logentryid, human_humanid, person_personid, error_code, notes, ts)
 													    VALUES (DEFAULT, %L, %L, %L, %L, now());',
@@ -865,9 +871,6 @@ $BODY$
 													);
 							END IF; -- end check for legitimate zipcode found on old person address
 					END IF; -- end check for existing address connection between person's parcel and ONE of that parcel's addresses
-
-				-- TODO: deal with ghosts in current person table which are what
-				-- NOVs point to: extract their data and inject into new fixed fields!!
 
 				RAISE NOTICE 'END PERSON RECORD';
 		END LOOP; -- over legacy person table records
@@ -879,6 +882,98 @@ $BODY$
   COST 100;
 
 
+
+CREATE OR REPLACE FUNCTION public.unifyspacesandtrim(chaostext TEXT)
+  	RETURNS TEXT AS
+
+$BODY$
+
+	BEGIN
+		-- start by replacing all spaces of any kind with latin 0020
+		-- then trim that normal space from the end and beginning
+		RETURN regexp_replace(
+					regexp_replace(
+						regexp_replace(chaostext, '[\s\u180e\u200B\u200C\u200D\u2060\uFEFF\u00a0]',' ','g'), 
+						'\s+$',''),
+						'^\s+','');
+	END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+
+
+CREATE OR REPLACE FUNCTION public.cnf_parsezipcode(zipraw TEXT)
+  	RETURNS TEXT AS
+$BODY$
+  	DECLARE
+  		cleanzip TEXT;
+
+	BEGIN
+		cleanzip := substring(zipraw FROM '(\d{5})');
+		IF cleanzip IS NOT NULL
+			THEN
+				RETURN cleanzip;
+			ELSE
+				RETURN '';
+		END IF;
+	END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+
+
+CREATE OR REPLACE FUNCTION public.cnf_injectstaticnovdata(targetmunicode INTEGER)
+  	RETURNS INTEGER AS
+$BODY$
+  	DECLARE
+  		nov_rec RECORD;
+  		pers_rec RECORD;
+  		fullname TEXT;
+  		fixedname TEXT;
+  		fixedaddr TEXT;
+  		fixedcity TEXT;
+  		fixedstate TEXT;
+  		fixedzip TEXT;
+  		nov_count INTEGER;
+	BEGIN
+		nov_count := 0;
+		FOR nov_rec IN SELECT noticeid, personid_recipient FROM public.noticeofviolation 
+			INNER JOIN public.cecase ON (noticeofviolation.caseid = cecase.caseid)
+			INNER JOIN public.property ON (cecase.property_propertyid = property.propertyid)
+			WHERE municipality_municode = targetmunicode
+
+			LOOP -- over NOVs by MUNI
+				SELECT personid, fname, lname, address_street, address_city, 
+       				address_state, address_zip FROM public.person WHERE personid = nov_rec.personid_recipient INTO pers_rec;
+
+   				RAISE NOTICE 'WRITING FIXED RECIPIENT ID % INTO NOV ID %', nov_rec.personid_recipient, nov_rec.noticeid;
+   				fullname := pers_rec.fname || ' ' || pers_rec.lname;
+
+   				EXECUTE format('UPDATE noticeofviolation SET 
+   					fixedrecipientxferts = now(), 
+   					fixedrecipientname = %L,
+   					fixedrecipientstreet = %L,
+				    fixedrecipientcity = %L,
+				    fixedrecipientstate = %L,
+				    fixedrecipientzip = %L WHERE noticeid = %L;',
+				    fullname,
+				    pers_rec.address_street,
+				    pers_rec.address_city,
+				    pers_rec.address_state,
+				    pers_rec.address_zip,
+				    nov_rec.noticeid);
+   				nov_count := nov_count + 1;
+   				RAISE NOTICE 'UPDATE SUCCESS! Count: % ', nov_count;
+			END LOOP; -- loop over NOVs by MUNI
+		RETURN nov_count;
+	END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
 
 
 

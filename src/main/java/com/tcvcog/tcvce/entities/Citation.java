@@ -27,9 +27,9 @@ import java.util.Objects;
  * 
  * @author ellen bascomb of apt 31y
  */
-public class    Citation 
-        extends TrackedEntity
-        implements IFace_humanListHolder{
+public  class       Citation 
+        extends     TrackedEntity
+        implements  IFace_humanListHolder{
     
     final static String CITATION_TABLE = "citation";
     final static String CITATION_PKFIELD = "citationid";
@@ -49,14 +49,18 @@ public class    Citation
     /**
      * External tracking by magistrate
      */
-    private String docketNo;
+
+    private LocalDateTime dateOfRecord;
+    private List<CitationDocketRecord> docketNos;
+
     protected User filingOfficer;
+    private CitationFilingType filingType;
+    private CourtEntity origin_courtentity;
     
     private List<CitationStatusLogEntry> statusLog;
-    private CourtEntity origin_courtentity;
+    
     private String officialText;
     
-    private LocalDateTime dateOfRecord;
     
     // notice that to avoid cycles, the Citation is allowed to have actual CodeViolation
     // objects in its LinkedList but CodeViolation only gets the citation IDs which
@@ -68,11 +72,8 @@ public class    Citation
     protected LinkedObjectSchemaEnum humanLinkSchemaEnum;
     protected List<HumanLink> humanLinkList;
     
-    
-    
     private String notes;
     
-
     /**
      * @return the citationID
      */
@@ -256,19 +257,7 @@ public class    Citation
         this.officialText = officialText;
     }
 
-    /**
-     * @return the docketNo
-     */
-    public String getDocketNo() {
-        return docketNo;
-    }
-
-    /**
-     * @param docketNo the docketNo to set
-     */
-    public void setDocketNo(String docketNo) {
-        this.docketNo = docketNo;
-    }
+   
 
     /**
      * @return the citationNo
@@ -365,6 +354,34 @@ public class    Citation
      */
     public void setCecaseID(int cecaseID) {
         this.cecaseID = cecaseID;
+    }
+
+    /**
+     * @return the docketNos
+     */
+    public List<CitationDocketRecord> getDocketNos() {
+        return docketNos;
+    }
+
+    /**
+     * @param docketNos the docketNos to set
+     */
+    public void setDocketNos(List<CitationDocketRecord> docketNos) {
+        this.docketNos = docketNos;
+    }
+
+    /**
+     * @return the filingType
+     */
+    public CitationFilingType getFilingType() {
+        return filingType;
+    }
+
+    /**
+     * @param filingType the filingType to set
+     */
+    public void setFilingType(CitationFilingType filingType) {
+        this.filingType = filingType;
     }
 
 }
