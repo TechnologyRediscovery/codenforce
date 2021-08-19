@@ -182,7 +182,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             //We never setpaymentList, let's just grab all the payments
             try {
                 paymentList = pc.getAllPayments();
-            } catch (IntegrationException ex) {
+            } catch (IntegrationException | BObStatusException ex) {
                 paymentList = new ArrayList<>();
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
@@ -433,7 +433,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
      *
      * @return
      */
-    public String getCurrentAddress() {
+    public String getCurrentAddress() throws BObStatusException {
 
         String address = "";
 
@@ -490,7 +490,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         return selectedPayment.getPayer().getHumanID();
     }
 
-    public void setSelectedPaymentPayer(int personID) {
+    public void setSelectedPaymentPayer(int personID) throws BObStatusException {
 
         PersonCoordinator pc = getPersonCoordinator();
 

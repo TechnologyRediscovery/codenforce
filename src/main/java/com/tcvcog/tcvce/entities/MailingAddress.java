@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.entities;
 import java.time.LocalDateTime;
 
 /**
- *
+ * Encapsulates a mailing address
  * @author sylvia
  */
 public  class   MailingAddress 
@@ -31,13 +31,11 @@ public  class   MailingAddress
     
     protected int addressID;
     protected String buildingNo;
-    protected String street;
-    protected String unitNo;
-    protected String city;
-    protected String state;
-    protected String zipCode;
+    protected MailingStreet street;
     protected int poBox;
     protected LocalDateTime verifiedTS;
+    protected User verifiedBy;
+    protected BOBSource verifiedSource;
     protected BOBSource source;
     protected String notes;
     
@@ -56,34 +54,7 @@ public  class   MailingAddress
         return buildingNo;
     }
 
-    /**
-     * @return the unitNo
-     */
-    public String getUnitNo() {
-        return unitNo;
-    }
-
-    /**
-     * @return the city
-     */
-    public String getCity() {
-        return city;
-    }
-
-    /**
-     * @return the state
-     */
-    public String getState() {
-        return state;
-    }
-
-    /**
-     * @return the zipCode
-     */
-    public String getZipCode() {
-        return zipCode;
-    }
-
+   
     /**
      * @return the poBox
      */
@@ -117,34 +88,6 @@ public  class   MailingAddress
      */
     public void setBuildingNo(String buildingNo) {
         this.buildingNo = buildingNo;
-    }
-
-    /**
-     * @param unitNo the unitNo to set
-     */
-    public void setUnitNo(String unitNo) {
-        this.unitNo = unitNo;
-    }
-
-    /**
-     * @param city the city to set
-     */
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    /**
-     * @param state the state to set
-     */
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    /**
-     * @param zipCode the zipCode to set
-     */
-    public void setZipCode(String zipCode) {
-        this.zipCode = zipCode;
     }
 
     /**
@@ -186,20 +129,7 @@ public  class   MailingAddress
         notes = n;
     }
 
-    /**
-     * @return the street
-     */
-    public String getStreet() {
-        return street;
-    }
-
-    /**
-     * @param street the street to set
-     */
-    public void setStreet(String street) {
-        this.street = street;
-    }
-
+  
     @Override
     public String getPKFieldName() {
         return PK_FIELD;
@@ -209,5 +139,48 @@ public  class   MailingAddress
     public String getDBTableName() {
         return TABLE_NAME;
     }
-    
+
+    /**
+     * @return the street
+     */
+    public MailingStreet getStreet() {
+        return street;
+    }
+
+    /**
+     * @param street the street to set
+     */
+    public void setStreet(MailingStreet street) {
+        this.street = street;
+    }
+
+    /**
+     * @return the verifiedBy
+     */
+    public User getVerifiedBy() {
+        return verifiedBy;
+    }
+
+    /**
+     * @param verifiedBy the verifiedBy to set
+     */
+    public void setVerifiedBy(User verifiedBy) {
+        this.verifiedBy = verifiedBy;
+    }
+
+    /**
+     * @return the verifiedSource
+     */
+    public BOBSource getVerifiedSource() {
+        return verifiedSource;
+    }
+
+    /**
+     * @param verifiedSource the verifiedSource to set
+     */
+    public void setVerifiedSource(BOBSource verifiedSource) {
+        this.verifiedSource = verifiedSource;
+    }
+
+   
 }

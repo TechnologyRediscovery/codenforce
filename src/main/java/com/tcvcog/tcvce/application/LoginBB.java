@@ -16,13 +16,10 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.UserAuthorized;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.context.ExternalContext;
 
@@ -45,7 +42,7 @@ public class LoginBB extends BackingBeanUtils {
         UserCoordinator uc = getUserCoordinator();
         try {
             publicUA = uc.auth_getPublicUserAuthorized();
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException  ex) {
             System.out.println(ex);
         }
         

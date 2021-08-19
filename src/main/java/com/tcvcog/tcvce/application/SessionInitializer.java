@@ -130,7 +130,7 @@ public  class       SessionInitializer
             tmpUser = ui.getUser(ui.getUserID(usernameQueuedForSession));
             userAuthorizedQueuedForSession = uc.auth_prepareUserForSessionChoice(tmpUser);
             sb.setSessUser(userAuthorizedQueuedForSession);
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException  ex) {
             System.out.println(ex);
         }
         
@@ -528,7 +528,7 @@ public  class       SessionInitializer
             if(!sessBean.getQueryPropertyList().isEmpty()){
                 sessBean.setQueryProperty(sessBean.getQueryPropertyList().get(0));
             }            
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException |  BObStatusException ex) {
             System.out.println(ex);
             throw new SessionException( "Error setting proerty query list", 
                                         ex, ss, 
@@ -566,7 +566,7 @@ public  class       SessionInitializer
             if(!sb.getQueryPersonList().isEmpty()){
                 sb.setQueryPerson(sb.getQueryPersonList().get(0));
             }
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
     }

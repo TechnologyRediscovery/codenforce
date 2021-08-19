@@ -159,7 +159,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public UserAuthorized auth_prepareUserForSessionChoice(User usr) throws IntegrationException{
+    public UserAuthorized auth_prepareUserForSessionChoice(User usr) throws IntegrationException, BObStatusException{
         UserIntegrator ui = getUserIntegrator();
         
         UserAuthorized ua = ui.getUserAuthorizedNoAuthPeriods(usr);
@@ -253,7 +253,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @param usr
      * @return An assembled list of users for authorization
      */
-    public List<User> user_assembleUserListForSearch(User usr){
+    public List<User> user_assembleUserListForSearch(User usr) throws BObStatusException{
         // we do nothing with muniList
         UserIntegrator ui = getUserIntegrator();
         
@@ -667,7 +667,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @return A UserAuthorized with the lowest possible rank
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public UserAuthorized auth_getPublicUserAuthorized() throws IntegrationException{
+    public UserAuthorized auth_getPublicUserAuthorized() throws IntegrationException, BObStatusException{
         UserAuthorized ua = null;
         int publicUserID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                     .getString("publicuserid"));
@@ -710,7 +710,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public User user_getUserRobot() throws IntegrationException{
+    public User user_getUserRobot() throws IntegrationException, BObStatusException{
         UserIntegrator ui = getUserIntegrator();
         User u;
         u = ui.getUser(Integer.parseInt(
@@ -946,7 +946,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public User user_getUser(int userID) throws IntegrationException{
+    public User user_getUser(int userID) throws IntegrationException, BObStatusException{
         if(userID == 0){
             return null;
         }
@@ -963,7 +963,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      * @throws AuthorizationException 
      */
-    public List<User> user_auth_assembleUserListForConfig(UserAuthorized userRequestor) throws IntegrationException, AuthorizationException{
+    public List<User> user_auth_assembleUserListForConfig(UserAuthorized userRequestor) throws IntegrationException, AuthorizationException, BObStatusException{
         
         UserIntegrator ui = getUserIntegrator();
         List<User> usersForConfig = null;
@@ -1014,7 +1014,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @param m
      * @return 
      */
-    private List<User> user_auth_assembleUserListForConfig(Municipality m, UserAuthorized uq) throws AuthorizationException, IntegrationException{
+    private List<User> user_auth_assembleUserListForConfig(Municipality m, UserAuthorized uq) throws AuthorizationException, IntegrationException, BObStatusException{
         UserIntegrator ui = getUserIntegrator();
         
         List<UserMuniAuthPeriod> umapList;
@@ -1060,7 +1060,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @return 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public List<User> user_assembleUserListComplete(UserAuthorized ua) throws IntegrationException{
+    public List<User> user_assembleUserListComplete(UserAuthorized ua) throws IntegrationException, BObStatusException{
         UserIntegrator ui = getUserIntegrator();
         List<User> ul = new ArrayList<>();
         if(ua.getKeyCard().isHasDeveloperPermissions()){
@@ -1084,7 +1084,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @throws AuthorizationException
      * @throws IntegrationException 
      */
-    public UserAuthorizedForConfig user_transformUserToUserAuthorizedForConfig(User userToConfigure) throws AuthorizationException, IntegrationException{
+    public UserAuthorizedForConfig user_transformUserToUserAuthorizedForConfig(User userToConfigure) throws AuthorizationException, IntegrationException, BObStatusException{
         UserAuthorizedForConfig uafc = null;
         UserIntegrator ui = getUserIntegrator();
         if(userToConfigure != null){

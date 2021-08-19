@@ -34,7 +34,7 @@ public  class       PropertyDataHeavy
         implements  IFace_CredentialSigned,
                     IFace_humanListHolder{
     
-    protected LinkedObjectSchemaEnum humanLinkSchemaEnum;
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUIM = LinkedObjectSchemaEnum.CECASEHUMAN;
     protected List<HumanLink> humanLinkList;
     
     
@@ -244,13 +244,8 @@ public  class       PropertyDataHeavy
     }
 
     @Override
-    public LinkedObjectSchemaEnum getLinkSchema() {
-        return humanLinkSchemaEnum;
-    }
-
-    @Override
-    public void setLinkSchema(LinkedObjectSchemaEnum lhse) {
-        humanLinkSchemaEnum = lhse;
+    public LinkedObjectSchemaEnum getHUMAN_LINK_SCHEMA_ENUM() {
+        return HUMAN_LINK_SCHEMA_ENUIM;
     }
 
     

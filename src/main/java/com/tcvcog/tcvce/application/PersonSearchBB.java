@@ -113,7 +113,7 @@ public class PersonSearchBB extends BackingBeanUtils{
                 currentPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessUser().getPerson(),
                             cred);
             }
-       } catch (IntegrationException ex){
+       } catch (IntegrationException | BObStatusException ex){
            System.out.println(ex);
        }
        
@@ -203,7 +203,7 @@ public class PersonSearchBB extends BackingBeanUtils{
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + pl.size() + " results", ""));
             
-        } catch (SearchException | IntegrationException ex) {
+        } catch (SearchException | IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -241,7 +241,7 @@ public class PersonSearchBB extends BackingBeanUtils{
             getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(p, getSessionBean().getSessUser().getMyCredential()));
             currentPerson = pc.assemblePersonDataHeavy(p, getSessionBean().getSessUser().getKeyCard());
             si.logObjectView_OverwriteDate(getSessionBean().getSessUser(), p);
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -326,7 +326,7 @@ public class PersonSearchBB extends BackingBeanUtils{
             currentPerson = pc.assemblePersonDataHeavy(
                     pc.personInit(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni()),
                     getSessionBean().getSessUser().getKeyCard());
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
     }
@@ -357,7 +357,7 @@ public class PersonSearchBB extends BackingBeanUtils{
                                 "Successfully added " + currentPerson.getFirstName() + " to the Database!", ""));
                }
                sc.logObjectView(getSessionBean().getSessUser(), currentPerson);
-           } catch (IntegrationException ex) {
+           } catch (IntegrationException | BObStatusException ex) {
                System.out.println(ex.toString());
                   getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -370,7 +370,7 @@ public class PersonSearchBB extends BackingBeanUtils{
         PersonCoordinator pc = getPersonCoordinator();
         try {
             currentPerson = pc.assemblePersonDataHeavy(currentPerson, getSessionBean().getSessUser().getKeyCard());
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
     }

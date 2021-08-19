@@ -28,10 +28,10 @@ public class        PropertyUnitDataHeavy
         extends     PropertyUnit
         implements  IFace_CredentialSigned,
                     IFace_humanListHolder{
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.PARCELUNITHUMAN;
 
     private List<OccPeriod> periodList;
     
-    protected LinkedObjectSchemaEnum humanLinkSchemaEnum;
     protected List<HumanLink> humanLinkList;
      
     
@@ -117,14 +117,10 @@ public class        PropertyUnitDataHeavy
     }
 
     @Override
-    public LinkedObjectSchemaEnum getLinkSchema() {
-        return humanLinkSchemaEnum;
+    public LinkedObjectSchemaEnum getHUMAN_LINK_SCHEMA_ENUM() {
+        return HUMAN_LINK_SCHEMA_ENUM;
     }
 
-    @Override
-    public void setLinkSchema(LinkedObjectSchemaEnum lhse) {
-        humanLinkSchemaEnum = lhse;
-    }
 
     @Override
     public int getHostPK() {

@@ -126,7 +126,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         } // close finally
     }
 
-    public List<CEActionRequest> getCEActionRequestByControlCode(int controlCode) throws IntegrationException {
+    public List<CEActionRequest> getCEActionRequestByControlCode(int controlCode) throws IntegrationException, BObStatusException {
         List<CEActionRequest> requestList = new ArrayList<>();
         String q = "SELECT requestid, requestpubliccc, muni_municode, \n"
                 + "	property_propertyid, issuetype_issuetypeid, actrequestor_requestorid, submittedtimestamp, \n"
@@ -250,7 +250,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
     }
 
-    private CEActionRequest generateActionRequestFromRS(ResultSet rs) throws SQLException, IntegrationException {
+    private CEActionRequest generateActionRequestFromRS(ResultSet rs) throws SQLException, IntegrationException, BObStatusException {
 
         // create the action request object
         CEActionRequest actionRequest = new CEActionRequest();
@@ -349,7 +349,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         } // close finally
     }
 
-    public CEActionRequest getActionRequestByRequestID(int requestID) throws IntegrationException {
+    public CEActionRequest getActionRequestByRequestID(int requestID) throws IntegrationException, BObStatusException {
         CEActionRequest newActionRequest = null;
         StringBuilder sb = new StringBuilder();
 

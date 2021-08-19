@@ -91,7 +91,7 @@ public  class       Person
     public String getAddressStreet(){
         MailingAddress ma = getPrimaryMailingAddress();
         if(ma != null){
-            return ma.buildingNo + " " + ma.street;
+            return ma.buildingNo + " " + ma.getStreet();
         }
         return "";
     }
@@ -104,7 +104,7 @@ public  class       Person
     public String getAddressCity(){
         MailingAddress ma = getPrimaryMailingAddress();
         if(ma != null){
-            return ma.city;
+            return ma.street.getCityStateZip().getCity();
         }
         return "";
     }
@@ -117,7 +117,7 @@ public  class       Person
     public String getAddressState(){
         MailingAddress ma = getPrimaryMailingAddress();
         if(ma != null){
-            return ma.state;
+            return ma.street.getCityStateZip().getState();
         }
         return "";
     }
@@ -130,7 +130,7 @@ public  class       Person
     public String getAddressZip(){
         MailingAddress ma = getPrimaryMailingAddress();
         if(ma != null){
-            return ma.zipCode;
+            return ma.street.getCityStateZip().getZipCode();
         }
         return "";
     }

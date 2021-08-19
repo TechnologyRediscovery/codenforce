@@ -134,7 +134,7 @@ public class UserConfigBB extends BackingBeanUtils{
             } else {
                 System.out.println("UserConfigBB.initBean: FATAL init error; null userconfig");
             }
-        } catch (IntegrationException | AuthorizationException ex) {
+        } catch (IntegrationException | AuthorizationException | BObStatusException ex) {
             System.out.println(ex);
         }
         
@@ -232,7 +232,7 @@ public class UserConfigBB extends BackingBeanUtils{
                 getSessionBean().setUserForConfig(userAuthorizedInConfig);
                 userSelected = true;
                 System.out.println("UserConfigBB.onObjectViewButtonChange: Assmbled user for config for " + userAuthorizedInConfig.getUsername());
-            } catch (AuthorizationException | IntegrationException ex) {
+            } catch (AuthorizationException | IntegrationException | BObStatusException ex) {
             
             }
         }
@@ -248,7 +248,8 @@ public class UserConfigBB extends BackingBeanUtils{
         UserCoordinator uc = getUserCoordinator();
         try {
             userListForConfig = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
-        } catch (IntegrationException | AuthorizationException ex) {
+        } catch (IntegrationException | AuthorizationException | BObStatusException ex) {
+            System.out.println(ex);
               getFacesContext().addMessage(null, 
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     "FATAL: Unable to load user list from database; Apologies", ""));
@@ -266,7 +267,7 @@ public class UserConfigBB extends BackingBeanUtils{
         UserCoordinator uc = getUserCoordinator();
         try {
             userAuthorizedInConfig = uc.user_transformUserToUserAuthorizedForConfig(uc.user_getUserSkeleton(getSessionBean().getSessUser()));
-        } catch (IntegrationException | AuthorizationException ex) {
+        } catch (IntegrationException | AuthorizationException | BObStatusException ex) {
             System.out.println(ex);
         }
         System.out.println("UserConfigBB.createNewUser");
@@ -296,7 +297,7 @@ public class UserConfigBB extends BackingBeanUtils{
               getFacesContext().addMessage(null, 
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                     "Complete user list loaded!", ""));
-        } catch (IntegrationException | AuthorizationException ex) {
+        } catch (IntegrationException | AuthorizationException | BObStatusException ex) {
             System.out.println(ex);  
             getFacesContext().addMessage(null, 
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -354,7 +355,7 @@ public class UserConfigBB extends BackingBeanUtils{
              try {
                  Person p = pc.getPerson(pc.getHuman(personIDToLink));
                  userAuthorizedInConfig.setPerson(p);
-             } catch (IntegrationException ex) {
+             } catch (IntegrationException | BObStatusException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -378,7 +379,7 @@ public class UserConfigBB extends BackingBeanUtils{
 
                 }
 
-            } catch (IntegrationException ex) {
+            } catch (IntegrationException | BObStatusException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -415,7 +416,7 @@ public class UserConfigBB extends BackingBeanUtils{
                             "Successfully udpated user", ""));
             getSessionBean().setUserForConfig(uc.user_transformUserToUserAuthorizedForConfig( userAuthorizedInConfig));
             reloadCurrentUser();
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -689,7 +690,7 @@ public class UserConfigBB extends BackingBeanUtils{
             getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_INFO,
                                "Reloaded current user: " + userAuthorizedInConfig.getUsername(), ""));
-        } catch (AuthorizationException | IntegrationException ex) {
+        } catch (AuthorizationException | IntegrationException | BObStatusException ex) {
             
          getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

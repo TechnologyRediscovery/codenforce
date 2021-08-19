@@ -60,7 +60,7 @@ public class PersonInfoBB extends BackingBeanUtils{
            try {
                currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(),
                        getSessionBean().getSessUser().getKeyCard());
-           } catch (IntegrationException ex) {
+           } catch (IntegrationException | BObStatusException ex) {
                System.out.println(ex);
            }
              getSessionBean().setSessPerson(currPerson);

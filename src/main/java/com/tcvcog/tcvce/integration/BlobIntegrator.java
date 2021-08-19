@@ -48,6 +48,8 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -162,7 +164,11 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
 //        blob.setBlobMetadata(generateBlobMetadata(rs));
         blob.setTitle(rs.getString("title"));
-        blob.setCreatedBy(uc.user_getUser(rs.getInt("createdby_userid")));
+        try {
+            blob.setCreatedBy(uc.user_getUser(rs.getInt("createdby_userid")));
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
         blob.setFilename(rs.getString("filename"));
         
         Timestamp time = rs.getTimestamp("createdts");

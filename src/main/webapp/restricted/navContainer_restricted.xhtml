@@ -319,7 +319,7 @@
                                                                         value="change"
                                                                         oncomplete="PF('activebob-perslist-overlay-var').show();" />
                                                         
-                                                        <p:commandLink  id="activebob-perslist-cb"
+                                                        <p:commandLink  id="activebob-perslist-search-cb"
                                                                         value="search"
                                                                         oncomplete="PF('search-persons-dialog-var').show();" />
                                                     </div>
@@ -912,7 +912,6 @@
                                                            value="execute selected query" 
                                                            disabled="#{personSearchBB.querySelected.queryExecuted}"
                                                            update="pers-search-messages-form
-                                                           pers-search-results-form
                                                            @form
                                                            log-form"/>
                                         

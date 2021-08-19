@@ -207,7 +207,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         UserCoordinator uc = getUserCoordinator();
         try {
             notifyingOfficerCandidateList = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
-        } catch (AuthorizationException | IntegrationException ex) {
+        } catch (AuthorizationException | IntegrationException | BObStatusException ex) {
             System.out.println(ex );
         } 
         
@@ -836,7 +836,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                 System.out.println("NoticeOfViolationBB.checkNOVRecipient | looked up person: " + getRetrievedManualLookupPerson());
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Search complete", ""));
-            } catch (IntegrationException ex) {
+            } catch (IntegrationException | BObStatusException  ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_WARN,

@@ -34,6 +34,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -169,18 +171,18 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
             }
         }
         
-        managerInspectorCandidateList = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
-        itemFilterOptions = Arrays.asList(ViewOptionsOccChecklistItemsEnum.values());
-        inspectedElementAddValueCandidateList = Arrays.asList(OccInspectionStatusEnum.values());
-        
         try {
+            managerInspectorCandidateList = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
+            itemFilterOptions = Arrays.asList(ViewOptionsOccChecklistItemsEnum.values());
+            inspectedElementAddValueCandidateList = Arrays.asList(OccInspectionStatusEnum.values());
+
             inspectionTemplateCandidateList = oii.getChecklistTemplateList(getSessionBean().getSessMuni());
             reportConfigOccInspec =
                     oc.getOccInspectionReportConfigDefault(
                             currentInspection,
                             currentOccPeriod,
                             getSessionBean().getSessUser());
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
         
@@ -291,7 +293,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                                 spc,
                                 selectedInspectedElementAddValue,
                                 null);
-                    } catch (IntegrationException ex) {
+                    } catch (IntegrationException | BObStatusException  ex) {
                         System.out.println(ex);
                     }
                 }
@@ -356,7 +358,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Reloaded inspection ID " + currentInspection.getInspectionID(), ""));
             }
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -401,7 +403,7 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
         getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Space added to checklist!", ""));
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -562,10 +564,14 @@ public class OccInspectionBB extends BackingBeanUtils implements Serializable {
     public String reports_generateOccPermit(OccPermit permit){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         currentOccPermit = permit;
-        reportConfigOccPermit = oc.getOccPermitReportConfigDefault( currentOccPermit, 
-                                                                    currentOccPeriod, 
-                                                                    currentPropertyUnit, 
-                                                                    getSessionBean().getSessUser());
+        try {
+            reportConfigOccPermit = oc.getOccPermitReportConfigDefault( currentOccPermit,
+                    currentOccPeriod,
+                    currentPropertyUnit,
+                    getSessionBean().getSessUser());
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+        }
         getSessionBean().setReportConfigOccPermit(reportConfigOccPermit);
         
         return "occPermit";

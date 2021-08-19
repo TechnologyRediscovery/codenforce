@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
@@ -40,7 +41,8 @@ public class linkBlobBB extends BackingBeanUtils implements Serializable{
         try{
             cc.violation_getCodeViolation(codeViolationID);
             System.out.println("linkBlobBB.linkBlobToCodeViolation | retrieved code violation");  //TESTING
-        }catch(IntegrationException e){
+        }catch(IntegrationException | BObStatusException ex){
+            System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR
                             ,"Unable to find Code Violation with that ID. " , ""));

@@ -18,8 +18,6 @@ package com.tcvcog.tcvce.entities;
 
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * The root object of the humanization system that replaces person records
@@ -34,7 +32,6 @@ public  class   Human
         static final String TABLE_NAME = "public.human";
         static final String PKFIELD = "humanid";
         
-    
         protected int humanID;
         protected String name;
         protected LocalDate dob;

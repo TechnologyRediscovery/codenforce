@@ -82,6 +82,8 @@ import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * King of all business logic implementation for the entire Occupancy object
@@ -134,7 +136,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public OccPeriodPropertyUnitHeavy getOccPeriodPropertyUnitHeavy(int periodid) throws IntegrationException {
         PropertyCoordinator pc = getPropertyCoordinator();
         OccPeriodPropertyUnitHeavy oppu = new OccPeriodPropertyUnitHeavy(getOccPeriod(periodid));
-        oppu.setPropUnitProp(pc.getPropertyUnitWithProp(oppu.getPropertyUnitID()));
+        try {
+            oppu.setPropUnitProp(pc.getPropertyUnitWithProp(oppu.getPropertyUnitID()));
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
         return oppu;
     }
     
@@ -508,7 +514,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public ReportConfigOccPermit getOccPermitReportConfigDefault(OccPermit permit,
             OccPeriod period,
             PropertyUnit propUnit,
-            User u) {
+            User u) throws BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         ReportConfigOccPermit rpt = new ReportConfigOccPermit();
         rpt.setTitle(getResourceBundle(Constants.MESSAGE_TEXT).getString("report_occpermit_default_title"));
@@ -741,7 +747,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             OccSpace spc,
             OccInspectionStatusEnum initialStatus,
             OccLocationDescriptor loc)
-            throws IntegrationException {
+            throws IntegrationException, BObStatusException {
         OccInspectionIntegrator inspecInt = getOccInspectionIntegrator();
 
         // Feed the given OccSpace to the constructor of the InspectedSpace
@@ -1292,14 +1298,24 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public void deleteChecklistElement(OccSpace os, int elementid) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
-        CodeElement ce = ci.getCodeElement(elementid);
+        CodeElement ce;
+        try {
+            ce = ci.getCodeElement(elementid);
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
         oii.detachCodeElementFromSpace(os, ce);
     }
     
     public void createChecklistElement(OccSpace os, int elementid) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
-        CodeElement ce = ci.getCodeElement(elementid);
+        CodeElement ce;
+        try {
+            ce = ci.getCodeElement(elementid);
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
         oii.attachCodeElementToSpace(os, ce);
     }
     

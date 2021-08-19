@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -166,7 +168,11 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
      */
     public CodeElement getCodeElement(int eleid) throws IntegrationException{
         CodeIntegrator ci = getCodeIntegrator();
-        return ci.getCodeElement(eleid);
+        try {
+            return ci.getCodeElement(eleid);
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
     }
     
     
@@ -181,7 +187,11 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
             return new ArrayList<>();
         }
         CodeIntegrator ci = getCodeIntegrator();
-        return ci.getCodeElements(src.getSourceID());
+        try {
+            return ci.getCodeElements(src.getSourceID());
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
     }
     
     
@@ -339,7 +349,11 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
     public Map<Municipality, CodeSet> getMuniCodeSetDefaultMap() throws IntegrationException{
         CodeIntegrator ci = getCodeIntegrator();
         
-        return ci.getMuniDefaultCodeSetMap();
+        try {
+            return ci.getMuniDefaultCodeSetMap();
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
         
         
     }
@@ -352,7 +366,12 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
      */
     public List<CodeSet> getCodeSetListComplete() throws IntegrationException{
         CodeIntegrator ci = getCodeIntegrator();
-        List<CodeSet> setList = ci.getCodeSets();
+        List<CodeSet> setList;
+        try {
+            setList = ci.getCodeSets();
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
         return setList;
         
     }
@@ -369,7 +388,7 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
         
         try {
             return integrator.getCodeSets(muniCode);
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex.toString());
         }
         
@@ -472,7 +491,11 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
      */
     public EnforcableCodeElement getEnforcableCodeElement(int eceID) throws IntegrationException{
         CodeIntegrator ci = getCodeIntegrator();
-        return ci.getEnforcableCodeElement(eceID);
+        try {
+            return ci.getEnforcableCodeElement(eceID);
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
         
     }
     
@@ -489,7 +512,7 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
         
         try {
             return integrator.getEnforcableCodeElementList(setID);
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex.toString());
         }
      

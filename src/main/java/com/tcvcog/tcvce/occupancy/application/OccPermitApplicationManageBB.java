@@ -126,7 +126,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
         try {
             PropertyCoordinator pc = getPropertyCoordinator();
             propertyForApplication = pc.getPropertyByPropUnitID(selectedApplication.getApplicationPropertyUnit().getUnitID());
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println("OccPermitManageBB.initBean() | ERROR: " + ex);
         } catch (NullPointerException ex) {
             //do nothing, this is just to check if anything is null in the method call above
@@ -793,7 +793,8 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
             getSessionBean().getNavStack().pushCurrentPage();
 
         return "unitsChanges";
-        } catch(IntegrationException ex){
+        } catch(IntegrationException | BObStatusException ex){
+            System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Something when wrong while trying to redirect you to unit changes!", ""));

@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
@@ -50,7 +51,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-    public FeeAssigned getFeeAssigned(int feeID, EventDomainEnum selectedDomain) throws IntegrationException {
+    public FeeAssigned getFeeAssigned(int feeID, EventDomainEnum selectedDomain) throws IntegrationException, BObStatusException {
 
         String query = "";
         FeeAssigned skeleton = new FeeAssigned();
@@ -122,7 +123,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return skeleton;
     }
 
-    public List<MoneyOccPeriodFeeAssigned> getFeeAssigned(OccPeriod period) throws IntegrationException {
+    public List<MoneyOccPeriodFeeAssigned> getFeeAssigned(OccPeriod period) throws IntegrationException, BObStatusException {
 
         List<MoneyOccPeriodFeeAssigned> assignedFees = new ArrayList<>();
 
@@ -168,7 +169,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return assignedFees;
     }
 
-    public List<MoneyCECaseFeeAssigned> getFeeAssigned(CECase cse) throws IntegrationException {
+    public List<MoneyCECaseFeeAssigned> getFeeAssigned(CECase cse) throws IntegrationException, BObStatusException {
 
         List<MoneyCECaseFeeAssigned> assignedFees = new ArrayList<>();
 
@@ -634,7 +635,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-    public FeeAssigned generateFeeAssigned(ResultSet rs) throws IntegrationException {
+    public FeeAssigned generateFeeAssigned(ResultSet rs) throws IntegrationException, BObStatusException {
 
         UserIntegrator ui = getUserIntegrator();
 
@@ -659,7 +660,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-    public MoneyOccPeriodFeeAssigned generateOccPeriodFeeAssigned(ResultSet rs) throws IntegrationException {
+    public MoneyOccPeriodFeeAssigned generateOccPeriodFeeAssigned(ResultSet rs) throws IntegrationException, BObStatusException {
 
         UserIntegrator ui = getUserIntegrator();
 
@@ -683,7 +684,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-    public MoneyCECaseFeeAssigned generateCECaseFeeAssigned(ResultSet rs) throws IntegrationException {
+    public MoneyCECaseFeeAssigned generateCECaseFeeAssigned(ResultSet rs) throws IntegrationException, BObStatusException {
 
         UserIntegrator ui = getUserIntegrator();
 
@@ -801,7 +802,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
      * @return
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public Payment getPayment(int paymentID) throws IntegrationException {
+    public Payment getPayment(int paymentID) throws IntegrationException, BObStatusException {
 
         String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
                 + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"
@@ -856,7 +857,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
      * @return
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public List<Payment> getPaymentList(OccPeriod period) throws IntegrationException {
+    public List<Payment> getPaymentList(OccPeriod period) throws IntegrationException, BObStatusException {
 
         String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
                 + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, moneypayment.notes,\n"
@@ -904,7 +905,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return paymentList;
     }
 
-    public List<Payment> getPaymentList(MoneyOccPeriodFeeAssigned fee) throws IntegrationException {
+    public List<Payment> getPaymentList(MoneyOccPeriodFeeAssigned fee) throws IntegrationException, BObStatusException {
 
         String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
                 + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, moneypayment.notes,\n"
@@ -964,7 +965,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
      * @return
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public List<Payment> getPaymentList(CECase cse) throws IntegrationException {
+    public List<Payment> getPaymentList(CECase cse) throws IntegrationException, BObStatusException {
 
         String query = "SELECT paymentid, paymenttype_typeid, datereceived, datedeposited, \n"
                 + "amount, payer_personid, referencenum, checkno, cleared,\n"
@@ -1012,7 +1013,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return paymentList;
     }
 
-    public List<Payment> getPaymentList(MoneyCECaseFeeAssigned fee) throws IntegrationException {
+    public List<Payment> getPaymentList(MoneyCECaseFeeAssigned fee) throws IntegrationException, BObStatusException {
 
         String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
                 + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, moneypayment.notes,\n"
@@ -1062,7 +1063,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return paymentList;
     }
 
-    public ArrayList<Payment> getPaymentList() throws IntegrationException {
+    public ArrayList<Payment> getPaymentList() throws IntegrationException, BObStatusException {
         String query = "SELECT paymentid, paymenttype_typeid, datereceived, \n"
                 + "       datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"
                 + "recordedby_userid, entrytimestamp\n"
@@ -1108,7 +1109,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return paymentList;
     }
 
-    public Payment getMostRecentPayment() throws IntegrationException {
+    public Payment getMostRecentPayment() throws IntegrationException, BObStatusException {
         String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
                 + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"
                 + "recordedby_userid, entrytimestamp\n"
@@ -1611,7 +1612,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } // close finally
     }
 
-    private Payment generatePayment(ResultSet rs, EventDomainEnum domain) throws IntegrationException {
+    private Payment generatePayment(ResultSet rs, EventDomainEnum domain) throws IntegrationException, BObStatusException {
         Payment newPayment = new Payment();
 
         PersonIntegrator pi = getPersonIntegrator();

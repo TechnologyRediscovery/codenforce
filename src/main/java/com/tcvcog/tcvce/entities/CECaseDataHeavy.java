@@ -28,10 +28,11 @@ public class CECaseDataHeavy
         IFace_humanListHolder{
 
     // accessed through methods specified in the interfaces
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CECASEHUMAN;
+
     private Property property;
     private PropertyUnit propertyUnit;
     
-    protected LinkedObjectSchemaEnum humanLinkSchemaEnum;
     protected List<HumanLink> humanLinkList;
     
     private List<Proposal> proposalList;
@@ -398,14 +399,11 @@ public class CECaseDataHeavy
     }
 
     @Override
-    public LinkedObjectSchemaEnum getLinkSchema() {
-        return humanLinkSchemaEnum;
+    public LinkedObjectSchemaEnum getHUMAN_LINK_SCHEMA_ENUM() {
+        return HUMAN_LINK_SCHEMA_ENUM;
     }
 
-    @Override
-    public void setLinkSchema(LinkedObjectSchemaEnum lhse) {
-        humanLinkSchemaEnum = lhse;
-    }
+    
 
     @Override
     public int getHostPK() {

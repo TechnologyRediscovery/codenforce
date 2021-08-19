@@ -100,7 +100,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      *
      * @throws IntegrationException
      */
-    private void setPublicUser() throws IntegrationException {
+    private void setPublicUser() throws IntegrationException, BObStatusException {
         if (publicUser == null) {
             UserCoordinator uc = getUserCoordinator();
             publicUser = uc.auth_getPublicUserAuthorized();
@@ -874,7 +874,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      * @param input
      * @return
      */
-    public Payment export(PublicInfoBundlePayment input) {
+    public Payment export(PublicInfoBundlePayment input) throws BObStatusException {
 
         PaymentIntegrator pi = getPaymentIntegrator();
 
@@ -904,7 +904,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      * @return
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public FeeAssigned export(PublicInfoBundleFeeAssigned input) throws IntegrationException {
+    public FeeAssigned export(PublicInfoBundleFeeAssigned input) 
+            throws IntegrationException, BObStatusException {
 
         PaymentIntegrator pi = getPaymentIntegrator();
 
@@ -987,7 +988,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      * @return
      *
      */
-    public OccInspection export(PublicInfoBundleOccInspection input) throws IntegrationException {
+    public OccInspection export(PublicInfoBundleOccInspection input) throws IntegrationException, BObStatusException {
 
         OccInspectionIntegrator oi = getOccInspectionIntegrator();
         OccInspection unbundled = input.getBundledInspection();
@@ -1090,7 +1091,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
      * @return
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public CodeViolation export(PublicInfoBundleCodeViolation input) throws IntegrationException {
+    public CodeViolation export(PublicInfoBundleCodeViolation input) throws IntegrationException, BObStatusException {
 
         CaseCoordinator cc = getCaseCoordinator();
         CodeViolation exportable = cc.violation_getCodeViolation(input.getBundledViolation().getViolationID());

@@ -44,6 +44,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -117,47 +119,51 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      */
     private EventCnF generateEventFromRS(ResultSet rs) throws SQLException, IntegrationException {
          
-        PersonCoordinator pc = getPersonCoordinator();
-        UserCoordinator uc = getUserCoordinator();
-        
-        EventCnF ev = new EventCnF();
-
-        ev.setEventID(rs.getInt("eventid"));
-        ev.setCategory(getEventCategory(rs.getInt("category_catid")));
-        ev.setDescription(rs.getString("eventDescription"));
-
-        // these values will be used by the configure method to set the domain
-        ev.setCeCaseID(rs.getInt("cecase_caseid"));
-        ev.setOccPeriodID(rs.getInt("occperiod_periodid"));
-
-        if (rs.getTimestamp("timestart") != null) {
-            LocalDateTime dt = rs.getTimestamp("timestart").toInstant()
-                    .atZone(ZoneId.systemDefault()).toLocalDateTime();
-            ev.setTimeStart(dt);
+        try {
+            PersonCoordinator pc = getPersonCoordinator();
+            UserCoordinator uc = getUserCoordinator();
+            
+            EventCnF ev = new EventCnF();
+            
+            ev.setEventID(rs.getInt("eventid"));
+            ev.setCategory(getEventCategory(rs.getInt("category_catid")));
+            ev.setDescription(rs.getString("eventDescription"));
+            
+            // these values will be used by the configure method to set the domain
+            ev.setCeCaseID(rs.getInt("cecase_caseid"));
+            ev.setOccPeriodID(rs.getInt("occperiod_periodid"));
+            
+            if (rs.getTimestamp("timestart") != null) {
+                LocalDateTime dt = rs.getTimestamp("timestart").toInstant()
+                        .atZone(ZoneId.systemDefault()).toLocalDateTime();
+                ev.setTimeStart(dt);
+            }
+            
+            if (rs.getTimestamp("timeend") != null) {
+                LocalDateTime dt = rs.getTimestamp("timeend").toInstant()
+                        .atZone(ZoneId.systemDefault()).toLocalDateTime();
+                ev.setTimeEnd(dt);
+            }
+            
+            ev.setUserCreator(uc.user_getUser(rs.getInt("creator_userid")));
+            if(rs.getTimestamp("creationts") != null){
+                ev.setCreationts(rs.getTimestamp("creationts").toInstant()
+                        .atZone(ZoneId.systemDefault()).toLocalDateTime());
+            }
+            
+            ev.setLastUpdatedBy(uc.user_getUser(rs.getInt("lastupdatedby_userid")));
+            if(rs.getTimestamp("lastupdatedts") != null){
+                ev.setCreationts(rs.getTimestamp("lastupdatedts").toInstant()
+                        .atZone(ZoneId.systemDefault()).toLocalDateTime());
+            }
+            
+            ev.setActive(rs.getBoolean("active"));
+            ev.setNotes(rs.getString("notes"));
+            
+            return ev;
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
         }
-        
-        if (rs.getTimestamp("timeend") != null) {
-            LocalDateTime dt = rs.getTimestamp("timeend").toInstant()
-                    .atZone(ZoneId.systemDefault()).toLocalDateTime();
-            ev.setTimeEnd(dt);
-        }
-        
-        ev.setUserCreator(uc.user_getUser(rs.getInt("creator_userid")));
-        if(rs.getTimestamp("creationts") != null){
-            ev.setCreationts(rs.getTimestamp("creationts").toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDateTime());
-        }
-        
-        ev.setLastUpdatedBy(uc.user_getUser(rs.getInt("lastupdatedby_userid")));
-        if(rs.getTimestamp("lastupdatedts") != null){
-            ev.setCreationts(rs.getTimestamp("lastupdatedts").toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDateTime());
-        }
-        
-        ev.setActive(rs.getBoolean("active"));
-        ev.setNotes(rs.getString("notes"));
-        
-        return ev;
     }
     
 
@@ -820,7 +826,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ec.setHostEventDescriptionSuggestedText(rs.getString("hosteventdescriptionsuggtext"));
         
         if(rs.getInt("directive_directiveid") != 0){
-            ec.setDirective(choiceInt.getDirective(rs.getInt("directive_directiveid")));
+            try {
+                ec.setDirective(choiceInt.getDirective(rs.getInt("directive_directiveid")));
+            } catch (BObStatusException ex) {
+                throw new IntegrationException(ex.getMessage());
+            }
         }
         ec.setActive(rs.getBoolean("active"));
         ec.setDefaultdurationmins(rs.getInt("defaultdurationmins"));

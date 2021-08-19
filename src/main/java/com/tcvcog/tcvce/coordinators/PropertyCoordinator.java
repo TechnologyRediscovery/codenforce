@@ -196,7 +196,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @return
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public PropertyUnitWithProp getPropertyUnitWithProp(int unitid) throws IntegrationException {
+    public PropertyUnitWithProp getPropertyUnitWithProp(int unitid) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         return pi.getPropertyUnitWithProp(unitid);
 
@@ -320,7 +320,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param p
      * @return
      */
-    public Property configureProperty(Property p) throws IntegrationException {
+    public Property configureProperty(Property p) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         
         p.setUnitList(pi.getPropertyUnitList(p));
@@ -615,7 +615,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @return
      * @throws IntegrationException
      */
-    public Property getProperty(int parcelID) throws IntegrationException {
+    public Property getProperty(int parcelID) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         Parcel par = pi.getParcel(parcelID);
         Property p = new Property(par);
@@ -631,7 +631,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @return
      * @throws IntegrationException
      */
-    public PropertyUnit getPropertyUnit(int unitID) throws IntegrationException {
+    public PropertyUnit getPropertyUnit(int unitID) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         return pi.getPropertyUnit(unitID);
 
@@ -655,7 +655,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return putList;
     }
 
-    public Property getPropertyByPropUnitID(int unitID) throws IntegrationException {
+    public Property getPropertyByPropUnitID(int unitID) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         return pi.getPropertyUnitWithProp(unitID).getProperty();
     }
@@ -696,7 +696,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param cred
      * @return
      */
-    public List<Property> assemblePropertyHistoryList(Credential cred) {
+    public List<Property> assemblePropertyHistoryList(Credential cred) throws BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         List<Property> propList = new ArrayList<>();
         List<Integer> propIDList = new ArrayList<>();
@@ -813,7 +813,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param uc
      * @throws IntegrationException
      */
-    public void implementPropertyUnitChangeOrder(PropertyUnitChangeOrder uc) throws IntegrationException {
+    public void implementPropertyUnitChangeOrder(PropertyUnitChangeOrder uc) throws IntegrationException, BObStatusException {
 
         PropertyIntegrator pi = getPropertyIntegrator();
 

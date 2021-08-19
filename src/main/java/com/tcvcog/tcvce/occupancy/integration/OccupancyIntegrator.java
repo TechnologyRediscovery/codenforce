@@ -362,7 +362,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return oc.configureOccPeriod(op);
     }
 
-    private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException {
+    private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException, BObStatusException {
         SystemIntegrator si = getSystemIntegrator();
         UserIntegrator ui = getUserIntegrator();
 
@@ -450,7 +450,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
     }   
 
-    public OccPermit getOccPermit(int permitID) throws IntegrationException {
+    public OccPermit getOccPermit(int permitID) throws IntegrationException, BObStatusException {
         OccPermit op = null;
         String query = "SELECT permitid, occperiod_periodid, referenceno, issuedto_personid, \n"
                 + "       issuedby_userid, dateissued, permitadditionaltext, notes\n"
@@ -477,7 +477,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
     }
 
-    private OccPermit generateOccPermit(ResultSet rs) throws SQLException, IntegrationException {
+    private OccPermit generateOccPermit(ResultSet rs) throws SQLException, IntegrationException, BObStatusException {
         UserIntegrator ui = getUserIntegrator();
         OccPermit permit = new OccPermit();
         PersonIntegrator pi = getPersonIntegrator();
@@ -501,7 +501,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return permit;
     }
 
-    public List<OccPermit> getOccPermitList(OccPeriod period) throws IntegrationException {
+    public List<OccPermit> getOccPermitList(OccPeriod period) throws IntegrationException, BObStatusException {
         List<OccPermit> permitList = new ArrayList<>();
         String query = "SELECT permitid FROM public.occpermit WHERE occperiod_periodid=?;";
         Connection con = getPostgresCon();

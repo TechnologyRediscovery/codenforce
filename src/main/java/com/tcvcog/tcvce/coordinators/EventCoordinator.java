@@ -136,7 +136,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return evList;
     }
     
-    public List<EventCnFPropUnitCasePeriodHeavy> getEventHistoryList(UserAuthorized ua) throws IntegrationException, EventException, SearchException{
+    public List<EventCnFPropUnitCasePeriodHeavy> getEventHistoryList(UserAuthorized ua) throws IntegrationException, EventException, SearchException, BObStatusException{
         EventIntegrator ei = getEventIntegrator();
         return assembleEventCnFPropUnitCasePeriodHeavyList(getEventList(ei.getEventHistory(ua.getUserID())));
         
@@ -154,7 +154,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
     public EventCnFPropUnitCasePeriodHeavy assembleEventCnFPropUnitCasePeriodHeavy(EventCnF ev) 
-                           throws EventException, IntegrationException, SearchException{
+                           throws EventException, IntegrationException, SearchException, BObStatusException{
 
         OccupancyCoordinator oc = getOccupancyCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
@@ -186,7 +186,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.SearchException 
      */
     public List<EventCnFPropUnitCasePeriodHeavy> assembleEventCnFPropUnitCasePeriodHeavyList(List<EventCnF> evList) 
-            throws EventException, IntegrationException, SearchException{
+            throws EventException, IntegrationException, SearchException, BObStatusException{
         List<EventCnFPropUnitCasePeriodHeavy> edhList = new ArrayList<>();
         if(evList != null && !evList.isEmpty() ){
             for(EventCnF ev: evList){

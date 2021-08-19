@@ -48,10 +48,7 @@ public class HumanMailingAddressLink
         
         this.addressID = ma.addressID;
         this.buildingNo = ma.buildingNo;
-        this.unitNo = ma.unitNo;
-        this.city = ma.city;
-        this.state = ma.state;
-        this.zipCode = ma.zipCode;
+        this.street = ma.street;
         this.poBox = ma.poBox;
         this.verifiedTS = ma.verifiedTS;
         this.source = ma.source;

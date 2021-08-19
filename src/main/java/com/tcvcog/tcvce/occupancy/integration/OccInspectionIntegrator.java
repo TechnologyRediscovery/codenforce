@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeElement;
@@ -364,7 +365,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             }
             spc.setSpaceElementList(eleList);
 
-        } catch (SQLException ex) {
+        } catch (SQLException | BObStatusException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("", ex);
 
@@ -717,7 +718,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
      * @return a fully-baked ImplementedChecklist
      * @throws IntegrationException
      */
-    public List<OccInspectedSpace> getInspectedSpaceList(int inspectionID) throws IntegrationException {
+    public List<OccInspectedSpace> getInspectedSpaceList(int inspectionID) throws IntegrationException, BObStatusException {
         List<OccInspectedSpace> inspSpaceList = new ArrayList<>();
         String query = "SELECT inspectedspaceid FROM public.occinspectedspace WHERE occinspection_inspectionid=?;";
 
@@ -768,7 +769,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return inspSpaceList;
     }
 
-    public OccInspectedSpace getInspectedSpace(int inspectedspaceID) throws IntegrationException {
+    public OccInspectedSpace getInspectedSpace(int inspectedspaceID) throws IntegrationException, BObStatusException {
         OccInspectedSpace inspectedSpace = null;
         if (inspectedspaceID == 0) {
             System.out.println("OccInspectionIntegrator.getInspectedSpace | called with spaceid=0");
@@ -839,7 +840,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return inspectedSpace;
     }
 
-    private OccInspectedSpace generateOccInspectedSpace(ResultSet rs) throws SQLException, IntegrationException {
+    private OccInspectedSpace generateOccInspectedSpace(ResultSet rs) throws SQLException, IntegrationException, BObStatusException {
         UserIntegrator ui = getUserIntegrator();
 
         OccInspectedSpace inSpace = new OccInspectedSpace(getOccSpace(rs.getInt("occspace_spaceid")));
@@ -857,7 +858,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
     }
 
-    public OccInspectedSpaceElement getInspectedSpaceElement(int eleID) throws IntegrationException {
+    public OccInspectedSpaceElement getInspectedSpaceElement(int eleID) throws IntegrationException, BObStatusException {
         String query_spaceIDs = "SELECT inspectedspaceelementid, notes, locationdescription_id, lastinspectedby_userid, \n"
                 + "       lastinspectedts, compliancegrantedby_userid, compliancegrantedts, \n"
                 + "       inspectedspace_inspectedspaceid, overriderequiredflagnotinspected_userid, \n"
@@ -915,7 +916,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
     }
 
-    private OccInspectedSpaceElement generateInspectedSpaceElement(ResultSet rs) throws SQLException, IntegrationException {
+    private OccInspectedSpaceElement generateInspectedSpaceElement(ResultSet rs) throws SQLException, IntegrationException, BObStatusException {
         CodeIntegrator ci = getCodeIntegrator();
         UserIntegrator ui = getUserIntegrator();
         BlobIntegrator bi = getBlobIntegrator();
@@ -1780,7 +1781,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         }
     }
 
-    public List<OccInspection> getOccInspectionList(OccPeriod op) throws IntegrationException {
+    public List<OccInspection> getOccInspectionList(OccPeriod op) throws IntegrationException, BObStatusException {
 
         List<OccInspection> inspecList = new ArrayList<>();
 
@@ -1799,7 +1800,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                 inspecList.add(getOccInspection(rs.getInt("inspectionid")));
             }
 
-        } catch (SQLException ex) {
+        } catch (SQLException | BObStatusException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Cannot retrieve occinspectionlist", ex);
 
@@ -1830,7 +1831,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
     }
 
-    public List<OccInspection> getOccInspectionListByPACC(int pacc) throws IntegrationException {
+    public List<OccInspection> getOccInspectionListByPACC(int pacc) throws IntegrationException, BObStatusException {
 
         List<OccInspection> inspecList = new ArrayList<>();
 
@@ -1880,7 +1881,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
     }
     
-    public OccInspection getOccInspection(int inspectionID) throws IntegrationException {
+    public OccInspection getOccInspection(int inspectionID) throws IntegrationException, BObStatusException {
         OccupancyCoordinator oc = getOccupancyCoordinator();
 
         OccInspection inspection = null;
@@ -1935,7 +1936,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return oc.configureOccInspection(inspection);
     }
 
-    private OccInspection generateOccInspection(ResultSet rs) throws IntegrationException, SQLException {
+    private OccInspection generateOccInspection(ResultSet rs) throws IntegrationException, SQLException, BObStatusException {
         OccInspection ins = new OccInspection();
 
         UserIntegrator ui = getUserIntegrator();

@@ -641,8 +641,7 @@ $BODY$
 									            notes)
 									    VALUES (DEFAULT, %L, %L, NULL, now(), %L, 
 									            now(), %L, NULL, NULL, 
-									            ''Created during person to human migration JUL-2021'');
-												);', 
+									            ''Created during person to human migration JUL-2021'');', 
 							            		fresh_human_id, unifyspacesandtrim(pr.email), creationrobotuser,
 				            					creationrobotuser);
 							ELSE
@@ -691,123 +690,123 @@ $BODY$
 				 			ELSE
 				 				EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
 													            logentryid, human_humanid, person_personid, error_code, notes, ts)
-													    VALUES (DEFAULT, %L, %L, %L, %L, now());',
-													    pr.personid, pr.personid, 5, 
+													    VALUES (DEFAULT, NULL, %L, %L, %L, now());',
+													     pr.personid, 5, 
 													    'UNABLE TO LINK PARCEL ' ||  parcel_rec.parcelkey || ' TO HUMAN ' || current_human_id
 													);
 		 				END IF;
-			 		END LOOP; -- end iteration over property-person records 
 
-		 			-- Next, check if this person's address is one of those linked any of the parcels to which he/she is connected, if so, do nothing
-		 			-- but if their address is not associated with parcel in our current muni, then make a new record in the mailingaddress
-		 			-- family and connect this fresh_human to a fresh address
+			 			-- Next, check if this person's address is one of those linked any of the parcels to which he/she is connected, if so, do nothing
+			 			-- but if their address is not associated with parcel in our current muni, then make a new record in the mailingaddress
+			 			-- family and connect this fresh_human to a fresh address
 
-		 			SELECT  addressid INTO mailing_rec
-						FROM public.mailingaddress 
-						INNER JOIN public.parcelmailingaddress 
-							ON (mailingparcel_mailingid = addressid)
-						WHERE mailingparcel_parcelid = parcel_rec.parcelkey
-							AND bldgno ILIKE extractbuildingno(pr.address_street); -- NOTE: We're playing fast and loose
-							-- with address matching: if the building numbers are the same, we assume it's the same address
-							-- and don't write a new mailingaddress record. EDGE cases of folks having a separate mailing
-							-- whose building numbers is exactly the same as their linked parcel are not addressed.
-							-- THE PO box parsing process potentially makes this fraught so beware!
+			 			SELECT  addressid INTO mailing_rec
+							FROM public.mailingaddress 
+							INNER JOIN public.parcelmailingaddress 
+								ON (mailingparcel_mailingid = addressid)
+							WHERE mailingparcel_parcelid = parcel_rec.parcelkey
+								AND bldgno ILIKE extractbuildingno(pr.address_street); -- NOTE: We're playing fast and loose
+								-- with address matching: if the building numbers are the same, we assume it's the same address
+								-- and don't write a new mailingaddress record. EDGE cases of folks having a separate mailing
+								-- whose building numbers is exactly the same as their linked parcel are not addressed.
+								-- THE PO box parsing process potentially makes this fraught so beware!
 
-					IF FOUND
-						THEN -- we've already got a link between the person and that person's address
-							RAISE NOTICE 'Fresh human has legacy address already linked to a parcel: moving on';
-							NULL;
-						ELSE 	-- we don't have a mailing address that matches the person record's mailing address, 
-								-- So write a new address and link it to our fresh human
+						IF FOUND
+							THEN -- we've already got a link between the person and that person's address
+								RAISE NOTICE 'Fresh human has legacy address already linked to a parcel: moving on';
+								NULL;
+							ELSE 	-- we don't have a mailing address that matches the person record's mailing address, 
+									-- So write a new address and link it to our fresh human
 
-							zip_parsed := cnf_parsezipcode(pr.address_zip);								
-							SELECT id 
-								FROM mailingcitystatezip 
-								WHERE zip_code = zip_parsed AND list_type_id = 1 
-								INTO citystatezip_rec;
+								zip_parsed := cnf_parsezipcode(pr.address_zip);								
+								SELECT id 
+									FROM mailingcitystatezip 
+									WHERE zip_code = zip_parsed AND list_type_id = 1 
+									INTO citystatezip_rec;
 
 
-							IF FOUND
-								THEN --we've got a real zip code to attach to our new street
-								RAISE NOTICE 'Fresh human has address with legitimite ZIP %', citystatezip_rec.id;
-								street_freshstreetname := extractstreet(pr.address_street);
-								RAISE NOTICE 'Extracted street from fresh address: %|<-SPACE CHECK', street_freshstreetname;
+								IF FOUND
+									THEN --we've got a real zip code to attach to our new street
+									RAISE NOTICE 'Fresh human has address with legitimite ZIP %', citystatezip_rec.id;
+									street_freshstreetname := extractstreet(pr.address_street);
+									RAISE NOTICE 'Extracted street from fresh address: %|<-SPACE CHECK', street_freshstreetname;
 
-								IF street_freshstreetname IS NOT NULL
-									THEN -- we have successfully extracted a street name
+									IF street_freshstreetname IS NOT NULL
+										THEN -- we have successfully extracted a street name
 
-										SELECT streetid INTO street_freshid 
-											FROM mailingstreet 
-											WHERE citystatezip_cszipid = citystatezip_rec.id
-												AND mailingstreet.name ILIKE street_freshstreetname;
+											SELECT streetid INTO street_freshid 
+												FROM mailingstreet 
+												WHERE citystatezip_cszipid = citystatezip_rec.id
+													AND mailingstreet.name ILIKE street_freshstreetname;
 
-										IF street_freshid IS NULL OR street_freshid = 0
-											THEN -- no existing street with this same zip, so write new street
+											IF street_freshid IS NULL OR street_freshid = 0
+												THEN -- no existing street with this same zip, so write new street
 
-												-- Write new street and address records	
-												EXECUTE format('
-													INSERT INTO public.mailingstreet(
-												            streetid, name, namevariantsarr, citystatezip_cszipid, notes, 
-												            pobox)
-												    VALUES (DEFAULT, %L, NULL, %L, %L, 
-											    	        NULL);',
-											    	        street_freshstreetname, citystatezip_rec.id, 'Migration pers-hum AUG-2021; Raw addr: '|| pr.address_street
-								    	        );
+													-- Write new street and address records	
+													EXECUTE format('
+														INSERT INTO public.mailingstreet(
+													            streetid, name, namevariantsarr, citystatezip_cszipid, notes, 
+													            pobox)
+													    VALUES (DEFAULT, %L, NULL, %L, %L, 
+												    	        NULL);',
+												    	        street_freshstreetname, citystatezip_rec.id, 'Migration pers-hum AUG-2021; Raw addr: '|| pr.address_street
+									    	        );
 
-								    	        -- Now get our fresh street ID for writing our building Number
-								    	        SELECT currval('mailingstreet_streetid_seq') INTO street_freshid;
-						    	        END IF; -- possibly write new street
-						    	        -- with a street PK, we're ready to write to the mailingaddress base table
-						    	        EXECUTE format('
-						    	        	INSERT INTO public.mailingaddress(
-										            addressid, bldgno, street_streetid, verifiedts, verifiedby_userid, 
-										            verifiedsource_sourceid, source_sourceid, createdts, createdby_userid, 
-										            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
-										            notes)
-										    VALUES (DEFAULT, %L, %L, NULL, NULL, 
-										            NULL, %L, now(), %L, 
-										            now(), %L, NULL, NULL, 
-										            %L);',
-										            extractbuildingno(pr.address_street), street_freshid,
-										            defaultsource, creationrobotuser,
-										            creationrobotuser,
-										            'Migration AUG-2021: Raw addr: ' || pr.address_street
-						    	        	);
+									    	        -- Now get our fresh street ID for writing our building Number
+									    	        SELECT currval('mailingstreet_streetid_seq') INTO street_freshid;
+							    	        END IF; -- possibly write new street
+							    	        -- with a street PK, we're ready to write to the mailingaddress base table
+							    	        EXECUTE format('
+							    	        	INSERT INTO public.mailingaddress(
+											            addressid, bldgno, street_streetid, verifiedts, verifiedby_userid, 
+											            verifiedsource_sourceid, source_sourceid, createdts, createdby_userid, 
+											            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, 
+											            notes)
+											    VALUES (DEFAULT, %L, %L, NULL, NULL, 
+											            NULL, %L, now(), %L, 
+											            now(), %L, NULL, NULL, 
+											            %L);',
+											            extractbuildingno(pr.address_street), street_freshid,
+											            defaultsource, creationrobotuser,
+											            creationrobotuser,
+											            'Migration AUG-2021: Raw addr: ' || pr.address_street
+							    	        	);
 
-						    	        SELECT currval('mailingaddress_addressid_seq') INTO address_freshid;
+							    	        SELECT currval('mailingaddress_addressid_seq') INTO address_freshid;
 
-						    	        -- Now that we know the ID of the fresh mailing, we can link our fresh human via the old personid
-						    	        -- to this new address we just made and got an ID for
-						    	        EXECUTE format('INSERT INTO public.humanmailingaddress(
-													            humanmailing_humanid, humanmailing_addressid, source_sourceid, 
-													            createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
-													            deactivatedts, deactivatedby_userid, notes, linkid, linkedobjectrole_lorid)
-													    VALUES (%L, %L, %L, 
-													            now(), %L, now(), %L, 
-													            NULL, NULL, ''Created during person-human migration AUG 2021'', DEFAULT, %L);',
-													            current_human_id, address_freshid, defaultsource,
-													            creationrobotuser, creationrobotuser, human_mailing_lorid);
-					    	        ELSE -- could not extract street
-					    	        	RAISE NOTICE 'COULD NOT EXTRACT STREET; SKIPPING NEW ADDRESS INSERT ';
+							    	        -- Now that we know the ID of the fresh mailing, we can link our fresh human via the old personid
+							    	        -- to this new address we just made and got an ID for
+							    	        EXECUTE format('INSERT INTO public.humanmailingaddress(
+														            humanmailing_humanid, humanmailing_addressid, source_sourceid, 
+														            createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, 
+														            deactivatedts, deactivatedby_userid, notes, linkid, linkedobjectrole_lorid)
+														    VALUES (%L, %L, %L, 
+														            now(), %L, now(), %L, 
+														            NULL, NULL, ''Created during person-human migration AUG 2021'', DEFAULT, %L);',
+														            current_human_id, address_freshid, defaultsource,
+														            creationrobotuser, creationrobotuser, human_mailing_lorid);
+						    	        ELSE -- could not extract street
+						    	        	RAISE NOTICE 'COULD NOT EXTRACT STREET; SKIPPING NEW ADDRESS INSERT ';
+											EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
+															            logentryid, human_humanid, person_personid, error_code, notes, ts)
+															    VALUES (DEFAULT, %L, %L, %L, %L, now());',
+															    current_human_id, pr.personid, 6,
+															    'Street parsing failure on: ' ||  pr.address_street
+															);
+										END IF;
+
+
+									ELSE -- malformed ZIP on legacy person, meaning we cannot write a new address
+									RAISE NOTICE 'ZIP NOT FOUND: % ', zip_parsed;
 										EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
 														            logentryid, human_humanid, person_personid, error_code, notes, ts)
 														    VALUES (DEFAULT, %L, %L, %L, %L, now());',
-														    current_human_id, pr.personid, 6,
-														    'Street parsing failure on: ' ||  pr.address_street
+														    current_human_id, pr.personid, 3, 
+														    'Zip not found in master file: ' || pr.address_zip
 														);
-									END IF;
-
-
-								ELSE -- malformed ZIP on legacy person, meaning we cannot write a new address
-								RAISE NOTICE 'ZIP NOT FOUND: % ', zip_parsed;
-									EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
-													            logentryid, human_humanid, person_personid, error_code, notes, ts)
-													    VALUES (DEFAULT, %L, %L, %L, %L, now());',
-													    current_human_id, pr.personid, 3, 
-													    'Zip not found in master file: ' || pr.address_zip
-													);
-							END IF; -- end check for legitimate zipcode found on old person address
-					END IF; -- end check for existing address connection between person's parcel and ONE of that parcel's addresses
+								END IF; -- end check for legitimate zipcode found on old person address
+						END IF; -- end check for existing address connection between person's parcel and ONE of that parcel's addresses
+		 		END LOOP; -- end iteration over property-person records 
 
 				RAISE NOTICE 'END PERSON RECORD';
 		END LOOP; -- over legacy person table records

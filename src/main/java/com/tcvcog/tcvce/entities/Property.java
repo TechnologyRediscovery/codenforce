@@ -16,9 +16,9 @@ import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
  * @author Ellen Bascomb
  */
 
-public class    Property 
-        extends Parcel 
-        implements IFace_Loggable,
+public class        Property 
+        extends     Parcel 
+        implements  IFace_Loggable,
                     IFace_ActivatableBOB{
     
     protected List<PropertyUnit> unitList;
@@ -48,7 +48,7 @@ public class    Property
      */
     public String getAddress(){
         if(addresses != null && !addresses.isEmpty()){
-            return addresses.get(0).buildingNo + " " + addresses.get(0).street;
+            return addresses.get(0).buildingNo + " " + addresses.get(0).getStreet();
         } else {
             return "[No Address]";
         }

@@ -232,7 +232,7 @@ public class CECaseSearchProfileBB
      * list viewing functions
      */
     @PostConstruct
-    public void initBean() {
+    public void initBean() throws BObStatusException {
         CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         UserCoordinator uc = getUserCoordinator();

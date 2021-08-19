@@ -491,7 +491,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         Person skel = pc.personInit(m);
         try {
             skel.setCreatedBy(uc.user_getUserRobot());
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
         currentRequest.setRequestor(skel);
@@ -611,7 +611,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                             "Success! Your request has been submitted and passed to our code enforcement team.", ""));
             return "successCEAR";
 
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException |  BObStatusException ex) {
             System.out.println(ex.toString());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -673,7 +673,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      * the user selected.
      * @param ev 
      */
-    public void searchForPropertiesSingleMuni(ActionEvent ev) {
+    public void searchForPropertiesSingleMuni(ActionEvent ev) throws BObStatusException {
         SearchCoordinator sc = getSearchCoordinator();
         UserCoordinator uc = getUserCoordinator();
 

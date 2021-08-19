@@ -37,7 +37,7 @@ public  class   CitationDocketRecord
     
     final static String PK_FIELD = "docketid";
     final static String TABLE_NAME = "citationdocketno";
-    protected LinkedObjectSchemaEnum linkSchema = LinkedObjectSchemaEnum.CITATIONDCKETHUMAN;
+    protected LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CITATIONDCKETHUMAN;
     
     
     protected int docketID;
@@ -59,15 +59,11 @@ public  class   CitationDocketRecord
     }
 
     @Override
-    public LinkedObjectSchemaEnum getLinkSchema() {
-        return linkSchema;
+    public LinkedObjectSchemaEnum getHUMAN_LINK_SCHEMA_ENUM() {
+        return HUMAN_LINK_SCHEMA_ENUM;
         
     }
 
-    @Override
-    public void setLinkSchema(LinkedObjectSchemaEnum lhse) {
-        linkSchema = lhse;
-    }
 
     @Override
     public int getHostPK() {

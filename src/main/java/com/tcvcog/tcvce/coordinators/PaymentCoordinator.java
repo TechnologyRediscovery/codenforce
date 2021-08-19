@@ -229,7 +229,7 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
-    public List<FeeAssigned> getAssignedFees(OccPeriod currentOccPeriod) throws IntegrationException {
+    public List<FeeAssigned> getAssignedFees(OccPeriod currentOccPeriod) throws IntegrationException, BObStatusException {
 
         PaymentIntegrator pi = getPaymentIntegrator();
         ArrayList<FeeAssigned> skeletonHorde = new ArrayList<>();
@@ -250,7 +250,7 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
-    public List<FeeAssigned> getAssignedFees(CECase currentCase) throws IntegrationException {
+    public List<FeeAssigned> getAssignedFees(CECase currentCase) throws IntegrationException, BObStatusException {
         PaymentIntegrator pi = getPaymentIntegrator();
         ArrayList<FeeAssigned> skeletonHorde = new ArrayList<>();
 
@@ -358,7 +358,7 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
-    public ArrayList<Payment> getAllPayments() throws IntegrationException {
+    public ArrayList<Payment> getAllPayments() throws IntegrationException, BObStatusException {
         PaymentIntegrator pi = getPaymentIntegrator();
         return pi.getPaymentList();
 

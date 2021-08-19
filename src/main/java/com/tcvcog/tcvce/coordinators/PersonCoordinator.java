@@ -42,6 +42,8 @@ import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The master controller class for Humans and their Java incarnation called
@@ -178,14 +180,13 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @return the fully-baked human (i.e. a person)
      * @throws IntegrationException 
      */
-    public Person getPerson(Human hum) throws IntegrationException{
+    public Person getPerson(Human hum) throws IntegrationException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();
         
         if(hum != null){
             return null;
         }
         Person p = new Person(hum);
-        
         
         return configurePerson(p);
     }
@@ -196,7 +197,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public List<Person> getPersonList(List<Integer> humanIDList) throws IntegrationException{
+    public List<Person> getPersonList(List<Integer> humanIDList) throws IntegrationException, BObStatusException{
         List<Person> pList = new ArrayList<>();
         if(humanIDList != null && !humanIDList.isEmpty()){
             for(Integer i: humanIDList){
@@ -215,7 +216,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @return return a list, possibly with Person objs in it!
      * @throws IntegrationException 
      */
-    public List<Person> getPersonListFromLinkList(List<HumanLink> humanLinkList) throws IntegrationException{
+    public List<Person> getPersonListFromLinkList(List<HumanLink> humanLinkList) throws IntegrationException, BObStatusException{
         List<Person> pl = new ArrayList<>();
         for(HumanLink hl: humanLinkList){
             pl.add(getPerson(hl));
@@ -232,7 +233,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    public PersonDataHeavy assemblePersonDataHeavy(Person pers, Credential cred) throws IntegrationException{
+    public PersonDataHeavy assemblePersonDataHeavy(Person pers, Credential cred) throws IntegrationException, BObStatusException{
         PersonDataHeavy pdh = null;
         if(pers != null && cred != null){
             // if we have a skeleton person, don't try to get a person from the DB, since there's no ID
@@ -278,7 +279,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param p
      * @return the configured person
      */
-    private Person configurePerson(Person p) throws IntegrationException{
+    private Person configurePerson(Person p) throws IntegrationException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();
         PropertyIntegrator propi = getPropertyIntegrator();
         
@@ -422,7 +423,11 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      */
     public Person selectDefaultPerson(Credential cred) throws IntegrationException{
         UserCoordinator uc = getUserCoordinator();
-        return uc.user_getUser(cred.getGoverningAuthPeriod().getUserID()).getPerson();
+        try {
+            return uc.user_getUser(cred.getGoverningAuthPeriod().getUserID()).getPerson();
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
         
     }
 
@@ -474,7 +479,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @return a list, possibly not null, of Person objs
      * @throws IntegrationException 
      */
-    public List<Person> assemblePersonListFromHumanList(List<Human> hl) throws IntegrationException{
+    public List<Person> assemblePersonListFromHumanList(List<Human> hl) throws IntegrationException, BObStatusException{
         List<Person> pl = new ArrayList<>();
         if(hl != null && !hl.isEmpty()){
             for(Human h: hl){

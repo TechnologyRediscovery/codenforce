@@ -351,7 +351,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public CECasePropertyUnitHeavy cecase_assembleCECasePropertyUnitHeavy(CECase cse) throws IntegrationException, SearchException {
+    public CECasePropertyUnitHeavy cecase_assembleCECasePropertyUnitHeavy(CECase cse) throws IntegrationException, SearchException, BObStatusException {
         PropertyCoordinator pc = getPropertyCoordinator();
 
         CECasePropertyUnitHeavy csepuh = null;
@@ -375,7 +375,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param cseList
      * @return
      */
-    public List<CECasePropertyUnitHeavy> cecase_assembleCECasePropertyUnitHeavyList(List<CECase> cseList) {
+    public List<CECasePropertyUnitHeavy> cecase_assembleCECasePropertyUnitHeavyList(List<CECase> cseList) throws BObStatusException {
 
         List<CECasePropertyUnitHeavy> cspudhList = new ArrayList<>();
 
@@ -414,7 +414,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param cseList
      * @return
      */
-    public List<CECasePropertyUnitHeavy> cecase_refreshCECasePropertyUnitHeavyList(List<CECasePropertyUnitHeavy> cseList) {
+    public List<CECasePropertyUnitHeavy> cecase_refreshCECasePropertyUnitHeavyList(List<CECasePropertyUnitHeavy> cseList) throws BObStatusException {
 
         List<CECasePropertyUnitHeavy> cspudhList = new ArrayList<>();
 
@@ -549,9 +549,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             return citList;
         } else {
             for(Citation cit: cse.getCitationList()){
-                if(cit.getStatus().isNonStatusEditsForbidden()){
+                // TODO: fix me to work with docket status
                     citList.add(cit);
-                }
             }
         }
         
@@ -1185,7 +1184,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                     for(CECaseDataHeavy cse: cseList){
                         if(!streetCaseMap.containsKey(cse.getProperty().getPrimaryAddressLink().getStreet())){
                              ssc = new ReportCECaseListStreetCECaseContainer();
-                             ssc.setStreetName(cse.getProperty().getPrimaryAddressLink().getStreet());
+                             ssc.setStreetName(cse.getProperty().getPrimaryAddressLink().getStreet().getName());
                             switch(enm){
                                 case CLOSED:
                                     ssc.getCaseClosedList().add(cse);
@@ -1212,7 +1211,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                             } // close switch
                         } // close if/else
                         // Write new or updated Street Case continaer to our map
-                        streetCaseMap.put(cse.getProperty().getPrimaryAddressLink().getStreet(), ssc);
+                        streetCaseMap.put(cse.getProperty().getPrimaryAddressLink().getStreet().getName(), ssc);
                     } // close for over case list
                 } // close null/emtpy check
             } // close for over enum vals
@@ -1972,10 +1971,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             nov.setMailingLink(addr);
             nov.setFixedRecipientName(h.getName());
             nov.setFixedRecipientBldgNo(addr.getBuildingNo());
-            nov.setFixedRecipientStreet(addr.getStreet());
-            nov.setFixedRecipientStreet(addr.getCity());
-            nov.setFixedRecipientStreet(addr.getState());
-            nov.setFixedRecipientStreet(addr.getZipCode());
+            nov.setFixedRecipientStreet(addr.getStreet().getName());
+            nov.setFixedRecipientState(addr.getStreet().getCityStateZip().getState());
+            nov.setFixedRecipientZip(addr.getStreet().getCityStateZip().getZipCode());
             
             ci.novLockAndQueueForMailing(nov);
             
@@ -2634,7 +2632,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException
      */
-    public CEActionRequest cear_getCEActionRequest(int cearid) throws IntegrationException {
+    public CEActionRequest cear_getCEActionRequest(int cearid) throws IntegrationException, BObStatusException {
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         return ceari.getActionRequestByRequestID(cearid);
     }
@@ -2842,7 +2840,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      */
     public CodeViolation violation_getCodeViolation(int vid) 
-            throws IntegrationException {
+            throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
         CodeViolation cv = ci.getCodeViolation(vid);
         return violation_configureCodeViolation(cv);
@@ -2850,7 +2848,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     
     
     
-    public CodeViolationPropCECaseHeavy violation_getCodeViolationPropCECaseHeavy(int vid) throws ViolationException, IntegrationException, SearchException{
+    public CodeViolationPropCECaseHeavy violation_getCodeViolationPropCECaseHeavy(int vid) throws ViolationException, IntegrationException, SearchException, BObStatusException{
         PropertyCoordinator pc = getPropertyCoordinator();
         CodeViolationPropCECaseHeavy cvpcdh = null;
         if(vid != 0){
@@ -3241,7 +3239,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException
      */
-    public List<CodeViolation> violation_getCodeViolations(List<Integer> cvIDList) throws IntegrationException{
+    public List<CodeViolation> violation_getCodeViolations(List<Integer> cvIDList) throws IntegrationException, BObStatusException{
         List<CodeViolation> vl = new ArrayList<>();
         
         if(cvIDList != null && !cvIDList.isEmpty()){

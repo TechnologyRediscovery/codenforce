@@ -33,6 +33,7 @@ public  class       Citation
     
     final static String CITATION_TABLE = "citation";
     final static String CITATION_PKFIELD = "citationid";
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CITATIONHUMAN;
     
     private int cecaseID;
     
@@ -69,7 +70,6 @@ public  class       Citation
     private List<CitationCodeViolationLink> violationList;
     private List<BlobLight> blobList;
 
-    protected LinkedObjectSchemaEnum humanLinkSchemaEnum;
     protected List<HumanLink> humanLinkList;
     
     private String notes;
@@ -314,14 +314,11 @@ public  class       Citation
     }
 
     @Override
-    public LinkedObjectSchemaEnum getLinkSchema() {
-        return humanLinkSchemaEnum;
+    public LinkedObjectSchemaEnum getHUMAN_LINK_SCHEMA_ENUM() {
+        return HUMAN_LINK_SCHEMA_ENUM;
     }
 
-    @Override
-    public void setLinkSchema(LinkedObjectSchemaEnum lhse) {
-        humanLinkSchemaEnum = lhse;
-    }
+  
 
     @Override
     public int getHostPK() {

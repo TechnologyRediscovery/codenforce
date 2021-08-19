@@ -164,7 +164,7 @@ public class PropertyUnitChangesBB
         
         try {
             pc.implementPropertyUnitChangeOrder(currChangeOrder);
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println("PropertyUnitChangesBB.applyChangeOrder() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

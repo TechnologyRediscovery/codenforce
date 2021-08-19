@@ -328,7 +328,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                                 "Something when wrong with the property search! Sorry!", ""));
             }
 
-        } catch (IntegrationException | SearchException ex) {
+        } catch (IntegrationException | SearchException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -522,7 +522,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
                                 "Something when wrong with the person search! Sorry!", ""));
             }
 
-        } catch (IntegrationException | SearchException ex) {
+        } catch (IntegrationException | SearchException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

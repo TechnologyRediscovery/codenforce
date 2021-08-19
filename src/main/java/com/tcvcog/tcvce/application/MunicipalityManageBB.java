@@ -12,6 +12,7 @@ import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeSource;
@@ -172,7 +173,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
             currentPropertyList = new ArrayList<>();
             currentPropertyList.add(getSessionBean().getSessProperty());
 
-        } catch (AuthorizationException | IntegrationException ex) {
+        } catch (AuthorizationException | IntegrationException | BObStatusException ex) {
 
             //Message Noticefication
             getFacesContext().addMessage(null,
@@ -323,8 +324,8 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
         Property property = null;
         try {
             property = pc.getProperty(currentMuniDataheavy.getMuniOfficePropertyId());
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fail to load Municipality Office Property", ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
         }
         return property;
     }

@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 
 
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
@@ -105,23 +106,27 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        System.out.println("SystemServicesBB.initBean");
-        UserCoordinator uc = getUserCoordinator();
-        SessionBean sb = getSessionBean();
-        
-        bbSessionUser = sb.getSessUser();
-        bbSessionMuni = sb.getSessMuni();
-        bbSessionProperty = sb.getSessProperty();
-        bbSessionPerson = sb.getSessPerson();
-        bbSessionPersonList = sb.getSessPersonList();
-        bbSessionPropertyList = sb.getSessPropertyList();
-        
-        userListForSearch = uc.user_assembleUserListForSearch(sb.getSessUser());
-        propertyListForSearch = sb.getSessPropertyList();
-        personListForSearch = sb.getSessPersonList();
-        
-        if(bbSessionUser != null){
-            municipalityListForSearch = bbSessionUser.getAuthMuniList();
+        try {
+            System.out.println("SystemServicesBB.initBean");
+            UserCoordinator uc = getUserCoordinator();
+            SessionBean sb = getSessionBean();
+            
+            bbSessionUser = sb.getSessUser();
+            bbSessionMuni = sb.getSessMuni();
+            bbSessionProperty = sb.getSessProperty();
+            bbSessionPerson = sb.getSessPerson();
+            bbSessionPersonList = sb.getSessPersonList();
+            bbSessionPropertyList = sb.getSessPropertyList();
+            
+            userListForSearch = uc.user_assembleUserListForSearch(sb.getSessUser());
+            propertyListForSearch = sb.getSessPropertyList();
+            personListForSearch = sb.getSessPersonList();
+            
+            if(bbSessionUser != null){
+                municipalityListForSearch = bbSessionUser.getAuthMuniList();
+            }
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
         }
         
        
@@ -305,7 +310,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
         if(impList == null){
             try {
                 impList = si.getImprovementSuggestions();
-            } catch (IntegrationException ex) {
+            } catch (IntegrationException | BObStatusException ex) {
                 System.out.println(ex);
             }
         }

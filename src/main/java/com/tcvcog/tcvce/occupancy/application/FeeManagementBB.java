@@ -96,7 +96,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     @PostConstruct
-    public void initBean() {
+    public void initBean() throws BObStatusException {
         selectedFeeType = new Fee();
 
         PaymentCoordinator pc = getPaymentCoordinator();
@@ -197,7 +197,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * @param currentFee
      * @throws IntegrationException
      */
-    public void onAssignedFeeSelectedButtonChange(FeeAssigned currentFee) throws IntegrationException {
+    public void onAssignedFeeSelectedButtonChange(FeeAssigned currentFee) throws IntegrationException, BObStatusException {
 
         // "Select" button was selected
         if (currentFeeSelected == true) {
@@ -266,7 +266,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * @param currentType
      * @throws IntegrationException
      */
-    public void onOccPeriodTypeSelectedButtonChange(OccPeriodType currentType) throws IntegrationException {
+    public void onOccPeriodTypeSelectedButtonChange(OccPeriodType currentType) throws IntegrationException, BObStatusException {
 
         if (currentFeeSelected == true) {
 
@@ -316,7 +316,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * @param currentElement
      * @throws IntegrationException
      */
-    public void onCodeElementSelectedButtonChange(EnforcableCodeElement currentElement) throws IntegrationException {
+    public void onCodeElementSelectedButtonChange(EnforcableCodeElement currentElement) throws IntegrationException, BObStatusException {
 
         if (currentFeeSelected == true) {
 
@@ -400,7 +400,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * the selectedAssignedFee is a new fee.
      * @return 
      */
-    public String onInsertAssignedFeeButtonChange() {
+    public String onInsertAssignedFeeButtonChange() throws BObStatusException {
 
         PaymentCoordinator pc = getPaymentCoordinator();
 
@@ -445,7 +445,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * Applies changes on the selected AssignedFee to the database.
      * @return 
      */
-    public String onUpdateAssignedFeeButtonChange() {
+    public String onUpdateAssignedFeeButtonChange() throws BObStatusException {
 
         PaymentCoordinator pc = getPaymentCoordinator();
         if (currentDomain == EventDomainEnum.OCCUPANCY) {
@@ -490,7 +490,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * so fees need to be waived instead.
      * @return 
      */
-    public String onRemoveAssignedFeeButtonChange() {
+    public String onRemoveAssignedFeeButtonChange() throws BObStatusException {
 
         PaymentCoordinator pc = getPaymentCoordinator();
 
@@ -957,7 +957,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * Refreshes the lists of assigned fees and loads the session BOb (either
      * an OccPeriod or a CECase)
      */
-    public void refreshFeeAssignedList() {
+    public void refreshFeeAssignedList() throws BObStatusException {
 
         feeAssignedList = new ArrayList<>();
 
@@ -1233,7 +1233,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.allFees = allFees;
     }
 
-    public String getOccPeriodAddress() {
+    public String getOccPeriodAddress() throws BObStatusException {
 
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
@@ -1271,7 +1271,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      *
      * @return
      */
-    public String getCECaseAddress() {
+    public String getCECaseAddress() throws BObStatusException {
         
         CaseCoordinator cc = getCaseCoordinator();
         try {

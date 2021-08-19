@@ -811,7 +811,7 @@ public class    SessionBean
         }
     }
     
-    public void setSessCECaseListWithDowncastAndLookup(List<CECaseDataHeavy> cseldh){
+    public void setSessCECaseListWithDowncastAndLookup(List<CECaseDataHeavy> cseldh) throws BObStatusException{
         CaseCoordinator cc = getCaseCoordinator();
         List<CECasePropertyUnitHeavy> cseListPDH = new ArrayList<>();
         if(cseldh != null && !cseldh.isEmpty()){

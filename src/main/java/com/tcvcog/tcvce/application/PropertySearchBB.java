@@ -228,7 +228,7 @@ public class PropertySearchBB extends BackingBeanUtils{
             // to runQuery, which will delegate the work to the searchForXXX methods
             // on the intergrators
             sc.runQuery(qp);
-        } catch (SearchException ex) {
+        } catch (SearchException | BObStatusException  ex) {
             System.out.println(ex);
         }
         List<Property> propList = null;
@@ -267,7 +267,7 @@ public class PropertySearchBB extends BackingBeanUtils{
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + pl.size() + " results", ""));
             
-        } catch (SearchException ex) {
+        } catch (SearchException |  BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -453,7 +453,7 @@ public class PropertySearchBB extends BackingBeanUtils{
      *
      * @return
      */
-    public String onInfoCaseListButtonChange() {
+    public String onInfoCaseListButtonChange() throws BObStatusException {
         CaseCoordinator cc = getCaseCoordinator();
 
         if (currentProperty != null && currentProperty.getPropInfoCaseList() != null) {
@@ -653,7 +653,7 @@ public class PropertySearchBB extends BackingBeanUtils{
             getSessionBean().getSessPersonList().add(0, p);
             try {
                 getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(p, getSessionBean().getSessUser().getKeyCard()));
-            } catch (IntegrationException ex) {
+            } catch (IntegrationException |  BObStatusException ex) {
                 System.out.println(ex);
             }
             return "personInfo";

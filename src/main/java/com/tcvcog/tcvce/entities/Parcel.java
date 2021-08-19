@@ -46,14 +46,15 @@ public  class Parcel
     }
     
     public Parcel(Parcel p){
-        
-        this.parcelKey = p.parcelKey;
-        this.countyParcelID = p.countyParcelID;
-        this.lotAndBlock = p.lotAndBlock;
-        this.muni = p.muni;
-        this.source = p.source;
-        this.notes = p.notes;
-        this.parcelInfo = p.parcelInfo;
+        if(p != null){
+            this.parcelKey = p.parcelKey;
+            this.countyParcelID = p.countyParcelID;
+            this.lotAndBlock = p.lotAndBlock;
+            this.muni = p.muni;
+            this.source = p.source;
+            this.notes = p.notes;
+            this.parcelInfo = p.parcelInfo;
+        }
     }
     
 

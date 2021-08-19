@@ -64,6 +64,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 
 /**
@@ -615,56 +617,61 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @throws IntegrationException 
      */
      private CECase generateCECase(ResultSet rs) throws SQLException, IntegrationException{
-        UserCoordinator uc = getUserCoordinator();
-        SystemIntegrator si = getSystemIntegrator();
-        
-        CECase cse = new CECase();
-
-        cse.setCaseID(rs.getInt("caseid"));
-        cse.setPublicControlCode(rs.getInt("cecasepubliccc"));
-
-        cse.setParcelKey(rs.getInt("property_propertyid"));
-        cse.setPropertyUnitID(rs.getInt("propertyunit_unitid"));
-        
-        cse.setCaseManager(uc.user_getUser(rs.getInt("login_userid")));
-
-        cse.setCaseName(rs.getString("casename"));
-        
-        if(rs.getTimestamp("originationdate") != null){
-            cse.setOriginationDate(rs.getTimestamp("originationdate")
-                    .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        try {
+            UserCoordinator uc = getUserCoordinator();
+            SystemIntegrator si = getSystemIntegrator();
+            
+            CECase cse = new CECase();
+            
+            cse.setCaseID(rs.getInt("caseid"));
+            cse.setPublicControlCode(rs.getInt("cecasepubliccc"));
+            
+            cse.setParcelKey(rs.getInt("property_propertyid"));
+            cse.setPropertyUnitID(rs.getInt("propertyunit_unitid"));
+            
+            cse.setCaseManager(uc.user_getUser(rs.getInt("login_userid")));
+            
+            
+            cse.setCaseName(rs.getString("casename"));
+            
+            if(rs.getTimestamp("originationdate") != null){
+                cse.setOriginationDate(rs.getTimestamp("originationdate")
+                        .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+            }
+            
+            if(rs.getTimestamp("closingdate") != null){
+                cse.setClosingDate(rs.getTimestamp("closingdate")
+                        .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+            }
+            if(rs.getTimestamp("creationtimestamp") != null){
+                cse.setCreationTimestamp(rs.getTimestamp("creationtimestamp")
+                        .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+            }
+            
+            cse.setNotes(rs.getString("notes"));
+            cse.setPaccEnabled(rs.getBoolean("paccenabled"));
+            cse.setAllowForwardLinkedPublicAccess(rs.getBoolean("allowuplinkaccess"));
+            cse.setPropertyInfoCase(rs.getBoolean("propertyinfocase"));
+            cse.setPersonInfoPersonID(rs.getInt("personinfocase_personid"));
+            
+            if(rs.getInt("bobsource_sourceid") != 0){
+                cse.setSource(si.getBOBSource(rs.getInt("bobsource_sourceid")));
+            }
+            cse.setActive(rs.getBoolean("active"));
+            
+            if(rs.getInt("lastupdatedby_userid") != 0){
+                cse.setLastUpdatedBy(uc.user_getUser(rs.getInt("lastupdatedby_userid")));
+            }
+            
+            if(rs.getTimestamp("lastupdatedts") != null){
+                cse.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+            }
+            
+            
+            return cse;
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.toString());
         }
-
-        if(rs.getTimestamp("closingdate") != null){
-            cse.setClosingDate(rs.getTimestamp("closingdate")
-                    .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        }
-        if(rs.getTimestamp("creationtimestamp") != null){
-            cse.setCreationTimestamp(rs.getTimestamp("creationtimestamp")
-                    .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        }
-        
-        cse.setNotes(rs.getString("notes"));
-        cse.setPaccEnabled(rs.getBoolean("paccenabled"));
-        cse.setAllowForwardLinkedPublicAccess(rs.getBoolean("allowuplinkaccess"));
-        cse.setPropertyInfoCase(rs.getBoolean("propertyinfocase"));
-        cse.setPersonInfoPersonID(rs.getInt("personinfocase_personid"));
-        
-        if(rs.getInt("bobsource_sourceid") != 0){
-            cse.setSource(si.getBOBSource(rs.getInt("bobsource_sourceid")));
-        }
-        cse.setActive(rs.getBoolean("active"));
-        
-        if(rs.getInt("lastupdatedby_userid") != 0){
-            cse.setLastUpdatedBy(uc.user_getUser(rs.getInt("lastupdatedby_userid")));
-        }
-        
-        if(rs.getTimestamp("lastupdatedts") != null){
-            cse.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
-        }
-        
-
-        return cse;
     }
     
      /**
@@ -1338,7 +1345,8 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      */
     private CodeViolation generateCodeViolationFromRS(ResultSet rs) 
             throws SQLException, 
-            IntegrationException
+            IntegrationException,
+            BObStatusException
             {
 
         CodeViolation v = new CodeViolation();
@@ -1427,7 +1435,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @throws IntegrationException
      */
     public CodeViolation getCodeViolation(int violationID) 
-            throws IntegrationException {
+            throws IntegrationException, BObStatusException {
         String query = "SELECT violationid, codesetelement_elementid, cecase_caseid, dateofrecord, \n" +
                         "       entrytimestamp, stipulatedcompliancedate, actualcompliancedate, \n" +
                         "       penalty, description, notes, legacyimport, compliancetimestamp, \n" +
@@ -1491,7 +1499,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot fetch code violation by ID, sorry.", ex);
+            throw new IntegrationException("CaseInt.getCodeViolations(CECase): Cannot fetch code violations by CECase, sorry.", ex);
 
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -2078,7 +2086,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @throws IntegrationException
      */
     public NoticeOfViolation novGet(int noticeID) 
-            throws IntegrationException{
+            throws IntegrationException, BObStatusException{
         String query =  "SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
                         "       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
                         "       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
@@ -2101,7 +2109,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("cannot fetch code violation by ID, sorry.", ex);
+            throw new IntegrationException("CaseIntegrator.netGet(): cannot fetch NoticeOfViolation by NoticeID, sorry.", ex);
 
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -2136,7 +2144,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("cannot fetch code violation by ID, sorry.", ex);
+            throw new IntegrationException("cannot fetch NOV List by CECAse, sorry.", ex);
 
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -2171,7 +2179,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("cannot fetch code violation by ID, sorry.", ex);
+            throw new IntegrationException("cannot fetch NOV LIst by CodeViolation, sorry!", ex);
 
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -2191,7 +2199,8 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      */
     private NoticeOfViolation novGenerate(ResultSet rs) 
             throws SQLException, 
-            IntegrationException {
+            IntegrationException,
+            BObStatusException {
 //SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, 
 //       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, 
 //       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, 
@@ -2257,7 +2266,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @throws IntegrationException
      */
     private NoticeOfViolation populateCodeViolations(NoticeOfViolation nov) 
-            throws IntegrationException{
+            throws IntegrationException, BObStatusException{
         String query =  "  SELECT noticeofviolation_noticeid, codeviolation_violationid, includeordtext, \n" +
                         "       includehumanfriendlyordtext, includeviolationphoto\n" +
                         "  FROM public.noticeofviolationcodeviolation WHERE noticeofviolation_noticeid = ?;";
@@ -2282,7 +2291,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot fetch code violation by ID, sorry.", ex);
+            throw new IntegrationException("Cannot populate notice of violation, sorry!", ex);
 
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -2327,7 +2336,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot fetch code violation by ID, sorry.", ex);
+            throw new IntegrationException("Cannot fetch TextBlockMap, sorries!", ex);
 
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }

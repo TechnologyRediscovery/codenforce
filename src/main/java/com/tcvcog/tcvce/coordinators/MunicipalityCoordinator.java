@@ -37,6 +37,8 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -154,7 +156,11 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
      */
     public MunicipalityDataHeavy getMuniDataHeavyList(int muniCode) throws IntegrationException, AuthorizationException {
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        return mi.getMunDataHeavy(muniCode);
+        try {
+            return mi.getMunDataHeavy(muniCode);
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
     }
     
     /**
@@ -186,7 +192,11 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
      */
     public ArrayList<MuniProfile> getMuniProfilesList() throws IntegrationException{
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        return mi.getMuniProfileList();
+        try {
+            return mi.getMuniProfileList();
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
     }
     
     

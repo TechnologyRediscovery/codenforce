@@ -165,7 +165,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
                 // Modified currentEvent selection logic during page collapse JAN-21
 //                currentEvent = ec.assembleEventCnFPropUnitCasePeriodHeavy(sessEv);
                 
-            } catch (EventException | IntegrationException | SearchException ex) {
+            } catch (EventException | IntegrationException | SearchException | BObStatusException ex) {
                 System.out.println(ex);
                 System.out.println("EventsBB.initbean: Current event loading error");
             }
@@ -389,7 +389,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable{
                Collections.sort(eventList);
                currentEvent = eventList.get(0);
            }
-       } catch (EventException |IntegrationException | SearchException ex) {
+       } catch (EventException |IntegrationException | SearchException | BObStatusException ex) {
                System.out.println("EventsBB.initBean: problem setting page event domain");
                System.out.println(ex);
        }

@@ -37,6 +37,8 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**
@@ -86,7 +88,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * objects returned from the integrator accessible via getResults()
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public QueryProperty runQuery(QueryProperty q) throws SearchException{
+    public QueryProperty runQuery(QueryProperty q) throws SearchException, BObStatusException{
         PropertyIntegrator pi = getPropertyIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
         
@@ -190,7 +192,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                  // add each batch of OccPeriod objects from the SearchParam run to our
                  // ongoing list
                  q.addToResults(ec.assembleEventCnFPropUnitCasePeriodHeavyList(evTempList));
-             } catch (EventException | IntegrationException ex) {
+             } catch (EventException | IntegrationException | BObStatusException ex) {
                  System.out.println(ex);
              }
             q.appendToQueryLog(sp);
@@ -388,7 +390,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     for(Integer i: ceari.searchForCEActionRequests(sp)){
                             ceariListTemp.add(cc.cear_getCEActionRequest(i));
                     }
-                } catch (IntegrationException ex) {
+                } catch (IntegrationException | BObStatusException ex) {
                     System.out.println(ex);
                     throw new SearchException("Integration error when querying CEARS");
                 }
@@ -2487,7 +2489,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setFilterName("Action requests you've made");
          
         params.setUser_ctl(true);
-        params.setUser_val(uc.user_getUser(cred.getGoverningAuthPeriod().getUserID()));
+        try {
+            params.setUser_val(uc.user_getUser(cred.getGoverningAuthPeriod().getUserID()));
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
             
         return params;
 

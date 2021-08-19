@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
@@ -78,7 +79,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      * @param rs
      * @throws SQLException 
      */
-    protected void populateTrackedFields(TrackedEntity ti, ResultSet rs) throws SQLException, IntegrationException{
+    protected void populateTrackedFields(TrackedEntity ti, ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         UserIntegrator ui = getUserIntegrator();
         
         if(rs != null){
@@ -103,7 +104,6 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             if(rs.getInt("deactivatedby_userid") != 0){
                 ti.setDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
             }
-            
         }
     }
 
@@ -121,7 +121,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      * @throws SQLException 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    protected void populateTrackedLinkFields(IFace_trackedEntityLink te, ResultSet rs) throws SQLException, IntegrationException{
+    protected void populateTrackedLinkFields(IFace_trackedEntityLink te, ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         UserIntegrator ui = getUserIntegrator();
         
         if(rs != null){
@@ -536,7 +536,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             + "  FROM public.improvementsuggestion INNER JOIN improvementstatus USING (statusid)\n"
             + "  INNER JOIN improvementtype ON improvementtypeid = typeid;";
 
-    public ArrayList<ImprovementSuggestion> getImprovementSuggestions() throws IntegrationException {
+    public ArrayList<ImprovementSuggestion> getImprovementSuggestions() throws IntegrationException, BObStatusException {
         ArrayList<ImprovementSuggestion> impList = new ArrayList<>();
 
         Connection con = getPostgresCon();
@@ -592,7 +592,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         return rs;
     }
 
-    private ImprovementSuggestion generateImprovementSuggestion(ResultSet rs) throws SQLException, IntegrationException {
+    private ImprovementSuggestion generateImprovementSuggestion(ResultSet rs) throws SQLException, IntegrationException, BObStatusException {
         UserIntegrator ui = getUserIntegrator();
         ImprovementSuggestion is = new ImprovementSuggestion();
         is.setSuggestionID(rs.getInt("improvementid"));
