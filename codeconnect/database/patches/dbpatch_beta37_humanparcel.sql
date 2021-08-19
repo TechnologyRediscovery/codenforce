@@ -654,8 +654,8 @@ $BODY$
 						RAISE NOTICE 'DUPLICATE HUMAN FOUND: logging and using already inserted humanid % ', current_human_id  ;
 						EXECUTE format('INSERT INTO public.personhumanmigrationlog(
 									            logentryid, human_humanid, person_personid, error_code, notes, ts)
-									    VALUES (DEFAULT, NULL, %L, 2, %L, now());',
-								    		pr.personid, 'DUPLICATE RECORD FOR fullname ' || fullname
+									    VALUES (DEFAULT, NULL, NULL, 2, %L, now());',
+								    		 'DUPLICATE RECORD FOR fullname ' || fullname || ' With Person ID: ' || pr.personid
 									    );
 
 				END IF; -- over duplicate check of person records
@@ -688,12 +688,13 @@ $BODY$
 
 				 			-- If no parcel exists, write record to migrationlog table
 				 			ELSE
-				 				EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
-													            logentryid, human_humanid, person_personid, error_code, notes, ts)
-													    VALUES (DEFAULT, NULL, %L, %L, %L, now());',
-													     pr.personid, 5, 
-													    'UNABLE TO LINK PARCEL ' ||  parcel_rec.parcelkey || ' TO HUMAN ' || current_human_id
-													);
+				 				RAISE NOTICE 'No parcel found to link';
+				 				-- EXECUTE format ('INSERT INTO public.personhumanmigrationlog(
+									-- 				            logentryid, human_humanid, person_personid, error_code, notes, ts)
+									-- 				    VALUES (DEFAULT, NULL, %L, %L, %L, now());',
+									-- 				     pr.personid, 5, 
+									-- 				    'UNABLE TO LINK PARCEL ' ||  parcel_rec.parcelkey || ' TO HUMAN ' || current_human_id
+									-- 				);
 		 				END IF;
 
 			 			-- Next, check if this person's address is one of those linked any of the parcels to which he/she is connected, if so, do nothing
@@ -912,7 +913,7 @@ $BODY$
   COST 100;
 
 
-
+ALTER TABLE citationviolation RENAME COLUMN linksource to source_sourceid;
 
 --IF datepublished IS NULL the patch is still open and receiving changes
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
