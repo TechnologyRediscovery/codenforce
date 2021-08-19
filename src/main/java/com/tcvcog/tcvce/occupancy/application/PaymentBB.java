@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.FeeAssigned;
+import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
 import com.tcvcog.tcvce.entities.Person;
@@ -180,7 +181,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             //We never setpaymentList, let's just grab all the payments
             try {
                 paymentList = pc.getAllPayments();
-            } catch (IntegrationException ex) {
+            } catch (IntegrationException | BObStatusException ex) {
                 paymentList = new ArrayList<>();
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
@@ -303,7 +304,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Please select a fee to assign this payment to.", " "));
-            selectedPayment.setPayer(new Person());
+            selectedPayment.setPayer(new Person(new Human()));
             return "";
         }
 
@@ -431,7 +432,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
      *
      * @return
      */
-    public String getCurrentAddress() {
+    public String getCurrentAddress() throws BObStatusException {
 
         String address = "";
 
@@ -485,15 +486,17 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     public int getSelectedPaymentPayer() {
-        return selectedPayment.getPayer().getPersonID();
+        return selectedPayment.getPayer().getHumanID();
     }
 
-    public void setSelectedPaymentPayer(int personID) {
+    public void setSelectedPaymentPayer(int personID) throws BObStatusException {
 
         PersonCoordinator pc = getPersonCoordinator();
 
         try {
-            selectedPayment.setPayer(pc.getPerson(personID));
+            //  ----->  TODO: Update for Humanization/Parcelization <------
+            // double check this setter's input
+            selectedPayment.setPayer(pc.getPerson(pc.getHuman(personID)));
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,

@@ -19,9 +19,11 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.RoleType;
@@ -58,7 +60,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public User getUser(int userID) throws IntegrationException{
+    public User getUser(int userID) throws IntegrationException, BObStatusException{
         
         if(userID == 0){
             return null;
@@ -67,11 +69,11 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         Connection con = getPostgresCon();
         ResultSet rs = null;
         User newUser = null;
-        // broken query
+        
         String query =  "   SELECT userid, username, notes, personlink, \n" +
                         "       createdby, createdts, nologinvirtualonly, \n" +
                         "       deactivatedts, deactivated_userid, lastupdatedts, homemuni \n" +
-                        "  FROM public.login WHERE userid = ?;";
+                        "  FROM public.login WHERE userid = ?;";   
         
         PreparedStatement stmt = null;
         
@@ -142,11 +144,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    private User generateUser(ResultSet rs) throws IntegrationException, SQLException{
+    private User generateUser(ResultSet rs) throws IntegrationException, SQLException, BObStatusException{
         User user = new User();
-        PersonIntegrator pi = getPersonIntegrator();
-        MunicipalityCoordinator mc = getMuniCoordinator();
-        
+        PersonCoordinator pc = getPersonCoordinator();
         
             // line 1 of SELECT
             user.setUserID(rs.getInt("userid"));
@@ -154,7 +154,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             user.setNotes(rs.getString("notes"));
             user.setPersonID(rs.getInt("personlink"));
             if(rs.getInt("personlink") != 0){
-                user.setPerson(pi.getPerson(rs.getInt("personlink")));
+                user.setPerson(pc.getPerson(pc.getHuman(rs.getInt("personlink"))));
             }
             // line 2 of SELECT
             user.setCreatedByUserId(rs.getInt("createdby"));
@@ -193,7 +193,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @return null returned with null input
      * @throws IntegrationException 
      */
-    public UserAuthorized getUserAuthorizedNoAuthPeriods(User usr) throws IntegrationException{
+    public UserAuthorized getUserAuthorizedNoAuthPeriods(User usr) throws IntegrationException, BObStatusException{
         if(usr == null){
             System.out.println("UserIntegrator.getUANoUMAPs: null User passed in");
             return null;
@@ -693,9 +693,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(2, userToInsert.getNotes());
             
             if(userToInsert.getPerson() == null){
-                stmt.setInt(3, userToInsert.getPersonID());
+                stmt.setInt(3, userToInsert.getHumanID());
             } else {
-                stmt.setInt(3, userToInsert.getPerson().getPersonID());
+                stmt.setInt(3, userToInsert.getPerson().getHumanID());
             }
             
             if(userToInsert.getCreatedByUserId() != 0){
@@ -743,7 +743,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public List<User> getUsersByHomeMuni(Municipality muni) throws IntegrationException{
+    public List<User> getUsersByHomeMuni(Municipality muni) throws IntegrationException, BObStatusException{
         UserCoordinator uc = getUserCoordinator();
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -914,14 +914,14 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             // check both the object and ID person link fields
             // without a Person object, use the raw ID
             if(usr.getPerson() == null){
-                if(usr.getPersonID() != 0){
-                    stmt.setInt(2, usr.getPersonID());
+                if(usr.getHumanID() != 0){
+                    stmt.setInt(2, usr.getHumanID());
                 } else {
                     stmt.setNull(2, java.sql.Types.NULL);
                 }
             } else { // we've got a person object
-                if(usr.getPerson().getPersonID() != 0){ // make sure it's not a new Person
-                    stmt.setInt(2, usr.getPerson().getPersonID());
+                if(usr.getPerson().getHumanID() != 0){ // make sure it's not a new Person
+                    stmt.setInt(2, usr.getPerson().getHumanID());
                 } else {
                     stmt.setNull(2, java.sql.Types.NULL);
                 }

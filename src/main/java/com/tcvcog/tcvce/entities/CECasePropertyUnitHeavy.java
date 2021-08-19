@@ -42,7 +42,7 @@ public class CECasePropertyUnitHeavy
 
         this.allowForwardLinkedPublicAccess = cse.allowForwardLinkedPublicAccess;
 
-        this.propertyID = cse.propertyID;
+        this.parcelKey = cse.parcelKey;
         this.propertyUnitID = cse.propertyUnitID;
 
         this.caseManager = cse.caseManager;

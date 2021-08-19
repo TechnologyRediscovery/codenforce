@@ -17,6 +17,8 @@
 package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.DomainEnum;
@@ -46,7 +48,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-    public FeeAssigned getFeeAssigned(int feeID, DomainEnum selectedDomain) throws IntegrationException {
+    public FeeAssigned getFeeAssigned(int feeID, EventDomainEnum selectedDomain) throws IntegrationException, BObStatusException {
 
         String query = "";
         FeeAssigned skeleton = new FeeAssigned();
@@ -118,7 +120,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return skeleton;
     }
 
-    public List<FeeAssigned> getFeeAssigned(OccPeriod period) throws IntegrationException {
+    public List<MoneyOccPeriodFeeAssigned> getFeeAssigned(OccPeriod period) throws IntegrationException, BObStatusException {
 
         List<FeeAssigned> assignedFees = new ArrayList<>();
 
@@ -164,52 +166,53 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return assignedFees;
     }
 
-//    public List<MoneyCECaseFeeAssigned> getFeeAssigned(CECase cse) throws IntegrationException {
-//
-//        List<MoneyCECaseFeeAssigned> assignedFees = new ArrayList<>();
-//
-//        String query = "SELECT * FROM moneycecasefeeassigned WHERE cecase_caseid = ?;";
-//
-//        Connection con = getPostgresCon();
-//        ResultSet rs = null;
-//        PreparedStatement stmt = null;
-//
-//        try {
-//            stmt = con.prepareStatement(query);
-//            stmt.setInt(1, cse.getCaseID());
-//            rs = stmt.executeQuery();
-//            while (rs.next()) {
-//                assignedFees.add(generateCECaseFeeAssigned(rs));
-//            }
-//        } catch (SQLException ex) {
-//            System.out.println(ex.toString());
-//            throw new IntegrationException("PaymentIntegrator.getFeeAssigned | Unable to retrieve fees assigned to CECase", ex);
-//        } finally {
-//            if (con != null) {
-//                try {
-//                    con.close();
-//                } catch (SQLException e) {
-//                    /* ignored */
-//                }
-//            }
-//            if (stmt != null) {
-//                try {
-//                    stmt.close();
-//                } catch (SQLException e) {
-//                    /* ignored */
-//                }
-//            }
-//            if (rs != null) {
-//                try {
-//                    rs.close();
-//                } catch (SQLException ex) {
-//                    /* ignored */ }
-//            }
-//        } // close finally
-//
-//        return assignedFees;
-//
-//    }
+
+    public List<MoneyCECaseFeeAssigned> getFeeAssigned(CECase cse) throws IntegrationException, BObStatusException {
+
+        List<MoneyCECaseFeeAssigned> assignedFees = new ArrayList<>();
+
+        String query = "SELECT * FROM moneycecasefeeassigned WHERE cecase_caseid = ?;";
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, cse.getCaseID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                assignedFees.add(generateCECaseFeeAssigned(rs));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PaymentIntegrator.getFeeAssigned | Unable to retrieve fees assigned to CECase", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        } // close finally
+
+        return assignedFees;
+
+    }
 
     public Fee getFee(int feeID) throws IntegrationException {
         Fee skeleton = new Fee();
@@ -636,7 +639,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-    public FeeAssigned generateFeeAssigned(ResultSet rs) throws IntegrationException {
+    public FeeAssigned generateFeeAssigned(ResultSet rs) throws IntegrationException, BObStatusException {
 
         UserIntegrator ui = getUserIntegrator();
 
@@ -661,6 +664,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
+
     // Don't think there should be two methods here! If you are coming across this, there was a nuclear refactor
     // on all this stuff, so it really needs gone over and properly tested! Just to be clear:
     // I pretty much just made sure this all compiled and I have no idea if it still works.
@@ -670,7 +674,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     // Note again from a little later: I am so sorry for this
 
-    public FeeAssigned generateOccPeriodFeeAssigned(ResultSet rs) throws IntegrationException {
+    public MoneyOccPeriodFeeAssigned generateOccPeriodFeeAssigned(ResultSet rs) throws IntegrationException, BObStatusException {
 
         UserIntegrator ui = getUserIntegrator();
 
@@ -693,7 +697,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-    public FeeAssigned generateCECaseFeeAssigned(ResultSet rs) throws IntegrationException {
+    public MoneyCECaseFeeAssigned generateCECaseFeeAssigned(ResultSet rs) throws IntegrationException, BObStatusException {
 
         UserIntegrator ui = getUserIntegrator();
 
@@ -773,7 +777,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             }
 
             stmt.setBigDecimal(4, BigDecimal.valueOf(payment.getAmount()));
-            stmt.setInt(5, payment.getPayer().getPersonID());
+            stmt.setInt(5, payment.getPayer().getHumanID());
             stmt.setString(6, payment.getReferenceNum());
             stmt.setInt(7, payment.getCheckNum());
             stmt.setBoolean(8, payment.isCleared());
@@ -810,7 +814,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
      * @return
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public Payment getPayment(int paymentID) throws IntegrationException {
+    public Payment getPayment(int paymentID) throws IntegrationException, BObStatusException {
 
         String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
                 + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"
@@ -865,7 +869,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
      * @return
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public List<Payment> getPaymentList(OccPeriod period) throws IntegrationException {
+    public List<Payment> getPaymentList(OccPeriod period) throws IntegrationException, BObStatusException {
 
         String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
                 + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, moneypayment.notes,\n"
@@ -912,6 +916,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         }
         return paymentList;
     }
+
 
     // Definitely broken method, I will just leave this one commented out and leave the other one for now
 
@@ -967,7 +972,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 //        return paymentList;
 //    }
 
-    public List<Payment> getPaymentList(FeeAssigned fee) throws IntegrationException {
+    public List<Payment> getPaymentList(MoneyOccPeriodFeeAssigned fee) throws IntegrationException, BObStatusException {
 
         String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
                 + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, moneypayment.notes,\n"
@@ -984,8 +989,10 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             stmt.setInt(1, fee.getAssignedFeeID());
             rs = stmt.executeQuery();
             while (rs.next()) {
-                Payment p = generatePayment(rs, fee.getDomain());
-                p.setAssignedFeeID(fee.getAssignedFeeID());
+                Payment p = generatePayment(rs, DomainEnum.OCCUPANCY);
+                p.setAssignedFeeID(fee.getOccPerAssignedFeeID());
+                p.setDomain(DomainEnum.OCCUPANCY);
+                paymentList.add(p);
 
             }
 
@@ -1017,7 +1024,113 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return paymentList;
     }
 
-    public ArrayList<Payment> getPaymentList() throws IntegrationException {
+    /**
+     * Extracts the ID of the given CECase and uses this to grab all relevant
+     * payments from the db associated with this CECase
+     *
+     * @param cse
+     * @return
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public List<Payment> getPaymentList(CECase cse) throws IntegrationException, BObStatusException {
+
+        String query = "SELECT paymentid, paymenttype_typeid, datereceived, datedeposited, \n"
+                + "amount, payer_personid, referencenum, checkno, cleared,\n"
+                + "moneypayment.notes, recordedby_userid, entrytimestamp\n"
+                + "FROM moneycecasefeeassigned, moneycecasefeepayment, public.moneypayment\n"
+                + "WHERE cecase_caseid = ? AND cecaseassignedfeeid = cecaseassignedfee_id AND payment_paymentid = paymentid;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        ArrayList<Payment> paymentList = new ArrayList();
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, cse.getCaseID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                paymentList.add(generatePayment(rs, EventDomainEnum.CODE_ENFORCEMENT));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get Payment List", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        }
+        return paymentList;
+    }
+
+    public List<Payment> getPaymentList(MoneyCECaseFeeAssigned fee) throws IntegrationException, BObStatusException {
+
+        String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
+                + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, moneypayment.notes,\n"
+                + "recordedby_userid, entrytimestamp\n"
+                + "FROM moneycecasefeepayment, public.moneypayment\n"
+                + "WHERE cecaseassignedfee_id = ? AND payment_paymentid = paymentid;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        ArrayList<Payment> paymentList = new ArrayList();
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, fee.getCeCaseAssignedFeeID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                Payment p = generatePayment(rs, EventDomainEnum.CODE_ENFORCEMENT);
+                p.setAssignedFeeID(fee.getCeCaseAssignedFeeID());
+
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get Payment List", ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    /* ignored */
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    /* ignored */ }
+            }
+        }
+        return paymentList;
+    }
+
+    public ArrayList<Payment> getPaymentList() throws IntegrationException, BObStatusException {
         String query = "SELECT paymentid, paymenttype_typeid, datereceived, \n"
                 + "       datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"
                 + "recordedby_userid, entrytimestamp\n"
@@ -1063,7 +1176,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return paymentList;
     }
 
-    public Payment getMostRecentPayment() throws IntegrationException {
+    public Payment getMostRecentPayment() throws IntegrationException, BObStatusException {
         String query = "SELECT paymentid, paymenttype_typeid, datereceived,\n"
                 + "datedeposited, amount, payer_personid, referencenum, checkno, cleared, notes,\n"
                 + "recordedby_userid, entrytimestamp\n"
@@ -1135,7 +1248,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
                 stmt.setNull(3, java.sql.Types.NULL);
             }
             stmt.setBigDecimal(4, BigDecimal.valueOf(payment.getAmount()));
-            stmt.setInt(5, payment.getPayer().getPersonID());
+            stmt.setInt(5, payment.getPayer().getHumanID());
             stmt.setString(6, payment.getReferenceNum());
             stmt.setInt(7, payment.getCheckNum());
             stmt.setString(8, payment.getNotes());
@@ -1568,10 +1681,11 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } // close finally
     }
 
-    private Payment generatePayment(ResultSet rs, DomainEnum domain) throws IntegrationException {
+    private Payment generatePayment(ResultSet rs, EventDomainEnum domain) throws IntegrationException, BObStatusException {
         Payment newPayment = new Payment();
 
         PersonIntegrator pi = getPersonIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
 
         UserIntegrator ui = getUserIntegrator();
 
@@ -1600,7 +1714,8 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
                 newPayment.setEntryTimestamp(null);
             }
             newPayment.setAmount(rs.getDouble("amount"));
-            newPayment.setPayer(pi.getPerson(rs.getInt("payer_personid")));
+            // Updated for humanization
+            newPayment.setPayer(pc.getPerson(pc.getHuman(rs.getInt("payer_personid"))));
             newPayment.setReferenceNum(rs.getString("referencenum"));
             newPayment.setCheckNum(rs.getInt("checkno"));
             newPayment.setCleared(rs.getBoolean("cleared"));

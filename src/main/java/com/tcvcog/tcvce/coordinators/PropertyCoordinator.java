@@ -32,6 +32,7 @@ import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
+import com.tcvcog.tcvce.entities.Parcel;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
@@ -50,7 +51,6 @@ import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
-import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -64,7 +64,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
+ * Business logic container for All Things Property related
+ * 
  * @author Dominic Pimpinella, MaRoSco, Ellen Bascomb (31Y)
  */
 public class PropertyCoordinator extends BackingBeanUtils implements Serializable {
@@ -72,6 +73,13 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     private final String DEFAULTUNITNUMBER = "-1";
     private final boolean DEFAULTRENTAL = false;
 
+     /**
+     * Creates a new instance of PropertyUnitCoordinator
+     */
+    public PropertyCoordinator() {
+    }
+
+    
     
     /**
      * Pass through for getting a property count by municode
@@ -107,11 +115,11 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
         if(prop != null && ua != null){
             // if we've been given a skeleton, just inject it into data heavy subclass
-            if(prop.getPropertyID() == 0){
+            if(prop.getParcelKey() == 0){
                 pdh = new PropertyDataHeavy(prop);
             } else {
 
-               pdh = new PropertyDataHeavy(getProperty(prop.getPropertyID()));
+               pdh = new PropertyDataHeavy(getProperty(prop.getParcelKey()));
 
                try {
                    // CECase list
@@ -126,7 +134,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
                    // check list and see if it's emtpy; 
                    if (pdh.getPropInfoCaseList() == null) {
-                       pdh.setPropInfoCaseList(new ArrayList<CECaseDataHeavy>());
+                       pdh.setPropInfoCaseList(new ArrayList<>());
                    }
 
                    if (pdh.getPropInfoCaseList().isEmpty()) {
@@ -142,13 +150,15 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                    // Person list
                    QueryPerson qp = sc.initQuery(QueryPersonEnum.PROPERTY_PERSONS, ua.getKeyCard());
                    qp.getPrimaryParams().setProperty_val(prop);
-                   pdh.setPersonList(sc.runQuery(qp).getBOBResultList());
-                   System.out.println("PropertyCoordinator.assemblePropertyDH: personlist size: " + pdh.getPersonList().size());
+                   // Fix for humanization
+                   pdh.setHumanLinkList(new ArrayList<>());
+//                   pdh.setPersonList(sc.runQuery(qp).getBOBResultList());
+//                   System.out.println("PropertyCoordinator.assemblePropertyDH: personlist size: " + pdh.getPersonList().size());
 
                    // wait on blobs
                    pdh.setBlobList(bc.getBlobLightList(bi.getBlobIDs(prop)));
                    // external data
-                   pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getPropertyID())));
+                   pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getParcelKey())));
 
                } catch (EventException | AuthorizationException | BObStatusException | BlobException | IntegrationException | SearchException ex) {
                    System.out.println(ex);
@@ -186,7 +196,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @return
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public PropertyUnitWithProp getPropertyUnitWithProp(int unitid) throws IntegrationException {
+    public PropertyUnitWithProp getPropertyUnitWithProp(int unitid) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         return pi.getPropertyUnitWithProp(unitid);
 
@@ -310,14 +320,13 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param p
      * @return
      */
-    public Property configureProperty(Property p) {
-        if (p.getUnitList() == null) {
-            p.setUnitList(new ArrayList<>());
-        }
+    public Property configureProperty(Property p) throws IntegrationException, BObStatusException {
+        PropertyIntegrator pi = getPropertyIntegrator();
+        
+        p.setUnitList(pi.getPropertyUnitList(p));
+        p.setAddresses(pi.getMailingAddressListByParcel(p.getParcelKey()));
         
         parseAddress(p);
-        
-
         return p;
     }
     
@@ -336,8 +345,9 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             Matcher matNum = patNum.matcher(prop.getAddress());
 
             while (matNum.find()){
-                prop.setAddressNum(matNum.group("num"));
-                prop.setAddressStreet(matNum.group("street"));
+                // Don't need this for humanization since we're already separating out num and street
+//                prop.setAddressNum(matNum.group("num"));
+//                prop.setAddressStreet(matNum.group("street"));
             }
 
         }
@@ -357,66 +367,25 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @throws BObStatusException
      */
     public void connectPersonToProperty(PropertyDataHeavy pdh, Person pers) throws IntegrationException, BObStatusException {
-        boolean proceedWithConnect = true;
-        PersonCoordinator pc = getPersonCoordinator();
-        if (pdh != null && pers != null) {
-            for (Person p : pdh.getPersonList()) {
-                if (p.getPersonID() == pers.getPersonID()) {
-                    proceedWithConnect = false;
-                }
-            }
-        }
-        if (proceedWithConnect) {
-            pc.connectPersonToProperty(pers, pdh);
-        } else {
-            throw new BObStatusException("Person Link Already Exists");
-        }
+        // TODO: fix for humanization upgrade
+//        boolean proceedWithConnect = true;
+//        PersonCoordinator pc = getPersonCoordinator();
+//        if (pdh != null && pers != null) {
+//            for (Person p : pdh.getPersonList()) {
+//                if (p.getHumanID() == pers.getHumanID()) {
+//                    proceedWithConnect = false;
+//                }
+//            }
+//            if (proceedWithConnect) {
+//                pc.connectPersonToProperty(pers, pdh);
+//            } else {
+//                throw new BObStatusException("Person Link Already Exists");
+//            }
+//        }
 
     }
 
-    /**
-     * Logic pass through for removals of property and person connections and I
-     * create a note documenting the removal and post to property
-     *
-     * @param p
-     * @param pers
-     * @param ua the user requesting the link removal for note
-     * @throws IntegrationException
-     * @throws BObStatusException
-     */
-    public void connectRemovePersonToProperty(Property p, Person pers, UserAuthorized ua) throws IntegrationException, BObStatusException {
-        PersonCoordinator pc = getPersonCoordinator();
-        PropertyIntegrator pi = getPropertyIntegrator();
-        SystemCoordinator sc = getSystemCoordinator();
-
-        pc.connectRemovePersonToProperty(pers, p);
-
-        // build person link removal note
-        MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.setUser(ua);
-        StringBuilder sb = new StringBuilder();
-        sb.append("Removal of link between Property at ");
-        sb.append(p.getAddress());
-        sb.append(" in ");
-        sb.append(p.getMuni().getMuniName());
-        sb.append(" (ID:");
-        sb.append(p.getPropertyID());
-        sb.append(")");
-        sb.append(" and Person ");
-        sb.append(pers.getFirstName());
-        sb.append(" ");
-        sb.append(pers.getLastName());
-        sb.append(" (ID:");
-        sb.append(pers.getPersonID());
-        sb.append(") ");
-        mbp.setNewMessageContent(sb.toString());
-        mbp.setExistingContent(p.getNotes());
-        mbp.setIncludeCredentialSig(false);
-        p.setNotes(sc.appendNoteBlock(mbp));
-        // commit person link removal note
-        pi.updateProperty(p);
-
-    }
+   
 
     public LocalDateTime configureDateTime(Date date) {
         return new java.sql.Timestamp(date.getTime()).toLocalDateTime();
@@ -524,63 +493,64 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     }
 
     /**
-     * Primary pathway for the creation of new records in the property
-     * table--the biggie!!
+     * Primary pathway for the creation of new records in the parcel
+     * table 
      *
-     * @param prop
+     * @param pcl
      * @param ua
      * @return
      * @throws IntegrationException
      */
-    public int addProperty(Property prop, UserAuthorized ua) throws IntegrationException {
+    public int addParcel(Parcel pcl, UserAuthorized ua) throws IntegrationException {
         PropertyIntegrator pi = getPropertyIntegrator();
         SystemIntegrator si = getSystemIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
 
-        prop.setLastUpdatedBy(ua);
-        prop.setBobSource(si.getBOBSource(
+        pcl.setCreatedBy(ua);
+        pcl.setLastUpdatedBy(ua);
+        pcl.setSource(si.getBOBSource(
                 Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString("bobsourcePropertyInternal"))));
-        prop.setNotes(sc.formatAndAppendNote(ua,
-                ua.getMyCredential(),
-                "Property created",
-                prop.getNotes()));
+        
         // this controller class passes the new property to insert
         // over to the data model to be written into the Database
-        return pi.insertProperty(prop);
+        return pi.insertParcel(pcl);
+        
 
     }
 
     /**
      * Logic container for property updates
      *
-     * @param prop
+     * @param pcl
      * @param ua
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public void editProperty(Property prop, UserAuthorized ua) throws IntegrationException, BObStatusException {
+    public void updateParcel(Parcel pcl, UserAuthorized ua) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
-        prop.setLastUpdatedBy(ua);
-        prop.setLastUpdatedTS(LocalDateTime.now());
-        if (checkAllDates(prop) == false) {
-            throw new BObStatusException("Date error in committing property updates; Ensure no end date is before a start date");
-
-        }
-        pi.updateProperty(prop);
+        pcl.setLastUpdatedBy(ua);
+        pi.updateParcel(pcl);
 
     }
 
+    
     public boolean checkAllDates(Property prop) {
         boolean unfit, vacant, abandoned;
-        unfit = checkStartDTisBeforeEndDT(prop.getUnfitDateStart(), prop.getUnfitDateStop());
-        vacant = checkStartDTisBeforeEndDT(prop.getVacantDateStart(), prop.getVacantDateStop());
-        abandoned = checkStartDTisBeforeEndDT(prop.getAbandonedDateStart(), prop.getAbandonedDateStop());
-        if (unfit && vacant && abandoned) {
-            return true;
-        } else {
-            return false;
-        }
+
+        // TODO: humanization: these values now live on the propertydata records, not direclty on
+        // a parcel
+//        unfit = checkStartDTisBeforeEndDT(prop.getUnfitDateStart(), prop.getUnfitDateStop());
+//        vacant = checkStartDTisBeforeEndDT(prop.getVacantDateStart(), prop.getVacantDateStop());
+//        abandoned = checkStartDTisBeforeEndDT(prop.getAbandonedDateStart(), prop.getAbandonedDateStop());
+//        if (unfit && vacant && abandoned) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+
+        // short circuit logic
+        return true;
     }
 
     public boolean checkStartDTisBeforeEndDT(LocalDateTime start, LocalDateTime end) {
@@ -638,14 +608,19 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
     /**
      * Logic intervention method for retrievals of simple properties from the DB
-     *
-     * @param propID
+     * Updated to reflect parcelization in which there's no "propertyID" but 
+     * rather a parcel ID that's internal to codeNforce and a countyParID
+     * 
+     * @param parcelID
      * @return
      * @throws IntegrationException
      */
-    public Property getProperty(int propID) throws IntegrationException {
+    public Property getProperty(int parcelID) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
-        return configureProperty(pi.getProperty(propID));
+        Parcel par = pi.getParcel(parcelID);
+        Property p = new Property(par);
+        
+        return configureProperty(p);
 
     }
 
@@ -656,7 +631,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @return
      * @throws IntegrationException
      */
-    public PropertyUnit getPropertyUnit(int unitID) throws IntegrationException {
+    public PropertyUnit getPropertyUnit(int unitID) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         return pi.getPropertyUnit(unitID);
 
@@ -680,7 +655,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return putList;
     }
 
-    public Property getPropertyByPropUnitID(int unitID) throws IntegrationException {
+    public Property getPropertyByPropUnitID(int unitID) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         return pi.getPropertyUnitWithProp(unitID).getProperty();
     }
@@ -716,10 +691,12 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
     /**
      *
+     * 
+     * 
      * @param cred
      * @return
      */
-    public List<Property> assemblePropertyHistoryList(Credential cred) {
+    public List<Property> assemblePropertyHistoryList(Credential cred) throws BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         List<Property> propList = new ArrayList<>();
         List<Integer> propIDList = new ArrayList<>();
@@ -734,7 +711,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                     } else {
                         Municipality m = cred.getGoverningAuthPeriod().getMuni();
                         for (Property pr : propList) {
-                            if (pr.getMuniCode() == m.getMuniCode()) {
+                            if (pr.getMuni().getMuniCode() == m.getMuniCode()) {
                                 propList.add(pr);
                             }
                         }
@@ -747,21 +724,17 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return propList;
     }
 
-    /**
-     * Creates a new instance of PropertyUnitCoordinator
-     */
-    public PropertyCoordinator() {
-    }
-
+   
     
     /**
+     * TODO: Update for parcelization
      * Generator method for Property objects
      * @param muni
      * @return the skelton property object with only muni set and ID of 0
      */
     public Property generatePropertySkeleton(Municipality muni) {
-        Property prop = new Property();
-        prop.setPropertyID(0);
+        Property prop = new Property(new Parcel());
+        prop.setParcelKey(0);
         prop.setMuni(muni);
         return prop;
     }
@@ -776,7 +749,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public PropertyUnit initPropertyUnit(Property p) {
         PropertyUnit propUnit = new PropertyUnit();
-        propUnit.setPropertyID(p.getPropertyID());
+        propUnit.setParcelKey(p.getParcelKey());
         propUnit.setUnitNumber(Constants.TEMP_UNIT_NUM);
         propUnit.setUnitNumber("");
         propUnit.setRentalNotes("");
@@ -809,7 +782,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
             // decide if we're updating a unit or inserting it based on initial value
             // newly created units don't have an ID, just a default unit number
-            unit.setPropertyID(prop.getPropertyID());
+            unit.setParcelKey(prop.getParcelKey());
 
             if (unit.getUnitID() == 0) {
                 pi.insertPropertyUnit(unit);
@@ -826,7 +799,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         prop.setUnitList(listTwo);
 
         // mark parent property as updated now
-        editProperty(prop, getSessionBean().getSessUser());
+        updateParcel(prop, getSessionBean().getSessUser());
 
         return listTwo;
 
@@ -840,7 +813,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param uc
      * @throws IntegrationException
      */
-    public void implementPropertyUnitChangeOrder(PropertyUnitChangeOrder uc) throws IntegrationException {
+    public void implementPropertyUnitChangeOrder(PropertyUnitChangeOrder uc) throws IntegrationException, BObStatusException {
 
         PropertyIntegrator pi = getPropertyIntegrator();
 

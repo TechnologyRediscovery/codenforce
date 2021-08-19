@@ -18,7 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.util;
 
 import com.tcvcog.tcvce.entities.CEActionRequestStatus;
-import com.tcvcog.tcvce.entities.CitationStatus;
+import com.tcvcog.tcvce.entities.CitationStatusLogEntry;
 import com.tcvcog.tcvce.entities.search.IFace_dateFieldHolder;
 import com.tcvcog.tcvce.entities.search.IFace_userFieldHolder;
 import javax.faces.component.UIComponent;

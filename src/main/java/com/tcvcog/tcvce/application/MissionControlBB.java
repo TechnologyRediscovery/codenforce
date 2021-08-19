@@ -103,13 +103,13 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     public void initBean() {
         UserCoordinator uc = getUserCoordinator();
         currentUser = getSessionBean().getSessUser();
-        userList = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
-        CaseCoordinator cc = getCaseCoordinator();
-        SearchCoordinator sc = getSearchCoordinator();
-        
-        SessionBean sb = getSessionBean();
-        QueryCECase cseQ = sc.initQuery(QueryCECaseEnum.OPENCASES, getSessionBean().getSessUser().getKeyCard());
         try {
+            userList = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
+            CaseCoordinator cc = getCaseCoordinator();
+            SearchCoordinator sc = getSearchCoordinator();
+
+            SessionBean sb = getSessionBean();
+            QueryCECase cseQ = sc.initQuery(QueryCECaseEnum.OPENCASES, getSessionBean().getSessUser().getKeyCard());
             cseQ = sc.runQuery(cseQ);
             
 //            List<CECase> hist = cc.cecase_getCECaseHistory(ua);
@@ -294,7 +294,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
             FacesContext facesContext = getFacesContext();
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                     ex.getMessage(), ""));
-        } catch (AuthorizationException ex) {
+        } catch (AuthorizationException | BObStatusException ex) {
             System.out.println(ex);
         } 
         System.out.println("MissionControlBB.switchMuni | selected muni: " + selectedMuni.getMuniName());

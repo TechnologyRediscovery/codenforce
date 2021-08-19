@@ -72,7 +72,7 @@ public class PropertyUnitChangesBB
         //let's grab the latest copy of the prop from the database and set it on the session bean
         try {
 
-            Property dbProp = pc.getProperty(currProp.getPropertyID());
+            Property dbProp = pc.getProperty(currProp.getParcelKey());
 
             currProp = pc.assemblePropertyDataHeavy(dbProp, getSessionBean().getSessUser());
 
@@ -103,7 +103,7 @@ public class PropertyUnitChangesBB
                     + " "
                     + change.getApprovedBy().getPerson().getLastName()
                     + " (ID# "
-                    + change.getApprovedBy().getPersonID()
+                    + change.getApprovedBy().getPerson().getHumanID()
                     + ")";
         } else if(change.isActive()) {
             return "No action taken yet";
@@ -164,7 +164,7 @@ public class PropertyUnitChangesBB
         
         try {
             pc.implementPropertyUnitChangeOrder(currChangeOrder);
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println("PropertyUnitChangesBB.applyChangeOrder() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

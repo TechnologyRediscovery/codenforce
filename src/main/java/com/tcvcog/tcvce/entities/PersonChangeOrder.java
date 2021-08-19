@@ -66,7 +66,7 @@ public class PersonChangeOrder extends ChangeOrder {
      */
     public PersonChangeOrder(Person original, Person proposed) {
 
-        personID = proposed.getPersonID();
+        personID = proposed.getHumanID();
 
         //check each field for changes
         if (!compareStrings(original.getFirstName(), proposed.getFirstName())) {
@@ -77,21 +77,23 @@ public class PersonChangeOrder extends ChangeOrder {
             lastName = proposed.getLastName();
         }
         
-        if (proposed.isCompositeLastName() != original.isCompositeLastName()) {
-            setCompositeLastName(proposed.isCompositeLastName());
-        }
-        
-        if (!compareStrings(original.getPhoneCell(), proposed.getPhoneCell())) {
-            phoneCell = proposed.getPhoneCell();
-        }
-        
-        if (!compareStrings(original.getPhoneHome(), proposed.getPhoneHome())) {
-            phoneHome = proposed.getPhoneHome();
-        }
-        
-        if (!compareStrings(original.getPhoneWork(), proposed.getPhoneWork())) {
-            phoneWork = proposed.getPhoneWork();
-        }
+       // TODO: Upgrade for humanization/parcelization
+//        
+//        if (proposed.isCompositeLastName() != original.isCompositeLastName()) {
+//            setCompositeLastName(proposed.isCompositeLastName());
+//        }
+//        
+//        if (!compareStrings(original.getPhoneCell(), proposed.getPhoneCell())) {
+//            phoneCell = proposed.getPhoneCell();
+//        }
+//        
+//        if (!compareStrings(original.getPhoneHome(), proposed.getPhoneHome())) {
+//            phoneHome = proposed.getPhoneHome();
+//        }
+//        
+//        if (!compareStrings(original.getPhoneWork(), proposed.getPhoneWork())) {
+//            phoneWork = proposed.getPhoneWork();
+//        }
         
         if (!compareStrings(original.getEmail(), proposed.getEmail())) {
             email = proposed.getEmail();
@@ -113,81 +115,86 @@ public class PersonChangeOrder extends ChangeOrder {
             addressZip = proposed.getAddressZip();
         }
         
-        if(original.isUseSeparateMailingAddress() != proposed.isUseSeparateMailingAddress()){
-            setUseSeparateMailingAddress(proposed.isUseSeparateMailingAddress());
-        }
-
-        if (!compareStrings(original.getMailingAddressStreet(), proposed.getMailingAddressStreet())) {
-            addressStreet = proposed.getMailingAddressStreet();
-        }
-        
-        if (!compareStrings(original.getMailingAddressCity(), proposed.getMailingAddressCity())) {
-            addressCity = proposed.getMailingAddressCity();
-        }
-        
-        if (!compareStrings(original.getMailingAddressState(), proposed.getMailingAddressState())) {
-            addressState = proposed.getMailingAddressState();
-        }
-        
-        if (!compareStrings(original.getMailingAddressZip(), proposed.getMailingAddressZip())) {
-            addressZip = proposed.getMailingAddressZip();
-        }
-        
-        personType = proposed.getPersonType();
+       // TODO: Upgrade for humanization/parcelization
+//        if(original.isUseSeparateMailingAddress() != proposed.isUseSeparateMailingAddress()){
+//            setUseSeparateMailingAddress(proposed.isUseSeparateMailingAddress());
+//        }
+//
+//        if (!compareStrings(original.getMailingAddressStreet(), proposed.getMailingAddressStreet())) {
+//            addressStreet = proposed.getMailingAddressStreet();
+//        }
+//        
+//        if (!compareStrings(original.getMailingAddressCity(), proposed.getMailingAddressCity())) {
+//            addressCity = proposed.getMailingAddressCity();
+//        }
+//        
+//        if (!compareStrings(original.getMailingAddressState(), proposed.getMailingAddressState())) {
+//            addressState = proposed.getMailingAddressState();
+//        }
+//        
+//        if (!compareStrings(original.getMailingAddressZip(), proposed.getMailingAddressZip())) {
+//            addressZip = proposed.getMailingAddressZip();
+//        }
+//        
+//        personType = proposed.getPersonType();
 
     }
 
     public PersonChangeOrder(Person input) {
-        personID = input.getPersonID();
-        personType = input.getPersonType();
-        firstName = input.getFirstName();
-        lastName = input.getLastName();
-        setCompositeLastName(input.isCompositeLastName());
-        phoneCell = input.getPhoneCell();
-        phoneHome = input.getPhoneHome();
-        phoneWork = input.getPhoneWork();
-        email = input.getEmail();
-        addressStreet = input.getAddressStreet();
-        addressCity = input.getAddressCity();
-        addressZip = input.getAddressZip();
-        addressState = input.getAddressState();
-        setUseSeparateMailingAddress(input.isUseSeparateMailingAddress());
-        mailingAddressStreet = input.getMailingAddressStreet();
-        mailingAddressThirdLine = input.getMailingAddressThirdLine();
-        mailingAddressCity = input.getMailingAddressCity();
-        mailingAddressZip = input.getMailingAddressZip();
-        mailingAddressState = input.getAddressState();
+        
+        // TODO: Upgrade for humanization/parcelization
+        
+//        personID = input.getHumanID();
+//        personType = input.getPersonType();
+//        firstName = input.getFirstName();
+//        lastName = input.getLastName();
+//        setCompositeLastName(input.isCompositeLastName());
+//        phoneCell = input.getPhoneCell();
+//        phoneHome = input.getPhoneHome();
+//        phoneWork = input.getPhoneWork();
+//        email = input.getEmail();
+//        addressStreet = input.getAddressStreet();
+//        addressCity = input.getAddressCity();
+//        addressZip = input.getAddressZip();
+//        addressState = input.getAddressState();
+//        setUseSeparateMailingAddress(input.isUseSeparateMailingAddress());
+//        mailingAddressStreet = input.getMailingAddressStreet();
+//        mailingAddressThirdLine = input.getMailingAddressThirdLine();
+//        mailingAddressCity = input.getMailingAddressCity();
+//        mailingAddressZip = input.getMailingAddressZip();
+//        mailingAddressState = input.getAddressState();
     }
 
     public Person toPerson() {
 
-        Person skeleton = new Person();
+        // TODO: Upgrade for humanization/parcelization
+//        Person skeleton = new Person();
+//
+//        skeleton.setPersonID(personID);
+//        skeleton.setPersonType(personType);
+//        skeleton.setFirstName(firstName);
+//        skeleton.setLastName(lastName);
+//        skeleton.setCompositeLastName(Boolean.getBoolean(compositeLastName));
+//
+//        skeleton.setPhoneCell(phoneCell);
+//        skeleton.setPhoneHome(phoneHome);
+//        skeleton.setPhoneWork(phoneWork);
+//        skeleton.setEmail(email);
+//
+//        skeleton.setAddressStreet(addressStreet);
+//        skeleton.setAddressCity(addressCity);
+//        skeleton.setAddressState(addressState);
+//        skeleton.setAddressZip(addressZip);
+//
+//        skeleton.setUseSeparateMailingAddress(Boolean.getBoolean(useSeparateMailingAddress));
+//        skeleton.setMailingAddressStreet(mailingAddressStreet);
+//        skeleton.setMailingAddressThirdLine(mailingAddressThirdLine);
+//        skeleton.setMailingAddressCity(mailingAddressCity);
+//        skeleton.setMailingAddressState(mailingAddressState);
+//        skeleton.setMailingAddressZip(mailingAddressZip);
 
-        skeleton.setPersonID(personID);
-        skeleton.setPersonType(personType);
-        skeleton.setFirstName(firstName);
-        skeleton.setLastName(lastName);
-        skeleton.setCompositeLastName(Boolean.getBoolean(compositeLastName));
-
-        skeleton.setPhoneCell(phoneCell);
-        skeleton.setPhoneHome(phoneHome);
-        skeleton.setPhoneWork(phoneWork);
-        skeleton.setEmail(email);
-
-        skeleton.setAddressStreet(addressStreet);
-        skeleton.setAddressCity(addressCity);
-        skeleton.setAddressState(addressState);
-        skeleton.setAddressZip(addressZip);
-
-        skeleton.setUseSeparateMailingAddress(Boolean.getBoolean(useSeparateMailingAddress));
-        skeleton.setMailingAddressStreet(mailingAddressStreet);
-        skeleton.setMailingAddressThirdLine(mailingAddressThirdLine);
-        skeleton.setMailingAddressCity(mailingAddressCity);
-        skeleton.setMailingAddressState(mailingAddressState);
-        skeleton.setMailingAddressZip(mailingAddressZip);
-
-        return skeleton;
-
+//        return skeleton;
+            return null;
     }
 
     /**
@@ -278,7 +285,12 @@ public class PersonChangeOrder extends ChangeOrder {
         this.personChangeID = personChangeID;
     }
 
-    public int getPersonID() {
+    /**
+     * Work around for reverse compatibility
+     * TODO: FIX ME FOR HUMANIZATION
+     * @return 
+     */
+    public int getHumanID() {
         return personID;
     }
 

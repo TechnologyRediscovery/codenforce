@@ -85,7 +85,7 @@ public abstract class PublicInfoBundle implements Serializable {
             sb.append(" ");
             sb.append(manager.getPerson().getLastName());
             setCaseManagerName(sb.toString());
-            setCaseManagerContact(manager.getPerson().getPhoneWork());
+            setCaseManagerContact(manager.getPerson().getPrimaryPhone().phoneNumber);
         }
     }
     
@@ -96,7 +96,10 @@ public abstract class PublicInfoBundle implements Serializable {
      * @param prop 
      */
     public void setAddress(Property prop){
-        if (prop == null || prop.isNonAddressable()) {
+        
+        // compound check for nonaddressable removed
+        // during humanization process
+        if (prop == null) {
                 setAddressAssociated(false);
             } else {
                 setAddressAssociated(true);

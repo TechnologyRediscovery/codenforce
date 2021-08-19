@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
 import com.tcvcog.tcvce.entities.PersonType;
@@ -112,14 +113,14 @@ public class PersonSearchBB extends BackingBeanUtils{
                 currentPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessUser().getPerson(),
                             cred);
             }
-       } catch (IntegrationException ex){
+       } catch (IntegrationException | BObStatusException ex){
            System.out.println(ex);
        }
        
        if(currentPerson != null){
              getFacesContext().addMessage(null,
             new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                    "Your current person is PersonID: " + currentPerson.getPersonID() + " ("+ currentPerson.getLastName() + ")", ""));
+                    "Your current person is PersonID: " + currentPerson.getHumanID() + " ("+ currentPerson.getLastName() + ")", ""));
        }
        
        
@@ -187,10 +188,11 @@ public class PersonSearchBB extends BackingBeanUtils{
     }
     
     public void executeQuery(ActionEvent event){
-        
+        PersonCoordinator pc = getPersonCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         try {
-            List<Person> pl = sc.runQuery(querySelected).getBOBResultList();
+            List<Person> pl = pc.assemblePersonListFromHumanList(sc.runQuery(querySelected).getBOBResultList());
+            
             if(!isAppendResultsToList()){
                 personList.clear();
             } 
@@ -201,7 +203,7 @@ public class PersonSearchBB extends BackingBeanUtils{
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + pl.size() + " results", ""));
             
-        } catch (SearchException ex) {
+        } catch (SearchException | IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -239,7 +241,7 @@ public class PersonSearchBB extends BackingBeanUtils{
             getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(p, getSessionBean().getSessUser().getMyCredential()));
             currentPerson = pc.assemblePersonDataHeavy(p, getSessionBean().getSessUser().getKeyCard());
             si.logObjectView_OverwriteDate(getSessionBean().getSessUser(), p);
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -248,19 +250,13 @@ public class PersonSearchBB extends BackingBeanUtils{
     }
 
     
+    /**
+     * TODO Adapt to humanization
+     * 
+     */
     public void loadPersonHistory(){
         PersonCoordinator pc = getPersonCoordinator();
-        try {
-            personList = pc.assemblePersonHistory(getSessionBean().getSessUser().getMyCredential());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "History was loaded!", ""));
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Could not load history, sorry", ""));
-            System.out.println(ex);
-        }
+        
         
     }
     
@@ -269,7 +265,8 @@ public class PersonSearchBB extends BackingBeanUtils{
         PersonCoordinator pc = getPersonCoordinator();
         // keep a stashed copy of our oroginal field values to write to notes
         // on a succesful update
-        fieldDump = pc.dumpPerson(currentPerson);
+        // TODO: create way to track changes in humanization schema
+
         
         
     }
@@ -285,7 +282,7 @@ public class PersonSearchBB extends BackingBeanUtils{
         SystemCoordinator sc = getSystemCoordinator();
 
         try {
-            pc.personEdit(currentPerson, getSessionBean().getSessUser());
+            pc.humanEdit(currentPerson, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO, 
                      "Edits of Person saved to database!", ""));
@@ -327,15 +324,15 @@ public class PersonSearchBB extends BackingBeanUtils{
         PersonCoordinator pc = getPersonCoordinator();
         try {
             currentPerson = pc.assemblePersonDataHeavy(
-                    pc.personCreateMakeSkeleton(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni()),
+                    pc.personInit(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni()),
                     getSessionBean().getSessUser().getKeyCard());
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
     }
     
     /**
-     * Action listener for creation of new person objectgs
+     * Action listener for creation of new person objects
      * @return  
      */
     public String personCreateCommit(){
@@ -343,12 +340,12 @@ public class PersonSearchBB extends BackingBeanUtils{
         SystemCoordinator sc = getSystemCoordinator();
     
         try {
-            int freshID = pc.personCreate(currentPerson, getSessionBean().getSessUser());
-            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(pc.getPerson(freshID),getSessionBean().getSessUser().getKeyCard()));
+            int freshID = pc.humanAdd(currentPerson, getSessionBean().getSessUser());
+            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(pc.getPerson(pc.getHuman(freshID)),getSessionBean().getSessUser().getKeyCard()));
                if(isConnectToActiveProperty()){
                    
                    Property property = getSessionBean().getSessProperty();
-                   pc.connectPersonToProperty(currentPerson, property);
+//                   pc.linkHuman();
                    getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Successfully added " + currentPerson.getFirstName() + " to the Database!" 
@@ -360,7 +357,7 @@ public class PersonSearchBB extends BackingBeanUtils{
                                 "Successfully added " + currentPerson.getFirstName() + " to the Database!", ""));
                }
                sc.logObjectView(getSessionBean().getSessUser(), currentPerson);
-           } catch (IntegrationException ex) {
+           } catch (IntegrationException | BObStatusException ex) {
                System.out.println(ex.toString());
                   getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -373,7 +370,7 @@ public class PersonSearchBB extends BackingBeanUtils{
         PersonCoordinator pc = getPersonCoordinator();
         try {
             currentPerson = pc.assemblePersonDataHeavy(currentPerson, getSessionBean().getSessUser().getKeyCard());
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
     }
@@ -400,7 +397,7 @@ public class PersonSearchBB extends BackingBeanUtils{
         try {
             pc.addNotesToPerson(currentPerson, getSessionBean().getSessUser(), formNotes);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO
-                    , "Done: Notes added to person ID:" + currentPerson.getPersonID(),"" ));
+                    , "Done: Notes added to person ID:" + currentPerson.getHumanID(),"" ));
             sc.logObjectView(getSessionBean().getSessUser(), currentPerson);
 //            refreshCurrentPerson();
         } catch (IntegrationException ex) {
@@ -421,34 +418,7 @@ public class PersonSearchBB extends BackingBeanUtils{
         
     }
     
-    
-    public String deletePerson(){
-        System.out.println("PersonBB.deletePerson | in method");
-        PersonCoordinator pc = getPersonCoordinator();
-        
-        try {
-            pc.personNuke(currentPerson, getSessionBean().getSessUser().getMyCredential());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        currentPerson.getFirstName() + " has been permanently deleted; Goodbye " 
-                                + currentPerson.getFirstName() 
-                                + ". Search results have been cleared.", ""));
-            
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Cannot delete person." + ex.toString(), "Best not to delete folks anyway..."));
-            return "";
-            
-        } catch (AuthorizationException ex) {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        ex.getLocalizedMessage(),""));
-            return "";
-            
-        }
-        return "personSearch";
-    }
+ 
     
     
     /**

@@ -13,129 +13,360 @@
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
                 <f:view id="pers-info-view">
+                    <p:outputPanel id="body-panel">
 
-                    <div class="mainContainer">
+                        <h:form id="messages-global-form">
 
-                        <h:form id="pers-info-messages-form">
-                            <p:messages id="pers-info-messages" globalOnly="true" showDetail="true" showSummary="true" />
+                            <p:growl id="messages-global-growl"
+                                     redisplay="true"
+                                     />
                         </h:form>
 
-                        <p:panel id="pers-info-panel"
-                                 toggleable="true"
-                                 widgetVar="pers-info-panel-var"
-                                 collapsed="false"
-                                 header="Person Information">
+                            <h1>
+                                <h:outputText id="header-person-ot" 
+                                              value="#{personInfoBB.currPerson.name}"/>  
+                            </h1>
 
-                            <h:form id="selected-person-info-form">
+                        <div class="mainContainer">
+                            <div class="page-links">
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#person-info-panel">
+                                        <h:outputText value="person info"/>
+                                    </a>
+                                </div>
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#person-notes-panel">
+                                        <h:outputText value="notes"/>
+                                    </a>
+                                </div>
+                                <h:outputText value=" | " />
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#person-addresses-panel">
+                                        <h:outputText value="Addresses ()" />
+                                    </a>
+                                </div>
+                                <h:outputText value=" | " />
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#person-phones-panel">
+                                        <h:outputText value="phone ()" />
+                                    </a>
+                                </div>
+                                <h:outputText value=" | " />
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <a href="#person-emails-panel">
+                                        <h:outputText value="email ()" />
+                                    </a>
+                                </div>
+                               
+                            </div>
 
-                                <div class="ui-g data-container">
+                            <div class="ui-g data_container_nested_restrict">
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
 
-                                    <div class="ui-g-12 ui-md-9 ui-lg-9 data_field">
-                                        <h:outputLabel styleClass="data_table_header" value="PERSON: #{personInfoBB.currPerson.firstName} #{personInfoBB.currPerson.lastName} | ID: #{personInfoBB.currPerson.personID}" />
-                                    </div>
+                                    <p:panel    id="person-info-panel"
+                                                toggleable="true"
+                                                widgetVar="person-info-panel"
+                                                collapsed="false"
+                                                rendered="true"
+                                                header="Info #{personInfoBB.currPerson.name} (ID: #{personInfoBB.currPerson.humanID})">
+                                        
+                                        <h:form id="person-profile-form">
+                                            <div class="ui-g data_container_nested_restrict">
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="person-name-ot">
+                                                            <h:outputText value="Name "/>
+                                                        </p:outputLabel>
+                                                        <div class="restrict-main-contents-io-link link-button">
 
-                                    <div class="ui-g-12 ui-md-3 ui-lg-3 data_field">
-                                        <p:commandButton styleClass="data_edit_button"
-                                                         value="Edit" 
-                                                         ajax="true"
-                                                         oncomplete="PF('person-addupdate-dialog-var').show()"
-                                                         update="person-addupdate-form"
-                                                         actionListener="#{personInfoBB.personEditInit}"
-                                                         />
-                                        <p:commandButton styleClass="data_edit_button"
-                                                         value="Create Note" 
-                                                         onclick="PF('person-note-dialog').show()" 
-                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}" 
-                                                         />
-                                    </div>
+                                                            <p:commandLink      id="person-rename-cb" 
+                                                                                ajax="true" 
+                                                                                actionListener="#{personInfoBB.onPersonNameEditInit}"
+                                                                                oncomplete="PF('person-rename-dialog-var').show()"
+                                                                                style="color:blue;"
+                                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasCOGStaffPermissions}"
+                                                                                value="edit" />
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Person Type"/>
-                                        <h:outputText styleClass="data_field_value" value="#{personInfoBB.currPerson.personType.label}"/>
-                                    </div>
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Job Title"/>
-                                        <h:outputText styleClass="data_field_value" value="#{personInfoBB.currPerson.jobTitle}"/>
-                                    </div>
+                                                        </div>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline wrapText">
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Email"/>
-                                        <h:outputText styleClass="data_field_value" value="#{personInfoBB.currPerson.email}"/>
-                                    </div>
+                                                        <h:outputLabel id="person-name-ot"
+                                                                       value="#{personInfoBB.currPerson.name}" />
+                                                    </div>
+                                                </div>
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Last Updated"/>
-                                        <h:outputText styleClass="data_field_value" value="#{personInfoBB.currPerson.lastUpdatedPretty}"/>
-                                    </div>
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="person-title-ot">
+                                                            <h:outputText value="Job title"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Address"/>
-                                        <h:outputText styleClass="data_field_value" value="#{personInfoBB.currPerson.addressStreet} #{personInfoBB.currPerson.addressCity} #{personInfoBB.currPerson.addressState} #{personInfoBB.currPerson.addressZip}"/>
-                                    </div>
+                                                        <h:outputLabel id="person-title-ot"
+                                                                       value="#{personInfoBB.currPerson.jobTitle}" />
+                                                    </div>
+                                                </div>
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Use Separate Mailing Address?"/>
-                                        <h:outputText styleClass="data_field_value" value="#{personInfoBB.currPerson.useSeparateMailingAddress ? 'Yes':'No'} #{personInfoBB.currPerson.mailingAddressStreet} #{personInfoBB.currPerson.mailingAddressCity} #{personInfoBB.currPerson.mailingAddressState} #{personInfoBB.currPerson.mailingAddressZip}"/>
-                                    </div>
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="person-business-ot">
+                                                            <h:outputText value="Business entity?"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Under 18?"/>
-                                        <h:outputText styleClass="data_field_value" value="#{personInfoBB.currPerson.under18 ? 'Yes':'No'}"/>
-                                    </div>
+                                                        <h:outputLabel id="person-business-ot"
+                                                                       value="#{personInfoBB.currPerson.businessEntity ? 'Yes' : 'No'}" />
+                                                    </div>
+                                                </div>
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Active?"/>
-                                        <h:outputText styleClass="data_field_value" value="#{personInfoBB.currPerson.active ? 'Yes':'No'}"/>
-                                    </div>
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="person-multi-ot">
+                                                            <h:outputText value="Muti-Person"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Composite Last Name?"/>
-                                        <h:outputText styleClass="data_field_value" value="#{personInfoBB.currPerson.compositeLastName? 'Yes':'No'}"/>
-                                    </div>
+                                                        <h:outputLabel id="case-multi-ot"
+                                                                       value="#{personInfoBB.currPerson.multiHuman ? 'Yes': 'No'}" />
+                                                    </div>
+                                                </div>
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Expires"/>
-                                        <h:outputText styleClass="data_field_value" value="#{personInfoBB.currPerson.expireString}"/>
-                                    </div>
+                                                
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="person-dob-ot">
+                                                            <h:outputText value="Date of birth"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Expiry Notes"/>
-                                        <h:outputText styleClass="data_field_value" value="#{personInfoBB.currPerson.expiryNotes}"/>
-                                    </div>
+                                                        <h:outputLabel id="case-status-ot"
+                                                                       value="#{personInfoBB.getPrettyDate(personInfoBB.currPerson.dob)}" />
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="person-under18-ot">
+                                                            <h:outputText value="Under 18?"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Phone(cell)"/>
-                                        <h:outputText styleClass="data_field_value" value="#{personInfoBB.currPerson.phoneCell}"/>
-                                    </div>
+                                                        <h:outputLabel id="person-under18-ot"
+                                                                       value="#{personInfoBB.currPerson.under18 ? 'Yes':'No'}" />
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="person-deceased-ot">
+                                                            <h:outputText value="Deceased on"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Phone(work)"/>
-                                        <h:outputText styleClass="data_field_value" value="#{personInfoBB.currPerson.phoneWork}"/>
-                                    </div>
+                                                        <h:outputLabel id="person-deceased-ot"
+                                                                       value="#{personInfoBB.getPrettyDate(personInfoBB.currPerson.deceasedDate)}" />
+                                                        <h:outputLabel id="person-deceased-by"
+                                                                       value="#{empty personInfoBB.currPerson.deceasedBy ? '' : personInfoBB.currPerson.deceasedBy.person.name}" />
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="person-created-ot">
+                                                            <h:outputText value="Created"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Phone(home)"/>
-                                        <h:outputText styleClass="data_field_value" value="#{personInfoBB.currPerson.phoneHome}"/>
-                                    </div>
+                                                        <h:outputLabel id="person-created-ot"
+                                                                       value="#{personInfoBB.getPrettyDate(personInfoBB.currPerson.createdTS)}" />
+                                                        <h:outputLabel id="person-created-by"
+                                                                       value="#{empty personInfoBB.currPerson.createdBy ? '' : personInfoBB.currPerson.createdBy.person.name}" />
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="person-source-ot">
+                                                            <h:outputText value="Source"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
 
-                                    <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Linked To User?"/>
-                                        <h:outputText styleClass="data_field_value" value="#{personInfoBB.currPerson.linkedUserID == 0 ? 'No':'Yes'}"/>
-                                    </div>
+                                                        <h:outputLabel id="person-source-by"
+                                                                       value="#{empty personInfoBB.currPerson.source ? '' : personInfoBB.currPerson.source.title}" />
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="person-lastupdated-ot">
+                                                            <h:outputText value="Last updated"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
 
-                                    <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-                                        <h:outputLabel styleClass="data_field_label" value="Person Notes"/>
-                                        <h:outputText styleClass="data_field_value" value="#{personInfoBB.currPerson.notes}"/>
-                                    </div>
+                                                        <h:outputLabel id="person-lastupdated-ot"
+                                                                       value="#{personInfoBB.getPrettyDate(personInfoBB.currPerson.lastUpdatedTS)}" />
+                                                        <h:outputLabel id="person-lastupdated-by"
+                                                                       value="#{empty personInfoBB.currPerson.lastUpdatedBy ? '' : personInfoBB.currPerson.lastUpdatedBy.person.name}" />
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <p:outputLabel for="person-deac-ot">
+                                                            <h:outputText value="Deactivated on"/>
+                                                        </p:outputLabel>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
+
+                                                        <h:outputLabel id="person-deac-ot"
+                                                                       value="#{personInfoBB.getPrettyDate(personInfoBB.currPerson.deactivatedTS)}" />
+                                                        <h:outputLabel id="person-deac-by"
+                                                                       value="#{empty personInfoBB.currPerson.deactivatedBy ? '' : personInfoBB.currPerson.deactivatedBy.person.name}" />
+                                                    </div>
+                                                </div>
+                                                
+                                              
+
+                                            <div class="ui-g data_container_nested_restrict">
+
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                                    <hr/>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
+                                                    <div class="restrict-main-contents-io-button gray_button">
+
+                                                        <p:commandButton        id="view-property-cb" 
+                                                                                ajax="false" 
+                                                                                icon="fa fa-home"
+                                                                                action="#{ceCaseSearchProfileBB.exploreProperty}"
+                                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                                value="view property: #{ceCaseSearchProfileBB.currentCasePropDataHeavy.address}" />
+
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
+                                                    <div class="restrict-main-contents-io-button gray_button">
+
+
+                                                        <p:commandButton      id="refresh-case-cb" 
+                                                                              ajax="false" 
+                                                                              icon="fa fa-refresh"
+                                                                              action="#{ceCaseSearchProfileBB.refreshCurrentCase}"
+                                                                              value="reload case" 
+                                                                              />
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
+                                                    <div class="restrict-main-contents-io-button gray_button">
+
+                                                        <p:commandButton      id="case-settings-cb" 
+                                                                              ajax="true" 
+                                                                              icon="fa fa-gears"
+                                                                              actionListener="#{ceCaseSearchProfileBB.onCaseSettingsInitButtonChnage}"
+                                                                              oncomplete="PF('case-update-dialog-var').show()"
+                                                                              disabled="false"
+                                                                              value="case settings" />
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
+                                                    <div class="restrict-main-contents-io-button gray_button">
+
+
+
+                                                        <p:commandButton   id="print-case-cb" 
+                                                                           ajax="true" actionListener="#{ceCaseSearchProfileBB.prepareReportCECase}"
+                                                                           icon="fa fa-print"
+
+                                                                           oncomplete="PF('report-case-profile-diaglog-var').show()"
+                                                                           value="print case profile" 
+                                                                           update="report-case-profile-form"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:form>
+                                       
+                                    </p:panel>
 
                                 </div>
+                            </div>
+                                
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                                
+                                   <p:panel    id="person-addresses-panel"
+                                                toggleable="true"
+                                                widgetVar="person-addresses-panel"
+                                                collapsed="false"
+                                                rendered="true"
+                                                header="Addresses connections: #{personInfoBB.currPerson.name}">
+                                   
+                                   
+                                   
+                                   
+                                   
+                                   </p:panel>
+                                        
+                                
 
-                            </h:form>
 
-                        </p:panel>
+                            </div>
+                        </div>
+                    </p:outputPanel>
 
-                    </div>
+
+                  
+                    
+                    
+
+                    <p:dialog 
+                              id="person-name-edit-dialog"
+                              header="Edit person name"
+                              height="550px" width="50%"
+                              widgetVar="person-name-edit-dialog-var"
+                              closable="true" 
+                              resizable="false"
+                              responsive="true"
+                              modal="true"
+                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                              >
+                        
+                        <h:form id="person-name-edit-form">
+                            
+                            
+                            
+                        </h:form>
+                        
+                    </p:dialog>
+                    
+                    
+                    
+                    
 
                     <p:dialog header="Edit"
                               id="person-addupdate-dialog"

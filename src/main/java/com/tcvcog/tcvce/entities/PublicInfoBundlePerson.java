@@ -27,13 +27,14 @@ import java.util.Date;
  *
  * @author Nathan Dietz
  */
-public class PublicInfoBundlePerson extends PublicInfoBundle {
+public class    PublicInfoBundlePerson 
+        extends PublicInfoBundle {
     
     private Person bundledPerson;
     
     @Override
     public String toString(){
-        return this.getClass().getName() + bundledPerson.getPersonID();
+        return this.getClass().getName() + bundledPerson.getHumanID();
     }
     
     public Person getBundledPerson() {
@@ -50,47 +51,49 @@ public class PublicInfoBundlePerson extends PublicInfoBundle {
         //If this person is a minor, they should be hidden from the public
         setPaccEnabled(!input.isUnder18());
         
-        input.setCreatorUserID(0);
+        // TODO: Revisit for humanization changes
         
-        input.setCreationTimeStamp(LocalDateTime.MIN);
-        
-        input.setJobTitle("*****");
-        
-        input.setUseSeparateMailingAddress(false);
-        input.setMailingAddressStreet("*****");
-        input.setMailingAddressThirdLine("*****");
-        input.setMailingAddressCity("*****");
-        input.setMailingAddressZip("*****");
-        input.setMailingAddressState("*****");
-        
-        input.setNotes("*****");
-        
-        input.setLastUpdated(LocalDateTime.MIN);
-        input.setLastUpdatedPretty("*****");
-        
-        input.setCanExpire(false);
-        
-        input.setExpiryDate(LocalDateTime.MIN);
-        input.setExpireString("*****");
-        input.setExpiryDateUtilDate(new Date());
-        input.setExpiryNotes("*****");
-        
-        input.setLinkedUserID(0);
-        
-        input.setVerifiedByUserID(0);
-        input.setGhostCreatedDate(LocalDateTime.MIN);
-        input.setGhostCreatedDatePretty("*****");
-        input.setGhostOf(0);
-        input.setGhostCreatedByUserID(0);
-        
-        input.setCloneCreatedDate(LocalDateTime.MIN);
-        input.setCloneCreatedDatePretty("*****");
-        input.setCloneOf(0);
-        input.setCloneCreatedByUserID(0);
-        
-        input.setGhostsList(new ArrayList<Integer>());
-        input.setCloneList(new ArrayList<Integer>());
-        input.setMergedList(new ArrayList<Integer>());
+//        input.setCreatorUserID(0);
+//        
+//        input.setCreationTimeStamp(LocalDateTime.MIN);
+//        
+//        input.setJobTitle("*****");
+//        
+//        input.setUseSeparateMailingAddress(false);
+//        input.setMailingAddressStreet("*****");
+//        input.setMailingAddressThirdLine("*****");
+//        input.setMailingAddressCity("*****");
+//        input.setMailingAddressZip("*****");
+//        input.setMailingAddressState("*****");
+//        
+//        input.setNotes("*****");
+//        
+//        input.setLastUpdated(LocalDateTime.MIN);
+//        input.setLastUpdatedPretty("*****");
+//        
+//        input.setCanExpire(false);
+//        
+//        input.setExpiryDate(LocalDateTime.MIN);
+//        input.setExpireString("*****");
+//        input.setExpiryDateUtilDate(new Date());
+//        input.setExpiryNotes("*****");
+//        
+//        input.setLinkedUserID(0);
+//        
+//        input.setVerifiedByUserID(0);
+//        input.setGhostCreatedDate(LocalDateTime.MIN);
+//        input.setGhostCreatedDatePretty("*****");
+//        input.setGhostOf(0);
+//        input.setGhostCreatedByUserID(0);
+//        
+//        input.setCloneCreatedDate(LocalDateTime.MIN);
+//        input.setCloneCreatedDatePretty("*****");
+//        input.setCloneOf(0);
+//        input.setCloneCreatedByUserID(0);
+//        
+//        input.setGhostsList(new ArrayList<Integer>());
+//        input.setCloneList(new ArrayList<Integer>());
+//        input.setMergedList(new ArrayList<Integer>());
         
         bundledPerson = input;
     }

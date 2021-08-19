@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -127,7 +128,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         } // close finally
     }
 
-    public List<CEActionRequest> getCEActionRequestByControlCode(int controlCode) throws IntegrationException {
+    public List<CEActionRequest> getCEActionRequestByControlCode(int controlCode) throws IntegrationException, BObStatusException {
         List<CEActionRequest> requestList = new ArrayList<>();
         String q = "SELECT requestid, requestpubliccc, muni_municode, \n"
                 + "	property_propertyid, issuetype_issuetypeid, actrequestor_requestorid, submittedtimestamp, \n"
@@ -198,14 +199,14 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
             stmt.setInt(2, actionRequest.getMuni().getMuniCode());
 
             if (actionRequest.isIsAtKnownAddress()) {
-                stmt.setInt(3, actionRequest.getRequestProperty().getPropertyID());
+                stmt.setInt(3, actionRequest.getRequestProperty().getParcelKey());
                 actionRequest.setAddressOfConcern(actionRequest.getRequestProperty().getAddress());
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }
 
             stmt.setInt(4, actionRequest.getIssue().getIssueTypeID());
-            stmt.setInt(5, actionRequest.getRequestor().getPersonID());
+            stmt.setInt(5, actionRequest.getRequestor().getHumanID());
             // case ID is null since the request hasn't been assigned to a case yet
             stmt.setNull(6, java.sql.Types.NULL); // 0 is the int version of null
 
@@ -251,18 +252,16 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
     }
 
-    private CEActionRequest generateActionRequestFromRS(ResultSet rs) throws SQLException, IntegrationException {
+    private CEActionRequest generateActionRequestFromRS(ResultSet rs) throws SQLException, IntegrationException, BObStatusException {
 
         // create the action request object
         CEActionRequest actionRequest = new CEActionRequest();
         
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
-        PropertyIntegrator propI = getPropertyIntegrator();
+        PersonCoordinator perc = getPersonCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
         UserIntegrator ui = getUserIntegrator();
-        BlobIntegrator bi = getBlobIntegrator();
-        BlobCoordinator bc = getBlobCoordinator();
         
         actionRequest.setRequestStatus(getRequestStatus(rs.getInt("status_id")));
         actionRequest.setPaccEnabled(rs.getBoolean("paccenabled"));
@@ -274,7 +273,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         actionRequest.setMuni(mi.getMuni(rs.getInt("muni_municode")));
         actionRequest.setIsAtKnownAddress(rs.getBoolean("notataddress"));
         actionRequest.setRequestProperty(pc.getProperty(rs.getInt("property_propertyID")));
-        actionRequest.setRequestor(pi.getPerson(rs.getInt("actrequestor_requestorid")));
+        actionRequest.setRequestor(perc.getPerson(perc.getHuman(rs.getInt("actrequestor_requestorid"))));
 
         actionRequest.setSubmittedTimeStamp(rs.getTimestamp("submittedtimestamp").toLocalDateTime());
         actionRequest.setDateOfRecord(rs.getTimestamp("dateofrecord").toLocalDateTime());
@@ -352,7 +351,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         } // close finally
     }
 
-    public CEActionRequest getActionRequestByRequestID(int requestID) throws IntegrationException {
+    public CEActionRequest getActionRequestByRequestID(int requestID) throws IntegrationException, BObStatusException {
         CEActionRequest newActionRequest = null;
         StringBuilder sb = new StringBuilder();
 
@@ -480,7 +479,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(q);
-            stmt.setInt(1, req.getRequestProperty().getPropertyID());
+            stmt.setInt(1, req.getRequestProperty().getParcelKey());
             stmt.setInt(2, req.getRequestID());
             System.out.println("CEActionRequestorIntegrator.updateActionRequestProperty | statement: " + stmt.toString());
             // Retrieve action data from postgres
@@ -508,7 +507,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(q);
-            stmt.setInt(1, req.getRequestor().getPersonID());
+            stmt.setInt(1, req.getRequestor().getHumanID());
             stmt.setInt(2, req.getRequestID());
             System.out.println("CEActionRequestorIntegrator.updateActionRequestor| statement: " + stmt.toString());
             // Retrieve action data from postgres
@@ -938,11 +937,11 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 }
                 
                 if(params.isRequestorPerson_ctl()){
-                    stmt.setInt(++paramCounter, params.getRequestorPerson_val().getPersonID());
+                    stmt.setInt(++paramCounter, params.getRequestorPerson_val().getHumanID());
                 }
                 
                 if(params.isProperty_ctl()){
-                    stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
+                    stmt.setInt(++paramCounter, params.getProperty_val().getParcelKey());
                 }
                 
 

@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
+
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectableStatus;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectionStatusEnum;
@@ -54,7 +55,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
-
 import com.tcvcog.tcvce.entities.occupancy.OccApplicationStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
@@ -63,11 +63,12 @@ import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
+import com.tcvcog.tcvce.integration.BlobIntegrator;
+import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 
 import java.util.Iterator;
-import java.util.stream.Collectors;
 
 /**
  * King of all business logic implementation for the entire Occupancy object
@@ -120,7 +121,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public OccPeriodPropertyUnitHeavy getOccPeriodPropertyUnitHeavy(int periodid) throws IntegrationException {
         PropertyCoordinator pc = getPropertyCoordinator();
         OccPeriodPropertyUnitHeavy oppu = new OccPeriodPropertyUnitHeavy(getOccPeriod(periodid));
-        oppu.setPropUnitProp(pc.getPropertyUnitWithProp(oppu.getPropertyUnitID()));
+        try {
+            oppu.setPropUnitProp(pc.getPropertyUnitWithProp(oppu.getPropertyUnitID()));
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
         return oppu;
     }
 
@@ -170,7 +175,10 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             if (!qp.getParamsList().isEmpty()) {
                 qp.getParamsList().get(0).setOccPeriod_val(per);
             }
-            opdh.setPersonList(sc.runQuery(qp).getBOBResultList());
+            
+            // TODO: Humanization upgrade after Ben's integration
+
+//            opdh.setPersonList(sc.runQuery(qp).getBOBResultList());
 
             // EVENT LIST
 
@@ -399,6 +407,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     }
 
     public ReportConfigOccPermit getOccPermitReportConfigDefault(OccPermit permit,
+
                                                                  OccPeriod period,
                                                                  PropertyUnit propUnit,
                                                                  User u) {
@@ -645,6 +654,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             throw new BObStatusException("Please specify an applicant.");
         }
 
+
         if (opa.getPreferredContact() == null) {
             opa.setPreferredContact(opa.getApplicantPerson());
         }
@@ -798,6 +808,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
         OccupancyIntegrator oi = getOccupancyIntegrator();
 
+
         List<PersonOccApplication> applicationPersons = application.getAttachedPersons();
         for (PersonOccApplication person : applicationPersons) {
 
@@ -807,9 +818,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                         + " Please insert persons into the database before running this method!");
             }
             
+            //: TODO update for humanization
+            
             /* If the person  is the applicantPerson on the 
             OccPermitApplication, set applicant to true*/
-            person.setApplicant(application.getApplicantPerson().getPersonID() == person.getPersonID());
+//            person.setApplicant(application.getApplicantPerson().getHumanID() == person.getHumanID());
 
             /* If the person is the preferredContact on the 
             OccPermitApplication, set preferredcontact to true */
@@ -886,9 +899,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                 oi.updatePersonOccPeriod(existingPerson, opa);
 
             }
-
         }
-
     }
 
     public void inspectionAction_removeSpaceFromChecklist(OccInspectedSpace spc, User u, OccInspection oi) throws IntegrationException {
@@ -968,6 +979,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
     public OccSpaceElement getOccSpaceElementSkeleton() {
         return new OccSpaceElement();
+
     }
 
     public OccChecklistTemplate getChecklistTemplate(int checklistID) throws IntegrationException {

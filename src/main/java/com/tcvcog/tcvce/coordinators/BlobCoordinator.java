@@ -105,7 +105,11 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             blob.setBlobUploadedBy(ua);
         } else {
             UserCoordinator uc = getUserCoordinator();
-            blob.setBlobUploadedBy(uc.auth_getPublicUserAuthorized());
+            try {
+                blob.setBlobUploadedBy(uc.auth_getPublicUserAuthorized());
+            } catch (BObStatusException ex) {
+                throw new IntegrationException(ex.getMessage());
+            }
         }
         return blob;
     }

@@ -314,7 +314,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @return the loaded up CodeElement with database data
      * @throws IntegrationException 
      */
-    public CodeElement getCodeElement(int elementID) throws IntegrationException{
+    public CodeElement getCodeElement(int elementID) throws IntegrationException, BObStatusException{
         CodeElement newCodeElement = null;
         PreparedStatement stmt = null;
         Connection con = getPostgresCon();
@@ -361,7 +361,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @param e an empty CodeElement. Client class is responsible for instantiation
      * @return a populated CodeElement extracted from that row in the ResultSet
      */
-    private CodeElement generateCodeElement(ResultSet rs) throws SQLException, IntegrationException{
+    private CodeElement generateCodeElement(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         if(rs == null) return null;
         CodeElement e = new CodeElement();
         UserIntegrator ui = getUserIntegrator();
@@ -441,7 +441,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException Caught by backing beans and converted into
      * user messages
      */
-    public List<CodeElement> getCodeElements(int sourceID) throws IntegrationException{
+    public List<CodeElement> getCodeElements(int sourceID) throws IntegrationException, BObStatusException{
         String query = "SELECT elementid from codeelement where codesource_sourceID = ? AND deactivatedts IS NULL;";
         Connection con = null;
         PreparedStatement stmt = null;
@@ -712,7 +712,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public CodeSet getCodeSetBySetID(int setID) throws IntegrationException{
+    public CodeSet getCodeSetBySetID(int setID) throws IntegrationException, BObStatusException{
          String query = "SELECT codesetid, name, description, municipality_municode, active  \n" +
                         "FROM public.codeset WHERE codesetid = ?";
         
@@ -750,7 +750,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public HashMap<Municipality, CodeSet> getMuniDefaultCodeSetMap() throws IntegrationException{
+    public HashMap<Municipality, CodeSet> getMuniDefaultCodeSetMap() throws IntegrationException, BObStatusException{
         HashMap<Municipality, CodeSet> muniSetMap = new HashMap<>();
         MunicipalityCoordinator mc = getMuniCoordinator();
         
@@ -787,7 +787,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @throws SQLException
      * @throws IntegrationException 
      */
-    private CodeSet populateCodeSetFromRS(ResultSet rs) throws SQLException, IntegrationException{
+    private CodeSet populateCodeSetFromRS(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         CodeSet set = new CodeSet();
         MunicipalityIntegrator muniInt = getMunicipalityIntegrator();
         
@@ -811,7 +811,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public ArrayList getCodeSets() throws IntegrationException {
+    public ArrayList getCodeSets() throws IntegrationException, BObStatusException {
         String query = "SELECT codesetid \n"
                 + "  FROM public.codeset WHERE active=TRUE;";
 
@@ -862,7 +862,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public ArrayList getCodeSets(int muniCode) throws IntegrationException{
+    public ArrayList getCodeSets(int muniCode) throws IntegrationException, BObStatusException{
          String query = "SELECT codesetid \n" +
                         "FROM public.codeset WHERE municipality_municode = ?";
         
@@ -902,7 +902,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @return the fully-baked EnforcableCodeElement
      * @throws IntegrationException 
      */
-    public EnforcableCodeElement getEnforcableCodeElement(int codeSetElementID) throws IntegrationException{
+    public EnforcableCodeElement getEnforcableCodeElement(int codeSetElementID) throws IntegrationException, BObStatusException{
         EnforcableCodeElement newEce = null;
         PreparedStatement stmt = null;
         Connection con = null;
@@ -943,7 +943,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
    * @return all CodeElement objects kicked out by postgres with that setID
    * @throws com.tcvcog.tcvce.domain.IntegrationException
    */
-    public ArrayList getEnforcableCodeElementList(int setID) throws IntegrationException{
+    public ArrayList getEnforcableCodeElementList(int setID) throws IntegrationException, BObStatusException{
         PreparedStatement stmt = null;
         Connection con = null;
         String query = "SELECT codesetelementid " +
@@ -981,7 +981,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @throws SQLException
      * @throws IntegrationException 
      */
-    private EnforcableCodeElement generateEnforcableCodeElement(ResultSet rs) throws SQLException, IntegrationException{
+    private EnforcableCodeElement generateEnforcableCodeElement(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         
         PaymentIntegrator pi = getPaymentIntegrator();
         UserIntegrator ui = getUserIntegrator();

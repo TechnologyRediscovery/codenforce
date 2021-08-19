@@ -47,9 +47,10 @@ public class PublicInfoBundleCEActionRequest extends PublicInfoBundle {
         setPacc(input.getRequestPublicCC());
         setAddressAssociated(!input.getNotAtAddress());
         
-        input.setRequestor(new Person());
+        // TODO: revisit after humanization
+//        input.setRequestor(new Person());
         
-        input.setRequestProperty(new Property());
+        input.setRequestProperty(null);
         input.setMuniCode(0);
         input.setCaseAttachmentUser(new User());
         input.setCogInternalNotes("*****");

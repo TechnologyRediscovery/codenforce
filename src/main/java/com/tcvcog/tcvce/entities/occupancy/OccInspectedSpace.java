@@ -101,6 +101,7 @@ public class OccInspectedSpace
         }
     }
 
+
     public List<OccLocationDescriptor> getAllUniqueLocationDescriptors() {
         Set<OccLocationDescriptor> locationDescriptors = new HashSet();
 
@@ -112,6 +113,7 @@ public class OccInspectedSpace
         List<OccLocationDescriptor> locationDescriptorList = new ArrayList();
         locationDescriptorList.addAll(locationDescriptors);
         return locationDescriptorList;
+
     }
     
     public List<CodeElement> getInspectedCodeElementsWithoutShell() {

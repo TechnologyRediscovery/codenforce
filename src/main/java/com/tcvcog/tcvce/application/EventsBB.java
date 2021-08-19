@@ -83,6 +83,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         typeCategoryMap = ec.assembleEventTypeCatMap_toEnact(pageDomain, currentEventHolder, getSessionBean().getSessUser());
     }
 
+
     /**
      * Grabs the current page event type from the sessionBean and uses that to populate
      * the currentEventHolder object with something we can grab events from!
@@ -144,6 +145,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         try {
             ec.updateEvent(currentEvent, getSessionBean().getSessUser());
 
+
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Save successful on event ID: " + currentEvent.getEventID(), ""));
             System.out.println("EventsBB.saveEventChanges successful");
@@ -154,6 +156,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     ex.getMessage(), ""));
             System.out.println("EventsBB.saveEventChanges failure");
+
 
             // Restore working copy of occ period to last working one if saving to database fails.
             discardEventChanges();

@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Person;
@@ -80,7 +81,7 @@ public class PersonSearchPublicBB extends BackingBeanUtils implements Serializab
                                 "Something when wrong with the person search! Sorry!", ""));
             }
 
-        } catch (IntegrationException | SearchException ex) {
+        } catch (IntegrationException | SearchException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -90,12 +91,15 @@ public class PersonSearchPublicBB extends BackingBeanUtils implements Serializab
         if (qp != null && !qp.getBOBResultList().isEmpty()) {
 
             PublicInfoCoordinator pic = getPublicInfoCoordinator();
-            List<Person> skeletonHorde = qp.getBOBResultList();
+//      TODO: Fix post humanization/parcelization
+//            List<Person> skeletonHorde = qp.getBOBResultList();
             bundledPersonSearchResults = new ArrayList<>();
             
-            for(Person skeleton : skeletonHorde){
-                bundledPersonSearchResults.add(pic.extractPublicInfo(skeleton));
-            }
+//            for(Person skeleton : skeletonHorde){
+                // TODO: Update for humanization
+                
+//                bundledPersonSearchResults.add(pic.extractPublicInfo(skeleton));
+//            }
             
         }
 

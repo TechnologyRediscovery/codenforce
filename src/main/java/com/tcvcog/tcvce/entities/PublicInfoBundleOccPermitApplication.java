@@ -65,11 +65,11 @@ public class PublicInfoBundleOccPermitApplication extends PublicInfoBundle {
         
         input.setApplicationPropertyUnit(new PropertyUnit());
         
-        input.setApplicantPerson(new Person());
+        input.setApplicantPerson(null);
         
-        input.setPreferredContact(new Person());
+        input.setPreferredContact(null);
         
-        input.setAttachedPersons(new ArrayList<PersonOccApplication>());
+        input.setAttachedPersons(new ArrayList<>());
         
         input.setConnectedPeriod(new OccPeriod());
         

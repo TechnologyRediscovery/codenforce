@@ -111,7 +111,7 @@ public class PropertySearchBB extends BackingBeanUtils{
     private Person personSelected;
     private List<Person> personToAddList;
     private boolean personLinkUseID;
-    private int personIDToLink;
+    private int humanIDToLink;
 
     private ViewOptionsProposalsEnum selectedPropViewOption;
     
@@ -228,7 +228,7 @@ public class PropertySearchBB extends BackingBeanUtils{
             // to runQuery, which will delegate the work to the searchForXXX methods
             // on the intergrators
             sc.runQuery(qp);
-        } catch (SearchException ex) {
+        } catch (SearchException | BObStatusException  ex) {
             System.out.println(ex);
         }
         List<Property> propList = null;
@@ -267,7 +267,7 @@ public class PropertySearchBB extends BackingBeanUtils{
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Your search completed with " + pl.size() + " results", ""));
             
-        } catch (SearchException ex) {
+        } catch (SearchException |  BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -431,7 +431,7 @@ public class PropertySearchBB extends BackingBeanUtils{
         currentProperty.setNotes(sc.appendNoteBlock(mbp));
         try {
             currentProperty.setLastUpdatedTS(LocalDateTime.now());
-            pc.editProperty(currentProperty, getSessionBean().getSessUser());
+            pc.updateParcel(currentProperty, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Succesfully appended note!", ""));
@@ -453,7 +453,7 @@ public class PropertySearchBB extends BackingBeanUtils{
      *
      * @return
      */
-    public String onInfoCaseListButtonChange() {
+    public String onInfoCaseListButtonChange() throws BObStatusException {
         CaseCoordinator cc = getCaseCoordinator();
 
         if (currentProperty != null && currentProperty.getPropInfoCaseList() != null) {
@@ -484,16 +484,16 @@ public class PropertySearchBB extends BackingBeanUtils{
         try {
             // based on the user's boolean button choice, either 
             // look up a person by ID or use the object
-            if (isPersonLinkUseID() && getPersonIDToLink() != 0) {
+            if (isPersonLinkUseID() && humanIDToLink != 0) {
                 Person checkPer = null;
-                checkPer = persc.getPerson(getPersonIDToLink());
-                if (checkPer != null && checkPer.getPersonID() != 0) {
+                checkPer = persc.getPerson(persc.getHuman(humanIDToLink));
+                if (checkPer != null && checkPer.getHumanID() != 0) {
                     pc.connectPersonToProperty(currentProperty, checkPer);
                     getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            "Connected " + checkPer.getLastName() + " to property ID " + currentProperty.getPropertyID(), ""));
+                            "Connected " + checkPer.getLastName() + " to property ID " + currentProperty.getParcelKey(), ""));
                 } else {
                     getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Could not find a Person with ID " + getPersonIDToLink(), ""));
+                            "Could not find a Person with ID " + humanIDToLink, ""));
                     
                 }
 
@@ -501,7 +501,7 @@ public class PropertySearchBB extends BackingBeanUtils{
                 if (getPersonSelected() != null) {
                     pc.connectPersonToProperty(currentProperty, getPersonSelected());
                     getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            "Connected " + getPersonSelected().getLastName() + " to property ID " + currentProperty.getPropertyID(), ""));
+                            "Connected " + getPersonSelected().getLastName() + " to property ID " + currentProperty.getParcelKey(), ""));
                 } else {
                     
                     getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -519,20 +519,22 @@ public class PropertySearchBB extends BackingBeanUtils{
     
     /**
      * Listener for user requests to remove a link between property and person
+     * TODO: Fix during parcelization
+     * 
      * @param p
      * @return 
      */
     public String onPersonConnectRemoveButtonChange(Person p){
         PropertyCoordinator pc = getPropertyCoordinator();
-        try {
-            pc.connectRemovePersonToProperty(currentProperty, p, getSessionBean().getSessUser());
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            "Removed property-person link and created documentation note.", ""));
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Could not remove link from property to person, sorry!", ""));
-        }
+//        try {
+//            pc.connectRemovePersonToProperty(currentProperty, p, getSessionBean().getSessUser());
+//            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+//                            "Removed property-person link and created documentation note.", ""));
+//        } catch (IntegrationException | BObStatusException ex) {
+//            System.out.println(ex);
+//            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+//                            "Could not remove link from property to person, sorry!", ""));
+//        }
         
         
         return "propertySearch";
@@ -594,12 +596,12 @@ public class PropertySearchBB extends BackingBeanUtils{
         SystemCoordinator sc = getSystemCoordinator();
         int newID;
         try {
-            newID = pc.addProperty(currentProperty, getSessionBean().getSessUser());
+            newID = pc.addParcel(currentProperty, getSessionBean().getSessUser());
             getSessionBean().setSessProperty(pc.getPropertyDataHeavy(newID, getSessionBean().getSessUser()));
             sc.logObjectView(getSessionBean().getSessUser(), currentProperty);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully added property with ID: " + currentProperty.getPropertyID()
+                            "Successfully added property with ID: " + currentProperty.getParcelKey()
                             + ", which is now your 'active property'", ""));
         } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
             System.out.println(ex);
@@ -621,12 +623,12 @@ public class PropertySearchBB extends BackingBeanUtils{
         SystemCoordinator sc = getSystemCoordinator();
         try {
 //            currentProperty.setAbandonedDateStart(pc.configureDateTime(currentProperty.getAbandonedDateStart().to));
-            pc.editProperty(currentProperty, getSessionBean().getSessUser());
+            pc.updateParcel(currentProperty, getSessionBean().getSessUser());
             getSessionBean().setSessProperty(currentProperty);
             sc.logObjectView(getSessionBean().getSessUser(), currentProperty);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully updated property with ID " + getCurrentProperty().getPropertyID()
+                            "Successfully updated property with ID " + getCurrentProperty().getParcelKey()
                             + ", which is now your 'active property'", ""));
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
@@ -651,7 +653,7 @@ public class PropertySearchBB extends BackingBeanUtils{
             getSessionBean().getSessPersonList().add(0, p);
             try {
                 getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(p, getSessionBean().getSessUser().getKeyCard()));
-            } catch (IntegrationException ex) {
+            } catch (IntegrationException |  BObStatusException ex) {
                 System.out.println(ex);
             }
             return "personInfo";
@@ -1096,10 +1098,10 @@ public class PropertySearchBB extends BackingBeanUtils{
     }
 
     /**
-     * @return the personIDToLink
+     * @return the humanIDToLink
      */
-    public int getPersonIDToLink() {
-        return personIDToLink;
+    public int getHumanIDToLink() {
+        return humanIDToLink;
     }
 
     /**
@@ -1182,10 +1184,10 @@ public class PropertySearchBB extends BackingBeanUtils{
     }
 
     /**
-     * @param personIDToLink the personIDToLink to set
+     * @param humanIDToLink the humanIDToLink to set
      */
-    public void setPersonIDToLink(int personIDToLink) {
-        this.personIDToLink = personIDToLink;
+    public void setHumanIDToLink(int humanIDToLink) {
+        this.humanIDToLink = humanIDToLink;
     }
 
     /**

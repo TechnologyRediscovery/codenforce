@@ -39,7 +39,7 @@ public class PublicInfoBundleProperty extends PublicInfoBundle {
     @Override
     public String toString(){
         
-        return this.getClass().getName() + bundledProperty.getPropertyID();
+        return this.getClass().getName() + bundledProperty.getParcelKey();
     }
 
     public Property getBundledProperty() {
@@ -57,40 +57,42 @@ public class PublicInfoBundleProperty extends PublicInfoBundle {
         setMuni(input.getMuni());
         setAddress(input);
         
-        input.setMuniCode(0);
-        input.setNotes("*****");
-        
-        input.setCreationTS(LocalDateTime.MIN);
-        input.setLastUpdatedTS(LocalDateTime.MIN);
-        input.setLastUpdatedBy(new User());
-        input.setLocationDescriptor(new OccLocationDescriptor());
-        
-        input.setBobSource(new BOBSource());
-        input.setUnfitDateStart(LocalDateTime.MIN);
-        input.setUnfitDateStop(LocalDateTime.MIN);
-        input.setUnfitBy(new User());
-        
-        input.setAbandonedDateStart(LocalDateTime.MIN);
-        input.setAbandonedDateStop(LocalDateTime.MIN);
-        input.setAbandonedDateUtilStart(new Date());
-        input.setAbandonedDateUtilStop(new Date());
-        input.setAbandonedBy(new User());
-        
-        input.setVacantDateStart(LocalDateTime.MIN);
-        input.setVacantDateStop(LocalDateTime.MIN);
-        input.setVacantBy(new User());
-        input.setCondition(new IntensityClass());
-        
-        input.setSaleYear(0);
-        input.setSalePrice(0);
-        input.setLandValue(0);
-        input.setBuildingValue(0);
-        input.setAssessmentYear(0);
-        input.setYearBuilt(0);
-        input.setLivingArea(0);
-        input.setTaxStatus(false);
-        input.setTaxYear(0);
-        
+        // TODO: Upgrade for parcelization
+//        
+//        input.setMuniCode(0);
+//        input.setNotes("*****");
+//        
+//        input.setCreationTS(LocalDateTime.MIN);
+//        input.setLastUpdatedTS(LocalDateTime.MIN);
+//        input.setLastUpdatedBy(new User());
+//        input.setLocationDescriptor(new OccLocationDescriptor());
+//        
+//        input.setBobSource(new BOBSource());
+//        input.setUnfitDateStart(LocalDateTime.MIN);
+//        input.setUnfitDateStop(LocalDateTime.MIN);
+//        input.setUnfitBy(new User());
+//        
+//        input.setAbandonedDateStart(LocalDateTime.MIN);
+//        input.setAbandonedDateStop(LocalDateTime.MIN);
+//        input.setAbandonedDateUtilStart(new Date());
+//        input.setAbandonedDateUtilStop(new Date());
+//        input.setAbandonedBy(new User());
+//        
+//        input.setVacantDateStart(LocalDateTime.MIN);
+//        input.setVacantDateStop(LocalDateTime.MIN);
+//        input.setVacantBy(new User());
+//        input.setCondition(new IntensityClass());
+//        
+//        input.setSaleYear(0);
+//        input.setSalePrice(0);
+//        input.setLandValue(0);
+//        input.setBuildingValue(0);
+//        input.setAssessmentYear(0);
+//        input.setYearBuilt(0);
+//        input.setLivingArea(0);
+//        input.setTaxStatus(false);
+//        input.setTaxYear(0);
+//        
         bundledProperty = input;
     }
 

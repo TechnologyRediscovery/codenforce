@@ -26,7 +26,10 @@ import java.util.Objects;
  */
 public  class       MunicipalityDataHeavy 
         extends     Municipality
-        implements  IFace_CredentialSigned{
+        implements  IFace_CredentialSigned,
+                    IFace_humanListHolder{
+    
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.MUNIHUMAN;
     
     private String address_street;
     private String address_city;
@@ -65,6 +68,10 @@ public  class       MunicipalityDataHeavy
     private List<User> userList;
     private List<CourtEntity> courtEntities;
     private List<Integer> photoDocList;
+    
+    
+    protected List<HumanLink> humanLinkList;
+    
     
     private int defaultOccPeriodID;
     
@@ -680,5 +687,26 @@ public  class       MunicipalityDataHeavy
     }
 
 
+    @Override
+    public List<HumanLink> getHumanLinkList() {
+        return humanLinkList;
+    }
+
+    @Override
+    public void setHumanLinkList(List<HumanLink> hll) {
+        humanLinkList = hll;
+    }
+
+    @Override
+    public LinkedObjectSchemaEnum getHUMAN_LINK_SCHEMA_ENUM() {
+        return HUMAN_LINK_SCHEMA_ENUM;
+    }
+
+
+    @Override
+    public int getHostPK() {
+        return muniCode;
+    }
   
+    
 }

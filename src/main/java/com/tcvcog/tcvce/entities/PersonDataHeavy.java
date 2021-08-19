@@ -21,7 +21,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
 import java.util.List;
 
 /**
- *
+ * The Listified version of a Person
  * @author sylvia
  */
 public  class PersonDataHeavy 
@@ -35,9 +35,7 @@ public  class PersonDataHeavy
     
     private String credentialSignature;
     
-    public PersonDataHeavy(){
-        
-    }
+   
     
     /**
      * @return the credentialSignature
@@ -50,86 +48,11 @@ public  class PersonDataHeavy
     
     
     public PersonDataHeavy(Person p, Credential cred){
-        
+        super(p);
         if(cred != null){
             credentialSignature = cred.getSignature();
         }
-        
-        this.personID = p.personID;
-
-        this.personType = p.personType;
-        this.muniCode = p.muniCode;
-        this.muniName = p.muniName;
-        this.muni = p.muni;
-
-        this.source = p.source;
-        this.creatorUserID = p.creatorUserID;
-        this.creationTimeStamp = p.creationTimeStamp;
-
-        // for backwards compatability
-
-        this.firstName = p.firstName;
-        this.lastName = p.lastName;
-
-        // frist, middle initial, and last all in lastName
-        this.compositeLastName = p.compositeLastName;
-        this.businessEntity = p.businessEntity;
-
-        this. jobTitle = p.jobTitle;
-
-        this. phoneCell = p.phoneCell;
-        this. phoneHome = p.phoneHome;
-        this. phoneWork = p.phoneWork;
-
-        this. email = p.email;
-        this. addressStreet = p.addressStreet;
-        this. addressCity = p.addressCity;
-
-        this. addressZip = p.addressZip;
-        this. addressState = p.addressState;
-
-        this.useSeparateMailingAddress = p.useSeparateMailingAddress;
-        this.mailingAddressStreet = p.mailingAddressStreet;
-        this.mailingAddressThirdLine = p.mailingAddressThirdLine;
-        this.mailingAddressCity = p.mailingAddressCity;
-        this.mailingAddressZip = p.mailingAddressZip;
-
-        this.mailingAddressState = p.mailingAddressState;
-
-        this.notes = p.notes;
-
-        this.lastUpdated = p.lastUpdated;
-        this.lastUpdatedPretty = p.lastUpdatedPretty;
-
-        this.canExpire = p.canExpire;
-        this.expiryDate = p.expiryDate;
-        this.expireString = p.expireString;
-        this.expiryDateUtilDate = p.expiryDateUtilDate;
-        this.expiryNotes = p.expiryNotes;
-        this.active = p.active;
-        this.linkedUserID = p.linkedUserID;
-
-        /**
-         * Tenancy tracking
-         */
-        this.under18 = p.under18;
-        this.verifiedByUserID = p.verifiedByUserID;
-
-        this.referencePerson = p.referencePerson;
-
-        this.ghostCreatedDate = p.ghostCreatedDate;
-        this.ghostCreatedDatePretty = p.ghostCreatedDatePretty;
-        this.ghostOf = p.ghostOf;
-        this.ghostCreatedByUserID = p.ghostCreatedByUserID;
-
-        this.cloneCreatedDate = p.cloneCreatedDate;
-        this.cloneCreatedDatePretty = p.cloneCreatedDatePretty;
-        this.cloneOf = p.cloneOf;
-        this.cloneCreatedByUserID = p.cloneCreatedByUserID;
-
-        this.ghostsList = p.ghostsList;
-        this.cloneList = p.cloneList;
-        this.mergedList = p.mergedList;
+      
         
     }
     
@@ -143,82 +66,8 @@ public  class PersonDataHeavy
      * 
      */
      public PersonDataHeavy(Person p){
+        super(p);
         
-        
-        this.personID = p.personID;
-
-        this.personType = p.personType;
-        this.muniCode = p.muniCode;
-        this. muniName = p.muniName;
-
-        this.source = p.source;
-        this.creatorUserID = p.creatorUserID;
-        this.creationTimeStamp = p.creationTimeStamp;
-
-        // for backwards compatability
-
-        this.firstName = p.firstName;
-        this.lastName = p.lastName;
-
-        // frist, middle initial, and last all in lastName
-        this.compositeLastName = p.compositeLastName;
-        this.businessEntity = p.businessEntity;
-
-        this. jobTitle = p.jobTitle;
-
-        this. phoneCell = p.phoneCell;
-        this. phoneHome = p.phoneHome;
-        this. phoneWork = p.phoneWork;
-
-        this. email = p.email;
-        this. addressStreet = p.addressStreet;
-        this. addressCity = p.addressCity;
-
-        this. addressZip = p.addressZip;
-        this. addressState = p.addressState;
-
-        this.useSeparateMailingAddress = p.useSeparateMailingAddress;
-        this.mailingAddressStreet = p.mailingAddressStreet;
-        this.mailingAddressThirdLine = p.mailingAddressThirdLine;
-        this.mailingAddressCity = p.mailingAddressCity;
-        this.mailingAddressZip = p.mailingAddressZip;
-
-        this.mailingAddressState = p.mailingAddressState;
-
-        this.notes = p.notes;
-
-        this.lastUpdated = p.lastUpdated;
-        this.lastUpdatedPretty = p.lastUpdatedPretty;
-
-        this.canExpire = p.canExpire;
-        this.expiryDate = p.expiryDate;
-        this.expireString = p.expireString;
-        this.expiryDateUtilDate = p.expiryDateUtilDate;
-        this.expiryNotes = p.expiryNotes;
-        this.active = p.active;
-        this.linkedUserID = p.linkedUserID;
-
-        /**
-         * Tenancy tracking
-         */
-        this.under18 = p.under18;
-        this.verifiedByUserID = p.verifiedByUserID;
-
-        this.referencePerson = p.referencePerson;
-
-        this.ghostCreatedDate = p.ghostCreatedDate;
-        this.ghostCreatedDatePretty = p.ghostCreatedDatePretty;
-        this.ghostOf = p.ghostOf;
-        this.ghostCreatedByUserID = p.ghostCreatedByUserID;
-
-        this.cloneCreatedDate = p.cloneCreatedDate;
-        this.cloneCreatedDatePretty = p.cloneCreatedDatePretty;
-        this.cloneOf = p.cloneOf;
-        this.cloneCreatedByUserID = p.cloneCreatedByUserID;
-
-        this.ghostsList = p.ghostsList;
-        this.cloneList = p.cloneList;
-        this.mergedList = p.mergedList;
         
     }
 

@@ -47,6 +47,7 @@ import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
+import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
@@ -143,13 +144,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         PropertyCoordinator pc = getPropertyCoordinator();
         BlobIntegrator bi = getBlobIntegrator();
         BlobCoordinator bc = getBlobCoordinator();
+        PersonCoordinator persc = getPersonCoordinator();
 
         // Wrap our base class in the subclass wrapper--an odd design structure, indeed
         CECaseDataHeavy cse = new CECaseDataHeavy(cecase_getCECase(c.getCaseID()));
 
         try {
 
-            cse.setProperty(pc.getProperty(c.getPropertyID()));
+            cse.setProperty(pc.getProperty(c.getParcelKey()));
             cse.setPropertyUnit(pc.getPropertyUnit(c.getPropertyUnitID()));
 
             // PROPOSAL LIST
@@ -157,6 +159,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
             // EVENT RULE LIST
             cse.setEventRuleList(wc.rules_getEventRuleImpList(cse, cred));
+            
+            // Human list
+            cse.setHumanLinkList(persc.assembleLinkedHumanLinks(cse));
 
             // CEAR LIST
             QueryCEAR qcear = sc.initQuery(QueryCEAREnum.ATTACHED_TO_CECASE, cred);
@@ -343,14 +348,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public CECasePropertyUnitHeavy cecase_assembleCECasePropertyUnitHeavy(CECase cse) throws IntegrationException, SearchException {
+    public CECasePropertyUnitHeavy cecase_assembleCECasePropertyUnitHeavy(CECase cse) throws IntegrationException, SearchException, BObStatusException {
         PropertyCoordinator pc = getPropertyCoordinator();
 
         CECasePropertyUnitHeavy csepuh = null;
 
         if (cse != null) {
             csepuh = new CECasePropertyUnitHeavy(cse);
-            csepuh.setProperty(pc.getProperty(cse.getPropertyID()));
+            csepuh.setProperty(pc.getProperty(cse.getParcelKey()));
             if (cse.getPropertyUnitID() != 0) {
                 csepuh.setPropUnit(pc.getPropertyUnit(cse.getPropertyUnitID()));
             }
@@ -367,7 +372,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param cseList
      * @return
      */
-    public List<CECasePropertyUnitHeavy> cecase_assembleCECasePropertyUnitHeavyList(List<CECase> cseList) {
+    public List<CECasePropertyUnitHeavy> cecase_assembleCECasePropertyUnitHeavyList(List<CECase> cseList) throws BObStatusException {
 
         List<CECasePropertyUnitHeavy> cspudhList = new ArrayList<>();
 
@@ -406,7 +411,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param cseList
      * @return
      */
-    public List<CECasePropertyUnitHeavy> cecase_refreshCECasePropertyUnitHeavyList(List<CECasePropertyUnitHeavy> cseList) {
+    public List<CECasePropertyUnitHeavy> cecase_refreshCECasePropertyUnitHeavyList(List<CECasePropertyUnitHeavy> cseList) throws BObStatusException {
 
         List<CECasePropertyUnitHeavy> cspudhList = new ArrayList<>();
 
@@ -541,9 +546,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             return citList;
         } else {
             for(Citation cit: cse.getCitationList()){
-                if(cit.getStatus().isNonStatusEditsForbidden()){
+                // TODO: fix me to work with docket status
                     citList.add(cit);
-                }
             }
         }
         
@@ -740,7 +744,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         // timestamp set by postgres
         // no closing date, by design of case flow
         newCase.setPublicControlCode(casePCC);
-        newCase.setPropertyID(p.getPropertyID());
+        newCase.setParcelKey(p.getParcelKey());
         newCase.setCaseManager(ua);
 
         return newCase;
@@ -897,7 +901,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             cse.setOriginationDate(LocalDateTime.now());
         }
 
-        if (cse.getPropertyID() == 0) {
+        if (cse.getParcelKey() == 0) {
             throw new BObStatusException("Cases must have a nonzero property id");
         }
 
@@ -1175,9 +1179,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                     ReportCECaseListStreetCECaseContainer ssc;
 
                     for(CECaseDataHeavy cse: cseList){
-                        if(!streetCaseMap.containsKey(cse.getProperty().getAddressStreet())){
+                        if(!streetCaseMap.containsKey(cse.getProperty().getPrimaryAddressLink().getStreet())){
                              ssc = new ReportCECaseListStreetCECaseContainer();
-                             ssc.setStreetName(cse.getProperty().getAddressStreet());
+                             ssc.setStreetName(cse.getProperty().getPrimaryAddressLink().getStreet().getName());
                             switch(enm){
                                 case CLOSED:
                                     ssc.getCaseClosedList().add(cse);
@@ -1190,7 +1194,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                                     break;
                             } // close switch
                         } else {
-                            ssc = streetCaseMap.get(cse.getProperty().getAddressStreet());
+                            ssc = streetCaseMap.get(cse.getProperty().getPrimaryAddressLink().getStreet());
                             switch(enm){
                                 case CLOSED:
                                     ssc.getCaseClosedList().add(cse);
@@ -1204,7 +1208,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                             } // close switch
                         } // close if/else
                         // Write new or updated Street Case continaer to our map
-                        streetCaseMap.put(cse.getProperty().getAddressStreet(), ssc);
+                        streetCaseMap.put(cse.getProperty().getPrimaryAddressLink().getStreet().getName(), ssc);
                     } // close for over case list
                 } // close null/emtpy check
             } // close for over enum vals
@@ -1406,7 +1410,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             // COUNT BY Citation status
             if(!citl.isEmpty()){
                 for(Citation cit: citl){
-                    String statTitle = cit.getStatus().getStatusTitle();
+                    String statTitle = cit.getStatus().getStatus().getStatusTitle();
                     if(citStatusMap.containsKey(statTitle)){
                         Integer statCount = citStatusMap.get(statTitle) + 1;
                         citStatusMap.put(statTitle, statCount);
@@ -1930,29 +1934,48 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      *
      * @param c
      * @param nov
+     * @param addr
+     * @param h
      * @param ua
      * @throws BObStatusException
      * @throws IntegrationException
      * @throws EventException
      * @throws ViolationException
      */
-    public void nov_LockAndQueue(CECaseDataHeavy c, NoticeOfViolation nov, UserAuthorized ua)
+    public void nov_LockAndQueue(CECaseDataHeavy c, 
+                                 NoticeOfViolation nov, 
+                                 HumanMailingAddressLink addr,
+                                 Human h,
+                                 UserAuthorized ua)
             throws BObStatusException, IntegrationException, EventException, ViolationException {
 
-        if(c == null || nov == null || ua == null){
+        if(c == null || nov == null || ua == null || addr == null || h == null){
             throw new BObStatusException("Cannot lock notice with null case, nov, or user");
         }
         CaseIntegrator ci = getCaseIntegrator();
-        PersonCoordinator pc = getPersonCoordinator();
-        PersonIntegrator pi = getPersonIntegrator();
 
         if (nov.getLockedAndqueuedTS() == null) {
-            int ghostID = pc.createChostPerson(nov.getRecipient(), ua);
-            nov.setRecipient(pi.getPerson(ghostID));
+//            int ghostID = pc.createChostPerson(nov.getRecipient(), ua);
+//            nov.setRecipient(pi.getPerson(ghostID));
             nov.setLockedAndqueuedTS(LocalDateTime.now());
             nov.setLockedAndQueuedBy(ua);
+            
+            // Pull out values of chosen Human and associated mailing address 
+            // and inject into permament NOV fields for record keeping
+            
+            nov.setFixedAddrXferTS(LocalDateTime.now());
+            nov.setRecipHuman(h);
+            nov.setMailingLink(addr);
+            nov.setFixedRecipientName(h.getName());
+            nov.setFixedRecipientBldgNo(addr.getBuildingNo());
+            nov.setFixedRecipientStreet(addr.getStreet().getName());
+            nov.setFixedRecipientState(addr.getStreet().getCityStateZip().getState());
+            nov.setFixedRecipientZip(addr.getStreet().getCityStateZip().getZipCode());
+            
             ci.novLockAndQueueForMailing(nov);
+            
             System.out.println("CaseCoordinator.novLockAndQueue | NOV locked in integrator");
+            
         } else {
             throw new BObStatusException("Notice is already locked and queued for sending");
         }
@@ -2282,11 +2305,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return fully-baked citation objects
      * @throws IntegrationException 
      */
-    private List<Citation> citation_getCitationList(CECase cse) throws IntegrationException{
-        CaseIntegrator ci = getCaseIntegrator();
+    private List<Citation> citation_getCitationList(CECase cse) throws IntegrationException, BObStatusException{
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
         List<Citation> citList = new ArrayList<>();
         if(cse!= null){
-            List<Integer> citIDList = ci.getCitations(cse);
+            List<Integer> citIDList = cei.getCitations(cse);
             if(citIDList != null && !citIDList.isEmpty()){
                 for(Integer i: citIDList){
                     citList.add(citation_getCitation(i));
@@ -2297,54 +2320,84 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
+     * Logic passthrough for acquiring a list of all possible citation statuses
+     * that can be attached to a CitationStatusLogEntry
+     * 
+     * @return 
+     */
+    public List<CitationStatus> citation_getCitationStatusList() throws IntegrationException{
+       CourtEntityIntegrator cei = getCourtEntityIntegrator();
+       return cei.getCitationStatusList();
+        
+        
+    }
+    
+    /**
      * Getter for Citation objects
      *
      * @param citationID
      * @return
      * @throws IntegrationException
      */
-    public Citation citation_getCitation(int citationID) throws IntegrationException {
-        CaseIntegrator ci = getCaseIntegrator();
-        Citation cit = ci.getCitation(citationID);
-        cit.setViolationList(ci.getCodeViolations(ci.getCodeViolationsByCitation(cit)));
-
-        return cit;
+    public Citation citation_getCitation(int citationID) throws IntegrationException, BObStatusException {
+        if(citationID == 0){
+            throw new BObStatusException("Cannot get citation with an ID of 0");
+            
+        }
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        Citation cit = cei.getCitation(citationID);
+         
+        return citation_configureCitation(cit);
 
     }
-
+    
     /**
-     * Logic container for retrieving the default citation status
-     * @return
-     * @throws IntegrationException 
+     * Logic method for getting citations all set up
+     * @param cit
+     * @return 
      */
-    private CitationStatus citation_getStartingCitationStatus() throws IntegrationException {
-        CaseIntegrator ci = getCaseIntegrator();
-        CitationStatus cs = ci.getCitationStatus(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString("citationInitialStatusID")));
-        return cs;
+    private Citation citation_configureCitation(Citation cit) throws IntegrationException, BObStatusException{
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
+
+        cit.setViolationList(cei.getCodeViolationsByCitation(cit));
+        cit.setStatusLog(cei.buildCitationStatusLog(cit));
+        cit.setHumanLinkList(pc.assembleLinkedHumanLinks(cit));
+        cit.setDocketNos(cei.getCitationDocketRecords(cit));
+        
+        // TODO: populate citation with events and blobs--but this can cycle, so be careful
+     
+       
+        
+        return cit;
+        
     }
+
+   
 
     /**
      * Initializes a Citation object with a default start status
      *
-     * @param ua
+     * @param creator
      * @param cse
+     * @param citingOfficer
      * @return
      * @throws BObStatusException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public Citation citation_getCitationSkeleton(UserAuthorized ua, CECase cse) throws BObStatusException, IntegrationException {
-        if (!ua.getKeyCard().isHasEnfOfficialPermissions()) {
+    public Citation citation_getCitationSkeleton(CECase cse, UserAuthorized creator, UserAuthorized citingOfficer) throws BObStatusException, IntegrationException {
+        if (!creator.getKeyCard().isHasEnfOfficialPermissions()) {
             throw new BObStatusException("Users must have enforcement office permissions to create a citation");
         }
         Citation cit = new Citation();
-        cit.setCeCaseNoLists(cse);
+        
+        cit.setCreatedBy(creator);
+        cit.setFilingOfficer(citingOfficer);
         cit.setDateOfRecord(LocalDateTime.now());
-        cit.setUserOwner(getSessionBean().getSessUser());
-        cit.setIsActive(true);
-        cit.setStatus(citation_getStartingCitationStatus());
         cit.setOrigin_courtentity(getSessionBean().getSessMuni().getCourtEntities().get(0));
+        
         List<CodeViolation> cvlst = new ArrayList<>();
+        
         if (cse.getViolationList() != null && !cse.getViolationList().isEmpty()) {
             for (CodeViolation v : cse.getViolationList()) {
                 if (v.getActualComplianceDate() == null) {
@@ -2353,70 +2406,167 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 }
             }
         }
-        cit.setViolationList(cvlst);
+        cit.setViolationList(buildCitationCodeViolationLinkSkeletonLiset(cvlst));
+        
 
         return cit;
 
     }
-
     /**
-     * Called to create a new citation for a given List of CodeViolation objects
-     *
-     * @param violationList
-     * @return
+     * Convenience method for injecting a code violation into a CitationCodeViolation
+     *  for skeltons to play with in their bellies
+     * @param cvl
+     * @return 
      */
-    public Citation citation_generateNewCitation(List<CodeViolation> violationList) {
-        Citation newCitation = new Citation();
-        List<CodeViolation> al = new ArrayList<>();
-        ListIterator<CodeViolation> li = violationList.listIterator();
-        CodeViolation cv;
-
-        StringBuilder notesBuilder = new StringBuilder();
-        notesBuilder.append("Failure to comply with the following ordinances:\n");
-
-        while (li.hasNext()) {
-
-            cv = li.next();
-            System.out.println("CaseCoordinator.generateNewCitation | linked list item: "
-                    + cv.getDescription());
-
-            // build a nice note section that lists the elements cited
-            notesBuilder.append("* Chapter ");
-            notesBuilder.append(cv.getCodeViolated().getOrdchapterNo());
-            notesBuilder.append(":");
-            notesBuilder.append(cv.getCodeViolated().getOrdchapterTitle());
-            notesBuilder.append(", Section ");
-            notesBuilder.append(cv.getCodeViolated().getOrdSecNum());
-            notesBuilder.append(":");
-            notesBuilder.append(cv.getCodeViolated().getOrdSecTitle());
-            notesBuilder.append(", Subsection ");
-            notesBuilder.append(cv.getCodeViolated().getOrdSubSecNum());
-            notesBuilder.append(": ");
-            notesBuilder.append(cv.getCodeViolated().getOrdSubSecTitle());
-            notesBuilder.append("\n\n");
-
-            al.add(cv);
-
+    private List<CitationCodeViolationLink> buildCitationCodeViolationLinkSkeletonLiset(List<CodeViolation> cvl){
+        List<CitationCodeViolationLink> ccvl = new ArrayList<>();
+        if(cvl != null){
+            for(CodeViolation cv: cvl){
+                ccvl.add(new CitationCodeViolationLink((cv)));
+            }
         }
-        newCitation.setViolationList(al);
-        newCitation.setNotes(notesBuilder.toString());
-        newCitation.setIsActive(true);
-
-        return newCitation;
+        
+        return ccvl;
+        
     }
-
+    
+    
     /**
      * Logic intermediary for recording that a Citation has been issued, meaning
      * sent to the proper magisterial authority
      *
      * @param c
+     * @param creator
+     * @param issuingOfficer
+     * @return 
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public void citation_issueCitation(Citation c) throws IntegrationException {
-        CaseIntegrator ci = getCaseIntegrator();
-        ci.insertCitation(c);
-
+    public int citation_insertCitation(    Citation c, 
+                                            UserAuthorized creator , 
+                                            User issuingOfficer) 
+                                    throws  IntegrationException, 
+                                            BObStatusException {
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+        int freshID = 0;
+        if(     c == null 
+                || creator == null 
+                || issuingOfficer == null 
+                || c.getViolationList() == null 
+                || !c.getViolationList().isEmpty()){
+            throw new BObStatusException("Cannot issue citation with null citation, creator, issuing officer, or viol list");
+            
+        }
+        
+        // TODO: Implement logic to check if the user passed in for issuing officer has
+        // sufficient rank to to do so (i.e. CEO or better)
+        
+        c.setCreatedBy(creator);
+        c.setLastUpdatedBy(creator);
+        c.setFilingOfficer(issuingOfficer);
+        c.setViolationList(new ArrayList<>());
+        
+        // Create CitationCodeViolationLink objects to wrap each incoming CodeViolation
+        // with metadata
+        for(CodeViolation cv: c.getViolationList()){
+            CitationCodeViolationLink ccvl = new CitationCodeViolationLink(cv);
+            ccvl.setCreatedBy(creator);
+            ccvl.setLinkCreatedBy(creator);
+            ccvl.setCitVStatus(getDefaultCitationViolationStatusEnumVal());
+            ccvl.setLinkSource(sc.getBObSource(Integer.parseInt(
+                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("bobsource_internalhuman"))));
+            c.getViolationList().add(ccvl);
+            
+        }
+        freshID = cei.insertCitation(c);
+        cei.linkViolationsToCitation(cei.getCitation(freshID));
+        return freshID;
+        
     }
+    
+    /**
+     * Logic container for returning the default status of a code violation
+     * attached to a single citation
+     * @return 
+     */
+    private CitationViolationStatusEnum getDefaultCitationViolationStatusEnumVal(){
+        return CitationViolationStatusEnum.PENDING;
+        
+    }
+    
+    
+    /**
+     * Entry point for making a new citation status log entry on a 
+     * particular citation. 
+     * 
+     * @param cit to which the log entry shall be attached
+     * @param csle the log entry to link to the given citation
+     * @param ua doing the logging
+     * @return the ID of the fresh record in the citationcitationstatus table
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public int citation_makeCitationStatusLogEntry( Citation cit, 
+                                                    CitationStatusLogEntry csle, 
+                                                    UserAuthorized ua) 
+                                            throws  BObStatusException, IntegrationException{
+        if(cit == null
+                || csle == null
+                || ua == null
+                || csle.getStatus() == null){
+            throw new BObStatusException("Cannot make a log entry with null citation, log entry, or user authorized");
+            
+        }
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        
+        csle.setCreatedBy(ua);
+        csle.setLastUpdatedBy(ua);
+        cit.setLastUpdatedBy(ua);
+       
+        return cei.insertCitationStatusLogEntry(cit, csle);
+        
+    }
+    
+    /**
+     * Updates a citation status log entry
+     * 
+     * @param cit
+     * @param csle
+     * @param ua
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public void citation_updateCitationStatusLogEntry(  Citation cit, 
+                                                        CitationStatusLogEntry csle, 
+                                                        UserAuthorized ua) 
+                                                throws  BObStatusException, 
+                                                        IntegrationException {
+        
+        if(cit == null || csle == null || ua == null || csle.getStatus() == null){
+            throw new BObStatusException("Cannot update citation status with null citation, log entry or its status, or user");
+        }
+        
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        csle.setLastUpdatedBy(ua);
+        
+        cei.updateStatusLogEntry(cit, csle);
+        
+    }
+
+    /**
+     * Deactivates a citation log entry
+     * 
+     * @param csle
+     * @param ua  doing the deactivating
+     */
+    public void citation_deactivateCitationStatusLogEntry(CitationStatusLogEntry csle, UserAuthorized ua){
+       csle.setDeactivatedBy(ua);
+       csle.setLastUpdatedBy(ua);
+        
+    }
+    
+    
 
     /**
      * Logic intermediary for updating fields on Citations in the DB
@@ -2426,9 +2576,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public void citation_updateCitation(Citation c) throws IntegrationException, BObStatusException {
-        CaseIntegrator ci = getCaseIntegrator();
+      CourtEntityIntegrator cei = getCourtEntityIntegrator();
         if (c.getStatus() != null) {
-            ci.updateCitation(c);
+            cei.updateCitation(c);
         } else {
             throw new BObStatusException("Cannot update this citation at its current status");
         }
@@ -2442,36 +2592,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public void citation_removeCitation(Citation c) throws IntegrationException, BObStatusException {
-        CaseIntegrator ci = getCaseIntegrator();
+    public void citation_removeCitation(Citation c, UserAuthorized ua) throws IntegrationException, BObStatusException {
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
         
-        if(c != null){
-            c.setIsActive(false);
-            ci.updateCitation(c);
+        if(c != null && ua != null){
+            c.setDeactivatedBy(ua);
+            cei.deactivateCitation(c);
         }
-        // Deactivated to allow for any citation to be removed
-        
-
-//        if (c.getStatus() != null && !c.getStatus().isNonStatusEditsForbidden()) {
-//            c.setIsActive(false);
-//            ci.updateCitation(c);
-//        } else {
-//            throw new BObStatusException("Cannot remove this citation at its current status");
-//        }
-
     }
 
-    /**
-     * Logic intermediary for updating citation status only
-     *
-     * @param c
-     * @throws IntegrationException
-     */
-    public void citation_updateCitationStatus(Citation c) throws IntegrationException {
-        CaseIntegrator ci = getCaseIntegrator();
-        ci.updateCitation(c);
-
-    }
+   
 
     /**
      * Updates only the notes field on Citation
@@ -2519,7 +2649,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException
      */
-    public CEActionRequest cear_getCEActionRequest(int cearid) throws IntegrationException {
+    public CEActionRequest cear_getCEActionRequest(int cearid) throws IntegrationException, BObStatusException {
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         return ceari.getActionRequestByRequestID(cearid);
     }
@@ -2727,7 +2857,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      */
     public CodeViolation violation_getCodeViolation(int vid) 
-            throws IntegrationException {
+            throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
         CodeViolation cv = ci.getCodeViolation(vid);
         return violation_configureCodeViolation(cv);
@@ -2735,7 +2865,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     
     
     
-    public CodeViolationPropCECaseHeavy violation_getCodeViolationPropCECaseHeavy(int vid) throws ViolationException, IntegrationException, SearchException{
+    public CodeViolationPropCECaseHeavy violation_getCodeViolationPropCECaseHeavy(int vid) throws ViolationException, IntegrationException, SearchException, BObStatusException{
         PropertyCoordinator pc = getPropertyCoordinator();
         CodeViolationPropCECaseHeavy cvpcdh = null;
         if(vid != 0){
@@ -2764,11 +2894,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     private CodeViolation violation_configureCodeViolation(CodeViolation cv) throws IntegrationException {
         SystemIntegrator si = getSystemIntegrator();
         CaseIntegrator ci = getCaseIntegrator();
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
         
         // TODO: NADGIT photo stuff
 //        cv.setBlobList(ci.loadViolationPhotoList(cv));
         
-        cv.setCitationIDList(ci.getCitations(cv.getViolationID()));
+        cv.setCitationIDList(cei.getCitationIDsByViolation(cv.getViolationID()));
         cv.setNoticeIDList(ci.novGetNOVIDList(cv));
         
         // nullification overrides all
@@ -3125,7 +3256,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException
      */
-    public List<CodeViolation> violation_getCodeViolations(List<Integer> cvIDList) throws IntegrationException{
+    public List<CodeViolation> violation_getCodeViolations(List<Integer> cvIDList) throws IntegrationException, BObStatusException{
         List<CodeViolation> vl = new ArrayList<>();
         
         if(cvIDList != null && !cvIDList.isEmpty()){

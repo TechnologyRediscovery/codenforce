@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2018 Turtle Creek Valley
-Council of Governments, PA
+ * Copyright (C) 2021 Technology Rediscovery LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,48 +16,46 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
-import java.io.Serializable;
-import java.util.Objects;
-
 /**
- * Represents the current state of a Citation
- * @author ellen bascomb of apt 31y
+ *  Subclass of Status which represents the current business
+ * state of a citation log entry
+ * 
+ * @author Ellen Bascomb of Apartment 31Y
  */
-public class CitationStatus extends Status {
-    private boolean nonStatusEditsForbidden;
-    private EventRuleAbstract phaseChangeRule;
+public class CitationStatus 
+        extends Status{
     
-    
+    protected boolean editsForbidden;
+    private EventRuleAbstract eventRuleAbstract;
 
     /**
-     * @return the nonStatusEditsForbidden
+     * @return the editsForbidden
      */
-    public boolean isNonStatusEditsForbidden() {
-        return nonStatusEditsForbidden;
+    public boolean isEditsForbidden() {
+        return editsForbidden;
     }
 
+  
     /**
-     * @param nonStatusEditsForbidden the nonStatusEditsForbidden to set
+     * @param editsForbidden the editsForbidden to set
      */
-    public void setNonStatusEditsForbidden(boolean nonStatusEditsForbidden) {
-        this.nonStatusEditsForbidden = nonStatusEditsForbidden;
-    }
-
-    /**
-     * @return the phaseChangeRule
-     */
-    public EventRuleAbstract getPhaseChangeRule() {
-        return phaseChangeRule;
-    }
-
-    /**
-     * @param phaseChangeRule the phaseChangeRule to set
-     */
-    public void setPhaseChangeRule(EventRuleAbstract phaseChangeRule) {
-        this.phaseChangeRule = phaseChangeRule;
+    public void setEditsForbidden(boolean editsForbidden) {
+        this.editsForbidden = editsForbidden;
     }
 
     
-    
+    /**
+     * @return the eventRuleAbstract
+     */
+    public EventRuleAbstract getEventRuleAbstract() {
+        return eventRuleAbstract;
+    }
+
+    /**
+     * @param eventRuleAbstract the eventRuleAbstract to set
+     */
+    public void setEventRuleAbstract(EventRuleAbstract eventRuleAbstract) {
+        this.eventRuleAbstract = eventRuleAbstract;
+    }
     
 }

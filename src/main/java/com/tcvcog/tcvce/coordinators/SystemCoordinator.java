@@ -299,6 +299,24 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         }
         return sourceList;
     }
+    
+    
+    /**
+     * Logic pass through for bob source objects
+     * @param sourceid
+     * @return
+     * @throws IntegrationException 
+     */
+   public BOBSource getBObSource(int sourceid) throws IntegrationException{
+       if(sourceid==0){
+           return null;
+       }
+       SystemIntegrator si = getSystemIntegrator();
+       
+       return si.getBOBSource(sourceid);
+       
+   }
+    
 
     /**
      * Adapter method for taking in simple note info, not in Object format and
@@ -362,22 +380,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         return muniCodeNameMap;
     }
 
-    /**
-     * Experimental method--decided to let respective Coordinators do this
-     *
-     * @deprecated
-     * @param obj
-     * @return
-     */
-    public String generateFieldDumpString(BOb obj) {
-        String dump = obj.toString();
-        PersonCoordinator pc = getPersonCoordinator();
-
-        if (obj instanceof Person) {
-            return pc.dumpPerson((Person) obj);
-        }
-        return dump;
-    }
 
     /**
      * @param muniCodeNameMap the muniCodeNameMap to set

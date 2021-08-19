@@ -142,7 +142,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 //              PropertyIntegrator pi = getPropertyIntegrator();
 //                if (currentRequest.getRequestProperty() != null) {
 //                      try {
-//                          personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getPropertyID()).getPersonOccApplicationList();
+//                          personCandidateList = pi.getPropertyDataHeavy(currentRequest.getRequestProperty().getParcelKey()).getPersonOccApplicationList();
 //                      } catch (IntegrationException | BObStatusException | EventException | AuthorizationException ex) {
 //                          System.out.println(ex);
 //                      }
@@ -279,7 +279,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                     Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                             .getString("actionRequestPublicUserPersonSourceID"))));
 
-            insertedPersonID = personIntegrator.insertPerson(p);
+//            insertedPersonID = personIntegrator.insertPerson(p);
             System.out.println("CEActionReqeustSubmitBB.storeActionRequestorPerson | PersonID " + insertedPersonID);
         } catch (IntegrationException ex) {
             System.out.println(ex.toString());
@@ -310,8 +310,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         CaseCoordinator cc = getCaseCoordinator();
         cear = cc.cear_getInititalizedCEActionRequest();
         cear.setMuni(selectedMuni);
-        cear.setBlobList(new ArrayList<BlobLight>());
-        cear.setRequestProperty(new Property());
+        cear.setBlobList(new ArrayList<>());
+        cear.setRequestProperty(null);
         getSessionBean().setSessCEAR(cear);
         getSessionBean().getNavStack().pushCurrentPage();
         return "chooseProperty";
@@ -488,10 +488,10 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         UserCoordinator uc = getUserCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
         Municipality m = currentRequest.getMuni();
-        Person skel = pc.personCreateMakeSkeleton(m);
+        Person skel = pc.personInit(m);
         try {
-            skel.setCreatorUserID(uc.user_getUserRobot().getUserID());
-        } catch (IntegrationException ex) {
+            skel.setCreatedBy(uc.user_getUserRobot());
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
         currentRequest.setRequestor(skel);
@@ -556,7 +556,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
         // LT goal: bundle these into a transaction that is rolled back if either 
         // the person or the request bounces
-        if (currentRequest.getRequestor().getPersonID() == 0) {
+        if (currentRequest.getRequestor().getHumanID() == 0) {
             
             //The person is not in our database, prepared it for saving
             if (getSessionBean().getSessUser() != null) {
@@ -573,12 +573,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             
             //insert it into the database.
             personID = insertActionRequestorNewPerson(currentRequest.getRequestor());
-            try {
                 //We want to get the entry we just inserted into the database
-                currentRequest.setRequestor(pi.getPerson(personID));
-            } catch (IntegrationException ex) {
-                System.out.println(ex);
-            }
+//                currentRequest.setRequestor(pi.getPerson(personID));
         } else {
 
             // do nothing, since we already have the person in the system
@@ -615,7 +611,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
                             "Success! Your request has been submitted and passed to our code enforcement team.", ""));
             return "successCEAR";
 
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException |  BObStatusException ex) {
             System.out.println(ex.toString());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -677,7 +673,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      * the user selected.
      * @param ev 
      */
-    public void searchForPropertiesSingleMuni(ActionEvent ev) {
+    public void searchForPropertiesSingleMuni(ActionEvent ev) throws BObStatusException {
         SearchCoordinator sc = getSearchCoordinator();
         UserCoordinator uc = getUserCoordinator();
 

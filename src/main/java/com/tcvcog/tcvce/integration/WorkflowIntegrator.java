@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.coordinators.WorkflowCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Choice;
@@ -70,7 +71,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @return
      * @throws IntegrationException 
      */
-    public Choice getChoice(int choiceID) throws IntegrationException{
+    public Choice getChoice(int choiceID) throws IntegrationException, BObStatusException{
        Choice c = null;
   
         StringBuilder sb = new StringBuilder();
@@ -110,7 +111,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @return
      * @throws IntegrationException 
      */
-    public List<IFace_Proposable> getChoiceList(int directiveID) throws IntegrationException{
+    public List<IFace_Proposable> getChoiceList(int directiveID) throws IntegrationException, BObStatusException{
         List<IFace_Proposable> choiceList = new ArrayList<>();
   
         StringBuilder sb = new StringBuilder();
@@ -149,7 +150,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @throws SQLException
      * @throws IntegrationException 
      */
-    private Choice generateChoice(ResultSet rs) throws SQLException, IntegrationException{
+    private Choice generateChoice(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         EventIntegrator ei = getEventIntegrator();
         SystemIntegrator si = getSystemIntegrator();
         Choice choice;
@@ -193,7 +194,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @return
      * @throws IntegrationException 
      */
-    public Proposal getProposal(int propID) throws IntegrationException{
+    public Proposal getProposal(int propID) throws IntegrationException, BObStatusException{
         Proposal prop = null;
         WorkflowCoordinator cc = getWorkflowCoordinator();
         
@@ -236,7 +237,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @return
      * @throws IntegrationException 
      */
-    public List<Proposal> getProposalList(CECase cse) throws IntegrationException{
+    public List<Proposal> getProposalList(CECase cse) throws IntegrationException, BObStatusException{
         List<Proposal> proposalList = new ArrayList<>();
   
         StringBuilder sb = new StringBuilder();
@@ -275,7 +276,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @return
      * @throws IntegrationException 
      */
-    public List<Proposal> getProposalList(OccPeriod occPer) throws IntegrationException{
+    public List<Proposal> getProposalList(OccPeriod occPer) throws IntegrationException, BObStatusException{
         
         List<Proposal> proposalList = new ArrayList<>();
   
@@ -314,7 +315,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @throws SQLException
      * @throws IntegrationException 
      */
-     private Proposal generateProposal(ResultSet rs) throws SQLException, IntegrationException{
+     private Proposal generateProposal(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         Proposal prop = new Proposal();
         UserCoordinator uc = getUserCoordinator();
         EventCoordinator ec = getEventCoordinator();
@@ -477,7 +478,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
     * @return
     * @throws IntegrationException 
     */
-    public Directive getDirective(int directiveID) throws IntegrationException{
+    public Directive getDirective(int directiveID) throws IntegrationException, BObStatusException{
 
         Directive proposal = new Directive();
         
@@ -525,7 +526,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @throws SQLException
      * @throws IntegrationException 
      */
-    private Directive generateDirective(ResultSet rs) throws SQLException, IntegrationException{
+    private Directive generateDirective(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         UserIntegrator ui = getUserIntegrator();
         SystemIntegrator si = getSystemIntegrator();
 
@@ -702,7 +703,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
 
         try {
             stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(1, p.getResponderActual().getPersonID());
+            stmt.setInt(1, p.getResponderActual().getHumanID());
             stmt.setString(2, p.getNotes());
             stmt.setInt(3, p.getChosenChoice().getChoiceID());
             if(p instanceof ProposalCECase){
@@ -837,7 +838,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @return
      * @throws IntegrationException 
      */
-    public EventRuleAbstract rules_getEventRuleAbstract(int ruleid) throws IntegrationException{
+    public EventRuleAbstract rules_getEventRuleAbstract(int ruleid) throws IntegrationException, BObStatusException{
         if(ruleid == 0){
             return null;
         }
@@ -925,7 +926,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @return
      * @throws SQLException
      */
-    private EventRuleAbstract rules_generateEventRule(ResultSet rs) throws SQLException, IntegrationException{
+    private EventRuleAbstract rules_generateEventRule(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         EventRuleAbstract evRule = new EventRuleAbstract();
         WorkflowIntegrator ci = getWorkflowIntegrator();
         EventIntegrator ei = getEventIntegrator();
@@ -988,7 +989,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @return
      * @throws IntegrationException 
      */
-    public List<EventRuleAbstract> rules_getEventRuleList(int ruleSetID) throws IntegrationException{
+    public List<EventRuleAbstract> rules_getEventRuleList(int ruleSetID) throws IntegrationException, BObStatusException{
         List<EventRuleAbstract> list = new ArrayList<>();
         String query = "SELECT eventrule_ruleid\n" +
                         "  FROM public.eventruleruleset WHERE ruleset_rulesetid=?;";
@@ -1022,7 +1023,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @return
      * @throws IntegrationException 
      */
-    public List<EventRuleSet> rules_getEventRuleSetList(MuniProfile profile) throws IntegrationException{
+    public List<EventRuleSet> rules_getEventRuleSetList(MuniProfile profile) throws IntegrationException, BObStatusException{
         List<EventRuleSet> setList = new ArrayList<>();
         String query =  "SELECT muniprofile_profileid, ruleset_setid FROM \n" +
                         "  FROM public.muniprofileeventruleset WHERE muniprofile_profileid=?;";
@@ -1055,7 +1056,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @return
      * @throws IntegrationException 
      */
-    public List<EventRuleSet> rules_getEventRuleSetList() throws IntegrationException{
+    public List<EventRuleSet> rules_getEventRuleSetList() throws IntegrationException, BObStatusException{
         List<EventRuleSet> setList = new ArrayList<>();
         String query = "SELECT rulesetid FROM public.eventruleset; ";
         Connection con = getPostgresCon();
@@ -1087,7 +1088,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @return
      * @throws IntegrationException 
      */
-    public EventRuleSet rules_getEventRuleSet(int setID) throws IntegrationException{
+    public EventRuleSet rules_getEventRuleSet(int setID) throws IntegrationException, BObStatusException{
         EventRuleSet set = null;
         String query = "SELECT rulesetid, title, description\n" +
                         "  FROM public.eventruleset WHERE rulesetid=?;";
@@ -1120,7 +1121,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @throws SQLException
      * @throws IntegrationException 
      */
-    private EventRuleSet rules_generateRuleSet(ResultSet rs) throws SQLException, IntegrationException{
+    private EventRuleSet rules_generateRuleSet(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         EventRuleSet s = new EventRuleSet();
         s.setRulseSetID(rs.getInt("rulesetid"));
         s.setTitle(rs.getString("title"));
@@ -1135,7 +1136,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @return
      * @throws IntegrationException 
      */
-    public EventRuleImplementation rules_getEventRuleImplemention(int implid) throws IntegrationException{
+    public EventRuleImplementation rules_getEventRuleImplemention(int implid) throws IntegrationException, BObStatusException{
         EventRuleImplementation ruleImp = null;
         
         String query =  "SELECT erimplid, eventrule_ruleid, cecase_caseid, occperiod_periodid, \n" +
@@ -1177,7 +1178,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @throws SQLException
      * @throws IntegrationException 
      */
-    private EventRuleImplementation rules_generateEventRuleImplementation(ResultSet rs) throws SQLException, IntegrationException{
+    private EventRuleImplementation rules_generateEventRuleImplementation(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         UserCoordinator uc = getUserCoordinator();
         EventCoordinator ec = getEventCoordinator();
         

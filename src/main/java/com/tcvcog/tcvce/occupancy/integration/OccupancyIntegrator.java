@@ -20,13 +20,15 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonOccApplication;
+import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PublicInfoBundleOccPermitApplication;
@@ -275,7 +277,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 }
                 
                 if (params.isProperty_ctl()) {
-                    stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
+                    stmt.setInt(++paramCounter, params.getProperty_val().getParcelKey());
                 }
 
                 if (params.isPropertyUnit_ctl()) {
@@ -288,7 +290,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
                 // filter OCC-8
                 if (params.isPerson_ctl()) {
-                    stmt.setInt(++paramCounter, params.getPerson_val().getPersonID());
+                    stmt.setInt(++paramCounter, params.getPerson_val().getHumanID());
                 }
 
             } else {
@@ -360,7 +362,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return oc.configureOccPeriod(op);
     }
 
-    private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException {
+    private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException, BObStatusException {
         SystemIntegrator si = getSystemIntegrator();
         UserIntegrator ui = getUserIntegrator();
 
@@ -456,7 +458,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
     }   
 
-    public OccPermit getOccPermit(int permitID) throws IntegrationException {
+    public OccPermit getOccPermit(int permitID) throws IntegrationException, BObStatusException {
         OccPermit op = null;
         String query = "SELECT permitid, occperiod_periodid, referenceno, issuedto_personid, \n"
                 + "       issuedby_userid, dateissued, permitadditionaltext, notes\n"
@@ -483,10 +485,11 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
     }
 
-    private OccPermit generateOccPermit(ResultSet rs) throws SQLException, IntegrationException {
+    private OccPermit generateOccPermit(ResultSet rs) throws SQLException, IntegrationException, BObStatusException {
         UserIntegrator ui = getUserIntegrator();
         OccPermit permit = new OccPermit();
         PersonIntegrator pi = getPersonIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
 
         permit.setPermitID(rs.getInt("permitid"));
         permit.setPeriodID(rs.getInt("occperiod_periodid"));
@@ -497,7 +500,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         }
 
         permit.setIssuedBy(ui.getUser(rs.getInt("issuedby_userid")));
-        permit.setIssuedTo(pi.getPerson(rs.getInt("issuedto_personid")));
+        
+        permit.setIssuedTo(pc.getPerson(pc.getHuman(rs.getInt("issuedto_personid"))));
 
         permit.setPermitAdditionalText(rs.getString("permitadditionaltext"));
         permit.setNotes(rs.getString("notes"));
@@ -505,7 +509,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return permit;
     }
 
-    public List<OccPermit> getOccPermitList(OccPeriod period) throws IntegrationException {
+    public List<OccPermit> getOccPermitList(OccPeriod period) throws IntegrationException, BObStatusException {
         List<OccPermit> permitList = new ArrayList<>();
         String query = "SELECT permitid FROM public.occpermit WHERE occperiod_periodid=?;";
         Connection con = getPostgresCon();
@@ -1045,9 +1049,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             int adults = 0;
             int youth = 0;
                     
-                    for(Person p : application.getAttachedPersons()){
+                    for(Human h : application.getAttachedPersons()){
                         
-                        if(p.isUnder18()){
+                        if(h.isUnder18()){
                             youth++;
                         } else {
                             adults++;
@@ -1171,17 +1175,18 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             if(occpermitapp.getConnectedPeriod() != null)
             {
             
-                occpermitapp.setAttachedPersons(new ArrayList<PersonOccApplication>());
+                occpermitapp.setAttachedPersons(new ArrayList<>());
                 
-                for (PersonOccApplication skeleton : pi.getPersonOccApplicationList(occpermitapp)) {
+                for (HumanLink skeleton : pi.getPersonOccApplicationList(occpermitapp)) {
 
-                    if (skeleton.isApplicant()){
-                        occpermitapp.setApplicantPerson(skeleton);
-                    }
-
-                    if(skeleton.isPreferredContact()){
-                        occpermitapp.setPreferredContact(skeleton);
-                    }
+    //  ----->  TODO: Update for Humanization/Parcelization <------
+//                    if (skeleton.isApplicant()) {
+//                        occpermitapp.setApplicantPerson(skeleton);
+//                    }
+//
+//                    if(skeleton.isPreferredContact()){
+//                        occpermitapp.setPreferredContact(skeleton);
+//                    }
 
                     occpermitapp.getAttachedPersons().add(skeleton);
 
@@ -1588,7 +1593,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
      * @param applicationID
      * @throws IntegrationException
      */
-    public void insertOccApplicationPerson(PersonOccApplication person, int applicationID) throws IntegrationException {
+    public void insertOccApplicationPerson(HumanLink person, int applicationID) throws IntegrationException {
 
         String query = "INSERT INTO public.occpermitapplicationperson(occpermitapplication_applicationid, "
                 + "person_personid, applicant, preferredcontact, active, applicationpersontype)\n"
@@ -1599,11 +1604,12 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, applicationID);
-            stmt.setInt(2, person.getPersonID());
+            stmt.setInt(2, person.getHumanID());
 
-            stmt.setBoolean(3, person.isApplicant());
-            stmt.setBoolean(4, person.isPreferredContact());
-            stmt.setString(5, person.getApplicationPersonType().name());
+//  ----->  TODO: Update for Humanization/Parcelization <------
+//            stmt.setBoolean(3, person.isApplicant());
+//            stmt.setBoolean(4, person.isPreferredContact());
+//            stmt.setString(5, person.getApplicationPersonType().name());
             
             stmt.execute();
             } catch (SQLException ex) {
@@ -1616,7 +1622,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             }
     }
     
-    public void updatePersonOccPeriod(PersonOccApplication input, OccPermitApplication app) throws IntegrationException{
+    public void updatePersonOccPeriod(HumanLink input, OccPermitApplication app) throws IntegrationException{
         Connection con = getPostgresCon();
         String query = "UPDATE occpermitapplicationperson "
                 + "SET applicant = ?, preferredcontact = ?, applicationpersontype = ?::persontype, active = ? "
@@ -1625,11 +1631,13 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setBoolean(1, input.isApplicant());
-            stmt.setBoolean(2, input.isPreferredContact());
-            stmt.setString(3, input.getApplicationPersonType().name());
-            stmt.setBoolean(4, input.isLinkActive());
-            stmt.setInt(5, input.getPersonID());
+
+//  ----->  TODO: Update for Humanization/Parcelization <------
+//            stmt.setBoolean(1, input.isApplicant());
+//            stmt.setBoolean(2, input.isPreferredContact());
+//            stmt.setString(3, input.getApplicationPersonType().name());
+//            stmt.setBoolean(4, input.isLinkActive());
+            stmt.setInt(5, input.getHumanID());
             stmt.setInt(6, app.getId());
             stmt.execute();
 

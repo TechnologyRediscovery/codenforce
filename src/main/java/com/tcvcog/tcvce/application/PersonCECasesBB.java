@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
@@ -56,7 +57,7 @@ public class PersonCECasesBB extends BackingBeanUtils{
            try {
                currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(),
                        getSessionBean().getSessUser().getKeyCard());
-           } catch (IntegrationException ex) {
+           } catch (IntegrationException | BObStatusException ex) {
                System.out.println(ex);
            }
              getSessionBean().setSessPerson(currPerson);

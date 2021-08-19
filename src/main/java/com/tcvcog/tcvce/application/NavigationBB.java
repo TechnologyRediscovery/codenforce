@@ -27,7 +27,7 @@ import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -88,7 +88,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
         SessionBean s = getSessionBean();
         try {
             String propertyAddress = s.getSessProperty().getAddress();
-            String propertyId = String.valueOf(s.getSessProperty().getPropertyID());
+            String propertyId = String.valueOf(s.getSessProperty().getParcelKey());
             return "Current Property: " + propertyAddress + " | ID: " + propertyId;
         } catch (Exception ex) {
             return "Current Property: " + " | ID: ";
@@ -114,7 +114,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
             String personName = sb.getSessPerson().getFirstName() 
             + " " + sb.getSessPerson().getLastName(); 
             
-            String personId = String.valueOf(sb.getSessPerson().getPersonID());
+            String personId = String.valueOf(sb.getSessPerson().getHumanID());
             return "Current Person: " + personName + " | ID: " + personId;
         } catch (Exception ex) {
             return "Current Person: " + " | ID: ";
@@ -197,7 +197,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     }
     
     
-    public String onPropertyListItemSelect(Property prop){
+    public String onPropertyListItemSelect(PropertyDataHeavy prop){
         String navTo = "";
         try {
             navTo = getSessionBean().navigateToPageCorrespondingToObject(prop);

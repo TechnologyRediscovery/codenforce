@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.entities.Person;
@@ -34,7 +35,9 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
 /**
- *
+ * TODO: This class has been commented to death during
+ * the humanization and parcelization process--revisit
+ * 
  * @author Nathan Dietz
  */
 public class PersonChangesBB
@@ -78,7 +81,7 @@ public class PersonChangesBB
 
                 currPersonList = new ArrayList<>();
 
-                currPersonList.add(pc.getPersonWithChanges(getSessionBean().getSessPerson().getPersonID()));
+                currPersonList.add(pc.getPersonWithChanges(getSessionBean().getSessPerson().getHumanID()));
             }
 
         } catch (IntegrationException ex) {
@@ -88,7 +91,8 @@ public class PersonChangesBB
                             "An error occurred while trying to load information from the database.", ""));
         }
 
-        currPerson = new PersonWithChanges();
+//        currPerson = new PersonWithChanges();
+
 
         currChangeOrder = new PersonChangeOrder();
 
@@ -143,7 +147,7 @@ public class PersonChangesBB
 
         try {
             getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(person, getSessionBean().getSessUser().getMyCredential()));
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
 
@@ -165,7 +169,7 @@ public class PersonChangesBB
                     + " "
                     + change.getApprovedBy().getPerson().getLastName()
                     + " (ID# "
-                    + change.getApprovedBy().getPersonID()
+                    + change.getApprovedBy().getPerson().getHumanID()
                     + ")";
         } else if (change.isActive()) {
             return "No action taken yet";
@@ -196,14 +200,8 @@ public class PersonChangesBB
     public void applyChangeOrder() {
         PersonCoordinator pc = getPersonCoordinator();
 
-        try {
-            pc.implementPersonChangeOrder(currChangeOrder);
-        } catch (IntegrationException ex) {
-            System.out.println("PersonChangesBB.applyChangeOrder() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occurred while trying to update the database.", ""));
-        }
+        // TODO: adopt change orders to humanization
+//            pc.implementPersonChangeOrder(currChangeOrder);
 
         setCurrentViewOption(currentViewOption);
 

@@ -379,8 +379,8 @@ public class    SessionBean
                 sessPropertyRoute = ActivatableRouteEnum.USER_CHOSEN;
                 
                 // PERSONS
-                sessPersonList = pdh.getPersonList();
-                if (sessPersonList != null && !sessPersonList.isEmpty()) {
+                sessPersonList = perc.getPersonListFromLinkList(pdh.getHumanLinkList());
+                if(sessPersonList != null && !sessPersonList.isEmpty()){
                     sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
                     sessPersonRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
                     sessPersonListRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
@@ -452,8 +452,9 @@ public class    SessionBean
                 
                 // check to see if our session Person is connected to the session property. If so, do nothing
                 // if not, figure out a property to associate with this Person and make it the sessionProperty
-                if(sessProperty != null && sessProperty.getPersonList() != null && !sessProperty.getPersonList().isEmpty()){
-                    if(!sessProperty.getPersonList().contains(sessPerson)){
+                if(sessProperty != null && sessProperty.getHumanLinkList()!= null && !sessProperty.getHumanLinkList().isEmpty()){
+                    // TODO: figure out checking a Person against a list of humanLink objects
+                    if(!sessProperty.getHumanLinkList().contains(sessPerson)){
                         QueryProperty qp = searchC.initQuery(QueryPropertyEnum.PERSONS, sessUser.getKeyCard());
                         if(qp.getParamsList() != null && !qp.getParamsList().isEmpty()){
                             qp.getParamsList().get(0).setPerson_ctl(true);
@@ -481,13 +482,12 @@ public class    SessionBean
                 CECaseDataHeavy csedh = cc.cecase_assembleCECaseDataHeavy(cse, ua);
                 // make sure property is the one hosting the case
                 sessCECase = csedh;
-
-                // Set current property to match the CE case's relevant property
-                setSessProperty(cse.getPropertyID());
-
+                
+                sessProperty = pc.assemblePropertyDataHeavy(pc.getProperty(cse.getParcelKey()), ua);
+                sessPropertyList = pc.assemblePropertyHistoryList(ua.getKeyCard());
                 sessCECaseList = sessProperty.getCeCaseList();
                 
-                sessPersonList = sessProperty.getPersonList();
+                sessPersonList = perc.getPersonListFromLinkList(sessProperty.getHumanLinkList());
                 if(sessPersonList != null && !sessPersonList.isEmpty()){
                     sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
                 }
@@ -838,7 +838,7 @@ public class    SessionBean
         }
     }
     
-    public void setSessCECaseListWithDowncastAndLookup(List<CECaseDataHeavy> cseldh){
+    public void setSessCECaseListWithDowncastAndLookup(List<CECaseDataHeavy> cseldh) throws BObStatusException{
         CaseCoordinator cc = getCaseCoordinator();
         List<CECasePropertyUnitHeavy> cseListPDH = new ArrayList<>();
         if(cseldh != null && !cseldh.isEmpty()){

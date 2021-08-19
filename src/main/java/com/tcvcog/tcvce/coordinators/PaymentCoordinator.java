@@ -220,8 +220,9 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
         pi.updateOccPeriodFee(input);
 
     }
-//
-    public List<FeeAssigned> getAssignedFees(OccPeriod currentOccPeriod) throws IntegrationException {
+
+
+    public List<FeeAssigned> getAssignedFees(OccPeriod currentOccPeriod) throws IntegrationException, BObStatusException {
 
         PaymentIntegrator pi = getPaymentIntegrator();
         ArrayList<FeeAssigned> skeletonHorde = new ArrayList<>();
@@ -243,9 +244,7 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
-    // Let's just hope you wont need to get the assigned fees
-
-    public List<FeeAssigned> getAssignedFees(CECase currentCase) throws IntegrationException {
+    public List<FeeAssigned> getAssignedFees(CECase currentCase) throws IntegrationException, BObStatusException {
         PaymentIntegrator pi = getPaymentIntegrator();
         ArrayList<FeeAssigned> skeletonHorde = new ArrayList<>();
 //
@@ -353,7 +352,7 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
-    public ArrayList<Payment> getAllPayments() throws IntegrationException {
+    public ArrayList<Payment> getAllPayments() throws IntegrationException, BObStatusException {
         PaymentIntegrator pi = getPaymentIntegrator();
         return pi.getPaymentList();
 

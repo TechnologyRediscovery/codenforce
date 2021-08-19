@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
- *
+ * Rougly maps to a parcelunit record in the DB
  * @author ellen bascomb of apt 31y
  */
 public class    PropertyUnit 
@@ -36,13 +36,15 @@ public class    PropertyUnit
     
     protected int conditionIntensityClassID;
     protected LocalDateTime lastUpdatedTS;
+    
+    protected MailingAddress parcelMailing;
 
     public PropertyUnit() {
     }
 
     public PropertyUnit(PropertyUnit input){
         unitID = input.getUnitID();
-        propertyID = input.getPropertyID();
+        parcelKey = input.getParcelKey();
         unitNumber = input.getUnitNumber();
         otherKnownAddress = input.getOtherKnownAddress();
         rentalIntentDateStart = input.getRentalIntentDateStart();
@@ -59,7 +61,7 @@ public class    PropertyUnit
     public int hashCode() {
         int hash = 5;
         hash = 43 * hash + this.unitID;
-        hash = 43 * hash + this.propertyID;
+        hash = 43 * hash + this.parcelKey;
         hash = 43 * hash + Objects.hashCode(this.unitNumber);
         hash = 43 * hash + Objects.hashCode(this.notes);
         hash = 43 * hash + Objects.hashCode(this.otherKnownAddress);
@@ -88,7 +90,7 @@ public class    PropertyUnit
         if (this.unitID != other.unitID) {
             return false;
         }
-        if (this.propertyID != other.propertyID) {
+        if (this.parcelKey != other.parcelKey) {
             return false;
         }
         if (this.active != other.active) {
@@ -273,6 +275,20 @@ public class    PropertyUnit
      */
     public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
         this.lastUpdatedTS = lastUpdatedTS;
+    }
+
+    /**
+     * @return the parcelMailing
+     */
+    public MailingAddress getParcelMailing() {
+        return parcelMailing;
+    }
+
+    /**
+     * @param parcelMailing the parcelMailing to set
+     */
+    public void setParcelMailing(MailingAddress parcelMailing) {
+        this.parcelMailing = parcelMailing;
     }
 
 }

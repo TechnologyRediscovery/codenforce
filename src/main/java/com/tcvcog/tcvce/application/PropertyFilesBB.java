@@ -63,7 +63,7 @@ public class PropertyFilesBB
         try {
             Blob blob = getBlobCoordinator().getPhotoBlob(blobID);
             if(blob.getType().getTypeEnum()== BlobTypeEnum.PHOTO){
-//                getBlobIntegrator().removePropertyBlobLink(blobID, currProp.getPropertyID());
+//                getBlobIntegrator().removePropertyBlobLink(blobID, currProp.getParcelKey());
             }
         }
         catch (IntegrationException | BlobException ex) {
@@ -87,7 +87,7 @@ public class PropertyFilesBB
 //            blob.setBytes(ev.getFile().getContents());  // set bytes
             blob.setFilename(ev.getFile().getFileName());
             
-            int municode = currProp.getMuniCode();
+            int municode = currProp.getMuni().getMuniCode();
             
             if(municode == 0){
                 municode = currProp.getMuni().getMuniCode();
@@ -107,7 +107,7 @@ public class PropertyFilesBB
             
             BlobIntegrator blobi = getBlobIntegrator();
             
-            blobi.linkBlobToProperty(blob.getPhotoDocID(), currProp.getPropertyID());
+            blobi.linkBlobToProperty(blob.getPhotoDocID(), currProp.getParcelKey());
             
         } catch (IntegrationException | IOException ex) {
             System.out.println("PropertyFilesBB.handleFileUpload | " + ex);

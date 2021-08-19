@@ -45,7 +45,8 @@ public class Payment extends BOb {
    public Payment() {
        notes = " ";
 
-       payer = new Person();
+
+       payer = null;
 
        dateReceived = LocalDateTime.now();
        dateDeposited = LocalDateTime.now();

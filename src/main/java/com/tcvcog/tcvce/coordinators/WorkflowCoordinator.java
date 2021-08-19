@@ -36,6 +36,8 @@ import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Holder of business logic related to event rules and proposals. The EventRule
@@ -82,7 +84,11 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
     
     public Proposal getProposal(int propid) throws IntegrationException{
         WorkflowIntegrator wi = getWorkflowIntegrator();
-        return wi.getProposal(propid);
+        try {
+            return wi.getProposal(propid);
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
     }
     
     /**
@@ -153,7 +159,11 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
     public Directive getDirective(int dirID) throws IntegrationException{
         WorkflowIntegrator wi = getWorkflowIntegrator();
         Directive d = null;
-        d = wi.getDirective(dirID);
+        try {
+            d = wi.getDirective(dirID);
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
         return d;
     }
     
@@ -765,7 +775,11 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
  */
     public EventRuleAbstract rules_getEventRuleAbstract(int eraid) throws IntegrationException {
         WorkflowIntegrator wi = getWorkflowIntegrator();
-        return wi.rules_getEventRuleAbstract(eraid);
+        try {
+            return wi.rules_getEventRuleAbstract(eraid);
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
     }
 
     /**
@@ -812,7 +826,11 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         List<Integer> impIDs = wi.rules_getEventRuleImplementationList(erg);
         if(impIDs != null && !impIDs.isEmpty()){
             for(Integer i: impIDs){
-                impList.add(wi.rules_getEventRuleImplemention(i));
+                try {
+                    impList.add(wi.rules_getEventRuleImplemention(i));
+                } catch (BObStatusException ex) {
+                    throw new IntegrationException(ex.getMessage());
+                }
             }
         }
         return impList;
@@ -851,7 +869,11 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
      */
     public List<EventRuleSet> rules_getEventRuleSetList() throws IntegrationException {
         WorkflowIntegrator wi = getWorkflowIntegrator();
-        return wi.rules_getEventRuleSetList();
+        try {
+            return wi.rules_getEventRuleSetList();
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
     }
 
     /**
@@ -991,7 +1013,12 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
         WorkflowIntegrator wi = getWorkflowIntegrator();
         int freshEventRuleID;
         if (era.getFormPromptingDirectiveID() != 0) {
-            Directive dir = wi.getDirective(era.getFormPromptingDirectiveID());
+            Directive dir;
+            try {
+                dir = wi.getDirective(era.getFormPromptingDirectiveID());
+            } catch (BObStatusException ex) {
+                throw new IntegrationException(ex.getMessage());
+            }
             if (dir != null) {
                 era.setPromptingDirective(dir);
                 System.out.println("EventCoordinator.rules_createEventRuleAbstract| Found not null directive ID: " + dir.getDirectiveID());

@@ -23,13 +23,17 @@ import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Citation;
+import com.tcvcog.tcvce.entities.ContactEmail;
+import com.tcvcog.tcvce.entities.ContactPhone;
+import com.tcvcog.tcvce.entities.ContactPhoneType;
 import com.tcvcog.tcvce.entities.EventCnF;
+import com.tcvcog.tcvce.entities.Human;
+import com.tcvcog.tcvce.entities.HumanLink;
+import com.tcvcog.tcvce.entities.IFace_humanListHolder;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
-import com.tcvcog.tcvce.entities.PersonOccApplication;
 import com.tcvcog.tcvce.entities.PersonType;
-import com.tcvcog.tcvce.entities.PersonWithChanges;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
@@ -46,7 +50,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Connects Person objects to the data store
@@ -61,44 +66,239 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      */
     public PersonIntegrator() {
     }
-
+    
+    
+   
+    
     /**
-     * Looks up a person given a personID and creates a returns a new instance
- of Person with all the available information loaded about that person
+     * Asks the inputted param for its linking table name and fetches
+     * related humans, building them into a nice little list
+     * @param hlh
+     * @return a list, not empty if there are linked humans
+     * @throws IntegrationException 
+     */
+    public List<HumanLink> getHumanLinks(IFace_humanListHolder hlh) throws IntegrationException{
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        if(hlh == null){
+            throw new IntegrationException("Cannot get linked humans with null list holder object!!");
+        }
+        
+        List<HumanLink> linkedHumans = new ArrayList<>();
+
+        try {
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("SELECT linkid, human_humanid, linkedobjectrole_lorid, \n");
+            sb.append("createdts, createdby_userid, lastupdatedts, lastupdatedby_userid,");
+            sb.append("deactivatedts, deactivatedby_userid, notes, source_sourceid  ");
+            sb.append("FROM ");
+            sb.append(hlh.getHUMAN_LINK_SCHEMA_ENUM().getLinkingTableName());
+            sb.append(" WHERE ");
+            sb.append(hlh.getHUMAN_LINK_SCHEMA_ENUM().getTargetTableFKField());
+            sb.append("=?");
+            sb.append(";");
+            
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, hlh.getHostPK());
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                linkedHumans.add(generateHumanLink(rs, getHuman(rs.getInt("human_humanid"))));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.getHumanLinkIDList()| Unable to retrieve person", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return linkedHumans;
+        
+    }
+    
+    /**
+     * Looks up a Human given a human and creates a returns a new instance
+     * of Human with all the available information loaded about that person
      *
-     * @param personId the id of the person to look up
-     * @return a Person object with all of the available data loaded
+     * @param humanID
+     * @return a Human object with all of the available data loaded
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public Person getPerson(int personId) throws IntegrationException {
+    public Human getHuman(int humanID) throws IntegrationException {
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        Person person = null;
+        
+        Human h = null;
 
         try {
             
-            String s = "SELECT personid, persontype, muni_municode, fname, lname, jobtitle, \n" +
-                        "       phonecell, phonehome, phonework, email, address_street, address_city, \n" +
-                        "       address_state, address_zip, notes, lastupdated, expirydate, isactive, \n" +
-                        "       isunder18, humanverifiedby, compositelname, sourceid, creator, \n" +
-                        "       businessentity, mailing_address_street, mailing_address_city, \n" +
-                        "       mailing_address_zip, mailing_address_state, useseparatemailingaddr, \n" +
-                        "       expirynotes, creationtimestamp, canexpire, userlink, mailing_address_thirdline, \n" +
-                        "       ghostof, ghostby, ghosttimestamp, cloneof, clonedby, clonetimestamp, \n" +
-                        "       referenceperson\n" +
-                        "  FROM public.person WHERE personid=?;";
+            String s =  "SELECT humanid, name, dob, under18, jobtitle, businessentity, \n" +
+                        "       multihuman, source_sourceid, deceaseddate, deceasedby_userid, \n" +
+                        "       cloneof_humanid, createdts, createdby_userid, lastupdatedts, \n" +
+                        "       lastupdatedby_userid, deactivatedts, deactivatedby_userid, notes\n" +
+                        "  FROM public.human WHERE humanid=?;";
             
             stmt = con.prepareStatement(s);
-            stmt.setInt(1, personId);
+            stmt.setInt(1, humanID);
 
             rs = stmt.executeQuery();
 
             while (rs.next()) {
                 // note that rs.next() is called and the cursor
                 // is advanced to the first row in the rs
-                person = generatePersonFromResultSet(rs);
+                h = generateHuman(rs);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.getHuman | Unable to retrieve human", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return h;
+    }
+    
+    /**
+     * Populates the member fields on a Human object from a resulset
+     * @param rs with all columns SELECTed
+     * @return the fully-baked Human
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
+    private Human generateHuman(ResultSet rs) throws SQLException, IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        
+        Human h = new Human();
+        
+        h.setHumanID(rs.getInt("humanid"));
+        h.setName(rs.getString("name"));
+        if(rs.getDate("dob") != null){
+            h.setDob(rs.getDate("dob").toLocalDate());
+        }
+        h.setUnder18(rs.getBoolean("under18"));
+        
+        h.setJobTitle(rs.getString("jobTitle"));
+        h.setBusinessEntity(rs.getBoolean("businessentity"));
+        h.setMultiHuman(rs.getBoolean("multihuman"));
+        if(rs.getInt("source_sourceid") != 0){
+            si.getBOBSource(rs.getInt("source_sourceid"));
+        }
+        
+        // Ship to our SystemIntegrator for standard fields
+//        si.populateTrackedFields(h, rs);
+        return h;
+    }
+    
+    /**
+     * Generator for HumanLink objects which are Humans connected to a BOb
+     * with connection metadata attached as a subclass, including
+     * the link source and the linked object role
+     * 
+     * @param rs containing fields for the standard linked tables
+     * @param h the human whose linked metadata is desired
+     * @return the HumanLink which is a human with link metadata attached
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
+    public HumanLink generateHumanLink(ResultSet rs, Human h) throws SQLException, IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        HumanLink hl = null;
+        
+        if(rs != null && h != null){
+            try {
+                hl = new HumanLink(h);
+                si.populateTrackedLinkFields(hl, rs);
+                hl.setLinkID(rs.getInt("linkid"));
+                hl.setLinkRole(si.getLinkedObjectRole(rs.getInt("linkedobjectrole_lorid")));
+            } catch (BObStatusException ex) {
+                throw new IntegrationException(ex.getMessage());
+                
+            }
+        }
+        
+        return hl;
+    }
+
+    /**
+     * Creates a record in the appropriate linking table for a given human
+     * to a given human list holder object =
+     * @param humanziedBOb the object to which the human shall be linked
+     * @param hl the human to link
+     * @return the link ID of the freshly created link, 0 for incomplete links
+     * @throws IntegrationException 
+     */
+    public int insertHumanLink(IFace_humanListHolder humanziedBOb, HumanLink hl) throws IntegrationException{
+        if (humanziedBOb == null || hl == null){
+            throw new IntegrationException("Cannot link a human and a list holder with null inputs");
+        }
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        int linkid = 0;
+        
+        try {
+            
+            StringBuilder sb = new StringBuilder();
+            
+            sb.append("INSERT INTO ");
+            sb.append(humanziedBOb.getHUMAN_LINK_SCHEMA_ENUM().getLinkingTableName());
+            sb.append(" (linkid, human_humanid,");
+            sb.append(humanziedBOb.getHUMAN_LINK_SCHEMA_ENUM().getTargetTableFKField());
+            sb.append(", createdts, createdby_userid, lastupdatedts, lastupdatedby_userid,");
+            sb.append(" linkedobjectrole_lorid, source_sourceid)");
+            sb.append(" VALUES (DEFAULT, ?, ?, now(), ?, now(), ?, ?, ?);");
+                        
+            stmt = con.prepareStatement(sb.toString());
+            
+            stmt.setInt(1, hl.getHumanID());
+            stmt.setInt(2, humanziedBOb.getHostPK());
+            if(hl.getCreatedBy() != null){
+                stmt.setInt(3, hl.getCreatedBy().getUserID() );
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            
+            if(hl.getLastUpdatedBy()!= null){
+                stmt.setInt(4, hl.getLinkLastUpdatedBy().getUserID() );
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            if(hl.getLinkedObjectRole() != null){
+                stmt.setInt(5, hl.getLinkedObjectRole().getRoleID());
+            } else  { 
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            
+            if(hl.getSource() != null){
+                stmt.setInt(6, hl.getSource().getSourceid());
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+
+            stmt.execute();
+
+            sb = new StringBuilder();
+            sb.append("SELECT currval('");
+            sb.append(humanziedBOb.getHUMAN_LINK_SCHEMA_ENUM().getLinkingTableSequenceID());
+            sb.append("');");
+            
+            stmt = con.prepareStatement(sb.toString());
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                linkid = rs.getInt(1);
             }
 
         } catch (SQLException ex) {
@@ -109,94 +309,950 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return person;
-    }
-
-    /**
-     * Accepts a result set and creates a new Person object. Note that this
-     * method does not move the cursor position on the result set passed in;
-     * rather, it will create a person based on the row to which the cursor is
-     * pointing when it is passed in. The client method is responsible for
-     * managing cursor position
-     *
-     * Also note that the client method is responsible for closing the result
-     * set that is passed to this method with rs.close();
-     *
-     * @param rs the result set from which to extract data for creating a person
-     * @return the new person object created from this single row of the rs
-     */
-    private Person generatePersonFromResultSet(ResultSet rs) throws IntegrationException {
-        // Instantiates the new person object
-        Person newPerson = new Person();
-        SystemCoordinator ssc = getSystemCoordinator();
-        SystemIntegrator si = getSystemIntegrator();
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
         
+        return linkid;
+    }
+    
+   /**
+     * Updates a record in the appropriate linking table for a given human
+     * to a given human list holder object =
+     * @param humanziedBOb the object to which the human shall be linked
+     * @param hl the human to link
+     * @throws IntegrationException 
+     */
+    public void updateHumanLink(IFace_humanListHolder humanziedBOb, HumanLink hl) throws IntegrationException{
+        if (humanziedBOb == null || hl == null){
+            throw new IntegrationException("Cannot link a human and a list holder with null inputs");
+        }
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
         
         try {
-            newPerson.setPersonID(rs.getInt("personid"));
-            newPerson.setPersonType(PersonType.valueOf(rs.getString("persontype")));
-            newPerson.setMuniCode(rs.getInt("muni_municode"));
-            newPerson.setMuni(mi.getMuni(newPerson.getMuniCode()));
-            newPerson.setFirstName(rs.getString("fName"));
-            newPerson.setLastName(rs.getString("lName"));
-            newPerson.setJobTitle(rs.getString("jobtitle"));
             
-            newPerson.setPhoneCell(rs.getString("phoneCell"));
-            newPerson.setPhoneHome(rs.getString("phoneHome"));
-            newPerson.setPhoneWork(rs.getString("phoneWork"));
-            newPerson.setEmail(rs.getString("email"));
-            newPerson.setAddressStreet(rs.getString("address_street"));
-            newPerson.setAddressCity(rs.getString("address_city"));
-
-            newPerson.setAddressState(rs.getString("address_state"));
-            newPerson.setAddressZip(rs.getString("address_zip"));
-            newPerson.setNotes(rs.getString("notes"));
-
-            if(rs.getTimestamp("lastupdated") != null){
-                newPerson.setLastUpdated(rs.getTimestamp("lastupdated").toLocalDateTime());
-            }
+            StringBuilder sb = new StringBuilder();
             
-            if (rs.getTimestamp("expirydate") != null) {
-                newPerson.setExpiryDate(rs.getTimestamp("expirydate").toLocalDateTime());
-            }
-            newPerson.setActive(rs.getBoolean("isactive"));
-
-            newPerson.setUnder18(rs.getBoolean("isunder18"));
-            newPerson.setVerifiedByUserID(rs.getInt("humanverifiedby"));
-            newPerson.setCompositeLastName(rs.getBoolean("compositelname"));
-            newPerson.setSource(si.getBOBSource(rs.getInt("sourceid")));
+            sb.append("UPDATE ");
+            sb.append(humanziedBOb.getHUMAN_LINK_SCHEMA_ENUM().getLinkingTableName());
+            sb.append(" SET source_sourceid=?, lastupdatedts=now(), lastupdatedby_userid=?, ");
+            sb.append(" linkedobjectrole_lorid=? WHERE ");
+            sb.append(humanziedBOb.getHUMAN_LINK_SCHEMA_ENUM().getLinkedTablePKField());
+            sb.append(" = ?;");
+                        
+            stmt = con.prepareStatement(sb.toString());
             
-            // avoiding cycles here by not storing the object
-            newPerson.setCreatorUserID(rs.getInt("creator"));
-            
-            newPerson.setBusinessEntity(rs.getBoolean("businessentity"));
-            newPerson.setMailingAddressStreet(rs.getString("mailing_address_street"));
-            newPerson.setMailingAddressCity(rs.getString("mailing_address_city"));
-            newPerson.setMailingAddressZip(rs.getString("mailing_address_zip"));
-            newPerson.setMailingAddressState(rs.getString("mailing_address_state"));
-            newPerson.setUseSeparateMailingAddress(rs.getBoolean("useseparatemailingaddr"));
-
-            newPerson.setExpiryNotes(rs.getString("expirynotes"));
-            if(!(rs.getTimestamp("creationtimestamp")==null)){
-                newPerson.setCreationTimeStamp(rs.getTimestamp("creationtimestamp").toLocalDateTime());
+            if(hl.getSource() != null){
+                stmt.setInt(1, hl.getSource().getSourceid());
             } else {
-                newPerson.setCreationTimeStamp(null);
+                stmt.setNull(1, java.sql.Types.NULL);
             }
-            newPerson.setCanExpire(rs.getBoolean("canexpire"));
-            newPerson.setLinkedUserID(rs.getInt("userlink"));
-            newPerson.setMailingAddressThirdLine(rs.getString("mailing_address_thirdline"));
             
-            // HAVE NOT IMPLEMENTED GHOSTS AND CLONES YET!
+            if(hl.getLastUpdatedBy()!= null){
+                stmt.setInt(2, hl.getLinkLastUpdatedBy().getUserID() );
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
             
+            if(hl.getLinkedObjectRole() != null){
+                stmt.setInt(3, hl.getLinkedObjectRole().getRoleID());
+            } else  { 
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(4, hl.getLinkID());
+
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.getPerson | Unable to retrieve person", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    
+   /**
+     * Updates a record in the appropriate linking table for a given human
+     * to a given human list holder object =
+     * @param humanziedBOb the object to which the human shall be linked
+     * @param hl the human to link
+     * @throws IntegrationException 
+     */
+    public void deactivateHumanLink(IFace_humanListHolder humanziedBOb, HumanLink hl) throws IntegrationException{
+        if (humanziedBOb == null || hl == null){
+            throw new IntegrationException("Cannot deactivate a human and a list holder with null inputs");
+        }
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            StringBuilder sb = new StringBuilder();
+            
+            sb.append("UPDATE ");
+            sb.append(humanziedBOb.getHUMAN_LINK_SCHEMA_ENUM().getLinkingTableName());
+            sb.append(" SET lastupdatedts=now(), lastupdatedby_userid=?, ");
+            sb.append(" deactivatedts=now(), deactivatedby_userid=? WHERE ");
+            sb.append(humanziedBOb.getHUMAN_LINK_SCHEMA_ENUM().getLinkedTablePKField());
+            sb.append(" = ?;");
+                        
+            stmt = con.prepareStatement(sb.toString());
+            
+            
+            if(hl.getLastUpdatedBy()!= null){
+                stmt.setInt(1, hl.getLinkLastUpdatedBy().getUserID() );
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            
+            if(hl.getDeceasedBy() != null){
+                stmt.setInt(2, hl.getLinkDeactivatedBy().getUserID() );
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(3, hl.getLinkID());
+
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.deactivateHumanLink", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    
+    
+    /**
+     * Updates values for a given record in the human table
+     * @param h containing the new values
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void updateHuman(Human h) throws IntegrationException{
+        
+        String selectQuery =  "UPDATE public.human\n" +
+                                "   SET name=?, dob=?, under18=?, jobtitle=?, businessentity=?, \n" + // 1-5
+                                "       multihuman=?, source_sourceid=?, deceaseddate=?, deceasedby_userid=?, \n" + // 6-9
+                                "       cloneof_humanid=?, lastupdatedts=now(), \n" + // 10
+                                "       lastupdatedby_userid=?, \n" + // 11
+                                "       notes=?\n" + //12
+                                " WHERE humanid=?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(selectQuery);
+            // first SQL row
+            stmt.setString(1, h.getName());
+            if(h.getDob() != null){
+                stmt.setDate(2, java.sql.Date.valueOf(h.getDob()));
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(3, h.isUnder18());
+            stmt.setString(4, h.getJobTitle());
+            stmt.setBoolean(5, h.isBusinessEntity());
+            
+            // second SQL row
+            stmt.setBoolean(6, h.isMultiHuman());
+            if(h.getSource() != null){
+                stmt.setInt(7, h.getSource().getSourceid());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            if(h.getDeceasedDate() != null){
+                stmt.setDate(8, java.sql.Date.valueOf(h.getDeceasedDate()));
+                if(h.getDeceasedBy() != null){
+                    stmt.setInt(9, h.getDeceasedBy().getUserID());
+                } else {
+                    stmt.setNull(9, java.sql.Types.NULL);
+                }
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+                stmt.setNull(9, java.sql.Types.NULL);
+            }
+            
+            // third sql row
+            if(h.getCloneOfHumanID() != 0){
+                stmt.setInt(10, h.getCloneOfHumanID());
+            } else {
+                stmt.setNull(10, java.sql.Types.NULL);
+            }
+            
+            // fourth sql row
+            if(h.getLastUpdatedBy() != null){
+                stmt.setInt(11, h.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(11, java.sql.Types.NULL);
+            }
+            
+            stmt.setString(12, h.getNotes());
+            
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.updateHuman: Unable to UpdatePerson", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    /**
+     * Creates a record in the human table
+     * @param h fully populated Human
+     * @return the ID of the freshly inserted human record
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public int insertHuman(Human h) throws IntegrationException{
+        int freshHumanID = 0;
+        
+        String query =    "INSERT INTO public.human(\n" +
+                                "           humanid, name, dob, under18, jobtitle, businessentity, multihuman, \n" +
+                                "            source_sourceid, deceaseddate, deceasedby_userid, cloneof_humanid, \n" +
+                                "            createdts, createdby_userid)\n" +
+                                "    VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, \n" +
+                                "            ?, ?, ?, ?, \n" +
+                                "            now(), ?);";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+        
+            // first SQL row
+            // DEFAULT ID
+            stmt.setString(1, h.getName());
+            if(h.getDob() != null){
+                stmt.setDate(2, java.sql.Date.valueOf(h.getDob()));
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            stmt.setBoolean(3, h.isUnder18());
+            stmt.setString(4, h.getJobTitle());
+            stmt.setBoolean(5, h.isBusinessEntity());
+            stmt.setBoolean(6, h.isMultiHuman());
+            
+            // second SQL row
+            if(h.getSource() != null){
+                stmt.setInt(7, h.getSource().getSourceid());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            if(h.getDeceasedDate() != null){
+                stmt.setDate(8, java.sql.Date.valueOf(h.getDeceasedDate()));
+                if(h.getDeceasedBy() != null){
+                    stmt.setInt(9, h.getDeceasedBy().getUserID());
+                } else {
+                    stmt.setNull(9, java.sql.Types.NULL);
+                }
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+                stmt.setNull(9, java.sql.Types.NULL);
+            }
+            
+            if(h.getCloneOfHumanID() != 0){
+                stmt.setInt(10, h.getCloneOfHumanID());
+            } else {
+                stmt.setNull(10, java.sql.Types.NULL);
+            }
+            
+            // third sql row
+            // creation timestamp set by now()
+            if(h.getCreatedBy() != null){
+                stmt.setInt(11, h.getCreatedBy().getUserID());
+            } else {
+                stmt.setNull(11, java.sql.Types.NULL);
+            }
+            
+            stmt.execute();
+             
+            String retrievalQuery = "SELECT currval('human_humanid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                freshHumanID = rs.getInt(1);
+            }
             
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Error generating person from ResultSet", ex);
+            throw new IntegrationException("PersonIntegrator.insertHuman: Unable to Insert new person", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return freshHumanID;
+    }
+    
+    
+    /**
+     * Retrieves an email record
+     * @param emailID
+     * @return the retrieved Email address
+     * @throws IntegrationException 
+     */
+    public ContactEmail getContactEmail(int emailID) throws IntegrationException {
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        ContactEmail em = null;
+
+        try {
+            
+            String s =  "SELECT emailid, human_humanid, emailaddress, bouncets, createdts, createdby_userid, \n" +
+                        "       lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, \n" +
+                        "       notes\n" +
+                        "  FROM public.contactemail WHERE emailid=?;";
+            
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, emailID);
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                // note that rs.next() is called and the cursor
+                // is advanced to the first row in the rs
+                em = generateContactEmail(rs);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return em;
+    }
+    
+    /**
+     * Retrieves all contactphone records by humanid
+     * @param humanID of the human to populate
+     * @return of all Contacts associated with the given human
+     */
+    public List<ContactPhone> getContactPhoneList(int humanID) throws IntegrationException{
+        List<ContactPhone> phoneList = new ArrayList<>();
+        
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            
+            String s =  "SELECT phoneid FROM contactphone WHERE human_humanid=? ";
+            
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, humanID);
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                // note that rs.next() is called and the cursor
+                // is advanced to the first row in the rs
+                phoneList.add(getContactPhone(rs.getInt("phoneid")));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return phoneList;
+        
+        
+    }
+    
+    /**
+     * Retrieves all contactemail records by humanid
+     * @param humanID of the human to search
+     * @return of all contacts associated with the given human
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public List<ContactEmail> getContactEmailList(int humanID) throws IntegrationException{
+        List<ContactEmail> emailList = new ArrayList<>();
+        
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            
+            String s =  "SELECT emailid FROM contactemail WHERE human_humanid=? ";
+            
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, humanID);
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                // note that rs.next() is called and the cursor
+                // is advanced to the first row in the rs
+                emailList.add(getContactEmail(rs.getInt("emailid")));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        
+        return emailList;
+    }
+    
+    
+    
+    /**
+     * Populates fields on a ContactEmail
+     * @param rs with all fields SELECTed
+     * @return the populated ContactEmail object
+     */
+    private ContactEmail generateContactEmail(ResultSet rs) throws SQLException, IntegrationException{
+        try {
+            SystemIntegrator si = getSystemIntegrator();
+            ContactEmail em = new ContactEmail();
+            
+            em.setEmailID(rs.getInt("emailid"));
+            em.setHumanID(rs.getInt("human_humanid"));
+            em.setEmailaddress(rs.getString("emailaddress"));
+            
+            if(rs.getTimestamp("bouncets") != null){
+                em.setBounceTS(rs.getTimestamp("bouncets").toLocalDateTime());
+            }
+            
+            si.populateTrackedFields(em, rs);
+            
+            return em;
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+            
         }
-        return newPerson;
-    } // close method
+    }
+    
+    
+    /**
+     * Updates a record in the contactemail table
+     * NOTE: bounces are recorded by a dedicated method in this Integrator
+     * NOTE: notes are recorded in the SystemIntegrator's updateNotes method
+     * @param em with all fields ready for insertion
+     * @throws IntegrationException 
+     */
+    public void updateContactEmail(ContactEmail em) throws IntegrationException, BObStatusException {
+        if(em == null){
+            throw new BObStatusException("Cannot update a null emailaddress");
+        }
+        
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            
+            String s =  "UPDATE public.contactemail\n" +
+                        "   SET human_humanid=?, emailaddress=?,\n" +
+                        "       lastupdatedts=now(), lastupdatedby_userid=?, \n" +
+                        " WHERE emailid=?;";
+            
+            stmt = con.prepareStatement(s);
+            if(em.getHumanID() != 0){
+                stmt.setInt(1, em.getHumanID());
+            }
+            stmt.setString(2, em.getEmailaddress());
+            if(em.getLastUpdatedBy() != null){
+                stmt.setInt(3, em.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+
+            stmt.setInt(4, em.getEmailID());
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    
+    /**
+     * Updates a record in the contactemail table
+     * @param em with all fields ready for insertion
+     * @throws IntegrationException 
+     */
+    public void updateContactEmailForBounce(ContactEmail em) throws IntegrationException {
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            
+            String s =  "UPDATE public.contactemail\n" +
+                        "   SET bouncets=now(), \n" +
+                        "       lastupdatedts=now(), lastupdatedby_userid=?, \n" +
+                        "       notes=?\n" +
+                        " WHERE emailid=?;";
+            
+            stmt = con.prepareStatement(s);
+            if(em.getLastUpdatedBy() != null){
+                stmt.setInt(1, em.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+                  
+            stmt.setInt(2, em.getEmailID());
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    
+    /**
+     * Creates a new record in the contactemail table
+     * @param em with fields ready for insertion
+     * @return the id of the freshly inserted record
+     * @throws IntegrationException 
+     */
+    public int insertContactEmail(ContactEmail em) throws IntegrationException {
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int lastID = 0;
+
+        try {
+            
+            String s =  "INSERT INTO public.contactemail(\n" +
+                        "            emailid, human_humanid, emailaddress, createdts, createdby_userid, \n" +
+                        "            lastupdatedts, lastupdatedby_userid \n" +
+                        "    VALUES (DEFAULT, ?, ?, now(), ?, \n" +
+                        "            now(), ?)";
+            
+            stmt = con.prepareStatement(s);
+             if(em.getHumanID() != 0){
+                stmt.setInt(1, em.getHumanID());
+            }
+            stmt.setString(2, em.getEmailaddress());
+            if(em.getCreatedBy() != null){
+                stmt.setInt(3, em.getCreatedBy().getUserID());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            if(em.getLastUpdatedBy() != null){
+                stmt.setInt(4, em.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+
+            stmt.execute();
+            
+            String idNumQuery = "SELECT currval('contactemail_emailid_seq');";
+            Statement st = con.createStatement();
+            rs = st.executeQuery(idNumQuery);
+            rs.next();
+            lastID = rs.getInt("currval");
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.insertContactEmail", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return lastID;
+    }
+    
+    /**
+     * Extracts a record from the contactphone table
+     * @param phoneID
+     * @return
+     * @throws IntegrationException 
+     */
+    public ContactPhone getContactPhone(int phoneID) throws IntegrationException {
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        ContactPhone phone = null;
+
+        try {
+            
+            String s =  "SELECT phoneid, human_humanid, phonenumber, phoneext, phonetype_typeid, \n" +
+                        "       disconnectts, disconnect_userid, createdts, createdby_userid, \n" +
+                        "       lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, \n" +
+                        "       notes\n" +
+                        "  FROM public.contactphone WHERE phoneid=?;";
+            
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, phoneID);
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                // note that rs.next() is called and the cursor
+                // is advanced to the first row in the rs
+                phone = generateContactPhone(rs);
+                
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return phone;
+    }
+    
+    
+    /**
+     * POpulates fields of a ContactPhone Object 
+     * @param rs with all fields SELECTed
+     * @return the populated object
+     */
+    private ContactPhone generateContactPhone(ResultSet rs) throws SQLException, IntegrationException{
+        try {
+            ContactPhone phone = new ContactPhone();
+            UserCoordinator uc = getUserCoordinator();
+            SystemIntegrator si = getSystemIntegrator();
+            
+            phone.setPhoneID(rs.getInt("phoneid"));
+            phone.setHumanID(rs.getInt("human_humanid"));
+            phone.setPhoneNumber(rs.getString("phonenumber"));
+            phone.setExtension(rs.getInt("phoneext"));
+            
+            phone.setPhoneType(getContactPhoneType(rs.getInt("phonetype_typeid")));
+            
+            if(rs.getTimestamp("disconnectts") != null){
+                phone.setDisconnectTS(rs.getTimestamp("disconnectts").toLocalDateTime());
+            }
+            phone.setDisconnectRecordedBy(uc.user_getUser(rs.getInt("disconnect_userid")));
+            
+            si.populateTrackedFields(phone, rs);
+            phone.setNotes(rs.getString("notes"));
+            
+            return phone;
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
+        
+    }
+    
+    /**
+     * Updates a record in the contactphone table
+     * @param phone
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public void updateContactPhone(ContactPhone phone) throws IntegrationException, BObStatusException {
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+
+        try {
+            
+            String s =  "UPDATE public.contactphone\n" +
+                        "   SET human_humanid=?, phonenumber=?, phoneext=?, phonetype_typeid=?, \n" +
+                        "       disconnectts=?, disconnect_userid=?, \n" +
+                        "       lastupdatedts=now(), lastupdatedby_userid=?, \n" +
+                        " WHERE phoneid=? ;";
+            
+            stmt = con.prepareStatement(s);
+            if(phone.getHumanID() != 0){
+                stmt.setInt(1, phone.getHumanID() );
+            } else {
+                throw new BObStatusException("Cannot update a phone contact with 0 as humanID link");
+            }
+            
+            stmt.setString(2, phone.getPhoneNumber());
+            // don't set extension as zero
+            // do not support edge case of a phone with an actual extension of 0
+            if(phone.getExtension() != 0){
+                stmt.setInt(3, phone.getExtension());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            
+            if(phone.getPhoneType() != null){
+                stmt.setInt(4, phone.getPhoneType().getPhoneTypeID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            if(phone.getDisconnectTS() != null){
+                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(phone.getDisconnectTS()));
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            
+            if(phone.getDisconnectRecordedBy() != null){
+                stmt.setInt(6, phone.getDisconnectRecordedBy().getUserID());
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+            
+            if(phone.getLastUpdatedBy() != null){
+                stmt.setInt(7, phone.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(8, phone.getPhoneID());
+
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    
+    
+    /**
+     * Inserts a record in the contactphone table
+     * @param phone the ContactPhone object with fields ready for insertion
+     * @return the ID of the freshly inserted phone object
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public int insertContactPhone(ContactPhone phone) throws IntegrationException, BObStatusException {
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int lastID = 0;
+
+        try {
+            
+            String s =  "INSERT INTO public.contactphone(\n" +
+                        "            phoneid, human_humanid, phonenumber, phoneext, phonetype_typeid, \n" +
+                        "            createdts, createdby_userid, \n" +
+                        "            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, \n" +
+                        "            notes)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
+                        "            now(), ?, \n" +
+                        "            now(), ?);";
+            
+            stmt = con.prepareStatement(s);
+            if(phone.getHumanID() != 0){
+                stmt.setInt(1, phone.getHumanID() );
+            } else {
+                throw new BObStatusException("Cannot insert a phone contact with 0 as humanID link");
+            }
+            
+            stmt.setString(2, phone.getPhoneNumber());
+            // don't set extension as zero
+            // do not support edge case of a phone with an actual extension of 0
+            if(phone.getExtension() != 0){
+                stmt.setInt(3, phone.getExtension());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            
+            if(phone.getPhoneType() != null){
+                stmt.setInt(4, phone.getPhoneType().getPhoneTypeID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            if(phone.getCreatedBy() != null){
+                stmt.setInt(5, phone.getCreatedBy().getUserID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            
+            if(phone.getLastUpdatedBy() != null){
+                stmt.setInt(6, phone.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+
+            stmt.execute();
+            
+            String idNumQuery = "SELECT currval('contactphone_phoneid_seq');";
+            Statement st = con.createStatement();
+            rs = st.executeQuery(idNumQuery);
+            rs.next();
+            lastID = rs.getInt("currval");
+
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return lastID;
+    }
+    
+    
+    
+    /**
+     * Extracts a record from the contactphonetype table
+     * @param phoneTypeID
+     * @return the record Objectified
+     * @throws IntegrationException 
+     */
+    public ContactPhoneType getContactPhoneType(int phoneTypeID) throws IntegrationException {
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        ContactPhoneType cpt = null;
+
+        try {
+            
+            String s = "SELECT phonetypeid, title, createdts, deactivatedts\n" +
+                        "  FROM public.contactphonetype;";
+            
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, phoneTypeID);
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                cpt = generateContactPhoneType(rs);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return cpt;
+    }
+    
+    /**
+     * Populates fields on a ConatctPhoneType object
+     * @param rs with all fields SELECTed
+     * @return the Objectified phone type
+     */
+    private ContactPhoneType generateContactPhoneType(ResultSet rs) throws SQLException{
+        ContactPhoneType cpt = new ContactPhoneType();
+        
+        cpt.setPhoneTypeID(rs.getInt("phonetypeid"));
+        cpt.setTitle(rs.getString("title"));
+        cpt.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
+        cpt.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+        return cpt;
+        
+    }
+    
+    
+    /**
+     * Updates a record in the contactphonetype table
+     * @param cpt
+     * @throws IntegrationException 
+     */
+    public void updateContactPhoneType(ContactPhoneType cpt) throws IntegrationException {
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            
+            String s =  "UPDATE public.contactphonetype\n" +
+                        "   SET title=?, deactivatedts=?\n" +
+                        " WHERE phonetypeid=?;";
+            
+            stmt = con.prepareStatement(s);
+            stmt.setString(1, cpt.getTitle() );
+            if(cpt.getDeactivatedTS() != null){
+                stmt.setTimestamp(2, java.sql.Timestamp.valueOf(cpt.getDeactivatedTS()));
+            }
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    
+    
+    /**
+     * Creates a new record in the contactphonetypetable
+     * @param cpt
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void insertContactPhoneType(ContactPhoneType cpt) throws IntegrationException {
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            
+            String s =  "INSERT INTO public.contactphonetype(\n" +
+                        "            phonetypeid, title, createdts)\n" +
+                        "    VALUES (DEFAULT, ?, now());";
+            
+            stmt = con.prepareStatement(s);
+            
+            stmt.setString(1, cpt.getTitle());
+            
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    
+    
     
     /**
      * We have a special type of Person which are those who have been attached to an application
@@ -206,8 +1262,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public List<PersonOccApplication> getPersonOccApplicationList(OccPermitApplication application) throws IntegrationException{
-        List<PersonOccApplication> personList = new ArrayList<>();
+    public List<HumanLink> getPersonOccApplicationList(OccPermitApplication application) throws IntegrationException{
+        List<HumanLink> personList = new ArrayList<>();
         String selectQuery =  "SELECT person_personid, occpermitapplication_applicationid, applicant, preferredcontact, \n" +
                                 "   applicationpersontype, active\n" +
                                 "   FROM public.occpermitapplicationperson WHERE occpermitapplication_applicationid=? AND active=true;";
@@ -246,12 +1302,12 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public PersonOccApplication getPersonOccApplication(int personID, int applicationID) throws IntegrationException{
+    public HumanLink getPersonOccApplication(int personID, int applicationID) throws IntegrationException{
         String selectQuery =  "SELECT person_personid, applicant, preferredcontact, \n" +
                                 "   applicationpersontype, active\n" +
                                 "   FROM public.occpermitapplicationperson "
                               + "WHERE occpermitapplication_applicationid=? AND person_personID=?;";
-        PersonOccApplication output = null;
+        HumanLink output = null;
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -285,8 +1341,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    public List<PersonOccApplication> getPersonOccApplicationListWithInactive(OccPermitApplication application) throws IntegrationException{
-        List<PersonOccApplication> personList = new ArrayList<>();
+    public List<HumanLink> getPersonOccApplicationListWithInactive(OccPermitApplication application) throws IntegrationException{
+        List<HumanLink> personList = new ArrayList<>();
         String selectQuery =  "SELECT person_personid, occpermitapplication_applicationid, applicant, preferredcontact, \n" +
                                 "   applicationpersontype, active\n" +
                                 "   FROM public.occpermitapplicationperson WHERE occpermitapplication_applicationid=?;";
@@ -316,608 +1372,17 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         return personList;
     }
     
-    private PersonOccApplication generatePersonOccPeriod(ResultSet rs) throws SQLException, IntegrationException{
-        PersonOccApplication pop = new PersonOccApplication(getPerson(rs.getInt("person_personid")));
-        pop.setApplicationID(rs.getInt("occpermitapplication_applicationid"));
-        pop.setApplicant(rs.getBoolean("applicant"));
-        pop.setPreferredContact(rs.getBoolean("preferredcontact"));
-        pop.setApplicationPersonType(PersonType.valueOf(rs.getString("applicationpersontype")));
-        pop.setLinkActive(rs.getBoolean("active"));
+    private HumanLink generatePersonOccPeriod(ResultSet rs) throws SQLException, IntegrationException{
+        HumanLink pop = new HumanLink(getHuman(rs.getInt("person_personid")));
+        // TODO: fix this with Occ
+
+//        pop.setApplicationID(rs.getInt("occpermitapplication_applicationid"));
+//        pop.setApplicant(rs.getBoolean("applicant"));
+//        pop.setPreferredContact(rs.getBoolean("preferredcontact"));
+//        pop.setApplicationPersonType(PersonType.valueOf(rs.getString("applicationpersontype")));
+//        pop.setLinkActive(rs.getBoolean("active"));
         return pop;        
     }   
-    
-    /**
-     * Creates a record in the person-property linking table, after checking that it does not exist
-     * @param person
-     * @param prop
-     * @throws IntegrationException 
-     */
-    public void connectPersonToProperty(Person person, Property prop) throws IntegrationException {
-
-        String selectQuery = "SELECT property_propertyid, person_personid\n" +
-                    "  FROM public.propertyperson WHERE property_propertyid = ? AND person_personid = ?;";
-
-        String query = "INSERT INTO public.propertyperson(\n"
-                + " property_propertyid, person_personid)\n"
-                + " VALUES (?, ?);";
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        try {
-            stmt = con.prepareStatement(selectQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            stmt.setInt(1, prop.getPropertyID());
-            stmt.setInt(2, person.getPersonID());
-            rs = stmt.executeQuery();
-            
-            if(!rs.first()){
-                stmt = con.prepareStatement(query);
-                stmt.setInt(1, prop.getPropertyID());
-                stmt.setInt(2, person.getPersonID());
-
-                stmt.execute();
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to insert person and connect to property", ex);
-
-        } finally {
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-    }
-    /**
-     * Creates a record in the person-property linking table, after checking that it does not exist
-     * @param person
-     * @param prop
-     * @throws IntegrationException 
-     */
-    public void connectRemovePersonToProperty(Person person, Property prop) throws IntegrationException {
-
-        
-        String query = "DELETE from propertyperson WHERE property_propertyid=? AND person_personid=?;";
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, prop.getPropertyID());
-            stmt.setInt(2, person.getPersonID());
-            stmt.execute();
-            
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to insert person and connect to property", ex);
-
-        } finally {
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-
-    }
-
-    /**
-     * Accepts a Person object to store in the database.
-     *
-     * @param personToStore the person to store
-     * @return the unique id number assigned to the record just created in
-     * postgres through a call to currval('[sequence_name]')
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public int insertPerson(Person personToStore) throws IntegrationException {
-        UserCoordinator uc = getUserCoordinator();
-
-        int unknownPersonSourceID = Integer.parseInt(getResourceBundle(
-                Constants.DB_FIXED_VALUE_BUNDLE).getString("unknownPersonSource"));
-        System.out.println("PersonIntegrator.insertPerson");
-        Connection con = getPostgresCon();
-        System.out.println("PersonIntegrator.insertPerson | after pgcon");
-        ResultSet rs = null;
-        int lastID;
-        
-            String query = "INSERT INTO public.person(" +
-                    " personid, persontype, muni_municode, " +
-                    " fname, lname, jobtitle, " +
-                    " phonecell, phonehome, phonework, " +
-                    " email, address_street, address_city, " +
-                    " address_state, address_zip, notes, " +
-                    " lastupdated, expirydate, isactive, " +
-                    " isunder18, humanverifiedby, compositelname, " +
-                    " sourceid, creator, businessentity, " +
-                    " mailing_address_street, mailing_address_city, " +
-                    " mailing_address_zip, mailing_address_state, useseparatemailingaddr, " +
-                    " expirynotes, creationtimestamp, canexpire, userlink, mailing_address_thirdline) " +
-                    " VALUES (DEFAULT, CAST (? AS persontype), ?, " //1-2
-                    + "?, ?, ?, " + //3-5, through jobtitle
-                    " ?, ?, ?, "
-                    + "?, ?, ?, " +
-                    " ?, ?, ?, " // through notes
-                    + "?, ?, ?, " +
-                    " ?, ?, ?," // through 20
-                    + "?, ?, ?, " 
-                    + "?, ?, " // through 25, mailing_address_city
-                    + "?, ?, ?, "
-                    + "?, ?, ?, NULL, ?);"; // through 32
-
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            // default ID generated by sequence in PostGres
-
-            if (personToStore.getPersonType() != null) {
-                stmt.setString(1, personToStore.getPersonType().toString());
-            } else {
-                stmt.setNull(1, java.sql.Types.NULL);
-                
-            }
-            stmt.setInt(2, personToStore.getMuniCode());
-
-            stmt.setString(3, personToStore.getFirstName());
-            stmt.setString(4, personToStore.getLastName());
-            stmt.setString(5, personToStore.getJobTitle());
-
-            stmt.setString(6, personToStore.getPhoneCell());
-            stmt.setString(7, personToStore.getPhoneHome());
-            stmt.setString(8, personToStore.getPhoneWork());
-            
-            stmt.setString(9, personToStore.getEmail());
-            stmt.setString(10, personToStore.getAddressStreet());
-            stmt.setString(11, personToStore.getAddressCity());
-
-            stmt.setString(12, personToStore.getAddressState());
-            stmt.setString(13, personToStore.getAddressZip());
-            stmt.setString(14, personToStore.getNotes());
-            
-            // last updated
-            stmt.setTimestamp(15, java.sql.Timestamp.valueOf(LocalDateTime.now()));
-            if (personToStore.getExpiryDate() != null) {
-                stmt.setTimestamp(16, java.sql.Timestamp.valueOf(personToStore.getExpiryDate()));
-
-            } else {
-                stmt.setNull(16, java.sql.Types.NULL);
-            }
-            stmt.setBoolean(17, personToStore.isActive());
-            
-            stmt.setBoolean(18, personToStore.isUnder18());
-            stmt.setInt(19, personToStore.getVerifiedByUserID());
-            stmt.setBoolean(20, personToStore.isCompositeLastName());
-            
-            
-            if(personToStore.getSource() != null){
-                stmt.setInt(21, personToStore.getSource().getSourceid());
-            } else {
-                stmt.setInt(21, unknownPersonSourceID);
-            }
-            if (personToStore != null && personToStore.getCreatorUserID() != 0) {
-                stmt.setInt(22, personToStore.getCreatorUserID());
-            } else {
-                stmt.setInt(22, uc.auth_getPublicUserAuthorized().getUserID());
-            }
-            stmt.setBoolean(23, personToStore.isBusinessEntity());
-            
-            stmt.setString(24, personToStore.getMailingAddressStreet());
-            stmt.setString(25, personToStore.getMailingAddressCity());
-            stmt.setString(26, personToStore.getMailingAddressZip());
-            stmt.setString(27, personToStore.getMailingAddressState());
-            
-            stmt.setBoolean(28, personToStore.isUseSeparateMailingAddress());
-            
-            stmt.setString(29, personToStore.getExpiryNotes());
-            stmt.setTimestamp(30, java.sql.Timestamp.valueOf(LocalDateTime.now()));
-            stmt.setBoolean(31, personToStore.isCanExpire());
-            
-//            stmt.setInt(32, personToStore.getLinkedUserID());
-
-            stmt.setString(32, personToStore.getMailingAddressThirdLine());
-            
-            stmt.execute();
-
-            // now get the most recent Unique ID added to this person to pass 
-            // to client methods who want to connect a record to this person
-            String idNumQuery = "SELECT currval('person_personIDSeq');";
-            Statement s = con.createStatement();
-            rs = s.executeQuery(idNumQuery);
-            rs.next();
-            lastID = rs.getInt("currval");
-
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error inserting new person", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-        System.out.println("PersonIntegrator.insertPerson  | returned ID " + lastID);
-        return lastID;
-
-    } // close insertPerson()
-
-    /**
-     * Convenience method for iterating over a List<Person> and calling
-     * eventPersonConnect for each one
-     * 
-     * @param ev
-     
-     * @throws IntegrationException 
-     * @throws com.tcvcog.tcvce.domain.BObStatusException 
-     */
-    public void eventPersonConnect(EventCnF ev) throws IntegrationException, BObStatusException {
-        if(ev != null && !ev.getPersonList().isEmpty()){
-            
-            for(Person p: ev.getPersonList())
-                if(!checkForExistingEventPersonConnections(ev, p)){
-                    eventPersonConnect(ev, p);
-                }
-        }
-    }
-    
-    /**
-     * Organ for avoiding duplicate connections in eventperson
-     * @param ev the event against which to check the Person argument for links
-     * @param p the Person to check
-     * @return true if there IS an existing connection
-     * @throws com.tcvcog.tcvce.domain.BObStatusException
-     */
-    public boolean checkForExistingEventPersonConnections(EventCnF ev, Person p) throws BObStatusException, IntegrationException{
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        List<Person> list = new ArrayList<>();
-        if(ev == null || p == null){
-            throw new BObStatusException("cannot check for links with null person or event");
-        }
-        
-        try {
-            String s = "SELECT ceevent_eventid, person_personid FROM public.eventperson WHERE person_personid=?;";
-            stmt = con.prepareStatement(s);
-            stmt.setInt(1, p.getPersonID());
-
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                return true;
-            }
-            return false;
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("PersonIntegrator.getPerson | Unable to retrieve person", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        
-    }
-
-    private void eventPersonConnect(EventCnF ev, Person p) throws IntegrationException {
-
-        String query = "INSERT INTO public.eventperson(\n"
-                + " ceevent_eventid, person_personid)\n"
-                + " VALUES (?, ?);";
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, ev.getEventID());
-            stmt.setInt(2, p.getPersonID());
-
-            System.out.println("PersonIntegrator.connectPersonToEvent | sql: " + stmt.toString());
-            stmt.execute();
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to insert person and connect to property", ex);
-
-        } finally {
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-
-    }
-    
-   
-    /**
-     * Drops all event-person connections  from eventperson
-     * @param ev 
-     * @throws com.tcvcog.tcvce.domain.IntegrationException 
-     */
-    public void eventPersonClear(EventCnF ev) throws IntegrationException{
-        String query = "DELETE FROM eventperson WHERE ceevent_eventid = ?;";
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, ev.getEventID());
-
-            stmt.execute();
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to insert person and connect to property", ex);
-
-        } finally {
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-    }
-    
-  
-    
-    
-    
-    public void connectPersonToMunicipalities(List<Municipality> munuiList, Person p) throws IntegrationException {
-
-        Iterator<Municipality> iter = munuiList.iterator();
-        while (iter.hasNext()) {
-            connectPersonToMunicipality( (Municipality) iter.next(), p);
-        }
-    }
-    
-    
-    public void connectPersonToMunicipality(Municipality munui, Person p) throws IntegrationException {
-
-        String query =  "INSERT INTO public.personmunilink(\n" +
-                        "            muni_municode, person_personid)\n" +
-                        "    VALUES (?, ?);";
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, munui.getMuniCode());
-            stmt.setInt(2, p.getPersonID());
-
-            System.out.println("PersonIntegrator.connectPersonToMunicipality | sql: " + stmt.toString());
-            stmt.execute();
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to connect person to muni ", ex);
-
-        } finally {
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-
-    }
-    
-    
-    public void connectPersonsToCitation(Citation c, List<Person> persList) throws IntegrationException {
-        Iterator<Person> iter = persList.iterator();
-        while (iter.hasNext()) {
-            connectPersonToCitation(c, (Person) iter.next());
-        }
-    }
-    
-    
-    public void connectPersonToCitation(Citation c, Person p) throws IntegrationException {
-
-        String query =  "INSERT INTO public.citationperson(\n" +
-                        "    citation_citationid, person_personid)\n" +
-                        "    VALUES (?, ?);";
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, c.getCitationID());
-            stmt.setInt(2, p.getPersonID());
-
-            stmt.execute();
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to connect person to citation ", ex);
-
-        } finally {
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-
-    }
-    
-    
-
-    /**
-     * Generates a linked list of Person objects given an array of person ID
- numbers. This is accomplished by making repeated calls to the
-     * createPersonFromResultSet() method.
-     *
-     * @return a linked list of person objects that can be used for display and
-     * selection
-     * @param peopleIDs
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    
-   public List<Person> getPersonList(List<Integer> peopleIDs) throws IntegrationException {
-        ArrayList<Person> list = new ArrayList<>();
-        
-        for (int personId: peopleIDs){
-            list.add(getPerson(personId));
-        }
-        return list;
-    } // close getPersonOccApplicationList()
-
-    /**
-     * Updates a given record for a person in the database. Will throw an error
- if the person does not exist. Note that this method will retrieve the
- Person object's ID number to determine which record to update in the db
-     *
-     * @param personToUpdate the Person object with the updated data to be
- stored in the database. All old information will be overwritten
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public void updatePerson(Person personToUpdate) throws IntegrationException {
-        Connection con = getPostgresCon();
-        String query;
-
-        query = "UPDATE public.person\n" +
-                "   SET persontype= CAST (? AS persontype), muni_municode=?, \n" +  // 1-2
-                "	fname=?, lname=?, jobtitle=?, \n" + // 3-5
-                "	phonecell=?, phonehome=?, phonework=?, \n" + // 6-8
-                "	email=?, address_street=?, address_city=?, \n" + // 9-11
-                "	address_state=?, address_zip=?, " + // 12-13
-                "	lastupdated=now(), expirydate=?, isactive=?, \n" +  // 14-15
-                "	isunder18=?, compositelname=?, \n" + // 16-17
-                "       sourceid=?, businessentity=?, \n" + // 18-19
-                "       mailing_address_street=?, mailing_address_city=?, mailing_address_zip=?, \n" +// 20-22
-                "       mailing_address_state=?, useseparatemailingaddr=?, expirynotes=?,  \n" + // 23-25
-                "       canexpire=?, mailing_address_thirdline=?  \n" +// 26-27
-                " WHERE personid=?;";
-
-       
-        
-        
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            // default ID generated by sequence in PostGres
-            stmt.setString(1, personToUpdate.getPersonType().toString());
-            stmt.setInt(2, personToUpdate.getMuniCode());
-
-            stmt.setString(3, personToUpdate.getFirstName());
-            stmt.setString(4, personToUpdate.getLastName());
-            stmt.setString(5, personToUpdate.getJobTitle());
-
-            stmt.setString(6, personToUpdate.getPhoneCell());
-            stmt.setString(7, personToUpdate.getPhoneHome());
-            stmt.setString(8, personToUpdate.getPhoneWork());
-
-            stmt.setString(9, personToUpdate.getEmail());
-            stmt.setString(10, personToUpdate.getAddressStreet());
-            stmt.setString(11, personToUpdate.getAddressCity());
-
-            stmt.setString(12, personToUpdate.getAddressState());
-            stmt.setString(13, personToUpdate.getAddressZip());
-
-            // Last updated set with a call to now() inside postgres
-            if (personToUpdate.getExpiryDate() == null) {
-                stmt.setNull(14, java.sql.Types.NULL);
-            } else {
-                stmt.setTimestamp(14, java.sql.Timestamp.valueOf(personToUpdate.getExpiryDate()));
-            }
-            stmt.setBoolean(15, personToUpdate.isActive());
-            
-            stmt.setBoolean(16, personToUpdate.isUnder18());          
-            stmt.setBoolean(17, personToUpdate.isCompositeLastName());
-            
-             if(personToUpdate.getSource() != null){
-                stmt.setInt(18, personToUpdate.getSource().getSourceid());
-            } else {
-                stmt.setNull(18, java.sql.Types.NULL);
-            }
-            stmt.setBoolean(19, personToUpdate.isBusinessEntity());
-            
-            stmt.setString(20, personToUpdate.getMailingAddressStreet());
-            stmt.setString(21, personToUpdate.getMailingAddressCity());
-            stmt.setString(22, personToUpdate.getMailingAddressZip());
-            
-            stmt.setString(23, personToUpdate.getMailingAddressState());
-            stmt.setBoolean(24, personToUpdate.isUseSeparateMailingAddress());
-            stmt.setString(25, personToUpdate.getExpiryNotes());
-            
-            stmt.setBoolean(26, personToUpdate.isCanExpire());
-            stmt.setString(27, personToUpdate.getMailingAddressThirdLine());
-            
-            stmt.setInt(28, personToUpdate.getPersonID());
-
-            stmt.execute();
-            System.out.println("PersonIntegrator.updatePerson : Excecuted update");
-                    
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to update person");
-
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    } // close updatePerson
-
-    /**
-     * Deprecated first gen person extraction method; replaced by searchForPersons
-     * @deprecated 
-     * @param p
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Person> getPersonList(Property p) throws IntegrationException {
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        List<Person> list = new ArrayList<>();
-
-        try {
-            String s = "SELECT person_personid FROM public.propertyperson WHERE property_propertyid = ?;";
-            stmt = con.prepareStatement(s);
-            stmt.setInt(1, p.getPropertyID());
-
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                Person pers = getPerson(rs.getInt("person_personid"));
-                list.add(pers);
-                
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("PersonIntegrator.getPerson | Unable to retrieve person", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-        return list;
-
-    }
-    
-    /**
-     * Dump-style retrieval for all Persons associated with a given event
-     * @param ev
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Integer> eventPersonAssembleList(EventCnF ev) throws IntegrationException {
-        Connection con = getPostgresCon();
-        
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        List<Integer> list = new ArrayList<>();
-
-        try {
-            String s = "SELECT person_personid FROM public.eventperson WHERE ceevent_eventid = ?;";
-            stmt = con.prepareStatement(s);
-            stmt.setInt(1, ev.getEventID());
-
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                list.add(rs.getInt("person_personid"));
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("PersonIntegrator.getPerson | Unable to retrieve person", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-
-        return list;
-
-    }
-
 
     public List<Integer> getPersonHistory(int userID) throws IntegrationException {
         Connection con = getPostgresCon();
@@ -975,7 +1440,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             String s = "select createghostperson(p.*, ? ) from person AS p where personid = ?;";
             stmt = con.prepareStatement(s);
             stmt.setInt(1, u.getUserID());
-            stmt.setInt(2, p.getPersonID());
+            stmt.setInt(2, p.getHumanID());
 
             rs = stmt.executeQuery();
             
@@ -1021,7 +1486,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             String s = "select createcloneperson(p.*, ? ) from person AS p where personid = ?;";
             stmt = con.prepareStatement(s);
             stmt.setInt(1, u.getUserID());
-            stmt.setInt(2, p.getPersonID());
+            stmt.setInt(2, p.getHumanID());
 
             rs = stmt.executeQuery();
             
@@ -1043,41 +1508,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
     }
     
-    
-    /**
-     * TODO: Finish!
-     * @param occPeriodID
-     * @return
-     * @throws IntegrationException 
-     */
-    public ArrayList<Person> getPersonList(int occPeriodID) throws IntegrationException{
-        ArrayList<Person> personList = new ArrayList();
-        String query =  "SELECT person_personid\n" +
-                        "  FROM public.occperiodperson WHERE period_periodid=?;";
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
- 
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, occPeriodID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                personList.add(getPerson(rs.getInt("person_personid")));
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("PersonIntegrator | Unable to retrieve person list by occ period", ex);
-        } finally{
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        
-        return personList;
-        
-    }
+   
 
     /**
      * Writes new value to the given person's note field. It's the Caller's job to 
@@ -1094,7 +1525,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         try {
             stmt = con.prepareStatement(query);
             stmt.setString(1, p.getNotes() );
-            stmt.setInt(2, p.getPersonID());
+            stmt.setInt(2, p.getHumanID());
             stmt.execute();
 
         } catch (SQLException ex) {
@@ -1106,29 +1537,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
-    public void deletePerson(Person pers) throws IntegrationException {
-        if(pers == null){ return; }
-        
-        Connection con = getPostgresCon();
-        String query = "DELETE FROM person WHERE personid = ?";
-
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, pers.getPersonID());
-            stmt.execute();
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Unable to delete person--probably because"
-                    + "this person has been attached to another database entity"
-                    + "such as a case or event. (Best leave this person in.)");
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
+  
     
     /**
      * Single point of entry for all queries against the person table, one SearchParamsPerson
@@ -1456,7 +1865,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 
                 // filter PERS-12
                 if (params.isProperty_ctl()) {
-                     stmt.setInt(++paramCounter, params.getProperty_val().getPropertyID());
+                     stmt.setInt(++paramCounter, params.getProperty_val().getParcelKey());
                 }
                 
                 // filter PERS-13
@@ -1477,7 +1886,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 }
                 // filter PERS-17
                 if (params.isMergeTarget_ctl()) {
-                     stmt.setInt(++paramCounter, params.getMergeTarget_val().getPersonID());
+                     stmt.setInt(++paramCounter, params.getMergeTarget_val().getHumanID());
                 }
 //                // filter PERS-18
 //                if (params.isMuni_ctl()) {
@@ -1517,6 +1926,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         return persIDList;
     }
     
+    /**
+     * TODO: JURPLEL needs to adapt this to humans
+     * @param rs
+     * @return 
+     */
     public PersonChangeOrder generatePersonChangeOrder(ResultSet rs){
         PersonChangeOrder skeleton = new PersonChangeOrder();
         UserCoordinator uc = getUserCoordinator();
@@ -1550,7 +1964,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         skeleton.setChangedBy(rs.getInt("changedby_personid"));
         skeleton.setActive(rs.getBoolean("active"));
         
-        } catch(SQLException | IntegrationException ex){
+        } catch(SQLException | IntegrationException | BObStatusException ex){
             System.out.println("PersonIntegrator.generatePersonChangeOrder() | ERROR: " + ex);
         }
         
@@ -1558,6 +1972,12 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
+    
+    /**
+     * TODO: JURPLEL needs to adapt to public occ application
+     * @param order
+     * @throws IntegrationException 
+     */
     public void insertPersonChangeOrder(PersonChangeOrder order) throws IntegrationException{
         
         String query =  "INSERT INTO public.personchange(\n" +
@@ -1577,7 +1997,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, order.getPersonID());
+//            stmt.setInt(1, order.getHumanID());
             stmt.setString(2,order.getFirstName());
             stmt.setString(3, order.getLastName());
             stmt.setBoolean(4, order.isCompositeLastName());
@@ -1598,7 +2018,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(19, order.isRemoved());
             stmt.setBoolean(20, order.isAdded());
             stmt.setTimestamp(21, Timestamp.valueOf(LocalDateTime.now()));
-            stmt.setInt(22, order.getPersonID());
+//            stmt.setInt(22, order.getHumanID());
 
             stmt.execute();
 
@@ -1613,6 +2033,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
+    /**
+     * TODO: JURPLEL needs to adapt this to humans on the public side
+     * @param order
+     * @throws IntegrationException 
+     */
     public void updatePersonChangeOrder(PersonChangeOrder order) throws IntegrationException{
         
         String query =  "UPDATE public.personchange\n" +
@@ -1629,7 +2054,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, order.getPersonID());
+//            stmt.setInt(1, order.getHumanID());
             stmt.setString(2, order.getFirstName());
             stmt.setString(3, order.getLastName());
             stmt.setBoolean(4, order.isCompositeLastName());
@@ -1672,16 +2097,22 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
+    /**
+     * TODO: JURPLEL needs to adapt this
+     * @param personID
+     * @return
+     * @throws IntegrationException 
+     */
     public List<PersonChangeOrder> getPersonChangeOrderList(int personID) throws IntegrationException{
         
         String query =  "SELECT personchangeid, person_personid, firstname, lastname, compositelastname, \n" +
-"       phonecell, phonehome, phonework, email, addressstreet, addresscity, \n" +
-"       addresszip, addressstate, useseparatemailingaddress, mailingaddressstreet, \n" +
-"       mailingaddresthirdline, mailingaddresscity, mailingaddresszip, \n" +
-"       mailingaddressstate, removed, added, entryts, approvedondate, \n" +
-"       approvedby_userid, changedby_userid, changedby_personid, active\n" +
-"  FROM public.personchange\n" +
-"  where person_personid = ? AND active = true AND approvedon IS NULL;";
+                        "       phonecell, phonehome, phonework, email, addressstreet, addresscity, \n" +
+                        "       addresszip, addressstate, useseparatemailingaddress, mailingaddressstreet, \n" +
+                        "       mailingaddresthirdline, mailingaddresscity, mailingaddresszip, \n" +
+                        "       mailingaddressstate, removed, added, entryts, approvedondate, \n" +
+                        "       approvedby_userid, changedby_userid, changedby_personid, active\n" +
+                        "  FROM public.personchange\n" +
+                        "  where person_personid = ? AND active = true AND approvedon IS NULL;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         List<PersonChangeOrder> orderList = new ArrayList<>();
@@ -1710,7 +2141,13 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-        public List<PersonChangeOrder> getPersonChangeOrderListAll(int personID) throws IntegrationException{
+    /**
+     * TODO: JURPLEL: Adapt to humans
+     * @param personID
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<PersonChangeOrder> getPersonChangeOrderListAll(int personID) throws IntegrationException{
         
         String query =  "SELECT personchangeid, person_personid, firstname, lastname, compositelastname, \n" +
 "       phonecell, phonehome, phonework, email, addressstreet, addresscity, \n" +

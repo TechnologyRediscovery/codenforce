@@ -25,40 +25,57 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Upgraded Citation version to utilize humanization principles
+ * 
  * @author ellen bascomb of apt 31y
  */
-public class Citation 
-        extends BOb
-        implements Serializable {
+public  class       Citation 
+        extends     TrackedEntity
+        implements  IFace_humanListHolder{
+    
+    final static String CITATION_TABLE = "citation";
+    final static String CITATION_PKFIELD = "citationid";
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CITATIONHUMAN;
+    
+    private int cecaseID;
+    
+    /**
+     * Database Key
+     */
     private int citationID;
+    
+    /**
+     * Internal tracking
+     */
     private String citationNo;
-    private CitationStatus status;
-    private boolean nonStausUpdatesAllowed;
+    
+    /**
+     * External tracking by magistrate
+     */
+
+    private LocalDateTime dateOfRecord;
+    private List<CitationDocketRecord> docketNos;
+
+    protected User filingOfficer;
+    private CitationFilingType filingType;
     private CourtEntity origin_courtentity;
+    
+    private List<CitationStatusLogEntry> statusLog;
     
     private String officialText;
     
-    private List<EventCnF> eventList;
-    
-    private CECase ceCaseNoLists;
-    private User userOwner;
-    
-    private LocalDateTime dateOfRecord;
-    private java.util.Date dateOfRecordUtilDate;
-    private String dateOfRecordPretty;
-    
-    private LocalDateTime timeStamp;
-    private String timeStampPretty;
-    
-    private boolean isActive;
-    private String notes;
     
     // notice that to avoid cycles, the Citation is allowed to have actual CodeViolation
     // objects in its LinkedList but CodeViolation only gets the citation IDs which
     // it can use to look up a Citation if needs be
-    private List<CodeViolation> violationList;
+    private List<EventCnF> eventList;
+    private List<CitationCodeViolationLink> violationList;
+    private List<BlobLight> blobList;
 
+    protected List<HumanLink> humanLinkList;
+    
+    private String notes;
+    
     /**
      * @return the citationID
      */
@@ -72,16 +89,7 @@ public class Citation
     public String getCitationNo() {
         return citationNo;
     }
-
-   
     
-    /**
-     * @return the userOwner
-     */
-    public User getUserOwner() {
-        return userOwner;
-    }
-
     /**
      * @return the dateOfRecord
      */
@@ -89,19 +97,6 @@ public class Citation
         return dateOfRecord;
     }
 
-    /**
-     * @return the timeStamp
-     */
-    public LocalDateTime getTimeStamp() {
-        return timeStamp;
-    }
-
-    /**
-     * @return the isActive
-     */
-    public boolean isIsActive() {
-        return isActive;
-    }
 
     /**
      * @return the notesO
@@ -124,16 +119,6 @@ public class Citation
         this.citationNo = citationNo;
     }
 
-
-    
-
-    /**
-     * @param userOwner the userOwner to set
-     */
-    public void setUserOwner(User userOwner) {
-        this.userOwner = userOwner;
-    }
-
     /**
      * @param dateOfRecord the dateOfRecord to set
      */
@@ -141,19 +126,6 @@ public class Citation
         this.dateOfRecord = dateOfRecord;
     }
 
-    /**
-     * @param timeStamp the timeStamp to set
-     */
-    public void setTimeStamp(LocalDateTime timeStamp) {
-        this.timeStamp = timeStamp;
-    }
-
-    /**
-     * @param isActive the isActive to set
-     */
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
-    }
 
     /**
      * @param notes the notes to set
@@ -165,14 +137,14 @@ public class Citation
     /**
      * @return the violationList
      */
-    public List<CodeViolation> getViolationList() {
+    public List<CitationCodeViolationLink> getViolationList() {
         return violationList;
     }
 
     /**
      * @param violationList the violationList to set
      */
-    public void setViolationList(List<CodeViolation> violationList) {
+    public void setViolationList(List<CitationCodeViolationLink> violationList) {
         this.violationList = violationList;
     }
 
@@ -181,11 +153,7 @@ public class Citation
         int hash = 7;
         hash = 71 * hash + this.citationID;
         hash = 71 * hash + Objects.hashCode(this.citationNo);
-        hash = 71 * hash + Objects.hashCode(this.ceCaseNoLists);
-        hash = 71 * hash + Objects.hashCode(this.userOwner);
         hash = 71 * hash + Objects.hashCode(this.dateOfRecord);
-        hash = 71 * hash + Objects.hashCode(this.timeStamp);
-        hash = 71 * hash + (this.isActive ? 1 : 0);
         hash = 71 * hash + Objects.hashCode(this.notes);
         hash = 71 * hash + Objects.hashCode(this.violationList);
         return hash;
@@ -209,25 +177,13 @@ public class Citation
         if (this.getOrigin_courtentity() != other.getOrigin_courtentity()) {
             return false;
         }
-        if (this.isActive != other.isActive) {
-            return false;
-        }
         if (!Objects.equals(this.citationNo, other.citationNo)) {
             return false;
         }
         if (!Objects.equals(this.notes, other.notes)) {
             return false;
         }
-        if (!Objects.equals(this.ceCaseNoLists, other.ceCaseNoLists)) {
-            return false;
-        }
-        if (!Objects.equals(this.userOwner, other.userOwner)) {
-            return false;
-        }
         if (!Objects.equals(this.dateOfRecord, other.dateOfRecord)) {
-            return false;
-        }
-        if (!Objects.equals(this.timeStamp, other.timeStamp)) {
             return false;
         }
         if (!Objects.equals(this.violationList, other.violationList)) {
@@ -239,15 +195,22 @@ public class Citation
     /**
      * @return the status
      */
-    public CitationStatus getStatus() {
-        return status;
+    public List<CitationStatusLogEntry> getStatusLog() {
+        return statusLog;
     }
 
     /**
      * @param status the status to set
      */
-    public void setStatus(CitationStatus status) {
-        this.status = status;
+    public void setStatusLog(List<CitationStatusLogEntry> status) {
+        this.statusLog = status;
+    }
+    
+    public CitationStatusLogEntry getStatus(){
+        if(statusLog != null && !statusLog.isEmpty()){
+            return statusLog.get(0); // return the first, most current status log entry
+        } 
+        return null;
     }
 
     /**
@@ -264,52 +227,8 @@ public class Citation
         this.origin_courtentity = origin_courtentity;
     }
 
-    /**
-     * @return the ceCaseNoLists
-     */
-    public CECase getCeCaseNoLists() {
-        return ceCaseNoLists;
-    }
 
-    /**
-     * @param ceCaseNoLists the ceCaseNoLists to set
-     */
-    public void setCeCaseNoLists(CECase ceCaseNoLists) {
-        this.ceCaseNoLists = ceCaseNoLists;
-    }
-
-    /**
-     * @return the dateOfRecordUtilDate
-     */
-    public java.util.Date getDateOfRecordUtilDate() {
-        dateOfRecordUtilDate = DateTimeUtil.convertUtilDate(dateOfRecord);
-        return dateOfRecordUtilDate;
-    }
-
-    /**
-     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
-     */
-    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        this.dateOfRecordUtilDate = dateOfRecordUtilDate;
-        this.dateOfRecord = DateTimeUtil.convertUtilDate(dateOfRecordUtilDate);
-    }
-
-    /**
-     * @return the dateOfRecordPretty
-     */
-    public String getDateOfRecordPretty() {
-        dateOfRecordPretty = DateTimeUtil.getPrettyDate(dateOfRecord);
-        return dateOfRecordPretty;
-    }
-
-    /**
-     * @return the timeStampPretty
-     */
-    public String getTimeStampPretty() {
-        timeStampPretty = DateTimeUtil.getPrettyDate(timeStamp);
-        return timeStampPretty;
-    }
-
+  
     /**
      * @return the eventList
      */
@@ -324,19 +243,7 @@ public class Citation
         this.eventList = eventList;
     }
 
-    /**
-     * @return the nonStausUpdatesAllowed
-     */
-    public boolean isNonStausUpdatesAllowed() {
-        return nonStausUpdatesAllowed;
-    }
-
-    /**
-     * @param nonStausUpdatesAllowed the nonStausUpdatesAllowed to set
-     */
-    public void setNonStausUpdatesAllowed(boolean nonStausUpdatesAllowed) {
-        this.nonStausUpdatesAllowed = nonStausUpdatesAllowed;
-    }
+   
 
     /**
      * @return the officialText
@@ -351,27 +258,122 @@ public class Citation
     public void setOfficialText(String officialText) {
         this.officialText = officialText;
     }
+
+
+    /**
+     * @param citatonNo the citationNo to set
+     */
+    public void setCitatonNo(String citatonNo) {
+        this.citationNo = citatonNo;
+    }
+
+    /**
+     * @return the blobList
+     */
+    public List<BlobLight> getBlobList() {
+        return blobList;
+    }
+
+    /**
+     * @param blobList the blobList to set
+     */
+    public void setBlobList(List<BlobLight> blobList) {
+        this.blobList = blobList;
+    }
+
+
+    @Override
+    public String getPKFieldName() {
+        return CITATION_PKFIELD;
+    }
+
+    @Override
+    public int getDBKey() {
+         return citationID;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return CITATION_TABLE;
+    }
     
-    
-    
-    
+    @Override
+    public List<HumanLink> getHumanLinkList() {
+        return humanLinkList;
+    }
+
+    @Override
+    public void setHumanLinkList(List<HumanLink> hll) {
+        humanLinkList = hll;
+    }
+
+    @Override
+    public LinkedObjectSchemaEnum getHUMAN_LINK_SCHEMA_ENUM() {
+        return HUMAN_LINK_SCHEMA_ENUM;
+    }
+
+  
+
+    @Override
+    public int getHostPK() {
+        return citationID;
+    }
+
+    /**
+     * @return the filingOfficer
+     */
+    public User getFilingOfficer() {
+        return filingOfficer;
+    }
+
+    /**
+     * @param filingOfficer the filingOfficer to set
+     */
+    public void setFilingOfficer(User filingOfficer) {
+        this.filingOfficer = filingOfficer;
+    }
+
+    /**
+     * @return the cecaseID
+     */
+    public int getCecaseID() {
+        return cecaseID;
+    }
+
+    /**
+     * @param cecaseID the cecaseID to set
+     */
+    public void setCecaseID(int cecaseID) {
+        this.cecaseID = cecaseID;
+    }
+
+    /**
+     * @return the docketNos
+     */
+    public List<CitationDocketRecord> getDocketNos() {
+        return docketNos;
+    }
+
+    /**
+     * @param docketNos the docketNos to set
+     */
+    public void setDocketNos(List<CitationDocketRecord> docketNos) {
+        this.docketNos = docketNos;
+    }
+
+    /**
+     * @return the filingType
+     */
+    public CitationFilingType getFilingType() {
+        return filingType;
+    }
+
+    /**
+     * @param filingType the filingType to set
+     */
+    public void setFilingType(CitationFilingType filingType) {
+        this.filingType = filingType;
+    }
+
 }
 
-
-/*
-
-
-CREATE TABLE citation
-(
-    citationID                      INTEGER DEFAULT nextval('citation_citationID_seq') NOT NULL, 
-    citationNo                      text, --collaboratively created with munis
-    origin_courtentity     INTEGER NOT NULL, --fk
-    cecase_caseID                   INTEGER NOT NULL, --fk
-    login_userID                    INTEGER NOT NULL, --fk
-    dateOfRecord                    TIMESTAMP WITH TIME ZONE NOT NULL,
-    transTimeStamp                  TIMESTAMP WITH TIME ZONE NOT NULL,
-    isActive                        boolean DEFAULT TRUE,
-    notes                           text
-    -- this is just a skeleton for a citation: more fields likely as system develops
-) ;
-*/

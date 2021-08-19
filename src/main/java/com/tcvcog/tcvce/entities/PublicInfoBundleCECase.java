@@ -105,7 +105,7 @@ public class PublicInfoBundleCECase extends PublicInfoBundle{
      */
     public void setBundledCase(CECase input) {
 
-        input.setPropertyID(0);
+        input.setParcelKey(0);
         input.setPropertyUnitID(0);
         input.setNotes("*****");
         input.setSource(new BOBSource());

@@ -118,7 +118,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
             if (getSessionBean().getSessCEAR() != null) {
                 selectedRequest = cc.cear_getCEActionRequest(getSessionBean().getSessCEAR().getRequestID());
             }
-        } catch (SearchException | IntegrationException ex) {
+        } catch (SearchException | IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
         
@@ -579,7 +579,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         System.out.println("ActionRequestManagebb.updateRequestList");
     }
 
-    public void searchForProperties(ActionEvent ev) {
+    public void searchForProperties(ActionEvent ev) throws BObStatusException {
         SearchCoordinator sc = getSearchCoordinator();
 
         propertyList = new ArrayList<>();
@@ -973,7 +973,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         if (selectedRequest != null) {
 
             try {
-                caseListForSelectedProperty = ci.getCECasesByProp(selectedRequest.getRequestProperty().getPropertyID());
+                caseListForSelectedProperty = ci.getCECasesByProp(selectedRequest.getRequestProperty().getParcelKey());
                 System.out.println("CEActionRequestsBB.getCaseListForSelectedProperty | case list size: " + caseListForSelectedProperty.size());
             } catch (IntegrationException | BObStatusException ex) {
                 System.out.println(ex);

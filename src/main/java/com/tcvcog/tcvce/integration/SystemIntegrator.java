@@ -19,19 +19,25 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
+import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CasePhaseEnum;
+import com.tcvcog.tcvce.entities.IFace_trackedEntityLink;
 import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.IntensitySchema;
+import com.tcvcog.tcvce.entities.LinkedObjectRole;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.TrackedEntity;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import java.io.Serializable;
@@ -44,9 +50,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.faces.application.FacesMessage;
 
 /**
- *
+ * A catch all location for database operations against tables
+ * that support Business objects across all sorts of subsystems
+ * 
  * @author ellen bascomb of apt 31y
  */
 public class SystemIntegrator extends BackingBeanUtils implements Serializable {
@@ -56,7 +65,248 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      */
     public SystemIntegrator() {
     }
+    
+    
+    /**
+     * Utility method for populating record tracking fields:
+     * createdts
+     * createdby_userid
+     * lastupdatedts
+     * lastupdatedby_userid
+     * deactivatedts
+     * deactivated_userid
+     * @param ti
+     * @param rs
+     * @throws SQLException 
+     */
+    protected void populateTrackedFields(TrackedEntity ti, ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
+        UserIntegrator ui = getUserIntegrator();
+        
+        if(rs != null){
+            
+            if(rs.getTimestamp("createdts") != null){
+                ti.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                
+            }
+            if(rs.getInt("createdby_userid") != 0){
+                ti.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+            }
+            
+            if(rs.getTimestamp("lastupdatedts") != null){
+                ti.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+            }
+            if(rs.getInt("lastupdatedby_userid") != 0){
+                ti.setLastUpdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+            }
+            
+            if(rs.getTimestamp("deactivatedts") != null){
+                ti.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+            }
+            if(rs.getInt("deactivatedby_userid") != 0){
+                ti.setDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
+            }
+        }
+    }
 
+    
+    /**
+     * Utility method for populating record tracking fields:
+     * createdts
+     * createdby_userid
+     * lastupdatedts
+     * lastupdatedby_userid
+     * deactivatedts
+     * deactivated_userid
+     * @param te
+     * @param rs
+     * @throws SQLException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    protected void populateTrackedLinkFields(IFace_trackedEntityLink te, ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
+        UserIntegrator ui = getUserIntegrator();
+        
+        if(rs != null){
+            
+            if(rs.getTimestamp("createdts") != null){
+                te.setLinkCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                
+            }
+            if(rs.getInt("createdby_userid") != 0){
+                te.setLinkCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+            }
+            
+            if(rs.getTimestamp("lastupdatedts") != null){
+                te.setLinkLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+            }
+            if(rs.getInt("lastupdatedby_userid") != 0){
+                te.setLinkLastUpdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+            }
+            
+            if(rs.getTimestamp("deactivatedts") != null){
+                te.setLinkDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+            }
+            if(rs.getInt("deactivatedby_userid") != 0){
+                te.setLinkDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
+            }
+            if(rs.getInt("source_sourceid") != 0){
+                te.setLinkSource(getBOBSource(rs.getInt("source_sourceid")));
+            }
+            te.setLinkNotes(rs.getString("notes"));
+            
+        }
+    }
+    
+    
+    /** Unified pathway for deactivating TrackedEntities
+     * 
+     * @param te
+     * @param ua
+     * @throws IntegrationException 
+     */
+    public void deactivateTrackedEntity(TrackedEntity te, UserAuthorized ua) throws IntegrationException{
+        if(te != null && ua != null){
+            
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("UPDATE ");
+            sb.append(te.getDBTableName());
+            sb.append(" SET deactivatedts=now() AND deactivatedby_userid=? WHERE ");
+            sb.append(te.getPKFieldName());
+            sb.append("=?;");
+            Connection con = getPostgresCon();
+            PreparedStatement stmt = null;
+
+            try {
+                stmt = con.prepareStatement(sb.toString());
+                stmt.setInt(1, ua.getUserID());
+                stmt.setInt(2, te.getDBKey());
+                
+                stmt.executeUpdate();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.toString());
+                throw new IntegrationException("Tracked Entity has been deactivated", ex);
+
+            } finally{
+                 if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+                 if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            } // close finally
+        }
+    }
+    
+    
+    /**
+     * Reverses a deactivation action by writing NULL to the deactivatedts and deactivatedby_userid
+     * fields of a TrackedEntity
+     * 
+     * @param te
+     * @param ua
+     * @throws IntegrationException 
+     */
+    public void reactivateTrackedEntity(TrackedEntity te, UserAuthorized ua) throws IntegrationException{
+         if(te != null && ua != null){
+            
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("UPDATE ");
+            sb.append(te.getDBTableName());
+            sb.append(" SET deactivatedts=NULL AND deactivatedby_userid=NULL WHERE ");
+            sb.append(te.getPKFieldName());
+            sb.append("=?;");
+            Connection con = getPostgresCon();
+            PreparedStatement stmt = null;
+
+            try {
+                stmt = con.prepareStatement(sb.toString());
+                stmt.setInt(1, te.getDBKey());
+                
+                stmt.executeUpdate();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.toString());
+                throw new IntegrationException("Tracked Entity has been deactivated", ex);
+
+            } finally{
+                 if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+                 if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            } // close finally
+        }
+    }
+    
+    /**
+     * Retrieves a linked object role record from the DB
+     * @param roleid
+     * @return the new object or null if roleid is 0
+     */
+    public LinkedObjectRole getLinkedObjectRole(int roleid) throws IntegrationException{
+        LinkedObjectRole lor = null;
+        if(roleid != 0){
+            
+            Connection con = getPostgresCon();
+            ResultSet rs = null;
+            PreparedStatement stmt = null;
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("SELECT lorid, lorschema_schemaid, title, description,  \n" );
+            sb.append(" createdts, deactivatedts, notes\n");
+            sb.append("FROM public.linkedobjectrole WHERE lorid=?;");
+
+            try {
+                stmt = con.prepareStatement(sb.toString());
+                stmt.setInt(1, roleid);
+                
+                rs = stmt.executeQuery();
+                
+                while (rs.next()) {
+                    lor = generateLinkedObjectRole(rs);
+                    
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.toString());
+                throw new IntegrationException("unable to linked object role", ex);
+            } finally {
+                if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+                if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+                if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+            } // close finally
+        }
+        return lor;
+    }
+    
+    /**
+     * Populates common fields among LinkedObjectRole family
+     * 
+     * @param rs containing each common field in linked objects
+     * @return the superclass ready to be injected into a subtype
+     * @throws java.sql.SQLException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public LinkedObjectRole generateLinkedObjectRole(ResultSet rs) throws SQLException, IntegrationException{
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        LinkedObjectRole lor = new LinkedObjectRole();
+         if(rs != null){
+            
+            lor.setRoleID(rs.getInt("roleid"));
+            
+            lor.setTitle((rs.getString("title")));
+            
+            if(rs.getTimestamp("createdts") != null){
+                lor.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                
+            }
+            lor.setDescription(rs.getString("description"));
+            
+            if(rs.getInt("muni_municode") != 0){
+                lor.setMuni(mc.getMuni(rs.getInt("muni_municode")));
+            }
+            
+            if(rs.getTimestamp("deactivatedts") != null){
+                lor.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+            }
+            lor.setNotes(rs.getString("notes"));
+        }
+        return lor;
+    }
+
+    
+    
     public Map<String, Integer> getPrintStyleMap() throws IntegrationException {
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -309,7 +559,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             + "  FROM public.improvementsuggestion INNER JOIN improvementstatus USING (statusid)\n"
             + "  INNER JOIN improvementtype ON improvementtypeid = typeid;";
 
-    public ArrayList<ImprovementSuggestion> getImprovementSuggestions() throws IntegrationException {
+    public ArrayList<ImprovementSuggestion> getImprovementSuggestions() throws IntegrationException, BObStatusException {
         ArrayList<ImprovementSuggestion> impList = new ArrayList<>();
 
         Connection con = getPostgresCon();
@@ -365,7 +615,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         return rs;
     }
 
-    private ImprovementSuggestion generateImprovementSuggestion(ResultSet rs) throws SQLException, IntegrationException {
+    private ImprovementSuggestion generateImprovementSuggestion(ResultSet rs) throws SQLException, IntegrationException, BObStatusException {
         UserIntegrator ui = getUserIntegrator();
         ImprovementSuggestion is = new ImprovementSuggestion();
         is.setSuggestionID(rs.getInt("improvementid"));
@@ -455,7 +705,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
           List<Integer> sidl = new ArrayList<>();
           BOBSource bs = null;
           
-          String query =    "   SELECT sourceid FROM public.bobsource;";
+          String query =    " SELECT sourceid FROM public.bobsource;";
         
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -654,6 +904,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(6, intsty.getIcon().getIconid());
             stmt.setInt(7, intsty.getClassID());
             stmt.executeUpdate();
+            
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to update Intensity", ex);
@@ -784,11 +1035,11 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 stmt = con.prepareStatement(insertSB.toString());
                 
                 stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getPersonID());
+                stmt.setInt(2, p.getHumanID());
                 
                 stmt.execute();
                 
-                System.out.println("SystemIntegrator.logObjectView: Person view logged id = " + p.getPersonID());
+                System.out.println("SystemIntegrator.logObjectView: Person view logged id = " + p.getHumanID());
                 
             } else if (ob instanceof Property) {
                 Property p = (Property) ob;
@@ -797,11 +1048,11 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 stmt = con.prepareStatement(insertSB.toString());
                 
                 stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getPropertyID());
+                stmt.setInt(2, p.getParcelKey());
 
                 stmt.execute();
 
-                System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getPropertyID());
+                System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getParcelKey());
             } else if (ob instanceof CECaseDataHeavy) {
                 CECaseDataHeavy c = (CECaseDataHeavy) ob;
                 
@@ -889,7 +1140,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 selectSB.append("AND person_personid = ? ");
                 stmt = con.prepareStatement(selectSB.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getPersonID());
+                stmt.setInt(2, p.getHumanID());
                 rs = stmt.executeQuery();
                 if (rs.first()) {
                     // history entry with this user and person already exists
@@ -902,16 +1153,16 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 }
                 // each UPDATE and INSERT SQL structures take the params in this order
                 stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getPersonID());
+                stmt.setInt(2, p.getHumanID());
                 stmt.execute();
-                System.out.println("SystemIntegrator.logObjectView: Person view logged id = " + p.getPersonID());
+                System.out.println("SystemIntegrator.logObjectView: Person view logged id = " + p.getHumanID());
             } else if (ob instanceof Property) {
                 Property p = (Property) ob;
                 // prepare SELECT statement
                 selectSB.append("AND property_propertyid = ? ");
                 stmt = con.prepareStatement(selectSB.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getPropertyID());
+                stmt.setInt(2, p.getParcelKey());
                 rs = stmt.executeQuery();
                 if (rs.first()) {
                     // history entry with this user and person already exists
@@ -924,9 +1175,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 }
                 // each UPDATE and INSERT SQL structures take the params in this order
                 stmt.setInt(1, u.getUserID());
-                stmt.setInt(2, p.getPropertyID());
+                stmt.setInt(2, p.getParcelKey());
                 stmt.execute();
-                System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getPropertyID());
+                System.out.println("SystemIntegrator.logObjectView: Property view logged id = " + p.getParcelKey());
             } else if (ob instanceof CECaseDataHeavy) {
                 CECaseDataHeavy c = (CECaseDataHeavy) ob;
                 // prepare SELECT statement

@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
@@ -94,7 +95,7 @@ public class CodeElementGuideBB extends BackingBeanUtils implements Serializable
             if(source != null){
                 elList = codeIntegrator.getCodeElements(source.getSourceID());
             }
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                             "Unable to populate list of code elements, sorry!", 

@@ -30,10 +30,31 @@ import java.util.List;
  */
 public  class NoticeOfViolation  
         extends BOb 
-        implements Serializable, Comparable<NoticeOfViolation> {
+        implements Serializable, 
+        Comparable<NoticeOfViolation> {
     
     private int noticeID;
+    
+    /**
+     * @deprecated with humanization
+     */
     private Person recipient;
+    
+    private Human recipHuman;
+    private HumanMailingAddressLink mailingLink;
+    /**
+     * Records a timestamp for when the human and connected mailing address
+     *  is transferred into these NOV-specific fields, such that we can always
+     * resurrect exactly where an NOV was sent, even when the underlying 
+     * records get updated after mailing
+     */
+    private LocalDateTime fixedAddrXferTS;
+    private String fixedRecipientName;
+    private String fixedRecipientBldgNo;
+    private String fixedRecipientStreet;
+    private String fixedRecipientCity;
+    private String fixedRecipientState;
+    private String fixedRecipientZip;
     
     private String noticeTextBeforeViolations;
     private List<TextBlock> blocksBeforeViolations;
@@ -566,6 +587,132 @@ public  class NoticeOfViolation
      */
     public void setNotifyingOfficer(User notifyingOfficer) {
         this.notifyingOfficer = notifyingOfficer;
+    }
+
+    /**
+     * @return the recipHuman
+     */
+    public Human getRecipHuman() {
+        return recipHuman;
+    }
+
+    /**
+     * @return the mailingLink
+     */
+    public HumanMailingAddressLink getMailingLink() {
+        return mailingLink;
+    }
+
+    /**
+     * @return the fixedAddrXferTS
+     */
+    public LocalDateTime getFixedAddrXferTS() {
+        return fixedAddrXferTS;
+    }
+
+    /**
+     * @return the fixedRecipientName
+     */
+    public String getFixedRecipientName() {
+        return fixedRecipientName;
+    }
+
+    /**
+     * @return the fixedRecipientBldgNo
+     */
+    public String getFixedRecipientBldgNo() {
+        return fixedRecipientBldgNo;
+    }
+
+    /**
+     * @return the fixedRecipientStreet
+     */
+    public String getFixedRecipientStreet() {
+        return fixedRecipientStreet;
+    }
+
+    /**
+     * @return the fixedRecipientCity
+     */
+    public String getFixedRecipientCity() {
+        return fixedRecipientCity;
+    }
+
+    /**
+     * @return the fixedRecipientState
+     */
+    public String getFixedRecipientState() {
+        return fixedRecipientState;
+    }
+
+    /**
+     * @return the fixedRecipientZip
+     */
+    public String getFixedRecipientZip() {
+        return fixedRecipientZip;
+    }
+
+    /**
+     * @param recipHuman the recipHuman to set
+     */
+    public void setRecipHuman(Human recipHuman) {
+        this.recipHuman = recipHuman;
+    }
+
+    /**
+     * @param mailingLink the mailingLink to set
+     */
+    public void setMailingLink(HumanMailingAddressLink mailingLink) {
+        this.mailingLink = mailingLink;
+    }
+
+    /**
+     * @param fixedAddrXferTS the fixedAddrXferTS to set
+     */
+    public void setFixedAddrXferTS(LocalDateTime fixedAddrXferTS) {
+        this.fixedAddrXferTS = fixedAddrXferTS;
+    }
+
+    /**
+     * @param fixedRecipientName the fixedRecipientName to set
+     */
+    public void setFixedRecipientName(String fixedRecipientName) {
+        this.fixedRecipientName = fixedRecipientName;
+    }
+
+    /**
+     * @param fixedRecipientBldgNo the fixedRecipientBldgNo to set
+     */
+    public void setFixedRecipientBldgNo(String fixedRecipientBldgNo) {
+        this.fixedRecipientBldgNo = fixedRecipientBldgNo;
+    }
+
+    /**
+     * @param fixedRecipientStreet the fixedRecipientStreet to set
+     */
+    public void setFixedRecipientStreet(String fixedRecipientStreet) {
+        this.fixedRecipientStreet = fixedRecipientStreet;
+    }
+
+    /**
+     * @param fixedRecipientCity the fixedRecipientCity to set
+     */
+    public void setFixedRecipientCity(String fixedRecipientCity) {
+        this.fixedRecipientCity = fixedRecipientCity;
+    }
+
+    /**
+     * @param fixedRecipientState the fixedRecipientState to set
+     */
+    public void setFixedRecipientState(String fixedRecipientState) {
+        this.fixedRecipientState = fixedRecipientState;
+    }
+
+    /**
+     * @param fixedRecipientZip the fixedRecipientZip to set
+     */
+    public void setFixedRecipientZip(String fixedRecipientZip) {
+        this.fixedRecipientZip = fixedRecipientZip;
     }
 
    

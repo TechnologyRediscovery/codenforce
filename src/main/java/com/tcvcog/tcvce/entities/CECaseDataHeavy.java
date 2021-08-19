@@ -25,12 +25,16 @@ public class CECaseDataHeavy
         IFace_CredentialSigned,
         IFace_Loggable,
         IFace_ActivatableBOB,
-        IFace_PaymentHolder {
+        IFace_PaymentHolder,
+        IFace_humanListHolder{
 
     // accessed through methods specified in the interfaces
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CECASEHUMAN;
+
     private Property property;
     private PropertyUnit propertyUnit;
     
+    protected List<HumanLink> humanLinkList;
     
     private List<Proposal> proposalList;
     private List<EventRuleImplementation> eventRuleList;
@@ -52,7 +56,7 @@ public class CECaseDataHeavy
 
         this.allowForwardLinkedPublicAccess = cse.allowForwardLinkedPublicAccess;
 
-        this.propertyID = cse.propertyID;
+        this.parcelKey = cse.parcelKey;
         this.propertyUnitID = cse.propertyUnitID;
 
         this.caseManager = cse.caseManager;
@@ -374,6 +378,29 @@ public class CECaseDataHeavy
      */
     public void setBlobList(List<BlobLight> blobList) {
         this.blobList = blobList;
+    }
+        
+
+    @Override
+    public List<HumanLink> getHumanLinkList() {
+        return humanLinkList;
+    }
+
+    @Override
+    public void setHumanLinkList(List<HumanLink> hll) {
+        humanLinkList = hll;
+    }
+
+    @Override
+    public LinkedObjectSchemaEnum getHUMAN_LINK_SCHEMA_ENUM() {
+        return HUMAN_LINK_SCHEMA_ENUM;
+    }
+
+    
+
+    @Override
+    public int getHostPK() {
+        return caseID;
     }
 
 }

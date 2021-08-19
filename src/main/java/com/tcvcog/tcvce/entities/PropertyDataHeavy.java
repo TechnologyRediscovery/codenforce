@@ -31,25 +31,23 @@ import java.util.List;
  */
 public  class       PropertyDataHeavy 
         extends     Property 
-        implements  IFace_CredentialSigned{
+        implements  IFace_CredentialSigned,
+                    IFace_humanListHolder{
+    
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUIM = LinkedObjectSchemaEnum.CECASEHUMAN;
+    protected List<HumanLink> humanLinkList;
     
     
     private List<CECasePropertyUnitHeavy> ceCaseList;
-    
     private List<PropertyUnitDataHeavy> unitWithListsList;
-    
-    private List<Person> personList;
-    
     private List<CECaseDataHeavy> propInfoCaseList;
-    
     private List<BlobLight> blobList;
+    private List<PropertyExtData> extDataList;
     
     private String credentialSignature;
     
-    private List<PropertyExtData> extDataList;
-    
-    public PropertyDataHeavy(){
-        
+    public PropertyDataHeavy(Property prop){
+        super(prop);
     }
     
     /**
@@ -59,107 +57,15 @@ public  class       PropertyDataHeavy
      * @param cred 
      */
     public PropertyDataHeavy(Property prop, Credential cred){
+        super(prop);
         
         this.credentialSignature = cred.getSignature();
-           
-        this.propertyID = prop.getPropertyID();
-        this.muni = prop.getMuni();
-        this.muniCode = prop.getMuniCode();
-        this.parID = prop.getParID();
-        this.lotAndBlock = prop.getLotAndBlock();
-        this.address = prop.getAddress();
-
-        this.useType = prop.getUseType();      
-        this.useGroup = prop.getUseGroup();
-        this.constructionType = prop.getConstructionType();
-        this.countyCode = prop.getCountyCode();
-
-        this.notes = prop.getNotes();
-        this.address_city = prop.getAddress_city();
-        this.address_state = prop.getAddress_state();
-        this.address_zip = prop.getAddress_zip();
-
-        this.ownerCode = prop.getOwnerCode();
-        this.propclass = prop.getPropclass();
-
-        this.lastUpdatedTS = prop.getLastUpdatedTS();
-        this.lastUpdatedBy = prop.getLastUpdatedBy();
-        this.locationDescriptor = prop.getLocationDescriptor();
-
-        this.bobSource = prop.getBobSource();
-        this.unfitDateStart = prop.getUnfitDateStart();
-        this.unfitDateStop = prop.getUnfitDateStop();
-        this.unfitBy = prop.getUnfitBy();
-
-        this.abandonedDateStart = prop.getAbandonedDateStart();
-        this.abandonedDateStop = prop.getAbandonedDateStop();
-        this.abandonedBy = prop.getAbandonedBy();
-        this.vacantDateStart = prop.getVacantDateStart();
-
-        this.vacantDateStop = prop.getVacantDateStop();
-        this.vacantBy = prop.getVacantBy();
-        this.condition = prop.getCondition();
-
-        this.landBankProspect = prop.getLandBankProspect();
-        this.LandBankHeld = prop.isLandBankHeld();
-        this.active = prop.isActive();
-        this.nonAddressable = prop.isNonAddressable();
-        
-        this.creationTS = prop.getCreationTS();
+         
+        this.addresses = prop.getAddresses();
         
         
     }
     
-
-    public PropertyDataHeavy(Property prop){
-        this.propertyID = prop.getPropertyID();
-        this.muni = prop.getMuni();
-        this.muniCode = prop.getMuniCode();
-        this.parID = prop.getParID();
-        this.lotAndBlock = prop.getLotAndBlock();
-        this.address = prop.getAddress();
-
-        this.useType = prop.getUseType();
-        this.useGroup = prop.getUseGroup();
-        this.constructionType = prop.getConstructionType();
-        this.countyCode = prop.getCountyCode();
-
-        this.notes = prop.getNotes();
-        this.address_city = prop.getAddress_city();
-        this.address_state = prop.getAddress_state();
-        this.address_zip = prop.getAddress_zip();
-
-        this.ownerCode = prop.getOwnerCode();
-        this.propclass = prop.getPropclass();
-
-        this.lastUpdatedTS = prop.getLastUpdatedTS();
-        this.lastUpdatedBy = prop.getLastUpdatedBy();
-        this.locationDescriptor = prop.getLocationDescriptor();
-
-        this.bobSource = prop.getBobSource();
-        this.unfitDateStart = prop.getUnfitDateStart();
-        this.unfitDateStop = prop.getUnfitDateStop();
-        this.unfitBy = prop.getUnfitBy();
-
-        this.abandonedDateStart = prop.getAbandonedDateStart();
-        this.abandonedDateStop = prop.getAbandonedDateStop();
-        this.abandonedBy = prop.getAbandonedBy();
-        this.vacantDateStart = prop.getVacantDateStart();
-
-        this.vacantDateStop = prop.getVacantDateStop();
-        this.vacantBy = prop.getVacantBy();
-        this.condition = prop.getCondition();
-
-        this.landBankProspect = prop.getLandBankProspect();
-        this.LandBankHeld = prop.isLandBankHeld();
-        this.active = prop.isActive();
-        this.nonAddressable = prop.isNonAddressable();
-        
-        this.unitList = prop.getUnitList();
-        this.creationTS = prop.getCreationTS();
-        
-        
-    }
     
     /**
      * @return the credentialSignature
@@ -259,26 +165,12 @@ public  class       PropertyDataHeavy
     }
 
 
-    /**
-     * @return the personList
-     */
-    public List<Person> getPersonList() {
-        return personList;
-    }
 
     /**
      * @param ceCaseList the ceCaseList to set
      */
     public void setCeCaseList(List<CECasePropertyUnitHeavy> ceCaseList) {
         this.ceCaseList = ceCaseList;
-    }
-
-
-    /**
-     * @param personList the personList to set
-     */
-    public void setPersonList(List<Person> personList) {
-        this.personList = personList;
     }
 
 
@@ -338,7 +230,29 @@ public  class       PropertyDataHeavy
         this.extDataList = extDataList;
     }
 
+   
 
-  
+
+   @Override
+    public List<HumanLink> getHumanLinkList() {
+        return humanLinkList;
+    }
+
+    @Override
+    public void setHumanLinkList(List<HumanLink> hll) {
+        humanLinkList = hll;
+    }
+
+    @Override
+    public LinkedObjectSchemaEnum getHUMAN_LINK_SCHEMA_ENUM() {
+        return HUMAN_LINK_SCHEMA_ENUIM;
+    }
+
+    
+    @Override
+    public int getHostPK() {
+        return parcelKey;
+    }
+
     
 }

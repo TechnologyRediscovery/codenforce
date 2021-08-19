@@ -40,7 +40,9 @@ import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.CaseStageEnum;
 import com.tcvcog.tcvce.entities.Citation;
+import com.tcvcog.tcvce.entities.CitationCodeViolationLink;
 import com.tcvcog.tcvce.entities.CitationStatus;
+import com.tcvcog.tcvce.entities.CitationStatusLogEntry;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CourtEntity;
@@ -50,6 +52,8 @@ import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.Human;
+import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.PageModeEnum;
@@ -81,14 +85,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
-
 import org.primefaces.event.FileUploadEvent;
 
 /**
- *
+ * Primary backing bean for the Code Enforcement case 
  * @author sylvia
  */
 public class CECaseSearchProfileBB
@@ -175,9 +179,9 @@ public class CECaseSearchProfileBB
     
     private int eventDurationFormField;
     
-    private List<Person> eventPersonCandidates;
-    private int eventPersonIDForLookup;
-    private Person eventPersonSelected;
+    private List<Human> eventHumanCandidates;
+    private int eventHumanIDForLookup;
+    private Human eventHumanSelected;
     
     private String formEventNoteText;
     
@@ -204,6 +208,8 @@ public class CECaseSearchProfileBB
     private List<CodeViolation> removedViolationList;
     private String citationEditEventDescription;
     
+    private User citationIssuingOfficer;
+    
     
     
     /*******************************************************
@@ -226,7 +232,7 @@ public class CECaseSearchProfileBB
      * list viewing functions
      */
     @PostConstruct
-    public void initBean() {
+    public void initBean() throws BObStatusException {
         CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         UserCoordinator uc = getUserCoordinator();
@@ -350,16 +356,15 @@ public class CECaseSearchProfileBB
             eventTypeSelected = getEventTypeCandidates().get(0);
             eventCategoryCandidates.addAll(getTypeCatMap().get(eventTypeSelected));
         }
-        eventPersonCandidates = new ArrayList<>();
+        eventHumanCandidates = new ArrayList<>();
         
         updateNewEventFieldsWithCatChange = true;
         
         // Citation stuff
         
-        CaseIntegrator caseInt = getCaseIntegrator();
         CourtEntityIntegrator cei = getCourtEntityIntegrator();
         try {
-            citationStatusList = caseInt.getCitationStatusList();
+            citationStatusList = cc.citation_getCitationStatusList();
             courtEntityList = cei.getCourtEntityList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -530,7 +535,7 @@ public class CECaseSearchProfileBB
             try {
                 currentCase = cc.cecase_assembleCECaseDataHeavy(cse, getSessionBean().getSessUser());
                 getSessionBean().setSessCECase(currentCase);
-                getSessionBean().setSessProperty(currentCase.getPropertyID());
+                getSessionBean().setSessProperty(currentCase.getParcelKey());
             } catch (IntegrationException | BObStatusException | SearchException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null, 
@@ -878,7 +883,7 @@ public class CECaseSearchProfileBB
      */
     public String exploreProperty(){
         try {
-            getSessionBean().setSessProperty(currentCase.getPropertyID());
+            getSessionBean().setSessProperty(currentCase.getParcelKey());
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -2037,36 +2042,7 @@ public class CECaseSearchProfileBB
         
     }
     
-    /**
-     * Listener for user requests to search for a person by ID
-     * @param ev 
-     */
-    public void onPersonLookupByIDButtonChange(ActionEvent ev){
-        PersonCoordinator pc = getPersonCoordinator();
-        if(eventPersonIDForLookup == 0){
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Shall not look up person with ID of 0",
-                            "Please enter a positive, non-zero ID"));
-             return;
-            
-        }
-        try {
-            eventPersonCandidates.add(pc.getPerson(eventPersonIDForLookup));
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Located " + eventPersonCandidates.size() + " persons with this ID",
-                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
-        } catch (IntegrationException ex) {
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(),
-                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
-        }
-        
-        
-    }
-    
+   
     /**
      * Listener for user request to go and view a person in personProfile
      * @param p
@@ -2180,9 +2156,9 @@ public class CECaseSearchProfileBB
      * @param ev 
      */
     public void queueSelectedPerson(ActionEvent ev) {
-        EventCoordinator ec = getEventCoordinator();
-        if (eventPersonSelected != null) {
-            getCurrentEvent().getPersonList().add(eventPersonSelected);
+        PersonCoordinator pc = getPersonCoordinator();
+        if (eventHumanSelected != null) {
+            getCurrentEvent().getPersonList().add(pc.getHumanLinkSkeleton(eventHumanSelected));
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -2258,7 +2234,7 @@ public class CECaseSearchProfileBB
      */
     public void personCreateInit(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
-        workingPerson = pc.personCreateMakeSkeleton(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni());
+        workingPerson = pc.personInit(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni());
     }
 
     /**
@@ -2269,23 +2245,24 @@ public class CECaseSearchProfileBB
         PersonCoordinator pc = getPersonCoordinator();
     
         try {
-            int freshID = pc.personCreate(workingPerson, getSessionBean().getSessUser());
-            PersonDataHeavy freshPerson = pc.assemblePersonDataHeavy(pc.getPerson(freshID),getSessionBean().getSessUser().getKeyCard());
+            int freshID = pc.humanAdd(workingPerson, getSessionBean().getSessUser());
+            PersonDataHeavy freshPerson = pc.assemblePersonDataHeavy(pc.getPerson(pc.getHuman(freshID)),getSessionBean().getSessUser().getKeyCard());
             getSessionBean().setSessPerson(freshPerson);
-
+            HumanLink hl = new HumanLink(freshPerson);
+        
             Property property = currentCase.getProperty();
             
-            pc.connectPersonToProperty(freshPerson, property);
+            pc.linkHuman(currentCase, hl, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO, 
                      "Successfully added " + freshPerson.getFirstName() + " to the Database!" 
                          + " and connected to " + property.getAddress(), ""));
-           } catch (IntegrationException ex) {
+           } catch (IntegrationException | BObStatusException ex) {
                System.out.println(ex.toString());
                   getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                                "Unable to add new person to the database, my apologies!", ""));
-           }
+        }
         //make sure the person list includes our fresh person
         refreshCasePropertyDataHeavy();
         
@@ -2311,7 +2288,7 @@ public class CECaseSearchProfileBB
           CaseCoordinator cc = getCaseCoordinator();
         
         try {
-            currentCitation = cc.citation_getCitationSkeleton(getSessionBean().getSessUser(), currentCase);
+            currentCitation = cc.citation_getCitationSkeleton(currentCase, getSessionBean().getSessUser(), getSessionBean().getSessUser());
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -2338,7 +2315,7 @@ public class CECaseSearchProfileBB
     public String onCitationRemoveCommitButtonChange() {
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            cc.citation_removeCitation(currentCitation);
+            cc.citation_removeCitation(currentCitation, getSessionBean().getSessUser());
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -2396,7 +2373,7 @@ public class CECaseSearchProfileBB
      * Listener for user requests to remove a violation from a citation
      * @param v 
      */
-    public void onCitationViolationRemoveButtonChange(CodeViolation v) {
+    public void onCitationViolationRemoveButtonChange(CitationCodeViolationLink v) {
         currentCitation.getViolationList().remove(v);
         removedViolationList.add(v);
     }
@@ -2405,7 +2382,7 @@ public class CECaseSearchProfileBB
      * Listener for user requests to add a violation to a citation
      * @param v 
      */
-    public void onCitationViolationRestoreButtonChange(CodeViolation v) {
+    public void onCitationViolationRestoreButtonChange(CitationCodeViolationLink v) {
         currentCitation.getViolationList().add(v);
         removedViolationList.remove(v);
     }
@@ -2478,7 +2455,7 @@ public class CECaseSearchProfileBB
     /**
      * Listener for user requests to issue a citation
      *
-     * @return
+     * @return page nav
      */
     public String onCitationAddCommitButtonChange() {
         System.out.println("CitationBB.IssueCitation");
@@ -2486,14 +2463,14 @@ public class CECaseSearchProfileBB
         if(currentCitation != null){
 
                 Citation c = currentCitation;
-                c.setUserOwner(getSessionBean().getSessUser());
+                
                 try {
-                    cc.citation_issueCitation(c);
+                    cc.citation_insertCitation(c,getSessionBean().getSessUser(),citationIssuingOfficer);
 
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,
                                     "New citation added to database!", ""));
-                } catch (IntegrationException ex) {
+                } catch (IntegrationException | BObStatusException ex) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                     "Unable to issue citation due to a database integration error", ""));
@@ -3037,22 +3014,22 @@ public class CECaseSearchProfileBB
     /**
      * @return the eventPersonCandidates
      */
-    public List<Person> getEventPersonCandidates() {
-        return eventPersonCandidates;
+    public List<Human> getEventPersonCandidates() {
+        return eventHumanCandidates;
     }
 
     /**
-     * @return the eventPersonIDForLookup
+     * @return the eventHumanIDForLookup
      */
-    public int getEventPersonIDForLookup() {
-        return eventPersonIDForLookup;
+    public int getEventHumanIDForLookup() {
+        return eventHumanIDForLookup;
     }
 
     /**
      * @return the eventPersonSelected
      */
-    public Person getEventPersonSelected() {
-        return eventPersonSelected;
+    public Human getEventPersonSelected() {
+        return eventHumanSelected;
     }
 
     /**
@@ -3107,22 +3084,22 @@ public class CECaseSearchProfileBB
     /**
      * @param eventPersonCandidates the eventPersonCandidates to set
      */
-    public void setEventPersonCandidates(List<Person> eventPersonCandidates) {
-        this.eventPersonCandidates = eventPersonCandidates;
+    public void setEventPersonCandidates(List<Human> eventPersonCandidates) {
+        this.eventHumanCandidates = eventPersonCandidates;
     }
 
     /**
-     * @param eventPersonIDForLookup the eventPersonIDForLookup to set
+     * @param eventHumanIDForLookup the eventHumanIDForLookup to set
      */
-    public void setEventPersonIDForLookup(int eventPersonIDForLookup) {
-        this.eventPersonIDForLookup = eventPersonIDForLookup;
+    public void setEventHumanIDForLookup(int eventHumanIDForLookup) {
+        this.eventHumanIDForLookup = eventHumanIDForLookup;
     }
 
     /**
      * @param eventPersonSelected the eventPersonSelected to set
      */
     public void setEventPersonSelected(Person eventPersonSelected) {
-        this.eventPersonSelected = eventPersonSelected;
+        this.eventHumanSelected = eventPersonSelected;
     }
 
     /**
@@ -3340,6 +3317,20 @@ public class CECaseSearchProfileBB
      */
     public void setCurrentBlob(BlobLight currentBlob) {
         this.currentBlob = currentBlob;
+    }
+
+    /**
+     * @return the citationIssuingOfficer
+     */
+    public User getCitationIssuingOfficer() {
+        return citationIssuingOfficer;
+    }
+
+    /**
+     * @param citationIssuingOfficer the citationIssuingOfficer to set
+     */
+    public void setCitationIssuingOfficer(User citationIssuingOfficer) {
+        this.citationIssuingOfficer = citationIssuingOfficer;
     }
 
    

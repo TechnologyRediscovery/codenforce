@@ -87,7 +87,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         
     }
     
-    public MunicipalityDataHeavy getMunDataHeavy(int muniCode) throws IntegrationException, AuthorizationException{
+    public MunicipalityDataHeavy getMunDataHeavy(int muniCode) throws IntegrationException, AuthorizationException, BObStatusException{
         PreparedStatement stmt = null;
         MunicipalityDataHeavy muniComplete = null;
         Connection con = null;
@@ -135,7 +135,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         return muni;
     }
     
-    private MunicipalityDataHeavy generateMuniDataHeavy(ResultSet rs) throws SQLException, IntegrationException, AuthorizationException{
+    private MunicipalityDataHeavy generateMuniDataHeavy(ResultSet rs) throws SQLException, IntegrationException, AuthorizationException, BObStatusException{
         CourtEntityIntegrator cei = getCourtEntityIntegrator();
         UserIntegrator ui = getUserIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
@@ -184,7 +184,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         return mdh;
     }
     
-    private MuniProfile getMuniProfile(int profileID) throws IntegrationException{
+    private MuniProfile getMuniProfile(int profileID) throws IntegrationException, BObStatusException{
         MuniProfile mp = null;
         PreparedStatement stmt = null;
         Connection con = null;
@@ -216,7 +216,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     }
     
     private MuniProfile generateMuniProfile(ResultSet rs) 
-            throws SQLException, IntegrationException{
+            throws SQLException, IntegrationException, BObStatusException{
         MuniProfile mp = new MuniProfile();
         EventIntegrator ei = getEventIntegrator();
         UserIntegrator ui = getUserIntegrator();
@@ -451,7 +451,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     }
     
     //xiaohong add
-    public ArrayList<MuniProfile> getMuniProfileList() throws IntegrationException {
+    public ArrayList<MuniProfile> getMuniProfileList() throws IntegrationException, BObStatusException {
 
         String query = "SELECT profileid FROM public.muniprofile;";
 

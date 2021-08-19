@@ -19,8 +19,9 @@ package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.EntityUtils;
+import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonOccApplication;
+import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.util.DateTimeUtil;
 
@@ -42,8 +43,8 @@ public class OccPermitApplication extends BOb {
     private String internalNotes;
     private String externalPublicNotes;
     private PropertyUnit applicationPropertyUnit;
-    private Person applicantPerson;
-    private Person preferredContact;
+    private Human applicantPerson;
+    private Human preferredContact;
     private OccPeriod connectedPeriod;
     private int publicControlCode;
     private boolean paccEnabled;
@@ -55,7 +56,7 @@ public class OccPermitApplication extends BOb {
  application. The occupancy coordinator will digest this list to determine if the requirements 
     * have been satisfied.
     */
-    private List<PersonOccApplication> attachedPersons;
+    private List<HumanLink> attachedPersons;
 
     /**
      * @return the id
@@ -158,7 +159,7 @@ public class OccPermitApplication extends BOb {
     /**
      * @return the applicantPerson
      */
-    public Person getApplicantPerson() {
+    public Human getApplicantPerson() {
         return applicantPerson;
     }
 
@@ -172,21 +173,21 @@ public class OccPermitApplication extends BOb {
     /**
      * @return the attachedPersons
      */
-    public List<PersonOccApplication> getAttachedPersons() {
+    public List<HumanLink> getAttachedPersons() {
         return attachedPersons;
     }
 
     /**
      * @param attachedPersons the attachedPersons to set
      */
-    public void setAttachedPersons(List<PersonOccApplication> attachedPersons) {
+    public void setAttachedPersons(List<HumanLink> attachedPersons) {
         this.attachedPersons = attachedPersons;
     }
 
     /**
      * @return the preferredContact
      */
-    public Person getPreferredContact() {
+    public Human getPreferredContact() {
         return preferredContact;
     }
 

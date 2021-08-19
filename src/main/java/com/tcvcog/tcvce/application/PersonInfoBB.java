@@ -20,34 +20,30 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
-import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonDataHeavy;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.util.Constants;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
 /**
- * Backing bean for person info page -- TO BE REMOVED
- * @deprecated replaced when fields collapsed into PersonSearchBB
- * @author Ellen Bascomb
+ * Backing bean for person info page 
+ * 
+ * @author Ellen Bascomb of apartment 31Y
  */
 public class PersonInfoBB extends BackingBeanUtils{
 
     private PersonDataHeavy currPerson;
-    private Person workingPerson;
-    private boolean connectToActiveProperty;
     
-    private String fieldDump;
     
     private String formNotes;
+    
+    // temp storage field values for writing old values to notes
+    protected String fieldNamePrevious;
+    
     
     /**
      * Creates a new instance of PersonBB
@@ -64,7 +60,7 @@ public class PersonInfoBB extends BackingBeanUtils{
            try {
                currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(),
                        getSessionBean().getSessUser().getKeyCard());
-           } catch (IntegrationException ex) {
+           } catch (IntegrationException | BObStatusException ex) {
                System.out.println(ex);
            }
              getSessionBean().setSessPerson(currPerson);
@@ -73,17 +69,24 @@ public class PersonInfoBB extends BackingBeanUtils{
             currPerson = (getSessionBean().getSessPerson());
        }
        
-       workingPerson = currPerson;
         
     }
     
     
-    public void personEditInit(ActionEvent ev){
-        PersonCoordinator pc = getPersonCoordinator();
-        // keep a stashed copy of our oroginal field values to write to notes
-        // on a succesful update
-        fieldDump = pc.dumpPerson(currPerson);
-        workingPerson = currPerson;
+    /**
+     * Listener for user requests to rename the current person
+     * @param ev 
+     */
+    public void onPersonNameEditInit(ActionEvent ev){
+        fieldNamePrevious = currPerson.getName();
+    }
+    
+    /**
+     * Listener for user requests to finalize a person name edit
+     * @param ev 
+     */
+    public void onPersonNameEditCommit(ActionEvent ev){
+        
         
     }
     
@@ -98,35 +101,27 @@ public class PersonInfoBB extends BackingBeanUtils{
         SystemCoordinator sc = getSystemCoordinator();
 
         try {
-            pc.personEdit(workingPerson, getSessionBean().getSessUser());
+//            pc.humanEdit(workingPerson, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO, 
                      "Edits of Person saved to database!", ""));
             // with a successful update, write field dump of previous values to person notes
-            pc.addNotesToPerson(workingPerson, getSessionBean().getSessUser(), fieldDump);
+//            pc.addNotesToPerson(workingPerson, getSessionBean().getSessUser(), fieldDump);
             // refresh our current person
-            currPerson = pc.assemblePersonDataHeavy(pc.getPerson(workingPerson.getPersonID()), getSessionBean().getSessUser().getMyCredential());
+//            currPerson = pc.assemblePersonDataHeavy(pc.getPerson(workingPerson.getHumanID()), getSessionBean().getSessUser().getMyCredential());
             sc.logObjectView(getSessionBean().getSessUser(), currPerson);
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                      "Edits failed on person due to a database bug!", ""));
-        } catch (BObStatusException ex) {
-            System.out.println(ex);
         }
-    }
-    
-    
-     public String viewPersonAssociatedProperty(Property p){
-         getSessionBean().setSessProperty(p);
-        return "propertyInfo";
     }
     
     
     public void personCreateInit(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
-        workingPerson = pc.personCreateMakeSkeleton(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni());
+//        workingPerson = pc.personInit(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni());
     }
     
     /**
@@ -137,30 +132,7 @@ public class PersonInfoBB extends BackingBeanUtils{
         PersonCoordinator pc = getPersonCoordinator();
         SystemCoordinator sc = getSystemCoordinator();
     
-        try {
-            int freshID = pc.personCreate(workingPerson, getSessionBean().getSessUser());
-            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(pc.getPerson(freshID),getSessionBean().getSessUser().getKeyCard()));
-               if(connectToActiveProperty){
-                   
-                   Property property = getSessionBean().getSessProperty();
-                   pc.connectPersonToProperty(workingPerson, property);
-                   getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            "Successfully added " + workingPerson.getFirstName() + " to the Database!" 
-                                + " and connected to " + property.getAddress(), ""));
-               } else {
-
-                   getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                                "Successfully added " + workingPerson.getFirstName() + " to the Database!", ""));
-               }
-               sc.logObjectView(getSessionBean().getSessUser(), currPerson);
-           } catch (IntegrationException ex) {
-               System.out.println(ex.toString());
-                  getFacesContext().addMessage(null,
-                       new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                               "Unable to add new person to the database, my apologies!", ""));
-           }
+         
         return "personSearch";
     }
     
@@ -172,7 +144,7 @@ public class PersonInfoBB extends BackingBeanUtils{
         try {
             pc.addNotesToPerson(currPerson, getSessionBean().getSessUser(), getFormNotes());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO
-                    , "Done: Notes added to person ID:" + currPerson.getPersonID(),"" ));
+                    , "Done: Notes added to person ID:" + currPerson.getHumanID(),"" ));
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR
@@ -183,35 +155,7 @@ public class PersonInfoBB extends BackingBeanUtils{
         }
     }
     
-    
-    public String deletePerson(){
-        System.out.println("PersonBB.deletePerson | in method");
-        PersonCoordinator pc = getPersonCoordinator();
-        
-        try {
-            pc.personNuke(currPerson, getSessionBean().getSessUser().getMyCredential());
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        currPerson.getFirstName() + " has been permanently deleted; Goodbye " 
-                                + currPerson.getFirstName() 
-                                + ". Search results have been cleared.", ""));
-            
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Cannot delete person." + ex.toString(), "Best not to delete folks anyway..."));
-            return "";
-            
-        } catch (AuthorizationException ex) {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        ex.getLocalizedMessage(),""));
-            return "";
-            
-        }
-        return "personSearch";
-    }
-    
+  
     
     /**
      * @return the currPerson
@@ -227,33 +171,7 @@ public class PersonInfoBB extends BackingBeanUtils{
         this.currPerson = currPerson;
     }
 
-    /**
-     * @return the fieldDump
-     */
-    public String getFieldDump() {
-        return fieldDump;
-    }
-
-    /**
-     * @param fieldDump the fieldDump to set
-     */
-    public void setFieldDump(String fieldDump) {
-        this.fieldDump = fieldDump;
-    }
-
-    /**
-     * @return the workingPerson
-     */
-    public Person getWorkingPerson() {
-        return workingPerson;
-    }
-
-    /**
-     * @param workingPerson the workingPerson to set
-     */
-    public void setWorkingPerson(Person workingPerson) {
-        this.workingPerson = workingPerson;
-    }
+ 
 
     /**
      * @return the formNotes
@@ -267,6 +185,20 @@ public class PersonInfoBB extends BackingBeanUtils{
      */
     public void setFormNotes(String formNotes) {
         this.formNotes = formNotes;
+    }
+
+    /**
+     * @return the fieldNamePrevious
+     */
+    public String getFieldNamePrevious() {
+        return fieldNamePrevious;
+    }
+
+    /**
+     * @param fieldNamePrevious the fieldNamePrevious to set
+     */
+    public void setFieldNamePrevious(String fieldNamePrevious) {
+        this.fieldNamePrevious = fieldNamePrevious;
     }
     
     

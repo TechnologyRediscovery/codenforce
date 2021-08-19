@@ -48,6 +48,8 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -162,7 +164,11 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
 //        blob.setBlobMetadata(generateBlobMetadata(rs));
         blob.setTitle(rs.getString("title"));
-        blob.setCreatedBy(uc.user_getUser(rs.getInt("createdby_userid")));
+        try {
+            blob.setCreatedBy(uc.user_getUser(rs.getInt("createdby_userid")));
+        } catch (BObStatusException ex) {
+            throw new IntegrationException(ex.getMessage());
+        }
         blob.setFilename(rs.getString("filename"));
         
         Timestamp time = rs.getTimestamp("createdts");
@@ -1210,7 +1216,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, bl.getPhotoDocID());
-            stmt.setInt(2, prop.getPropertyID());
+            stmt.setInt(2, prop.getParcelKey());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println("BlobIntegrator.removePropertyBlobLink() | ERROR: "+ ex);
@@ -1440,7 +1446,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             
             stmt = con.prepareStatement(query);
             stmt.setInt(1, bl.getPhotoDocID());
-            stmt.setInt(2, prop.getPropertyID());
+            stmt.setInt(2, prop.getParcelKey());
             stmt.execute();
             System.out.println("BlobIntegrator.linkBlobToProperty | link succesfull. ");
             
@@ -2517,7 +2523,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         try {
             
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, prop.getPropertyID());
+            stmt.setInt(1, prop.getParcelKey());
             rs = stmt.executeQuery();
             while(rs.next()){
                  idList.add(rs.getInt("photodoc_photodocid"));
