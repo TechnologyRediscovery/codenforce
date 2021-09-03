@@ -40,6 +40,8 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Stores member vars of pretty much all our custom types
@@ -140,7 +142,11 @@ public class    SessionBean
             System.out.println(ex);
         }
 
-        sessPropertyList = pc.assemblePropertyHistoryList(sessUser.getKeyCard());
+        try {
+            sessPropertyList = pc.assemblePropertyHistoryList(sessUser.getKeyCard());
+        } catch (BObStatusException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
     
     
@@ -379,7 +385,7 @@ public class    SessionBean
                 sessPropertyRoute = ActivatableRouteEnum.USER_CHOSEN;
                 
                 // PERSONS
-                sessPersonList = perc.getPersonListFromLinkList(pdh.getHumanLinkList());
+                sessPersonList = perc.getPersonListFromHumanLinkList(pdh.getHumanLinkList());
                 if(sessPersonList != null && !sessPersonList.isEmpty()){
                     sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
                     sessPersonRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
@@ -487,7 +493,7 @@ public class    SessionBean
                 sessPropertyList = pc.assemblePropertyHistoryList(ua.getKeyCard());
                 sessCECaseList = sessProperty.getCeCaseList();
                 
-                sessPersonList = perc.getPersonListFromLinkList(sessProperty.getHumanLinkList());
+                sessPersonList = perc.getPersonListFromHumanLinkList(sessProperty.getHumanLinkList());
                 if(sessPersonList != null && !sessPersonList.isEmpty()){
                     sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
                 }
@@ -1405,7 +1411,7 @@ public class    SessionBean
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
             sessOccPeriod.setPropUnitProp(pi.getPropertyUnitWithProp(sessOccPeriod.getPeriodID()));
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
 

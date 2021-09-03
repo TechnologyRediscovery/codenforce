@@ -32,6 +32,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class OccInspectionCoordinator extends BackingBeanUtils implements Serializable {
@@ -178,8 +180,8 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         // now use our convenience method to record Inspection of the space's individual elements
         oii.recordInspectionOfSpaceElements(inspectedSpace, inspection);
 
-        // check sequence by retrieving new inspected space and displaying info
-        inspectedSpace = oii.getInspectedSpace(inspectedSpace.getInspectedSpaceID());
+            // check sequence by retrieving new inspected space and displaying info
+            inspectedSpace = oii.getInspectedSpace(inspectedSpace.getInspectedSpaceID());
         System.out.println("OccupancyCoordinator.inspectionAction_commenceSpaceInspection | retrievedInspectedSpaceID= " + inspectedSpace);
 
         return inspection;

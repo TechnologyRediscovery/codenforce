@@ -5,6 +5,7 @@ import com.tcvcog.tcvce.application.SessionBean;
 import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.User;
@@ -14,6 +15,8 @@ import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The premier backing bean for occupancy inspections workflow.
@@ -66,8 +69,12 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     public void initUserList() {
         UserCoordinator uc = getUserCoordinator();
 
-        // TODO: probably shouldn't pass null here...
-        userList = uc.user_assembleUserListForSearch(null);
+        try {
+            // TODO: probably shouldn't pass null here...
+            userList = uc.user_assembleUserListForSearch(null);
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+        }
     }
 
     /**

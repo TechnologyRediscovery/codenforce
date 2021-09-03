@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.tcvcog.tcvce.entities.IFace_PersonListHolder;
 
 /**
  * The master controller class for Humans and their Java incarnation called
@@ -216,12 +217,19 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @return return a list, possibly with Person objs in it!
      * @throws IntegrationException 
      */
-    public List<Person> getPersonListFromLinkList(List<HumanLink> humanLinkList) throws IntegrationException, BObStatusException{
+    public List<Person> getPersonListFromHumanLinkList(List<HumanLink> humanLinkList) throws IntegrationException, BObStatusException{
         List<Person> pl = new ArrayList<>();
         for(HumanLink hl: humanLinkList){
             pl.add(getPerson(hl));
         }
         return pl;
+        
+    }
+    
+    public IFace_PersonListHolder assemblePersonList(IFace_PersonListHolder plh){
+        
+        return null;
+        
         
     }
     

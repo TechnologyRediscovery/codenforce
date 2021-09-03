@@ -501,7 +501,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
 
             getSessionBean().setSessOccPeriod(oc.getOccPeriod(ins.getOccPeriodID()));
             return "occInspectionAdd";
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (IntegrationException ex) {
             System.out.println("manageBlobBB.goToInspectedSpaceElement() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

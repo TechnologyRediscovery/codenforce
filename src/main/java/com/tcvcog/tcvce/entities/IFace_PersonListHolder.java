@@ -16,10 +16,18 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.util.List;
+
 /**
- * 
+ * A person is a subclass of human, with addresses, contacts, and emails objects
  * @author sylvia
  */
-public interface IFace_PersonLinkHolder {
+public interface IFace_PersonListHolder
+        extends IFace_humanListHolder{
+    List<Person> getPersonList();
+    
+    void setPersonList(List<Person> pList);
+    
+    
     
 }

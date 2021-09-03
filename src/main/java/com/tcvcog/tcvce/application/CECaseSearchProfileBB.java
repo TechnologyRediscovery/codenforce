@@ -117,6 +117,7 @@ public class CECaseSearchProfileBB
     
     private List<EventCategory> closingEventCategoryList;
     private EventCategory closingEventCategorySelected;
+    protected int eventPersonIDForLookup;
     
     private ViewOptionsActiveHiddenListsEnum eventViewOptionSelected;
     private List<ViewOptionsActiveHiddenListsEnum> eventViewOptions;
@@ -232,7 +233,7 @@ public class CECaseSearchProfileBB
      * list viewing functions
      */
     @PostConstruct
-    public void initBean() throws BObStatusException {
+    public void initBean()  {
         CaseCoordinator cc = getCaseCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
         UserCoordinator uc = getUserCoordinator();
@@ -247,10 +248,10 @@ public class CECaseSearchProfileBB
 
         configureParameters();
 
+        try {
         caseList = new ArrayList<>();
         caseList.addAll(cc.cecase_refreshCECasePropertyUnitHeavyList(sb.getSessCECaseList()));
         CECaseDataHeavy cseTemp = getSessionBean().getSessCECase();
-        try {
             
             // TODO: edie
             // deal with event page load issues later
@@ -272,9 +273,6 @@ public class CECaseSearchProfileBB
             System.out.println("CECaseSearchProfileBB.initBean(): current case ID: " + currentCase.getCaseID());
             setClosingEventCategoryList(ec.getEventCategeryList(EventType.Closing));
             
-        } catch (IntegrationException | BObStatusException | SearchException  ex) {
-            System.out.println(ex);
-        }
 
         propListForSearch = sb.getSessPropertyList();
         caseStageList = CaseStageEnum.values();
@@ -285,6 +283,9 @@ public class CECaseSearchProfileBB
         userManagerOptionList = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
         bobSourceOptionList = sysCor.getBobSourceListComplete();
 
+        } catch (IntegrationException | BObStatusException | SearchException  ex) {
+            System.out.println(ex);
+        }
         ReportConfigCECaseList listRpt = getSessionBean().getReportConfigCECaseList();
         
         if (listRpt != null) {
@@ -3331,6 +3332,20 @@ public class CECaseSearchProfileBB
      */
     public void setCitationIssuingOfficer(User citationIssuingOfficer) {
         this.citationIssuingOfficer = citationIssuingOfficer;
+    }
+
+    /**
+     * @return the eventPersonIDForLookup
+     */
+    public int getEventPersonIDForLookup() {
+        return eventPersonIDForLookup;
+    }
+
+    /**
+     * @param eventPersonIDForLookup the eventPersonIDForLookup to set
+     */
+    public void setEventPersonIDForLookup(int eventPersonIDForLookup) {
+        this.eventPersonIDForLookup = eventPersonIDForLookup;
     }
 
    

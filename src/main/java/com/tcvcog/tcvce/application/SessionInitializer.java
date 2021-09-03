@@ -552,7 +552,7 @@ public  class       SessionInitializer
         PersonCoordinator persc = getPersonCoordinator();
         
         try {
-            sb.setSessPersonList(persc.getPersonListFromLinkList(getSessionBean().getSessProperty().getHumanLinkList()));
+            sb.setSessPersonList(persc.getPersonListFromHumanLinkList(getSessionBean().getSessProperty().getHumanLinkList()));
             if(sb.getSessPersonList().isEmpty()){
                 sb.setSessPersonQueued(persc.selectDefaultPerson(cred));
             } else {

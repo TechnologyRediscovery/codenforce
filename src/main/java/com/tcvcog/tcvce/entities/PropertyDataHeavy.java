@@ -20,8 +20,6 @@ package com.tcvcog.tcvce.entities;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
-import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,10 +30,12 @@ import java.util.List;
 public  class       PropertyDataHeavy 
         extends     Property 
         implements  IFace_CredentialSigned,
-                    IFace_humanListHolder{
+                    IFace_humanListHolder,
+                    IFace_PersonListHolder{
     
     final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUIM = LinkedObjectSchemaEnum.CECASEHUMAN;
     protected List<HumanLink> humanLinkList;
+    protected List<Person> personList;
     
     
     private List<CECasePropertyUnitHeavy> ceCaseList;
@@ -64,6 +64,16 @@ public  class       PropertyDataHeavy
         this.addresses = prop.getAddresses();
         
         
+    }
+    
+     @Override
+    public List<Person> getPersonList() {
+        return personList;
+    }
+
+    @Override
+    public void setPersonList(List<Person> pList) {
+        personList = pList;
     }
     
     
@@ -253,6 +263,8 @@ public  class       PropertyDataHeavy
     public int getHostPK() {
         return parcelKey;
     }
+
+   
 
     
 }

@@ -106,7 +106,7 @@ public class OccPeriodSearchWorkflowBB
         try {
             currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
             propertyUnitCandidateList = sb.getSessProperty().getUnitList();
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
 
@@ -307,15 +307,8 @@ public class OccPeriodSearchWorkflowBB
      * @return
      */
     public String exploreProperty() {
-        try {
-            getSessionBean().setSessProperty(currentPropertyUnit.getPropertyID());
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not load property data heavy; reloaded page", ""));
-            return "";
-        }
+        // TODO: update for humanziation
+//            getSessionBean().setSessProperty(currentPropertyUnit.);
         return "propertyInfo";
 
     }
