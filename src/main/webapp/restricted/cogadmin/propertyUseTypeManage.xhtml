@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+      
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    
+                            
+                    <h1>Property Use Type Manager</h1>
+                    
+                    <f:view>
+                        <h:form id="put-manage-form">
+                            
+                              <p:commandButton ajax="true" value="Add New Property Use Type" icon="fa fa-plus" 
+                                             actionListener="#{propertyUseTypeBB.initPutSkeleton}"
+                                             oncomplete="PF('put-add-update-dialog-var').show()"
+                                             rendered="true"
+                                             update="put-add-update-form"/>
+                            
+                            <p:spacer height="15px"/>
+                            
+                             <p:dataTable
+                                id="put-table"
+                                var="put"
+                                value="#{propertyUseTypeBB.putList}"
+                                rowKey="#{put.typeID}"
+                                tableStyleClass="primeDataTable">
+                                <p:column width="10%">
+                                    <f:facet name="header">
+                                        <h:outputText value="ID" />
+                                    </f:facet>
+                                    <h:outputText value="#{put.typeID}"/>
+                                </p:column>
+                                
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Name" />
+                                    </f:facet>
+                                    <h:outputText value="#{put.name}"/>
+                                </p:column>
+                                
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Description" />
+                                    </f:facet>
+                                    <h:outputText value="#{put.description}"/>
+                                </p:column>
+                                
+                               <!--   <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Zone Class" />
+                                    </f:facet>
+                                    <h:outputText value="#{put.zoneClass}"/>
+                                </p:column>
+                                -->
+                                 
+                             
+                            
+                            </p:dataTable>
+                            
+                        <p:spacer height="15px"/>
+                        <hr/>
+                        <p:spacer height="15px"/>
+                        
+
+                        </h:form>
+                        
+                   		<!-- 
+                   		Adding and editing property use types
+                    	-->     
+	                    <h:form id="put-add-update-form">
+					        <p:dialog id="put-add-update-dialog"
+					                  width="1000"
+					                  widgetVar="put-add-update-dialog-var"
+					                  header="Add/Update Property Use Type"
+					                  modal="true"
+					                  resizable="true">
+					            
+					            <p:outputLabel styleClass="p-d-block">Name:</p:outputLabel>
+								<p:inputText styleClass="p-d-block" value="#{propertyUseTypeBB.putSkeleton.name}">
+									<p:ajax update="put-add-update-dialog-button"/> 
+								</p:inputText>
+								
+								<p:outputLabel styleClass="p-d-block">Description:</p:outputLabel>
+								<p:inputText styleClass="p-d-block" value="#{propertyUseTypeBB.putSkeleton.description}"/> 
+					
+					            <f:facet name="footer">
+					                  <p:commandButton value="Cancel"
+						                               icon="pi pi-times"
+						                               class="ui-button-outlined p-mr-1"
+						                               oncomplete="PF('put-add-update-dialog-var').hide()"/>
+						              <p:commandButton id="put-add-update-dialog-button"
+						              				   actionListener="#{propertyUseTypeBB.insertPut}"
+						                               value="Add/Update"
+						                               disabled="#{empty propertyUseTypeBB.putSkeleton.name}"
+						                               icon="pi pi-check"
+						                               oncomplete="PF('put-add-update-dialog-var').hide()"/>
+					            </f:facet>
+					        </p:dialog>
+					    </h:form>
+                        
+                        
+                
+                        
+                        
+                        
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+
