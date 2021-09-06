@@ -25,64 +25,156 @@
                                 <h:outputText value="I'm invisible !"/>
                             </div>
                         </div>
+                        
+                        
+                        <h2>Code enforcement activity summary for period 
+                            <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_start_val)}" />
+                            <h:outputText value=" to " />
+                            <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)}" />
+                        </h2>
+                        <div class="ui-g data_container_nested_restrict_report">
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputLabel value="Total cases opened during reporting period: "/>
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline"
+                                     style="color:black;">
+                                    <h:outputText value="#{reportingBB.reportCECaseList.caseListOpenedInDateRange.size()}" />
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputLabel value="Total cases open as of "/>
+                                    <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)}:" />
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline"
+                                     style="color:black;">
+                                    <h:outputText value="#{reportingBB.reportCECaseList.caseListOpenAsOfDateEnd.size()}" />
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" 
+                                     >
+                                    <h:outputLabel value="Total cases closed during reporting period: "/>
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline"
+                                     style="color:black;" >
+                                    <h:outputText value="#{reportingBB.reportCECaseList.caseListClosedInDateRange.size()}" />
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" 
+                                     >
+                                    <h:outputLabel value="Total events logged across all cases during period: "/>
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline"
+                                     style="color:black;" >
+                                    <h:outputText value="#{reportingBB.reportCECaseList.eventList.size()}" />
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" 
+                                     >
+                                    
+                                    <h:outputText id="metric-averageage-openasof"
+                                      value="Average age of open cases as of end of period:" />
+
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline"
+                                     style="color:black;" >
+                                    <h:outputText value="#{reportingBB.reportCECaseList.averageAgeOfCasesOpenAsOfReportEndDate} days" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                         <div class="report-trailblaze-headerbox">
+                            <div class="report-trailblaze-headerbox-title">
+                                <h:outputText value="Violation, Citation, and Case Closure Breakdown" />
+                            </div>
+                            <div class="report-trailblaze-headerbox-tail">
+                                <h:outputText value="I'm invisible !"/>
+                            </div>
+                        </div>
+
 
                         <div class="report-tb-kpis">
 
-                            <div class="report-tb-kpi-container">
-                                <div class="ui-g">
-                                    <div class="ui-g-6 ui-md-6 ui-lg-6" >
+                            <f:subview id="pie-case-subview"
+                                       rendered="#{reportingBB.reportCECaseList.includePieCaseStatus}">
+                                
+                                <div class="report-tb-kpi-container">
+                                    <div class="ui-g">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6" >
 
-                                        <div class="report-kpi-aggregate-container">
+                                            <div class="report-kpi-aggregate-container">
 
-                                            <div class="report-tb-kpi-icon">
-                                                <div class="inline-icon report-icon">
-                                                    <i class="material-icons">
-                                                        <h:outputText value="checklist_rtl"/>
-                                                    </i>
-                                                </div>
-
-                                                <div class="report-tb-kpi-title">
-                                                    <h:outputText value="Code enforcement cases by status" />
-                                                </div>
-                                                <div class="report-tb-kpi-value">
-                                                    <h:outputText value="Active case count: #{reportingBB.reportCECaseList.assembleNonClosedCaseList().size()}" />
-
-                                                </div>
-                                            </div>
-
-
-                                            <div class="report-legend-container">
-
-                                                <ui:repeat value="#{reportingBB.reportCECaseList.pieEnforcementLegend}" 
-                                                           var="lienforce">
-                                                    <div class="report-legend-item">
-                                                        <div class="report-legend-colorbox"
-                                                             style="background-color: #{lienforce.colorRGBString}; color:#{lienforce.colorRGBString}">
-                                                            <h:outputText value="color"/>
-                                                        </div>
-                                                        <div class="report-legend-title">
-                                                            <h:outputText value="#{lienforce.title}: " />
-                                                        </div>
-                                                        <div class="report-legend-count">
-                                                            <h:outputText value="#{lienforce.value}" />
-                                                        </div>
+                                                <div class="report-tb-kpi-icon">
+                                                    <div class="inline-icon report-icon">
+                                                        <i class="material-icons">
+                                                            <h:outputText value="checklist_rtl"/>
+                                                        </i>
                                                     </div>
-                                                </ui:repeat>
 
+                                                    <div class="report-tb-kpi-title">
+                                                        <h:outputText value="Code enforcement cases by status" />
+                                                    </div>
+                                                    <div class="report-tb-kpi-value">
+                                                        <h:outputText value="Active case count: #{reportingBB.reportCECaseList.assembleNonClosedCaseList().size()}" />
+
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="report-legend-container">
+
+                                                    <ui:repeat value="#{reportingBB.reportCECaseList.pieEnforcementLegend}" 
+                                                               var="lienforce">
+                                                        <div class="report-legend-item">
+                                                            <div class="report-legend-colorbox"
+                                                                 style="background-color: #{lienforce.colorRGBString}; color:#{lienforce.colorRGBString}">
+                                                                <h:outputText value="color"/>
+                                                            </div>
+                                                            <div class="report-legend-title">
+                                                                <h:outputText value="#{lienforce.title}: " />
+                                                            </div>
+                                                            <div class="report-legend-count">
+                                                                <h:outputText value="#{lienforce.value}" />
+                                                            </div>
+                                                        </div>
+                                                    </ui:repeat>
+
+                                                </div>
                                             </div>
+
                                         </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6" >
 
-                                    </div>
-                                    <div class="ui-g-6 ui-md-6 ui-lg-6" >
+                                            <div class="report-pie-container">
+                                                <p:pieChart id="pie-enforce"
+                                                            model="#{reportingBB.reportCECaseList.pieEnforcement}" />
+                                            </div>
 
-                                        <div class="report-pie-container">
-                                            <p:pieChart id="pie-enforce"
-                                                        model="#{reportingBB.reportCECaseList.pieEnforcement}" />
                                         </div>
-
                                     </div>
                                 </div>
-                            </div>
+                            </f:subview>
+
 
                             <div class="report-tb-kpi-container">
                                 <div class="ui-g">
@@ -99,9 +191,6 @@
 
                                                 <div class="report-tb-kpi-title">
                                                     <h:outputText value="Code Violations" />
-                                                </div>
-                                                <div class="report-tb-kpi-value">
-                                                    <h:outputText value="Count of violation compliance: #{reportingBB.reportCECaseList.pieViolCompCount}" />
                                                 </div>
                                             </div>
 
@@ -248,54 +337,58 @@
                         </div>
 
 
-                        <div class="report-trailblaze-headerbox">
-                            <div class="report-trailblaze-headerbox-title">
-                                <h:outputText value="Code Enforcement by Street: Summary" />
+                        <f:subview id="rpt-cecaselist-streetsum"
+                                   rendered="#{reportingBB.reportCECaseList.includeStreetSummaryTable}">
+                        
+                            <div class="report-trailblaze-headerbox">
+                                <div class="report-trailblaze-headerbox-title">
+                                    <h:outputText value="Code Enforcement by Street: Summary" />
+                                </div>
+                                <div class="report-trailblaze-headerbox-tail">
+                                    <h:outputText value=" text"/>
+                                </div>
                             </div>
-                            <div class="report-trailblaze-headerbox-tail">
-                                <h:outputText value=" text"/>
-                            </div>
-                        </div>
-                        
-                        <p:spacer height="10px" />
-                        
-                        <p:dataTable id="street-summary-table"
-                                     value="#{reportingBB.reportCECaseList.streetContainerList}"
-                                     var="streetcont"
-                                     draggableColumns="true"
-                                     tableStyleClass="primeDataTable">
-                        
-                            <p:column width="25%">
-                                <f:facet name="header">
-                                    <h:outputText value="Street name" />
-                                </f:facet>
-                                <h:outputText value="#{streetcont.streetName}"/>
-                            </p:column>
-                        
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="New Cases this period" />
-                                </f:facet>
-                                <h:outputText value="#{streetcont.caseOpenedList.size()}"/>
-                            </p:column>
-                        
-                        
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="Continuing cases" />
-                                </f:facet>
-                                <h:outputText value="#{streetcont.caseContinuingList.size()}"/>
-                            </p:column>
-                        
-                        
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="Closed cases" />
-                                </f:facet>
-                                <h:outputText value="#{streetcont.caseClosedList.size()}"/>
-                            </p:column>
-                        
-                        </p:dataTable>
+
+                            <p:spacer height="10px" />
+
+                            <p:dataTable id="street-summary-table"
+                                         value="#{reportingBB.reportCECaseList.streetContainerList}"
+                                         var="streetcont"
+                                         draggableColumns="true"
+                                         tableStyleClass="primeDataTable">
+
+                                <p:column width="25%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Street name" />
+                                    </f:facet>
+                                    <h:outputText value="#{streetcont.streetName}"/>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="New Cases this period" />
+                                    </f:facet>
+                                    <h:outputText value="#{streetcont.caseOpenedList.size()}"/>
+                                </p:column>
+
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Continuing cases" />
+                                    </f:facet>
+                                    <h:outputText value="#{streetcont.caseContinuingList.size()}"/>
+                                </p:column>
+
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Closed cases" />
+                                    </f:facet>
+                                    <h:outputText value="#{streetcont.caseClosedList.size()}"/>
+                                </p:column>
+
+                            </p:dataTable>
+                        </f:subview>
                         
                         <p:spacer height="5px" />
                         

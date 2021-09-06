@@ -734,11 +734,14 @@
                                             value="#{ceCaseSearchProfileBB.caseList}"
                                             tableStyleClass="primeDataTable">
 
-                                            <p:column width="5%" sortBy="#{c.caseID}">
+                                            <p:column width="5%" sortBy="#{c.caseManager.person.lastName}">
                                                 <f:facet name="header">
-                                                    <h:outputText value="ID" />
+                                                    <h:outputText value="Mngr/ID" />
                                                 </f:facet>
-                                                <h:outputText value="#{c.caseID}"/>
+                                                
+                                                <h:outputText value="#{c.caseManager.person.lastName}"/>
+                                                <p:spacer height="2px"/>
+                                                <h:outputText value="ID:#{c.caseID}"/>
                                             </p:column>
                                             <p:column width="10%" sortBy="#{c.originationDate}">
                                                 <f:facet name="header">
@@ -1017,10 +1020,26 @@
 
                                     <p:spacer height="5px"/>
 
+                                    <h:outputLabel class="bold" 
+                                                   value="Include pie chart: Case Status" 
+                                                   for="report-caselist-casestatuspie-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-caselist-casestatuspie-chkbox" 
+                                                             value="#{ceCaseSearchProfileBB.reportCECaseList.includePieCaseStatus}" />
+
+                                    <p:spacer height="5px"/>
+
+                                    <h:outputLabel class="bold" 
+                                                   value="Include Summary stats by street" 
+                                                   for="report-caselist-streetsummary-chkbox" />
+                                    <p:selectBooleanCheckbox id="report-caselist-streetsummary-chkbox" 
+                                                             value="#{ceCaseSearchProfileBB.reportCECaseList.includeStreetSummaryTable}" />
+
+                                    <p:spacer height="5px"/>
+                                    
                                     <h:outputLabel class="bold" value="Include case names" for="report-caselist-casename-chkbox" />
                                     <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeCaseNames}" />
 
-
+                                    <p:spacer height="5px"/>
                                             <p:outputLabel for="cecase-list-report-date-start-cal" 
                                                            value="start date"/>
 
@@ -1041,6 +1060,7 @@
                                                         required="true"/>
 
 
+                                    <p:spacer height="5px"/>
 
                                             <p:outputLabel for="cecase-list-report-date-end-cal" 
                                                            value="end date"/>
@@ -1062,9 +1082,13 @@
                                                         required="true"/>
 
 
-
-                                    <h:outputLabel for="report-caselist-notes-ita" value="Notes"/>
                                     <p:spacer height="5px"/>
+
+                                    <h:outputLabel for="report-caselist-notes-ita" 
+                                                   value="Notes (Displayed in the upper right of report)"/>
+                                    
+                                    <p:spacer height="5px"/>
+                                    
                                     <p:inputText id="report-caselist-notes-ita" style="width: 300px; height: 100px;" value="#{ceCaseSearchProfileBB.reportCECaseList.notes}"/>
                                 </div>
                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">

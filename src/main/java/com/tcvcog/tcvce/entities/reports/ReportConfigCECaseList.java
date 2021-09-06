@@ -35,6 +35,8 @@ public class ReportConfigCECaseList
     private boolean includeFullOwnerContactInfo;
     private boolean includeViolationList;
     private boolean includeEventSummaryByCase;
+    private boolean includePieCaseStatus;
+    private boolean includeStreetSummaryTable;
     
     private boolean includeExtendedPropertyDetails;
     
@@ -555,6 +557,34 @@ public class ReportConfigCECaseList
      */
     public void setPieViolCompCount(int pieViolCompCount) {
         this.pieViolCompCount = pieViolCompCount;
+    }
+
+    /**
+     * @return the includePieCaseStatus
+     */
+    public boolean isIncludePieCaseStatus() {
+        return includePieCaseStatus;
+    }
+
+    /**
+     * @param includePieCaseStatus the includePieCaseStatus to set
+     */
+    public void setIncludePieCaseStatus(boolean includePieCaseStatus) {
+        this.includePieCaseStatus = includePieCaseStatus;
+    }
+
+    /**
+     * @return the includeStreetSummaryTable
+     */
+    public boolean isIncludeStreetSummaryTable() {
+        return includeStreetSummaryTable;
+    }
+
+    /**
+     * @param includeStreetSummaryTable the includeStreetSummaryTable to set
+     */
+    public void setIncludeStreetSummaryTable(boolean includeStreetSummaryTable) {
+        this.includeStreetSummaryTable = includeStreetSummaryTable;
     }
     
     

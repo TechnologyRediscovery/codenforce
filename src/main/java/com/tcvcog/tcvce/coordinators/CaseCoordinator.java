@@ -60,6 +60,7 @@ import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -513,7 +514,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                             // we shouldn't hit this...
                         case 3: // at least 1 violation used in a citation that's attached to case
                             statusBundle.setPhase(cecase_determineAndSetPhase_stageCITATION(cse));
-                            //                            cecase_determineAndSetPhase_stageCITATION(cse);
+                            // cecase_determineAndSetPhase_stageCITATION(cse);
                             break;
                         default: // unintentional dumping ground 
                             statusBundle.setPhase(CasePhaseEnum.InactiveHolding);
@@ -1017,6 +1018,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         listRpt.setIncludeFullOwnerContactInfo(true);
         listRpt.setIncludeViolationList(true);
         listRpt.setIncludeEventSummaryByCase(false);
+        listRpt.setIncludePieCaseStatus(false);
+        listRpt.setIncludeStreetSummaryTable(false);
         return listRpt;
 
     }
@@ -1090,7 +1093,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 sumOfAges += cse.getCaseAgeAsOf(rpt.getDate_end_val());
             }
             double avg = (double) sumOfAges / (double) rpt.getCaseListOpenAsOfDateEnd().size();
-            rpt.setAverageAgeOfCasesOpenAsOfReportEndDate(avg);
+            // Thanks to Hemant Metalia via
+            // https://stackoverflow.com/questions/15201713/how-to-truncate-the-double-value
+            DecimalFormat df = new DecimalFormat("#.#");
+            rpt.setAverageAgeOfCasesOpenAsOfReportEndDate(Double.valueOf(df.format(avg)));
         }
         
         QueryCECase query_closed = sc.initQuery(QueryCECaseEnum.CLOSED_CASES, ua.getKeyCard());
@@ -1262,18 +1268,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
         // build our count map
         Map<ViolationStatusEnum, Integer> violMap = new HashMap<>();
+        violMap.put(ViolationStatusEnum.RESOLVED, 0);
         violMap.put(ViolationStatusEnum.UNRESOLVED_WITHINCOMPTIMEFRAME, 0);
         violMap.put(ViolationStatusEnum.UNRESOLVED_EXPIREDCOMPLIANCETIMEFRAME, 0);
-        violMap.put(ViolationStatusEnum.RESOLVED, 0);
         violMap.put(ViolationStatusEnum.UNRESOLVED_CITED, 0);
-        violMap.put(ViolationStatusEnum.NULLIFIED, 0);
         
         for(CodeViolation cv: vl){
-            ViolationStatusEnum vs = cv.getStatus();
-            
-            Integer catCount = violMap.get(vs);
-            catCount += 1;
-            violMap.put(cv.getStatus(), catCount);
+            // Don't show nullified violations
+            if(cv.getStatus() != ViolationStatusEnum.NULLIFIED){
+                ViolationStatusEnum vs = cv.getStatus();
+
+                Integer catCount = violMap.get(vs);
+                catCount += 1;
+                violMap.put(cv.getStatus(), catCount);
+            }
         }
         
         rpt.setPieViolStatMap(violMap);

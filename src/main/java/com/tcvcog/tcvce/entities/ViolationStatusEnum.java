@@ -27,22 +27,22 @@ package com.tcvcog.tcvce.entities;
  */
 public enum ViolationStatusEnum {
 
-    RESOLVED(                               "Resolved through compliance", 
+    RESOLVED(                               "Compliance", 
                                             "Issue no longer remains on property",
                                             "codeviolation_resolved_iconid",
                                             0),
     
-    UNRESOLVED_WITHINCOMPTIMEFRAME(         "Unresolved; within compliance timeframe",
+    UNRESOLVED_WITHINCOMPTIMEFRAME(         "Notice of Violation Appeal Period",
                                             "Compliance days remaining: ",
                                             "codeviolation_unresolved_withincomptimeframe_iconid",
                                             1),
     
-    UNRESOLVED_EXPIREDCOMPLIANCETIMEFRAME(  "Unresolved; expired compliance timeframe", 
+    UNRESOLVED_EXPIREDCOMPLIANCETIMEFRAME(  "Requiring Ongoing Officer Action", 
                                             "Days since end of compliance timeframe: ",
                                             "codeviolation_unresolved_overdue_iconid",
                                              2),
     
-    UNRESOLVED_CITED(                       "Unresolved but included in citation", 
+    UNRESOLVED_CITED(                       "Cited", 
                                             "Days since end of compliance timeframe: ",
                                             "codeviolation_unresolved_citation_iconid",
                                             3),
