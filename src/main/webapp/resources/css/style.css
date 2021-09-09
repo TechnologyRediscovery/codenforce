@@ -2258,6 +2258,18 @@ body .ui-panel .ui-panel-titlebar{
     color:white;
 }
 
+body .ui-panel-titlebar-cecase{
+    
+    
+}
+
+body .ui-panel-titlebar-occperiod{
+    
+    background-color: #31004C;
+    
+}
+
+
 
 
 body .ui-dialog .ui-dialog-titlebar{
