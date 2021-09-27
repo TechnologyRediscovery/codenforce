@@ -27,6 +27,7 @@ import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CasePhaseEnum;
 import com.tcvcog.tcvce.entities.IFace_trackedEntityLink;
 import com.tcvcog.tcvce.entities.Icon;
+import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.IntensitySchema;
@@ -510,6 +511,115 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return iList;
+    }
+    
+    public PropertyUseType getPut(int putID) throws IntegrationException {
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT propertyusetypeid, name, description, icon_iconid, zoneclass ");
+        sb.append("FROM public.propertyusetype WHERE propertyusetypeid=?;");
+        PropertyUseType p = null;
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, putID);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                p = new PropertyUseType();
+                p.setTypeID(rs.getInt("propertyusetypeid"));
+                p.setName(rs.getString("name"));
+                p.setDescription(rs.getString("description"));
+                p.setIcon(getIcon(rs.getInt("icon_iconid")));
+                p.setZoneClass(rs.getString("zoneclass"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to generate put", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return p;
+
+    }
+    
+    public void updatePut(PropertyUseType p) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE public.propertyusetype SET name=?, description=?, icon_iconid=?, zoneclass=? ");
+        sb.append(" WHERE propertyusetypeid = ?;");
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setString(1, p.getName());
+            stmt.setString(2, p.getDescription());
+            stmt.setInt(3, p.getIcon().getIconid());
+            stmt.setString(4, p.getZoneClass());
+            stmt.setInt(5, p.getTypeID());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to update put", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             
+        } // close finally
+    }
+    
+    public void insertPut(PropertyUseType p) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("INSERT INTO public.propertyusetype(");
+        sb.append("propertyusetypeid, name, description, icon_iconid, zoneclass) ");
+        sb.append("VALUES (DEFAULT, ?, ?, ?, ?);");
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setString(1, p.getName());
+            stmt.setString(2, p.getDescription());
+            stmt.setInt(3, p.getIcon().getIconid());
+            stmt.setString(4, p.getZoneClass());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to insert PropertyUseType", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             
+        } // close finally
+    }
+    
+    public List<PropertyUseType> getPutList() throws IntegrationException {
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT propertyusetypeid FROM public.propertyusetype;");
+        List<PropertyUseType> putList = new ArrayList<>();
+        
+        System.out.println(sb.toString());
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                putList.add(getPut(rs.getInt("propertyusetypeid")));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to generate propertyUseType(List)", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return putList;
     }
 
     public void insertImprovementSuggestion(ImprovementSuggestion is) throws IntegrationException {

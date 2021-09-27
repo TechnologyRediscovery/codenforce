@@ -28,7 +28,7 @@ public class PropertyUseType {
     private String description;
     private Icon icon;
     private String zoneClass;
-
+    
     /**
      * @return the typeID
      */
