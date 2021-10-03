@@ -70,6 +70,15 @@ public class        Property
         }
         return null;
     }
+    
+    /**
+     * Convenience method for reverse comptability with property IDs
+     * @return the internal parcelKEY
+     * 
+     */
+    public int getPropertyID(){
+        return parcelKey;
+    }
 
 
 

@@ -1,0 +1,840 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+                    
+    
+    
+                    <p:dialog   id="citation-profile-dialog"
+                                height="800" width="800"
+                                widgetVar="citation-profile-dialog-var"
+                                responsive="true"
+                                resizable="true"
+                                closable="true"
+                                closeOnEscape="true"
+                                modal="true"
+                                header="Citation ID: #{ceCaseSearchProfileBB.currentCitation.citationID} Profile"
+                                rendered="true"
+                                >
+
+
+                        <h:form id="citation-profile-form">
+
+                            <div    id="citation-profile-container-div"
+                                    class="ui-g data-container">
+
+                                <div    id="citation-number-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="citation-no-ot"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Citation Number (Internal Only)"/>
+                                    </p:outputLabel>
+
+                                    <h:outputText    id="citation-no-ot"
+                                                     styleClass="data_field_value"
+                                                     value="#{ceCaseSearchProfileBB.currentCitation.citationNo}"/>
+                                </div>
+                                
+                                
+                                <p:commandButton    id="citation-profile-done-button"
+                                                    ajax="true"
+                                                    value="Done"
+                                                    process="@none"
+                                                    immediate="true"
+                                                    oncomplete="PF('citation-profile-dialog-var').hide()"
+                                                    actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}"
+                                                    icon="fa fa-plus" />
+
+                                <div    id="citation-status-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+                                    
+                                    <p:dataTable    id="citation-status-log-table"
+                                                    value="#{ceCaseSearchProfileBB.currentCitation.statusLog}"
+                                                    var="csle"
+                                                    rowKey="#{photo.blobID}"
+                                                    tableStyleClass="primeDataTable"
+                                                    draggableRows="true" 
+                                                    tabindex="6">
+                                        
+
+                                        <p:column width="10%">
+                                            <f:facet name="header">
+                                                <h:outputText value="EntryID"/>
+                                            </f:facet>
+                                            <h:outputText value="#{csle.logEntryID}"
+
+                                        </p:column>
+
+                                        <p:column width="10%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Date"/>
+                                            </f:facet>
+                                            <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDateNoTime(csle.dateOfRecord)}"
+
+                                        </p:column>
+
+                                        <p:column width="50%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Status"/>
+                                            </f:facet>
+                                            <h:outputText value="#{csle.status.statusTitle}"
+
+                                        </p:column>
+
+                                        <p:column width="50%">
+                                            <f:facet name="header">
+                                                <h:outputText value="Actions"/>
+                                            </f:facet>
+                                            <p:commandLink      id="citation-update-status-cb"
+                                                                ajax="true"
+                                                                actionListener="#{ceCaseSearchProfileBB.onCitationUpdateStatusInitButtonChange}"
+                                                                oncomplete="PF('citation-update-status-dialog-var').show()"
+                                                                style="color:blue;"
+                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                update="citation-update-status-dialog
+                                                                citation-update-status-form"
+                                                                value="edit" />
+                                            
+
+                                        </p:column>
+
+                                    
+                                    
+                                    </p:dataTable>
+                                        
+
+                                    <p:outputLabel for="citation-status-ot"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Status"/>
+
+                                        <div class="restrict-main-contents-io-link">
+
+
+
+                                        </div>
+
+                                    </p:outputLabel>
+
+                                    <h:outputText    id="citation-status-ot"
+                                                     styleClass="data_field_value"
+                                                     value="#{ceCaseSearchProfileBB.currentCitation.status.statusTitle}"/>
+                                </div>
+
+                                <div    id="citation-dor-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="citation-dor-ot"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Date of Issuance"/>
+
+                                        <div class="restrict-main-contents-io-link">
+
+                                            <p:commandLink      id="citation-update-cb"
+                                                                ajax="true"
+                                                                actionListener="#{ceCaseSearchProfileBB.onCitationUpdateInitButtonChange}"
+                                                                oncomplete="PF('citation-update-dialog-var').show()"
+                                                                style="color:blue;"
+                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                update="citation-update-dialog
+                                                                citation-update-form"
+                                                                value="edit" />
+
+
+                                        </div>
+                                    </p:outputLabel>
+
+                                    <h:outputText    id="citation-dor-ot"
+                                                     styleClass="data_field_value"
+                                                     value="#{ceCaseSearchProfileBB.currentCitation.dateOfRecordPretty}"/>
+
+                                </div>
+
+                                <div    id="citation-violations-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field"
+                                        style="width: 100%; clear: both;">
+
+                                    <p:outputLabel for="citation-violations-datascroller"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Linked Violations"/>
+                                    </p:outputLabel>
+                                    <p:dataScroller
+                                        id="citation-violations-datascroller"
+                                        value="#{ceCaseSearchProfileBB.currentCitation.violationList}"
+                                        var="citvv"
+                                        widgetVar="citation-violation-compactlist-widgetvar">
+
+                                        <h:outputText  value="Ch. #{citvv.violatedEnfElement.ordchapterNo}:" />
+                                        <h:outputText  value="#{citvv.violatedEnfElement.ordchapterTitle} | " />
+                                        <h:outputText  value="&#167;#{citvv.violatedEnfElement.ordSecNum}:" />
+                                        <h:outputText  value="#{citvv.violatedEnfElement.ordSecTitle} |  " />
+                                        <h:outputText  value="&#167;&#167;#{citvv.violatedEnfElement.ordSubSecNum} " />
+                                        <h:outputText  value="#{citvv.violatedEnfElement.ordSubSecTitle} " />
+                                        <h:outputText id="v-source-name-compactlist-ot" value="(#{citvv.violatedEnfElement.source.sourceName}" />
+                                        <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
+                                        <h:outputText id="v-source-year-compactlist-ot" value="#{citvv.violatedEnfElement.source.sourceYear}) | "/>
+                                        <h:outputText id="status-compactlist-line-ot" value="Status: #{citvv.status.label}"/>
+
+                                    </p:dataScroller>
+                                </div>
+
+                                <div    id="citation-court-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="citation-court-ot"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Court Entity of Origin"/>
+
+                                        <div class="restrict-main-contents-io-link">
+
+                                            <p:commandLink      id="citation-update-cb-2"
+                                                                ajax="true"
+                                                                actionListener="#{ceCaseSearchProfileBB.onCitationUpdateInitButtonChange}"
+                                                                oncomplete="PF('citation-update-dialog-var').show()"
+                                                                style="color:blue;"
+                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                update="citation-update-dialog
+                                                                citation-update-form"
+                                                                value="edit" />
+
+
+                                        </div>
+                                    </p:outputLabel>
+
+                                    <h:outputText    id="citation-court-ot"
+                                                     styleClass="data_field_value"
+                                                     value="#{!(empty ceCaseSearchProfileBB.currentCitation.origin_courtentity) ? ceCaseSearchProfileBB.currentCitation.origin_courtentity.courtEntityName : 'No Court selected' }"/>
+
+                                </div>
+
+                                <div    id="citation-creator-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="citation-creator-ot"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Issuing Officer"/>
+
+                                        <div class="restrict-main-contents-io-link">
+
+                                            <p:commandLink      id="citation-update-cb-3"
+                                                                ajax="true"
+                                                                actionListener="#{ceCaseSearchProfileBB.onCitationUpdateInitButtonChange}"
+                                                                oncomplete="PF('citation-update-dialog-var').show()"
+                                                                style="color:blue;"
+                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                update="citation-update-dialog
+                                                                citation-update-form"
+                                                                value="edit" />
+
+
+                                        </div>
+                                    </p:outputLabel>
+
+                                    <h:outputText    id="citation-creator-ot"
+                                                     styleClass="data_field_value"
+                                                     value="#{!(empty ceCaseSearchProfileBB.currentCitation.userOwner) ? ceCaseSearchProfileBB.currentCitation.userOwner.person.lastName : '' }"/>
+
+                                </div>
+                                <div    id="citation-officialtext-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="citation-text-ot"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Official Text: "/>
+                                    </p:outputLabel>
+
+                                    <p:commandLink      id="citation-update-cb-4"
+                                                        ajax="true"
+                                                        actionListener="#{ceCaseSearchProfileBB.onCitationUpdateInitButtonChange}"
+                                                        oncomplete="PF('citation-update-dialog-var').show()"
+                                                        style="color:blue;"
+                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                        update="citation-update-dialog
+                                                        citation-update-form"
+                                                        value="edit" />
+
+                                    <h:outputText    id="citation-text-ot"
+                                                     styleClass="data_field_value"
+                                                     value="#{ceCaseSearchProfileBB.currentCitation.officialText}"/>
+
+                                </div>
+
+                                <div    id="citation-active-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="citation-active-ot"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Active"/>
+
+                                        <div class="restrict-main-contents-io-link">
+
+                                            <p:commandLink      id="citation-remove-init-cb"
+                                                                ajax="true"
+                                                                actionListener="#{ceCaseSearchProfileBB.onCitationUpdateInitButtonChange}"
+                                                                oncomplete="PF('citation-remove-dialog-var').show()"
+                                                                style="color:blue;"
+                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                update="citation-remove-dialog
+                                                                citation-update-form"
+                                                                value="remove citation" />
+
+
+                                        </div>
+                                    </p:outputLabel>
+
+                                    <h:outputText    id="citation-active-ot"
+                                                     styleClass="data_field_value"
+                                                     value="#{ceCaseSearchProfileBB.currentCitation.isActive}"/>
+
+                                </div>
+
+
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
+
+                                    <div class="restrict-main-contents-io-button gray_button">
+
+                                        <p:commandButton    id="citation-profile-done-button"
+                                                            ajax="true"
+                                                            value="Done"
+                                                            process="@none"
+                                                            immediate="true"
+                                                            oncomplete="PF('citation-profile-dialog-var').hide()"
+                                                            actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}"
+                                                            icon="fa fa-stop" />
+
+                                    </div>
+                                </div>
+                            </div>
+                        </h:form>
+                    </p:dialog>
+
+
+
+
+                    <p:dialog   id="citation-add-dialog"
+                                height="800" width="800"
+                                widgetVar="citation-add-dialog-var"
+                                responsive="true"
+                                resizable="true"
+                                closable="true"
+                                closeOnEscape="true"
+                                modal="true"
+                                header="Add new citation"
+                                rendered="true"
+                                >
+
+                        <h:form id="citation-add-form">
+                            <p>Populate fields for a new citation and updated an existing citation.</p>
+
+                            <p:spacer height="15px"/>
+
+                            <h2>Outstanding code violations on Case ID <h:outputText value="#{citationBB.currentCase.caseID}" />
+                                at <h:outputText value="#{ceCaseSearchProfileBB.currentCase.property.address}" /></h2>
+
+                            <p:dataTable
+                                id="citation-violations-table"
+                                selectionMode="none"
+                                value="#{ceCaseSearchProfileBB.currentCitation.violationList}"
+                                tableStyleClass="primeDataTable"
+                                expandedRow="false"
+                                rowExpandMode="multiple"
+                                draggableColumns="true"
+                                reflow="true"
+                                var="citv"
+                                rowKey="#{citv.violationID}">
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Code Element" />
+                                    </f:facet>
+                                    <div class="rowExpansion">
+                                        <h:outputLabel value="#{citv.violatedEnfElement.ordchapterTitle}:
+                                                       #{citv.violatedEnfElement.ordSecNum}
+                                                       #{citv.violatedEnfElement.ordSecTitle}:
+                                                       #{citv.violatedEnfElement.ordSubSecNum}
+                                                       #{citv.violatedEnfElement.ordSubSecTitle}"/>
+                                    </div>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Stipulated Comp. Date" />
+                                    </f:facet>
+                                    <h:outputText value="#{citv.stipulatedComplianceDate}"/>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Remove" />
+                                    </f:facet>
+                                    <p:commandButton id="remove-violation-from-violationtable-cb"
+                                                     ajax="true"
+                                                     actionListener="#{ceCaseSearchProfileBB.onCitationViolationRemoveButtonChange(citv)}"
+                                                     icon="fa fa-trash"
+                                                     value="Remove"
+                                                     immediate="true"
+                                                     update="citation-violations-table">
+                                    </p:commandButton>
+
+                                </p:column>
+                            </p:dataTable>
+
+
+                            <h2>Citation form fields</h2>
+
+                            <div    id="citation-profile-container-div"
+                                    class="ui-g data-container">
+
+                                <div    id="citation-number-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="citation-no-it"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Citation Number (internal only)"/>
+                                    </p:outputLabel>
+
+                                    <p:inputText id="citation-no-it"
+                                                 value="#{ceCaseSearchProfileBB.currentCitation.citationNo}"
+                                                 tabindex="1"
+                                                 required="false"
+                                                 styleClass="data_field_value"/>
+
+                                    <h:message for="citation-no-it" showDetail="false" showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </div>
+
+                                <div    id="citation-dor-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="citation-dor-it"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Date of Record" />
+                                    </p:outputLabel>
+
+                                    <p:calendar id="citation-dor-it"
+                                                value="#{ceCaseSearchProfileBB.currentCitation.dateOfRecordUtilDate}"
+                                                mode="popup" tabindex="3"
+                                                showOn="button"
+                                                pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                navigator="true" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                                showButtonPanel="true"
+                                                showTodayButton="true"
+                                                required="true"/>
+
+                                    <h:message for="citation-dor-it" showDetail="false" showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </div>
+
+
+
+                                <div    id="citation-court-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="citation-court-som"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Court Entity of Origin" />
+                                    </p:outputLabel>
+
+                                    <p:selectOneMenu id="citation-court-som"
+                                                     required="false"
+                                                     value="#{ceCaseSearchProfileBB.currentCitation.origin_courtentity}">
+                                        <f:converter converterId="courtEntityConverter"/>
+                                        <f:selectItems value="#{ceCaseSearchProfileBB.courtEntityList}"
+                                                       var="ce" itemValue="#{ce}" itemLabel="#{ce.courtEntityName}"/>
+                                    </p:selectOneMenu>
+
+                                    <h:message for="citation-court-som" showDetail="false" showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                </div>
+
+                                <div    id="citation-text-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="citation-text-it"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Official Text" />
+                                    </p:outputLabel>
+
+                                    <p:inputTextarea id="citation-text-it"
+                                                     value="#{ceCaseSearchProfileBB.currentCitation.officialText}"
+                                                     tabindex="15"
+                                                     required="true"
+                                                     styleClass="data_field_value"/>
+                                    <h:message for="citation-text-it"
+                                               showDetail="false"
+                                               showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                </div>
+
+
+
+
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+
+                                    <div class="restrict-main-contents-io-button gray_button">
+
+                                        <p:commandButton    id="citation-insert-abort-button"
+                                                            ajax="true"
+                                                            value="Cancel Issue Citation"
+                                                            process="@none"
+                                                            immediate="true"
+                                                            actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}"
+                                                            icon="fa fa-stop" />
+
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+                                    <div class="restrict-main-contents-io-button">
+
+                                        <p:commandButton    id="citation-insert-button"
+                                                            ajax="false"
+                                                            value="Issue Citation"
+                                                            action="#{ceCaseSearchProfileBB.onCitationAddCommitButtonChange}"
+                                                            icon="fa fa-gavel" />
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </h:form>
+                    </p:dialog>
+
+
+
+                    <p:dialog   id="citation-update-status-dialog"
+                                height="300" width="600"
+                                widgetVar="citation-update-status-dialog-var"
+                                responsive="true"
+                                resizable="true"
+                                closable="true"
+                                closeOnEscape="true"
+                                modal="true"
+                                header="Update citation ID: #{ceCaseSearchProfileBB.currentCitation.citationID}"
+                                rendered="true"
+                                >
+
+                        <h:form id="citation-update-status-form">
+
+
+                            <div    id="citation-update-status-container-div"
+                                    class="ui-g data-container">
+
+                                <div    id="citation-update-status-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="citation-update-status-som"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Current Status"/>
+                                    </p:outputLabel>
+
+                                    <p:selectOneMenu id="citation-update-status-som"
+                                                     required="false"
+                                                     value="#{ceCaseSearchProfileBB.currentCitation.status}">
+                                        <f:converter converterId="citationStatusConverter"/>
+                                        <f:selectItems value="#{ceCaseSearchProfileBB.citationStatusList}"
+                                                       var="cs" itemValue="#{cs}" itemLabel="#{cs.statusTitle}"/>
+                                    </p:selectOneMenu>
+                                    <h:message for="citation-update-status-som" showDetail="false" showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </div>
+
+
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+
+                                    <div class="restrict-main-contents-io-button gray_button">
+
+                                        <p:commandButton    id="citation-update-status-abort-button"
+                                                            ajax="true"
+                                                            value="Abort Update"
+                                                            process="@none"
+                                                            immediate="true"
+                                                            actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}"
+                                                            oncomplete="PF('citation-update-status-dialog-var').hide()"
+                                                            icon="fa fa-stop" />
+
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+                                    <div class="restrict-main-contents-io-button">
+
+
+                                        <p:commandButton    id="citation-update-status-commit-button"
+                                                            ajax="false"
+                                                            value="Update Citation Status"
+                                                            action="#{ceCaseSearchProfileBB.onCitationUpdateStatusCommitButtonChange}"
+                                                            icon="fa fa-edit"/>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </h:form>
+
+
+
+                    </p:dialog>
+
+                    <p:dialog   id="citation-update-dialog"
+                                height="800" width="800"
+                                widgetVar="citation-update-dialog-var"
+                                responsive="true"
+                                resizable="true"
+                                closable="true"
+                                closeOnEscape="true"
+                                modal="true"
+                                header="Update Status of citation ID: #{ceCaseSearchProfileBB.currentCitation.citationID}"
+                                rendered="true"
+                                >
+
+
+                        <h:form id="citation-update-form">
+
+
+                            <div    id="citation-update-container-div"
+                                    class="ui-g data-container">
+
+                                <div    id="citation-update-number-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="citation-update-no-it"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Citation Number (Internal Only)"/>
+                                    </p:outputLabel>
+
+                                    <p:inputText id="citation-update-no-it"
+                                                 value="#{ceCaseSearchProfileBB.currentCitation.citationNo}"
+                                                 tabindex="1"
+                                                 required="true"
+                                                 styleClass="data_field_value"/>
+
+                                    <h:message for="citation-update-no-it" showDetail="false" showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </div>
+
+                                <div    id="citation-update-dor-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="citation-update-dor-it"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Date of Record" />
+                                    </p:outputLabel>
+
+                                    <p:calendar id="citation-update-dor-it"
+                                                value="#{ceCaseSearchProfileBB.currentCitation.dateOfRecordUtilDate}"
+                                                mode="popup" tabindex="3"
+                                                showOn="button"
+                                                pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                navigator="true" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                                showButtonPanel="true"
+                                                showTodayButton="true"
+                                                required="true"/>
+
+                                    <h:message for="citation-update-dor-it" showDetail="false" showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </div>
+
+
+
+                                <div    id="citation-update-court-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="citation-update-court-som"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Court Entity of Origin" />
+                                    </p:outputLabel>
+
+                                    <p:selectOneMenu id="citation-update-court-som"
+                                                     required="false"
+                                                     value="#{ceCaseSearchProfileBB.currentCitation.origin_courtentity}">
+                                        <f:converter converterId="courtEntityConverter"/>
+                                        <f:selectItems value="#{ceCaseSearchProfileBB.courtEntityList}"
+                                                       var="ce" itemValue="#{ce}" itemLabel="#{ce.courtEntityName}"/>
+                                    </p:selectOneMenu>
+
+                                    <h:message for="citation-update-court-som" showDetail="false" showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                </div>
+
+                                <div    id="citation-update-text-div"
+                                        class="ui-g-12 ui-md-12 ui-lg-12 data_field">
+
+                                    <p:outputLabel for="citation-update-text-it"
+                                                   styleClass="data_field_label">
+                                        <h:outputText value="Official Text" />
+                                    </p:outputLabel>
+
+                                    <p:inputTextarea id="citation-update-text-it"
+                                                     value="#{ceCaseSearchProfileBB.currentCitation.officialText}"
+                                                     tabindex="15"
+                                                     required="true"
+                                                     styleClass="data_field_value"/>
+                                    <h:message for="citation-update-text-it"
+                                               showDetail="false"
+                                               showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    <p class="italic">note: each of the violations included in the upper table are permanently
+                                        linked with this citation and need not be described in these notes</p>
+                                </div>
+
+
+
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+
+                                    <div class="restrict-main-contents-io-button gray_button">
+                                        <p:commandButton    id="citation-update-abort-button"
+                                                            ajax="true"
+                                                            value="Abort Updates"
+                                                            process="@none"
+                                                            immediate="true"
+                                                            actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}"
+                                                            oncomplete="PF('citation-update-dialog-var').hide()"
+                                                            icon="fa fa-stop" />
+
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+                                    <div class="restrict-main-contents-io-button">
+
+                                        <p:commandButton    id="citation-update-commit-button"
+                                                            ajax="false"
+                                                            value="Update Citation"
+                                                            action="#{ceCaseSearchProfileBB.onUpdateCitationCommitButtonChange}"
+                                                            icon="fa fa-edit"/>
+
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </h:form>
+                    </p:dialog>
+
+
+                    <p:dialog   id="citation-remove-dialog"
+                                height="400" width="600"
+                                widgetVar="citation-remove-dialog-var"
+                                responsive="true"
+                                resizable="true"
+                                closable="true"
+                                closeOnEscape="true"
+                                modal="true"
+                                header="Remove citation ID: #{ceCaseSearchProfileBB.currentCitation.citationID}"
+                                rendered="true"
+                                >
+
+                        <h:form id="citation-remove-form">
+                            <div class="ui-g data_container_nested_restrict">
+
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
+                                    <p>Removing a citation will deactivate the record. Removed citations can only be resurrected by a system admin.</p>
+
+
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+
+                                    <div class="restrict-main-contents-io-button gray_button">
+
+                                        <p:commandButton    id="citation-remove-cancel-button"
+                                                            ajax="true"
+                                                            value="Cancel"
+                                                            process="@none"
+                                                            immediate="true"
+                                                            actionListener="#{ceCaseSearchProfileBB.onOperationCancelButtonChange}"
+                                                            oncomplete="PF('citation-remove-dialog-var').hide()"
+                                                            icon="fa fa-stop" />
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+                                    <div class="restrict-main-contents-io-button red_button">
+
+                                        <p:commandButton
+                                            icon="fa fa-trash"
+                                            ajax="false"
+                                            action="#{ceCaseSearchProfileBB.onCitationRemoveCommitButtonChange}"
+                                            value="Remove Citation ID:#{ceCaseSearchProfileBB.currentCitation.citationNo}"
+                                            />
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </h:form>
+                    </p:dialog>
+
+
+                    <p:dialog   id="citation-notes-dialog"
+                                height="800" width="800"
+                                widgetVar="citation-notes-dialog-var"
+                                responsive="true"
+                                resizable="true"
+                                closable="true"
+                                closeOnEscape="true"
+                                modal="true"
+                                header="Add note to citation ID: #{ceCaseSearchProfileBB.currentCitation.citationID}"
+                                rendered="true"
+                                >
+
+                        <h:form id="citation-note-form">
+
+
+                            <h:panelGrid columns="1"
+                                         columnClasses="gridTd, gridTd">
+
+                                <h:panelGroup>
+                                    <h:outputText styleClass="ui-label" value="Note text: "/>
+                                    <p:textEditor   id="citation-notes-editor"
+                                                    value="#{ceCaseSearchProfileBB.formNoteText}"
+                                                    required="false"
+                                                    secure="false"
+                                                    height="200"/>
+
+
+                                    <p:spacer height="5px" />
+                                    <p:commandButton    id="citation-updatemetadata-button-cancel"
+                                                        ajax="true"  tabindex="27"
+                                                        value="Cancel"
+                                                        icon="fa fa-stop"
+                                                        immediate="true"
+                                                        onclick="PF('citation-note-dialog-var').hide()"
+                                                        />
+
+                                    <p:commandButton   id="citation-dialog-notes-button-addnote"
+                                                       ajax="false"
+                                                       actionListener="#{ceCaseSearchProfileBB.onNoteCommitButtonChange}"
+                                                       oncomplete="PF('citation-note-dialog-var').hide()"
+                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                       value="Attach Note"
+                                                       styleClass="inline-button"
+                                                       icon="fa fa-sticky-note-o"
+                                                       update="citation-notes-form"/>
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        </h:form>
+
+                        <h:form id="citation-notes-form">
+
+                            <p:commandButton   id="citation-notes-add-button"
+                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                               value="Add New Note"
+                                               icon="fa fa-sticky-note-o"
+                                               actionListener="#{ceCaseSearchProfileBB.onNoteInitButtonChange}"
+                                               oncomplete="PF('citation-note-dialog-var').show()"
+                                               update="citation-note-form"/>
+
+                            <h:outputText id="citation-note-ot"
+                                          value="#{ceCaseSearchProfileBB.currentCitation.notes}"
+                                          escape="false" />
+
+                        </h:form>
+                    </p:dialog>
+    
+    
+    
+    
+    
+</ui:composition>
