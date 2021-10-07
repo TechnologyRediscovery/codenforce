@@ -41,6 +41,7 @@ import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.CaseStageEnum;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CitationCodeViolationLink;
+import com.tcvcog.tcvce.entities.CitationFilingType;
 import com.tcvcog.tcvce.entities.CitationStatus;
 import com.tcvcog.tcvce.entities.CitationStatusLogEntry;
 import com.tcvcog.tcvce.entities.CodeSet;
@@ -201,6 +202,7 @@ public class CECaseSearchProfileBB
     private Citation currentCitation;
     private List<CitationStatus> citationStatusList;
     private List<CourtEntity> courtEntityList;
+    private List<CitationFilingType> citationFilingTypeList;
 
     private boolean issueCitationDisabled;
     private boolean updateCitationDisabled;
@@ -210,6 +212,13 @@ public class CECaseSearchProfileBB
     private String citationEditEventDescription;
     
     private User citationIssuingOfficer;
+    
+    private CitationStatusLogEntry currentCitationStatusLogEntry;
+    
+    
+    private boolean citationInfoEditMode;
+    private boolean citationDocketEditMode;
+    private boolean citationStatusEditMode;
     
     
     
@@ -2278,6 +2287,13 @@ public class CECaseSearchProfileBB
     /*******************************************************/
     
     /**
+     * Listener for user requests to edit a citation's info
+     */
+   public void onCitationInfoEditModeToggle(){
+       citationInfoEditMode = !citationInfoEditMode;
+   } 
+   
+    /**
      * Listener for user requests to view a citation
      * @param cit 
      */
@@ -3346,6 +3362,76 @@ public class CECaseSearchProfileBB
      */
     public void setEventPersonIDForLookup(int eventPersonIDForLookup) {
         this.eventPersonIDForLookup = eventPersonIDForLookup;
+    }
+
+    /**
+     * @return the citationFilingTypeList
+     */
+    public List<CitationFilingType> getCitationFilingTypeList() {
+        return citationFilingTypeList;
+    }
+
+    /**
+     * @return the currentCitationStatusLogEntry
+     */
+    public CitationStatusLogEntry getCurrentCitationStatusLogEntry() {
+        return currentCitationStatusLogEntry;
+    }
+
+    /**
+     * @return the citationDocketEditMode
+     */
+    public boolean isCitationDocketEditMode() {
+        return citationDocketEditMode;
+    }
+
+    /**
+     * @return the citationStatusEditMode
+     */
+    public boolean isCitationStatusEditMode() {
+        return citationStatusEditMode;
+    }
+
+    /**
+     * @param citationFilingTypeList the citationFilingTypeList to set
+     */
+    public void setCitationFilingTypeList(List<CitationFilingType> citationFilingTypeList) {
+        this.citationFilingTypeList = citationFilingTypeList;
+    }
+
+    /**
+     * @param currentCitationStatusLogEntry the currentCitationStatusLogEntry to set
+     */
+    public void setCurrentCitationStatusLogEntry(CitationStatusLogEntry currentCitationStatusLogEntry) {
+        this.currentCitationStatusLogEntry = currentCitationStatusLogEntry;
+    }
+
+    /**
+     * @param citationDocketEditMode the citationDocketEditMode to set
+     */
+    public void setCitationDocketEditMode(boolean citationDocketEditMode) {
+        this.citationDocketEditMode = citationDocketEditMode;
+    }
+
+    /**
+     * @param citationStatusEditMode the citationStatusEditMode to set
+     */
+    public void setCitationStatusEditMode(boolean citationStatusEditMode) {
+        this.citationStatusEditMode = citationStatusEditMode;
+    }
+
+    /**
+     * @return the citationInfoEditMode
+     */
+    public boolean isCitationInfoEditMode() {
+        return citationInfoEditMode;
+    }
+
+    /**
+     * @param citationInfoEditMode the citationInfoEditMode to set
+     */
+    public void setCitationInfoEditMode(boolean citationInfoEditMode) {
+        this.citationInfoEditMode = citationInfoEditMode;
     }
 
    

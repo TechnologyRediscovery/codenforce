@@ -2333,6 +2333,19 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
+     * Logic pass through for citation filing types (e.g. private criminal complaint vs. non-traffic)
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public List<CitationFilingType> citation_getCitationFilingTypeList() throws IntegrationException, BObStatusException {
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        return cei.getCitationFilingTypes();
+        
+        
+    }
+    
+    /**
      * Getter for Citation objects
      *
      * @param citationID
