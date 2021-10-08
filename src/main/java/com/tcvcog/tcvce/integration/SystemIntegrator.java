@@ -379,7 +379,92 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
 
         return style;
     }
+    
+    private int checkForUse(String tableName, String target, int targetID) throws IntegrationException{
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT ");
+        sb.append(target);
+        sb.append(" FROM ");
+        sb.append(tableName);
+        sb.append(" WHERE ");
+        sb.append(target);
+        sb.append("=?;");
+        int uses = 0;
 
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, targetID);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                uses++;     
+                rs.getInt(target);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to locate " + target + ": " + targetID, ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return uses;
+        
+    }
+    
+    private List<String> findForeignUseTables(String search) throws IntegrationException {
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        List<String> results = new ArrayList();
+        sb.append("SELECT TABLE_NAME ");
+        //sb.append("CONSTRAINT_NAME, ");
+        //sb.append("CONSTRAINT_TYPE ");
+        sb.append("FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS ");
+        sb.append("WHERE CONSTRAINT_NAME LIKE '%").append(search).append("_fk'; ");
+        
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                results.add(rs.getString("TABLE_NAME"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to generate table_name", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return results;
+    }
+    
+    public int iconCheckForUse(Icon i) throws IntegrationException {
+        int uses = 0;
+        List<String> useTables = findForeignUseTables("iconid");
+        for(int x = 0; x < useTables.size(); x++){
+            uses =+ checkForUse("public." + useTables.get(x), "icon_iconid", i.getIconID());
+            //System.out.println("Checked public." + useTables.get(x) + " for icon_iconid:" + i.getIconID());
+        }
+        //uses += checkForUse("public.blobtype","icon_iconid",i.getIconID());
+        //uses += checkForUse("public.ceactionrequeststatus","icon_iconid",i.getIconID());
+        //uses += checkForUse("public.choice","icon_iconid",i.getIconID());
+        //uses += checkForUse("public.choicedirective","icon_iconid",i.getIconID());
+        //uses += checkForUse("public.citationstatus","icon_iconid",i.getIconID());
+        //uses += checkForUse("public.codeelementguide","icon_iconid",i.getIconID());
+        //uses += checkForUse("public.eventcategory","icon_iconid",i.getIconID());
+        //uses += checkForUse("public.improvementstatus","icon_iconid",i.getIconID());
+        //uses += checkForUse("public.intensityclass","icon_iconid",i.getIconID());
+        //uses += checkForUse("public.propertyusetype","icon_iconid",i.getIconID());
+        //uses += checkForUse("public.textblockcategory","icon_iconid",i.getIconID());
+        //uses += checkForUse("public.cecasestatusicon","icon_iconid",i.getIconID());
+        return uses;
+    }
+    
     public Icon getIcon(int iconID) throws IntegrationException {
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -395,7 +480,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
             while (rs.next()) {
                 i = new Icon();
-                i.setIconid(rs.getInt("iconid"));
+                i.setIconID(rs.getInt("iconid"));
                 i.setName(rs.getString("name"));
                 i.setStyleClass(rs.getString("styleclass"));
                 i.setFontAwesome(rs.getString("fontawesome"));
@@ -412,13 +497,34 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         return i;
 
     }
+    
+    public void deactivateIcon(Icon i) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE public.icon SET active=false ");
+        sb.append("WHERE iconid=?");
+        
+        try{
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, i.getIconID());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to deactivate icon", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             
+        } // close finally     
+    }
 
     public void updateIcon(Icon i) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         StringBuilder sb = new StringBuilder();
-        sb.append("UPDATE public.icon SET name=?, styleclass=?, fontawesome=?, materialicons=? ");
-        sb.append(" WHERE iconid = ?;");
+        sb.append("UPDATE public.icon SET name=?, styleclass=?, fontawesome=?, materialicons=?, active=? ");
+        sb.append("WHERE iconid = ?;");
 
         try {
             stmt = con.prepareStatement(sb.toString());
@@ -426,7 +532,8 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(2, i.getStyleClass());
             stmt.setString(3, i.getFontAwesome());
             stmt.setString(4, i.getMaterialIcon());
-            stmt.setInt(5, i.getIconid());
+            stmt.setBoolean(5, true);
+            stmt.setInt(6, i.getIconID());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -437,37 +544,14 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
              
         } // close finally
     }
-    
-    //method for deleting icons
-//    public void deleteIcon(Icon i) throws IntegrationException {
-//        Connection con = getPostgresCon();
-//        PreparedStatement stmt = null;
-//        
-//        try {
-//            stmt = con.prepareStatement(query);
-//            stmt.setString(1, i.getName());
-//            stmt.setString(2, i.getStyleClass());
-//            stmt.setString(3, i.getFontAwesome());
-//            stmt.setString(4, i.getMaterialIcon());
-//            stmt.setInt(5, i.getIconid());
-//            stmt.executeUpdate();
-//        } catch (SQLException ex) {
-//            System.out.println(ex.toString());
-//            throw new IntegrationException("unable to update icon", ex);
-//        } finally {
-//             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-//             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-//             
-//        } // close finally
-//    }
 
     public void insertIcon(Icon i) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         StringBuilder sb = new StringBuilder();
         sb.append("INSERT INTO public.icon(");
-        sb.append("iconid, name, styleclass, fontawesome, materialicons) ");
-        sb.append("VALUES (DEFAULT, ?, ?, ?, ?);");
+        sb.append("iconid, name, styleclass, fontawesome, materialicons, active) ");
+        sb.append("VALUES (DEFAULT, ?, ?, ?, ?, ?);");
 
         try {
             stmt = con.prepareStatement(sb.toString());
@@ -475,13 +559,14 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(2, i.getStyleClass());
             stmt.setString(3, i.getFontAwesome());
             stmt.setString(4, i.getMaterialIcon());
+            stmt.setBoolean(5, true);
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("unable to insert icon", ex);
         } finally {
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              
         } // close finally
     }
@@ -493,7 +578,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         PreparedStatement stmt = null;
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT iconid FROM public.icon;");
+        sb.append("SELECT iconid FROM public.icon WHERE active=true;");
         List<Icon> iList = new ArrayList<>();
 
         try {
@@ -511,6 +596,17 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return iList;
+    }
+    
+    public int putCheckForUse(PropertyUseType p) throws IntegrationException {
+        int uses = 0;
+        List<String> useTables = findForeignUseTables("propertyusetypeid");
+        for(int x = 0; x < useTables.size(); x++){
+            uses =+ checkForUse("public." + useTables.get(x), "usetype_typeid", p.getTypeID());
+            System.out.println("Checked public." + useTables.get(x) + " for  usetype_typeid" + p.getTypeID());
+        };
+        //uses += checkForUse("public.property","usetype_typid",p.getTypeID());
+        return uses;
     }
     
     public PropertyUseType getPut(int putID) throws IntegrationException {
@@ -546,20 +642,42 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
 
     }
     
+    public void deactivatePut(PropertyUseType p) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE public.propertyusetype SET active=false ");
+        sb.append("WHERE propertyusetypeid=?");
+        
+        try{
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, p.getTypeID());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to deactivate put", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             
+        } // close finally
+    }
+    
     public void updatePut(PropertyUseType p) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         StringBuilder sb = new StringBuilder();
-        sb.append("UPDATE public.propertyusetype SET name=?, description=?, icon_iconid=?, zoneclass=? ");
-        sb.append(" WHERE propertyusetypeid = ?;");
+        sb.append("UPDATE public.propertyusetype SET name=?, description=?, icon_iconid=?, zoneclass=?, active=? ");
+        sb.append("WHERE propertyusetypeid = ?;");
 
         try {
             stmt = con.prepareStatement(sb.toString());
             stmt.setString(1, p.getName());
             stmt.setString(2, p.getDescription());
-            stmt.setInt(3, p.getIcon().getIconid());
+            stmt.setInt(3, p.getIcon().getIconID());
             stmt.setString(4, p.getZoneClass());
-            stmt.setInt(5, p.getTypeID());
+            stmt.setBoolean(5, true);
+            stmt.setInt(6, p.getTypeID());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -576,15 +694,16 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         PreparedStatement stmt = null;
         StringBuilder sb = new StringBuilder();
         sb.append("INSERT INTO public.propertyusetype(");
-        sb.append("propertyusetypeid, name, description, icon_iconid, zoneclass) ");
-        sb.append("VALUES (DEFAULT, ?, ?, ?, ?);");
+        sb.append("propertyusetypeid, name, description, icon_iconid, zoneclass, active) ");
+        sb.append("VALUES (DEFAULT, ?, ?, ?, ?, ?);");
 
         try {
             stmt = con.prepareStatement(sb.toString());
             stmt.setString(1, p.getName());
             stmt.setString(2, p.getDescription());
-            stmt.setInt(3, p.getIcon().getIconid());
+            stmt.setInt(3, p.getIcon().getIconID());
             stmt.setString(4, p.getZoneClass());
+            stmt.setBoolean(5, true);
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -601,10 +720,8 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         PreparedStatement stmt = null;
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT propertyusetypeid FROM public.propertyusetype;");
+        sb.append("SELECT propertyusetypeid FROM public.propertyusetype WHERE active=true;");
         List<PropertyUseType> putList = new ArrayList<>();
-        
-        System.out.println(sb.toString());
         try {
             stmt = con.prepareStatement(sb.toString());
             rs = stmt.executeQuery();
@@ -1011,7 +1128,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(3, intsty.getNumericRating());
             stmt.setString(4, intsty.getSchema().getLabel());
             stmt.setBoolean(5, intsty.isActive());
-            stmt.setInt(6, intsty.getIcon().getIconid());
+            stmt.setInt(6, intsty.getIcon().getIconID());
             stmt.setInt(7, intsty.getClassID());
             stmt.executeUpdate();
             
@@ -1041,7 +1158,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(3, intsty.getNumericRating());
             stmt.setString(4, intsty.getSchema().getLabel());
             stmt.setBoolean(5, intsty.isActive());
-            stmt.setInt(6, intsty.getIcon().getIconid());
+            stmt.setInt(6, intsty.getIcon().getIconID());
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());

@@ -15,9 +15,7 @@
             <ui:define name="content">
                 <div class="mainContainer">
                     <h:form id="putmanage-messages-form">
-                        <h:messages id="putmanage-messages" globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
+                        <p:growl id="growl" showDetail="true"/>
                     </h:form>
                             
                     <h1>PUT Manager</h1>
@@ -141,8 +139,10 @@
                                                     value="Icon ID" 
                                                     for="put-iconid-it"/>
                                     <p:inputText id="put-iconid-it" 
-                                                 value="#{propertyUseTypeBB.currentPut.icon.iconid}" 
+                                                 value="#{propertyUseTypeBB.currentPut.icon.iconID}" 
                                                  style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
+                                    
+                                    
                                     <h:message for="put-iconid-it" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
@@ -167,7 +167,7 @@
                                                 ajax="true" value="Update Put data" icon="fa fa-plus" 
                                              tabindex="11" 
                                              actionListener="#{propertyUseTypeBB.commitUpdates}"
-                                             disabled="#{!(propertyUseTypeBB.currentPut.typeID!= 0)}"
+                                             disabled="#{!(propertyUseTypeBB.currentPut.typeID != 0)}"
                                              oncomplete="PF('put-addupdate-dialog').hide()"
                                              update="put-manage-form:put-table
                                              putmanage-messages-form"
@@ -185,9 +185,9 @@
                              
                              <p:commandButton    id="put-commitremove-cb"
                                                 ajax="true" value="Remove Put" icon="fa fa-trash" 
-                                                tabindex="11" actionListener="#{propertyUseTypeBB.commitDelete}"
-                                                disabled="#{!(propertyUseTypeBB.currentPut.typeID == 0)}"
-                                             oncomplete="PF('').hide()"
+                                                tabindex="11" actionListener="#{propertyUseTypeBB.commitRemove}"
+                                                disabled="#{!(propertyUseTypeBB.currentPut.typeID != 0)}"
+                                             oncomplete="PF('put-addupdate-dialog').hide()"
                                              update="put-manage-form:put-table
                                              putmanage-messages-form"
                                              />

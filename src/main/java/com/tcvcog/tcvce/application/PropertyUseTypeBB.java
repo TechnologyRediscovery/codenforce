@@ -8,7 +8,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.PropertyUseType;
-import com.tcvcog.tcvce.integration.SystemIntegrator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Level;
@@ -37,9 +37,13 @@ public class PropertyUseTypeBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        SystemIntegrator si = getSystemIntegrator();
+        refreshPutList();
+    }
+    
+    public void refreshPutList(){
+        SystemCoordinator sc = getSystemCoordinator();
         try {
-            putList = si.getPutList();
+            putList = sc.getPutList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -50,9 +54,9 @@ public class PropertyUseTypeBB extends BackingBeanUtils implements Serializable{
     }
     
     public void commitUpdates(ActionEvent ev){
-        SystemIntegrator si = getSystemIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
         try {
-            si.updatePut(currentPut);
+            sc.updatePut(currentPut);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully updated PropertyUseType", ""));
@@ -61,13 +65,13 @@ public class PropertyUseTypeBB extends BackingBeanUtils implements Serializable{
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not update PropertyUseType, sorry", ""));
         }
-        
+        refreshPutList();
     }
     
     public void commitInsert(ActionEvent ev){
-        SystemIntegrator si = getSystemIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
         try {
-            si.insertPut(currentPut);
+            sc.insertPut(currentPut);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Success! PropertyUseType inserted", ""));
@@ -76,20 +80,36 @@ public class PropertyUseTypeBB extends BackingBeanUtils implements Serializable{
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not insert PropertyUseType, sorry", ""));
         }
-        
+        refreshPutList();
     }
+    
     //method for deleting existing puts
-    public void commitDelete(ActionEvent ev) {
-//		  SystemIntegrator si = getSystemIntegrator(); 
-//		  try {
-//			  si.deletePut(currentPut); 
-//			  getFacesContext().addMessage(null, 
-//					  new FacesMessage(FacesMessage.SEVERITY_INFO, 
-//							  "Success! PropertyUseType removed", "")); 
-//		  } catch (IntegrationException ex) { getFacesContext().addMessage(null, new
-//				  FacesMessage(FacesMessage.SEVERITY_ERROR, "Could not remove PropertyUseType, sorry",
-//				  "")); }
-//		 
+    public void commitRemove(ActionEvent ev) {
+        SystemCoordinator sc = getSystemCoordinator();
+        if(currentPut.getTypeID() > 0){             
+            try {
+                int uses = sc.putCheckForUse(currentPut);
+                if(uses == 0){
+                    sc.deactivatePut(currentPut);
+                    getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Success! PropertyUseType removed", ""));
+                } else {
+                    getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "PropertyUseType is in use " + uses + " times. Could not remove", ""));
+                }
+            } catch (IntegrationException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Could not remove PropertyUseType, sorry", ""));
+            }
+            refreshPutList();
+        } else {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Invalid PropertyUseTypeID: " + currentPut.getTypeID(), ""));
+        }
     }
     
     public void createNewPut(){
@@ -117,7 +137,6 @@ public class PropertyUseTypeBB extends BackingBeanUtils implements Serializable{
      * @return the currentPut
      */
     public PropertyUseType getCurrentPut() {
-        System.out.println("getCurrentPuts");
         return currentPut;
     }
 

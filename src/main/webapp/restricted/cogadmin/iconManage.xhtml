@@ -15,9 +15,7 @@
             <ui:define name="content">
                 <div class="mainContainer">
                     <h:form id="iconmanage-messages-form">
-                        <h:messages id="iconmanage-messages" globalOnly="true" showDetail="true" showSummary="true"
-                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                        </h:messages>
+                        <p:growl id="growl" showDetail="true"/>
                     </h:form>
                             
                     <h1>Icon Manager</h1>
@@ -36,13 +34,13 @@
                                 id="icon-table"
                                 var="icon"
                                 value="#{iconBB.iconList}"
-                                rowKey="#{icon.iconid}"
+                                rowKey="#{icon.iconID}"
                                 tableStyleClass="primeDataTable">
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="ID" />
                                     </f:facet>
-                                    <h:outputText value="#{icon.iconid}"/>
+                                    <h:outputText value="#{icon.iconID}"/>
                                 </p:column>
                                  
                                  <p:column width="8%">
@@ -112,7 +110,7 @@
                         <h:form id="icon-add-update-form">
                             
                             <h2>Add/update icon</h2>
-                            <p><h:outputText id="icon-id-ot" value="Icon ID: #{iconBB.currentIcon.iconid}"/></p>
+                            <p><h:outputText id="icon-id-ot" value="Icon ID: #{iconBB.currentIcon.iconID}"/></p>
                             
                             <h:panelGrid columns="2" border="0" 
                                          cellpadding="5" columnClasses="gridTd, gridTd"
@@ -169,7 +167,7 @@
                                                 ajax="true" value="Update icon data" icon="fa fa-plus" 
                                              tabindex="11" 
                                              actionListener="#{iconBB.commitUpdates}"
-                                             disabled="#{!(iconBB.currentIcon.iconid!= 0)}"
+                                             disabled="#{!(iconBB.currentIcon.iconID!= 0)}"
                                              oncomplete="PF('icon-addupdate-dialog').hide()"
                                              update="icon-manage-form:icon-table
                                              iconmanage-messages-form"
@@ -178,7 +176,7 @@
                              <p:commandButton    id="icon-commitinsert-cb"
                                                 ajax="true" value="Add new icon" icon="fa fa-plus" 
                                                 tabindex="11" actionListener="#{iconBB.commitInsert}"
-                                                disabled="#{!(iconBB.currentIcon.iconid == 0)}"
+                                                disabled="#{!(iconBB.currentIcon.iconID == 0)}"
                                              oncomplete="PF('icon-addupdate-dialog').hide()"
                                              update="icon-manage-form:icon-table
                                              iconmanage-messages-form"
@@ -186,9 +184,9 @@
                              
                              <p:commandButton    id="icon-commitremove-cb"
                                                 ajax="true" value="Remove icon" icon="fa fa-trash" 
-                                                tabindex="11" actionListener="#{iconBB.commitDelete}"
-                                                disabled="#{!(iconBB.currentIcon.iconid == 0)}"
-                                             oncomplete="PF('').hide()"
+                                                tabindex="11" actionListener="#{iconBB.commitRemove}"
+                                                disabled="#{!(iconBB.currentIcon.iconID != 0)}"
+                                             oncomplete="PF('icon-addupdate-dialog').hide()"
                                              update="icon-manage-form:icon-table
                                              iconmanage-messages-form"
                                              />
