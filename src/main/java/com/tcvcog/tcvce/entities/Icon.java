@@ -17,6 +17,7 @@ public class Icon  {
     private String styleClass;
     private String fontAwesome;
     private String materialIcon;
+    private Boolean active;
 
     /**
      * @return the iconID
@@ -61,6 +62,9 @@ public class Icon  {
             return false;
         }
         if (!Objects.equals(this.materialIcon, other.materialIcon)) {
+            return false;
+        }
+        if (!Objects.equals(this.active, other.active)) {
             return false;
         }
         return true;
@@ -127,6 +131,20 @@ public class Icon  {
      */
     public void setMaterialIcon(String materialIcon) {
         this.materialIcon = materialIcon;
+    }
+
+    /**
+     * @return the active
+     */
+    public Boolean getActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(Boolean active) {
+        this.active = active;
     }
     
 }

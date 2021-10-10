@@ -470,7 +470,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         PreparedStatement stmt = null;
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT iconid, name, styleclass, fontawesome, materialicons ");
+        sb.append("SELECT iconid, name, styleclass, fontawesome, materialicons, active ");
         sb.append("FROM public.icon WHERE iconid=?;");
         Icon i = null;
 
@@ -485,6 +485,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 i.setStyleClass(rs.getString("styleclass"));
                 i.setFontAwesome(rs.getString("fontawesome"));
                 i.setMaterialIcon(rs.getString("materialicons"));
+                i.setActive(rs.getBoolean("active"));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -532,7 +533,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(2, i.getStyleClass());
             stmt.setString(3, i.getFontAwesome());
             stmt.setString(4, i.getMaterialIcon());
-            stmt.setBoolean(5, true);
+            stmt.setBoolean(5, i.getActive());
             stmt.setInt(6, i.getIconID());
             stmt.executeUpdate();
         } catch (SQLException ex) {
@@ -614,7 +615,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         PreparedStatement stmt = null;
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT propertyusetypeid, name, description, icon_iconid, zoneclass ");
+        sb.append("SELECT propertyusetypeid, name, description, icon_iconid, zoneclass, active ");
         sb.append("FROM public.propertyusetype WHERE propertyusetypeid=?;");
         PropertyUseType p = null;
 
@@ -629,6 +630,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 p.setDescription(rs.getString("description"));
                 p.setIcon(getIcon(rs.getInt("icon_iconid")));
                 p.setZoneClass(rs.getString("zoneclass"));
+                p.setActive(rs.getBoolean("active"));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -676,7 +678,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(2, p.getDescription());
             stmt.setInt(3, p.getIcon().getIconID());
             stmt.setString(4, p.getZoneClass());
-            stmt.setBoolean(5, true);
+            stmt.setBoolean(5, p.getActive());
             stmt.setInt(6, p.getTypeID());
             stmt.executeUpdate();
         } catch (SQLException ex) {
