@@ -1,0 +1,35 @@
+--*************************************
+--NOT FOR FINAL USE
+-- Data Insert Faux-1
+-- OCT 10, 2021
+-- GIT Issue #214 
+--********************
+
+INSERT INTO public.occinspectiondetermination
+	(title, active)
+VALUES
+	('PASS for Occupancy no violations', true),
+	('PASS with violations', true),
+	('Fail NO LEGAL OCCUPANCY PERMITTED', true),
+	('Fail with Violations NO LEGAL OCCUPANCY PERMITTED', true),
+	('Pass with Affidavit for TCO', true),
+	('Progress Inspection', true),
+	('Follow Up Inspection', true);
+
+
+INSERT INTO public.occinspectioncause
+	(title, active)
+VALUES
+	('CO-Scheduled', true),
+	('CO Re-Inspection less than 20 Days', true),
+	('CO Re-Inspection more than 20 Days', true),
+	('CO Re-Inspection more than 30 Days', true),
+	('Patrol Findind Initial', true),
+	('Health Safety Welfare', true),
+	('Complaint Recieved', true),
+	('Follow up/Progress Inspection', true);
+	
+
+
+
+

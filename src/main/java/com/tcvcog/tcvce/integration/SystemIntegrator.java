@@ -450,18 +450,6 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             uses =+ checkForUse("public." + useTables.get(x), "icon_iconid", i.getIconID());
             //System.out.println("Checked public." + useTables.get(x) + " for icon_iconid:" + i.getIconID());
         }
-        //uses += checkForUse("public.blobtype","icon_iconid",i.getIconID());
-        //uses += checkForUse("public.ceactionrequeststatus","icon_iconid",i.getIconID());
-        //uses += checkForUse("public.choice","icon_iconid",i.getIconID());
-        //uses += checkForUse("public.choicedirective","icon_iconid",i.getIconID());
-        //uses += checkForUse("public.citationstatus","icon_iconid",i.getIconID());
-        //uses += checkForUse("public.codeelementguide","icon_iconid",i.getIconID());
-        //uses += checkForUse("public.eventcategory","icon_iconid",i.getIconID());
-        //uses += checkForUse("public.improvementstatus","icon_iconid",i.getIconID());
-        //uses += checkForUse("public.intensityclass","icon_iconid",i.getIconID());
-        //uses += checkForUse("public.propertyusetype","icon_iconid",i.getIconID());
-        //uses += checkForUse("public.textblockcategory","icon_iconid",i.getIconID());
-        //uses += checkForUse("public.cecasestatusicon","icon_iconid",i.getIconID());
         return uses;
     }
     
@@ -606,7 +594,6 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             uses =+ checkForUse("public." + useTables.get(x), "usetype_typeid", p.getTypeID());
             System.out.println("Checked public." + useTables.get(x) + " for  usetype_typeid" + p.getTypeID());
         };
-        //uses += checkForUse("public.property","usetype_typid",p.getTypeID());
         return uses;
     }
     
