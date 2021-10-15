@@ -33,14 +33,15 @@ import java.util.List;
  */
 public  class   CitationDocketRecord 
         extends TrackedEntity
-        implements IFace_humanListHolder{
+        implements IFace_humanListHolder,
+                   IFace_noteHolder {
     
     final static String PK_FIELD = "docketid";
     final static String TABLE_NAME = "citationdocketno";
     protected LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CITATIONDCKETHUMAN;
     
-    
     protected int docketID;
+    private int citationID;
     protected String docketNumber;
     protected LocalDateTime dateOfRecord;
     protected CourtEntity courtEntity;
@@ -170,6 +171,20 @@ public  class   CitationDocketRecord
      */
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    /**
+     * @return the citationID
+     */
+    public int getCitationID() {
+        return citationID;
+    }
+
+    /**
+     * @param citationID the citationID to set
+     */
+    public void setCitationID(int citationID) {
+        this.citationID = citationID;
     }
 
    

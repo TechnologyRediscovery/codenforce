@@ -19,16 +19,19 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.BOBSource;
+import com.tcvcog.tcvce.entities.IFace_noteHolder;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.IntensitySchema;
 import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.PrintStyle;
+import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.LogIntegrator;
@@ -48,12 +51,16 @@ import java.util.Random;
 import javax.annotation.PostConstruct;
 
 /**
- *
+ * Logic holder for all sorts of misc cross-object
+ * and system objects
+ * 
  * @author ellen bascomb of apt 31y
  */
 public class SystemCoordinator extends BackingBeanUtils implements Serializable {
 
+    private final RoleType MIN_RANK_TO_APPEND_NOTES = RoleType.MuniReader;
     private Map<Integer, String> muniCodeNameMap;
+    
 
     /**
      * Creates a new instance of LoggingCoordinator
@@ -194,10 +201,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         sb.append(Constants.FMT_AT);
         sb.append(stampCurrentTimeForNote());
 
-
-     
-       
-
         if (mbp.getCred() != null && mbp.isIncludeCredentialSig()) {
             sb.append(Constants.FMT_SIGNATURELEAD);
             sb.append(mbp.getCred().getSignature());
@@ -211,6 +214,27 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             sb.append(mbp.getExistingContent());
         }
         return sb.toString();
+    }
+    
+    /**
+     * Logic pass through for note writing using the standardized interface
+     * 
+     * @param nh Caller must prepare the note holder with all the correct content
+     * of its note field so this method and the integrator can just yank and go
+     * @param ua doing the noting
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public void writeNotes(IFace_noteHolder nh, UserAuthorized ua) throws IntegrationException, BObStatusException{
+        SystemIntegrator si = getSystemIntegrator();
+        if(nh == null || ua == null || nh.getDBKey() == 0){
+            throw new BObStatusException("Cannot append notes with null notes, user, or PK of 0");
+        }
+        // enforce minimum permissions
+        if(ua.getKeyCard().getGoverningAuthPeriod().getRole().getRank() >= MIN_RANK_TO_APPEND_NOTES.getRank() ){
+            si.writeNotes(nh);
+        }
+        
     }
 
     /**

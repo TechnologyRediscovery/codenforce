@@ -22,11 +22,17 @@ package com.tcvcog.tcvce.entities;
  */
 public enum CitationViolationStatusEnum {
 
-    PENDING ("Pending"),
+    FILED ("Filed"),
+    AWAITING_PLEA ("Awaiting Plea"),
+    CONTINUED ("Continued"),
     GUILTY ("Guilty"),
-    DISMISSED ("Dimissed"),
+    NO_CONTEST("No Contest"),
+    DISMISSED ("Dismissed"),
     COMPLIANCE ("Compliance"),
-    INVALID ("Deemed ivalid by judge");
+    INVALID ("Deemed invalid by judge"),
+    WITHDRAWN ("Withdrawn"),
+    NOT_GUILTY ("Not Guilty"),
+    OTHER ("Other");
     
     private final String label;
     

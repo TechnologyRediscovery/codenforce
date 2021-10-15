@@ -2142,4 +2142,9 @@
         <managed-bean-class>com.tcvcog.tcvce.occupancy.integration.OccChecklistIntegrator</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
+    <managed-bean>
+        <managed-bean-name>citationBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CitationBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
 </faces-config>

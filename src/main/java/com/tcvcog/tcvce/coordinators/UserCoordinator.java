@@ -357,6 +357,37 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         } 
         return v;
     }
+    
+    /**
+     * *** SECURITY CRITICAL METHOD ***
+     * Throws an exception if the given UserAuthorized does meet or exceed
+     * the rank of the supplied role type
+     * @param ua
+     * @param rt 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException 
+     */
+    public void auth_verifyUserAuthorizedRank_MeetOrExceed_SECURITYCRITICAL(UserAuthorized ua, RoleType rt) 
+            throws BObStatusException, AuthorizationException{
+        if(ua == null || rt == null){
+            throw new BObStatusException("Cannot verify rank (meet or exceed) with null User or Role");
+            
+        }
+        if(ua.getKeyCard().getGoverningAuthPeriod().getRole() != rt){
+            StringBuilder sb = new StringBuilder();
+            sb.append("User with rank: ");
+            sb.append(ua.getKeyCard().getGoverningAuthPeriod().getRole().getLabel());
+            sb.append("(rank ");
+            sb.append(ua.getKeyCard().getGoverningAuthPeriod().getRole().getRank());
+            sb.append(") fails to meet or exceed required rank: ");
+            sb.append(rt.getLabel());
+            sb.append("(rank");
+            sb.append(rt.getRank());
+            sb.append(");");
+            
+            throw new AuthorizationException(sb.toString());
+        }
+    }
    
    
     /**

@@ -196,29 +196,7 @@ public class CECaseSearchProfileBB
     
     
     
-    /*******************************************************
-     *              Citation jazz
-    /*******************************************************/
-    private Citation currentCitation;
-    private List<CitationStatus> citationStatusList;
-    private List<CourtEntity> courtEntityList;
-    private List<CitationFilingType> citationFilingTypeList;
-
-    private boolean issueCitationDisabled;
-    private boolean updateCitationDisabled;
-    private String formNoteCitationText;
-    
-    private List<CodeViolation> removedViolationList;
-    private String citationEditEventDescription;
-    
-    private User citationIssuingOfficer;
-    
-    private CitationStatusLogEntry currentCitationStatusLogEntry;
-    
-    
-    private boolean citationInfoEditMode;
-    private boolean citationDocketEditMode;
-    private boolean citationStatusEditMode;
+  
     
     
     
@@ -369,19 +347,7 @@ public class CECaseSearchProfileBB
         eventHumanCandidates = new ArrayList<>();
         
         updateNewEventFieldsWithCatChange = true;
-        
-        // Citation stuff
-        
-        CourtEntityIntegrator cei = getCourtEntityIntegrator();
-        try {
-            citationStatusList = cc.citation_getCitationStatusList();
-            courtEntityList = cei.getCourtEntityList();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        
-        removedViolationList = new ArrayList<>();
-        
+       
         
     }
     
@@ -400,6 +366,15 @@ public class CECaseSearchProfileBB
             
             }
         }
+    }
+    
+       
+    /**
+     * Listener for user requests to view a citation
+     * @param cit 
+     */
+    public void onCitationViewButtonChange(Citation cit){
+        getSessionBean().setSessCitation(cit);
     }
     
     /**
@@ -2280,230 +2255,6 @@ public class CECaseSearchProfileBB
     
     
     
-    /*******************************************************
-    /*******************************************************
-     **              Citations                            **
-    /*******************************************************/
-    /*******************************************************/
-    
-    /**
-     * Listener for user requests to edit a citation's info
-     */
-   public void onCitationInfoEditModeToggle(){
-       citationInfoEditMode = !citationInfoEditMode;
-   } 
-   
-    /**
-     * Listener for user requests to view a citation
-     * @param cit 
-     */
-    public void onCitationViewButtonChange(Citation cit){
-        currentCitation = cit;
-    }
-    
-    public void onCitationAddInitButtonChange(ActionEvent ev){
-          CaseCoordinator cc = getCaseCoordinator();
-        
-        try {
-            currentCitation = cc.citation_getCitationSkeleton(currentCase, getSessionBean().getSessUser(), getSessionBean().getSessUser());
-        } catch (BObStatusException | IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-            
-        }
-        
-    }
-    
-    /**
-     * Listener for user requests to start the citation removal process
-     * @param cit 
-     */
-    public void onCitationRemoveInitButtonChange(Citation cit){
-        currentCitation = cit;
-    }
-    
-     /**
-     * Listener for user requests to remove a citation
-     *
-     * @return
-     */
-    public String onCitationRemoveCommitButtonChange() {
-        CaseCoordinator cc = getCaseCoordinator();
-        try {
-            cc.citation_removeCitation(currentCitation, getSessionBean().getSessUser());
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-            return "";
-        }
-
-        return "ceCaseProfile";
-
-    }
-    
-    /**
-     * Listener for user requests to start the note process
-     * for a specific citation
-     * @param cit 
-     */
-    public void onCitationNoteInitButtonChange(Citation cit){
-        formNoteCitationText = "";
-        
-    }
-    
-    /**
-     * Listener for user requests to complete the citation
-     * note add operation
-     * @param ev 
-     */
-    public void onCitationNoteCommitButtonChange(ActionEvent ev){
-        
-         CaseCoordinator cc = getCaseCoordinator();
-
-        MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.setCred(getSessionBean().getSessUser().getKeyCard());
-        mbp.setExistingContent(currentCitation.getNotes());
-        mbp.setNewMessageContent(getFormNoteText());
-        mbp.setHeader("Citation Note");
-        mbp.setUser(getSessionBean().getSessUser());
-
-        try {
-
-            cc.citation_updateNotes(mbp, currentCitation);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Succesfully appended note!", ""));
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Fatal error appending note; apologies!", ""));
-        }
-        
-    }
-    
-    /**
-     * Listener for user requests to remove a violation from a citation
-     * @param v 
-     */
-    public void onCitationViolationRemoveButtonChange(CitationCodeViolationLink v) {
-        currentCitation.getViolationList().remove(v);
-        removedViolationList.add(v);
-    }
-
-    /**
-     * Listener for user requests to add a violation to a citation
-     * @param v 
-     */
-    public void onCitationViolationRestoreButtonChange(CitationCodeViolationLink v) {
-        currentCitation.getViolationList().add(v);
-        removedViolationList.remove(v);
-    }
-    
-    
-    /**
-     * Listener for user requests to update the current citation.
-     * Only accessible from a citation profile, so no need for
-     * the Citation to come as an input param
-     */
-    public void onCitationUpdateInitButtonChange(){
-        
-        // TODO: Check logic on citation to see for allowable updates
-        
-    }
-     
-     /**
-     * Listener for user requests to commit citation updates
-     *
-     * @return
-     */
-    public String onCitationUpdateCommitButtonChange() {
-        System.out.println("CitationBB.updateCitation");
-        CaseCoordinator cc = getCaseCoordinator();
-
-        try {
-            cc.citation_updateCitation(currentCitation);
-        } catch (IntegrationException | BObStatusException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-            System.out.println(ex);
-            return "";
-        }
-        return "ceCaseProfile";
-    }
-
-    /**
-     * Listener for user requests to begin citation status update operation
-     * @param ev 
-     */
-    public void onCitationUpdateStatusInitButtonChange(ActionEvent ev){
-        
-    }
-    
-    /**
-     * Listener for user requests to commit changes to citation status
-     *
-     * @return
-     */
-    public String onCitationUpdateStatusCommitButtonChange() {
-        System.out.println("CitationBB.updateCitationStatus");
-        CaseCoordinator cc = getCaseCoordinator();
-
-        try {
-            cc.citation_updateCitation(currentCitation);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Success: Updated citation status!", ""));
-        } catch (IntegrationException | BObStatusException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-            System.out.println(ex);
-            return "";
-        }
-        return "ceCaseProfile";
-    }
-
-    /**
-     * Listener for user requests to issue a citation
-     *
-     * @return page nav
-     */
-    public String onCitationAddCommitButtonChange() {
-        System.out.println("CitationBB.IssueCitation");
-        CaseCoordinator cc = getCaseCoordinator();
-        if(currentCitation != null){
-
-                Citation c = currentCitation;
-                
-                try {
-                    cc.citation_insertCitation(c,getSessionBean().getSessUser(),citationIssuingOfficer);
-
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                    "New citation added to database!", ""));
-                } catch (IntegrationException | BObStatusException ex) {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Unable to issue citation due to a database integration error", ""));
-                    System.out.println(ex);
-                    return "";
-                }
-                return "ceCaseProfile";
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to issue citation due to page object error", ""));
-            return "";
-        }
-    }
-    
-   
     
     /*******************************************************
     /*******************************************************
@@ -3196,118 +2947,7 @@ public class CECaseSearchProfileBB
         this.currentCasePropDataHeavy = currentCasePropDataHeavy;
     }
 
-    /**
-     * @return the currentCitation
-     */
-    public Citation getCurrentCitation() {
-        return currentCitation;
-    }
-
-    /**
-     * @return the citationStatusList
-     */
-    public List<CitationStatus> getCitationStatusList() {
-        return citationStatusList;
-    }
-
-    /**
-     * @return the courtEntityList
-     */
-    public List<CourtEntity> getCourtEntityList() {
-        return courtEntityList;
-    }
-
-    /**
-     * @return the issueCitationDisabled
-     */
-    public boolean isIssueCitationDisabled() {
-        return issueCitationDisabled;
-    }
-
-    /**
-     * @return the updateCitationDisabled
-     */
-    public boolean isUpdateCitationDisabled() {
-        return updateCitationDisabled;
-    }
-
-    /**
-     * @return the formNoteCitationText
-     */
-    public String getFormNoteCitationText() {
-        return formNoteCitationText;
-    }
-
-    /**
-     * @return the removedViolationList
-     */
-    public List<CodeViolation> getRemovedViolationList() {
-        return removedViolationList;
-    }
-
-    /**
-     * @return the citationEditEventDescription
-     */
-    public String getCitationEditEventDescription() {
-        return citationEditEventDescription;
-    }
-
-    /**
-     * @param currentCitation the currentCitation to set
-     */
-    public void setCurrentCitation(Citation currentCitation) {
-        this.currentCitation = currentCitation;
-    }
-
-    /**
-     * @param citationStatusList the citationStatusList to set
-     */
-    public void setCitationStatusList(List<CitationStatus> citationStatusList) {
-        this.citationStatusList = citationStatusList;
-    }
-
-    /**
-     * @param courtEntityList the courtEntityList to set
-     */
-    public void setCourtEntityList(List<CourtEntity> courtEntityList) {
-        this.courtEntityList = courtEntityList;
-    }
-
-    /**
-     * @param issueCitationDisabled the issueCitationDisabled to set
-     */
-    public void setIssueCitationDisabled(boolean issueCitationDisabled) {
-        this.issueCitationDisabled = issueCitationDisabled;
-    }
-
-    /**
-     * @param updateCitationDisabled the updateCitationDisabled to set
-     */
-    public void setUpdateCitationDisabled(boolean updateCitationDisabled) {
-        this.updateCitationDisabled = updateCitationDisabled;
-    }
-
-    /**
-     * @param formNoteCitationText the formNoteCitationText to set
-     */
-    public void setFormNoteCitationText(String formNoteCitationText) {
-        this.formNoteCitationText = formNoteCitationText;
-    }
-
-    /**
-     * @param removedViolationList the removedViolationList to set
-     */
-    public void setRemovedViolationList(List<CodeViolation> removedViolationList) {
-        this.removedViolationList = removedViolationList;
-    }
-
-    /**
-     * @param citationEditEventDescription the citationEditEventDescription to set
-     */
-    public void setCitationEditEventDescription(String citationEditEventDescription) {
-        this.citationEditEventDescription = citationEditEventDescription;
-    }
-
+    
     /**
      * @return the blobList
      */
@@ -3336,20 +2976,7 @@ public class CECaseSearchProfileBB
         this.currentBlob = currentBlob;
     }
 
-    /**
-     * @return the citationIssuingOfficer
-     */
-    public User getCitationIssuingOfficer() {
-        return citationIssuingOfficer;
-    }
-
-    /**
-     * @param citationIssuingOfficer the citationIssuingOfficer to set
-     */
-    public void setCitationIssuingOfficer(User citationIssuingOfficer) {
-        this.citationIssuingOfficer = citationIssuingOfficer;
-    }
-
+   
     /**
      * @return the eventPersonIDForLookup
      */
@@ -3363,79 +2990,6 @@ public class CECaseSearchProfileBB
     public void setEventPersonIDForLookup(int eventPersonIDForLookup) {
         this.eventPersonIDForLookup = eventPersonIDForLookup;
     }
-
-    /**
-     * @return the citationFilingTypeList
-     */
-    public List<CitationFilingType> getCitationFilingTypeList() {
-        return citationFilingTypeList;
-    }
-
-    /**
-     * @return the currentCitationStatusLogEntry
-     */
-    public CitationStatusLogEntry getCurrentCitationStatusLogEntry() {
-        return currentCitationStatusLogEntry;
-    }
-
-    /**
-     * @return the citationDocketEditMode
-     */
-    public boolean isCitationDocketEditMode() {
-        return citationDocketEditMode;
-    }
-
-    /**
-     * @return the citationStatusEditMode
-     */
-    public boolean isCitationStatusEditMode() {
-        return citationStatusEditMode;
-    }
-
-    /**
-     * @param citationFilingTypeList the citationFilingTypeList to set
-     */
-    public void setCitationFilingTypeList(List<CitationFilingType> citationFilingTypeList) {
-        this.citationFilingTypeList = citationFilingTypeList;
-    }
-
-    /**
-     * @param currentCitationStatusLogEntry the currentCitationStatusLogEntry to set
-     */
-    public void setCurrentCitationStatusLogEntry(CitationStatusLogEntry currentCitationStatusLogEntry) {
-        this.currentCitationStatusLogEntry = currentCitationStatusLogEntry;
-    }
-
-    /**
-     * @param citationDocketEditMode the citationDocketEditMode to set
-     */
-    public void setCitationDocketEditMode(boolean citationDocketEditMode) {
-        this.citationDocketEditMode = citationDocketEditMode;
-    }
-
-    /**
-     * @param citationStatusEditMode the citationStatusEditMode to set
-     */
-    public void setCitationStatusEditMode(boolean citationStatusEditMode) {
-        this.citationStatusEditMode = citationStatusEditMode;
-    }
-
-    /**
-     * @return the citationInfoEditMode
-     */
-    public boolean isCitationInfoEditMode() {
-        return citationInfoEditMode;
-    }
-
-    /**
-     * @param citationInfoEditMode the citationInfoEditMode to set
-     */
-    public void setCitationInfoEditMode(boolean citationInfoEditMode) {
-        this.citationInfoEditMode = citationInfoEditMode;
-    }
-
-   
-   
 
    
 

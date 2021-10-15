@@ -25,6 +25,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CasePhaseEnum;
+import com.tcvcog.tcvce.entities.IFace_noteHolder;
 import com.tcvcog.tcvce.entities.IFace_trackedEntityLink;
 import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
@@ -64,6 +65,48 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      * Creates a new instance of SystemIntegrator
      */
     public SystemIntegrator() {
+    }
+    
+    /**
+     * The Universal Note Appending method
+     * @param nh with the notes ready for insertion. NO PROCESSING OF THE NOTE
+     * field is done by this method. Use the Universal note appending tools
+     * of this class to do so and only pass it here when the new note and meta data
+     * has been appended to the original notes and that whole blob written back 
+     * into notes. I just call getNotes() and stick that sucker in!
+     * @throws IntegrationException 
+     */
+    public void writeNotes(IFace_noteHolder nh) throws IntegrationException{
+         if(nh != null && nh.getDBKey() != 0){
+            
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("UPDATE ");
+            sb.append(nh.getDBTableName());
+            sb.append(" SET notes=? WHERE ");
+            sb.append(nh.getPKFieldName());
+            sb.append("=?;");
+            Connection con = getPostgresCon();
+            PreparedStatement stmt = null;
+
+            try {
+                stmt = con.prepareStatement(sb.toString());
+                stmt.setString(1, nh.getNotes());
+                stmt.setInt(2, nh.getDBKey());
+                
+                stmt.executeUpdate();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.toString());
+                throw new IntegrationException("Tracked Entity has been deactivated", ex);
+
+            } finally{
+                 if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+                 if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            } // close finally
+        }
+        
+        
     }
     
     
