@@ -2523,7 +2523,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return 
      */
     private CitationViolationStatusEnum getDefaultCitationViolationStatusEnumVal(){
-        return CitationViolationStatusEnum.PENDING;
+        return CitationViolationStatusEnum.AWAITING_PLEA;
         
     }
     
@@ -2628,15 +2628,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     /**
      * Factory method for citation dockets
      * Sets the DOR to now and the origin court entity to the head of the muni list
+     * @param cit
      * @return 
      */
-   public CitationDocketRecord citation_getCitationDocketRecordSkeleton(){
+   public CitationDocketRecord citation_getCitationDocketRecordSkeleton(Citation cit){
        CitationDocketRecord cdr = new CitationDocketRecord();
-       cdr.setDateOfRecord(LocalDateTime.now());
-       if(getSessionBean().getSessMuni().getCourtEntities() != null && !getSessionBean().getSessMuni().getCourtEntities().isEmpty()){       
-           cdr.setCourtEntity(getSessionBean().getSessMuni().getCourtEntities().get(0));
+       if(cit != null && cit.getCitationID() != 0){
+            cdr.setCitationID(cit.getCitationID());
+            cdr.setDateOfRecord(LocalDateTime.now());
+            if(getSessionBean().getSessMuni().getCourtEntities() != null && !getSessionBean().getSessMuni().getCourtEntities().isEmpty()){       
+                cdr.setCourtEntity(getSessionBean().getSessMuni().getCourtEntities().get(0));
+            }
+            return cdr;
        }
-       return cdr;
+       return null;
    }
     
     

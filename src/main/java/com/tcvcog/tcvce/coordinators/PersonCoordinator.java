@@ -219,8 +219,10 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      */
     public List<Person> getPersonListFromHumanLinkList(List<HumanLink> humanLinkList) throws IntegrationException, BObStatusException{
         List<Person> pl = new ArrayList<>();
-        for(HumanLink hl: humanLinkList){
-            pl.add(getPerson(hl));
+        if(humanLinkList != null && !humanLinkList.isEmpty()){
+            for(HumanLink hl: humanLinkList){
+                pl.add(getPerson(hl));
+            }
         }
         return pl;
         

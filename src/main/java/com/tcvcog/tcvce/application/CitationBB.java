@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -39,7 +40,7 @@ public class CitationBB extends BackingBeanUtils {
 
     private Citation currentCitation;
         
-    private List<User> userManagerOptionList;
+    private List<User> filingOfficerCandidateList;
     
     private String formNoteText;
     
@@ -80,14 +81,18 @@ public class CitationBB extends BackingBeanUtils {
     public void initBean()  {
         System.out.println("CitationBB.initBean()");
         CaseCoordinator cc = getCaseCoordinator();
-         
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         // Citation stuff
         
-        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        
         try {
-            setCitationStatusList(cc.citation_getCitationStatusList());
-            setCourtEntityList(cei.getCourtEntityList());
-        } catch (IntegrationException ex) {
+            citationStatusList = cc.citation_getCitationStatusList();
+            courtEntityList = cei.getCourtEntityList();
+            citationFilingTypeList = cc.citation_getCitationFilingTypeList();
+            filingOfficerCandidateList = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
+            
+        } catch (IntegrationException | BObStatusException | AuthorizationException ex) {
             System.out.println(ex);
         }
         
@@ -121,14 +126,26 @@ public class CitationBB extends BackingBeanUtils {
     /*******************************************************/
     /*******************************************************/
     
+    public void refreshCurrentCitation(){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            currentCitation = cc.citation_getCitation(currentCitation.getCitationID());
+        } catch (IntegrationException | BObStatusException ex) {
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+        }
+        
+    }
+    
     /**
      * Listener for user requests to edit a citation's info
      */
    public void onCitationEditModeToggle(){
-        citationInfoEditMode = !citationInfoEditMode;
         if(citationInfoEditMode){
             onCitationUpdateCommitButtonChange(null);
         }
+        citationInfoEditMode = !citationInfoEditMode;
        System.out.println("CitationBB.onCitationEditModeToggle: End of method citationInfoEditMode is: " + citationInfoEditMode);
    } 
    
@@ -223,7 +240,6 @@ public class CitationBB extends BackingBeanUtils {
             System.out.println(ex);
             
         }
-        onCitationEditModeToggle();
     }
     
     /**
@@ -332,11 +348,18 @@ public class CitationBB extends BackingBeanUtils {
      * Listener for user requests to edit a citation's status record 
      */
    public void onCitationStatusLogEditModeToggle(){
-        citationStatusEditMode = !citationStatusEditMode;
         // clicking done means save edits
         if(citationStatusEditMode){
-            onStatusLogEntryEditCommitButtonChange(null);
+            if(currentCitationStatusLogEntry != null && currentCitationStatusLogEntry.getLogEntryID() == 0){
+                onStatusLogEntryAddCommitButtonChange(null);
+                System.out.println("citationBB.onStatusLogEntryAddCommitButtonChange | called on status edit mode toggle");
+            } else {
+                onStatusLogEntryEditCommitButtonChange(null);
+                System.out.println("citationBB.onStatusLogEntryEditCommitButtonChange | called on status edit mode toggle");
+            }
+            refreshCurrentCitation();
         }
+        citationStatusEditMode = !citationStatusEditMode;
         System.out.println("CitationBB.onCitationStatusLogEditModeToggle | citationStatusEditMode val is " + citationStatusEditMode);
    } 
    
@@ -497,6 +520,14 @@ public class CitationBB extends BackingBeanUtils {
      * Listener for user requests to edit a citation docket record info
      */
    public void onCitationDocketEditModeToggle(){
+       if(citationDocketEditMode){
+           if(currentCitationDocket != null && currentCitationDocket.getDocketID()==0){
+               onDocketAddCommitButtonChange();
+           } else {
+               onDocketEditCommitButtonChange(null);
+           }
+           refreshCurrentCitation();
+       }
         citationDocketEditMode = !citationDocketEditMode;
         
         System.out.println("CitationBB.onCitationDocketEditModeToggle | citationDocketEditMode val is " + citationDocketEditMode);
@@ -505,12 +536,31 @@ public class CitationBB extends BackingBeanUtils {
    
    /**
     * Listener for commencement of docket creation process
+     * @param ev
     */
-   public void onDocketAddInitButtonChange(){
+   public void onDocketAddInitButtonChange(ActionEvent ev){
        CaseCoordinator cc = getCaseCoordinator();
-       currentCitationDocket = cc.citation_getCitationDocketRecordSkeleton();
+       currentCitationDocket = cc.citation_getCitationDocketRecordSkeleton(currentCitation);
        System.out.println("CitationBB.onDocketAddInitButtonChange");
+       citationDocketEditMode = true;
        
+   }
+   
+   /**
+    * Initiates the writing of a new docket to a citation
+    */
+   public void onDocketAddCommitButtonChange(){
+       CaseCoordinator cc = getCaseCoordinator();
+        try {
+            cc.citation_insertDocketEntry(currentCitationDocket, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Success! Docket added to citation.", ""));
+        } catch (IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+        }
    }
    
     /**
@@ -523,14 +573,14 @@ public class CitationBB extends BackingBeanUtils {
             cc.citation_updateDocketEntry(currentCitationDocket, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Success! Updated log entry ID: " + currentCitationStatusLogEntry.getLogEntryID(), ""));
+                            "Success! Updated docket Number: " + currentCitationDocket.getDocketNumber(), ""));
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), ""));
         }
-        onCitationDocketEditModeToggle();
+        citationDocketEditMode = false;
         System.out.println("CitationBB.onDocketEditCommitButtonChange");
     }
     
@@ -594,6 +644,18 @@ public class CitationBB extends BackingBeanUtils {
         } 
     }
     
+    /**
+     * Listener for users to stop the docket add or update operation
+     * @param ev 
+     */
+    public void onDocketAddEditOperationAbortButtonChange(ActionEvent ev){
+        citationDocketEditMode = false;
+        System.out.println("citationBB.onDocketAddEditOperationAbortButtonChange");
+        getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Operation aborted!" + currentCitationDocket.getDocketID(),""));
+    }
+    
     
     /* ******************************************** */
     /* *************misc citation stuff *********** */
@@ -626,10 +688,10 @@ public class CitationBB extends BackingBeanUtils {
   
 
     /**
-     * @return the userManagerOptionList
+     * @return the filingOfficerCandidateList
      */
-    public List<User> getUserManagerOptionList() {
-        return userManagerOptionList;
+    public List<User> getFilingOfficerCandidateList() {
+        return filingOfficerCandidateList;
     }
 
     /**
@@ -738,10 +800,10 @@ public class CitationBB extends BackingBeanUtils {
     }
 
     /**
-     * @param userManagerOptionList the userManagerOptionList to set
+     * @param filingOfficerCandidateList the filingOfficerCandidateList to set
      */
-    public void setUserManagerOptionList(List<User> userManagerOptionList) {
-        this.userManagerOptionList = userManagerOptionList;
+    public void setFilingOfficerCandidateList(List<User> filingOfficerCandidateList) {
+        this.filingOfficerCandidateList = filingOfficerCandidateList;
     }
 
     /**

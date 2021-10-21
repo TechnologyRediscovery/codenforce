@@ -42,6 +42,8 @@ public class    CitationStatusLogEntry
     
     private String notes;
     
+    private CourtEntity courtEntity;
+    
     private boolean nonStatusEditsForbidden;
     private EventRuleAbstract phaseChangeRule;
 
@@ -166,6 +168,20 @@ public class    CitationStatusLogEntry
      */
     public void setLogEntryID(int logEntryID) {
         this.logEntryID = logEntryID;
+    }
+
+    /**
+     * @return the courtEntity
+     */
+    public CourtEntity getCourtEntity() {
+        return courtEntity;
+    }
+
+    /**
+     * @param courtEntity the courtEntity to set
+     */
+    public void setCourtEntity(CourtEntity courtEntity) {
+        this.courtEntity = courtEntity;
     }
     
 }
