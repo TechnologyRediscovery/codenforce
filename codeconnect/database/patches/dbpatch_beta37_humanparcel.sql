@@ -915,6 +915,8 @@ $BODY$
 
 ALTER TABLE citationviolation RENAME COLUMN linksource to source_sourceid;
 
+ALTER TABLE citationcitationstatus ADD COLUMN courtentity_entityid INTEGER CONSTRAINT citationcitationstatus_courtentityid_fk REFERENCES courtentity (entityid);
+
 --IF datepublished IS NULL the patch is still open and receiving changes
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
     VALUES (37, 'database/patches/dbpatch_beta37.sql',NULL, 'ecd', 'Human and Parcel migration');
