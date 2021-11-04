@@ -18,7 +18,6 @@
 
         <h:form id="cecase-citations-form">
 
-
             <p:commandButton    id="cecase-citation-add-button"
                                 ajax="true"
                                 styleClass="noFill button-size-small"
@@ -280,20 +279,12 @@
 
 
 
-                    <p:column width="40">
+                    <p:column width="50">
                         <f:facet name="header">
-                            <h:outputText value="Docket Number &amp; persons"/>
+                            <h:outputText value="Docket Number"/>
                         </f:facet>
                         <h:outputText value="#{cdno.docketNumber}" />
-                        <p:spacer height="2px" />
-                        <p:dataScroller value="#{cdno.humanLinkList}"
-                                        var="humLink"
-                                        rowIndexVar="#{humLink.DBKey}">
-                        
-                            <h:outputText value="#{humLink.humanID}" />
-                        </p:dataScroller>
-                                        
-
+                       
                     </p:column>
                    
                     <p:column width="15%">
@@ -304,7 +295,7 @@
 
                     </p:column>
 
-                    <p:column width="35%">
+                    <p:column width="25%">
                         <f:facet name="header">
                             <h:outputText value="Court"/>
                         </f:facet>
@@ -433,7 +424,7 @@
 
         </p:panel>
         
-          <p:panel    id="citation-notes-panel"
+        <p:panel    id="citation-notes-panel"
                     toggleable="true"
                     collapsed="false"
                     header="Notes">
@@ -456,7 +447,70 @@
 
               </h:form>
               
-          </p:panel>
+        </p:panel>
+        
+        
+        <p:panel    id="citation-persons-panel"
+                    toggleable="true"
+                    collapsed="false"
+                    header="Persons">
+            <h:form id="citation-persons-form">
+
+                    <div class="restrict-main-contents-io-link">
+                        <p:commandLink      id="citation-persons-add-cl"
+                                            ajax="true"
+                                            actionListener="#{citationBB.onDocketNoteInitButtonChange}"
+                                            oncomplete="PF('citation-status-log-note-dialog').show()"
+                                            style="color:blue;"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                            update="citation-status-log-note-form"
+                                            value="Connect person" />
+                    </div>
+                
+                
+                    <p:spacer height="5px"/>
+                    
+                    
+                <p:dataTable    id="citation-docket-persons-table"
+                                value="#{citationBB.currentCitation.humanLinkList}"
+                                var="chl"
+                                rowKey="#{chl.humanID}"
+                                tableStyleClass="primeDataTable"
+                                draggableRows="true" 
+                                tabindex="6">
+
+
+                    <p:column width="50%">
+                        <f:facet name="header">
+                            <h:outputText value="Name"/>
+                        </f:facet>
+                        <h:outputText value="#{chl.name}" />
+                    </p:column>
+
+                    <p:column width="25%">
+                        <f:facet name="header">
+                            <h:outputText value="Role"/>
+                        </f:facet>
+                        <h:outputText value="#{chl.linkedObjectRole.title}" />
+                    </p:column>
+
+                    <p:column width="25%">
+                        <f:facet name="header">
+                            <h:outputText value="Actions"/>
+                        </f:facet>
+                        
+                         <p:commandLink      id="citation-persons-link-remove"
+                                            ajax="true"
+                                            actionListener="#{citationBB.onDocketPersonRemoveButtonChange(dhl)}"
+                                            style="color:blue;"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                            update="docket-persons-form"
+                                            value="remove link" />
+                        
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
 
     </p:dialog>
 
@@ -899,10 +953,79 @@
                     <p:spacer height="2px" />
                     <h:outputText value="#{empty citationBB.currentCitationDocket.deactivatedTS ? '' : citationBB.getPrettyDate(citationBB.currentCitationDocket.deactivatedTS) }" />
                 </div>
-                
-               
+            </div>
+        </h:form>
+        
+        <p:panel    id="docket-persons-panel"
+                    toggleable="true"
+                    collapsed="false"
+                    header="Persons">
+            <h:form id="docket-persons-form">
 
-                <div class="p-col-6">Notes
+                    <div class="restrict-main-contents-io-link">
+                        <p:commandLink      id="citation-docket-person-add-cl"
+                                            ajax="true"
+                                            actionListener="#{citationBB.onDocketNoteInitButtonChange}"
+                                            oncomplete="PF('citation-status-log-note-dialog').show()"
+                                            style="color:blue;"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                            update="citation-status-log-note-form"
+                                            value="Connect person" />
+                    </div>
+                
+                
+                    <p:spacer height="5px"/>
+                    
+                    
+                <p:dataTable    id="citation-docket-persons-table"
+                                value="#{citationBB.currentCitationDocket.humanLinkList}"
+                                var="dhl"
+                                rowKey="#{dhl.humanID}"
+                                tableStyleClass="primeDataTable"
+                                draggableRows="true" 
+                                tabindex="6">
+
+
+                    <p:column width="50%">
+                        <f:facet name="header">
+                            <h:outputText value="Name"/>
+                        </f:facet>
+                        <h:outputText value="#{dhl.name}" />
+                    </p:column>
+
+                    <p:column width="25%">
+                        <f:facet name="header">
+                            <h:outputText value="Role"/>
+                        </f:facet>
+                        <h:outputText value="#{dhl.linkedObjectRole.title}" />
+                    </p:column>
+
+                    <p:column width="25%">
+                        <f:facet name="header">
+                            <h:outputText value="Actions"/>
+                        </f:facet>
+                        
+                         <p:commandLink      id="citation-docket-person-link-remove"
+                                            ajax="true"
+                                            actionListener="#{citationBB.onDocketPersonRemoveButtonChange(dhl)}"
+                                            style="color:blue;"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                            update="docket-persons-form"
+                                            value="remove link" />
+                        
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        
+        
+        <p:panel    id="docket-notes-panel"
+                    toggleable="true"
+                    collapsed="false"
+                    header="Docket notes">
+            <h:form id="docket-notes-form">
+                
+                        
 
                     <div class="restrict-main-contents-io-link">
                         <p:commandLink      id="citation-docket-note-add-cl"
@@ -914,39 +1037,14 @@
                                             update="citation-status-log-note-form"
                                             value="add note" />
                     </div>
-                </div>
-                <div class="p-col-6">
+                    <p:spacer height="5px"/>
+            
                     <h:outputText styleClass="wrapText" 
-                                  value="#{citationBB.currentCitationStatusLogEntry.notes}"/>
-                </div>
-            </div>
-            <f:facet name="footer">
-
-                <div class="restrict-main-contents-io-button gray_button">
-
-                    <p:commandButton    id="citation-update-status-abort-button"
-                                        ajax="true"
-                                        value="Done"
-                                        process="@none"
-                                        immediate="true"
-                                        actionListener="#{citationBB.onOperationCancelButtonChange}"
-                                        oncomplete="PF('citation-docket-note-dialog-var').hide()"
-                                        icon="fa fa-stop" />
-
-                </div>
-                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
-                    <div class="restrict-main-contents-io-button">
-                        <p:commandButton    id="citation-update-status-commit-button"
-                                            rendered="#{citationBB.citationStatusEditMode}"
-                                            ajax="true"
-                                            value="Save updates"
-                                            actionListener="#{citationBB.onDocketEditCommitButtonChange}"
-                                            icon="fa fa-edit"
-                                            update="citation-docket-form"/>
-                    </div>
-                </div>
-            </f:facet>
-        </h:form>
+                                  value="#{!empty citationBB.currentCitationStatusLogEntry.notes ? citationBB.currentCitationStatusLogEntry.notes : 'no notes' }"/>
+            
+            </h:form>
+        </p:panel>
+        
     </p:dialog>
 
     <p:dialog   id="citation-docket-note-dialog"
@@ -994,11 +1092,7 @@
                 </div>
             </f:facet>
         </h:form>
-
-
     </p:dialog>
-
-
 
     <p:dialog   id="citation-remove-dialog"
                 height="400" width="600"
@@ -1066,11 +1160,8 @@
                 >
 
         <h:form id="citation-note-form">
-
-
             <h:panelGrid columns="1"
                          columnClasses="gridTd, gridTd">
-
                 <h:panelGroup>
                     <h:outputText styleClass="ui-label" value="Note text: "/>
                     <p:inputTextarea   id="citation-notes-editor"
@@ -1099,12 +1190,5 @@
                 </h:panelGroup>
             </h:panelGrid>
         </h:form>
-
-
     </p:dialog>
-
-
-
-
-
 </ui:composition>

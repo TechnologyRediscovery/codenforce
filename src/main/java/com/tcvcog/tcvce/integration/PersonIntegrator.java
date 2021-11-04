@@ -649,6 +649,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * Retrieves all contactphone records by humanid
      * @param humanID of the human to populate
      * @return of all Contacts associated with the given human
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public List<ContactPhone> getContactPhoneList(int humanID) throws IntegrationException{
         List<ContactPhone> phoneList = new ArrayList<>();
@@ -1168,6 +1169,48 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
         return cpt;
     }
+    
+    
+    
+    /**
+     * Extracts all active records from the contactphonetype table
+     * @param phoneTypeID
+     * @return the record Objectified
+     * @throws IntegrationException 
+     */
+    public List<ContactPhoneType> getContactPhoneTypeList() throws IntegrationException {
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        List<ContactPhoneType> cptl = new ArrayList<>();
+
+        try {
+            
+            String s = "SELECT phonetypeid, title, createdts, deactivatedts\n" +
+                       "  FROM public.contactphonetype WHERE deactivatedts IS NOT NULL";
+            
+            stmt = con.prepareStatement(s);
+            
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                cptl.add(generateContactPhoneType(rs));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return cptl;
+    }
+    
+    
+    
     
     /**
      * Populates fields on a ConatctPhoneType object

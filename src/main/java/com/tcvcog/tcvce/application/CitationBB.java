@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
@@ -21,6 +22,7 @@ import com.tcvcog.tcvce.entities.CitationStatusLogEntry;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CourtEntity;
 import com.tcvcog.tcvce.entities.EventType;
+import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -655,6 +657,25 @@ public class CitationBB extends BackingBeanUtils {
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Operation aborted!" + currentCitationDocket.getDocketID(),""));
     }
+    
+    
+    
+    /**
+     * removes a link between a citaiton human and a docket
+     * NOTE that users can only link a person to a docket
+     * if they are also linked to the citation first
+     * And citations can only contain links to persons
+     * who are already attached to the property (or will be
+     * mapped to that property at the time of citation linking)
+     * @param hl 
+     */
+    public void onDocketPersonRemoveButtonChange(HumanLink hl){
+        PersonCoordinator pc = getPersonCoordinator();
+//        IS this the correct call?
+//        pc.deactivateLinkedHuman(currentCitation, hl, ua);
+        
+    }
+    
     
     
     /* ******************************************** */

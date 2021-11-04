@@ -2024,14 +2024,6 @@
     </navigation-rule>
     
     
-    <managed-bean>
-        <managed-bean-name>rentalRegistrationBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.rental.RentalRegistrationBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
-    
-    
     <navigation-rule>
         
         
@@ -2145,6 +2137,17 @@
     <managed-bean>
         <managed-bean-name>citationBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CitationBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>personBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.PersonBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <description>Home of tools for managing a mailing address</description>
+        <managed-bean-name>addressBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.AddressBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 </faces-config>

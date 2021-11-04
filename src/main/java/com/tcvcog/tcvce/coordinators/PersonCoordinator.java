@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.ContactPhoneType;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.HumanLink;
@@ -42,8 +43,6 @@ import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import com.tcvcog.tcvce.entities.IFace_PersonListHolder;
 
 /**
@@ -507,6 +506,17 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     public PersonType[] getPersonTypes() {
         
         return personTypes;
+    }
+    
+    /**
+     * Returns the master list of all contact phone types
+     * e.g. cell phone, home, work, etc. 
+     * @return 
+     */
+    public List<ContactPhoneType> getContactPhoneTypeList() throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        return pi.getContactPhoneTypeList();
+        
     }
 
     
