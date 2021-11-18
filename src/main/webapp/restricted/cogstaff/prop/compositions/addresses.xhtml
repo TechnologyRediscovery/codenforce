@@ -1,0 +1,391 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+
+    <p:growl id="addresses-growl"
+             globalOnly="false" 
+             />
+
+    <p:dialog   id="address-dialog"
+                height="700" width="600"
+                widgetVar="address-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="#{addressBB.currentAddress.addressID eq 0 ? 'Add new address' : 'Edit address'}"
+                rendered="true"
+                >
+
+        <p:panel id="address-info-panel"
+                 toggleable="true"
+                 collapsed="false"
+                 header="Address Info">
+
+            <h:form id="address-info-form">
+
+                <p:commandButton id="address-edit-button"
+                                 value="#{addressBB.addressEditMode? 'Save changes' : 'Edit'}"
+                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                 icon="fa #{addressBB.addressEditMode ? 'fa-check' : 'fa-pencil'}"
+                                 actionListener="#{personBB.toggleEmailEditMode}"
+                                 oncomplete="PF('address-dialog-var').show()"
+                                 update="address-info-form"/>
+          
+                <p:commandButton id="zip-search-button"
+                                 value="City, State, Zip Search"
+                                 rendered="true"
+                                 icon="fa fa-address-book"
+                                 oncomplete="PF('csz-dialog-var').show()"
+                                 update="csz-dialog-form"/>
+
+
+                <div class="restrict-main-contents-io-button gray_button">
+
+                    <p:commandButton    id="address-edit-abort-button"
+                                        ajax="true"
+                                        rendered="#{addressBB.addressEditMode}"
+                                        value="Abort edit"
+                                        process="@none"
+                                        immediate="true"
+                                        actionListener="#{personBB.onEmailOperationAbortButtonChange}"
+                                        oncomplete="PF('address-dialog-var').show()"
+                                        update="address-info-form"
+                                        icon="fa fa-stop" />
+
+                </div>
+
+                <p:spacer height="5px"/>    
+
+                <div class="p-grid">
+                    <div class="p-col-6">Address ID</div>
+
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                      value="#{addressBB.currentAddress.addressID eq 0 ? 'new record' : addressBB.currentAddress.addressID}"/>
+
+                    </div>
+
+                    <div class="p-col-6">Building Number</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                      value="#{addressBB.currentAddress.buildingNo}"/>
+
+                        <p:inputText rendered="#{addressBB.addressEditMode}"
+                                     value="#{addressBB.currentAddress.buildingNo}" />
+                    </div>
+                    <div class="p-col-6">PO Box</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                      value="#{addressBB.currentAddress.poBox}"/>
+
+                        <p:inputText rendered="#{addressBB.addressEditMode}"
+                                     value="#{addressBB.currentAddress.poBox}" />
+                    </div>
+                    <div class="p-col-6">Street</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                      value="#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.name : ''}"/>
+
+                        <p:inputText rendered="#{addressBB.addressEditMode}"
+                                     value="#{addressBB.currentAddress.poBox}" />
+                    </div>
+                    
+                    <div class="p-col-6">City</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                      value="#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.cityStateZip.city : ''}"/>
+                    </div>
+                    
+                    <div class="p-col-6">State</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                      value="#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.cityStateZip.state : ''}"/>
+                    </div>
+                    
+                    <div class="p-col-6">ZIP Code</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                      value="#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.cityStateZip.zipCode : ''}"/>
+
+                        <p:inputText rendered="#{addressBB.addressEditMode}"
+                                     value="#{addressBB.formZip}" />
+                    </div>
+                    
+
+                    <div class="p-col-6">Source</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                      value="#{addressBB.currentAddress.source.title}"/>
+                        
+                        <p:selectOneMenu id="address-source-som"
+                                         required="true"
+                                         rendered="#{addressBB.addressEditMode}" 
+                                         value="#{addressBB.currentAddress.source}">
+                            <f:converter converterId="bobSourceConverter"/>
+                            <f:selectItems value="#{addressBB.addressSourceList}"
+                                           var="bs" 
+                                           itemValue="#{bs}" 
+                                           itemLabel="#{bs.title} (ID:#{bs.sourceid})"/>
+                        </p:selectOneMenu>
+
+                    </div>
+                    
+                    
+                    <div class="p-col-6">Verified?</div>
+                    <div class="p-col-6">
+                        <h:outputText   rendered="#{!addressBB.addressEditMode}"
+                                        value="#{empty addressBB.currentAddress.verifiedTS ? 'No' : 'Yes'}" />
+                        
+                        <p:spacer height="2px" />
+                        
+                        <h:outputText   rendered="#{!addressBB.addressEditMode}"
+                                        value="#{!empty addressBB.currentAddress.verifiedTS ? 'on ' : ''}" />
+                        
+                        <p:spacer height="2px" />
+                        
+                        <h:outputText   rendered="#{!addressBB.addressEditMode}"
+                                        value="#{!empty addressBB.currentAddress.verifiedBy ? 'by ' : ''}" />
+                        
+                        <h:outputText   rendered="#{!addressBB.addressEditMode}"
+                                        value="#{!empty addressBB.currentAddress.verifiedBy ? addressBB.currentAddress.verifiedBy.username : ''}" />
+
+                        
+                        <p:selectBooleanCheckbox rendered="#{addressBB.addressEditMode}"
+                                                 value="#{addressBB.getPrettyDateNoTime(addressBB.currentAddress.verifiedTS)}" />
+                    </div>
+                    
+                    <div class="p-col-6">Verification Source</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                      value="#{addressBB.currentAddress.verifiedSource.title}"/>
+                        
+                        <p:selectOneMenu id="address-ver-source-som"
+                                         required="false"
+                                         rendered="#{addressBB.addressEditMode}" 
+                                         value="#{addressBB.currentAddress.verifiedSource}">
+                            <f:converter converterId="bobSourceConverter"/>
+                            <f:selectItems value="#{addressBB.addressSourceList}"
+                                           var="bs" 
+                                           itemValue="#{bs}" 
+                                           itemLabel="#{bs.title} (ID:#{bs.sourceid})"/>
+                        </p:selectOneMenu>
+
+                    </div>
+                    
+                    <div class="p-col-6">Creation</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{addressBB.getPrettyDate(addressBB.currentAddress.createdTS)}" />
+                        <p:spacer height="2px" />
+                        <h:outputText   rendered="#{!empty addressBB.currentAddress.createdBy}"
+                                        value="by #{addressBB.currentAddress.createdBy.username}" />
+                    </div>
+
+                    <div class="p-col-6">Last update</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{addressBB.getPrettyDate(addressBB.currentAddress.lastUpdatedTS)}" />
+                        <p:spacer height="2px" />
+                        <h:outputText   rendered="#{!empty addressBB.currentAddress.lastUpdatedBy}"
+                                        value="by #{addressBB.currentAddress.lastUpdatedBy.username}" />
+                    </div>
+
+                    <div class="p-col-6">Record status</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{empty addressBB.currentAddress.deactivatedTS ? 'active' : 'deactivated on'}" />
+                        <p:spacer height="2px" />
+                        <h:outputText value="#{empty addressBB.currentAddress.deactivatedTS ? '' : addressBB.getPrettyDate(addressBB.currentAddress.deactivatedTS) }" />
+                        <p:spacer height="2px" />
+                        <h:outputText   rendered="#{!empty addressBB.currentAddress.deactivatedBy}"
+                                        value="by #{addressBB.currentAddress.deactivatedBy.username}" />
+                    </div>
+                </div>
+            </h:form>
+        </p:panel>
+    </p:dialog>
+    
+      <p:dialog   id="csz-dialog"
+                height="700" width="800"
+                widgetVar="csz-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Search for City, State, & ZIP Code"
+                rendered="true"
+                >
+
+        <p:panel id="csz-search-panel"
+                 toggleable="true"
+                 collapsed="false"
+                 header="City, State, ZIP Code Search">
+
+            <h:form id="csz-search-form">
+                
+                
+                   <p:selectOneMenu id="csz-search-query-som"
+                                    tabindex="1"
+                                    value="#{addressBB.selectedCSZQuery}"
+                                    style="width: 100%"
+                                    >
+                       <f:converter converterId="bOBQueryConverter"/>
+
+                       <f:selectItem itemLabel="select a query..."
+                                     noSelectionOption="true"
+                                     itemDisabled="true"
+                                     />
+                       <f:selectItems id="csz-search-query-si"
+                                      value="#{propertySearchBB.queryList}"
+                                      var="ql"
+                                      itemValue="#{ql}"
+                                      itemLabel="#{ql.queryTitle}" 
+                                      />
+                       <p:ajax update="prop-search-filter-addr-val-0
+                               @form
+                               prop-search-messages-form"
+                               listener="#{addressBB.onQueryChange}"
+                               />
+                   </p:selectOneMenu>
+                
+
+                <p:commandButton id="csz-search-button"
+                                 value="Search"
+                                 rendered="true"
+                                 icon="fa fa-search"
+                                 actionListener="#{addressBB.onQueryCSZExecuteButtonChange}"
+                                 oncomplete="PF('csz-dialog-var').show()"
+                                 update="csz-serach-form
+                                 addresses-growl"/>
+
+
+                <div class="restrict-main-contents-io-button gray_button">
+
+                    <p:commandButton    id="csz-search-abort-button"
+                                        ajax="true"
+                                        rendered="true"
+                                        value="Abort search"
+                                        process="@none"
+                                        immediate="true"
+                                        actionListener="#{addressBB.onQueryOperationCancelButtonChange}"
+                                        oncomplete="PF('csz-dialog-var').hide()"
+                                        icon="fa fa-stop" />
+                
+                    
+                    <p:commandButton    id="csz-search-clear-button"
+                                        ajax="true"
+                                        rendered="true"
+                                        value="Reset search"
+                                        process="@none"
+                                        immediate="true"
+                                        actionListener="#{addressBB.onQueryResetButtonChange}"
+                                        oncomplete="PF('csz-dialog-var').show()"
+                                        icon="fa fa-eraser" />
+
+                </div>
+
+                <p:spacer height="5px"/>    
+
+                <div class="p-grid">
+                    <div class="p-col-6">ZIP Code</div>
+
+                    <div class="p-col-6">
+                        <p:inputText value="#{addressBB.selectedCSZQuery.primaryParams.zip_val}" />
+                    </div>
+                    <div class="p-col-6">City</div>
+
+                    <div class="p-col-6">
+                        <p:inputText value="#{addressBB.selectedCSZQuery.primaryParams.city_val}" />
+                    </div>
+                </div>
+                
+                <p:spacer height="5px"/>    
+                
+                
+                <p:dataTable    id="csz-results-table"
+                                value="#{addressBB.selectedCSZQuery.results}"
+                                var="csz"
+                                rowKey="#{csz.cityStateZipID}"
+                                tableStyleClass="primeDataTable"
+                                draggableRows="true" 
+                                tabindex="6">
+
+
+                    <p:column width="10%">
+                        <f:facet name="header">
+                            <h:outputText value="ID"/>
+                        </f:facet>
+                        <h:outputText value="#{csz.cityStateZipID}" />
+                    </p:column>
+                
+
+                    <p:column width="10%">
+                        <f:facet name="header">
+                            <h:outputText value="ZIP Code"/>
+                        </f:facet>
+                        <h:outputText value="#{csz.zipCode}" />
+                    </p:column>
+                
+
+                    <p:column width="25%">
+                        <f:facet name="header">
+                            <h:outputText value="City"/>
+                        </f:facet>
+                        <h:outputText value="#{csz.city}" />
+                    </p:column>
+                
+
+                    <p:column width="10%">
+                        <f:facet name="header">
+                            <h:outputText value="State"/>
+                        </f:facet>
+                        <h:outputText value="#{csz.state}" />
+                    </p:column>
+                
+
+                    <p:column width="10%">
+                        <f:facet name="header">
+                            <h:outputText value="Type"/>
+                        </f:facet>
+                        <h:outputText value="#{csz.recordType.typeTitle}" />
+                    </p:column>
+                
+
+                    <p:column width="10%">
+                        <f:facet name="header">
+                            <h:outputText value="Default Role"/>
+                        </f:facet>
+                        <h:outputText value="#{csz.defaultType.typeTitle}" />
+                    </p:column>
+
+                    <p:column width="15%">
+                        <f:facet name="header">
+                            <h:outputText value="Default Cotu"/>
+                        </f:facet>
+                        <h:outputText value="#{csz.defaultCity}" />
+                    </p:column>
+                
+
+                    <p:column width="10%">
+                        <f:facet name="header">
+                            <h:outputText value="Actions"/>
+                        </f:facet>
+
+                        <p:commandButton id="csz-select"
+                                         value="Select"
+                                         rendered="true"
+                                         icon="fa fa-check"
+                                         actionListener="#{addressBB.selectCityStateZip(csz)}"
+                                         oncomplete="PF('csz-dialog-var').hide()"
+                                         />
+
+                    </p:column>
+            </h:form>
+        </p:panel>
+    
+    
+</composition>
+    

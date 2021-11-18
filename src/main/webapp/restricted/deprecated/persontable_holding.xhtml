@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>CE Case Profile</title>
+    </h:head>
+
+    <h:body id="cecase-lookup-profile-body">
+        
+
+<p:panel id="persontools-panel"
+             toggleable="true"
+             collapsed="false"
+             header="persons (#{ceCaseSearchProfileBB.currentCase.personList.size()})"
+             rendered="true"
+             >
+
+        <h:form id="-persons-form">
+
+            <p:commandButton    id="-person-add-button"
+                                ajax="true"
+                                styleClass="noFill button-size-small"
+                                actionListener="#{personBB.onCitationAddInitButtonChange}"
+                                oncomplete="PF('person-add-dialog-var').show()"
+                                value="Add Citation"
+                                icon="fa fa-gavel"
+                                update="person-add-dialog
+                                person-add-form"
+
+                                />
+
+            <p:spacer height="5px" />
+
+            <p:dataTable
+                id="-persons-table"
+                var="person"
+                rowKey="#{person.personID}"
+                value="#{ceCaseSearchProfileBB.currentCase.personList}"
+                tableStyleClass="primeDataTable"
+                draggableColumns="true"
+                reflow="true">
+
+                <p:column width="10%">
+                    <f:facet name="header">
+                        <h:outputText value="Issuance / ID" />
+                    </f:facet>
+                    <h:outputText value="#{personBB.getPrettyDateNoTime(person.dateOfRecord)}"/>
+                    <p:spacer height="2px"/>
+                    <h:outputText value="#{person.personNo}"/>
+
+                </p:column>
+
+                <p:column width="80%">
+
+                    <f:facet name="header">
+                        <h:outputText value="Status / Date" />
+                    </f:facet>
+
+                    <h:outputText value="#{person.status.status.statusTitle}"/>
+
+                    <p:spacer height="2px"/>
+
+                    <h:outputText value="as of #{personBB.getPrettyDateNoTime(person.status.dateOfRecord)}"/>
+
+                </p:column>
+
+
+                <p:column width="10%">
+                    <f:facet name="edit">
+                        <h:outputText value="Actions" />
+                    </f:facet>
+
+                    <div class="restrict-main-contents-io-link">
+                        <p:commandLink      id="person-profile-init-cb"
+                                            ajax="true"
+                                            actionListener="#{personBB.onCitationViewButtonChange(person)}"
+                                            oncomplete="PF('person-profile-dialog-var').show()"
+                                            style="color:blue;"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                            update="person-profile-dialog"
+                                            value="view/edit" />
+                    </div>
+
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:panel>
+    </h:body>
+</html>

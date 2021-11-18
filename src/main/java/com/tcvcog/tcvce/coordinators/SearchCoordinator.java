@@ -17,6 +17,9 @@ import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.Human;
+import com.tcvcog.tcvce.entities.MailingCityStateZip;
+import com.tcvcog.tcvce.entities.MailingCityStateZipDefaultTypeEnum;
+import com.tcvcog.tcvce.entities.MailingCityStateZipRecordTypeEnum;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
@@ -41,7 +44,8 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**
- *
+ * The home for all search infrastructure! Organized by method family;
+ * Families in no particular order
  * @author sylvia
  */
 public class SearchCoordinator extends BackingBeanUtils implements Serializable{
@@ -398,6 +402,44 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         }
         postRunConfigureQuery(q);
         return q;
+    }
+    
+    /**
+     * The single entry point for queries against the mailingcitystatezip
+     * table. Since this is not custom data, the restrictions are limited
+     * for this data. Let all zip data roam free across the land.
+     * @param q
+     * @return 
+     */
+    public QueryMailingCityStateZip runQuery(QueryMailingCityStateZip q) throws SearchException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
+        if(q == null){
+            return null;
+        }
+        
+        prepareQueryForRun(q);
+
+        List<SearchParamsMailingCityStateZip> paramsList = q.getParamsList();
+        List<MailingCityStateZip> mcszTempList = new ArrayList<>();
+        
+        for(SearchParamsMailingCityStateZip sp: paramsList){
+            mcszTempList.clear();
+                try {
+                    for(Integer i: pi.searchForMailingCityStateZip(sp)){
+                            mcszTempList.add(pc.getMailingCityStateZip(i));
+                    }
+                } catch (IntegrationException | BObStatusException ex) {
+                    System.out.println(ex);
+                    throw new SearchException("Integration error when querying CEARS");
+                }
+            q.addToResults(mcszTempList);
+            q.appendToQueryLog(sp);
+        }
+        postRunConfigureQuery(q);
+        return q;
+        
     }
     
 //    --------------------------------------------------------------------------
@@ -1044,6 +1086,44 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return (QueryCEAR) initQueryFinalizeInit(query);
     }
     
+    /**
+     * Container for query initialization logic based on the given Enum val
+     * for this method's associated Query subclass. Delegates configuration of
+     * filter-level settings on parameter objects to methods grouped later in this
+     * class prefixed by genParams_XXXX
+     * 
+     * @param qName
+     * @param cred
+     * @return the initialized query
+     */
+    public QueryMailingCityStateZip initQuery(QueryMailingCityStateZipEnum qName, Credential cred) {
+        QueryMailingCityStateZip query = null;
+        List<SearchParamsMailingCityStateZip> paramList = new ArrayList<>();
+        SearchParamsMailingCityStateZip params = generateParams_MCSZ_init();
+              
+        switch(qName){
+            case ALL_RECORDS_BY_ZIPCODE:
+                paramList.add(generateParams_MCSZ_allRecordsByZip(params));
+                break;
+            case DEFAULT_RECORD_BY_ZIPCODE:
+                paramList.add(generateParams_MCSZ_defaultCityByZip(params));
+                break;
+            case VALID_RECORDS_BY_ZIPCODE:
+                paramList.add(generateParams_MCSZ_validByZip(params));
+                break;
+            case ZIPCODES_BY_CITY_AND_STATE:
+                paramList.add(generateParams_MCSZ_zipByCityState(params));
+                break;
+            default:
+                break;
+        }
+        
+        query = new QueryMailingCityStateZip(qName, paramList, cred);
+        return (QueryMailingCityStateZip) initQueryFinalizeInit(query);
+        
+        
+    }
+    
     
     
 //    --------------------------------------------------------------------------
@@ -1209,6 +1289,25 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             }
         }
         return queryList;
+    }
+    
+    /**
+     * Assembles a list of possible queries against our city/state/zip table
+     * @param cred
+     * @return All possible queries
+     */
+    public List<QueryMailingCityStateZip> buildQueryMailingCityStateZipList(Credential cred){
+        
+        QueryMailingCityStateZipEnum[] nameArray = QueryMailingCityStateZipEnum.values();
+        List<QueryMailingCityStateZip> queryList = new ArrayList<>();
+        for(QueryMailingCityStateZipEnum queryTitle: nameArray){
+            if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
+                queryList.add(initQuery(queryTitle, cred));
+            }
+        }
+        return queryList;
+        
+        
     }
     
     
@@ -2529,6 +2628,108 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     // END VIII. CEActionRequest
+     
+     // MAILING CITY STATE AND ZIP
+     
+     /**
+      * Generate for SearchParamsCityStateZip; A lot less config happens on CSZ records since the data
+      * inside them are non-sensitive USPS mappings.
+      * 
+      * @return 
+      */
+     public SearchParamsMailingCityStateZip generateParams_MCSZ_init(){
+         SearchParamsMailingCityStateZip spmcsz = new SearchParamsMailingCityStateZip();
+         
+         return spmcsz;
+     }
+     
+     
+     public SearchParamsMailingCityStateZip generateParams_MCSZ_zipByCityState(SearchParamsMailingCityStateZip params){
+          params.setFilterName("Search for ZIP codes by city and state");
+          
+          params.setZip_ctl(false);
+          
+          params.setState_ctl(true);
+          // client injects value
+          
+          params.setCity_ctl(true);
+          // client injects value
+          
+          params.setRecordType_ctl(true);
+          params.setRecordType_val(MailingCityStateZipRecordTypeEnum.DEFAULT_AND_RECOGNIZED);
+          
+          params.setDefaultType_ctl(false);
+          
+          params.setDefaultCity_ctl(false);
+          
+         return params;
+     }
+     
+     
+     public SearchParamsMailingCityStateZip generateParams_MCSZ_allRecordsByZip(SearchParamsMailingCityStateZip params){
+          params.setFilterName("Search for city and state by zip, including invalid city names");
+          
+          params.setZip_ctl(true);
+          // client injects value
+          
+          params.setState_ctl(false);
+          
+          params.setCity_ctl(false);
+          
+          params.setRecordType_ctl(true);
+          params.setRecordType_val(MailingCityStateZipRecordTypeEnum.ALL);
+          
+          params.setDefaultType_ctl(false);
+          
+          params.setDefaultCity_ctl(false);
+          
+         return params;
+     }
+     
+     
+     public SearchParamsMailingCityStateZip generateParams_MCSZ_validByZip(SearchParamsMailingCityStateZip params){
+          params.setFilterName("Search for city and state by ZIP, valid only");
+          
+          params.setZip_ctl(true);
+          // client injects value
+          
+          params.setState_ctl(false);
+          
+          params.setCity_ctl(false);
+          
+          params.setRecordType_ctl(true);
+          params.setRecordType_val(MailingCityStateZipRecordTypeEnum.DEFAULT_AND_RECOGNIZED);
+          
+          params.setDefaultType_ctl(false);
+          
+          params.setDefaultCity_ctl(false);
+          
+         return params;
+         
+     }
+     
+     
+     public SearchParamsMailingCityStateZip generateParams_MCSZ_defaultCityByZip(SearchParamsMailingCityStateZip params){
+          params.setFilterName("Search for city and state by zip; default only");
+          
+          params.setZip_ctl(true);
+          // client injects value
+          
+          params.setState_ctl(false);
+          
+          params.setCity_ctl(false);
+          
+          params.setRecordType_ctl(true);
+          params.setRecordType_val(MailingCityStateZipRecordTypeEnum.DEFAULT);
+          
+          params.setDefaultType_ctl(true);
+          params.setDefaultType_val(MailingCityStateZipDefaultTypeEnum.STANDARD);
+          
+          params.setDefaultCity_ctl(false);
+         
+         return params;
+     }
+     
     
     
 }

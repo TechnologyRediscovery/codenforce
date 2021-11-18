@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
  * Represents a single street
  * @author Ellen Bascomb of 31Y
  */
-public class MailingStreet {
+public class MailingStreet extends TrackedEntity{
     
     private int streetID;
     private String name;
@@ -30,6 +30,10 @@ public class MailingStreet {
     private String notes;
     private boolean poBox;
     private LocalDateTime createdTS;
+    
+    final String TABLE_NAME = "mailingstreet";
+    final String PK_NAME = "streetid";
+    
 
     /**
      * @return the streetID
@@ -113,6 +117,21 @@ public class MailingStreet {
      */
     public void setCreatedTS(LocalDateTime createdTS) {
         this.createdTS = createdTS;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return PK_NAME;
+    }
+
+    @Override
+    public int getDBKey() {
+        return streetID;
+    }
+
+    @Override
+    public String getDBTableName() {
+       return TABLE_NAME;
     }
     
 }

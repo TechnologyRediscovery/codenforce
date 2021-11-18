@@ -45,6 +45,7 @@ import com.tcvcog.tcvce.entities.ParcelMailingAddressLink;
 import com.tcvcog.tcvce.entities.PropertyExtData;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.TaxStatus;
+import com.tcvcog.tcvce.entities.search.SearchParamsMailingCityStateZip;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
@@ -529,6 +530,50 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
         return mcsz;
     }
+    
+    /**
+     * Queries the master city state zip table by zip code
+     * @param zip the five-digit zip
+     * @return a list of matching records that are default or accepted, not not accepted
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public List<MailingCityStateZip> queryMailingCityStateZipByZip(String zip) 
+            throws BObStatusException, IntegrationException{
+        
+        if(zip == null){
+            throw new BObStatusException("Cannot query for zip codes with null zip.");
+        }
+          
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        List<MailingCityStateZip> mcszl = new ArrayList<>();
+
+        try {
+            
+            String s =  "SELECT id " +
+                        "  FROM public.mailingcitystatezip WHERE zip_code=?;";
+            
+            stmt = con.prepareStatement(s);
+            stmt.setString(1, zip);
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                mcszl.add(getMailingCityStateZip(rs.getInt("id")));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PropertyIntegrator.queryMCSZByZip", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return mcszl; 
+    }
      
     /**
      * Extracts a Street record from the DB and creates an injected object
@@ -547,7 +592,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         try {
             
             String s =  "SELECT streetid, name, namevariantsarr, citystatezip_cszipid, notes, \n" +
-                        "       pobox, createdts\n" +
+                        "       pobox, createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, \n" +
+                        "       deactivatedts, deactivatedby_userid\n" +
                         "  FROM public.mailingstreet WHERE streetid=?;";
             
             stmt = con.prepareStatement(s);
@@ -577,7 +623,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
       * @return 
       */
      private MailingStreet generateMailingStreet(ResultSet rs) throws BObStatusException, SQLException, IntegrationException{
-         
+         SystemIntegrator si = getSystemIntegrator();
          if(rs == null){
              throw new BObStatusException("Cannot generate a street with null RS");
          }
@@ -587,7 +633,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
          ms.setName(rs.getString("name"));
          ms.setCityStateZip(getMailingCityStateZip(rs.getInt("citystatezip_cszipid")));
          ms.setNotes(rs.getString("notes"));
-         ms.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
+         si.populateTrackedFields(ms, rs);
          return ms;
      }
     
@@ -673,6 +719,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @param parcelID
      * @return the list of addresses
      * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public List<ParcelMailingAddressLink> getMailingAddressListByParcel(int parcelID) 
             throws IntegrationException, BObStatusException{
@@ -743,6 +790,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * Extracts all mailing addresses associated with a given human
      * @param humanID
      * @return the list of address objects
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public List<HumanMailingAddressLink> getMailingAddressListByHuman(int humanID) 
             throws IntegrationException, BObStatusException{
@@ -808,6 +857,172 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
     }
     
+    
+    
+      /**
+     * 
+     * Primary entry point for queries against the mailingcitystatezip
+     * table. 
+     * 
+     * 
+     * @param params
+     * @return List MailingCityState records
+     * @throws IntegrationException 
+     */
+    public List<Integer> searchForMailingCityStateZip(SearchParamsMailingCityStateZip params) throws IntegrationException {
+        
+        List<Integer> msszl = new ArrayList<>();
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        params.appendSQL("SELECT mailingcitystatezip.id FROM public.mailingcitystatezip ");
+        
+        params.appendSQL("WHERE id IS NOT NULL ");
+        
+        // **********************************
+        // **    FILTER COM-4 OBJECT ID     **
+        // ***********************************
+         if (!params.isBobID_ctl()) {
+           
+
+            //**************************************
+           // **   FILTER CSZ-1   ZIP            **
+           // **************************************
+            if (params.isZip_ctl()) {
+                params.appendSQL("AND zip_code ILIKE ? ");
+            }
+
+            //***************************************
+           // **   FILTER CSZ-2:  STATE **
+           // ***************************************
+            if (params.isState_ctl()) {
+                params.appendSQL("AND state_abbr ILIKE ? ");
+            }
+
+            
+            //***************************************
+           // **   FILTER CSZ-3:  CITY **
+           // ***************************************
+            if (params.isCity_ctl()) {
+                params.appendSQL("AND city ILIKE ? ");
+            }
+            
+            //***************************************
+           // **   FILTER CSZ-4:  RECORD TYPE **
+           // ***************************************
+            if (params.isRecordType_ctl()) {
+                params.appendSQL("AND list_type=? ");
+            }
+            
+            
+            //***************************************
+           // **   FILTER CSZ-5:  DEFAULT TYPE **
+           // ***************************************
+            if (params.isDefaultType_ctl()) {
+                params.appendSQL("AND default_type=?");
+            }
+            
+            
+            
+            //***************************************
+           // **   FILTER CSZ-6:  DEFAULT CITY**
+           // ***************************************
+            if (params.isDefaultCity_ctl()) {
+                params.appendSQL("AND default_city ILIKE ?");
+            }
+            
+            
+           
+        // ****************************
+        // ** COM-4  OBJECT ID       **
+        // **************************** 
+        } else {
+            params.appendSQL("AND id=? "); // will be param 2 with ID search
+        }
+        params.appendSQL(";");
+        int paramCounter = 0;
+        StringBuilder str = null;
+
+        try {
+            stmt = con.prepareStatement(params.extractRawSQL());
+
+            if (!params.isBobID_ctl()) {
+                
+                if (params.isZip_ctl()) {
+                     stmt.setString(++paramCounter, params.getZip_val());
+                }
+                
+                if (params.isState_ctl()) {
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getState_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
+                }
+                
+                if (params.isCity_ctl()) {
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getCity_val());
+                    str.append("%");
+                    stmt.setString(++paramCounter, str.toString());
+                }
+                
+                if (params.isRecordType_ctl()) {
+                     stmt.setString(++paramCounter, params.getRecordType_val().getTypeDBString());
+                }
+                
+                if (params.isDefaultType_ctl()) {
+                     stmt.setString(++paramCounter, params.getDefaultType_val().getTypeDBString());
+                }
+                
+                if (params.isDefaultCity_ctl()) {
+                  str = new StringBuilder();
+                  str.append("%");
+                  str.append(params.getDefaultCity_val());
+                  str.append("%");
+                  stmt.setString(++paramCounter, str.toString());
+                }
+                
+
+            } else {
+                stmt.setInt(++paramCounter, params.getBobID_val());
+            }
+            
+            params.appendToParamLog("City State Zip query before execution: ");
+            params.appendToParamLog(stmt.toString());
+            rs = stmt.executeQuery();
+            
+            int counter = 0;
+            int maxResults;
+            if (params.isLimitResultCount_ctl()) {
+                maxResults = 100;
+            } else {
+                maxResults = Integer.MAX_VALUE;
+            }
+            while (rs.next() && counter < maxResults) {
+                msszl.add(rs.getInt("id"));
+                counter++;
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot search for city/state/zip, sorry!", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return msszl;
+    }
+
+    
+    
+    
+//    ***********************************************
+//    ************** END OF MAILING!!! ************** 
+//    ***********************************************
+    
   
     
     /**
@@ -856,9 +1071,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      */
     public void updateMailingAddress(MailingAddress addr) throws BObStatusException, IntegrationException{
         if(addr == null){
-            
             throw new BObStatusException("Cannot update a null object");
-            
         }
         
         Connection con = getPostgresCon();

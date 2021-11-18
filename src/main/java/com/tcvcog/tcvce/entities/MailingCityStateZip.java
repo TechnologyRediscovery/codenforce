@@ -27,6 +27,10 @@ public class MailingCityStateZip {
     private int stateID;
     private String state;
     private String city;
+    
+    private MailingCityStateZipRecordTypeEnum recordType;
+    private MailingCityStateZipRecordTypeEnum defaultType;
+    private String defaultCity;
 
     /**
      * @return the cityStateZipID
@@ -96,6 +100,48 @@ public class MailingCityStateZip {
      */
     public void setCity(String city) {
         this.city = city;
+    }
+
+    /**
+     * @return the recordType
+     */
+    public MailingCityStateZipRecordTypeEnum getRecordType() {
+        return recordType;
+    }
+
+    /**
+     * @return the defaultType
+     */
+    public MailingCityStateZipRecordTypeEnum getDefaultType() {
+        return defaultType;
+    }
+
+    /**
+     * @return the defaultCity
+     */
+    public String getDefaultCity() {
+        return defaultCity;
+    }
+
+    /**
+     * @param recordType the recordType to set
+     */
+    public void setRecordType(MailingCityStateZipRecordTypeEnum recordType) {
+        this.recordType = recordType;
+    }
+
+    /**
+     * @param defaultType the defaultType to set
+     */
+    public void setDefaultType(MailingCityStateZipRecordTypeEnum defaultType) {
+        this.defaultType = defaultType;
+    }
+
+    /**
+     * @param defaultCity the defaultCity to set
+     */
+    public void setDefaultCity(String defaultCity) {
+        this.defaultCity = defaultCity;
     }
     
     

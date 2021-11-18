@@ -26,23 +26,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
-import com.tcvcog.tcvce.entities.Parcel;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
-import com.tcvcog.tcvce.entities.PropertyDataHeavy;
-import com.tcvcog.tcvce.entities.PropertyExtData;
-import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
-import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
-import com.tcvcog.tcvce.entities.PropertyUseType;
-import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
@@ -687,6 +671,19 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             }
         }
         return null;
+    }
+    
+    
+    /**
+     * Logic container for retrieving city/state/zip objects
+     * @param cszid
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public MailingCityStateZip getMailingCityStateZip(int cszid) throws IntegrationException, BObStatusException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        return pi.getMailingCityStateZip(cszid);
     }
 
     /**

@@ -106,6 +106,8 @@ public class    SessionBean
     
     private boolean startPropInfoPageWithAdd;
     
+    private MailingCityStateZip sessMailingCityStateZip;
+    
     /* >>> QUERY PROPERTY <<< */
     private QueryProperty queryProperty;
     private List<QueryProperty> queryPropertyList;
@@ -1875,6 +1877,20 @@ public class    SessionBean
      */
     public void setOnPageLoad_sessionSwitch_viewProfile(boolean onPageLoad_sessionSwitch_viewProfile) {
         this.onPageLoad_sessionSwitch_viewProfile = onPageLoad_sessionSwitch_viewProfile;
+    }
+
+    /**
+     * @return the sessMailingCityStateZip
+     */
+    public MailingCityStateZip getSessMailingCityStateZip() {
+        return sessMailingCityStateZip;
+    }
+
+    /**
+     * @param sessMailingCityStateZip the sessMailingCityStateZip to set
+     */
+    public void setSessMailingCityStateZip(MailingCityStateZip sessMailingCityStateZip) {
+        this.sessMailingCityStateZip = sessMailingCityStateZip;
     }
 
     

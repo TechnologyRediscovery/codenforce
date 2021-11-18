@@ -9,84 +9,6 @@
              globalOnly="false" 
              />
 
-    <p:panel id="persontools-panel"
-             toggleable="true"
-             collapsed="false"
-             header="persons (#{ceCaseSearchProfileBB.currentCase.personList.size()})"
-             rendered="true"
-             >
-
-        <h:form id="-persons-form">
-
-            <p:commandButton    id="-person-add-button"
-                                ajax="true"
-                                styleClass="noFill button-size-small"
-                                actionListener="#{personBB.onCitationAddInitButtonChange}"
-                                oncomplete="PF('person-add-dialog-var').show()"
-                                value="Add Citation"
-                                icon="fa fa-gavel"
-                                update="person-add-dialog
-                                person-add-form"
-
-                                />
-
-            <p:spacer height="5px" />
-
-            <p:dataTable
-                id="-persons-table"
-                var="person"
-                rowKey="#{person.personID}"
-                value="#{ceCaseSearchProfileBB.currentCase.personList}"
-                tableStyleClass="primeDataTable"
-                draggableColumns="true"
-                reflow="true">
-
-                <p:column width="10%">
-                    <f:facet name="header">
-                        <h:outputText value="Issuance / ID" />
-                    </f:facet>
-                    <h:outputText value="#{personBB.getPrettyDateNoTime(person.dateOfRecord)}"/>
-                    <p:spacer height="2px"/>
-                    <h:outputText value="#{person.personNo}"/>
-
-                </p:column>
-
-                <p:column width="80%">
-
-                    <f:facet name="header">
-                        <h:outputText value="Status / Date" />
-                    </f:facet>
-
-                    <h:outputText value="#{person.status.status.statusTitle}"/>
-
-                    <p:spacer height="2px"/>
-
-                    <h:outputText value="as of #{personBB.getPrettyDateNoTime(person.status.dateOfRecord)}"/>
-
-                </p:column>
-
-
-                <p:column width="10%">
-                    <f:facet name="edit">
-                        <h:outputText value="Actions" />
-                    </f:facet>
-
-                    <div class="restrict-main-contents-io-link">
-                        <p:commandLink      id="person-profile-init-cb"
-                                            ajax="true"
-                                            actionListener="#{personBB.onCitationViewButtonChange(person)}"
-                                            oncomplete="PF('person-profile-dialog-var').show()"
-                                            style="color:blue;"
-                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                            update="person-profile-dialog"
-                                            value="view/edit" />
-                    </div>
-
-                </p:column>
-            </p:dataTable>
-        </h:form>
-    </p:panel>
-
     <p:dialog   id="person-profile-dialog"
                 height="700" width="600"
                 widgetVar="person-profile-dialog-var"
@@ -353,7 +275,9 @@
 
                     </p:column>
                 </p:dataTable>
-            </h:form>               
+            </h:form>          
+            
+              <ui:include src="../prop/compositions/addresses.xhtml"/>
 
         </p:panel>
 
@@ -703,13 +627,6 @@
                         <h:outputText rendered="#{!personBB.currentContactEmailEditMode}" 
                                       value="#{personBB.currentContactEmail.emailID eq 0 ? 'new record' : personBB.currentContactEmail.emailID}"/>
 
-                    </div>
-
-                    <div class="p-col-6">Address</div>
-                    <div class="p-col-6">
-                        <h:outputText rendered="#{!personBB.currentContactEmailEditMode}" 
-                                      value="#{personBB.currentContactEmail.emailaddress}"/>
-
                         <p:inputMask    id="email-inputmask"
                                         rendered="#{personBB.currentContactEmailEditMode}"
                                         value="#{personBB.currentContactEmail.emailaddress}"
@@ -718,6 +635,13 @@
                                         validatorMessage="Enter email in format address@domain.xxx"
                                         requiredMessage="A email number address is required to complete the form"
                                         required="true"/>
+                    </div>
+
+                    <div class="p-col-6">Address</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!personBB.currentContactEmailEditMode}" 
+                                      value="#{personBB.currentContactEmail.emailaddress}"/>
+
                     </div>
                     
                     
@@ -763,119 +687,6 @@
         </p:panel>
     </p:dialog>
     
-    
-    
-    <p:dialog   id="address-dialog"
-                height="700" width="600"
-                widgetVar="address-dialog-var"
-                responsive="true"
-                resizable="true"
-                closable="true"
-                closeOnEscape="true"
-                modal="true"
-                header="#{personBB.currentContactEmail.emailID eq 0 ? 'Create new email address' : 'View/Edit email address'}"
-                rendered="true"
-                >
-
-        <p:panel id="email-info-panel"
-                 toggleable="true"
-                 collapsed="false"
-                 header="Email Info">
-
-            <h:form id="email-info-form">
-
-                <p:commandButton id="email-edit-button"
-                                 value="#{personBB.currentContactEmailEditMode? 'Save changes' : 'Edit'}"
-                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                 icon="fa #{personBB.currentContactEmailEditMode ? 'fa-check' : 'fa-pencil'}"
-                                 actionListener="#{personBB.toggleEmailEditMode}"
-                                 oncomplete="PF('email-dialog-var').show()"
-                                 update="email-info-form"/>
-
-
-                <div class="restrict-main-contents-io-button gray_button">
-
-                    <p:commandButton    id="email-edit-abort-button"
-                                        ajax="true"
-                                        rendered="#{personBB.currentContactEmailEditMode}"
-                                        value="Abort edit"
-                                        process="@none"
-                                        immediate="true"
-                                        actionListener="#{personBB.onEmailOperationAbortButtonChange}"
-                                        oncomplete="PF('person-profile-dialog-var').show()"
-                                        update="email-info-form"
-                                        icon="fa fa-stop" />
-
-                </div>
-
-                <p:spacer height="5px"/>    
-
-                <div class="p-grid">
-                    <div class="p-col-6">Email ID</div>
-
-                    <div class="p-col-6">
-                        <h:outputText rendered="#{!personBB.currentContactEmailEditMode}" 
-                                      value="#{personBB.currentContactEmail.emailID eq 0 ? 'new record' : personBB.currentContactEmail.emailID}"/>
-
-                    </div>
-
-                    <div class="p-col-6">Address</div>
-                    <div class="p-col-6">
-                        <h:outputText rendered="#{!personBB.currentContactEmailEditMode}" 
-                                      value="#{personBB.currentContactEmail.emailaddress}"/>
-
-                        <p:inputMask    id="email-inputmask"
-                                        rendered="#{personBB.currentContactEmailEditMode}"
-                                        value="#{personBB.currentContactEmail.emailaddress}"
-                                        mask="a*@a*.a*" 
-                                        validateMask="true"
-                                        validatorMessage="Enter email in format address@domain.xxx"
-                                        requiredMessage="A email number address is required to complete the form"
-                                        required="true"/>
-                    </div>
-                    
-                    
-                    <div class="p-col-6">Bounce?</div>
-                    <div class="p-col-6">
-                        <h:outputText   rendered="#{!personBB.currentContactEmailEditMode}"
-                                        value="#{empty personBB.currentContactEmail.bounceTS ? 'No' : 'Yes'}" />
-                        
-                        <h:outputText   rendered="#{!personBB.currentContactEmailEditMode}"
-                                        value="#{!empty personBB.currentContactEmail.bounceTS ? 'Bounce on ' : ''}" />
-
-                        <p:selectBooleanCheckbox rendered="#{personBB.currentContactEmailEditMode}"
-                                                 value="#{personBB.getPrettyDateNoTime(personBB.currentContactEmail.bounceTS)}" />
-                    </div>
-                    
-                    <div class="p-col-6">Creation</div>
-                    <div class="p-col-6">
-                        <h:outputText value="#{personBB.getPrettyDate(personBB.currentContactEmail.createdTS)}" />
-                        <p:spacer height="2px" />
-                        <h:outputText   rendered="#{!empty personBB.currentContactEmail.createdBy}"
-                                        value="by #{personBB.currentContactEmail.createdBy.username}" />
-                    </div>
-
-                    <div class="p-col-6">Last update</div>
-                    <div class="p-col-6">
-                        <h:outputText value="#{personBB.getPrettyDate(personBB.currentContactEmail.lastUpdatedTS)}" />
-                        <p:spacer height="2px" />
-                        <h:outputText   rendered="#{!empty personBB.currentContactEmail.lastUpdatedBy}"
-                                        value="by #{personBB.currentContactEmail.lastUpdatedBy.username}" />
-                    </div>
-
-                    <div class="p-col-6">Record status</div>
-                    <div class="p-col-6">
-                        <h:outputText value="#{empty personBB.currentContactEmail.deactivatedTS ? 'active' : 'deactivated on'}" />
-                        <p:spacer height="2px" />
-                        <h:outputText value="#{empty personBB.currentContactEmail.deactivatedTS ? '' : personBB.getPrettyDate(personBB.currentContactEmail.deactivatedTS) }" />
-                        <p:spacer height="2px" />
-                        <h:outputText   rendered="#{!empty personBB.currentContactEmail.deactivatedBy}"
-                                        value="by #{personBB.currentContactEmail.deactivatedBy.username}" />
-                    </div>
-                </div>
-            </h:form>
-        </p:panel>
-    </p:dialog>
     
     
     
