@@ -129,6 +129,7 @@
                         <h:outputText   rendered="#{!empty personBB.currentHuman.deactivatedBy}"
                                         value="by #{personBB.currentHuman.deactivatedBy.username}" />
                     </div>
+                </div>
             </h:form>
         </p:panel>
 
@@ -199,7 +200,7 @@
                  toggleable="true"
                  collapsed="false"
                  header="Addresses">
-
+         <ui:include src="../../prop/compositions/addresses.xhtml"/>
 
             <h:form id="person-profile-addresses-form">
 
@@ -211,7 +212,6 @@
                                         oncomplete="PF('address-dialog-var').show()"
                                         style="color:blue;"
                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                        update="address-form"
                                         value="Add address" />
                 </div>
 
@@ -277,7 +277,7 @@
                 </p:dataTable>
             </h:form>          
             
-              <ui:include src="../prop/compositions/addresses.xhtml"/>
+     
 
         </p:panel>
 
@@ -293,10 +293,10 @@
                     <p:commandLink      id="phones-add-cb"
                                         ajax="true"
                                         actionListener="#{personBB.onPhoneAddInitButtonChange}"
-                                        oncomplete="PF('citation-status-log-note-dialog').show()"
+                                        oncomplete="PF('phone-dialog-var').show()"
                                         style="color:blue;"
                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                        update="citation-status-log-note-form"
+                                        update="phone-info-form"
                                         value="Connect person" />
                 </div>
 
@@ -344,7 +344,7 @@
                                             actionListener="#{personBB.onPhoneEditInitButtonChange(ph)}"
                                             style="color:blue;"
                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                            update="docket-persons-form"
+                                            update="phone-info-form"
                                             value="edit" />
 
                     </p:column>
@@ -691,4 +691,4 @@
     
     
     
-</composition>
+</ui:composition>

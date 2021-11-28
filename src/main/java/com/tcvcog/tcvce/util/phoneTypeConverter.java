@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.util;
 
+import com.tcvcog.tcvce.entities.ContactPhoneType;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.Person;
 import javax.faces.component.UIComponent;
@@ -29,16 +30,16 @@ import javax.faces.convert.FacesConverter;
  * @author Eric Darsow
  */
 
-@FacesConverter(value="personConverter")
-public class PersonConverter extends EntityConverter implements Converter{
+@FacesConverter(value="phoneTypeConverter")
+public class phoneTypeConverter extends EntityConverter implements Converter{
 
     @Override
-    public Object getAsObject(FacesContext fc, UIComponent uic, String pName) {
-        if(pName.isEmpty()) {
+    public Object getAsObject(FacesContext fc, UIComponent uic, String ptname) {
+        if(ptname.isEmpty()) {
             return null; 
         }
-        Person p = (Person) this.getViewMap(fc).get(pName);
-        return p;
+        ContactPhoneType pt = (ContactPhoneType) this.getViewMap(fc).get(ptname);
+        return pt;
     }
 
     @Override
@@ -47,18 +48,11 @@ public class PersonConverter extends EntityConverter implements Converter{
         if (o == null){
             return "";
         }
-        Person p = (Person) o;
-        String fullName = p.getFirstName() + " " +  p.getLastName();
-        if (fullName != null){
-            this.getViewMap(fc).put(fullName,o);
-            return fullName;
-            
-        } else {
-            return "person conversion error";
-        }
+        ContactPhoneType pt = (ContactPhoneType) o;
+        String ptName = pt.getTitle();
+        this.getViewMap(fc).put(ptName ,o);
+        return ptName;
         
-        
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

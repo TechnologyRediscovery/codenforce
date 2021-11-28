@@ -67,14 +67,8 @@ implements IFace_RankLowerBounded{
 
     @Override
     public RoleType getRequiredRoleMin() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    /**
-     * @return the requiredRoleFloor
-     */
-    public RoleType getRequiredRoleFloor() {
         return requiredRoleFloor;
     }
-    
+
+   
 }

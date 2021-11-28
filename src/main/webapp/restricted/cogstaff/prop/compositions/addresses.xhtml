@@ -4,10 +4,12 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns="http://www.w3.org/1999/xhtml">
 
+    <h:form id="addresses-growl-form">
 
-    <p:growl id="addresses-growl"
-             globalOnly="false" 
-             />
+        <p:growl id="addresses-growl"
+                 globalOnly="false" 
+                 />
+    </h:form>
 
     <p:dialog   id="address-dialog"
                 height="700" width="600"
@@ -35,13 +37,13 @@
                                  actionListener="#{personBB.toggleEmailEditMode}"
                                  oncomplete="PF('address-dialog-var').show()"
                                  update="address-info-form"/>
-          
+
                 <p:commandButton id="zip-search-button"
-                                 value="City, State, Zip Search"
+                                 value="Search for Zip, City, and State"
                                  rendered="true"
                                  icon="fa fa-address-book"
                                  oncomplete="PF('csz-dialog-var').show()"
-                                 update="csz-dialog-form"/>
+                                 />
 
 
                 <div class="restrict-main-contents-io-button gray_button">
@@ -94,19 +96,19 @@
                         <p:inputText rendered="#{addressBB.addressEditMode}"
                                      value="#{addressBB.currentAddress.poBox}" />
                     </div>
-                    
+
                     <div class="p-col-6">City</div>
                     <div class="p-col-6">
                         <h:outputText rendered="#{!addressBB.addressEditMode}" 
                                       value="#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.cityStateZip.city : ''}"/>
                     </div>
-                    
+
                     <div class="p-col-6">State</div>
                     <div class="p-col-6">
                         <h:outputText rendered="#{!addressBB.addressEditMode}" 
                                       value="#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.cityStateZip.state : ''}"/>
                     </div>
-                    
+
                     <div class="p-col-6">ZIP Code</div>
                     <div class="p-col-6">
                         <h:outputText rendered="#{!addressBB.addressEditMode}" 
@@ -115,13 +117,13 @@
                         <p:inputText rendered="#{addressBB.addressEditMode}"
                                      value="#{addressBB.formZip}" />
                     </div>
-                    
+
 
                     <div class="p-col-6">Source</div>
                     <div class="p-col-6">
                         <h:outputText rendered="#{!addressBB.addressEditMode}" 
                                       value="#{addressBB.currentAddress.source.title}"/>
-                        
+
                         <p:selectOneMenu id="address-source-som"
                                          required="true"
                                          rendered="#{addressBB.addressEditMode}" 
@@ -134,36 +136,36 @@
                         </p:selectOneMenu>
 
                     </div>
-                    
-                    
+
+
                     <div class="p-col-6">Verified?</div>
                     <div class="p-col-6">
                         <h:outputText   rendered="#{!addressBB.addressEditMode}"
                                         value="#{empty addressBB.currentAddress.verifiedTS ? 'No' : 'Yes'}" />
-                        
+
                         <p:spacer height="2px" />
-                        
+
                         <h:outputText   rendered="#{!addressBB.addressEditMode}"
                                         value="#{!empty addressBB.currentAddress.verifiedTS ? 'on ' : ''}" />
-                        
+
                         <p:spacer height="2px" />
-                        
+
                         <h:outputText   rendered="#{!addressBB.addressEditMode}"
                                         value="#{!empty addressBB.currentAddress.verifiedBy ? 'by ' : ''}" />
-                        
+
                         <h:outputText   rendered="#{!addressBB.addressEditMode}"
                                         value="#{!empty addressBB.currentAddress.verifiedBy ? addressBB.currentAddress.verifiedBy.username : ''}" />
 
-                        
+
                         <p:selectBooleanCheckbox rendered="#{addressBB.addressEditMode}"
                                                  value="#{addressBB.getPrettyDateNoTime(addressBB.currentAddress.verifiedTS)}" />
                     </div>
-                    
+
                     <div class="p-col-6">Verification Source</div>
                     <div class="p-col-6">
                         <h:outputText rendered="#{!addressBB.addressEditMode}" 
                                       value="#{addressBB.currentAddress.verifiedSource.title}"/>
-                        
+
                         <p:selectOneMenu id="address-ver-source-som"
                                          required="false"
                                          rendered="#{addressBB.addressEditMode}" 
@@ -176,7 +178,7 @@
                         </p:selectOneMenu>
 
                     </div>
-                    
+
                     <div class="p-col-6">Creation</div>
                     <div class="p-col-6">
                         <h:outputText value="#{addressBB.getPrettyDate(addressBB.currentAddress.createdTS)}" />
@@ -206,8 +208,8 @@
             </h:form>
         </p:panel>
     </p:dialog>
-    
-      <p:dialog   id="csz-dialog"
+
+    <p:dialog   id="csz-dialog"
                 height="700" width="800"
                 widgetVar="csz-dialog-var"
                 responsive="true"
@@ -215,7 +217,7 @@
                 closable="true"
                 closeOnEscape="true"
                 modal="true"
-                header="Search for City, State, & ZIP Code"
+                header="Search for City, State, ZIP Code"
                 rendered="true"
                 >
 
@@ -225,32 +227,31 @@
                  header="City, State, ZIP Code Search">
 
             <h:form id="csz-search-form">
-                
-                
-                   <p:selectOneMenu id="csz-search-query-som"
-                                    tabindex="1"
-                                    value="#{addressBB.selectedCSZQuery}"
-                                    style="width: 100%"
-                                    >
-                       <f:converter converterId="bOBQueryConverter"/>
 
-                       <f:selectItem itemLabel="select a query..."
-                                     noSelectionOption="true"
-                                     itemDisabled="true"
-                                     />
-                       <f:selectItems id="csz-search-query-si"
-                                      value="#{propertySearchBB.queryList}"
-                                      var="ql"
-                                      itemValue="#{ql}"
-                                      itemLabel="#{ql.queryTitle}" 
-                                      />
-                       <p:ajax update="prop-search-filter-addr-val-0
-                               @form
-                               prop-search-messages-form"
-                               listener="#{addressBB.onQueryChange}"
-                               />
-                   </p:selectOneMenu>
-                
+
+                <p:selectOneMenu id="csz-search-query-som"
+                                 tabindex="1"
+                                 value="#{addressBB.selectedCSZQuery}"
+                                 style="width: 100%"
+                                 >
+                    <f:converter converterId="bOBQueryConverter"/>
+
+                    <f:selectItem itemLabel="select a query..."
+                                  noSelectionOption="true"
+                                  itemDisabled="true"
+                                  />
+                    <f:selectItems id="csz-search-query-si"
+                                   value="#{propertySearchBB.queryList}"
+                                   var="ql"
+                                   itemValue="#{ql}"
+                                   itemLabel="#{ql.queryTitle}" 
+                                   />
+                    <p:ajax update="param-itfield-city 
+                            param-itfield-zip"
+                            listener="#{addressBB.onQueryChange}"
+                            />
+                </p:selectOneMenu>
+
 
                 <p:commandButton id="csz-search-button"
                                  value="Search"
@@ -258,8 +259,7 @@
                                  icon="fa fa-search"
                                  actionListener="#{addressBB.onQueryCSZExecuteButtonChange}"
                                  oncomplete="PF('csz-dialog-var').show()"
-                                 update="csz-serach-form
-                                 addresses-growl"/>
+                                 update="   csz-search-form"/>
 
 
                 <div class="restrict-main-contents-io-button gray_button">
@@ -273,8 +273,8 @@
                                         actionListener="#{addressBB.onQueryOperationCancelButtonChange}"
                                         oncomplete="PF('csz-dialog-var').hide()"
                                         icon="fa fa-stop" />
-                
-                    
+
+
                     <p:commandButton    id="csz-search-clear-button"
                                         ajax="true"
                                         rendered="true"
@@ -293,18 +293,22 @@
                     <div class="p-col-6">ZIP Code</div>
 
                     <div class="p-col-6">
-                        <p:inputText value="#{addressBB.selectedCSZQuery.primaryParams.zip_val}" />
+                        <p:inputText    id="param-itfield-zip"
+                                        value="#{addressBB.selectedCSZQuery.primaryParams.zip_val}" 
+                                        disabled="#{!addressBB.selectedCSZQuery.primaryParams.zip_ctl}"/>
                     </div>
                     <div class="p-col-6">City</div>
 
                     <div class="p-col-6">
-                        <p:inputText value="#{addressBB.selectedCSZQuery.primaryParams.city_val}" />
+                        <p:inputText    id="param-itfield-city"
+                                        value="#{addressBB.selectedCSZQuery.primaryParams.city_val}" 
+                                        disabled="#{!addressBB.selectedCSZQuery.primaryParams.city_ctl}"/>
                     </div>
                 </div>
-                
+
                 <p:spacer height="5px"/>    
-                
-                
+
+
                 <p:dataTable    id="csz-results-table"
                                 value="#{addressBB.selectedCSZQuery.results}"
                                 var="csz"
@@ -320,7 +324,7 @@
                         </f:facet>
                         <h:outputText value="#{csz.cityStateZipID}" />
                     </p:column>
-                
+
 
                     <p:column width="10%">
                         <f:facet name="header">
@@ -328,7 +332,7 @@
                         </f:facet>
                         <h:outputText value="#{csz.zipCode}" />
                     </p:column>
-                
+
 
                     <p:column width="25%">
                         <f:facet name="header">
@@ -336,7 +340,7 @@
                         </f:facet>
                         <h:outputText value="#{csz.city}" />
                     </p:column>
-                
+
 
                     <p:column width="10%">
                         <f:facet name="header">
@@ -344,7 +348,7 @@
                         </f:facet>
                         <h:outputText value="#{csz.state}" />
                     </p:column>
-                
+
 
                     <p:column width="10%">
                         <f:facet name="header">
@@ -352,7 +356,7 @@
                         </f:facet>
                         <h:outputText value="#{csz.recordType.typeTitle}" />
                     </p:column>
-                
+
 
                     <p:column width="10%">
                         <f:facet name="header">
@@ -367,7 +371,7 @@
                         </f:facet>
                         <h:outputText value="#{csz.defaultCity}" />
                     </p:column>
-                
+
 
                     <p:column width="10%">
                         <f:facet name="header">
@@ -383,9 +387,10 @@
                                          />
 
                     </p:column>
+                </p:dataTable>
             </h:form>
         </p:panel>
-    
-    
-</composition>
-    
+    </p:dialog>
+
+
+</ui:composition>
